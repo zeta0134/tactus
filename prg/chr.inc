@@ -1,0 +1,1 @@
+.global FAR_initialize_chr_ram

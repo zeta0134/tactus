@@ -1,5 +1,6 @@
         .setcpu "6502"
 
+        .include "chr.inc"
         .include "far_call.inc"
         .include "main.inc"
         .include "memory_util.inc"
@@ -38,6 +39,9 @@ start:
         ; initialize the prng seed to a nonzero value
         lda #1
         sta seed
+
+        ; copy the initial batch of graphics into CHR RAM
+        far_call FAR_initialize_chr_ram
 
         ; now enable rendering and proceed to the main game loop
         lda #$1E
