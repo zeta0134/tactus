@@ -1,0 +1,6 @@
+build
+*.nes
+*.sav
+*.o
+*.dbg
+audiodump.raw
