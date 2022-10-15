@@ -1,0 +1,131 @@
+Modules list:
+-------------
+bhop.o:
+    ZEROPAGE          Offs=000000  Size=00000A  Align=00001  Fill=0000
+    PRGFIXED_C000     Offs=000000  Size=00141E  Align=00001  Fill=0000
+    RAM               Offs=000000  Size=000108  Align=00001  Fill=0000
+far_call.o:
+    ZEROPAGE          Offs=00000A  Size=000004  Align=00001  Fill=0000
+    PRGFIXED_C000     Offs=00141E  Size=000002  Align=00001  Fill=0000
+header.o:
+    HEADER            Offs=000000  Size=000010  Align=00001  Fill=0000
+input.o:
+    ZEROPAGE          Offs=00000E  Size=000005  Align=00001  Fill=0000
+    PRGFIXED_C000     Offs=001420  Size=000056  Align=00001  Fill=0000
+main.o:
+    PRGFIXED_C000     Offs=001476  Size=000057  Align=00001  Fill=0000
+memory_util.o:
+    PRGFIXED_C000     Offs=0014CD  Size=00002B  Align=00001  Fill=0000
+ppu.o:
+    PRGFIXED_C000     Offs=0014F8  Size=000118  Align=00001  Fill=0000
+prng.o:
+    ZEROPAGE          Offs=000013  Size=000002  Align=00001  Fill=0000
+    PRGFIXED_C000     Offs=001610  Size=000023  Align=00001  Fill=0000
+sound.o:
+    ZEROPAGE          Offs=000015  Size=000008  Align=00001  Fill=0000
+    RAM               Offs=000108  Size=00000C  Align=00001  Fill=0000
+    PRGFIXED_C000     Offs=001633  Size=000A18  Align=00001  Fill=0000
+vectors.o:
+    PRGFIXED_C000     Offs=00204B  Size=000056  Align=00001  Fill=0000
+    VECTORS           Offs=000000  Size=000006  Align=00001  Fill=0000
+vram_buffer.o:
+    ZEROPAGE          Offs=00001D  Size=000002  Align=00001  Fill=0000
+    PRGFIXED_C000     Offs=002100  Size=000191  Align=00100  Fill=005F
+zeropage.o:
+    ZEROPAGE          Offs=00001F  Size=000013  Align=00001  Fill=0000
+
+
+Segment list:
+-------------
+Name                   Start     End    Size  Align
+----------------------------------------------------
+HEADER                000000  00000F  000010  00001
+ZEROPAGE              000000  000031  000032  00001
+RAM                   000300  000413  000114  00001
+PRGFIXED_C000         00C000  00E290  002291  00100
+VECTORS               00FFFA  00FFFF  000006  00001
+
+
+Exports list by name:
+---------------------
+GameloopCounter           00002F RLZ    LastNmi                   000030 RLZ    
+NmiSoftDisable            000031 RLZ    R0                        00001F RLZ    
+R2                        000021 RLZ    bhop_init                 00C929 RLA    
+bhop_music_data           00D633 RLA    bhop_mute_channel         00D2F8 RLA    
+bhop_play                 00D2EE RLA    bhop_unmute_channel       00D314 RLA    
+clear_memory              00D4CD RLA    global_attenuation        000407 RLA    
+init_audio                00D69D RLA    initialize_palettes       00D544 RLA    
+initialize_ppu            00D4F8 RLA    play_track                00D6FF RLA    
+poll_input                00D420 RLA    seed                      000013 RLZ    
+start                     00D476 RLA    target_music_variant      000003 RLZ    
+update_audio              00D6BE RLA    vram_zipper               00E203 RLA    
+
+
+
+Exports list by value:
+----------------------
+target_music_variant      000003 RLZ    seed                      000013 RLZ    
+R0                        00001F RLZ    R2                        000021 RLZ    
+GameloopCounter           00002F RLZ    LastNmi                   000030 RLZ    
+NmiSoftDisable            000031 RLZ    global_attenuation        000407 RLA    
+bhop_init                 00C929 RLA    bhop_play                 00D2EE RLA    
+bhop_mute_channel         00D2F8 RLA    bhop_unmute_channel       00D314 RLA    
+poll_input                00D420 RLA    start                     00D476 RLA    
+clear_memory              00D4CD RLA    initialize_ppu            00D4F8 RLA    
+initialize_palettes       00D544 RLA    bhop_music_data           00D633 RLA    
+init_audio                00D69D RLA    update_audio              00D6BE RLA    
+play_track                00D6FF RLA    vram_zipper               00E203 RLA    
+
+
+
+Imports list:
+-------------
+GameloopCounter (zeropage.o):
+    vectors.o                 prg/zeropage.inc:2
+LastNmi (zeropage.o):
+    vectors.o                 prg/zeropage.inc:2
+NmiSoftDisable (zeropage.o):
+    vectors.o                 prg/zeropage.inc:2
+R0 (zeropage.o):
+    sound.o                   prg/zeropage.inc:1
+    ppu.o                     prg/zeropage.inc:1
+    memory_util.o             prg/zeropage.inc:1
+    main.o                    prg/zeropage.inc:1
+R2 (zeropage.o):
+    memory_util.o             prg/zeropage.inc:1
+    main.o                    prg/zeropage.inc:1
+bhop_init (bhop.o):
+    sound.o                   prg/bhop/bhop.inc:5
+bhop_music_data (sound.o):
+    bhop.o                    prg/bhop/config.inc:8
+bhop_mute_channel (bhop.o):
+    sound.o                   prg/bhop/bhop.inc:6
+bhop_play (bhop.o):
+    sound.o                   prg/bhop/bhop.inc:5
+bhop_unmute_channel (bhop.o):
+    sound.o                   prg/bhop/bhop.inc:6
+clear_memory (memory_util.o):
+    main.o                    prg/memory_util.inc:1
+global_attenuation (bhop.o):
+    sound.o                   prg/bhop/bhop.inc:10
+init_audio (sound.o):
+    main.o                    prg/sound.inc:1
+initialize_palettes (ppu.o):
+    main.o                    prg/ppu.inc:21
+initialize_ppu (ppu.o):
+    main.o                    prg/ppu.inc:20
+play_track (sound.o):
+    main.o                    prg/sound.inc:3
+poll_input (input.o):
+    vectors.o                 prg/input.inc:2
+seed (prng.o):
+    main.o                    prg/prng.inc:2
+start (main.o):
+    vectors.o                 prg/main.inc:1
+target_music_variant (bhop.o):
+    sound.o                   prg/bhop/bhop.inc:9
+update_audio (sound.o):
+    vectors.o                 prg/sound.inc:2
+vram_zipper (vram_buffer.o):
+    vectors.o                 prg/vram_buffer.inc:13
+
