@@ -1,5 +1,6 @@
 .include "nes.inc"
 
+.include "action53.inc"
 .include "input.inc"
 .include "main.inc"
 .include "memory_util.inc"
@@ -25,6 +26,8 @@ reset:
         cld            ; make sure decimal mode is off (not that it does anything)
         ldx #$ff       ; initialize stack
         txs
+
+        jsr init_action53
 
         ; Wait for the PPU to finish warming up
         spinwait_for_vblank
@@ -106,6 +109,10 @@ nmi_soft_disable:
         pla
         ; all done
         rti
+
+        ; This region is unused, and reserved for potential nesdev-2022 compo purposes
+        .org $FFD0
+        .res 30 
 
         ;
         ; Labels nmi/reset/irq are part of prg3_e000.s
