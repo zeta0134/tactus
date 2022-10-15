@@ -1,6 +1,7 @@
 .include "nes.inc"
 
 .include "action53.inc"
+.include "chr.inc"
 .include "input.inc"
 .include "main.inc"
 .include "memory_util.inc"
@@ -90,7 +91,11 @@ all_frames:
         ;     will glitch pretty badly
         ; ===========================================================
 
-        ; (Currently nothing)
+        lda #00
+        sta PPUSCROLL
+        sta PPUSCROLL
+
+        a53_set_chr CurrentChrBank
 
 nmi_soft_disable:
         ; Here we *only* update the audio engine, nothing else. This is mostly to

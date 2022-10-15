@@ -42,17 +42,31 @@ start:
 
         ; copy the initial batch of graphics into CHR RAM
         far_call FAR_initialize_chr_ram
+        far_call FAR_init_nametables
+        far_call FAR_demo_nametable
 
         ; now enable rendering and proceed to the main game loop
         lda #$1E
         sta PPUMASK
-        lda #$80
+        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
         sta PPUCTRL
 
         lda #1
         jsr play_track
 
 main_loop:
-        ; TODO: this
+        far_call FAR_sync_chr_bank_to_music
 
+        jsr wait_for_next_vblank
         jmp main_loop
+
+
+; === Utility Functions ===
+.proc wait_for_next_vblank
+        inc GameloopCounter
+@loop:
+        lda LastNmi
+        cmp GameloopCounter
+        bne @loop
+        rts
+.endproc
