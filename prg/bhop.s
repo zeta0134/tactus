@@ -82,7 +82,7 @@ effect_skip_target: .byte $00
 global_attenuation: .byte $00
 TRIANGLE_ATTENUATION_THRESHOLD = 4
 DPCM_ATTENUATION_THRESHOLD = 4
-.export global_attenuation
+.export global_attenuation, row_counter
 
         .segment BHOP_PLAYER_SEGMENT
         ; global
