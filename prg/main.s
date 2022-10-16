@@ -3,6 +3,7 @@
         .include "battlefield.inc"
         .include "chr.inc"
         .include "far_call.inc"
+        .include "kernel.inc"
         .include "main.inc"
         .include "memory_util.inc"
         .include "nes.inc"
@@ -52,28 +53,14 @@ start:
         lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
         sta PPUCTRL
 
-        ; TODO: pretty much everyting in this little section is debug demo stuff
-        ; Later, organize this into a proper kernel
-        lda #1
-        jsr play_track
 
-        far_call FAR_initialize_battlefield
+        ; Setup our initial kernel state
+        st16 GameMode, init_engine
 
-
+        ; hand control over to the kernel, which will manage game mode management
+        ; for the rest of runtime
 main_loop:
-        far_call FAR_sync_chr_bank_to_music
-        far_call FAR_queue_battlefield_updates
-
-        jsr wait_for_next_vblank
+        jsr run_kernel
         jmp main_loop
 
 
-; === Utility Functions ===
-.proc wait_for_next_vblank
-        inc GameloopCounter
-@loop:
-        lda LastNmi
-        cmp GameloopCounter
-        bne @loop
-        rts
-.endproc

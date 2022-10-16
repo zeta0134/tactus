@@ -1,6 +1,7 @@
 .include "nes.inc"
 
 .include "action53.inc"
+.include "battlefield.inc"
 .include "chr.inc"
 .include "input.inc"
 .include "main.inc"
@@ -92,6 +93,10 @@ all_frames:
         ; ===========================================================
 
         lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        ldx active_battlefield
+        beq write_ppuctrl
+        ora #(NT_2400)
+write_ppuctrl:
         sta PPUCTRL
         lda #00
         sta PPUSCROLL
