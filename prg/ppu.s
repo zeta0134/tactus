@@ -6,6 +6,9 @@
 
         .segment "PRGFIXED_C000"
 
+bg_palette:
+        .incbin "../art/test_palette.pal"
+
 .proc initialize_ppu
         ; disable rendering
         lda #$00
@@ -43,16 +46,13 @@ loop:
         ; Backgrounds
         set_ppuaddr #$3F00
 
-        .repeat 4
-        lda #$30
+        ldx #0
+loop:
+        lda bg_palette, x
         sta PPUDATA
-        lda #$10
-        sta PPUDATA
-        lda #$00
-        sta PPUDATA
-        lda #$0F
-        sta PPUDATA
-        .endrepeat
+        inx
+        cpx #16
+        bne loop
 
         ; Sprites
         ; gray!

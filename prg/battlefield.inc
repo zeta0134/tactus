@@ -1,0 +1,2 @@
+.global FAR_initialize_battlefield
+.global FAR_queue_battlefield_updates
