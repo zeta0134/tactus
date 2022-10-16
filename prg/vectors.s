@@ -91,6 +91,8 @@ all_frames:
         ;     will glitch pretty badly
         ; ===========================================================
 
+        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        sta PPUCTRL
         lda #00
         sta PPUSCROLL
         sta PPUSCROLL

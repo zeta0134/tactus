@@ -125,7 +125,7 @@ loop:
 .endproc
 
 chr_frame_pacing:
-        .byte 0, 0, 0, 1, 1, 2, 2, 3
+        .byte 0, 1, 1, 2, 2, 3, 3, 3
 
 .proc FAR_sync_chr_bank_to_music
         lda row_counter

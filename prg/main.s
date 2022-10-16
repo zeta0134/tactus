@@ -1,5 +1,6 @@
         .setcpu "6502"
 
+        .include "battlefield.inc"
         .include "chr.inc"
         .include "far_call.inc"
         .include "main.inc"
@@ -51,11 +52,17 @@ start:
         lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
         sta PPUCTRL
 
+        ; TODO: pretty much everyting in this little section is debug demo stuff
+        ; Later, organize this into a proper kernel
         lda #1
         jsr play_track
 
+        far_call FAR_initialize_battlefield
+
+
 main_loop:
         far_call FAR_sync_chr_bank_to_music
+        far_call FAR_queue_battlefield_updates
 
         jsr wait_for_next_vblank
         jmp main_loop
