@@ -92,7 +92,7 @@ all_frames:
         ;     will glitch pretty badly
         ; ===========================================================
 
-        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        lda #(VBLANK_NMI | BG_0000 | OBJ_1000 | OBJ_8X16)
         ldx active_battlefield
         beq write_ppuctrl
         ora #(NT_2400)
