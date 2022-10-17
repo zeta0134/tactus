@@ -2,6 +2,7 @@
 
         .include "battlefield.inc"
         .include "chr.inc"
+        .include "debug.inc"
         .include "far_call.inc"
         .include "kernel.inc"
         .include "main.inc"
@@ -60,6 +61,7 @@ start:
         ; hand control over to the kernel, which will manage game mode management
         ; for the rest of runtime
 main_loop:
+        debug_color LIGHTGRAY
         jsr run_kernel
         jmp main_loop
 

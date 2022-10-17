@@ -1,12 +1,15 @@
         .setcpu "6502"
 
-        .include "chr.inc"
         .include "bhop/bhop.inc"
         .include "battlefield.inc"
+        .include "chr.inc"
+        .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
         .include "kernel.inc"
+        .include "nes.inc"
         .include "sound.inc"
+        .include "sprites.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
 
@@ -20,6 +23,7 @@ CurrentBeatCounter: .res 1
 
 ; === Utility Functions ===
 .proc wait_for_next_vblank
+        debug_color 0
         inc GameloopCounter
 @loop:
         lda LastNmi
@@ -38,12 +42,27 @@ CurrentBeatCounter: .res 1
 ; === Game Mode Functions Follow ===
 
 .proc init_engine
+MetaSpriteIndex := R0
         ; TODO: pretty much everyting in this little section is debug demo stuff
         ; Later, organize this so that it loads the title screen, initial levels, etc
         lda #1
         jsr play_track
 
         far_call FAR_initialize_battlefield
+
+        ; spawn in a TEST sprite (debug!)
+        jsr find_unused_sprite
+        ldx MetaSpriteIndex
+        cpx #$FF
+        beq sprite_failed
+        lda #(SPRITE_ACTIVE | SPRITE_RISE)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #128
+        sta sprite_table + MetaSpriteState::PositionX, x
+        sta sprite_table + MetaSpriteState::PositionY, x
+        lda #SPRITES_TEST_CUBE
+        sta sprite_table + MetaSpriteState::TileIndex, x
+sprite_failed:
 
         st16 GameMode, beat_frame_1
         jsr wait_for_next_vblank
@@ -57,6 +76,7 @@ CurrentBeatCounter: .res 1
         ; - Resolve the player's action
         ; - Queue up any changed squares to the **active** buffer
         ; - Begin playback of any sprite animations
+        jsr age_sprites
         jsr every_gameloop
         st16 GameMode, update_enemies_1
         rts
@@ -192,6 +212,7 @@ continue_waiting:
 .proc every_gameloop
         far_call FAR_sync_chr_bank_to_music
         far_call FAR_queue_battlefield_updates
+        jsr draw_sprites
 
         jsr wait_for_next_vblank
         rts

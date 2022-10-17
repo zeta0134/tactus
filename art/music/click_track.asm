@@ -59,8 +59,8 @@ ft_song_1:
 	.word ft_s1_frames
 	.byte 1	; frame count
 	.byte 64	; pattern length
-	.byte 1	; speed
-	.byte 150	; tempo
+	.byte 3	; speed
+	.byte 120	; tempo
 	.byte 0	; groove position
 	.byte 0	; initial bank
 

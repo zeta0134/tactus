@@ -23,6 +23,9 @@ enemy_frame_3:
 static_bg_tiles:
         .incbin "../art/raw_chr/static_bg_tiles.chr"
 
+sprite_tiles:
+        .incbin "../art/raw_chr/sprite_tiles.chr"        
+
 ; note: set PPUADDR and PPUCTRL appropriately before calling
 .proc memcpy_ppudata
 SourceAddr := R0
@@ -74,10 +77,17 @@ CurrentStaticBank := R4
         sta CurrentStaticBank
 loop:
         a53_set_chr CurrentStaticBank
+        
         st16 SourceAddr, static_bg_tiles
         st16 Length, $0800
         set_ppuaddr #$0800
         jsr memcpy_ppudata
+
+        st16 SourceAddr, sprite_tiles
+        st16 Length, $1000
+        set_ppuaddr #$1000
+        jsr memcpy_ppudata
+        
         inc CurrentStaticBank
         lda CurrentStaticBank
         cmp #4
