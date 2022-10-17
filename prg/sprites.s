@@ -211,6 +211,7 @@ loop:
         beq skip
         ; then check to see if we are now exactly "one" beat old...
         lda sprite_table + MetaSpriteState::LifetimeBeats, x
+        cmp #1
         bne skip
         ; ... and if so, mark this sprite inactive
         lda #0

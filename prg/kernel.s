@@ -55,8 +55,10 @@ MetaSpriteIndex := R0
         ldx MetaSpriteIndex
         cpx #$FF
         beq sprite_failed
-        lda #(SPRITE_ACTIVE | SPRITE_RISE)
+        lda #(SPRITE_ACTIVE | SPRITE_RISE | SPRITE_ONE_BEAT)
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
         lda #128
         sta sprite_table + MetaSpriteState::PositionX, x
         sta sprite_table + MetaSpriteState::PositionY, x
@@ -204,6 +206,7 @@ StartingTile := R15
         and #%00000111
         bne continue_waiting
         st16 GameMode, beat_frame_1
+        rts ; do that now
 continue_waiting:
         jsr every_gameloop
         rts
