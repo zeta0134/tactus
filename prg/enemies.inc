@@ -1,5 +1,6 @@
 ; Every entity has an ID, and in this game it also doubles as their starting tile in CHR space.
 TILE_CLOCK_FACE = $00 ; debug sprite
+TILE_BASIC_SLIME = ($04 | %10) ; orange slime
 
 ; Non-enemies also have IDs, eeeeeeverything has an update function
 TILE_REGULAR_FLOOR = $80
