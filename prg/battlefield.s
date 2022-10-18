@@ -34,13 +34,14 @@ WT := TILE_WALL_TOP
 PE := TILE_PIT_EDGE
 PT := TILE_PIT
 CF := TILE_CLOCK_FACE
+BS := TILE_BASIC_SLIME
         ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
         .byte WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT ; 0
         .byte WT, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WT ; 1
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 2
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 3
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 4
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 5
+        .byte WT, FL, FL, FL, FL, FL, BS, FL, FL, FL, FL, FL, FL, WT ; 4
+        .byte WT, FL, FL, FL, BS, FL, FL, FL, BS, FL, FL, FL, FL, WT ; 5
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
         .byte WT, FL, FL, FL, FL, PE, PE, PE, FL, FL, FL, FL, FL, WT ; 7
         .byte WT, FL, FL, FL, FL, PT, PT, PT, FL, FL, FL, FL, FL, WT ; 8
@@ -228,6 +229,7 @@ RowCounter := R5
 top_row_loop:
         ; top left
         lda battlefield, x
+        and #%11111100
         sta VRAM_TABLE_START, y
         iny
         ; top right
@@ -251,6 +253,7 @@ top_row_loop:
 bottom_row_loop:
         ; bottom left
         lda battlefield, x
+        and #%11111100
         clc
         adc #1
         sta VRAM_TABLE_START, y
