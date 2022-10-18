@@ -15,13 +15,18 @@ ANIMATED_PNG_FILES := $(wildcard $(ARTDIR)/animated_tiles/*.png)
 ANIMATED_CHR_FILES := \
 	$(patsubst $(ARTDIR)/animated_tiles/%.png,$(BUILDDIR)/animated_tiles/%.chr,$(ANIMATED_PNG_FILES)) \
 
-.PRECIOUS: $(BIN_FILES) $(ANIMATED_CHR_FILES)
+STATIC_PNG_FILES := $(wildcard $(ARTDIR)/static_tiles/*.png)
+STATIC_CHR_FILES := \
+	$(patsubst $(ARTDIR)/static_tiles/%.png,$(BUILDDIR)/static_tiles/%.chr,$(STATIC_PNG_FILES)) \
+
+.PRECIOUS: $(BIN_FILES) $(ANIMATED_CHR_FILES) $(STATIC_CHR_FILES)
 
 all: dir $(ROM_NAME)
 
 dir:
 	@mkdir -p build
 	@mkdir -p build/animated_tiles
+	@mkdir -p build/static_tiles
 
 clean:
 	-@rm -rf build
@@ -49,8 +54,11 @@ everdrive: dir $(ROM_NAME)
 $(ROM_NAME): $(SOURCEDIR)/action53.cfg $(O_FILES)
 	ld65 -m $(BUILDDIR)/map.txt --dbgfile $(DBG_NAME) -o $@ -C $^
 
-$(BUILDDIR)/%.o: $(SOURCEDIR)/%.s $(BIN_FILES) $(ANIMATED_CHR_FILES)
+$(BUILDDIR)/%.o: $(SOURCEDIR)/%.s $(BIN_FILES) $(ANIMATED_CHR_FILES) $(STATIC_CHR_FILES)
 	ca65 -g -o $@ $<
 
 $(BUILDDIR)/animated_tiles/%.chr: $(ARTDIR)/animated_tiles/%.png
 	tools/animatedtile.py $< $@
+
+$(BUILDDIR)/static_tiles/%.chr: $(ARTDIR)/static_tiles/%.png
+	tools/statictile.py $< $@

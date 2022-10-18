@@ -12,23 +12,29 @@ CurrentChrBank: .res 1
 
 .segment "PRG0_8000"
 
-enemy_frame_0:
-        .incbin "../art/raw_chr/enemies_frame0.chr"
-enemy_frame_1:
-        .incbin "../art/raw_chr/enemies_frame1.chr"
-enemy_frame_2:
-        .incbin "../art/raw_chr/enemies_frame2.chr"
-enemy_frame_3:
-        .incbin "../art/raw_chr/enemies_frame3.chr"
-
-static_bg_tiles:
-        .incbin "../art/raw_chr/static_bg_tiles.chr"
-
-sprite_template:
         .include "../build/animated_tiles/sprite_template.chr"
+        .include "../build/animated_tiles/tile_template.chr"
 
+        .include "../build/static_tiles/floor.chr"
+        .include "../build/static_tiles/disco_floor.chr"
+        .include "../build/static_tiles/wall_face.chr"
+        .include "../build/static_tiles/wall_top.chr"
+        .include "../build/static_tiles/pit_edge.chr"
+
+ANIMATED_TILE_TABLE_LENGTH = 2
 animated_tile_table:
+        .word $0000, tile_template
         .word $1000, sprite_template
+
+STATIC_TILE_TABLE_LENGTH = 6
+static_tile_table:
+        .word $0800, floor
+        .word $0840, disco_floor
+        .word $0880, wall_top
+        .word $08C0, wall_face
+        .word $0900, pit_edge
+        .word $0940, floor
+
 
 ; note: set PPUADDR and PPUCTRL appropriately before calling
 .proc memcpy_ppudata
@@ -46,9 +52,7 @@ loop:
         rts
 .endproc
 
-
-
-.proc decompress_tiles_to_chr_ram
+.proc decompress_animated_tiles_to_chr_ram
 MemcpySourceAddr := R0
 DecompressionSourceAddr := R0
 
@@ -58,11 +62,13 @@ DecompressionTargetAddr := R2
 SpriteTableAddr := R4
 SpriteTableLength := R6
 SpriteTableIndex := R7
-        lda #1
+
+ChrBank := R8
+        lda #ANIMATED_TILE_TABLE_LENGTH
         sta SpriteTableLength
         lda #0
         sta SpriteTableIndex
-loop:
+tile_loop:
         ldx SpriteTableIndex
         lda animated_tile_table + 2, x
         sta DecompressionSourceAddr
@@ -72,45 +78,28 @@ loop:
         st16 DecompressionTargetAddr, $0200 ; clobber shadow OAM since these are only 256 bytes each
         jsr decompress ; clobbers R0 - R3, R14-R15
 
-        a53_set_chr #0
-        st16 MemcpySourceAddr, $0200
+        lda #0
+        sta ChrBank
+bank_loop:
+        a53_set_chr ChrBank
+        lda #$02
+        sta MemcpySourceAddr+1
+        lda ChrBank
+        .repeat 6
+        asl
+        .endrepeat
+        sta MemcpySourceAddr
         st16 MemcpyLength, 64
         ldx SpriteTableIndex
-        lda animated_tile_table + 1
+        lda animated_tile_table + 1, x
         sta PPUADDR
-        lda animated_tile_table + 0
-        sta PPUADDR
-        jsr memcpy_ppudata
-
-        a53_set_chr #1
-        st16 MemcpySourceAddr, $0240
-        st16 MemcpyLength, 64
-        ldx SpriteTableIndex
-        lda animated_tile_table + 1
-        sta PPUADDR
-        lda animated_tile_table + 0
+        lda animated_tile_table + 0, x
         sta PPUADDR
         jsr memcpy_ppudata
-
-        a53_set_chr #2
-        st16 MemcpySourceAddr, $0280
-        st16 MemcpyLength, 64
-        ldx SpriteTableIndex
-        lda animated_tile_table + 1
-        sta PPUADDR
-        lda animated_tile_table + 0
-        sta PPUADDR
-        jsr memcpy_ppudata
-
-        a53_set_chr #3
-        st16 MemcpySourceAddr, $02C0
-        st16 MemcpyLength, 64
-        ldx SpriteTableIndex
-        lda animated_tile_table + 1
-        sta PPUADDR
-        lda animated_tile_table + 0
-        sta PPUADDR
-        jsr memcpy_ppudata
+        inc ChrBank
+        lda ChrBank
+        cmp #4
+        bne bank_loop
 
         dec SpriteTableLength
         beq done
@@ -118,7 +107,62 @@ loop:
         clc
         adc #4
         sta SpriteTableIndex
-        jmp loop
+        jmp tile_loop
+done:
+        rts
+.endproc
+
+.proc decompress_static_tiles_to_chr_ram
+MemcpySourceAddr := R0
+DecompressionSourceAddr := R0
+
+MemcpyLength := R2
+DecompressionTargetAddr := R2
+
+SpriteTableAddr := R4
+SpriteTableLength := R6
+SpriteTableIndex := R7
+
+ChrBank := R8
+        lda #STATIC_TILE_TABLE_LENGTH
+        sta SpriteTableLength
+        lda #0
+        sta SpriteTableIndex
+tile_loop:
+        ldx SpriteTableIndex
+        lda static_tile_table + 2, x
+        sta DecompressionSourceAddr
+        lda static_tile_table + 3, x
+        sta DecompressionSourceAddr + 1
+
+        st16 DecompressionTargetAddr, $0200 ; clobber shadow OAM since these are only 256 bytes each
+        jsr decompress ; clobbers R0 - R3, R14-R15
+
+        lda #0
+        sta ChrBank
+bank_loop:
+        a53_set_chr ChrBank
+        ; for static tiles, duplicate the decompressed result four times
+        st16 MemcpySourceAddr, $0200
+        st16 MemcpyLength, 64
+        ldx SpriteTableIndex
+        lda static_tile_table + 1, x
+        sta PPUADDR
+        lda static_tile_table + 0, x
+        sta PPUADDR
+        jsr memcpy_ppudata
+        inc ChrBank
+        lda ChrBank
+        cmp #4
+        bne bank_loop
+
+        dec SpriteTableLength
+        beq done
+        lda SpriteTableIndex
+        clc
+        adc #4
+        sta SpriteTableIndex
+        jmp tile_loop
 done:
         rts
 .endproc
@@ -130,51 +174,9 @@ CurrentStaticBank := R4
         lda #0
         sta PPUCTRL ; disable NMI, set VRAM increment to +1
 
-        a53_set_chr #0
-        st16 SourceAddr, enemy_frame_0
-        st16 Length, $0800
-        set_ppuaddr #$0000
-        jsr memcpy_ppudata
-
-        a53_set_chr #1
-        st16 SourceAddr, enemy_frame_1
-        st16 Length, $0800
-        set_ppuaddr #$0000
-        jsr memcpy_ppudata
-
-        a53_set_chr #2
-        st16 SourceAddr, enemy_frame_2
-        st16 Length, $0800
-        set_ppuaddr #$0000
-        jsr memcpy_ppudata
-
-        a53_set_chr #3
-        st16 SourceAddr, enemy_frame_3
-        st16 Length, $0800
-        set_ppuaddr #$0000
-        jsr memcpy_ppudata
-
-        lda #0
-        sta CurrentStaticBank
-loop:
-        a53_set_chr CurrentStaticBank
-        
-        st16 SourceAddr, static_bg_tiles
-        st16 Length, $0800
-        set_ppuaddr #$0800
-        jsr memcpy_ppudata
-        
-        inc CurrentStaticBank
-        lda CurrentStaticBank
-        cmp #4
-        bne loop
-
-        a53_set_chr #0
-        lda #0
-        sta CurrentChrBank
-
         ; THING!
-        jsr decompress_tiles_to_chr_ram
+        jsr decompress_animated_tiles_to_chr_ram
+        jsr decompress_static_tiles_to_chr_ram
 
         rts
 .endproc
