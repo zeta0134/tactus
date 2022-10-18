@@ -75,9 +75,16 @@ sprite_failed:
         inc CurrentBeatCounter
         ; - Swap the active and inactive buffers
         far_call FAR_swap_battlefield_buffers
+
         ; - Resolve the player's action
+        ;   TODO! (very soon!)
+
         ; - Queue up any changed squares to the **active** buffer
-        ; - Begin playback of any sprite animations
+        ; - Begin playback of any sprite animations (?)
+
+        ; - clear "moved this frame" flags from all tiles, permitting
+        ;   the updates we will perform over the next few frames
+        jsr clear_active_move_flags
         jsr age_sprites
         jsr every_gameloop
         st16 GameMode, update_enemies_1
