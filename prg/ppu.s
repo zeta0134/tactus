@@ -57,38 +57,38 @@ loop:
         ; Sprites
         ; gray!
         set_ppuaddr #$3F11
-        lda #$20
+        lda #$0F
         sta PPUDATA
         lda #$10
         sta PPUDATA
-        lda #$0F
+        lda #$20
         sta PPUDATA
 
         ; red!
         set_ppuaddr #$3F15
-        lda #$36
+        lda #$06
         sta PPUDATA
         lda #$26
         sta PPUDATA
-        lda #$06
+        lda #$36
         sta PPUDATA
 
         ; blue!
         set_ppuaddr #$3F19
-        lda #$31
+        lda #$01
         sta PPUDATA
         lda #$21
         sta PPUDATA
-        lda #$01
+        lda #$31
         sta PPUDATA
 
         ; green(ish)!
         set_ppuaddr #$3F1D
-        lda #$39
+        lda #$09
         sta PPUDATA
         lda #$29
         sta PPUDATA
-        lda #$09
+        lda #$39
         sta PPUDATA
 
         ; Reset PPUADDR to 0,0

@@ -1,5 +1,6 @@
 .PHONY: all clean dir run
 
+ARTDIR := art
 SOURCEDIR := prg
 BUILDDIR := build
 ROM_NAME := $(notdir $(CURDIR)).nes
@@ -10,12 +11,17 @@ PRG_ASM_FILES := $(wildcard $(SOURCEDIR)/*.s)
 O_FILES := \
   $(patsubst $(SOURCEDIR)/%.s,$(BUILDDIR)/%.o,$(PRG_ASM_FILES))
 
-.PRECIOUS: $(BIN_FILES)
+ANIMATED_PNG_FILES := $(wildcard $(ARTDIR)/animated_tiles/*.png)
+ANIMATED_CHR_FILES := \
+	$(patsubst $(ARTDIR)/animated_tiles/%.png,$(BUILDDIR)/animated_tiles/%.chr,$(ANIMATED_PNG_FILES)) \
+
+.PRECIOUS: $(BIN_FILES) $(ANIMATED_CHR_FILES)
 
 all: dir $(ROM_NAME)
 
 dir:
 	@mkdir -p build
+	@mkdir -p build/animated_tiles
 
 clean:
 	-@rm -rf build
@@ -43,7 +49,8 @@ everdrive: dir $(ROM_NAME)
 $(ROM_NAME): $(SOURCEDIR)/action53.cfg $(O_FILES)
 	ld65 -m $(BUILDDIR)/map.txt --dbgfile $(DBG_NAME) -o $@ -C $^
 
-$(BUILDDIR)/%.o: $(SOURCEDIR)/%.s $(BIN_FILES) 
+$(BUILDDIR)/%.o: $(SOURCEDIR)/%.s $(BIN_FILES) $(ANIMATED_CHR_FILES)
 	ca65 -g -o $@ $<
 
-
+$(BUILDDIR)/animated_tiles/%.chr: $(ARTDIR)/animated_tiles/%.png
+	tools/animatedtile.py $< $@

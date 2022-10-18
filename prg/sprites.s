@@ -109,7 +109,7 @@ write_sprite_y:
         sta SHADOW_OAM + OAM_Y_POS, y
         sta SHADOW_OAM + ONE_SPRITE + OAM_Y_POS, y
         ; Sprite tile may be inverted if we are horizontally flipped
-        lda sprite_table + MetaSpriteState::LifetimeBeats, x
+        lda sprite_table + MetaSpriteState::BehaviorFlags, x
         and #SPRITE_HORIZ_FLIP
         bne horizontal_flip
 no_horizontal_flip:

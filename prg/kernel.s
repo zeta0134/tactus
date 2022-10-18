@@ -55,7 +55,7 @@ MetaSpriteIndex := R0
         ldx MetaSpriteIndex
         cpx #$FF
         beq sprite_failed
-        lda #(SPRITE_ACTIVE | SPRITE_RISE | SPRITE_ONE_BEAT)
+        lda #(SPRITE_ACTIVE)
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
         lda #$FF
         sta sprite_table + MetaSpriteState::LifetimeBeats, x

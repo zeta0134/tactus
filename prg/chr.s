@@ -1,6 +1,7 @@
         .include "action53.inc"
         .include "bhop/bhop.inc"
         .include "chr.inc"
+        .include "compression.inc"
         .include "nes.inc"
         .include "ppu.inc"
         .include "word_util.inc"
@@ -23,8 +24,11 @@ enemy_frame_3:
 static_bg_tiles:
         .incbin "../art/raw_chr/static_bg_tiles.chr"
 
-sprite_tiles:
-        .incbin "../art/raw_chr/sprite_tiles.chr"        
+sprite_template:
+        .include "../build/animated_tiles/sprite_template.chr"
+
+animated_tile_table:
+        .word $1000, sprite_template
 
 ; note: set PPUADDR and PPUCTRL appropriately before calling
 .proc memcpy_ppudata
@@ -39,6 +43,83 @@ loop:
         lda Length
         ora Length+1
         bne loop
+        rts
+.endproc
+
+
+
+.proc decompress_tiles_to_chr_ram
+MemcpySourceAddr := R0
+DecompressionSourceAddr := R0
+
+MemcpyLength := R2
+DecompressionTargetAddr := R2
+
+SpriteTableAddr := R4
+SpriteTableLength := R6
+SpriteTableIndex := R7
+        lda #1
+        sta SpriteTableLength
+        lda #0
+        sta SpriteTableIndex
+loop:
+        ldx SpriteTableIndex
+        lda animated_tile_table + 2, x
+        sta DecompressionSourceAddr
+        lda animated_tile_table + 3, x
+        sta DecompressionSourceAddr + 1
+
+        st16 DecompressionTargetAddr, $0200 ; clobber shadow OAM since these are only 256 bytes each
+        jsr decompress ; clobbers R0 - R3, R14-R15
+
+        a53_set_chr #0
+        st16 MemcpySourceAddr, $0200
+        st16 MemcpyLength, 64
+        ldx SpriteTableIndex
+        lda animated_tile_table + 1
+        sta PPUADDR
+        lda animated_tile_table + 0
+        sta PPUADDR
+        jsr memcpy_ppudata
+
+        a53_set_chr #1
+        st16 MemcpySourceAddr, $0240
+        st16 MemcpyLength, 64
+        ldx SpriteTableIndex
+        lda animated_tile_table + 1
+        sta PPUADDR
+        lda animated_tile_table + 0
+        sta PPUADDR
+        jsr memcpy_ppudata
+
+        a53_set_chr #2
+        st16 MemcpySourceAddr, $0280
+        st16 MemcpyLength, 64
+        ldx SpriteTableIndex
+        lda animated_tile_table + 1
+        sta PPUADDR
+        lda animated_tile_table + 0
+        sta PPUADDR
+        jsr memcpy_ppudata
+
+        a53_set_chr #3
+        st16 MemcpySourceAddr, $02C0
+        st16 MemcpyLength, 64
+        ldx SpriteTableIndex
+        lda animated_tile_table + 1
+        sta PPUADDR
+        lda animated_tile_table + 0
+        sta PPUADDR
+        jsr memcpy_ppudata
+
+        dec SpriteTableLength
+        beq done
+        lda SpriteTableIndex
+        clc
+        adc #4
+        sta SpriteTableIndex
+        jmp loop
+done:
         rts
 .endproc
 
@@ -82,11 +163,6 @@ loop:
         st16 Length, $0800
         set_ppuaddr #$0800
         jsr memcpy_ppudata
-
-        st16 SourceAddr, sprite_tiles
-        st16 Length, $1000
-        set_ppuaddr #$1000
-        jsr memcpy_ppudata
         
         inc CurrentStaticBank
         lda CurrentStaticBank
@@ -96,6 +172,9 @@ loop:
         a53_set_chr #0
         lda #0
         sta CurrentChrBank
+
+        ; THING!
+        jsr decompress_tiles_to_chr_ram
 
         rts
 .endproc
