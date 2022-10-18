@@ -23,17 +23,16 @@ def hardware_tile_to_bitplane(index_array):
   high_bytes = [bits_to_byte(high_bits[i:i+8]) for i in range(0,64,8)]
   return low_bytes + high_bytes
 
-def read_animation(filename):
+def read_tile(filename):
   im = Image.open(filename)
   assert im.getpalette() != None, "Non-paletted tile found! This is unsupported: " + filename
-  assert im.width == 64, "Animated tiles must be 64 pixels wide! Bailing. " + filename
+  assert im.width == 16, "Static tiles must be 16 pixels wide! Bailing. " + filename
   assert im.height == 16, "All tiles must be 16 pixels tall! Bailing. " + filename
   chr_tiles = []
-  for i in range(0, 4):
-    chr_tiles.append(hardware_tile_to_bitplane(im.crop((0+(i*16), 0,  8+(i*16),  8)).getdata()))
-    chr_tiles.append(hardware_tile_to_bitplane(im.crop((0+(i*16), 8,  8+(i*16), 16)).getdata()))
-    chr_tiles.append(hardware_tile_to_bitplane(im.crop((8+(i*16), 0, 16+(i*16),  8)).getdata()))
-    chr_tiles.append(hardware_tile_to_bitplane(im.crop((8+(i*16), 8, 16+(i*16), 16)).getdata()))
+  chr_tiles.append(hardware_tile_to_bitplane(im.crop((0, 0,  8,  8)).getdata()))
+  chr_tiles.append(hardware_tile_to_bitplane(im.crop((0, 8,  8, 16)).getdata()))
+  chr_tiles.append(hardware_tile_to_bitplane(im.crop((8, 0, 16,  8)).getdata()))
+  chr_tiles.append(hardware_tile_to_bitplane(im.crop((8, 8, 16, 16)).getdata()))
   chr_bytes = []
   for tile in chr_tiles:
     chr_bytes = chr_bytes + tile
@@ -45,7 +44,7 @@ def nice_label(full_path_and_filename):
   safe_label = re.sub(r'[^A-Za-z0-9\-\_]', '_', base_filename)
   return safe_label
 
-def write_animation(filename, chr_bytes):
+def write_tile(filename, chr_bytes):
   with open(filename, "w") as output_file:
     compression_type, compressed_bytes = compress_smallest(chr_bytes)
 
@@ -59,11 +58,11 @@ def write_animation(filename, chr_bytes):
 
 if __name__ == '__main__':
   if len(sys.argv) != 3:
-    print("Usage: animatedtile.py input.png output.chr")
+    print("Usage: statictile.py input.png output.chr")
     sys.exit(-1)
   input_filename = sys.argv[1]
   output_filename = sys.argv[2]
 
-  chr_bytes = read_animation(input_filename)
-  write_animation(output_filename, chr_bytes)
+  chr_bytes = read_tile(input_filename)
+  write_tile(output_filename, chr_bytes)
 

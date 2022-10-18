@@ -232,7 +232,7 @@ top_row_loop:
         iny
         ; top right
         clc
-        adc #1
+        adc #2
         sta VRAM_TABLE_START, y
         iny
         inx
@@ -252,12 +252,12 @@ bottom_row_loop:
         ; bottom left
         lda battlefield, x
         clc
-        adc #2
+        adc #1
         sta VRAM_TABLE_START, y
         iny
         ; bottom right
         clc
-        adc #1
+        adc #2
         sta VRAM_TABLE_START, y
         iny
         inx
