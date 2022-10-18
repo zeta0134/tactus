@@ -15,7 +15,8 @@ CurrentChrBank: .res 1
         .include "../build/animated_tiles/sprite_template.chr"
         .include "../build/animated_tiles/tile_template.chr"
 
-        .include "../build/animated_tiles/slime_idle.chr"        
+        .include "../build/animated_tiles/slime_idle.chr"
+        .include "../build/animated_tiles/smoke_puff.chr"
 
         .include "../build/static_tiles/floor.chr"
         .include "../build/static_tiles/disco_floor.chr"
@@ -25,7 +26,7 @@ CurrentChrBank: .res 1
 
 ANIMATED_TILE_TABLE_LENGTH = 2
 animated_tile_table:
-        .word $0000, tile_template
+        .word $0000, smoke_puff
         .word $0040, slime_idle
         .word $1000, sprite_template
 
