@@ -34,19 +34,18 @@ FADE_SPEED = 8
 .export bhop_music_data
 bhop_music_data: ; TODO: deprecated label, remove later
 
-module_click_track:
+music_module:
         .scope
-        ;.include "../art/music/click_track.asm"
-        .include "../art/music/sawtooth_test_track.asm"
+        .include "../art/music/music.asm"
         .endscope
 
         .segment "PRGFIXED_C000"
 
 track_table_bank:
-        .lobytes .bank(module_click_track), .bank(module_click_track)
+        .lobytes .bank(music_module), .bank(music_module)
         
 track_table_song:
-        .byte 0, 0 ; click_track
+        .byte 0, 1
 
 track_table_num_variants:
         .byte 1, 1 ; click_track
