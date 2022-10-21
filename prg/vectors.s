@@ -2,6 +2,7 @@
 
 .include "action53.inc"
 .include "battlefield.inc"
+.include "bhop/bhop.inc"
 .include "chr.inc"
 .include "input.inc"
 .include "main.inc"
@@ -42,7 +43,8 @@ reset:
         ; Jump to main
         jmp start
 
-nmi:
+.proc nmi
+        cli
         ; preserve registers
         pha
         txa
@@ -121,6 +123,21 @@ nmi_soft_disable:
         pla
         ; all done
         rti
+.endproc
+
+.proc manual_nmi_handler
+        ; Empty for now (TODO: not this)
+        rti
+.endproc
+.export manual_nmi_handler
+
+; TODO: Pick one of these, probably
+.align 64
+all_00_byte: .byte $00
+.align 64
+all_ff_byte: .byte $FF
+
+.export all_00_byte, all_ff_byte
 
         ; This region is unused, and reserved for potential nesdev-2022 compo purposes
         .org $FFD0
@@ -132,4 +149,4 @@ nmi_soft_disable:
         .segment "VECTORS"
         .addr nmi
         .addr reset
-        .addr irq
+        .addr zetasaw_irq
