@@ -3,10 +3,11 @@
 .include "bhop/bhop_internal.inc"
 .include "bhop/longbranch.inc"
 
-NUM_CHANNELS = 5 ;  note: this might change with expansion support
+NUM_CHANNELS = 6 ;  note: this might change with expansion support
 
 .include "bhop/commands.asm"
-.include "bhop/effects.asm"        
+.include "bhop/effects.asm"    
+.include "bhop/blarggsaw.asm"    
 
         .segment BHOP_ZP_SEGMENT
 ; scratch ptr, used for all sorts of indirect reads
@@ -25,6 +26,8 @@ row_counter: .byte $00
 row_cmp: .byte $00
 frame_counter: .byte $00
 frame_cmp: .byte $00
+
+.export row_counter
 
 song_ptr: .word $0000
 frame_ptr: .word $0000
@@ -77,12 +80,13 @@ duty_sequence_index: .res BHOP::NUM_CHANNELS
 effect_note_delay: .res BHOP::NUM_CHANNELS
 effect_cut_delay: .res BHOP::NUM_CHANNELS
 effect_skip_target: .byte $00
+effect_dpcm_offset: .byte $00
 
-; dungeon-game specific
 global_attenuation: .byte $00
 TRIANGLE_ATTENUATION_THRESHOLD = 4
 DPCM_ATTENUATION_THRESHOLD = 4
-.export global_attenuation, row_counter
+.export global_attenuation
+
 
         .segment BHOP_PLAYER_SEGMENT
         ; global
@@ -179,6 +183,7 @@ positive:
         sta channel_volume + PULSE_2_INDEX
         sta channel_volume + TRIANGLE_INDEX
         sta channel_volume + NOISE_INDEX
+        sta channel_volume + BLARGGSAW_INDEX
 
         ; disable any active effects
         lda #0
@@ -187,6 +192,7 @@ positive:
         sta channel_pitch_effects_active + TRIANGLE_INDEX
         sta channel_pitch_effects_active + NOISE_INDEX
         sta channel_pitch_effects_active + DPCM_INDEX
+        sta channel_pitch_effects_active + BLARGGSAW_INDEX
 
         ; reset every channel's status
         lda #(CHANNEL_MUTED)
@@ -195,6 +201,7 @@ positive:
         sta channel_status + TRIANGLE_INDEX
         sta channel_status + NOISE_INDEX
         sta channel_status + DPCM_INDEX
+        sta channel_status + BLARGGSAW_INDEX
 
         ; clear out special effects
         lda #0
@@ -212,14 +219,12 @@ effect_init_loop:
         sta channel_duty, x
         bne effect_init_loop
 
+        sta effect_skip_target
+        sta effect_dpcm_offset
+
         ; finally, enable all channels except DMC
         lda #%00001111
         sta $4015
-
-        ; dungeon-game specific init here
-        lda #0
-        sta current_music_variant
-        sta target_music_variant
 
         rts
 .endproc
@@ -272,42 +277,50 @@ loop:
 
         ; Pulse 1
         lda (bhop_ptr), y
-        sta channel_pattern_ptr_low+0
+        sta channel_pattern_ptr_low+PULSE_1_INDEX
         iny
         lda (bhop_ptr), y
-        sta channel_pattern_ptr_high+0
+        sta channel_pattern_ptr_high+PULSE_1_INDEX
         iny
 
         ; Pulse 2
         lda (bhop_ptr), y
-        sta channel_pattern_ptr_low+1
+        sta channel_pattern_ptr_low+PULSE_2_INDEX
         iny
         lda (bhop_ptr), y
-        sta channel_pattern_ptr_high+1
+        sta channel_pattern_ptr_high+PULSE_2_INDEX
         iny
 
         ; Triangle
         lda (bhop_ptr), y
-        sta channel_pattern_ptr_low+2
+        sta channel_pattern_ptr_low+TRIANGLE_INDEX
         iny
         lda (bhop_ptr), y
-        sta channel_pattern_ptr_high+2
+        sta channel_pattern_ptr_high+TRIANGLE_INDEX
         iny
 
         ; Noise
         lda (bhop_ptr), y
-        sta channel_pattern_ptr_low+3
+        sta channel_pattern_ptr_low+NOISE_INDEX
         iny
         lda (bhop_ptr), y
-        sta channel_pattern_ptr_high+3
+        sta channel_pattern_ptr_high+NOISE_INDEX
+        iny
+
+        ; BLARGGSAW
+        lda (bhop_ptr), y
+        sta channel_pattern_ptr_low+BLARGGSAW_INDEX
+        iny
+        lda (bhop_ptr), y
+        sta channel_pattern_ptr_high+BLARGGSAW_INDEX
         iny
 
         ; DPCM
         lda (bhop_ptr), y
-        sta channel_pattern_ptr_low+4
+        sta channel_pattern_ptr_low+DPCM_INDEX
         iny
         lda (bhop_ptr), y
-        sta channel_pattern_ptr_high+4
+        sta channel_pattern_ptr_high+DPCM_INDEX
         iny
 
         ; reset all the row counters to 0
@@ -316,6 +329,7 @@ loop:
         sta channel_row_delay_counter + PULSE_2_INDEX
         sta channel_row_delay_counter + TRIANGLE_INDEX
         sta channel_row_delay_counter + NOISE_INDEX
+        sta channel_row_delay_counter + BLARGGSAW_INDEX
         sta channel_row_delay_counter + DPCM_INDEX
 
         rts
@@ -653,6 +667,11 @@ done:
         jsr advance_channel_row
         jsr fix_noise_freq
 
+        ; BLARGGSAW
+        lda #BLARGGSAW_INDEX
+        sta channel_index
+        jsr advance_channel_row
+
         ; DPCM
         lda #DPCM_INDEX
         sta channel_index
@@ -679,6 +698,11 @@ done:
 
         ; NOISE
         lda #NOISE_INDEX
+        sta channel_index
+        jsr skip_channel_row
+
+        ; BLARGGSAW
+        lda #BLARGGSAW_INDEX
         sta channel_index
         jsr skip_channel_row
 
@@ -799,6 +823,19 @@ done_with_cut_delay:
         lda #DPCM_INDEX
         sta channel_index
         jsr tick_delayed_effects
+
+        ; BLARGGSAW
+        lda #BLARGGSAW_INDEX
+        sta channel_index
+        jsr tick_delayed_effects        
+        jsr update_volume_effects
+        jsr tick_volume_envelope
+        ; TODO:
+        ; blarggsaw can in theory support arp effects, but this
+        ; needs special handling because the concept of pitch doesn't exist.
+        ; I'm putting this off until the basics are working. 
+        ;jsr update_arp
+        ;jsr tick_arp_envelope
 
         rts
 .endproc
@@ -1471,7 +1508,6 @@ tick_pulse1:
         asl
         asl
         ora channel_instrument_volume + PULSE_1_INDEX
-
         tax
         lda volume_table, x
 
@@ -1535,7 +1571,6 @@ tick_pulse2:
         asl
         asl
         ora channel_instrument_volume + PULSE_2_INDEX
-
         tax
         lda volume_table, x
 
@@ -1605,7 +1640,6 @@ tick_triangle:
         cmp #TRIANGLE_ATTENUATION_THRESHOLD
         bcs triangle_muted
 
-
         lda #$FF
         sta $4008 ; timers to max
 
@@ -1635,7 +1669,6 @@ tick_noise:
         asl
         asl
         ora channel_instrument_volume + NOISE_INDEX
-
         tax
         lda volume_table, x
 
@@ -1685,6 +1718,7 @@ noise_muted:
 
 cleanup:
         jsr play_dpcm_samples
+        jsr play_blarggsaw
 
         ; clear the triggered flag from every instrument
         lda channel_status + PULSE_1_INDEX
@@ -1702,6 +1736,10 @@ cleanup:
         lda channel_status + NOISE_INDEX
         and #($FF - CHANNEL_TRIGGERED)
         sta channel_status + NOISE_INDEX
+
+        lda channel_status + BLARGGSAW_INDEX
+        and #($FF - CHANNEL_TRIGGERED)
+        sta channel_status + BLARGGSAW_INDEX
 
         lda channel_status + DPCM_INDEX
         and #($FF - CHANNEL_TRIGGERED)
@@ -1763,9 +1801,14 @@ no_delta_set:
         ; - location byte
         ; - size byte
         ; - bank to switch in
+        
         lda (bhop_ptr), y
-        iny
+        ; cheaper to just do this unconditionally
+        clc
+        adc effect_dpcm_offset
         sta $4012
+        iny
+
         lda (bhop_ptr), y
         sta $4013
 
@@ -1787,9 +1830,103 @@ done:
 dpcm_muted:
         ; simply disable the channel and exit (whatever is in the sample playback buffer will
         ; finish, up to 8 bits, there is no way to disable this)
-        lda #%00001111
+        ;lda #%00001111
+        ;sta $4015
+
+        rts
+.endproc
+
+.proc play_blarggsaw
+        lda #CHANNEL_SUPPRESSED
+        bit channel_status + BLARGGSAW_INDEX
+        bne skip
+        bmi blarggsaw_muted
+
+        ; apply the combined channel and instrument volume
+        lda channel_tremolo_volume + BLARGGSAW_INDEX
+        asl
+        asl
+        asl
+        asl
+        ora channel_instrument_volume + BLARGGSAW_INDEX
+        tax
+        lda volume_table, x
+
+        ; dungeon-game specific: apply global fade here
+        beq saw_nofix
+        sec
+        sbc global_attenuation
+        bmi saw_fix
+        beq saw_fix
+        jmp saw_nofix
+saw_fix:
+        lda #1
+saw_nofix:
+
+        ; go from 4-bit to 6-bit
+        asl
+        asl
+        ;sta saw_volume
+        sta zetasaw_volume
+        beq blarggsaw_muted
+
+        ; blarggsaw will use the tracked note directly
+        lda channel_base_note + BLARGGSAW_INDEX
+        asl
+        tax
+
+        sei ; briefly disable interrupts, for pointer safety
+        lda blarggsaw_note_lists, x 
+        sta zetasaw_ptr
+        lda blarggsaw_note_lists+1, x 
+        sta zetasaw_ptr+1
+        cli ; the pointer is valid, it should be safe to re-enable interrupts again
+
+        ; Now, if we were just triggered, start the sample playback from scratch
+        lda channel_status + BLARGGSAW_INDEX
+        and #CHANNEL_TRIGGERED
+        beq skip
+
+        sei ; briefly disable interrupts (again) to start a new note
+        lda #0
+        sta zetasaw_pos
+        lda #1
+        sta zetasaw_count
+
+        ; set up the sample address and size
+        lda #<((all_00_byte - $C000) >> 6)
+        sta $4012
+        lda #0
+        sta $4013
+        ; start it up (the IRQ will take over future starts after this)
+        lda #$8F
+        sta $4010
+        lda #$1F
         sta $4015
 
+        ; in... *theory* that's enough?
+        cli ; enable interrupts
+        ; tell the NMI handler that interrupts are active
+        lda #$FF
+        sta irq_enabled 
+        rts
+
+blarggsaw_muted:
+        ; halt playback
+        lda #$0F
+        sta $4015
+        ; disable interrupt
+        lda #0
+        sta $4010
+        ; acknowledge interrupt?
+
+        sei ; disable interrupts
+        ; Tell the NMI handler that interrupts are no longer active
+        ; (It'll need to do its own OAM DMA)
+        lda #$00
+        sta irq_enabled
+skip:
+        ; Do not pass go. Do not collect $200
         rts
 .endproc
 

@@ -38,7 +38,7 @@ CurrentTile := R15
         txa
         lsr
         tax
-        sta inactive_attribute_queue
+        sta inactive_attribute_queue, x
         rts
 .endproc
 
@@ -48,7 +48,7 @@ CurrentTile := R15
         txa
         lsr
         tax
-        sta inactive_attribute_queue
+        sta inactive_attribute_queue, x
         rts
 .endproc
 

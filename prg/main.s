@@ -54,6 +54,8 @@ start:
         lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
         sta PPUCTRL
 
+        cli ; enable interrupts
+
 
         ; Setup our initial kernel state
         st16 GameMode, init_engine

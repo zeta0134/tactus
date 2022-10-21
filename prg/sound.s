@@ -36,7 +36,8 @@ bhop_music_data: ; TODO: deprecated label, remove later
 
 module_click_track:
         .scope
-        .include "../art/music/click_track.asm"
+        ;.include "../art/music/click_track.asm"
+        .include "../art/music/sawtooth_test_track.asm"
         .endscope
 
         .segment "PRGFIXED_C000"
@@ -45,7 +46,7 @@ track_table_bank:
         .lobytes .bank(module_click_track), .bank(module_click_track)
         
 track_table_song:
-        .byte 0, 1 ; click_track
+        .byte 0, 0 ; click_track
 
 track_table_num_variants:
         .byte 1, 1 ; click_track
