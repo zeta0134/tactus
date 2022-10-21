@@ -43,8 +43,18 @@ reset:
         ; Jump to main
         jmp start
 
+
 .proc nmi
-        cli
+        bit irq_active
+        bpl safe_to_run_nmi
+        dec manual_nmi_needed
+        rti ; exit immediately; IRQ will continue and call NMI when it is done
+safe_to_run_nmi:
+        jsr manual_nmi_handler
+        rti
+.endproc
+
+.proc manual_nmi_handler
         ; preserve registers
         pha
         txa
@@ -56,15 +66,23 @@ reset:
         lda NmiSoftDisable
         bne nmi_soft_disable
 
-        lda GameloopCounter
-        cmp LastNmi
-        beq lag_frame
-
-        ; always update sprite OAM right away
+        bit irq_enabled
+        bpl perform_oam_dma
+        dec manual_oam_needed ; Perform OAM DMA during the IRQ routine
+        ; allow interrupts during nmi as early as possible
+        cli
+        jmp done_with_oam
+perform_oam_dma:
+        ; do the sprite thing
         lda #$00
         sta OAMADDR
         lda #$02
         sta OAM_DMA
+done_with_oam:
+
+        lda GameloopCounter
+        cmp LastNmi
+        beq lag_frame
 
         ; ===========================================================
         ; Tasks which should be guarded by a successful gameloop
@@ -122,13 +140,9 @@ nmi_soft_disable:
         tax
         pla
         ; all done
-        rti
+        rts
 .endproc
 
-.proc manual_nmi_handler
-        ; Empty for now (TODO: not this)
-        rti
-.endproc
 .export manual_nmi_handler
 
 ; TODO: Pick one of these, probably
