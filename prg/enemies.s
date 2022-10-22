@@ -626,6 +626,9 @@ TargetSquare := R13
         ; Now the tricky part: we need to scan the map and find this enemy's poof
         ; (It might not exist if we have a bugged board, so handle that safely)
         jsr find_puff_tile
+        lda PuffSquare
+        cmp #$FF
+        beq no_puff_found
         ; Copy ourselves over the puff tile, to cancel our own movement
         lda PuffSquare
         sta TargetIndex
