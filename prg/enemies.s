@@ -74,6 +74,31 @@ CurrentTile := R15
         rts
 .endproc
 
+tile_index_to_row_lut:
+        .repeat ::BATTLEFIELD_HEIGHT, h
+        .repeat ::BATTLEFIELD_WIDTH, w
+        .byte h
+        .endrepeat
+        .endrepeat
+
+
+.proc draw_active_tile
+TargetIndex := R0
+TileId := R1
+        ldx TargetIndex
+        lda TileId
+        sta battlefield, x
+        lda tile_index_to_row_lut, x
+        tax
+        lda #1
+        sta active_tile_queue, x
+        txa
+        lsr
+        tax
+        sta active_attribute_queue, x
+        rts
+.endproc
+
 .proc no_behavior
         ; does what it says on the tin
         rts
@@ -438,7 +463,7 @@ AttackLanded := R7
 WeaponProperties := R8
 TilesRemaining := R9
 ; Indirect target square, so the tile we attack knows its own location
-IndirectAttackSquare := R10 
+EffectiveAttackSquare := R10 
 
 ; We don't use these, but we should know not to clobber them
 TargetRow := R14
@@ -448,10 +473,10 @@ TargetCol := R15
         ; tile_data, so we'll roll an indirect attack on that square
         ldx AttackSquare
         lda tile_data, x
-        sta IndirectAttackSquare
+        sta EffectiveAttackSquare
         ; the top 6 bits index into the behavior table, which is a list of **words**
         ; so we want it to end up like this: %0bbbbbb0
-        ldx IndirectAttackSquare
+        ldx EffectiveAttackSquare
         lda battlefield, x
         lsr
         and #%01111110
@@ -467,11 +492,15 @@ TargetCol := R15
 
 .proc direct_attack_slime
 AttackSquare := R3
+EffectiveAttackSquare := R10 
         ; If we have *just moved*, then ignore this attack
         ; (A valid attack can only land at our previous destination)
         ldx AttackSquare
         lda tile_flags, x
         bmi ignore_attack
+        ; Copy in the attack square, so we can use shared logic to process the effect
+        lda AttackSquare
+        sta EffectiveAttackSquare
         jsr attack_slime_common
 ignore_attack:
         rts
@@ -483,9 +512,28 @@ ignore_attack:
 .endproc
 
 .proc attack_slime_common
+; For drawing tiles
+TargetIndex := R0
+TileId := R1
+
 AttackLanded := R7
-        ; For testing, just register the attack for now
+EffectiveAttackSquare := R10 
+        ; Register the attack as a hit
         lda #1
         sta AttackLanded
+
+        ; FOR NOW, slimes have 1 HP, so there is no health bar. Just delete
+        ; the slime by replacing it with a floor tile
+
+        lda EffectiveAttackSquare
+        sta TargetIndex
+        lda #TILE_REGULAR_FLOOR
+        sta TileId
+        jsr draw_active_tile
+        ldx EffectiveAttackSquare
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+
         rts
 .endproc
