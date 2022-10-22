@@ -5,6 +5,8 @@
         .include "kernel.inc"
         .include "zeropage.inc"
 
+.zeropage
+DestPtr: .res 2
 
 .segment "RAM"
 
@@ -23,6 +25,16 @@ static_behaviors:
         .word no_behavior     ; $90 - pit edge
         ; safety: fill out the rest of the table
         .repeat 27
+        .word no_behavior
+        .endrepeat
+
+player_attack_enemy_behaviors:
+        .word attack_puff
+        .word attack_slime
+        .repeat 30
+        .word no_behavior
+        .endrepeat
+        .repeat 32
         .word no_behavior
         .endrepeat
 
@@ -80,7 +92,6 @@ disco_tile:
 .endproc
 
 .proc __trampoline
-DestPtr := R0
         jmp (DestPtr)
         ; tail call
 .endproc
@@ -88,7 +99,6 @@ DestPtr := R0
 ; Note: parameters are intentionally backloaded, to allow the behavior functions to use R0+
 ; without conflict
 .proc update_static_enemy_row
-DestPtr := R0
 Length := R13
 CurrentRow := R14
 StartingTile := R15
@@ -372,5 +382,57 @@ proceed_with_jump:
 .proc update_smoke_puff
         ; All a smoke puff needs to do is return to normal floor after one beat
         jsr draw_disco_tile
+        rts
+.endproc
+
+
+
+.proc attack_enemy_tile
+; This is all state from the calling function. We can use this, but shouldn't (generally) clobber it
+TargetRow := R0
+TargetCol := R1
+PlayerSquare := R2
+AttackSquare := R3
+WeaponSquaresIndex := R4
+WeaponSquaresPtr := R5 ; R6
+AttackLanded := R7
+WeaponProperties := R8
+TilesRemaining := R9
+
+        ldx AttackSquare
+        lda battlefield, x
+        ; the top 6 bits index into the behavior table, which is a list of **words**
+        ; so we want it to end up like this: %0bbbbbb0
+        lsr
+        and #%01111110
+        tax
+        lda player_attack_enemy_behaviors, x
+        sta DestPtr
+        lda player_attack_enemy_behaviors+1, x
+        sta DestPtr+1
+        jsr __trampoline
+
+        rts
+.endproc
+
+.proc attack_puff
+TargetRow := R0
+TargetCol := R1
+PlayerSquare := R2
+AttackSquare := R3
+WeaponSquaresIndex := R4
+WeaponSquaresPtr := R5 ; R6
+AttackLanded := R7
+WeaponProperties := R8
+TilesRemaining := R9
+        
+        ; As a test, let's just set "AttackLanded" to 1. This should block movement?
+        lda #1
+        sta AttackLanded
+
+        rts
+.endproc
+
+.proc attack_slime
         rts
 .endproc
