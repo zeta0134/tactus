@@ -8,6 +8,8 @@
 
 bg_palette:
         .incbin "../art/test_palette.pal"
+obj_palette:
+        .incbin "../art/sprite_palette.pal"
 
 .proc initialize_ppu
         ; disable rendering
@@ -43,53 +45,27 @@ loop:
         lda #$00
         sta PPUMASK
 
+        ; Sprites
+        set_ppuaddr #$3F10
+
+        ldx #0
+obj_loop:
+        lda obj_palette, x
+        sta PPUDATA
+        inx
+        cpx #16
+        bne obj_loop
+
         ; Backgrounds
         set_ppuaddr #$3F00
 
         ldx #0
-loop:
+bg_loop:
         lda bg_palette, x
         sta PPUDATA
         inx
         cpx #16
-        bne loop
-
-        ; Sprites
-        ; gray!
-        set_ppuaddr #$3F11
-        lda #$0F
-        sta PPUDATA
-        lda #$10
-        sta PPUDATA
-        lda #$20
-        sta PPUDATA
-
-        ; red!
-        set_ppuaddr #$3F15
-        lda #$06
-        sta PPUDATA
-        lda #$26
-        sta PPUDATA
-        lda #$36
-        sta PPUDATA
-
-        ; blue!
-        set_ppuaddr #$3F19
-        lda #$01
-        sta PPUDATA
-        lda #$21
-        sta PPUDATA
-        lda #$31
-        sta PPUDATA
-
-        ; green(ish)!
-        set_ppuaddr #$3F1D
-        lda #$09
-        sta PPUDATA
-        lda #$29
-        sta PPUDATA
-        lda #$39
-        sta PPUDATA
+        bne bg_loop
 
         ; Reset PPUADDR to 0,0
         lda #$00

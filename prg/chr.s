@@ -14,6 +14,7 @@ CurrentChrBank: .res 1
 
         .include "../build/animated_tiles/sprite_template.chr"
         .include "../build/animated_tiles/tile_template.chr"
+        .include "../build/animated_tiles/player.chr"
 
         .include "../build/animated_tiles/slime_idle.chr"
         .include "../build/animated_tiles/smoke_puff.chr"
@@ -24,11 +25,11 @@ CurrentChrBank: .res 1
         .include "../build/static_tiles/wall_top.chr"
         .include "../build/static_tiles/pit_edge.chr"
 
-ANIMATED_TILE_TABLE_LENGTH = 2
+ANIMATED_TILE_TABLE_LENGTH = 4
 animated_tile_table:
         .word $0000, smoke_puff
         .word $0040, slime_idle
-        .word $1000, sprite_template
+        .word $1000, player
 
 STATIC_TILE_TABLE_LENGTH = 6
 static_tile_table:
