@@ -27,4 +27,4 @@ SPRITE_ONE_BEAT    = %00000100
 .global initialize_sprites, draw_sprites, age_sprites, find_unused_sprite
 .global sprite_table
 
-SPRITES_TEST_CUBE = $01
+SPRITES_PLAYER_IDLE = $01
