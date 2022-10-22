@@ -72,12 +72,35 @@ AS := TILE_ADVANCED_SLIME
         .byte PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE ; 9
 .endscope
 
+hit_box_testing:
+.scope
+FL := TILE_REGULAR_FLOOR
+WF := TILE_WALL_FACE
+WT := TILE_WALL_TOP
+PE := TILE_PIT_EDGE
+PT := TILE_PIT
+BS := TILE_BASIC_SLIME
+IS := TILE_INTERMEDIATE_SLIME
+AS := TILE_ADVANCED_SLIME
+        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
+        .byte WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT ; 0
+        .byte WT, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WT ; 1
+        .byte WT, BS, BS, BS, BS, BS, FL, FL, FL, BS, FL, FL, FL, WT ; 2
+        .byte WT, BS, BS, BS, BS, BS, FL, FL, FL, FL, BS, FL, FL, WT ; 3
+        .byte WT, BS, BS, BS, BS, BS, FL, FL, FL, FL, FL, BS, FL, WT ; 4
+        .byte WT, BS, BS, BS, BS, BS, FL, FL, FL, FL, BS, FL, FL, WT ; 5
+        .byte WT, BS, BS, BS, BS, BS, FL, FL, FL, BS, FL, FL, FL, WT ; 6
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
+        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, BS, BS, BS, WF ; 8
+        .byte PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE ; 9
+.endscope
+
 .proc FAR_initialize_battlefield
 LayoutPtr := R0
 Length := R2
         ; TODO: make this accept the layout pointer as an argument
         ;st16 LayoutPtr, test_layout
-        st16 LayoutPtr, test_layout
+        st16 LayoutPtr, hit_box_testing
         ldy #0
 loop:
         lda (LayoutPtr), y
