@@ -106,6 +106,10 @@ rising_sprite_y:
         sec
         sbc ScratchByte
 write_sprite_y:
+        ; account for 1px screen offset
+        sec
+        sbc #1
+        ; perform the write
         sta SHADOW_OAM + OAM_Y_POS, y
         sta SHADOW_OAM + ONE_SPRITE + OAM_Y_POS, y
         ; Sprite tile may be inverted if we are horizontally flipped
