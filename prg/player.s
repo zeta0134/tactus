@@ -321,8 +321,8 @@ arrived_at_target:
 
 ; Called once at the beginning of every beat
 .proc update_player
-TargetRow := R0
-TargetCol := R1
+TargetRow := R14
+TargetCol := R15
         lda PlayerRow
         sta TargetRow
         lda PlayerCol
@@ -361,8 +361,8 @@ do_nothing:
 .endproc
 
 .proc player_move
-TargetRow := R0
-TargetCol := R1
+TargetRow := R14
+TargetCol := R15
 ; If we get here, we are attempting a movement. Whether it succeeds or not, animate the
 ; player jumping (possibly in place)
         lda #0
@@ -412,9 +412,7 @@ player_tile_index_table:
         .endrepeat
 
 .proc player_swing_weapon
-; We don't use these, but we should know not to clobber them
-TargetRow := R0
-TargetCol := R1
+; R0 and R1 are reserved for the enemy behaviors to use
 ; Current target square to consider for attacking
 PlayerSquare := R2
 AttackSquare := R3
@@ -423,7 +421,9 @@ WeaponSquaresPtr := R5 ; R6
 AttackLanded := R7
 WeaponProperties := R8
 TilesRemaining := R9
-
+; We don't use these, but we should know not to clobber them
+TargetRow := R14
+TargetCol := R15
         ldx PlayerRow
         lda player_tile_index_table, x ; Row * Width
         clc
@@ -454,7 +454,7 @@ check_west:
         cmp #DIRECTION_WEST
         bne done_choosing_direction ; should never be taken
         jsr player_face_left
-        ldy #WeaponClass::SouthSquaresPtr
+        ldy #WeaponClass::WestSquaresPtr
 
 done_choosing_direction:
         lda (PlayerWeaponPtr), y
@@ -485,7 +485,7 @@ loop:
         bmi negative_y
 positive_y:
         tax        
-        lda player_tile_index_table
+        lda player_tile_index_table, x
         clc
         adc AttackSquare
         sta AttackSquare
@@ -502,6 +502,7 @@ converge:
         iny
         lda (WeaponSquaresPtr), y ; Behavioral Flags for this tile
         sta WeaponProperties      ; Stash these here so the enemies can see them (if applicable)
+        iny
         sty WeaponSquaresIndex
         jsr attack_enemy_tile
 check_player_movement:
