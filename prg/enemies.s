@@ -28,9 +28,19 @@ static_behaviors:
         .word no_behavior
         .endrepeat
 
-player_attack_enemy_behaviors:
-        .word attack_puff
-        .word attack_slime
+direct_attack_behaviors:
+        .word direct_attack_puff
+        .word direct_attack_slime
+        .repeat 30
+        .word no_behavior
+        .endrepeat
+        .repeat 32
+        .word no_behavior
+        .endrepeat
+
+indirect_attack_behaviors:
+        .word no_behavior ; smoke puff can't attack itself
+        .word indirect_attack_slime
         .repeat 30
         .word no_behavior
         .endrepeat
@@ -408,16 +418,16 @@ TargetCol := R15
         lsr
         and #%01111110
         tax
-        lda player_attack_enemy_behaviors, x
+        lda direct_attack_behaviors, x
         sta DestPtr
-        lda player_attack_enemy_behaviors+1, x
+        lda direct_attack_behaviors+1, x
         sta DestPtr+1
         jsr __trampoline
 
         rts
 .endproc
 
-.proc attack_puff
+.proc direct_attack_puff
 ; R0 and R1 are reserved for the enemy behaviors to use
 ; Current target square to consider for attacking
 PlayerSquare := R2
@@ -427,19 +437,55 @@ WeaponSquaresPtr := R5 ; R6
 AttackLanded := R7
 WeaponProperties := R8
 TilesRemaining := R9
+; Indirect target square, so the tile we attack knows its own location
+IndirectAttackSquare := R10 
+
 ; We don't use these, but we should know not to clobber them
 TargetRow := R14
 TargetCol := R15
         
-        ; As a test, let's just set "AttackLanded" to 1. This should block movement?
-        lda #1
-        sta AttackLanded
-
-        
+        ; A puff stores the tile index of the enemy that moved in its
+        ; tile_data, so we'll roll an indirect attack on that square
+        ldx AttackSquare
+        lda tile_data, x
+        sta IndirectAttackSquare
+        ; the top 6 bits index into the behavior table, which is a list of **words**
+        ; so we want it to end up like this: %0bbbbbb0
+        ldx IndirectAttackSquare
+        lda battlefield, x
+        lsr
+        and #%01111110
+        tax
+        lda indirect_attack_behaviors, x
+        sta DestPtr
+        lda indirect_attack_behaviors+1, x
+        sta DestPtr+1
+        jsr __trampoline
 
         rts
 .endproc
 
-.proc attack_slime
+.proc direct_attack_slime
+AttackSquare := R3
+        ; If we have *just moved*, then ignore this attack
+        ; (A valid attack can only land at our previous destination)
+        ldx AttackSquare
+        lda tile_flags, x
+        bmi ignore_attack
+        jsr attack_slime_common
+ignore_attack:
+        rts
+.endproc
+
+.proc indirect_attack_slime
+        jsr attack_slime_common
+        rts
+.endproc
+
+.proc attack_slime_common
+AttackLanded := R7
+        ; For testing, just register the attack for now
+        lda #1
+        sta AttackLanded
         rts
 .endproc
