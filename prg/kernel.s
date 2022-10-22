@@ -63,6 +63,7 @@ CurrentBeatCounter: .res 1
 
         ; - Resolve the player's action
         ;   TODO! (very soon!)
+        jsr update_player
 
         ; - Queue up any changed squares to the **active** buffer
         ; - Begin playback of any sprite animations (?)
@@ -207,6 +208,7 @@ continue_waiting:
 .proc every_gameloop
         far_call FAR_sync_chr_bank_to_music
         far_call FAR_queue_battlefield_updates
+        jsr determine_player_intent
         jsr draw_player
         jsr draw_sprites
 
