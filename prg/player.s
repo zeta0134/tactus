@@ -177,6 +177,7 @@ check_east:
         cmp #DIRECTION_EAST
         bne check_south
         inc TargetCol
+        jsr player_face_right
         jmp done_choosing_target
 check_south:
         cmp #DIRECTION_SOUTH
@@ -187,6 +188,7 @@ check_west:
         cmp #DIRECTION_WEST
         bne done_choosing_target
         dec TargetCol        
+        jsr player_face_left
 
 done_choosing_target:
         ; FOR NOW, merely set the player's new row and column and exit.
@@ -346,5 +348,19 @@ arrived_at_target:
         sta CurrentPos + 1
         lda #0
         sta CurrentPos
+        rts
+.endproc
+
+.proc player_face_right
+        ldx PlayerSpriteIndex
+        lda #(SPRITE_ACTIVE)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        rts
+.endproc
+
+.proc player_face_left
+        ldx PlayerSpriteIndex
+        lda #(SPRITE_ACTIVE | SPRITE_HORIZ_FLIP)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
         rts
 .endproc
