@@ -4,6 +4,7 @@
         .include "enemies.inc"
         .include "kernel.inc"
         .include "player.inc"
+        .include "sprites.inc"
         .include "zeropage.inc"
 
 .zeropage
@@ -100,6 +101,12 @@ tile_index_to_row_lut:
         .endrepeat
         .endrepeat
 
+tile_index_to_col_lut:
+        .repeat ::BATTLEFIELD_HEIGHT, h
+        .repeat ::BATTLEFIELD_WIDTH, w
+        .byte w
+        .endrepeat
+        .endrepeat
 
 .proc draw_active_tile
 TargetIndex := R0
@@ -115,6 +122,43 @@ TileId := R1
         lsr
         tax
         sta active_attribute_queue, x
+        rts
+.endproc
+
+.proc spawn_death_sprite_here
+MetaSpriteIndex := R0
+EffectiveAttackSquare := R10
+        jsr find_unused_sprite
+        ldx MetaSpriteIndex
+        cpx #$FF
+        beq sprite_failed
+
+        lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_RISE | SPRITE_PAL_1)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+
+        ldy EffectiveAttackSquare
+        lda tile_index_to_col_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_X
+        sta sprite_table + MetaSpriteState::PositionX, x
+
+        lda tile_index_to_row_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_Y
+        sta sprite_table + MetaSpriteState::PositionY, x
+
+        lda #SPRITES_DEATH_SKULL
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+sprite_failed:
         rts
 .endproc
 
@@ -559,6 +603,10 @@ EffectiveAttackSquare := R10
         lda #0
         sta tile_data, x
         sta tile_flags, x
+
+        ; Juice: spawn a floaty, flashy death skull above our tile
+        ; #RIP
+        jsr spawn_death_sprite_here
 
         rts
 .endproc
