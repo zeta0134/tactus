@@ -7,9 +7,12 @@
         .include "nes.inc"
         .include "player.inc"
         .include "sprites.inc"
+        .include "weapons.inc"
         .include "zeropage.inc"
 
 .zeropage
+
+PlayerWeaponPtr: .res 2
 
 .segment "RAM"
 
@@ -26,6 +29,9 @@ PlayerTargetX: .res 2
 PlayerTargetY: .res 2
 
 PlayerJumpHeightPos: .res 2
+
+PlayerWeaponDmg: .res 1
+PlayerMovementBlocked: .res 1
 
 BATTLEFIELD_OFFSET_X = 16
 BATTLEFIELD_OFFSET_Y = 32
@@ -60,14 +66,27 @@ MetaSpriteIndex := R0
         lda #SPRITES_PLAYER_IDLE
         sta sprite_table + MetaSpriteState::TileIndex, x
 
+        ; For now, init the player to position 6, 6 (for no particular reason)
         lda #6
         sta PlayerRow
         sta PlayerCol
         jsr set_player_target_coordinates
         jsr apply_target_coordinates_immediately
 
+        ; Initialize us to the *end* of the jump height table; this is its resting state
         lda #JUMP_HEIGHT_END
         sta PlayerJumpHeightPos
+
+        ; The player should start with a standard dagger
+        lda #WEAPON_DAGGER
+        asl
+        tax
+        lda weapon_class_table, x
+        sta PlayerWeaponPtr
+        lda weapon_class_table+1, x
+        sta PlayerWeaponPtr+1
+        lda #1
+        sta PlayerWeaponDmg
 
         rts
 
@@ -142,71 +161,6 @@ check_west:
         lda #DIRECTION_WEST
         sta PlayerNextDirection        
 no_valid_press:
-        rts
-.endproc
-
-; Called once at the beginning of every beat
-.proc update_player
-TargetRow := R0
-TargetCol := R1
-        lda PlayerRow
-        sta TargetRow
-        lda PlayerCol
-        sta TargetCol
-
-; TODO: If no move or attack was attempted, reset the combo counter (assuming we implement one)
-        lda PlayerNextDirection
-        beq do_nothing
-
-; TODO: Attempt an attack. If we hit something, most weapon types will skip movement
-
-
-; If we get here, we are attempting a movement. Whether it succeeds or not, animate the
-; player jumping (possibly in place)
-        lda #0
-        sta PlayerJumpHeightPos
-
-; Movement 
-        lda PlayerNextDirection
-check_north:
-        cmp #DIRECTION_NORTH
-        bne check_east
-        dec TargetRow
-        jmp done_choosing_target
-check_east:
-        cmp #DIRECTION_EAST
-        bne check_south
-        inc TargetCol
-        jsr player_face_right
-        jmp done_choosing_target
-check_south:
-        cmp #DIRECTION_SOUTH
-        bne check_west
-        inc TargetRow
-        jmp done_choosing_target
-check_west:
-        cmp #DIRECTION_WEST
-        bne done_choosing_target
-        dec TargetCol        
-        jsr player_face_left
-
-done_choosing_target:
-        ; FOR NOW, merely set the player's new row and column and exit.
-        ; TODO: check to see if this is a valid tile and, if not, forbid the move
-        ; TODO: lerp from the old to the new position
-        ; TODO: set up and apply a jump offset to the Y position here, even if the move is forbbidden (the jump in place communicates a "try")
-        lda TargetRow
-        sta PlayerRow
-        lda TargetCol
-        sta PlayerCol
-
-do_nothing:
-        jsr set_player_target_coordinates
-
-        ; Clear player intent for the next beat
-        lda #0
-        sta PlayerNextDirection
-
         rts
 .endproc
 
@@ -364,3 +318,221 @@ arrived_at_target:
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
         rts
 .endproc
+
+; Called once at the beginning of every beat
+.proc update_player
+TargetRow := R0
+TargetCol := R1
+        lda PlayerRow
+        sta TargetRow
+        lda PlayerCol
+        sta TargetCol
+
+; TODO: If no move or attack was attempted, reset the combo counter (assuming we implement one)
+        lda PlayerNextDirection
+        beq resolve_enemy_collision
+
+        lda #0
+        sta PlayerMovementBlocked
+
+; TODO: Attempt an attack. If we hit something, most weapon types will skip movement
+swing_weapon:
+        jsr player_swing_weapon
+
+        ; If the player's movement is still allowed, then attempt a move
+        lda PlayerMovementBlocked
+        bne resolve_enemy_collision
+
+move_player:
+        jsr player_move
+
+resolve_enemy_collision:
+
+
+
+do_nothing:
+        jsr set_player_target_coordinates
+
+        ; Clear player intent for the next beat
+        lda #0
+        sta PlayerNextDirection
+
+        rts
+.endproc
+
+.proc player_move
+TargetRow := R0
+TargetCol := R1
+; If we get here, we are attempting a movement. Whether it succeeds or not, animate the
+; player jumping (possibly in place)
+        lda #0
+        sta PlayerJumpHeightPos
+
+; Movement 
+        lda PlayerNextDirection
+check_north:
+        cmp #DIRECTION_NORTH
+        bne check_east
+        dec TargetRow
+        jmp done_choosing_target
+check_east:
+        cmp #DIRECTION_EAST
+        bne check_south
+        inc TargetCol
+        jsr player_face_right
+        jmp done_choosing_target
+check_south:
+        cmp #DIRECTION_SOUTH
+        bne check_west
+        inc TargetRow
+        jmp done_choosing_target
+check_west:
+        cmp #DIRECTION_WEST
+        bne done_choosing_target
+        dec TargetCol        
+        jsr player_face_left
+
+done_choosing_target:
+        ; FOR NOW, merely set the player's new row and column and exit.
+        ; TODO: check to see if this is a valid tile and, if not, forbid the move
+        ; TODO: lerp from the old to the new position
+        ; TODO: set up and apply a jump offset to the Y position here, even if the move is forbbidden (the jump in place communicates a "try")
+        lda TargetRow
+        sta PlayerRow
+        lda TargetCol
+        sta PlayerCol
+
+        rts
+.endproc
+
+; For rapidly computing the tile row
+player_tile_index_table:
+        .repeat ::BATTLEFIELD_HEIGHT, i
+        .byte (::BATTLEFIELD_WIDTH * i)
+        .endrepeat
+
+.proc player_swing_weapon
+; We don't use these, but we should know not to clobber them
+TargetRow := R0
+TargetCol := R1
+; Current target square to consider for attacking
+PlayerSquare := R2
+AttackSquare := R3
+WeaponSquaresIndex := R4
+WeaponSquaresPtr := R5 ; R6
+AttackLanded := R7
+WeaponProperties := R8
+TilesRemaining := R9
+
+        ldx PlayerRow
+        lda player_tile_index_table, x ; Row * Width
+        clc
+        adc PlayerCol                  ; ... + Col
+        sta PlayerSquare
+
+        ; depending on the player's directional input, we'll need to load one of
+        ; the four directional pointers, so do that:
+
+        lda PlayerNextDirection
+check_north:
+        cmp #DIRECTION_NORTH
+        bne check_east
+        ldy #WeaponClass::NorthSquaresPtr
+        jmp done_choosing_direction
+check_east:
+        cmp #DIRECTION_EAST
+        bne check_south
+        jsr player_face_right
+        ldy #WeaponClass::EastSquaresPtr
+        jmp done_choosing_direction
+check_south:
+        cmp #DIRECTION_SOUTH
+        bne check_west
+        ldy #WeaponClass::SouthSquaresPtr
+        jmp done_choosing_direction
+check_west:
+        cmp #DIRECTION_WEST
+        bne done_choosing_direction ; should never be taken
+        jsr player_face_left
+        ldy #WeaponClass::SouthSquaresPtr
+
+done_choosing_direction:
+        lda (PlayerWeaponPtr), y
+        sta WeaponSquaresPtr
+        iny
+        lda (PlayerWeaponPtr), y
+        sta WeaponSquaresPtr+1
+        
+        ; Now we iterate through each of these squares, roll an attack against the square
+        lda #0
+        sta AttackLanded
+        sta WeaponSquaresIndex
+        ldy #WeaponClass::NumSquares
+        lda (PlayerWeaponPtr), y
+        sta TilesRemaining
+loop:
+        ; Reset to the player's position
+        lda PlayerSquare
+        sta AttackSquare
+        ; Add the relative offset from the considered square
+        ldy WeaponSquaresIndex
+        lda (WeaponSquaresPtr), y ; X offset
+        clc
+        adc AttackSquare
+        sta AttackSquare
+        iny
+        lda (WeaponSquaresPtr), y ; Y offset
+        bmi negative_y
+positive_y:
+        tax        
+        lda player_tile_index_table
+        clc
+        adc AttackSquare
+        sta AttackSquare
+        jmp converge
+negative_y:
+        eor #$FF
+        tax
+        inx
+        sec
+        lda AttackSquare
+        sbc player_tile_index_table, x
+        sta AttackSquare
+converge:
+        iny
+        lda (WeaponSquaresPtr), y ; Behavioral Flags for this tile
+        sta WeaponProperties      ; Stash these here so the enemies can see them (if applicable)
+        sty WeaponSquaresIndex
+        jsr attack_enemy_tile
+check_player_movement:
+        ; If this weapon square could cancel movement
+        lda #WEAPON_CANCEL_MOVEMENT
+        and WeaponProperties
+        beq check_early_exit
+        ; ... and an attack actually landed
+        lda AttackLanded
+        beq check_early_exit
+        ; ... then block player movement
+        lda #1
+        sta PlayerMovementBlocked
+check_early_exit:
+        ; If this weapon square is single target...
+        lda #WEAPON_SINGLE_TARGET
+        and WeaponProperties
+        beq no_early_exit
+        ; ... and the attack actually landed
+        lda AttackLanded
+        beq no_early_exit
+        ; Then we are done with the swing, and should clean up
+        jmp done_with_swing
+no_early_exit:
+        ; Otherwise, iterate to the next weapon square and continue
+        dec TilesRemaining
+        bne loop
+
+done_with_swing:
+        ; If there is any cleanup to do, do that here. Otherwise we're finished I think?
+
+        rts
+.endproc
+

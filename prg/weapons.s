@@ -7,6 +7,9 @@
 weapon_class_table:
         .word dagger
         .word broadsword
+        .word longsword
+        .word spear
+        .word flail
 
 ; Programmer notes: try to prefer clockwise update order, for consistency.
 ; That means single-hit weapons should prioritize the *player's* left
