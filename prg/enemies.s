@@ -3,6 +3,7 @@
         .include "battlefield.inc"
         .include "enemies.inc"
         .include "kernel.inc"
+        .include "player.inc"
         .include "zeropage.inc"
 
 .zeropage
@@ -34,6 +35,7 @@ direct_attack_behaviors:
         .repeat 30
         .word no_behavior
         .endrepeat
+        ; safety: fill out the rest of the table
         .repeat 32
         .word no_behavior
         .endrepeat
@@ -44,7 +46,24 @@ indirect_attack_behaviors:
         .repeat 30
         .word no_behavior
         .endrepeat
+        ; safety: fill out the rest of the table
         .repeat 32
+        .word no_behavior
+        .endrepeat
+
+bonk_behaviors:
+        .word no_behavior ; standing in a smoke puff is fine
+        .word basic_enemy_attacks_player
+        .repeat 30
+        .word no_behavior
+        .endrepeat
+        .word no_behavior ; $80 - plain floor
+        .word no_behavior ; $84 - disco floor
+        .word solid_tile_forbids_movement     ; $88 - wall top
+        .word solid_tile_forbids_movement     ; $8C - wall face
+        .word solid_tile_forbids_movement     ; $90 - pit edge
+        ; safety: fill out the rest of the table
+        .repeat 27
         .word no_behavior
         .endrepeat
 
@@ -98,6 +117,10 @@ TileId := R1
         sta active_attribute_queue, x
         rts
 .endproc
+
+; ============================================================================================================================
+; ===                                           Enemy Update Behaviors                                                     ===
+; ============================================================================================================================
 
 .proc no_behavior
         ; does what it says on the tin
@@ -420,7 +443,9 @@ proceed_with_jump:
         rts
 .endproc
 
-
+; ============================================================================================================================
+; ===                                      Player Attacks Enemy Behaviors                                                  ===
+; ============================================================================================================================
 
 .proc attack_enemy_tile
 ; R0 and R1 are reserved for the enemy behaviors to use
@@ -535,5 +560,50 @@ EffectiveAttackSquare := R10
         sta tile_data, x
         sta tile_flags, x
 
+        rts
+.endproc
+
+; ============================================================================================================================
+; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
+; ============================================================================================================================
+
+.proc player_collides_with_tile
+TargetSquare := R13
+; This is our target position after movement. It might be the same as our player position;
+; regardless, this is where we want to go on this frame. What happens when we land?
+TargetRow := R14
+TargetCol := R15
+        ; the top 6 bits index into the behavior table, which is a list of **words**
+        ; so we want it to end up like this: %0bbbbbb0
+        ldx TargetSquare
+        lda battlefield, x
+        lsr
+        and #%01111110
+        tax
+        lda bonk_behaviors, x
+        sta DestPtr
+        lda bonk_behaviors+1, x
+        sta DestPtr+1
+        jsr __trampoline
+
+        rts
+.endproc
+
+.proc basic_enemy_attacks_player
+        rts
+.endproc
+
+.proc solid_tile_forbids_movement
+        jsr forbid_player_movement
+        rts
+.endproc
+
+.proc forbid_player_movement
+TargetRow := R14
+TargetCol := R15
+        lda PlayerCol
+        sta TargetCol
+        lda PlayerRow
+        sta TargetRow
         rts
 .endproc

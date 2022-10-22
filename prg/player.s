@@ -33,6 +33,8 @@ PlayerJumpHeightPos: .res 2
 PlayerWeaponDmg: .res 1
 PlayerMovementBlocked: .res 1
 
+PlayerHealth: .res 1
+
 BATTLEFIELD_OFFSET_X = 16
 BATTLEFIELD_OFFSET_Y = 32
 
@@ -87,6 +89,9 @@ MetaSpriteIndex := R0
         sta PlayerWeaponPtr+1
         lda #1
         sta PlayerWeaponDmg
+
+        lda #10
+        sta PlayerHealth
 
         rts
 
@@ -347,10 +352,14 @@ move_player:
         jsr player_move
 
 resolve_enemy_collision:
+        jsr player_resolve_collision
 
+        ; Now we may finalize the player's position and draw
+        lda TargetRow
+        sta PlayerRow
+        lda TargetCol
+        sta PlayerCol
 
-
-do_nothing:
         jsr set_player_target_coordinates
 
         ; Clear player intent for the next beat
@@ -391,16 +400,9 @@ check_west:
         bne done_choosing_target
         dec TargetCol        
         jsr player_face_left
-
 done_choosing_target:
-        ; FOR NOW, merely set the player's new row and column and exit.
-        ; TODO: check to see if this is a valid tile and, if not, forbid the move
-        ; TODO: lerp from the old to the new position
-        ; TODO: set up and apply a jump offset to the Y position here, even if the move is forbbidden (the jump in place communicates a "try")
-        lda TargetRow
-        sta PlayerRow
-        lda TargetCol
-        sta PlayerCol
+        ; That's it; leave it in Target Col/Row for now, as we need to let
+        ; collision have a go at it, and collision needs old/new coords
 
         rts
 .endproc
@@ -537,3 +539,27 @@ done_with_swing:
         rts
 .endproc
 
+.proc player_resolve_collision
+TargetSquare := R13
+; This is our target position after movement. It might be the same as our player position;
+; regardless, this is where we want to go on this frame. What happens when we land?
+TargetRow := R14
+TargetCol := R15
+        ldx TargetRow
+        lda player_tile_index_table, x ; Row * Width
+        clc
+        adc TargetCol                  ; ... + Col
+        sta TargetSquare
+
+        jsr player_collides_with_tile
+
+        rts
+.endproc
+
+.proc damage_player
+        lda PlayerHealth
+        beq already_dead
+        dec PlayerHealth
+already_dead:
+        rts
+.endproc
