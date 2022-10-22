@@ -589,7 +589,79 @@ TargetCol := R15
         rts
 .endproc
 
+.proc find_puff_tile
+PuffSquare := R12
+TargetSquare := R13
+        lda #$FF        ; A value of $FF indicates search failure
+        sta PuffSquare
+        ldx #0
+loop:
+        ; is this a poof?
+        lda battlefield, x
+        and #%11111100
+        cmp #TILE_SMOKE_PUFF
+        bne not_our_puff
+        ; is this OUR poof?
+        lda tile_data, x
+        cmp TargetSquare
+        bne not_our_puff
+        ; we did it!
+        stx PuffSquare
+        rts
+not_our_puff:
+        inx
+        cpx #::BATTLEFIELD_SIZE
+        bne loop
+done:
+        rts
+.endproc
+
 .proc basic_enemy_attacks_player
+TargetIndex := R0
+TileId := R1
+PuffSquare := R12
+TargetSquare := R13
+        ; All basic enemies do 1 damage to the player on hit
+        jsr damage_player
+        ; Now the tricky part: we need to scan the map and find this enemy's poof
+        ; (It might not exist if we have a bugged board, so handle that safely)
+        jsr find_puff_tile
+        ; Copy ourselves over the puff tile, to cancel our own movement
+        lda PuffSquare
+        sta TargetIndex
+        ldx TargetSquare
+        lda battlefield, x
+        sta TileId
+        jsr draw_active_tile
+
+        ldx TargetSquare
+        ldy PuffSquare
+        lda tile_data, x
+        sta tile_data, y
+        lda tile_flags, x
+        sta tile_flags, y
+
+        ; Now, draw a basic floor tile here, which will be underneath the player
+        lda TargetSquare
+        sta TargetIndex
+        lda #TILE_REGULAR_FLOOR
+        sta TileId
+        jsr draw_active_tile
+        ldx TargetSquare
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+
+        ; TODO: we just damaged the player. Spawn a hit sprite inbetween the enemy that dealt
+        ; the damage and the player's position
+
+        rts
+no_puff_found:
+        ; If we couldn't find a puff, then try to cancel the player's movement instead.
+        ; This *shouldn't* happen for basic enemies, but if we can't kick the enemy back,
+        ; we should try to at least separate it from the player. (If this also fails the
+        ; player will soft lock and die very quickly.)
+        jsr forbid_player_movement
         rts
 .endproc
 
