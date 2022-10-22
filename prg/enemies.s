@@ -388,9 +388,8 @@ proceed_with_jump:
 
 
 .proc attack_enemy_tile
-; This is all state from the calling function. We can use this, but shouldn't (generally) clobber it
-TargetRow := R0
-TargetCol := R1
+; R0 and R1 are reserved for the enemy behaviors to use
+; Current target square to consider for attacking
 PlayerSquare := R2
 AttackSquare := R3
 WeaponSquaresIndex := R4
@@ -398,6 +397,9 @@ WeaponSquaresPtr := R5 ; R6
 AttackLanded := R7
 WeaponProperties := R8
 TilesRemaining := R9
+; We don't use these, but we should know not to clobber them
+TargetRow := R14
+TargetCol := R15
 
         ldx AttackSquare
         lda battlefield, x
@@ -416,8 +418,8 @@ TilesRemaining := R9
 .endproc
 
 .proc attack_puff
-TargetRow := R0
-TargetCol := R1
+; R0 and R1 are reserved for the enemy behaviors to use
+; Current target square to consider for attacking
 PlayerSquare := R2
 AttackSquare := R3
 WeaponSquaresIndex := R4
@@ -425,10 +427,15 @@ WeaponSquaresPtr := R5 ; R6
 AttackLanded := R7
 WeaponProperties := R8
 TilesRemaining := R9
+; We don't use these, but we should know not to clobber them
+TargetRow := R14
+TargetCol := R15
         
         ; As a test, let's just set "AttackLanded" to 1. This should block movement?
         lda #1
         sta AttackLanded
+
+        
 
         rts
 .endproc
