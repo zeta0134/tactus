@@ -12,6 +12,7 @@
 
 .zeropage
 
+PlayerWeapon: .res 2
 PlayerWeaponPtr: .res 2
 
 .segment "RAM"
@@ -82,6 +83,7 @@ MetaSpriteIndex := R0
         ;lda #WEAPON_DAGGER
         ; ... y'know, except when testing
         lda #WEAPON_BROADSWORD
+        sta PlayerWeapon
         asl
         tax
         lda weapon_class_table, x

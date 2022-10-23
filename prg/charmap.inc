@@ -1,5 +1,7 @@
 FONT_BASE = 208
-
+LETTERS_BASE = (FONT_BASE + 0)
+NUMBERS_BASE = (FONT_BASE + 26)
+SYMBOLS_BASE = (FONT_BASE + 36)
 
 .charmap 65, (FONT_BASE + 0) ; A
 .charmap 66, (FONT_BASE + 1) ; B

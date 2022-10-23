@@ -8,3 +8,5 @@
 .global PlayerCol
 .global PlayerMaxHealth
 .global PlayerHealth
+.global PlayerWeapon
+.global PlayerWeaponDmg
