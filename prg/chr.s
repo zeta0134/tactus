@@ -251,24 +251,6 @@ loop:
         rts
 .endproc
 
-; Until we have real playfield drawing, put any test tile drawing stuff here.
-; Remember to remove this later.
-.proc FAR_demo_nametable
-        lda #0
-        sta PPUCTRL ; disable NMI, set VRAM increment to +1        
-        set_ppuaddr #($2000 + (32 * 8) + 8)
-        lda #0
-        sta PPUDATA
-        lda #1
-        sta PPUDATA
-        set_ppuaddr #($2000 + (32 * 9) + 8)
-        lda #16
-        sta PPUDATA
-        lda #17
-        sta PPUDATA
-        rts
-.endproc
-
 chr_frame_pacing:
         .byte 0, 1, 1, 2, 2, 3, 3, 3
 

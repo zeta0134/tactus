@@ -6,6 +6,7 @@
         .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
+        .include "hud.inc"
         .include "kernel.inc"
         .include "nes.inc"
         .include "player.inc"
@@ -49,6 +50,7 @@ CurrentBeatCounter: .res 1
         jsr play_track
 
         far_call FAR_initialize_battlefield
+        far_call FAR_init_hud
         jsr init_player
 
         st16 GameMode, beat_frame_1
@@ -72,6 +74,7 @@ CurrentBeatCounter: .res 1
         ;   the updates we will perform over the next few frames
         jsr clear_active_move_flags
         jsr age_sprites
+        far_call FAR_refresh_hud
         jsr every_gameloop
         st16 GameMode, update_enemies_1
         rts
@@ -208,6 +211,7 @@ continue_waiting:
 .proc every_gameloop
         far_call FAR_sync_chr_bank_to_music
         far_call FAR_queue_battlefield_updates
+        far_call FAR_queue_hud
         jsr determine_player_intent
         jsr draw_player
         jsr draw_sprites

@@ -99,8 +99,8 @@ AS := TILE_ADVANCED_SLIME
 LayoutPtr := R0
 Length := R2
         ; TODO: make this accept the layout pointer as an argument
-        ;st16 LayoutPtr, test_layout
-        st16 LayoutPtr, hit_box_testing
+        st16 LayoutPtr, test_layout
+        ;st16 LayoutPtr, hit_box_testing
         ldy #0
 loop:
         lda (LayoutPtr), y

@@ -6,3 +6,5 @@
 
 .global PlayerRow
 .global PlayerCol
+.global PlayerMaxHealth
+.global PlayerHealth
