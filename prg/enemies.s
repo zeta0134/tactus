@@ -4,7 +4,9 @@
         .include "enemies.inc"
         .include "kernel.inc"
         .include "player.inc"
+        .include "sound.inc"
         .include "sprites.inc"
+        .include "word_util.inc"
         .include "zeropage.inc"
 
 .zeropage
@@ -607,6 +609,12 @@ EffectiveAttackSquare := R10
         ; Juice: spawn a floaty, flashy death skull above our tile
         ; #RIP
         jsr spawn_death_sprite_here
+
+        ; Play an appropriately crunchy death sound
+        st16 R0, sfx_defeat_enemy_pulse
+        jsr play_sfx_pulse2
+        st16 R0, sfx_defeat_enemy_noise
+        jsr play_sfx_noise
 
         rts
 .endproc

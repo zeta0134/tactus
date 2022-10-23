@@ -9,6 +9,14 @@
 .global play_sfx_noise
 .global play_sfx_dpcm
 
+; rhythm game
+.global sfx_defeat_enemy_noise
+.global sfx_defeat_enemy_pulse
+
+; old sounds from dungeon game
+; if we decide to use any, move these ^ up there.
+; These are ideal candidates to delete to make space later
+
 .global sfx_jump
 .global sfx_double_jump
 .global sfx_bounce

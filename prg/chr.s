@@ -11,36 +11,64 @@
 CurrentChrBank: .res 1
 
 .segment "PRG0_8000"
-
-        .include "../build/animated_tiles/sprite_template.chr"
-        .include "../build/animated_tiles/tile_template.chr"
+        ; player
         .include "../build/animated_tiles/player.chr"
+        ; weapons
+        .include "../build/static_tiles/dagger.chr"
+        .include "../build/static_tiles/broadsword.chr"
+        .include "../build/static_tiles/longsword.chr"
+        .include "../build/static_tiles/spear.chr"
+        .include "../build/static_tiles/flail.chr"
+        ; sprite effects
         .include "../build/animated_tiles/death_skull.chr"
 
+        ; enemies
         .include "../build/animated_tiles/slime_idle.chr"
         .include "../build/animated_tiles/smoke_puff.chr"
 
+        ; static level geometry
         .include "../build/static_tiles/floor.chr"
         .include "../build/static_tiles/disco_floor.chr"
         .include "../build/static_tiles/wall_face.chr"
         .include "../build/static_tiles/wall_top.chr"
         .include "../build/static_tiles/pit_edge.chr"
 
+        ; hud
+        .include "../build/static_tiles/empty_heart.chr"
+        .include "../build/static_tiles/half_heart.chr"
+        .include "../build/static_tiles/full_heart.chr"
+
+hud_font:
+        .incbin "../art/raw_chr/font_chicago_reduced.chr"
+
 ANIMATED_TILE_TABLE_LENGTH = 4
 animated_tile_table:
         .word $0000, smoke_puff
         .word $0040, slime_idle
+
         .word $1000, player
         .word $1040, death_skull
 
-STATIC_TILE_TABLE_LENGTH = 6
+
+STATIC_TILE_TABLE_LENGTH = 14
 static_tile_table:
+        ; level geometry, ascending
         .word $0800, floor
         .word $0840, disco_floor
         .word $0880, wall_top
         .word $08C0, wall_face
         .word $0900, pit_edge
         .word $0940, floor
+        ; hud, descending
+        .word $0CC0, full_heart
+        .word $0C80, half_heart
+        .word $0C40, empty_heart
+        ; weapon sprites
+        .word $1080, dagger
+        .word $10C0, broadsword
+        .word $1100, longsword
+        .word $1140, spear
+        .word $1180, flail
 
 
 ; note: set PPUADDR and PPUCTRL appropriately before calling
@@ -174,16 +202,35 @@ done:
         rts
 .endproc
 
+.proc copy_hud_font_to_chr_ram
+SourceAddr := R0
+Length := R2
+ChrBank := R8
+        lda #0
+        sta ChrBank
+bank_loop:
+        a53_set_chr ChrBank
+        st16 SourceAddr, hud_font
+        st16 Length, $0300
+        set_ppuaddr #$0D00
+        jsr memcpy_ppudata
+        inc ChrBank
+        lda ChrBank
+        cmp #4
+        bne bank_loop
+        rts
+.endproc
+
 .proc FAR_initialize_chr_ram
 SourceAddr := R0
 Length := R2
-CurrentStaticBank := R4
         lda #0
         sta PPUCTRL ; disable NMI, set VRAM increment to +1
 
         ; THING!
         jsr decompress_animated_tiles_to_chr_ram
         jsr decompress_static_tiles_to_chr_ram
+        jsr copy_hud_font_to_chr_ram
 
         rts
 .endproc
