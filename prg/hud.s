@@ -24,10 +24,10 @@ HudGoldDisplay: .res 5
 
 HUD_UPPER_ROW_LEFT  = $2342
 HUD_MIDDLE_ROW_LEFT = $2362
-HUD_LOWER_ROW_LEFT  = $2382
+HUD_LOWER_ROW_LEFT  = $2322
 HUD_UPPER_ROW_RIGHT  = $2742
 HUD_MIDDLE_ROW_RIGHT = $2762
-HUD_LOWER_ROW_RIGHT  = $2782
+HUD_LOWER_ROW_RIGHT  = $2722
 HUD_ATTR_LEFT = $23F0
 HUD_ATTR_RIGHT = $27F0
 
@@ -83,6 +83,19 @@ skip_top_row_left:
         and #%11111110
         sta HudMiddleRowDirty
 skip_middle_row_left:
+        lda HudBottomRowDirty
+        and #%00000001
+        beq skip_bottom_row_left
+        lda queued_bytes_counter
+        cmp #(MAXIMUM_QUEUE_SIZE - 28)
+        bcs skip_bottom_row_left
+        write_vram_header_imm HUD_LOWER_ROW_LEFT, #28, VRAM_INC_1
+        ldy VRAM_TABLE_INDEX
+        near_call FAR_queue_hud_bottom_row
+        lda HudBottomRowDirty
+        and #%11111110
+        sta HudBottomRowDirty
+skip_bottom_row_left:
         lda HudTopRowDirty
         and #%00000010
         beq skip_top_row_right
@@ -109,6 +122,19 @@ skip_top_row_right:
         and #%11111101
         sta HudMiddleRowDirty
 skip_middle_row_right:
+        lda HudBottomRowDirty
+        and #%00000010
+        beq skip_bottom_row_right
+        lda queued_bytes_counter
+        cmp #(MAXIMUM_QUEUE_SIZE - 28)
+        bcs skip_bottom_row_right
+        write_vram_header_imm HUD_LOWER_ROW_RIGHT, #28, VRAM_INC_1
+        ldy VRAM_TABLE_INDEX
+        near_call FAR_queue_hud_bottom_row
+        lda HudBottomRowDirty
+        and #%11111101
+        sta HudBottomRowDirty
+skip_bottom_row_right:
         lda HudAttrDirty
         and #%00000001
         beq skip_attributes_left
@@ -290,6 +316,121 @@ converge:
         adc #28
         sta queued_bytes_counter
 
+        rts
+.endproc
+
+zone_text: .asciiz "ZONE: "
+hyphen_text: .asciiz "-"
+weapon_level_text: .asciiz "L-"
+
+weapon_name_table:
+        .word dagger_text
+        .word broadsword_text
+        .word longsword_text
+        .word spear_text
+        .word flail_text
+
+dagger_text:     .asciiz "DAGGER"     ; 6
+broadsword_text: .asciiz "BROADSWORD" ; 10
+longsword_text:  .asciiz "LONGSWORD"  ; 9
+spear_text:      .asciiz "SPEAR"      ; 5
+flail_text:      .asciiz "FLAIL"      ; 5
+
+weapon_padding_table:
+        .byte 4, 0, 1, 5, 5
+
+.proc draw_padding
+PaddingAmount := R0
+        lda PaddingAmount
+        beq skip
+        lda #BLANK_TILE
+loop:
+        sta VRAM_TABLE_START, y
+        iny
+        dec PaddingAmount
+        bne loop
+skip:
+        rts
+.endproc
+
+.proc draw_string
+StringPtr := R0
+VramIndex := R2
+        sty VramIndex ; preserve
+loop:
+        ldy #0
+        lda (StringPtr), y
+        beq end_of_string
+        ldy VramIndex
+        sta VRAM_TABLE_START, y
+        inc VramIndex
+        inc16 StringPtr
+        jmp loop
+end_of_string:
+        ldy VramIndex
+        rts
+.endproc
+
+.proc draw_single_digit
+Digit := R0
+        lda #NUMBERS_BASE
+        clc
+        adc Digit
+        sta VRAM_TABLE_START, y
+        iny
+        rts
+.endproc
+
+.proc FAR_queue_hud_bottom_row
+; One scratch byte, many functions
+; (okay stringptr uses two bytes)
+PaddingAmount := R0
+StringPtr := R0
+Digit := R0
+        ; 0123456789012345678901234567
+        ; ZONE: W-L     L-N WWWWWWWWWW
+        ; Zone area, indicating our overall game state
+        st16 StringPtr, zone_text
+        jsr draw_string
+        lda #1 ; TODO: use the actual world number
+        sta Digit
+        jsr draw_single_digit
+        st16 StringPtr, hyphen_text
+        jsr draw_string
+        lda #1 ; TODO: use the actual level number
+        sta Digit
+        jsr draw_single_digit
+        ; Fixed padding between zone end and weapon area begin
+        lda #5
+        sta PaddingAmount
+        jsr draw_padding
+        ; Variable padding depending on player equipped weapon
+        ldx PlayerWeapon
+        lda weapon_padding_table, x
+        sta PaddingAmount
+        jsr draw_padding
+        ; Weapon level
+        st16 StringPtr, weapon_level_text
+        jsr draw_string
+        lda PlayerWeaponDmg ; TODO: use the actual level number
+        sta Digit
+        jsr draw_single_digit
+        ; One space between the weapon level and its name
+        lda #1
+        sta PaddingAmount
+        jsr draw_padding
+        ; Finally the weapon name
+        lda PlayerWeapon
+        asl
+        tax
+        lda weapon_name_table, x
+        sta StringPtr
+        lda weapon_name_table+1, x
+        sta StringPtr+1
+        jsr draw_string
+        ; And that's the whole top row, we just need to close out the vram buffer 
+        sty VRAM_TABLE_INDEX
+        inc VRAM_TABLE_ENTRIES
         rts
 .endproc
 
