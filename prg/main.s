@@ -46,7 +46,6 @@ start:
         ; copy the initial batch of graphics into CHR RAM
         far_call FAR_initialize_chr_ram
         far_call FAR_init_nametables
-        far_call FAR_demo_nametable
 
         ; now enable rendering and proceed to the main game loop
         lda #$1E

@@ -33,7 +33,9 @@ PlayerJumpHeightPos: .res 2
 PlayerWeaponDmg: .res 1
 PlayerMovementBlocked: .res 1
 
+PlayerMaxHealth: .res 1
 PlayerHealth: .res 1
+PlayerKeys: .res 1
 
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
@@ -89,8 +91,12 @@ MetaSpriteIndex := R0
         lda #1
         sta PlayerWeaponDmg
 
-        lda #10
+        lda #5
         sta PlayerHealth
+        lda #10
+        sta PlayerMaxHealth
+        lda #0
+        sta PlayerKeys
 
         rts
 
