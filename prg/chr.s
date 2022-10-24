@@ -37,6 +37,7 @@ CurrentChrBank: .res 1
         .include "../build/static_tiles/empty_heart.chr"
         .include "../build/static_tiles/half_heart.chr"
         .include "../build/static_tiles/full_heart.chr"
+        .include "../build/static_tiles/map_icons.chr"
 
 hud_font:
         .incbin "../art/raw_chr/font_chicago_reduced.chr"
@@ -50,7 +51,7 @@ animated_tile_table:
         .word $1040, death_skull
 
 
-STATIC_TILE_TABLE_LENGTH = 14
+STATIC_TILE_TABLE_LENGTH = 15
 static_tile_table:
         ; level geometry, ascending
         .word $0800, floor
@@ -63,6 +64,7 @@ static_tile_table:
         .word $0CC0, full_heart
         .word $0C80, half_heart
         .word $0C40, empty_heart
+        .word $0C00, map_icons
         ; weapon sprites
         .word $1080, dagger
         .word $10C0, broadsword

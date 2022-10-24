@@ -27,7 +27,7 @@ weapon_class_table:
 
 dagger:
         ;       Tile, Length
-        .byte    $00,    $01
+        .byte    $09,    $01
         .word dagger_north, dagger_east, dagger_south, dagger_west
 
 dagger_north:
@@ -57,7 +57,7 @@ dagger_west:
 
 broadsword:
         ;       Tile, Length
-        .byte    $00,    $03
+        .byte    $0D,    $03
         .word broadsword_north, broadsword_east, broadsword_south, broadsword_west
 
 broadsword_north:
@@ -94,7 +94,7 @@ broadsword_west:
 
 longsword:
         ;       Tile, Length
-        .byte    $00,    $02
+        .byte    $11,    $02
         .word longsword_north, longsword_east, longsword_south, longsword_west
 
 longsword_north:
@@ -131,7 +131,7 @@ longsword_west:
 
 spear:
         ;       Tile, Length
-        .byte    $00,    $02
+        .byte    $15,    $02
         .word spear_north, spear_east, spear_south, spear_west
 
 spear_north:
@@ -172,7 +172,7 @@ spear_west:
 
 flail:
         ;       Tile, Length
-        .byte    $00,    $05
+        .byte    $19,    $05
         .word flail_north, flail_east, flail_south, flail_west
 
 flail_north:

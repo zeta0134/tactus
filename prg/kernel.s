@@ -8,6 +8,7 @@
         .include "far_call.inc"
         .include "hud.inc"
         .include "kernel.inc"
+        .include "levels.inc"
         .include "nes.inc"
         .include "player.inc"
         .include "sound.inc"
@@ -51,6 +52,7 @@ CurrentBeatCounter: .res 1
 
         far_call FAR_initialize_battlefield
         far_call FAR_init_hud
+        far_call FAR_demo_init_floor
         jsr init_player
 
         st16 GameMode, beat_frame_1

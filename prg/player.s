@@ -38,6 +38,8 @@ PlayerMaxHealth: .res 1
 PlayerHealth: .res 1
 PlayerKeys: .res 1
 
+PlayerRoomIndex: .res 1
+
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
 DIRECTION_SOUTH = 3
@@ -99,6 +101,7 @@ MetaSpriteIndex := R0
         sta PlayerMaxHealth
         lda #0
         sta PlayerKeys
+        sta PlayerRoomIndex
 
         rts
 
