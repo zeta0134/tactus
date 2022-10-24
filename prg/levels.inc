@@ -3,6 +3,7 @@
 .global room_layouts, room_flags
 
 ; layouts
+.global test_layout_with_four_exits
 .global test_layout
 .global far_too_many_slimes
 .global hit_box_testing

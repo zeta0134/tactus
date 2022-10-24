@@ -62,9 +62,34 @@ test_floor:
 ; Room Layouts
 
 layouts_table:
+        .word test_layout_with_four_exits
         .word test_layout
         .word far_too_many_slimes
         .word hit_box_testing
+
+
+test_layout_with_four_exits:
+.scope
+FL := TILE_REGULAR_FLOOR
+WF := TILE_WALL_FACE
+WT := TILE_WALL_TOP
+PE := TILE_PIT_EDGE
+PT := TILE_PIT
+BS := TILE_BASIC_SLIME
+IS := TILE_INTERMEDIATE_SLIME
+AS := TILE_ADVANCED_SLIME
+        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
+        .byte WT, WT, WT, WT, FL, FL, FL, FL, FL, FL, WT, WT, WT, WT ; 0
+        .byte WT, WF, WF, WF, FL, FL, FL, FL, FL, FL, WF, WF, WF, WT ; 1
+        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
+        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
+        .byte FL, FL, FL, FL, FL, FL, IS, FL, FL, FL, FL, FL, FL, FL ; 4
+        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
+        .byte WT, FL, FL, FL, BS, FL, FL, FL, AS, FL, FL, FL, FL, WT ; 6
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
+        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
+        .byte PE, PE, PE, PE, FL, FL, FL, FL, FL, FL, PE, PE, PE, PE ; 9
+.endscope
 
 test_layout:
 .scope
