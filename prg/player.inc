@@ -10,3 +10,5 @@
 .global PlayerHealth
 .global PlayerWeapon
 .global PlayerWeaponDmg
+.globalzp PlayerWeaponPtr
+.global PlayerRoomIndex
