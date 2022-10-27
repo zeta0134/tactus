@@ -1,5 +1,6 @@
         .setcpu "6502"
         .include "nes.inc"
+        .include "palette.inc"
         .include "ppu.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
@@ -52,6 +53,7 @@ loop:
 obj_loop:
         lda obj_palette, x
         sta PPUDATA
+
         inx
         cpx #16
         bne obj_loop
