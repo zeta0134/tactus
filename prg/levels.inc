@@ -1,4 +1,5 @@
 .global FAR_demo_init_floor
+.global FAR_init_current_room
 
 .global room_layouts, room_flags
 

@@ -10,6 +10,7 @@
         .include "kernel.inc"
         .include "levels.inc"
         .include "nes.inc"
+        .include "palette.inc"
         .include "player.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -50,13 +51,26 @@ CurrentBeatCounter: .res 1
         lda #1
         jsr play_track
 
-        far_call FAR_initialize_battlefield
         far_call FAR_init_hud
         far_call FAR_demo_init_floor
         jsr init_player
 
-        st16 GameMode, beat_frame_1
+        st16 GameMode, room_init
         jsr wait_for_next_vblank
+        rts
+.endproc
+
+.proc game_init
+        rts
+.endproc
+
+.proc zone_init
+        rts
+.endproc
+
+.proc room_init
+        far_call FAR_init_current_room
+        st16 GameMode, beat_frame_1
         rts
 .endproc
 
@@ -66,7 +80,6 @@ CurrentBeatCounter: .res 1
         far_call FAR_swap_battlefield_buffers
 
         ; - Resolve the player's action
-        ;   TODO! (very soon!)
         jsr update_player
 
         ; - Queue up any changed squares to the **active** buffer
@@ -217,6 +230,8 @@ continue_waiting:
         jsr determine_player_intent
         jsr draw_player
         jsr draw_sprites
+        far_call FAR_update_brightness
+        far_call FAR_refresh_palettes_gameloop
 
         jsr wait_for_next_vblank
         rts

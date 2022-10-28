@@ -1,4 +1,5 @@
         .setcpu "6502"
+        .include "far_call.inc"
         .include "nes.inc"
         .include "palette.inc"
         .include "ppu.inc"
@@ -46,25 +47,30 @@ loop:
         lda #$00
         sta PPUMASK
 
-        ; Sprites
-        set_ppuaddr #$3F10
+        ; Set OBJ and BG palettes to all black
+        set_ppuaddr #$3F00
+        lda #$0F
+        ldx #0
+palette_loop:
+        sta PPUDATA
+        inx
+        cpx #32
+        bne palette_loop
+
+        ; Copy palette data into the palette manager
 
         ldx #0
 obj_loop:
         lda obj_palette, x
-        sta PPUDATA
-
+        sta ObjPaletteBuffer, x
         inx
         cpx #16
         bne obj_loop
 
-        ; Backgrounds
-        set_ppuaddr #$3F00
-
         ldx #0
 bg_loop:
         lda bg_palette, x
-        sta PPUDATA
+        sta BgPaletteBuffer, x
         inx
         cpx #16
         bne bg_loop
@@ -73,6 +79,12 @@ bg_loop:
         lda #$00
         sta PPUADDR
         sta PPUADDR
+
+        ; Initialize brightness to 0 (fully black) so we can fade it in
+        lda #0
+        jsr set_brightness
+        lda #4
+        sta TargetBrightness
 
         rts
 .endproc
