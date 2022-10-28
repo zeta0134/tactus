@@ -1,7 +1,9 @@
         .setcpu "6502"
 
         .include "bhop/bhop.inc"
+        .include "hud.inc"
         .include "nes.inc"
+        .include "player.inc"
         .include "sprites.inc"
         .include "zeropage.inc"
 
@@ -223,6 +225,33 @@ loop:
         ; side note: only sprites with a beat lifetime of 0 beats are actually drawn,
         ; so you can use a beat lifeitme of $FF to spawn a sprite, but not *display* it
         ; until the start of the next beat, and still have it despawn on the following beat
+skip:
+        lda #.sizeof(MetaSpriteState)
+        clc
+        adc MetaSpriteIndex
+        cmp #(.sizeof(MetaSpriteState) * MAX_METASPRITES)
+        beq done
+        sta MetaSpriteIndex
+        jmp loop
+done:
+        rts
+.endproc
+
+; If it's not the player sprite or the hud sprite, kill it with fire
+.proc despawn_unimportant_sprites
+MetaSpriteIndex := R0
+        lda #0
+        sta MetaSpriteIndex
+        ldy #0
+loop:
+        lda MetaSpriteIndex
+        cmp PlayerSpriteIndex
+        beq skip
+        cmp HudWeaponSpriteIndex
+        beq skip
+        lda #0
+        ldx MetaSpriteIndex
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
 skip:
         lda #.sizeof(MetaSpriteState)
         clc

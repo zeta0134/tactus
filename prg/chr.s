@@ -37,6 +37,7 @@ CurrentChrBank: .res 1
         .include "../build/static_tiles/big_key.chr"
         .include "../build/static_tiles/gold_sack.chr"
         .include "../build/static_tiles/treasure_chest.chr"
+        .include "../build/static_tiles/weapon_shadow.chr"
 
         ; hud
         .include "../build/static_tiles/empty_heart.chr"
@@ -56,7 +57,7 @@ animated_tile_table:
         .word $1040, death_skull
 
 
-STATIC_TILE_TABLE_LENGTH = 15
+STATIC_TILE_TABLE_LENGTH = 19
 static_tile_table:
         ; level geometry, ascending
         .word $0800, floor
@@ -69,6 +70,7 @@ static_tile_table:
         .word $0980, treasure_chest
         .word $09C0, big_key
         .word $0A00, gold_sack
+        .word $0A40, weapon_shadow
         ; hud, descending
         .word $0CC0, full_heart
         .word $0C80, half_heart

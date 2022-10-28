@@ -3,3 +3,4 @@
 .global FAR_refresh_hud
 
 .global HudDirty, HudAttrDirty, HudGoldDisplay
+.global HudWeaponSpriteIndex
