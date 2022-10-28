@@ -40,6 +40,8 @@ PlayerHealth: .res 1
 PlayerKeys: .res 1
 PlayerGold: .res 2
 
+PlayerZone: .res 1
+PlayerFloor: .res 1
 PlayerRoomIndex: .res 1
 
 DIRECTION_NORTH = 1
@@ -105,6 +107,11 @@ MetaSpriteIndex := R0
         sta PlayerKeys
         sta PlayerRoomIndex
         st16 PlayerGold, 0
+
+        lda #1
+        sta PlayerZone
+        lda #1
+        sta PlayerFloor
 
         rts
 

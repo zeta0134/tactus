@@ -50,7 +50,7 @@ MAP_ICON_EXPLORED = 194
 MAP_ICON_CURRENT = 195
 
 weapon_palette_table:
-        .byte %00, %10, %01, %11
+        .byte %00, %01, %10, %11
 
 .proc FAR_init_hud
 MetaSpriteIndex := R0
