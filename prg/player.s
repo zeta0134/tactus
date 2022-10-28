@@ -99,7 +99,7 @@ MetaSpriteIndex := R0
 
         lda #5
         sta PlayerHealth
-        lda #10
+        lda #12
         sta PlayerMaxHealth
         lda #0
         sta PlayerKeys

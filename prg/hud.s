@@ -255,7 +255,7 @@ RoomIndex := R0
 FullHeartThreshold := R1
 HalfHeartThreshold := R2
         ; up to 10 hearts
-        lda #1
+        lda #0
         sta CurrentHeart
         lda #2
         sta FullHeartThreshold
@@ -307,11 +307,11 @@ converge:
         inc HalfHeartThreshold
         inc CurrentHeart
         lda CurrentHeart
-        cmp #11
+        cmp #MAX_HEARTS
         bne loop
 
         ; For now, just pad out the remainder
-        lda #4
+        lda #10
         sta PaddingAmount
         jsr draw_padding
 
@@ -340,8 +340,10 @@ CurrentHeart := R0
 RoomIndex := R0
 FullHeartThreshold := R1
 HalfHeartThreshold := R2
+NumberWord := R0
+StringPtr := R0
         ; up to 10 hearts
-        lda #1
+        lda #0
         sta CurrentHeart
         lda #2
         sta FullHeartThreshold
@@ -394,11 +396,17 @@ converge:
         inc HalfHeartThreshold
         inc CurrentHeart
         lda CurrentHeart
-        cmp #11
+        cmp #MAX_HEARTS
         bne loop
 
+        ; Draw the player's gold counter
+        st16 StringPtr, money_text
+        jsr draw_string
+        mov16 NumberWord, PlayerGold
+        jsr draw_16bit_number
+
         ; For now, just pad out the remainder
-        lda #4
+        lda #3
         sta PaddingAmount
         jsr draw_padding
 
@@ -424,6 +432,7 @@ zone_text: .asciiz "ZONE "
 hyphen_text: .asciiz "-"
 weapon_level_text: .asciiz "L"
 key_text: .asciiz "k"
+money_text: .asciiz " $"
 
 weapon_name_table:
         .word dagger_text
@@ -585,15 +594,15 @@ RoomIndex := R0
 ; Note: Expects a VRAM header to aleady be written, and Y to be loaded with the index
 ; DOES close out this header upon completion
 .proc FAR_queue_attributes
-        ; heart cells (11) on the bottom, text (01) on the top
+        ; heart cells (7+padding) on the bottom, text (01) on the top
         lda #%11110101
-        .repeat 5
+        .repeat 4
         sta VRAM_TABLE_START, y
         iny
         .endrepeat
         ; everything else will be pure text
         lda #%01010101
-        .repeat 3
+        .repeat 4
         sta VRAM_TABLE_START, y
         iny
         .endrepeat
@@ -650,5 +659,96 @@ converge:
         inc RoomIndex
         dec Counter
         bne loop
+        rts
+.endproc
+
+.macro sub16w addr, value
+        sec
+        lda addr
+        sbc #<value
+        sta addr
+        lda addr+1
+        sbc #>value
+        sta addr+1
+.endmacro
+
+.proc draw_16bit_number
+NumberWord := R0
+CurrentDigit := R2
+        lda #0
+        sta CurrentDigit
+tens_of_thousands_loop:
+        cmp16 NumberWord, #10000
+        bcc display_tens_of_thousands
+        inc CurrentDigit
+        sub16w NumberWord, 10000
+        jmp tens_of_thousands_loop
+display_tens_of_thousands:
+        lda #NUMBERS_BASE
+        clc
+        adc CurrentDigit
+        sta VRAM_TABLE_START, y
+        iny
+
+        lda #0
+        sta CurrentDigit
+thousands_loop:
+        cmp16 NumberWord, #1000
+        bcc display_thousands
+        inc CurrentDigit
+        sub16w NumberWord, 1000
+        jmp thousands_loop
+display_thousands:
+        lda #NUMBERS_BASE
+        clc
+        adc CurrentDigit
+        sta VRAM_TABLE_START, y
+        iny
+
+        lda #0
+        sta CurrentDigit
+hundreds_loop:
+        cmp16 NumberWord, #100
+        bcc display_hundreds
+        inc CurrentDigit
+        sub16w NumberWord, 100
+        jmp hundreds_loop
+display_hundreds:
+        lda #NUMBERS_BASE
+        clc
+        adc CurrentDigit
+        sta VRAM_TABLE_START, y
+        iny
+
+        lda #0
+        sta CurrentDigit
+tens_loop:
+        cmp16 NumberWord, #10
+        bcc display_tens
+        inc CurrentDigit
+        sub16w NumberWord, 10
+        jmp tens_loop
+display_tens:
+        lda #NUMBERS_BASE
+        clc
+        adc CurrentDigit
+        sta VRAM_TABLE_START, y
+        iny
+
+        lda #0
+        sta CurrentDigit
+ones_loop:
+        cmp16 NumberWord, #1
+        bcc display_ones
+        inc CurrentDigit
+        sub16w NumberWord, 1
+        jmp ones_loop
+display_ones:
+        lda #NUMBERS_BASE
+        clc
+        adc CurrentDigit
+        sta VRAM_TABLE_START, y
+        iny
+
         rts
 .endproc
