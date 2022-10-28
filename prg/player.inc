@@ -13,3 +13,4 @@
 .globalzp PlayerWeaponPtr
 .global PlayerRoomIndex
 .global PlayerKeys
+.global PlayerGold

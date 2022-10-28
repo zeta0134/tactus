@@ -38,6 +38,7 @@ PlayerMovementBlocked: .res 1
 PlayerMaxHealth: .res 1
 PlayerHealth: .res 1
 PlayerKeys: .res 1
+PlayerGold: .res 2
 
 PlayerRoomIndex: .res 1
 
@@ -103,6 +104,7 @@ MetaSpriteIndex := R0
         lda #0
         sta PlayerKeys
         sta PlayerRoomIndex
+        st16 PlayerGold, 0
 
         rts
 
