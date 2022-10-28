@@ -7,6 +7,7 @@
 .include "input.inc"
 .include "main.inc"
 .include "memory_util.inc"
+.include "prng.inc"
 .include "sound.inc"
 .include "vram_buffer.inc"
 .include "zeropage.inc"
@@ -95,7 +96,6 @@ done_with_oam:
         ; Update palette memory if required
         ;jsr refresh_palettes
         ; Read controller registers and update button status
-        jsr poll_input
         ; This signals to the gameloop that it may continue
         lda GameloopCounter
         sta LastNmi
@@ -124,14 +124,15 @@ write_ppuctrl:
 
         a53_set_chr CurrentChrBank
 
+        ; poll for input *after* setting the scroll position
+        jsr poll_input
+        ; Advance the global pRNG once every frame
+        jsr next_rand
+
 nmi_soft_disable:
         ; Here we *only* update the audio engine, nothing else. This is mostly to
         ; smooth over transitions when loading a new level.
         jsr update_audio
-
-        ; todo: we might wish to update the audio engine here? That way music
-        ; continues to play at the proper speed even if the game lags, ie, we
-        ; trade potentially worse lag for maintaining the tempo
 
         ; restore registers
         pla

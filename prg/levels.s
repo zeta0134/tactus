@@ -15,8 +15,10 @@
 
 .segment "RAM"
 
+global_rng_seed: .res 1
 room_layouts: .res 16
 room_flags: .res 16
+room_seeds: .res 16
 
 .segment "PRG0_8000"
 
