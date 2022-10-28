@@ -276,6 +276,19 @@ continue:
 .endmacro
 
 .macro if_valid_destination success_label,
+        ; Screen edges are never okay
+        ldx TargetTile
+        lda tile_index_to_row_lut, x
+        cmp #0
+        beq failure
+        cmp #(::BATTLEFIELD_HEIGHT-1)
+        beq failure
+        lda tile_index_to_col_lut, x
+        cmp #0
+        beq failure
+        cmp #(::BATTLEFIELD_WIDTH-1)
+        beq failure
+
         ldx TargetTile
         lda battlefield, x
         ; floors are unconditionally okay
