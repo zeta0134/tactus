@@ -79,8 +79,23 @@ bonk_behaviors:
         .word solid_tile_forbids_movement     ; $88 - wall top
         .word solid_tile_forbids_movement     ; $8C - wall face
         .word solid_tile_forbids_movement     ; $90 - pit edge
+        .word no_behavior ; $94 - pit center
+        .word no_behavior ; $98 - treasure chest
+        .word no_behavior ; $9C - big key
+        .word no_behavior ; $A0 - gold sack
+        .word no_behavior ; $A4
+        .word no_behavior ; $A8
+        .word no_behavior ; $AC
+        .word no_behavior ; $B0
+        .word no_behavior ; $B4
+        .word no_behavior ; $B8
+        .word no_behavior ; $BC
+        .word no_behavior ; $C0
+        .word no_behavior ; $C4
+        .word no_behavior ; $C8
+        .word collect_heart_container ; $CC - heart container
         ; safety: fill out the rest of the table
-        .repeat 27
+        .repeat 12
         .word no_behavior
         .endrepeat
 
@@ -129,6 +144,7 @@ TileId := R1
 
 .proc spawn_death_sprite_here
 MetaSpriteIndex := R0
+AttackSquare := R3
 EffectiveAttackSquare := R10
         jsr find_unused_sprite
         ldx MetaSpriteIndex
@@ -140,7 +156,7 @@ EffectiveAttackSquare := R10
         lda #$FF
         sta sprite_table + MetaSpriteState::LifetimeBeats, x
 
-        ldy EffectiveAttackSquare
+        ldy AttackSquare
         lda tile_index_to_col_lut, y
         .repeat 4
         asl
@@ -736,5 +752,31 @@ TargetCol := R15
         sta TargetCol
         lda PlayerRow
         sta TargetRow
+        rts
+.endproc
+
+.proc collect_heart_container
+TargetIndex := R0
+TileId := R1
+TargetSquare := R13
+        lda PlayerMaxHealth
+        clc
+        adc #2
+        sta PlayerMaxHealth
+        sta PlayerHealth
+
+        ; TODO: a nice SFX
+
+        ; Now, draw a basic floor tile here, which will be underneath the player
+        lda TargetSquare
+        sta TargetIndex
+        lda #TILE_REGULAR_FLOOR
+        sta TileId
+        jsr draw_active_tile
+        ldx TargetSquare
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+
         rts
 .endproc
