@@ -1,5 +1,6 @@
         .setcpu "6502"
 
+        .include "battlefield.inc" ; for queued bytes counter
         .include "branch_util.inc"
         .include "nes.inc"
         .include "palette.inc"
@@ -13,6 +14,8 @@ ObjPaletteDirty: .res 1
 BgPaletteBuffer: .res 16
 ObjPaletteBuffer: .res 16
 Brightness: .res 1
+TargetBrightness: .res 1
+BrightnessDelay: .res 1
 
         .segment "PRG0_8000"
 
@@ -82,8 +85,10 @@ brightness_table:
         .word white_palette
 
 
+.segment "PRGFIXED_C000"
+
 ; call with desired brightness in a
-.proc FAR_set_brightness
+.proc set_brightness
         sta Brightness
         lda #1
         sta BgPaletteDirty
@@ -91,12 +96,20 @@ brightness_table:
         rts
 .endproc
 
+.segment "PRG0_8000"
+
 .proc FAR_refresh_palettes_gameloop
 PalAddr := R0
 PalIndex := R2
         lda BgPaletteDirty
         ora ObjPaletteDirty
         jeq done
+
+        lda queued_bytes_counter
+        cmp #(MAXIMUM_QUEUE_SIZE - 32)
+        bcc continue
+        rts ; the queue is full; bail immediately
+continue:
 
         lda Brightness
         asl
@@ -177,6 +190,36 @@ done:
         lda #0
         sta BgPaletteDirty
         sta ObjPaletteDirty
+
+        lda queued_bytes_counter
+        clc
+        adc #32
+        sta queued_bytes_counter
+
         rts
 .endproc
 
+.proc FAR_update_brightness
+        lda BrightnessDelay
+        beq continue
+        dec BrightnessDelay
+        rts
+continue:        
+        lda TargetBrightness
+        cmp Brightness
+        beq done ; nothing to do
+        bcc target_lower
+target_higher:
+        inc Brightness
+        jmp converge
+target_lower:
+        dec Brightness
+converge:
+        lda #1
+        sta BgPaletteDirty
+        sta ObjPaletteDirty
+        lda #GLOBAL_PALETTE_FADE_SPEED
+        sta BrightnessDelay
+done:
+        rts
+.endproc

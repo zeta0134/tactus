@@ -28,10 +28,6 @@ active_battlefield: .res 1
 
 .proc FAR_initialize_battlefield
 LayoutPtr := R0
-Length := R2
-        ; TODO: make this accept the layout pointer as an argument
-        st16 LayoutPtr, test_layout_with_four_exits
-        ;st16 LayoutPtr, hit_box_testing
         ldy #0
 loop:
         lda (LayoutPtr), y
