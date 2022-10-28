@@ -79,6 +79,9 @@ CurrentBeatCounter: .res 1
         ; - Swap the active and inactive buffers
         far_call FAR_swap_battlefield_buffers
 
+        ; Set the next kernel mode early; the player might override this
+        st16 GameMode, update_enemies_1
+
         ; - Resolve the player's action
         jsr update_player
 
@@ -91,7 +94,6 @@ CurrentBeatCounter: .res 1
         jsr age_sprites
         far_call FAR_refresh_hud
         jsr every_gameloop
-        st16 GameMode, update_enemies_1
         rts
 .endproc
 

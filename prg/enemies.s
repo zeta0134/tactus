@@ -16,6 +16,20 @@ DestPtr: .res 2
 
 .segment "PRGFIXED_C000"
 
+tile_index_to_row_lut:
+        .repeat ::BATTLEFIELD_HEIGHT, h
+        .repeat ::BATTLEFIELD_WIDTH, w
+        .byte h
+        .endrepeat
+        .endrepeat
+
+tile_index_to_col_lut:
+        .repeat ::BATTLEFIELD_HEIGHT, h
+        .repeat ::BATTLEFIELD_WIDTH, w
+        .byte w
+        .endrepeat
+        .endrepeat
+
 static_behaviors:
         .word update_smoke_puff      ; $00 - smoke puff
         .word update_slime           ; $04 - slime (idle pose)
@@ -95,20 +109,6 @@ CurrentTile := R15
         sta inactive_attribute_queue, x
         rts
 .endproc
-
-tile_index_to_row_lut:
-        .repeat ::BATTLEFIELD_HEIGHT, h
-        .repeat ::BATTLEFIELD_WIDTH, w
-        .byte h
-        .endrepeat
-        .endrepeat
-
-tile_index_to_col_lut:
-        .repeat ::BATTLEFIELD_HEIGHT, h
-        .repeat ::BATTLEFIELD_WIDTH, w
-        .byte w
-        .endrepeat
-        .endrepeat
 
 .proc draw_active_tile
 TargetIndex := R0
