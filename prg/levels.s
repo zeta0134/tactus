@@ -95,13 +95,17 @@ PT := TILE_PIT
 BS := TILE_BASIC_SLIME
 IS := TILE_INTERMEDIATE_SLIME
 AS := TILE_ADVANCED_SLIME
+TC := TILE_TREASURE_CHEST
+BK := TILE_BIG_KEY
+HC := TILE_HEART_CONTAINER
+GS := TILE_GOLD_SACK
 
 test_layout_top_left:
         ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
         .byte WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT ; 0
         .byte WT, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WT ; 1
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
+        .byte WT, FL, TC, GS, BK, HC, FL, FL, FL, FL, FL, FL, FL, FL ; 3
         .byte WT, FL, FL, FL, FL, FL, IS, FL, FL, FL, FL, FL, FL, FL ; 4
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
         .byte WT, FL, FL, FL, BS, FL, FL, FL, AS, FL, FL, FL, FL, WT ; 6

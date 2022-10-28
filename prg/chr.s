@@ -33,10 +33,15 @@ CurrentChrBank: .res 1
         .include "../build/static_tiles/wall_top.chr"
         .include "../build/static_tiles/pit_edge.chr"
 
+        ; treasures
+        .include "../build/static_tiles/big_key.chr"
+        .include "../build/static_tiles/gold_sack.chr"
+        .include "../build/static_tiles/treasure_chest.chr"
+
         ; hud
         .include "../build/static_tiles/empty_heart.chr"
         .include "../build/static_tiles/half_heart.chr"
-        .include "../build/static_tiles/full_heart.chr"
+        .include "../build/static_tiles/full_heart.chr" ; also the treasure icon
         .include "../build/static_tiles/map_icons.chr"
 
 hud_font:
@@ -59,7 +64,11 @@ static_tile_table:
         .word $0880, wall_top
         .word $08C0, wall_face
         .word $0900, pit_edge
-        .word $0940, floor
+        .word $0940, floor ; pit non-edge
+        ; treasures
+        .word $0980, treasure_chest
+        .word $09C0, big_key
+        .word $0A00, gold_sack
         ; hud, descending
         .word $0CC0, full_heart
         .word $0C80, half_heart
