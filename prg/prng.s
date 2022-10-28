@@ -1,5 +1,7 @@
         .setcpu "6502"
         .include "prng.inc"
+        .include "player.inc"
+        .include "levels.inc"
 ;
 ; 6502 LFSR PRNG - 16-bit
 ; Brad Smith, 2019
@@ -84,3 +86,15 @@ next_fixed_rand:
 	sta fixed_seed+0
 	rts
 
+.proc set_fixed_room_seed
+        lda global_rng_seed
+        sta fixed_seed
+        ldx PlayerRoomIndex
+        lda room_seeds, x
+        sta fixed_seed+1
+        ; I've noticed that the first number pulled can be a *mite* predictable, so to
+        ; resolve this run the routine twice before returning
+        jsr next_fixed_rand
+        jsr next_fixed_rand
+        rts
+.endproc

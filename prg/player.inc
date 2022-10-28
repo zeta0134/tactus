@@ -4,6 +4,8 @@
 .global update_player
 .global damage_player
 
+.global row_number_to_tile_index_lut
+
 .global PlayerRow
 .global PlayerCol
 .global PlayerMaxHealth
