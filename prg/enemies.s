@@ -808,7 +808,7 @@ TargetSquare := R13
 TargetIndex := R0
 TileId := R1
 TargetSquare := R13
-        add16b PlayerGold, #100
+        add16w PlayerGold, #23789
 
         ; TODO: a nice SFX
 
