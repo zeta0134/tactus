@@ -8,6 +8,7 @@
         .include "player.inc"
         .include "sprites.inc"
         .include "weapons.inc"
+        .include "word_util.inc"
         .include "zeropage.inc"
 
 .zeropage
@@ -376,6 +377,9 @@ resolve_enemy_collision:
         lda #0
         sta PlayerNextDirection
 
+        ; Detect exits and, if necessary, transition to the next room
+        jsr detect_exit
+
         rts
 .endproc
 
@@ -571,5 +575,56 @@ TargetCol := R15
         beq already_dead
         dec PlayerHealth
 already_dead:
+        rts
+.endproc
+
+; Note: checks and updates PlayerRow/PlayerCol,
+; but does **not** update the target or tween positions.
+; This intentionally desynchronizes the on-screen position, which
+; allows the player to appear to jump to the exit tile. When the next
+; room loads, we'll instantly set their new position and they'll be in
+; the right spot based on the way they left the previous field.
+.proc detect_exit
+        lda PlayerCol
+        cmp #0
+        beq exit_left
+        cmp #(::BATTLEFIELD_WIDTH - 1)
+        beq exit_right
+        lda PlayerRow
+        cmp #0
+        beq exit_top
+        cmp #(::BATTLEFIELD_HEIGHT - 1)
+        beq exit_bottom
+no_exit:
+        rts
+exit_left:
+        dec PlayerRoomIndex
+        lda #(::BATTLEFIELD_WIDTH - 2)
+        sta PlayerCol
+        jmp converge
+exit_right:
+        inc PlayerRoomIndex
+        lda #1
+        sta PlayerCol
+        jmp converge
+exit_top:
+        lda PlayerRoomIndex
+        sec
+        sbc #4
+        sta PlayerRoomIndex
+        lda #(::BATTLEFIELD_HEIGHT - 2)
+        sta PlayerRow
+        jmp converge
+exit_bottom:
+        lda PlayerRoomIndex
+        clc
+        adc #4
+        sta PlayerRoomIndex
+        lda #1
+        sta PlayerRow
+        jmp converge
+converge:
+        ; TODO: this probably needs to be a fade out state, rather than right to room init
+        st16 GameMode, room_init
         rts
 .endproc

@@ -55,6 +55,12 @@ LayoutPtr := R0
         sta LayoutPtr+1
         near_call FAR_initialize_battlefield
 
+        ; Mark this room as visited
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        ora #ROOM_FLAG_VISITED
+        sta room_flags, x
+
         ; TODO: spawn enemies
         rts
 .endproc

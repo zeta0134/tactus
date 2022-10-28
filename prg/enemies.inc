@@ -14,3 +14,5 @@ TILE_PIT_EDGE =      $90
 TILE_PIT      =      $94
 
 .global update_static_enemy_row, clear_active_move_flags, attack_enemy_tile, player_collides_with_tile
+
+.global tile_index_to_row_lut, tile_index_to_col_lut
