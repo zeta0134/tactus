@@ -81,7 +81,7 @@ bonk_behaviors:
         .word solid_tile_forbids_movement     ; $90 - pit edge
         .word no_behavior ; $94 - pit center
         .word no_behavior ; $98 - treasure chest
-        .word no_behavior ; $9C - big key
+        .word collect_key ; $9C - big key
         .word no_behavior ; $A0 - gold sack
         .word no_behavior ; $A4
         .word no_behavior ; $A8
@@ -764,6 +764,29 @@ TargetSquare := R13
         adc #2
         sta PlayerMaxHealth
         sta PlayerHealth
+
+        ; TODO: a nice SFX
+
+        ; Now, draw a basic floor tile here, which will be underneath the player
+        lda TargetSquare
+        sta TargetIndex
+        lda #TILE_REGULAR_FLOOR
+        sta TileId
+        jsr draw_active_tile
+        ldx TargetSquare
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+
+        rts
+.endproc
+
+.proc collect_key
+TargetIndex := R0
+TileId := R1
+TargetSquare := R13
+        lda #1 ; there is only one key per dungeon floor
+        sta PlayerKeys
 
         ; TODO: a nice SFX
 

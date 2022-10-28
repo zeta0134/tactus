@@ -423,6 +423,7 @@ converge:
 zone_text: .asciiz "ZONE "
 hyphen_text: .asciiz "-"
 weapon_level_text: .asciiz "L"
+key_text: .asciiz "k"
 
 weapon_name_table:
         .word dagger_text
@@ -502,8 +503,20 @@ RoomIndex := R0
         lda #1 ; TODO: use the actual level number
         sta Digit
         jsr draw_single_digit
+        ; If the player has a key, draw the key icon
+        lda PlayerKeys
+        beq no_key
+has_key:
+        st16 StringPtr, key_text
+        jsr draw_string
+        jmp done_with_keys
+no_key:
+        lda #1
+        sta PaddingAmount
+        jsr draw_padding
+done_with_keys:
         ; Fixed padding between zone end and weapon area begin
-        lda #2
+        lda #1
         sta PaddingAmount
         jsr draw_padding
         ; Variable padding depending on player equipped weapon
