@@ -853,6 +853,16 @@ sprite_failed:
 TargetIndex := R0
 TileId := R1
 AttackSquare := R3
+        ; If the player is already at max hearts...
+        lda PlayerMaxHealth
+        cmp #(MAX_HEARTS * 2)
+        bne okay_to_spawn
+        ; ... then we must not increase their health any further.
+        ; Spawn a gold sack instead
+        jsr spawn_gold_sack
+        rts
+
+okay_to_spawn:
         ; Super easy: replace the chest with a heart container tile
         lda AttackSquare
         sta TargetIndex
