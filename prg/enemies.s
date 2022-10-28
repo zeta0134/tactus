@@ -165,7 +165,7 @@ EffectiveAttackSquare := R10
         cpx #$FF
         beq sprite_failed
 
-        lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_RISE | SPRITE_PAL_1)
+        lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_RISE | SPRITE_PAL_3)
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
         lda #$FF
         sta sprite_table + MetaSpriteState::LifetimeBeats, x
@@ -684,9 +684,14 @@ cheaty_weapon_lut:
         ; bonus percent
         .byte WEAPON_LONGSWORD
 
+weapon_damage_lut:
+        .byte 1, 2, 3, 3
+
 .proc attack_treasure_chest
 MetaSpriteIndex := R0
 WeaponClassTemp := R1
+TargetIndex := R0
+TileId := R1
 AttackSquare := R3
 AttackLanded := R7
 WeaponPtr := R12 
@@ -702,7 +707,17 @@ WeaponPtr := R12
         sta WeaponClassTemp
         ; TODO: chests should spawn any treasure, not just a weapon. But as weapons are complicated...
         ; let's do those first.
-        ; TODO: weapon strength should be clamped based on the current floor (and later, zone?)
+        ; weapon strength should be clamped based on the current floor (and later, zone?)
+        and #%00000011 ; isolate the damage index
+        cmp PlayerFloor
+        bcc zone_index_valid
+        lda #0 ; force a lvl 1 weapon; this affects spawn rate of higher tier weapons on each floor
+zone_index_valid:
+        tax
+        lda WeaponClassTemp
+        and #%00111100 ; isolate weapon type
+        ora weapon_damage_lut, x  ;  apply the damage bits here
+        sta WeaponClassTemp
 
 spawn_weapon:
         ; Spawn a sprite to hold the weapon
@@ -765,8 +780,12 @@ spawn_weapon:
         ldx AttackSquare
         sta tile_flags, x
         ; and finally, set this tile to a weapon shadow
+
+        lda AttackSquare
+        sta TargetIndex
         lda #TILE_WEAPON_SHADOW
-        sta battlefield, x
+        sta TileId
+        jsr draw_active_tile
         ; ... we're done?
         rts
 
@@ -969,6 +988,50 @@ TargetSquare := R13
 
 
 .proc collect_weapon
-        ; currently stubbed
+TargetIndex := R0
+TileId := R1
+TargetSquare := R13
+        ; We stuffed the WeaponClassTemp variable in tile_flags, so use that to determine
+        ; the weapon properties
+        ldx TargetSquare
+        lda tile_flags, x
+        and #%00000011
+        sta PlayerWeaponDmg
+        lda tile_flags, x
+        and #%00111100
+        lsr
+        lsr
+        tax
+        lda cheaty_weapon_lut, x
+        sta PlayerWeapon
+        ; we also need to update the weapon ptr here
+        asl
+        tax
+        lda weapon_class_table, x
+        sta PlayerWeaponPtr
+        lda weapon_class_table+1, x
+        sta PlayerWeaponPtr+1
+
+        ; TODO: play a weapon gain SFX
+
+        ; Despawn the weapon sprite
+        ldx TargetSquare
+        lda tile_data, x
+        tax
+        lda #0
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+
+        ; Finally, draw a basic floor tile here
+        lda TargetSquare
+        sta TargetIndex
+        lda #TILE_REGULAR_FLOOR
+        sta TileId
+        jsr draw_active_tile
+        ldx TargetSquare
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+
+
         rts
 .endproc
