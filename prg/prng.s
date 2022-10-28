@@ -20,6 +20,7 @@
 
 .zeropage
 seed: .res 2 ; seed can be 2-4 bytes
+fixed_seed: .res 2
 
         .segment "PRGFIXED_C000"
 
@@ -28,7 +29,6 @@ seed: .res 2 ; seed can be 2-4 bytes
 ; 35 bytes
 
 next_rand:
-galois16o:
 	lda seed+1
 	tay ; store copy of high byte
 	; compute seed+1 ($39>>1 = %11100)
@@ -55,3 +55,32 @@ galois16o:
 	eor seed+0
 	sta seed+0
 	rts
+
+next_fixed_rand:
+	lda fixed_seed+1
+	tay ; store copy of high byte
+	; compute fixed_seed+1 ($39>>1 = %11100)
+	lsr ; shift to consume zeroes on left...
+	lsr
+	lsr
+	sta fixed_seed+1 ; now recreate the remaining bits in reverse order... %111
+	lsr
+	eor fixed_seed+1
+	lsr
+	eor fixed_seed+1
+	eor fixed_seed+0 ; recombine with original low byte
+	sta fixed_seed+1
+	; compute fixed_seed+0 ($39 = %111001)
+	tya ; original high byte
+	sta fixed_seed+0
+	asl
+	eor fixed_seed+0
+	asl
+	eor fixed_seed+0
+	asl
+	asl
+	asl
+	eor fixed_seed+0
+	sta fixed_seed+0
+	rts
+
