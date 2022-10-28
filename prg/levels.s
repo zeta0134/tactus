@@ -20,6 +20,8 @@ global_rng_seed: .res 1
 room_layouts: .res 16
 room_flags: .res 16
 room_seeds: .res 16
+chest_spawned: .res 1
+enemies_active: .res 1
 
 .segment "PRG0_8000"
 
@@ -75,7 +77,125 @@ LayoutPtr := R0
         ora #ROOM_FLAG_VISITED
         sta room_flags, x
 
+        ; If the player has already collected this room's treausre, then don't allow
+        ; another one to spawn
+        lda room_flags, x
+        and #ROOM_FLAG_TREASURE_COLLECTED
+        bne treasure_already_collected
+        lda #0
+        sta chest_spawned
+        jmp converge_treasure
+treasure_already_collected:
+        lda #1
+        sta chest_spawned
+converge_treasure:
+
+        ; set the initial enemies active counter to nonzero, so we process at least one full beat before considering the room to be "empty"
+        lda #1
+        sta enemies_active
+
         ; TODO: spawn enemies
+        rts
+.endproc
+
+.proc FAR_handle_room_spawns
+EntityId := R1
+        lda enemies_active
+        bne all_done
+        lda chest_spawned
+        bne all_done
+        ; This room was just cleared! Mark it so
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        ora #ROOM_FLAG_CLEARED
+        sta room_flags, x
+
+        ; load the fixed seed for the players current room
+        jsr set_fixed_room_seed
+        ; spawn in a chest
+        lda #TILE_TREASURE_CHEST
+        sta EntityId
+        jsr spawn_entity
+        lda #1
+        sta chest_spawned
+all_done:
+        ; reset the enemies active counter for the next beat
+        lda #0
+        sta enemies_active
+        rts
+.endproc
+
+; These are used to take a 5bit random number and pick something "in bounds" coordinate wise,
+; with reasonable speed and fairness
+random_row_table:
+        .repeat 32, i
+        .byte (2 + (i .MOD (::BATTLEFIELD_HEIGHT - 4)))
+        .endrepeat
+
+random_col_table:
+        .repeat 32, i
+        .byte (2 + (i .MOD (::BATTLEFIELD_WIDTH - 4)))
+        .endrepeat
+
+; Spawn the provided entity somewhere "safe" in the room.
+; Safe positions are: row >= 2, row <= height-2, col >= 2, col <= height-2
+; The player's current location is not safe
+; Only floor tiles (and disco floor tiles I suppose) are safe
+; WARNING: If there are no safe floor tiles at all on this map, the function WILL lock up indefinitely.
+; Try not to let this happen.
+; Note: calls 
+.proc spawn_entity
+TempIndex := R0
+EntityId := R1
+TempRow := R2
+TempCol := R3
+
+find_safe_coordinate:
+        jsr next_fixed_rand
+        and #%00011111
+        tax
+        lda random_row_table, x
+        sta TempRow
+        jsr next_fixed_rand
+        and #%00011111
+        tax
+        lda random_col_table, x
+        sta TempCol
+check_player_coords:
+        lda PlayerRow
+        cmp TempRow
+        bne check_floor
+        lda PlayerCol
+        cmp TempCol
+        bne check_floor
+        ; no good; this spawn would be on top of the player. Move it somewhere else
+        jmp find_safe_coordinate
+check_floor:
+        ldx TempRow
+        lda row_number_to_tile_index_lut, x
+        clc
+        adc TempCol
+        sta TempIndex
+        ldx TempIndex
+        lda battlefield, x
+        and #%11111100 ; we only care about the index, not the color
+        cmp #TILE_REGULAR_FLOOR
+        beq is_valid_space
+        cmp #TILE_DISCO_FLOOR
+        beq is_valid_space
+        ; no good; this is not a floor tile. We cannot spawn anything here,
+        ; try again
+        jmp find_safe_coordinate
+is_valid_space:
+        ; conveniently, X is already our destination, so just write this
+        ; tile there
+        jsr draw_active_tile
+        ; zero out the other two properties
+        ; (Not sure if this will ever be incorrect? unclear)
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+        ; all done!
         rts
 .endproc
 
@@ -119,7 +239,7 @@ test_layout_top_left:
         .byte WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT ; 0
         .byte WT, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WT ; 1
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
-        .byte WT, FL, TC, GS, BK, HC, FL, FL, FL, FL, FL, FL, FL, FL ; 3
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
         .byte WT, FL, FL, FL, FL, FL, IS, FL, FL, FL, FL, FL, FL, FL ; 4
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
         .byte WT, FL, FL, FL, BS, FL, FL, FL, AS, FL, FL, FL, FL, WT ; 6

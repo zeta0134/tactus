@@ -429,6 +429,7 @@ done_choosing_target:
 .endproc
 
 ; For rapidly computing the tile row
+row_number_to_tile_index_lut:
 player_tile_index_table:
         .repeat ::BATTLEFIELD_HEIGHT, i
         .byte (::BATTLEFIELD_WIDTH * i)

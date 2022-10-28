@@ -93,6 +93,7 @@ CurrentBeatCounter: .res 1
 
         ; - Resolve the player's action
         jsr update_player
+        far_call FAR_handle_room_spawns
 
         ; - Queue up any changed squares to the **active** buffer
         ; - Begin playback of any sprite animations (?)

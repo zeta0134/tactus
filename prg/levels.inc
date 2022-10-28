@@ -1,7 +1,8 @@
 .global FAR_demo_init_floor
 .global FAR_init_current_room
+.global FAR_handle_room_spawns
 
-.global room_layouts, room_flags, room_seeds, global_rng_seed
+.global room_layouts, room_flags, room_seeds, global_rng_seed, enemies_active
 
 ; layouts
 .global test_layout_with_four_exits

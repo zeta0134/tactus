@@ -322,6 +322,7 @@ failure:
 
 .proc update_slime
 CurrentTile := R15
+        inc enemies_active
         ldx CurrentTile
         lda battlefield, x
         and #%00000011
@@ -717,11 +718,7 @@ WeaponPtr := R12
         sta AttackLanded
 
         ; load the room seed before spawning the treasure
-        lda global_rng_seed
-        sta fixed_seed+1
-        ldx PlayerRoomIndex
-        lda room_seeds, x
-        sta fixed_seed
+        jsr set_fixed_room_seed
 
         ; if this is a boss room, we need to always spawn the key!
         ldx PlayerRoomIndex
@@ -1058,6 +1055,12 @@ TargetSquare := R13
         sta tile_data, x
         sta tile_flags, x
 
+        ; We have *collected a treasure*! Mark this as such in the current room data
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        ora #ROOM_FLAG_TREASURE_COLLECTED
+        sta room_flags, x
+
         rts
 .endproc
 
@@ -1081,6 +1084,12 @@ TargetSquare := R13
         sta tile_data, x
         sta tile_flags, x
 
+        ; We have *collected a treasure*! Mark this as such in the current room data
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        ora #ROOM_FLAG_TREASURE_COLLECTED
+        sta room_flags, x
+
         rts
 .endproc
 
@@ -1102,6 +1111,12 @@ TargetSquare := R13
         lda #0
         sta tile_data, x
         sta tile_flags, x
+
+        ; We have *collected a treasure*! Mark this as such in the current room data
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        ora #ROOM_FLAG_TREASURE_COLLECTED
+        sta room_flags, x
 
         rts
 .endproc
@@ -1153,6 +1168,11 @@ TargetSquare := R13
         sta tile_data, x
         sta tile_flags, x
 
+        ; We have *collected a treasure*! Mark this as such in the current room data
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        ora #ROOM_FLAG_TREASURE_COLLECTED
+        sta room_flags, x
 
         rts
 .endproc
