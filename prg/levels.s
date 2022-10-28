@@ -9,6 +9,7 @@
         .include "nes.inc"
         .include "player.inc"
         .include "ppu.inc"
+        .include "prng.inc"
         .include "vram_buffer.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
@@ -40,7 +41,18 @@ room_loop:
         inx
         cpx #16
         bne room_loop
+
+        ; set each room up with its own RNG low byte
+        ldx #0
+seed_loop:
+        jsr next_rand
+        sta room_seeds, x
+        inx
+        cpx #16
+        bne seed_loop        
+
         ; For now that's enough, don't overthink this :)
+
         rts
 .endproc
 

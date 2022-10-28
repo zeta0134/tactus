@@ -12,6 +12,7 @@
         .include "nes.inc"
         .include "palette.inc"
         .include "player.inc"
+        .include "prng.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "word_util.inc"
@@ -51,20 +52,27 @@ CurrentBeatCounter: .res 1
         lda #1
         jsr play_track
 
-        far_call FAR_init_hud
-        far_call FAR_demo_init_floor
-        jsr init_player
-
-        st16 GameMode, room_init
+        st16 GameMode, game_init
         jsr wait_for_next_vblank
         rts
 .endproc
 
 .proc game_init
+        jsr next_rand
+        ora #%00000001
+        sta global_rng_seed
+
+        far_call FAR_init_hud
+        jsr init_player
+
+        st16 GameMode, zone_init
         rts
 .endproc
 
 .proc zone_init
+        ; FOR NOW, do a demo init that generates a static floor
+        far_call FAR_demo_init_floor
+        st16 GameMode, room_init
         rts
 .endproc
 

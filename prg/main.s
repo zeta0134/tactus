@@ -5,6 +5,7 @@
         .include "debug.inc"
         .include "far_call.inc"
         .include "kernel.inc"
+        .include "levels.inc"
         .include "main.inc"
         .include "memory_util.inc"
         .include "nes.inc"
@@ -42,6 +43,8 @@ start:
         ; initialize the prng seed to a nonzero value
         lda #1
         sta seed
+        sta fixed_seed
+
 
         ; copy the initial batch of graphics into CHR RAM
         far_call FAR_initialize_chr_ram

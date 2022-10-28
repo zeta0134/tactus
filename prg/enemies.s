@@ -716,7 +716,12 @@ WeaponPtr := R12
         lda #1
         sta AttackLanded
 
-        ; TODO: load the room seed here
+        ; load the room seed before spawning the treasure
+        lda global_rng_seed
+        sta fixed_seed+1
+        ldx PlayerRoomIndex
+        lda room_seeds, x
+        sta fixed_seed
 
         ; if this is a boss room, we need to always spawn the key!
         ldx PlayerRoomIndex
@@ -727,7 +732,7 @@ WeaponPtr := R12
         rts
 spawn_treasure:
         ; determine which weapon category to spawn
-        jsr next_rand
+        jsr next_fixed_rand
         and #%00001111
         tax
         lda treasure_category_table, x
@@ -757,7 +762,7 @@ WeaponPtr := R12
         ; First we need to roll a weapon class
         ; TODO: this should almost certainly use a FIXED seed. Without this, the player
         ; can leave and re-enter the room to try the roll again, which is scummy
-        jsr next_rand
+        jsr next_fixed_rand
         and #%00111111 ; low 2 bits = weapon strength, middle 4 bits = weapon type from table
         sta WeaponClassTemp
         ; TODO: chests should spawn any treasure, not just a weapon. But as weapons are complicated...
