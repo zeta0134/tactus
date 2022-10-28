@@ -12,3 +12,4 @@
 .global PlayerWeaponDmg
 .globalzp PlayerWeaponPtr
 .global PlayerRoomIndex
+.global PlayerKeys
