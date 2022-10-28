@@ -70,6 +70,7 @@ CurrentBeatCounter: .res 1
 
 .proc room_init
         far_call FAR_init_current_room
+        jsr despawn_unimportant_sprites
         st16 GameMode, beat_frame_1
         rts
 .endproc

@@ -54,7 +54,6 @@ weapon_palette_table:
 
 .proc FAR_init_hud
 MetaSpriteIndex := R0
-        near_call FAR_refresh_hud
         lda #0
         sta HudGoldDisplay+0
         sta HudGoldDisplay+1
@@ -74,6 +73,8 @@ MetaSpriteIndex := R0
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #208
         sta sprite_table + MetaSpriteState::PositionY, x
+        lda #(SPRITE_ACTIVE)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
         jsr update_weapon_sprite
 sprite_failed:
         ; uhh...

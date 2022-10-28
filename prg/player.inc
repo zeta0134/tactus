@@ -14,5 +14,6 @@
 .global PlayerRoomIndex
 .global PlayerKeys
 .global PlayerGold
+.global PlayerSpriteIndex
 
 MAX_HEARTS = 7

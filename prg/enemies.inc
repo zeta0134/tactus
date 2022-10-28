@@ -17,6 +17,7 @@ TILE_PIT      =      $94
 TILE_TREASURE_CHEST = ($98 | %10)
 TILE_BIG_KEY = ($9C | %01)
 TILE_GOLD_SACK = ($A0 | %10)
+TILE_WEAPON_SHADOW = $A4
 TILE_HEART_CONTAINER = ($CC | %11)
 
 .global update_static_enemy_row, clear_active_move_flags, attack_enemy_tile, player_collides_with_tile

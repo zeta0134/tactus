@@ -24,7 +24,7 @@ SPRITE_RISE        = %00001000
 SPRITE_ONE_BEAT    = %00000100
 ; the last 2 bits are the sprite palette
 
-.global initialize_sprites, draw_sprites, age_sprites, find_unused_sprite
+.global initialize_sprites, draw_sprites, age_sprites, find_unused_sprite, despawn_unimportant_sprites
 .global sprite_table
 
 SPRITES_PLAYER_IDLE = $01
