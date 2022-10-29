@@ -10,6 +10,7 @@
 .struct AttackSquare
         RelativePosX .byte
         RelativePosY .byte
+        FxTileId .byte
         BehaviorFlags .byte
 .endstruct
 

@@ -19,6 +19,9 @@ CurrentChrBank: .res 1
         .include "../build/static_tiles/longsword.chr"
         .include "../build/static_tiles/spear.chr"
         .include "../build/static_tiles/flail.chr"
+
+        .include "../build/animated_tiles/horizontal_slash.chr"
+        .include "../build/animated_tiles/vertical_slash.chr"
         ; sprite effects
         .include "../build/animated_tiles/death_skull.chr"
 
@@ -50,13 +53,16 @@ CurrentChrBank: .res 1
 hud_font:
         .incbin "../art/raw_chr/font_chicago_reduced.chr"
 
-ANIMATED_TILE_TABLE_LENGTH = 4
+ANIMATED_TILE_TABLE_LENGTH = 6
 animated_tile_table:
         .word $0000, smoke_puff
         .word $0040, slime_idle
 
         .word $1000, player
         .word $1040, death_skull
+
+        .word $11C0, horizontal_slash
+        .word $1200, vertical_slash
 
 
 STATIC_TILE_TABLE_LENGTH = 21
