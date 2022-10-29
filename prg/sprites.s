@@ -1,7 +1,7 @@
         .setcpu "6502"
 
-        .include "bhop/bhop.inc"
         .include "hud.inc"
+        .include "kernel.inc"
         .include "nes.inc"
         .include "player.inc"
         .include "sprites.inc"
@@ -101,7 +101,7 @@ rising_sprite_y:
         sec
         sbc ScratchByte
         pha
-        lda row_counter
+        lda DisplayedRowCounter
         and #%00000111        
         sta ScratchByte
         pla

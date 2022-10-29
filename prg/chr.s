@@ -1,7 +1,7 @@
         .include "action53.inc"
-        .include "bhop/bhop.inc"
         .include "chr.inc"
         .include "compression.inc"
+        .include "kernel.inc"
         .include "nes.inc"
         .include "ppu.inc"
         .include "word_util.inc"
@@ -32,6 +32,8 @@ CurrentChrBank: .res 1
         .include "../build/static_tiles/wall_face.chr"
         .include "../build/static_tiles/wall_top.chr"
         .include "../build/static_tiles/pit_edge.chr"
+        .include "../build/static_tiles/exit_block.chr"
+        .include "../build/static_tiles/exit_stairs.chr"
 
         ; treasures
         .include "../build/static_tiles/big_key.chr"
@@ -57,7 +59,7 @@ animated_tile_table:
         .word $1040, death_skull
 
 
-STATIC_TILE_TABLE_LENGTH = 19
+STATIC_TILE_TABLE_LENGTH = 21
 static_tile_table:
         ; level geometry, ascending
         .word $0800, floor
@@ -71,6 +73,9 @@ static_tile_table:
         .word $09C0, big_key
         .word $0A00, gold_sack
         .word $0A40, weapon_shadow
+        ; interactables
+        .word $0A80, exit_block
+        .word $0AC0, exit_stairs
         ; hud, descending
         .word $0CC0, full_heart
         .word $0C80, half_heart
@@ -268,7 +273,7 @@ chr_frame_pacing:
         .byte 0, 1, 1, 2, 2, 3, 3, 3
 
 .proc FAR_sync_chr_bank_to_music
-        lda row_counter
+        lda DisplayedRowCounter
         and #%00000111
         tax
         lda chr_frame_pacing, x
