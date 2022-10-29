@@ -36,10 +36,16 @@ TILE_HEART_CONTAINER = ($CC | %11)
 TILE_EXIT_BLOCK = ($A8 | %01)
 TILE_EXIT_STAIRS = ($AC | %00)
 
-.global update_static_enemy_row, clear_active_move_flags, attack_enemy_tile, player_collides_with_tile
+; Actually in the fixed page
 .global draw_active_tile
-
 .global tile_index_to_row_lut, tile_index_to_col_lut
+
+; NOT in the fixed page
+.global FAR_update_static_enemy_row
+.global FAR_clear_active_move_flags
+.global FAR_attack_enemy_tile
+.global FAR_player_collides_with_tile
+
 
 SPIDER_TARGET_RADIUS = 5
 ZOMBIE_TARGET_RADIUS = 8

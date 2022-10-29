@@ -19,6 +19,24 @@ DestPtr: .res 2
 
 .segment "PRGFIXED_C000"
 
+.proc draw_active_tile
+TargetIndex := R0
+TileId := R1
+        ldx TargetIndex
+        lda TileId
+        sta battlefield, x
+        lda tile_index_to_row_lut, x
+        tax
+        lda #1
+        sta active_tile_queue, x
+        txa
+        lsr
+        tax
+        lda #1
+        sta active_attribute_queue, x
+        rts
+.endproc
+
 tile_index_to_row_lut:
         .repeat ::BATTLEFIELD_HEIGHT, h
         .repeat ::BATTLEFIELD_WIDTH, w
@@ -32,6 +50,8 @@ tile_index_to_col_lut:
         .byte w
         .endrepeat
         .endrepeat
+
+.segment "PRG0_8000"
 
 static_behaviors:
         .word update_smoke_puff      ; $00 - smoke puff
@@ -160,24 +180,6 @@ CurrentTile := R15
         rts
 .endproc
 
-.proc draw_active_tile
-TargetIndex := R0
-TileId := R1
-        ldx TargetIndex
-        lda TileId
-        sta battlefield, x
-        lda tile_index_to_row_lut, x
-        tax
-        lda #1
-        sta active_tile_queue, x
-        txa
-        lsr
-        tax
-        lda #1
-        sta active_attribute_queue, x
-        rts
-.endproc
-
 .proc spawn_death_sprite_here
 MetaSpriteIndex := R0
 AttackSquare := R3
@@ -254,7 +256,7 @@ disco_tile:
 
 ; Note: parameters are intentionally backloaded, to allow the behavior functions to use R0+
 ; without conflict
-.proc update_static_enemy_row
+.proc FAR_update_static_enemy_row
 Length := R13
 CurrentRow := R14
 StartingTile := R15
@@ -286,7 +288,7 @@ loop:
         rts
 .endproc
 
-.proc clear_active_move_flags
+.proc FAR_clear_active_move_flags
         ldx #0
 loop:
         lda tile_flags, x
@@ -994,7 +996,7 @@ proceed_with_jump:
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
 
-.proc attack_enemy_tile
+.proc FAR_attack_enemy_tile
 ; R0 and R1 are reserved for the enemy behaviors to use
 ; Current target square to consider for attacking
 PlayerSquare := R2
@@ -1506,7 +1508,7 @@ no_key:
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================
 
-.proc player_collides_with_tile
+.proc FAR_player_collides_with_tile
 TargetSquare := R13
 ; This is our target position after movement. It might be the same as our player position;
 ; regardless, this is where we want to go on this frame. What happens when we land?

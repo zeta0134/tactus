@@ -2,6 +2,7 @@
 
         .include "battlefield.inc"
         .include "enemies.inc"
+        .include "far_call.inc"
         .include "input.inc"
         .include "kernel.inc"
         .include "nes.inc"
@@ -86,7 +87,8 @@ MetaSpriteIndex := R0
         sta PlayerJumpHeightPos
 
         ; The player should start with a standard L1-DAGGER
-        lda #WEAPON_DAGGER
+        ;lda #WEAPON_DAGGER
+        lda #WEAPON_BROADSWORD
         sta PlayerWeapon
         asl
         tax
@@ -535,7 +537,7 @@ converge:
         sta WeaponProperties      ; Stash these here so the enemies can see them (if applicable)
         iny
         sty WeaponSquaresIndex
-        jsr attack_enemy_tile
+        far_call FAR_attack_enemy_tile
 check_player_movement:
         ; If this weapon square could cancel movement
         lda #WEAPON_CANCEL_MOVEMENT
@@ -696,7 +698,7 @@ TargetCol := R15
         adc TargetCol                  ; ... + Col
         sta TargetSquare
 
-        jsr player_collides_with_tile
+        far_call FAR_player_collides_with_tile
 
         rts
 .endproc
