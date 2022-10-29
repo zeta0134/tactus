@@ -28,6 +28,8 @@ CurrentChrBank: .res 1
         ; enemies
         .include "../build/animated_tiles/slime_idle.chr"
         .include "../build/animated_tiles/smoke_puff.chr"
+        .include "../build/animated_tiles/spider.chr"
+        .include "../build/animated_tiles/spider_anticipate.chr"
 
         ; static level geometry
         .include "../build/static_tiles/floor.chr"
@@ -53,10 +55,13 @@ CurrentChrBank: .res 1
 hud_font:
         .incbin "../art/raw_chr/font_chicago_reduced.chr"
 
-ANIMATED_TILE_TABLE_LENGTH = 6
+ANIMATED_TILE_TABLE_LENGTH = 8
 animated_tile_table:
         .word $0000, smoke_puff
         .word $0040, slime_idle
+        .word $0080, spider
+        .word $00C0, spider_anticipate
+
 
         .word $1000, player
         .word $1040, death_skull
