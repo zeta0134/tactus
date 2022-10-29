@@ -52,9 +52,16 @@ seed_loop:
         inx
         cpx #16
         bne seed_loop        
-
-        ; For now that's enough, don't overthink this :)
+        
         ; TODO: pick the boss, exit, and player spawn locations here
+        ; FOR TESTING, the boss room will be slot 1
+        ldx #1
+        lda #ROOM_FLAG_BOSS
+        sta room_flags, x
+        ; FOR TESTING, the exit room shall be slot 2
+        ldx #2
+        lda #ROOM_FLAG_EXIT_STAIRS
+        sta room_flags, x
 
         rts
 .endproc
@@ -100,9 +107,18 @@ converge_treasure:
         lda room_flags, x
         and #ROOM_FLAG_CLEARED
         bne room_cleared
+        ; If this is a boss room, we need to use the boss pool
+        lda room_flags, x
+        and #ROOM_FLAG_BOSS
+        bne spawn_boss_enemies
+spawn_basic_enemies:
         jsr spawn_basic_enemies_from_pool
+        jmp room_cleared
+spawn_boss_enemies:
+        jsr spawn_boss_enemies_from_pool
+        jmp room_cleared
 room_cleared:
-        
+
         rts
 .endproc
 
@@ -271,6 +287,51 @@ EntityList := R4
         ; one of the enemy lists
         jsr next_fixed_rand ; clobbers Y
         and #%00001111
+        asl ; still indexing words
+        tay
+        lda (PoolPtr), y
+        sta EntityList
+        iny
+        lda (PoolPtr), y
+        sta EntityList+1
+        ; Finally, now that we have the entity list, spawn random enemies from it
+        jsr spawn_entity_list
+done:
+        rts
+.endproc
+
+.proc spawn_boss_enemies_from_pool
+CollectionPtr := R0
+PoolPtr := R2
+EntityList := R4
+        ; Everything we are about to do depends on the room seed, so fix that in place before we start
+        jsr set_fixed_room_seed
+
+        ; First find the pool collection for this zone
+        lda PlayerZone
+        sec
+        sbc #1 ; the lists are 0-based, but zones are 1-based
+        asl ; the lists contain words
+        tax
+        lda zone_list_boss, x
+        sta CollectionPtr
+        lda zone_list_boss+1, x
+        sta CollectionPtr+1
+        ; Now load the appropriate pool list for this floor from the collection
+        lda PlayerFloor
+        sec
+        sbc #1 ; the lists are 0-based, but zones are 1-based
+        asl ; the lists contain words
+        tay
+        lda (CollectionPtr), y
+        sta PoolPtr
+        iny
+        lda (CollectionPtr), y
+        sta PoolPtr+1
+        ; Here we need to pick a random number from 0-3, and use that to index the pool to select
+        ; one of the enemy lists
+        jsr next_fixed_rand ; clobbers Y
+        and #%00000011
         asl ; still indexing words
         tay
         lda (PoolPtr), y
