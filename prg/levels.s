@@ -548,9 +548,11 @@ el_advanced_slimes:
         .byte TILE_INTERMEDIATE_SLIME, 4
         .byte TILE_ADVANCED_SLIME, 4
 
-el_just_one_spider:
-        .byte 1
-        .byte TILE_SPIDER_BASIC, 1
+el_debug_enemies:
+        .byte 2
+        .byte TILE_SPIDER_BASIC, 3
+        .byte TILE_ZOMBIE_BASIC, 3
+
 
 ; Each pool is a FIXED length:
 ; - Basic pools have 16 entries
@@ -560,7 +562,7 @@ el_just_one_spider:
 
 debug_pool:
         .repeat 16
-        .word el_just_one_spider
+        .word el_debug_enemies
         .endrepeat
 
 debug_pool_collection:

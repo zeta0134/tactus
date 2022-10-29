@@ -38,7 +38,9 @@ static_behaviors:
         .word update_slime           ; $04 - slime (idle pose)
         .word update_spider_base     ; $08 - spider (idle)
         .word update_spider_anticipate ; $08 - spider (anticipate)
-        .repeat 28
+        .word update_zombie_base     ; $08 - spider (idle)
+        .word update_zombie_anticipate ; $08 - spider (anticipate)
+        .repeat 26
         .word no_behavior ; unimplemented
         .endrepeat
         .word draw_disco_tile ; $80 - plain floor
@@ -57,7 +59,9 @@ direct_attack_behaviors:
         .word direct_attack_slime
         .word direct_attack_spider
         .word direct_attack_spider
-        .repeat 28
+        .word direct_attack_zombie
+        .word direct_attack_zombie
+        .repeat 26
         .word no_behavior
         .endrepeat
         ; floors, statics, and technical tiles
@@ -83,7 +87,9 @@ indirect_attack_behaviors:
         .word indirect_attack_slime
         .word indirect_attack_spider
         .word indirect_attack_spider
-        .repeat 28
+        .word indirect_attack_zombie
+        .word indirect_attack_zombie
+        .repeat 26
         .word no_behavior
         .endrepeat
         ; safety: fill out the rest of the table
@@ -96,7 +102,9 @@ bonk_behaviors:
         .word basic_enemy_attacks_player
         .word basic_enemy_attacks_player
         .word basic_enemy_attacks_player
-        .repeat 28
+        .word basic_enemy_attacks_player
+        .word basic_enemy_attacks_player
+        .repeat 26
         .word no_behavior
         .endrepeat
         .word no_behavior ; $80 - plain floor
@@ -553,6 +561,8 @@ proceed_with_jump:
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
+        inc enemies_active
+
         ldx CurrentTile
         bail_if_already_moved
 
@@ -613,8 +623,12 @@ PlayerDistance := R2
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
+        inc enemies_active
+
         lda CurrentTile
         sta TargetTile
+        lda CurrentRow
+        sta TargetRow
 
         jsr player_manhattan_distance
 track_player:
@@ -732,7 +746,249 @@ proceed_with_jump:
         rts
 .endproc
 
+; Zombies work quite similarly to spiders, except they move cardinally instead of diagonally
 
+.proc update_zombie_base
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+        inc enemies_active
+
+        ldx CurrentTile
+        bail_if_already_moved
+
+        inc tile_data, x
+        lda tile_data, x
+        cmp #2 ; TODO: pick a threshold based on zombie difficulty
+        bcc no_change
+        ; switch to our anticipation pose
+        lda battlefield, x
+        and #%00000011
+        ora #TILE_ZOMBIE_ANTICIPATE
+        sta battlefield, x
+
+        ldx CurrentRow
+        jsr queue_row_x
+
+no_change:
+        rts
+.endproc
+
+; utility functions
+.proc pick_random_cardinal
+TargetRow := R0
+TargetTile := R1
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+        lda CurrentRow
+        sta TargetRow
+        lda CurrentTile
+        sta TargetTile
+
+        jsr next_rand
+        and #%00000011
+        beq east
+        cmp #1
+        beq south
+        cmp #2
+        beq west
+north:
+        dec TargetRow
+        lda TargetTile
+        sec
+        sbc #::BATTLEFIELD_WIDTH
+        sta TargetTile
+        rts
+east:
+        inc TargetTile
+        rts
+south:
+        inc TargetRow
+        lda TargetTile
+        clc
+        adc #::BATTLEFIELD_WIDTH
+        sta TargetTile
+        rts
+west:
+        dec TargetTile
+        rts
+.endproc
+
+.proc target_player_cardinal
+TargetRow := R0
+TargetTile := R1
+PlayerDistanceRow := R2
+PlayerDistanceCol := R3
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+        lda CurrentRow
+        sta TargetRow
+        lda CurrentTile
+        sta TargetTile
+
+        ; Compute the absolute distance the player is away from us on both axis, independently
+
+        ; First the row
+        lda PlayerRow
+        sec
+        sbc CurrentRow
+        bpl save_row_distance
+fix_row_minus:
+        eor #$FF
+        clc
+        adc #1
+save_row_distance:
+        sta PlayerDistanceRow
+
+        ; Now the column
+        lda PlayerCol
+        ldx CurrentTile
+        sec
+        sbc tile_index_to_col_lut, x
+        bpl save_col_distance
+fix_col_minus:
+        eor #$FF
+        clc
+        adc #1
+save_col_distance:
+        sta PlayerDistanceCol
+
+        ; Now, whichever of these is bigger will be our axis of travel. If they re the same size,
+        ; pick randomly
+        lda PlayerDistanceRow
+        sec
+        sbc PlayerDistanceCol
+        beq choose_randomly
+        bmi move_horizontally
+        jmp move_vertically
+choose_randomly:
+        jsr next_rand
+        bmi move_horizontally
+        jmp move_vertically
+
+move_horizontally:
+        ; If the player is to our right...
+        lda PlayerCol
+        ldx CurrentTile
+        sec
+        sbc tile_index_to_col_lut, x
+        bmi move_left
+move_right: 
+        inc TargetTile
+        rts
+move_left:
+        dec TargetTile
+        rts
+
+move_vertically:
+        ; If the player is below us...
+        lda PlayerRow
+        sec
+        sbc CurrentRow
+        bmi move_up
+move_down:
+        inc TargetRow
+        lda TargetTile
+        clc
+        adc #::BATTLEFIELD_WIDTH
+        sta TargetTile
+        rts
+move_up:
+        dec TargetRow
+        lda TargetTile
+        sec
+        sbc #::BATTLEFIELD_WIDTH
+        sta TargetTile
+        rts
+.endproc
+
+.proc update_zombie_anticipate
+TargetRow := R0
+TargetTile := R1
+PlayerDistance := R2
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+        inc enemies_active
+
+        lda CurrentTile
+        sta TargetTile
+        lda CurrentRow
+        sta TargetRow
+
+        jsr player_manhattan_distance
+track_player:        
+        ; If we're outside the tracking radius, choose our next position randomly
+        ; (here, A already has the distance from before)
+        cmp #ZOMBIE_TARGET_RADIUS
+        bcs randomly_choose_direction
+        ; Otherwise target the player
+        jsr target_player_cardinal
+        jmp location_chosen
+randomly_choose_direction:
+        jsr pick_random_cardinal
+location_chosen:
+        ; Now our destination tile is in TargetTile, make sure it's valid
+        if_valid_destination proceed_with_jump
+jump_failed:
+
+        ; Turn ourselves back into an idle pose
+        ldx CurrentTile
+        lda battlefield, x
+        and #%00000011
+        ora #TILE_ZOMBIE_BASE
+        sta battlefield, x
+        ; Zero out our delay counter, so we start fresh
+        lda #0
+        sta tile_data, x
+
+        ldx CurrentRow
+        jsr queue_row_x
+
+        ; And all done
+        rts
+
+proceed_with_jump:        
+        ldx CurrentTile
+        ldy TargetTile
+        ; Draw ourselves at the target (keep our color palette)
+        lda battlefield, x
+        and #%00000011
+        ora #TILE_ZOMBIE_BASE
+        sta battlefield, y
+
+        ; Fix our counter at the destination tile so we start fresh
+        lda #0
+        sta tile_data, y
+
+        ; Now, draw a puff of smoke at our current location
+        ; this should use the same palette that we use
+        lda battlefield, x
+        and #%00000011
+        ora #TILE_SMOKE_PUFF
+        sta battlefield, x
+        ; Write our new position to the data byte for the puff of smoke
+        lda TargetTile
+        sta tile_data, x
+
+        ; Move our data flags to the destination, and flag ourselves as having just moved
+        lda #%10000000
+        ora tile_flags, x
+        sta tile_flags, y
+        ; And finally clear the data flags for the puff of smoke, just to keep things tidy
+        lda #0
+        sta tile_flags, x
+
+        ; Queue up both rows
+        ldx CurrentRow
+        jsr queue_row_x
+        ldx TargetRow
+        jsr queue_row_x
+
+        rts
+.endproc
 
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
@@ -865,6 +1121,38 @@ EffectiveAttackSquare := R10
 .endproc
 
 .proc direct_attack_spider
+EnemyHealth := R11
+        lda #4
+        sta EnemyHealth
+        jsr direct_attack_with_hp
+        rts
+.endproc
+
+.proc indirect_attack_spider
+EnemyHealth := R11
+        lda #4
+        sta EnemyHealth
+        jsr indirect_attack_with_hp
+        rts
+.endproc
+
+.proc direct_attack_zombie
+EnemyHealth := R11
+        lda #4
+        sta EnemyHealth
+        jsr direct_attack_with_hp
+        rts
+.endproc
+
+.proc indirect_attack_zombie
+EnemyHealth := R11
+        lda #4
+        sta EnemyHealth
+        jsr indirect_attack_with_hp
+        rts
+.endproc
+
+.proc direct_attack_with_hp
 AttackSquare := R3
 EffectiveAttackSquare := R10 
         ; If we have *just moved*, then ignore this attack
@@ -875,24 +1163,24 @@ EffectiveAttackSquare := R10
         ; Copy in the attack square, so we can use shared logic to process the effect
         lda AttackSquare
         sta EffectiveAttackSquare
-        jsr attack_spider_common
+        jsr attack_with_hp_common
 ignore_attack:
         rts
 .endproc
 
-.proc indirect_attack_spider
-        jsr attack_spider_common
+.proc indirect_attack_with_hp
+        jsr attack_with_hp_common
         rts
 .endproc
 
-.proc attack_spider_common
+.proc attack_with_hp_common
 ; For drawing tiles
 TargetIndex := R0
 TileId := R1
 
-
 AttackLanded := R7
 EffectiveAttackSquare := R10 
+EnemyHealth := R11
         ; Register the attack as a hit
         lda #1
         sta AttackLanded
@@ -905,7 +1193,7 @@ EffectiveAttackSquare := R10
         sta tile_flags, x
         ; Now check: if the damage, NOT including the movement bit, is greater than our health...
         and #%01111111
-        cmp #4 ; TODO: vary this based on the spider's difficulty
+        cmp EnemyHealth
         bcs die
         ; TODO: if we implement health bars, we should draw one right now
         ; TODO: should we have a "weapon hit something" SFX?
