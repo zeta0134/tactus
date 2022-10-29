@@ -112,7 +112,7 @@ DisplayedRowCounter: .res 1
 
         ; - clear "moved this frame" flags from all tiles, permitting
         ;   the updates we will perform over the next few frames
-        jsr clear_active_move_flags
+        far_call FAR_clear_active_move_flags
         jsr age_sprites
         far_call FAR_refresh_hud
         jsr every_gameloop
@@ -127,25 +127,25 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 0)
         sta StartingTile
-        jsr update_static_enemy_row
+        far_call FAR_update_static_enemy_row
 
         lda #1
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 1)
         sta StartingTile
-        jsr update_static_enemy_row
+        far_call FAR_update_static_enemy_row
 
         lda #2
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 2)
         sta StartingTile
-        jsr update_static_enemy_row
+        far_call FAR_update_static_enemy_row
 
         lda #3
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 3)
         sta StartingTile
-        jsr update_static_enemy_row
+        far_call FAR_update_static_enemy_row
 
         jsr every_gameloop
         st16 GameMode, update_enemies_2
@@ -160,13 +160,13 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 4)
         sta StartingTile
-        jsr update_static_enemy_row
+        far_call FAR_update_static_enemy_row
 
         lda #5
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 5)
         sta StartingTile
-        jsr update_static_enemy_row
+        far_call FAR_update_static_enemy_row
 
         jsr every_gameloop
         st16 GameMode, update_enemies_3
@@ -181,13 +181,13 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 6)
         sta StartingTile
-        jsr update_static_enemy_row
+        far_call FAR_update_static_enemy_row
 
         lda #7
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 7)
         sta StartingTile
-        jsr update_static_enemy_row
+        far_call FAR_update_static_enemy_row
 
         jsr every_gameloop
         st16 GameMode, update_enemies_4
@@ -202,13 +202,13 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 8)
         sta StartingTile
-        jsr update_static_enemy_row
+        far_call FAR_update_static_enemy_row
 
         lda #9
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 9)
         sta StartingTile
-        jsr update_static_enemy_row
+        far_call FAR_update_static_enemy_row
 
         jsr every_gameloop
         st16 GameMode, update_enemies_5
