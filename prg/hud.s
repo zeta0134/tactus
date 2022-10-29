@@ -505,12 +505,12 @@ RoomIndex := R0
         ; Zone area, indicating our overall game state
         st16 StringPtr, zone_text
         jsr draw_string
-        lda #1 ; TODO: use the actual world number
+        lda PlayerZone ; TODO: use the actual world number
         sta Digit
         jsr draw_single_digit
         st16 StringPtr, hyphen_text
         jsr draw_string
-        lda #1 ; TODO: use the actual level number
+        lda PlayerFloor ; TODO: use the actual level number
         sta Digit
         jsr draw_single_digit
         ; If the player has a key, draw the key icon
