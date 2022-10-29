@@ -86,8 +86,7 @@ MetaSpriteIndex := R0
         sta PlayerJumpHeightPos
 
         ; The player should start with a standard L1-DAGGER
-        ;lda #WEAPON_DAGGER
-        lda #WEAPON_FLAIL
+        lda #WEAPON_DAGGER
         sta PlayerWeapon
         asl
         tax
@@ -582,11 +581,68 @@ FxTileId := R13
 .endproc
 
 .proc draw_multiple_hit_fx
+PlayerSquare := R2
 AttackSquare := R3
+WeaponSquaresIndex := R4
+WeaponSquaresPtr := R5 ; R6
 FxTileId := R13
+TilesRemaining := R9
         ; For this we actually need to loop all the way back over the structure
-        ; ... TODO: you were here
-        ; Goodness we are TIRED.
+        ldy #WeaponClass::NumSquares
+        lda (PlayerWeaponPtr), y
+        sta TilesRemaining
+
+        ; Just like when swinging the weapon, we must compute the position of each square
+        lda #0
+        sta WeaponSquaresIndex
+        ldy #WeaponClass::NumSquares
+        lda (PlayerWeaponPtr), y
+        sta TilesRemaining
+loop:
+        ; Reset to the player's position
+        lda PlayerSquare
+        sta AttackSquare
+        ; Add the relative offset from the considered square
+        ldy WeaponSquaresIndex
+        lda (WeaponSquaresPtr), y ; X offset
+        clc
+        adc AttackSquare
+        sta AttackSquare
+        iny
+        lda (WeaponSquaresPtr), y ; Y offset
+        bmi negative_y
+positive_y:
+        tax        
+        lda player_tile_index_table, x
+        clc
+        adc AttackSquare
+        sta AttackSquare
+        jmp converge
+negative_y:
+        eor #$FF
+        tax
+        inx
+        sec
+        lda AttackSquare
+        sbc player_tile_index_table, x
+        sta AttackSquare
+converge:
+        iny
+
+        ; Read the FX ID, which we are about to draw
+        lda (WeaponSquaresPtr), y
+        sta FxTileId
+        iny
+
+        ; Skip over the behavioral flags
+        iny
+        sty WeaponSquaresIndex
+
+        ; Now we have the attack square, we can draw the weapon FX 
+        jsr spawn_fx_sprite_here
+        dec TilesRemaining
+        bne loop
+
         rts
 .endproc
 
