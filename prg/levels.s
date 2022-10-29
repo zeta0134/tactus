@@ -549,9 +549,8 @@ el_advanced_slimes:
         .byte TILE_ADVANCED_SLIME, 4
 
 el_debug_enemies:
-        .byte 2
-        .byte TILE_SPIDER_BASIC, 3
-        .byte TILE_ZOMBIE_BASIC, 3
+        .byte 1
+        .byte TILE_BIRB_LEFT_BASIC, 1
 
 
 ; Each pool is a FIXED length:
