@@ -55,7 +55,9 @@ direct_attack_behaviors:
         ; enemies
         .word direct_attack_puff
         .word direct_attack_slime
-        .repeat 30
+        .word direct_attack_spider
+        .word direct_attack_spider
+        .repeat 28
         .word no_behavior
         .endrepeat
         ; floors, statics, and technical tiles
@@ -79,7 +81,9 @@ direct_attack_behaviors:
 indirect_attack_behaviors:
         .word no_behavior ; smoke puff can't attack itself
         .word indirect_attack_slime
-        .repeat 30
+        .word indirect_attack_spider
+        .word indirect_attack_spider
+        .repeat 28
         .word no_behavior
         .endrepeat
         ; safety: fill out the rest of the table
@@ -859,6 +863,80 @@ EffectiveAttackSquare := R10
 
         rts
 .endproc
+
+.proc direct_attack_spider
+AttackSquare := R3
+EffectiveAttackSquare := R10 
+        ; If we have *just moved*, then ignore this attack
+        ; (A valid attack can only land at our previous destination)
+        ldx AttackSquare
+        lda tile_flags, x
+        bmi ignore_attack
+        ; Copy in the attack square, so we can use shared logic to process the effect
+        lda AttackSquare
+        sta EffectiveAttackSquare
+        jsr attack_spider_common
+ignore_attack:
+        rts
+.endproc
+
+.proc indirect_attack_spider
+        jsr attack_spider_common
+        rts
+.endproc
+
+.proc attack_spider_common
+; For drawing tiles
+TargetIndex := R0
+TileId := R1
+
+
+AttackLanded := R7
+EffectiveAttackSquare := R10 
+        ; Register the attack as a hit
+        lda #1
+        sta AttackLanded
+
+        ; Add the player's currently equipped damage to our flags byte
+        ldx EffectiveAttackSquare
+        lda PlayerWeaponDmg
+        clc
+        adc tile_flags, x
+        sta tile_flags, x
+        ; Now check: if the damage, NOT including the movement bit, is greater than our health...
+        and #%01111111
+        cmp #4 ; TODO: vary this based on the spider's difficulty
+        bcs die
+        ; TODO: if we implement health bars, we should draw one right now
+        ; TODO: should we have a "weapon hit something" SFX?
+        ; otherwise we're done
+        rts
+
+die:
+        ; Replace ourselves with a regular floor, and spawn the usual death juice
+        lda EffectiveAttackSquare
+        sta TargetIndex
+        lda #TILE_REGULAR_FLOOR
+        sta TileId
+        jsr draw_active_tile
+        ldx EffectiveAttackSquare
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+
+        ; Juice: spawn a floaty, flashy death skull above our tile
+        ; #RIP
+        jsr spawn_death_sprite_here
+
+        ; Play an appropriately crunchy death sound
+        st16 R0, sfx_defeat_enemy_pulse
+        jsr play_sfx_pulse2
+        st16 R0, sfx_defeat_enemy_noise
+        jsr play_sfx_noise
+
+        rts
+.endproc
+
 
 ; map all 5 weapons to 16 entries, for a mostly fair random type
 ; we'll give longswords one extra slot, as they're a fairly decent
