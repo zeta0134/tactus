@@ -54,12 +54,14 @@ seed_loop:
         bne seed_loop        
 
         ; For now that's enough, don't overthink this :)
+        ; TODO: pick the boss, exit, and player spawn locations here
 
         rts
 .endproc
 
 .proc FAR_init_current_room
 LayoutPtr := R0
+EntityList := R4
         ; Load this room into the current battlefield
         ldx PlayerRoomIndex
         lda room_layouts, x
@@ -94,7 +96,13 @@ converge_treasure:
         lda #1
         sta enemies_active
 
-        ; TODO: spawn enemies
+        ; Has the player already cleared this room?
+        lda room_flags, x
+        and #ROOM_FLAG_CLEARED
+        bne room_cleared
+        jsr spawn_basic_enemies_from_pool
+room_cleared:
+        
         rts
 .endproc
 
@@ -192,6 +200,7 @@ is_valid_space:
         jsr draw_active_tile
         ; zero out the other two properties
         ; (Not sure if this will ever be incorrect? unclear)
+        ldx TempIndex
         lda #0
         sta tile_data, x
         sta tile_flags, x
@@ -199,7 +208,85 @@ is_valid_space:
         rts
 .endproc
 
+.proc spawn_entity_list
+EntityId := R1
+EntityList := R4
+ListIndex := R6
+ListLength := R7
+EntityCount := R8
+        ldy #0
+        lda (EntityList), y
+        beq done ; do not process an empty list
+        sta ListLength
+        iny
+        sty ListIndex
+list_loop:
+        ldy ListIndex
+        lda (EntityList), y
+        sta EntityId
+        iny
+        lda (EntityList), y
+        sta EntityCount
+        iny
+        sty ListIndex
+entity_loop:
+        jsr spawn_entity
+        dec EntityCount
+        bne entity_loop
+        dec ListLength
+        bne list_loop
+done:
+        rts
+.endproc
+
+.proc spawn_basic_enemies_from_pool
+CollectionPtr := R0
+PoolPtr := R2
+EntityList := R4
+        ; Everything we are about to do depends on the room seed, so fix that in place before we start
+        jsr set_fixed_room_seed
+
+        ; First find the pool collection for this zone
+        lda PlayerZone
+        sec
+        sbc #1 ; the lists are 0-based, but zones are 1-based
+        asl ; the lists contain words
+        tax
+        lda zone_list_basic, x
+        sta CollectionPtr
+        lda zone_list_basic+1, x
+        sta CollectionPtr+1
+        ; Now load the appropriate pool list for this floor from the collection
+        lda PlayerFloor
+        sec
+        sbc #1 ; the lists are 0-based, but zones are 1-based
+        asl ; the lists contain words
+        tay
+        lda (CollectionPtr), y
+        sta PoolPtr
+        iny
+        lda (CollectionPtr), y
+        sta PoolPtr+1
+        ; Here we need to pick a random number from 0-15, and use that to index the pool to select
+        ; one of the enemy lists
+        jsr next_fixed_rand ; clobbers Y
+        and #%00001111
+        asl ; still indexing words
+        tay
+        lda (PoolPtr), y
+        sta EntityList
+        iny
+        lda (PoolPtr), y
+        sta EntityList+1
+        ; Finally, now that we have the entity list, spawn random enemies from it
+        jsr spawn_entity_list
+done:
+        rts
+.endproc
+
+; =============================
 ; Floors - collections of rooms
+; =============================
 
 test_floor:
         .byte 1, 5, 5, 2
@@ -240,9 +327,9 @@ test_layout_top_left:
         .byte WT, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WT ; 1
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
-        .byte WT, FL, FL, FL, FL, FL, IS, FL, FL, FL, FL, FL, FL, FL ; 4
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 4
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
-        .byte WT, FL, FL, FL, BS, FL, FL, FL, AS, FL, FL, FL, FL, WT ; 6
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
         .byte PE, PE, PE, PE, FL, FL, FL, FL, FL, FL, PE, PE, PE, PE ; 9
@@ -253,9 +340,9 @@ test_layout_top_right:
         .byte WT, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WT ; 1
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 2
         .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 3
-        .byte FL, FL, FL, FL, FL, FL, IS, FL, FL, FL, FL, FL, FL, WT ; 4
+        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 4
         .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 5
-        .byte WT, FL, FL, FL, BS, FL, FL, FL, AS, FL, FL, FL, FL, WT ; 6
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
         .byte PE, PE, PE, PE, FL, FL, FL, FL, FL, FL, PE, PE, PE, PE ; 9
@@ -266,9 +353,9 @@ test_layout_bottom_left:
         .byte WT, WF, WF, WF, FL, FL, FL, FL, FL, FL, WF, WF, WF, WT ; 1
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
-        .byte WT, FL, FL, FL, FL, FL, IS, FL, FL, FL, FL, FL, FL, FL ; 4
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 4
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
-        .byte WT, FL, FL, FL, BS, FL, FL, FL, AS, FL, FL, FL, FL, WT ; 6
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
         .byte PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE ; 9
@@ -279,9 +366,9 @@ test_layout_bottom_right:
         .byte WT, WF, WF, WF, FL, FL, FL, FL, FL, FL, WF, WF, WF, WT ; 1
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 2
         .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 3
-        .byte FL, FL, FL, FL, FL, FL, IS, FL, FL, FL, FL, FL, FL, WT ; 4
+        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 4
         .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 5
-        .byte WT, FL, FL, FL, BS, FL, FL, FL, AS, FL, FL, FL, FL, WT ; 6
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
         .byte PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE ; 9
@@ -292,9 +379,9 @@ test_layout_top_edge:
         .byte WT, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WT ; 1
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
         .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
-        .byte FL, FL, FL, FL, FL, FL, IS, FL, FL, FL, FL, FL, FL, FL ; 4
+        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 4
         .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
-        .byte WT, FL, FL, FL, BS, FL, FL, FL, AS, FL, FL, FL, FL, WT ; 6
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
         .byte PE, PE, PE, PE, FL, FL, FL, FL, FL, FL, PE, PE, PE, PE ; 9
@@ -305,9 +392,9 @@ test_layout_bottom_edge:
         .byte WT, WF, WF, WF, FL, FL, FL, FL, FL, FL, WF, WF, WF, WT ; 1
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
         .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
-        .byte FL, FL, FL, FL, FL, FL, IS, FL, FL, FL, FL, FL, FL, FL ; 4
+        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 4
         .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
-        .byte WT, FL, FL, FL, BS, FL, FL, FL, AS, FL, FL, FL, FL, WT ; 6
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
         .byte PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE ; 9
@@ -318,9 +405,9 @@ test_layout_left_edge:
         .byte WT, WF, WF, WF, FL, FL, FL, FL, FL, FL, WF, WF, WF, WT ; 1
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
-        .byte WT, FL, FL, FL, FL, FL, IS, FL, FL, FL, FL, FL, FL, FL ; 4
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 4
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
-        .byte WT, FL, FL, FL, BS, FL, FL, FL, AS, FL, FL, FL, FL, WT ; 6
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
         .byte PE, PE, PE, PE, FL, FL, FL, FL, FL, FL, PE, PE, PE, PE ; 9
@@ -331,9 +418,9 @@ test_layout_right_edge:
         .byte WT, WF, WF, WF, FL, FL, FL, FL, FL, FL, WF, WF, WF, WT ; 1
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 2
         .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 3
-        .byte FL, FL, FL, FL, FL, FL, IS, FL, FL, FL, FL, FL, FL, WT ; 4
+        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 4
         .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 5
-        .byte WT, FL, FL, FL, BS, FL, FL, FL, AS, FL, FL, FL, FL, WT ; 6
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
         .byte PE, PE, PE, PE, FL, FL, FL, FL, FL, FL, PE, PE, PE, PE ; 9
@@ -344,49 +431,90 @@ test_layout_with_four_exits:
         .byte WT, WF, WF, WF, FL, FL, FL, FL, FL, FL, WF, WF, WF, WT ; 1
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
         .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
-        .byte FL, FL, FL, FL, FL, FL, IS, FL, FL, FL, FL, FL, FL, FL ; 4
+        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 4
         .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
-        .byte WT, FL, FL, FL, BS, FL, FL, FL, AS, FL, FL, FL, FL, WT ; 6
+        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
         .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
         .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
         .byte PE, PE, PE, PE, FL, FL, FL, FL, FL, FL, PE, PE, PE, PE ; 9
 
-test_layout:
-        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
-        .byte WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT ; 0
-        .byte WT, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WT ; 1
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 2
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 3
-        .byte WT, FL, FL, FL, FL, FL, IS, FL, FL, FL, FL, FL, FL, WT ; 4
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 5
-        .byte WT, FL, FL, FL, BS, FL, FL, FL, AS, FL, FL, FL, FL, WT ; 6
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
-        .byte PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE ; 9
 
-far_too_many_slimes:
-        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
-        .byte WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT ; 0
-        .byte WT, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WT ; 1
-        .byte WT, FL, BS, FL, FL, AS, IS, FL, FL, BS, FL, FL, IS, WT ; 2
-        .byte WT, BS, FL, FL, BS, IS, FL, FL, AS, FL, FL, FL, FL, WT ; 3
-        .byte WT, FL, AS, AS, FL, FL, IS, IS, FL, FL, AS, FL, BS, WT ; 4
-        .byte WT, FL, IS, FL, FL, BS, FL, FL, FL, FL, FL, FL, FL, WT ; 5
-        .byte WT, AS, BS, FL, BS, FL, BS, FL, AS, IS, IS, FL, FL, WT ; 6
-        .byte WT, FL, FL, IS, FL, IS, FL, AS, FL, FL, FL, BS, FL, WT ; 7
-        .byte WF, FL, AS, FL, BS, FL, FL, IS, FL, FL, AS, FL, FL, WF ; 8
-        .byte PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE ; 9
+; =============================================
+; Enemies - Pools of spawns for rooms to select
+; =============================================
 
-hit_box_testing:
-        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
-        .byte WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT ; 0
-        .byte WT, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WT ; 1
-        .byte WT, BS, BS, BS, BS, BS, FL, FL, FL, BS, FL, FL, FL, WT ; 2
-        .byte WT, BS, BS, BS, BS, BS, FL, FL, FL, FL, BS, FL, FL, WT ; 3
-        .byte WT, BS, BS, BS, BS, BS, FL, FL, FL, FL, FL, BS, FL, WT ; 4
-        .byte WT, BS, BS, BS, BS, BS, FL, FL, FL, FL, BS, FL, FL, WT ; 5
-        .byte WT, BS, BS, BS, BS, BS, FL, FL, FL, BS, FL, FL, FL, WT ; 6
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, BS, BS, BS, WF ; 8
-        .byte PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE ; 9
+; Enemy lists have an arbitrary length, and can house any number
+; of spawns. ALL spawns will appear in a room that uses a list, so
+; if you want to vary the amount, make several similar lists
 
+el_basic_slimes:
+        .byte 1 ; length
+        .byte TILE_BASIC_SLIME, 8
+
+el_intermediate_slimes:
+        .byte 2 ; length
+        .byte TILE_BASIC_SLIME, 4
+        .byte TILE_INTERMEDIATE_SLIME, 8
+
+el_advanced_slimes:
+        .byte 3 ; length
+        .byte TILE_BASIC_SLIME, 2
+        .byte TILE_INTERMEDIATE_SLIME, 4
+        .byte TILE_ADVANCED_SLIME, 4
+
+; Each pool is a FIXED length:
+; - Basic pools have 16 entries
+; - Boss pools have 4 entries
+; If including fewer unique enemy lists, be sure
+; to duplicate the list so that it is the full size
+
+basic_pool_zone_1_floor_1:
+        .word el_basic_slimes
+        .word el_basic_slimes
+        .word el_basic_slimes
+        .word el_basic_slimes
+        .word el_basic_slimes
+        .word el_basic_slimes
+        .word el_basic_slimes
+        .word el_basic_slimes
+        .word el_basic_slimes
+        .word el_basic_slimes
+        .word el_basic_slimes
+        .word el_basic_slimes
+        .word el_intermediate_slimes
+        .word el_intermediate_slimes
+        .word el_intermediate_slimes
+        .word el_intermediate_slimes
+
+boss_pool_zone_1_floor_1:
+        .word el_advanced_slimes
+        .word el_advanced_slimes
+        .word el_advanced_slimes
+        .word el_advanced_slimes
+
+; Each zone is a collection of pools, one pool for each floor
+
+zone_1_basic_pools:
+        .word basic_pool_zone_1_floor_1 ; floor 1
+        .word basic_pool_zone_1_floor_1 ; floor 2
+        .word basic_pool_zone_1_floor_1 ; floor 3
+        .word basic_pool_zone_1_floor_1 ; floor 4
+
+zone_1_boss_pools:
+        .word boss_pool_zone_1_floor_1 ; floor 1
+        .word boss_pool_zone_1_floor_1 ; floor 2
+        .word boss_pool_zone_1_floor_1 ; floor 3
+        .word boss_pool_zone_1_floor_1 ; floor 4
+
+; And finally, here is the list of zone collections
+zone_list_basic:
+        .word zone_1_basic_pools ; zone 1
+        .word zone_1_basic_pools ; zone 2
+        .word zone_1_basic_pools ; zone 3
+        .word zone_1_basic_pools ; zone 4
+
+zone_list_boss:
+        .word zone_1_boss_pools ; zone 1
+        .word zone_1_boss_pools ; zone 2
+        .word zone_1_boss_pools ; zone 3
+        .word zone_1_boss_pools ; zone 4
