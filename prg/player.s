@@ -86,7 +86,8 @@ MetaSpriteIndex := R0
         sta PlayerJumpHeightPos
 
         ; The player should start with a standard L1-DAGGER
-        lda #WEAPON_DAGGER
+        ;lda #WEAPON_DAGGER
+        lda #WEAPON_FLAIL
         sta PlayerWeapon
         asl
         tax
@@ -445,7 +446,9 @@ WeaponSquaresPtr := R5 ; R6
 AttackLanded := R7
 WeaponProperties := R8
 TilesRemaining := R9
+FxTileId := R13
 ; We don't use these, but we should know not to clobber them
+EffectiveAttackSquare := R10
 TargetRow := R14
 TargetCol := R15
         ldx PlayerRow
@@ -524,6 +527,11 @@ negative_y:
         sta AttackSquare
 converge:
         iny
+
+        lda (WeaponSquaresPtr), y
+        sta FxTileId ; stash for if this hits
+        iny
+
         lda (WeaponSquaresPtr), y ; Behavioral Flags for this tile
         sta WeaponProperties      ; Stash these here so the enemies can see them (if applicable)
         iny
@@ -549,15 +557,74 @@ check_early_exit:
         lda AttackLanded
         beq no_early_exit
         ; Then we are done with the swing, and should clean up
+        jsr draw_single_hit_fx
         jmp done_with_swing
 no_early_exit:
         ; Otherwise, iterate to the next weapon square and continue
         dec TilesRemaining
         bne loop
 
+        lda AttackLanded
+        beq done_with_swing
+        jsr draw_multiple_hit_fx
+
 done_with_swing:
         ; If there is any cleanup to do, do that here. Otherwise we're finished I think?
 
+        rts
+.endproc
+
+.proc draw_single_hit_fx
+AttackSquare := R3
+FxTileId := R13
+        jsr spawn_fx_sprite_here
+        rts
+.endproc
+
+.proc draw_multiple_hit_fx
+AttackSquare := R3
+FxTileId := R13
+        ; For this we actually need to loop all the way back over the structure
+        ; ... TODO: you were here
+        ; Goodness we are TIRED.
+        rts
+.endproc
+
+.proc spawn_fx_sprite_here
+MetaSpriteIndex := R0
+AttackSquare := R3
+FxTileId := R13
+        jsr find_unused_sprite
+        ldx MetaSpriteIndex
+        cpx #$FF
+        beq sprite_failed
+
+        lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_PAL_1)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+
+        ldy AttackSquare
+        lda tile_index_to_col_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_X
+        sta sprite_table + MetaSpriteState::PositionX, x
+
+        lda tile_index_to_row_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_Y
+        sta sprite_table + MetaSpriteState::PositionY, x
+
+        lda FxTileId
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+sprite_failed:
         rts
 .endproc
 
