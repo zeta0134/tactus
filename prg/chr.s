@@ -32,6 +32,10 @@ CurrentChrBank: .res 1
         .include "../build/animated_tiles/spider_anticipate.chr"
         .include "../build/animated_tiles/zombie_idle.chr"
         .include "../build/animated_tiles/zombie_anticipate.chr"
+        .include "../build/animated_tiles/birb_idle_left.chr"
+        .include "../build/animated_tiles/birb_idle_right.chr"
+        .include "../build/animated_tiles/birb_flying_left.chr"
+        .include "../build/animated_tiles/birb_flying_right.chr"
 
         ; static level geometry
         .include "../build/static_tiles/floor.chr"
@@ -57,7 +61,7 @@ CurrentChrBank: .res 1
 hud_font:
         .incbin "../art/raw_chr/font_chicago_reduced.chr"
 
-ANIMATED_TILE_TABLE_LENGTH = 10
+ANIMATED_TILE_TABLE_LENGTH = 14
 animated_tile_table:
         .word $0000, smoke_puff
         .word $0040, slime_idle
@@ -65,6 +69,10 @@ animated_tile_table:
         .word $00C0, spider_anticipate
         .word $0100, zombie_idle
         .word $0140, zombie_anticipate
+        .word $0180, birb_idle_left
+        .word $01C0, birb_idle_right
+        .word $0200, birb_flying_left
+        .word $0240, birb_flying_right
 
         .word $1000, player
         .word $1040, death_skull
