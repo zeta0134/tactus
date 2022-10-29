@@ -67,8 +67,10 @@ direct_attack_behaviors:
         .word no_behavior ; $9C - big key
         .word no_behavior ; $A0 - gold sack
         .word no_behavior ; $A4 - weapon shadow
+        .word attack_exit_block ; $A8 - exit block
+        .word no_behavior ; $AC - exit stairs
         ; safety: fill out the rest of the table
-        .repeat 25
+        .repeat 23
         .word no_behavior
         .endrepeat
 
@@ -99,8 +101,8 @@ bonk_behaviors:
         .word collect_key ; $9C - big key
         .word collect_gold_sack ; $A0 - gold sack
         .word collect_weapon ; $A4 - weapon shadow
-        .word no_behavior ; $A8
-        .word no_behavior ; $AC
+        .word solid_tile_forbids_movement ; $A8 - exit block
+        .word descend_stairs ; $AC - exit stairs
         .word no_behavior ; $B0
         .word no_behavior ; $B4
         .word no_behavior ; $B8
@@ -912,6 +914,34 @@ AttackSquare := R3
         rts
 .endproc
 
+.proc attack_exit_block
+TargetIndex := R0
+TileId := R1
+AttackSquare := R3
+AttackLanded := R7
+        lda PlayerKeys
+        beq no_key
+        
+        ; Register the attack as a hit
+        ; (don't otherwise interfere with combat if the player doesn't have the key)
+        lda #1
+        sta AttackLanded
+
+        ; Replace the exit block with the stairs down
+        lda AttackSquare
+        sta TargetIndex
+        lda #TILE_EXIT_STAIRS
+        sta TileId
+        jsr draw_active_tile
+        ldx AttackSquare
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+
+no_key:
+        rts
+.endproc
+
 ; ============================================================================================================================
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================
@@ -1174,5 +1204,10 @@ TargetSquare := R13
         ora #ROOM_FLAG_TREASURE_COLLECTED
         sta room_flags, x
 
+        rts
+.endproc
+
+.proc descend_stairs
+        ; stubbed for now
         rts
 .endproc

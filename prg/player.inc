@@ -19,5 +19,6 @@
 .global PlayerSpriteIndex
 .global PlayerZone
 .global PlayerFloor
+.global PlayerNextDirection
 
 MAX_HEARTS = 7

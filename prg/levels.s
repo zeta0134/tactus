@@ -103,6 +103,13 @@ converge_treasure:
         lda #1
         sta enemies_active
 
+        ; Does this room have exit stairs? If so, spawn those first
+        lda room_flags, x
+        and #ROOM_FLAG_EXIT_STAIRS
+        beq no_exit_stairs
+        jsr spawn_exit_block
+no_exit_stairs:
+
         ; Has the player already cleared this room?
         lda room_flags, x
         and #ROOM_FLAG_CLEARED
@@ -342,6 +349,15 @@ EntityList := R4
         ; Finally, now that we have the entity list, spawn random enemies from it
         jsr spawn_entity_list
 done:
+        rts
+.endproc
+
+.proc spawn_exit_block
+EntityId := R1
+        jsr set_fixed_room_seed
+        lda #TILE_EXIT_BLOCK
+        sta EntityId
+        jsr spawn_entity
         rts
 .endproc
 

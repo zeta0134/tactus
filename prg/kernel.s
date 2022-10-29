@@ -23,6 +23,9 @@ GameMode: .res 2
 
 .segment "RAM"
 CurrentBeatCounter: .res 1
+CurrentBeat: .res 1
+LastBeat: .res 1
+DisplayedRowCounter: .res 1
 
 .segment "PRGFIXED_C000"
 
@@ -51,6 +54,11 @@ CurrentBeatCounter: .res 1
         ; Later, organize this so that it loads the title screen, initial levels, etc
         lda #1
         jsr play_track
+        lda #0
+        sta DisplayedRowCounter
+        sta CurrentBeat
+        sta LastBeat
+        sta CurrentBeatCounter
 
         st16 GameMode, game_init
         jsr wait_for_next_vblank
@@ -85,6 +93,10 @@ CurrentBeatCounter: .res 1
 
 .proc beat_frame_1
         inc CurrentBeatCounter
+        lda CurrentBeat
+        sta LastBeat
+        lda #0
+        sta DisplayedRowCounter
         ; - Swap the active and inactive buffers
         far_call FAR_swap_battlefield_buffers
 
@@ -224,10 +236,28 @@ StartingTile := R15
 .proc wait_for_the_next_beat
         ;- Variable Frames: wait for the next "beat" to begin
 
-        ; for now, ignore player input and transition to the next beat when the row counter becomes 0
+        ; If it's not time for the next beat yet, then continue waiting no matter what
+        lda CurrentBeat
+        cmp LastBeat
+        beq continue_waiting
+
+        ; The time for the next beat has come.
+        ; If the player's input HAS arrived:
+        lda PlayerNextDirection
+        beq no_input_received
+input_received:
+        ; Then immediatly process this beat
+        jmp process_next_beat_now
+no_input_received:        
+        ; The player's input might arrive late, so give them some time. If we get to
+        ; an actual row of 3 or more, THEN process the beat without waiting any longer:
         lda row_counter
         and #%00000111
-        bne continue_waiting
+        cmp #2
+        bcs process_next_beat_now
+        ; Otherwise let the whole engine lag while the player makes up their damned mind :)
+        jmp continue_waiting
+process_next_beat_now:
         st16 GameMode, beat_frame_1
         rts ; do that now
 continue_waiting:
@@ -236,6 +266,7 @@ continue_waiting:
 .endproc
 
 .proc every_gameloop
+        jsr update_beat_counters
         far_call FAR_sync_chr_bank_to_music
         far_call FAR_queue_battlefield_updates
         far_call FAR_queue_hud
@@ -249,3 +280,34 @@ continue_waiting:
         rts
 .endproc
 
+; Utility Functions
+
+.proc update_beat_counters
+        ; Don't update the displayed row counter if it's already >= 7
+        lda DisplayedRowCounter
+        cmp #7
+        bcs done_with_displayed_row_counter
+        ; If the displayed row counter does not equal the actual row counter
+        lda row_counter
+        and #%00000111
+        cmp DisplayedRowCounter
+        beq done_with_displayed_row_counter
+        ; ... then increment it by one stage
+        inc DisplayedRowCounter
+done_with_displayed_row_counter:
+        ; If the current row_counter is 0...
+        lda row_counter
+        and #%00000111
+        bne done_with_current_beat
+        ; ... and current and last beat ARE the same
+        lda CurrentBeat
+        cmp LastBeat
+        bne done_with_current_beat
+        ; and... to prevent hyper-beat speed, the displayed row counter is not STILL 0...
+        lda DisplayedRowCounter
+        beq done_with_current_beat
+        ; ... then increment CurrentBeat
+        inc CurrentBeat
+done_with_current_beat:
+        rts
+.endproc

@@ -20,6 +20,10 @@ TILE_GOLD_SACK = ($A0 | %10)
 TILE_WEAPON_SHADOW = $A4
 TILE_HEART_CONTAINER = ($CC | %11)
 
+; Interactable blocks
+TILE_EXIT_BLOCK = ($A8 | %01)
+TILE_EXIT_STAIRS = ($AC | %00)
+
 .global update_static_enemy_row, clear_active_move_flags, attack_enemy_tile, player_collides_with_tile
 .global draw_active_tile
 
