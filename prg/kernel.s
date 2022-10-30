@@ -7,12 +7,14 @@
         .include "enemies.inc"
         .include "far_call.inc"
         .include "hud.inc"
+        .include "input.inc"
         .include "kernel.inc"
         .include "levels.inc"
         .include "nes.inc"
         .include "palette.inc"
         .include "player.inc"
         .include "prng.inc"
+        .include "ppu.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "word_util.inc"
@@ -53,7 +55,64 @@ DisplayedRowCounter: .res 1
         ; TODO: pretty much everyting in this little section is debug demo stuff
         ; Later, organize this so that it loads the title screen, initial levels, etc
 
+        st16 GameMode, title_prep
+        jsr wait_for_next_vblank
+        rts
+.endproc
+
+.proc title_prep
+        ; disable rendering, and soft-disable NMI (so music keeps playing)
+        lda #$00
+        sta PPUMASK
+
+        lda #1
+        sta NmiSoftDisable
+
+        jsr initialize_title_palettes
+
+        lda #0
+        jsr set_brightness
+        lda #4
+        sta TargetBrightness
+
+        ; copy the initial batch of graphics into CHR RAM
+        far_call FAR_initialize_chr_ram_title
+        far_call FAR_copy_title_nametable
+
+        ; Enable NMI first (but not rendering)
+        lda #0
+        sta NmiSoftDisable
+
+        st16 GameMode, run_title_screen
+        jsr wait_for_next_vblank
+
+        ; NOW it is safe to re-enable rendering
+        lda #$1E
+        sta PPUMASK
+        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        sta PPUCTRL
+
+        rts
+.endproc
+
+.proc run_title_screen
+        lda #0
+        sta queued_bytes_counter
+
+        jsr update_beat_counters
+        far_call FAR_sync_chr_bank_to_music
+        jsr draw_sprites
+        far_call FAR_update_brightness
+        far_call FAR_refresh_palettes_gameloop
+
+        lda #KEY_START
+        and ButtonsDown
+        beq stay_here
+
+        ; TODO: fade out to game prep?
         st16 GameMode, game_prep
+
+stay_here:
         jsr wait_for_next_vblank
         rts
 .endproc
@@ -62,13 +121,20 @@ DisplayedRowCounter: .res 1
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
         sta PPUMASK
-        
+
         lda #1
         sta NmiSoftDisable
 
+        ; set the game palette
+        jsr initialize_game_palettes
+        lda #0
+        jsr set_brightness
+        lda #4
+        sta TargetBrightness
 
         ; copy the initial batch of graphics into CHR RAM
         far_call FAR_initialize_chr_ram_game
+        far_call FAR_init_nametables
 
         ; Enable NMI first (but not rendering)
         lda #0
@@ -99,6 +165,7 @@ DisplayedRowCounter: .res 1
         ora #%00000001
         sta global_rng_seed
 
+        jsr initialize_sprites
         far_call FAR_init_hud
         jsr init_player
 

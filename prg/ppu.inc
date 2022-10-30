@@ -19,3 +19,5 @@
 
 .global initialize_ppu
 .global initialize_palettes
+.global initialize_game_palettes
+.global initialize_title_palettes

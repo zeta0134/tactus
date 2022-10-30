@@ -276,6 +276,25 @@ bank_loop:
         rts
 .endproc
 
+.proc copy_title_patterns_to_chr_ram
+SourceAddr := R0
+Length := R2
+ChrBank := R8
+        lda #0
+        sta ChrBank
+bank_loop:
+        a53_set_chr ChrBank
+        st16 SourceAddr, title_chr
+        st16 Length, $1000
+        set_ppuaddr #$0000
+        jsr memcpy_ppudata
+        inc ChrBank
+        lda ChrBank
+        cmp #4
+        bne bank_loop
+        rts
+.endproc
+
 .proc FAR_initialize_chr_ram_game
 SourceAddr := R0
 Length := R2
@@ -287,6 +306,20 @@ Length := R2
         jsr decompress_static_tiles_to_chr_ram
         jsr copy_hud_font_to_chr_ram
 
+        rts
+.endproc
+
+.proc FAR_initialize_chr_ram_title
+        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        sta PPUCTRL ; set VRAM increment to +1
+
+        ; First copy in the animated tiles, since we need the player sprite to be present
+        jsr decompress_animated_tiles_to_chr_ram
+        ; Now we need to copy in the title CHR graphics four times, just like we did with
+        ; the HUD
+        jsr copy_title_patterns_to_chr_ram
+
+        ; and that's about it
         rts
 .endproc
 
@@ -303,6 +336,43 @@ loop:
         lda Length
         ora Length+1
         bne loop
+        rts
+.endproc
+
+.proc write_nametable
+DataAddr := R0
+Length := R2
+        st16 Length, $0400
+        
+        ldy #0
+loop:
+        lda (DataAddr), y ; static tile 0
+        sta PPUDATA
+        dec16 Length
+        inc16 DataAddr
+        lda Length
+        ora Length+1
+        bne loop
+        rts
+.endproc
+
+.proc FAR_copy_title_nametable
+DataAddr := R0
+        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        sta PPUCTRL ; set VRAM increment to +1
+
+        ; HACK alert:
+        ; NMI is not getting touched; copy this to both nametables
+        ; redundantly and let whichever one is active be displayed.
+        ; It's fine.
+        set_ppuaddr #$2000
+        st16 DataAddr, title_nametable
+        jsr write_nametable
+
+        set_ppuaddr #$2400
+        st16 DataAddr, title_nametable
+        jsr write_nametable
+
         rts
 .endproc
 
