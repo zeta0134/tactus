@@ -36,6 +36,10 @@ CurrentChrBank: .res 1
         .include "../build/animated_tiles/birb_idle_right.chr"
         .include "../build/animated_tiles/birb_flying_left.chr"
         .include "../build/animated_tiles/birb_flying_right.chr"
+        .include "../build/static_tiles/mole_hole.chr"
+        .include "../build/animated_tiles/mole_idle.chr"
+        .include "../build/animated_tiles/mole_throwing.chr"
+        .include "../build/animated_tiles/wrench_projectile.chr"
 
         ; static level geometry
         .include "../build/static_tiles/floor.chr"
@@ -61,7 +65,7 @@ CurrentChrBank: .res 1
 hud_font:
         .incbin "../art/raw_chr/font_chicago_reduced.chr"
 
-ANIMATED_TILE_TABLE_LENGTH = 14
+ANIMATED_TILE_TABLE_LENGTH = 17
 animated_tile_table:
         .word $0000, smoke_puff
         .word $0040, slime_idle
@@ -73,6 +77,9 @@ animated_tile_table:
         .word $01C0, birb_idle_right
         .word $0200, birb_flying_left
         .word $0240, birb_flying_right
+        .word $02C0, mole_throwing
+        .word $0300, mole_idle
+        .word $0340, wrench_projectile
 
         .word $1000, player
         .word $1040, death_skull
@@ -81,7 +88,7 @@ animated_tile_table:
         .word $1200, vertical_slash
 
 
-STATIC_TILE_TABLE_LENGTH = 21
+STATIC_TILE_TABLE_LENGTH = 22
 static_tile_table:
         ; level geometry, ascending
         .word $0800, floor
@@ -109,6 +116,8 @@ static_tile_table:
         .word $1100, longsword
         .word $1140, spear
         .word $1180, flail
+        ; static enemy poses
+        .word $0280, mole_hole
 
 
 ; note: set PPUADDR and PPUCTRL appropriately before calling

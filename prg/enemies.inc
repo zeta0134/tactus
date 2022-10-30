@@ -28,6 +28,13 @@ TILE_BIRB_RIGHT_ADVANCED = (TILE_BIRB_RIGHT_BASE | %11)
 TILE_BIRB_LEFT_FLYING = $20
 TILE_BIRB_RIGHT_FLYING = $24
 
+TILE_MOLE_HOLE_BASE = $28
+TILE_MOLE_HOLE_BASIC = (TILE_MOLE_HOLE_BASE | %11)
+TILE_MOLE_HOLE_ADVANCED = (TILE_MOLE_HOLE_BASE | %01)
+TILE_MOLE_THROWING = $2C
+TILE_MOLE_IDLE = $30
+TILE_WRENCH_PROJECTILE = $34
+
 ; Non-enemies also have IDs, eeeeeeverything has an update function
 TILE_REGULAR_FLOOR = $80
 TILE_DISCO_FLOOR =   $84
@@ -57,6 +64,12 @@ TILE_EXIT_STAIRS = ($AC | %00)
 .global FAR_attack_enemy_tile
 .global FAR_player_collides_with_tile
 
-
+; Below this distance, mobs will prefer to move directly towards the player
 SPIDER_TARGET_RADIUS = 5
 ZOMBIE_TARGET_RADIUS = 8
+
+; Below this distance, moles will not rise out of the ground
+; (intentionally very small, mostly to prevent the player from being able to
+; stand on a mole hole *while* a mole is rising, which would deal way too much
+; damage AND look weird)
+MOLE_SUPPRESSION_RADIUS = 2
