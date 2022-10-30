@@ -1885,11 +1885,14 @@ TREASURE_HEART = 1
 TREASURE_GOLD = 2
 
 ; control frequency of gold, weapon, and heart container drops
+; right now it feels like we should favor weapons, as the player
+; has to work pretty hard to get a chest to spawn. Hearts are useful,
+; gold not so much, it feels like a nothing drop
 treasure_category_table:
-        .repeat 8
+        .repeat 4
         .byte TREASURE_GOLD
         .endrepeat
-        .repeat 6
+        .repeat 10
         .byte TREASURE_WEAPON
         .endrepeat
         .repeat 2
@@ -2419,6 +2422,7 @@ TargetSquare := R13
 .endproc
 
 .proc descend_stairs
+        st16 GameMode, advance_to_next_floor
         ; stubbed for now
         rts
 .endproc
