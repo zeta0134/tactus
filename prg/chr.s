@@ -276,11 +276,11 @@ bank_loop:
         rts
 .endproc
 
-.proc FAR_initialize_chr_ram
+.proc FAR_initialize_chr_ram_game
 SourceAddr := R0
 Length := R2
-        lda #0
-        sta PPUCTRL ; disable NMI, set VRAM increment to +1
+        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        sta PPUCTRL ; set VRAM increment to +1
 
         ; THING!
         jsr decompress_animated_tiles_to_chr_ram
@@ -292,8 +292,8 @@ Length := R2
 
 .proc FAR_init_nametables
 Length := R0
-        lda #0
-        sta PPUCTRL ; disable NMI, set VRAM increment to +1
+        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        sta PPUCTRL ; set VRAM increment to +1
         st16 Length, $0800
         set_ppuaddr #$2000
 loop:

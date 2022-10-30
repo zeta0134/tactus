@@ -52,6 +52,41 @@ DisplayedRowCounter: .res 1
 .proc init_engine
         ; TODO: pretty much everyting in this little section is debug demo stuff
         ; Later, organize this so that it loads the title screen, initial levels, etc
+
+        st16 GameMode, game_prep
+        jsr wait_for_next_vblank
+        rts
+.endproc
+
+.proc game_prep
+        ; disable rendering, and soft-disable NMI (so music keeps playing)
+        lda #$00
+        sta PPUMASK
+        
+        lda #1
+        sta NmiSoftDisable
+
+
+        ; copy the initial batch of graphics into CHR RAM
+        far_call FAR_initialize_chr_ram_game
+
+        ; Enable NMI first (but not rendering)
+        lda #0
+        sta NmiSoftDisable
+
+        st16 GameMode, game_init
+        jsr wait_for_next_vblank
+
+        ; NOW it is safe to re-enable rendering
+        lda #$1E
+        sta PPUMASK
+        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        sta PPUCTRL
+
+        rts
+.endproc
+
+.proc game_init
         lda #1
         jsr play_track
         lda #0
@@ -60,12 +95,6 @@ DisplayedRowCounter: .res 1
         sta LastBeat
         sta CurrentBeatCounter
 
-        st16 GameMode, game_init
-        jsr wait_for_next_vblank
-        rts
-.endproc
-
-.proc game_init
         jsr next_rand
         ora #%00000001
         sta global_rng_seed

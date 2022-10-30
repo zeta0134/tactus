@@ -45,9 +45,6 @@ start:
         sta seed
         sta fixed_seed
 
-
-        ; copy the initial batch of graphics into CHR RAM
-        far_call FAR_initialize_chr_ram
         far_call FAR_init_nametables
 
         ; now enable rendering and proceed to the main game loop
