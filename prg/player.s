@@ -17,6 +17,8 @@
 PlayerWeapon: .res 2
 PlayerWeaponPtr: .res 2
 
+FxTileId: .res 1
+
 .segment "RAM"
 
 PlayerSpriteIndex: .res 1
@@ -447,7 +449,6 @@ WeaponSquaresPtr := R5 ; R6
 AttackLanded := R7
 WeaponProperties := R8
 TilesRemaining := R9
-FxTileId := R13
 ; We don't use these, but we should know not to clobber them
 EffectiveAttackSquare := R10
 TargetRow := R14
@@ -577,7 +578,6 @@ done_with_swing:
 
 .proc draw_single_hit_fx
 AttackSquare := R3
-FxTileId := R13
         jsr spawn_fx_sprite_here
         rts
 .endproc
@@ -587,7 +587,6 @@ PlayerSquare := R2
 AttackSquare := R3
 WeaponSquaresIndex := R4
 WeaponSquaresPtr := R5 ; R6
-FxTileId := R13
 TilesRemaining := R9
         ; For this we actually need to loop all the way back over the structure
         ldy #WeaponClass::NumSquares
@@ -651,7 +650,6 @@ converge:
 .proc spawn_fx_sprite_here
 MetaSpriteIndex := R0
 AttackSquare := R3
-FxTileId := R13
         jsr find_unused_sprite
         ldx MetaSpriteIndex
         cpx #$FF
