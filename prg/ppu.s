@@ -13,6 +13,9 @@ bg_palette:
 obj_palette:
         .incbin "../art/sprite_palette.pal"
 
+title_palette:
+        .incbin "../art/title_bg_palette.pal"
+
 .proc initialize_ppu
         ; disable rendering
         lda #$00
@@ -57,6 +60,23 @@ palette_loop:
         cpx #32
         bne palette_loop
 
+        jsr initialize_title_palettes
+
+        ; Reset PPUADDR to 0,0
+        lda #$00
+        sta PPUADDR
+        sta PPUADDR
+
+        ; Initialize brightness to 0 (fully black) so we can fade it in
+        lda #0
+        jsr set_brightness
+        lda #4
+        sta TargetBrightness
+
+        rts
+.endproc
+
+.proc initialize_game_palettes
         ; Copy palette data into the palette manager
 
         ldx #0
@@ -74,17 +94,26 @@ bg_loop:
         inx
         cpx #16
         bne bg_loop
+        rts
+.endproc
 
-        ; Reset PPUADDR to 0,0
-        lda #$00
-        sta PPUADDR
-        sta PPUADDR
+.proc initialize_title_palettes
+        ; Copy palette data into the palette manager
 
-        ; Initialize brightness to 0 (fully black) so we can fade it in
-        lda #0
-        jsr set_brightness
-        lda #4
-        sta TargetBrightness
+        ldx #0
+obj_loop:
+        lda obj_palette, x
+        sta ObjPaletteBuffer, x
+        inx
+        cpx #16
+        bne obj_loop
 
+        ldx #0
+bg_loop:
+        lda title_palette, x
+        sta BgPaletteBuffer, x
+        inx
+        cpx #16
+        bne bg_loop
         rts
 .endproc
