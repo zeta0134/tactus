@@ -86,6 +86,7 @@ continue_waiting:
 .endproc
 
 .proc title_prep
+MetaSpriteIndex := R0
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
         sta PPUMASK
@@ -103,6 +104,22 @@ continue_waiting:
         ; copy the initial batch of graphics into CHR RAM
         far_call FAR_initialize_chr_ram_title
         far_call FAR_copy_title_nametable
+
+        ; Set up a player sprite, which will act as our cursor
+        jsr initialize_sprites
+        jsr find_unused_sprite
+        ; this runs on an empty set, so it ought to succeed
+        lda #(SPRITE_ACTIVE)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+        lda #72
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda #71
+        sta sprite_table + MetaSpriteState::PositionY, x
+        lda #SPRITES_PLAYER_IDLE
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
 
         ; Enable NMI first (but not rendering)
         lda #0
@@ -124,7 +141,7 @@ continue_waiting:
         lda #0
         sta queued_bytes_counter
 
-        jsr update_beat_counters
+        jsr update_beat_counters_title
         far_call FAR_sync_chr_bank_to_music
         jsr draw_sprites
         far_call FAR_update_brightness
@@ -422,6 +439,13 @@ continue_waiting:
 .endproc
 
 ; Utility Functions
+
+.proc update_beat_counters_title
+        lda row_counter
+        and #%00000111
+        sta DisplayedRowCounter
+        rts
+.endproc
 
 .proc update_beat_counters
         ; Don't update the displayed row counter if it's already >= 7
