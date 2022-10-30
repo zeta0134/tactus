@@ -17,6 +17,7 @@
         .include "ppu.inc"
         .include "sound.inc"
         .include "sprites.inc"
+        .include "static_screens.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
 
@@ -87,6 +88,9 @@ continue_waiting:
 
 .proc title_prep
 MetaSpriteIndex := R0
+        ; Play lovely silence while we're loading
+        lda #0
+        jsr play_track
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
         sta PPUMASK
@@ -134,6 +138,10 @@ MetaSpriteIndex := R0
         lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
         sta PPUCTRL
 
+        ; For now, play the click track on the title screen
+        lda #1
+        jsr play_track
+
         rts
 .endproc
 
@@ -147,20 +155,17 @@ MetaSpriteIndex := R0
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
 
-        lda #KEY_START
-        and ButtonsDown
-        beq stay_here
+        jsr update_title
 
-        ; TODO: fade out to game prep?
-        st16 FadeToGameMode, game_prep
-        st16 GameMode, fade_to_game_mode
-
-stay_here:
         jsr wait_for_next_vblank
         rts
 .endproc
 
 .proc game_prep
+        ; play lovely silence while we load
+        ; (this also ensures the music / beat counter are in a deterministic spot when we fade back in)
+        lda #0
+        jsr play_track
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
         sta PPUMASK
@@ -196,7 +201,7 @@ stay_here:
 .endproc
 
 .proc game_init
-        lda #1
+        lda #2
         jsr play_track
         lda #0
         sta DisplayedRowCounter
@@ -259,7 +264,7 @@ stay_here:
         far_call FAR_swap_battlefield_buffers
 
         ; Set the next kernel mode early; the player might override this
-        st16 GameMode, update_enemies_1
+        st16 GameMode, wait_for_player_draw_1
 
         ; - Resolve the player's action
         jsr update_player
@@ -274,6 +279,30 @@ stay_here:
         jsr age_sprites
         far_call FAR_refresh_hud
         jsr every_gameloop
+        rts
+.endproc
+
+.proc wait_for_player_draw_1
+StartingRow := R14
+StartingTile := R15
+        ; Do nothing! The player probably updated several rows, and
+        ; we should give them a frame or two to draw before we do enemies again.
+        ; If we draw enemies too quickly, we can get things slightly out of sync
+
+        jsr every_gameloop
+        st16 GameMode, wait_for_player_draw_2
+        rts
+.endproc
+
+.proc wait_for_player_draw_2
+StartingRow := R14
+StartingTile := R15
+        ; Do nothing! The player probably updated several rows, and
+        ; we should give them a frame or two to draw before we do enemies again.
+        ; If we draw enemies too quickly, we can get things slightly out of sync
+
+        jsr every_gameloop
+        st16 GameMode, update_enemies_1
         rts
 .endproc
 
@@ -476,3 +505,4 @@ done_with_displayed_row_counter:
 done_with_current_beat:
         rts
 .endproc
+

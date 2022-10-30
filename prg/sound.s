@@ -43,16 +43,24 @@ music_module:
         .segment "PRGFIXED_C000"
 
 track_table_bank:
-        .lobytes .bank(music_module), .bank(music_module)
+        .repeat 3
+        .lobytes .bank(music_module)
+        .endrepeat
         
 track_table_song:
-        .byte 0, 1
+        .byte 0 ; silence (used for transitions)
+        .byte 1 ; click track (meant for debugging)
+        .byte 2 ; level music
 
 track_table_num_variants:
-        .byte 1, 1 ; click_track
+        .byte 1 ; silence 
+        .byte 1 ; click_track
+        .byte 1 ; level music
 
 track_table_variant_length:
-        .byte 0, 0 ; click_track
+        .byte 0 ; silence
+        .byte 0 ; click_track
+        .byte 0 ; level music
 
 .proc init_audio
         ; Always initialize the music engine with track 0 of the first module. This will
@@ -131,8 +139,8 @@ done:
 ; inputs: track number in A
 .proc play_track
         .if ::DEBUG_DISABLE_MUSIC
-        ; ignore the requested track, and queue up the silent track instead
-        lda #0
+        ; ignore the requested track, and queue up the click track instead
+        lda #1
         .endif
         cmp MusicCurrentTrack
         beq no_change
