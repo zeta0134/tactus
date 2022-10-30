@@ -22,6 +22,7 @@
 
         .zeropage
 GameMode: .res 2
+FadeToGameMode: .res 2
 
 .segment "RAM"
 CurrentBeatCounter: .res 1
@@ -47,6 +48,30 @@ DisplayedRowCounter: .res 1
         ; whatever game mode we are currently in, run one loop of that and exit
         jmp (GameMode)
         ; the game state function will exit
+.endproc
+
+; === Special game mode: fade brightness to 0 and THEN run the next state ===
+.proc fade_to_game_mode
+        lda #0
+        sta TargetBrightness
+        lda Brightness
+        bne continue_waiting
+
+        lda FadeToGameMode
+        sta GameMode
+        lda FadeToGameMode+1
+        sta GameMode+1
+
+continue_waiting:
+        lda #0
+        sta queued_bytes_counter
+        far_call FAR_update_brightness
+        far_call FAR_refresh_palettes_gameloop
+        jsr update_beat_counters
+        far_call FAR_sync_chr_bank_to_music
+
+        jsr wait_for_next_vblank
+        rts
 .endproc
 
 ; === Game Mode Functions Follow ===
@@ -110,7 +135,8 @@ DisplayedRowCounter: .res 1
         beq stay_here
 
         ; TODO: fade out to game prep?
-        st16 GameMode, game_prep
+        st16 FadeToGameMode, game_prep
+        st16 GameMode, fade_to_game_mode
 
 stay_here:
         jsr wait_for_next_vblank
