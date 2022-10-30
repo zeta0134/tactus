@@ -30,6 +30,7 @@ CurrentBeatCounter: .res 1
 CurrentBeat: .res 1
 LastBeat: .res 1
 DisplayedRowCounter: .res 1
+AccumulatedGameBeats: .res 2
 
 .segment "PRGFIXED_C000"
 
@@ -161,6 +162,61 @@ MetaSpriteIndex := R0
         rts
 .endproc
 
+.proc game_end_screen_prep
+        ; Play lovely silence while we're loading
+        lda #0
+        jsr play_track
+        ; disable rendering, and soft-disable NMI (so music keeps playing)
+        lda #$00
+        sta PPUMASK
+
+        lda #1
+        sta NmiSoftDisable
+
+        lda #0
+        jsr set_brightness
+        lda #4
+        sta TargetBrightness
+
+        jsr initialize_sprites
+        jsr init_game_end_screen
+
+        ; Enable NMI first (but not rendering)
+        lda #0
+        sta NmiSoftDisable
+
+        st16 GameMode, run_game_end_screen
+        jsr wait_for_next_vblank
+
+        ; NOW it is safe to re-enable rendering
+        lda #$1E
+        sta PPUMASK
+        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        sta PPUCTRL
+
+        ; For now, play the click track on the game over screen
+        lda #1
+        jsr play_track
+
+        rts
+.endproc
+
+.proc run_game_end_screen
+        lda #0
+        sta queued_bytes_counter
+
+        jsr update_beat_counters_title
+        far_call FAR_sync_chr_bank_to_music
+        jsr draw_sprites
+        far_call FAR_update_brightness
+        far_call FAR_refresh_palettes_gameloop
+
+        jsr update_game_end_screen
+
+        jsr wait_for_next_vblank
+        rts
+.endproc
+
 .proc game_prep
         ; play lovely silence while we load
         ; (this also ensures the music / beat counter are in a deterministic spot when we fade back in)
@@ -208,6 +264,8 @@ MetaSpriteIndex := R0
         sta CurrentBeat
         sta LastBeat
         sta CurrentBeatCounter
+        sta AccumulatedGameBeats
+        sta AccumulatedGameBeats+1
 
         jsr next_rand
         ora #%00000001
@@ -255,6 +313,7 @@ MetaSpriteIndex := R0
 .endproc
 
 .proc beat_frame_1
+        inc16 AccumulatedGameBeats
         inc CurrentBeatCounter
         lda CurrentBeat
         sta LastBeat

@@ -48,10 +48,10 @@ SYMBOLS_BASE = (FONT_BASE + 36)
 .charmap 45, (FONT_BASE + 40) ; -
 .charmap 36, (FONT_BASE + 41) ; $
 .charmap 32, (FONT_BASE + 42) ; " "
-;.charmap 46, (FONT_BASE + 43) ; 
-;.charmap 46, (FONT_BASE + 44) ; 
-;.charmap 46, (FONT_BASE + 45) ; 
-;.charmap 46, (FONT_BASE + 46) ; 
+.charmap 40, (FONT_BASE + 43) ; 
+.charmap 41, (FONT_BASE + 44) ; 
+.charmap 58, (FONT_BASE + 45) ; 
+.charmap 39, (FONT_BASE + 46) ; 
 .charmap 107, (FONT_BASE + 47) ; KEY, "k"
 
 

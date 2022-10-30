@@ -43,7 +43,7 @@ HUD_ATTR_RIGHT = $27F0
 HEART_FULL_TILE = 204
 HEART_HALF_TILE = 200
 HEART_EMPTY_TILE = 196
-BLANK_TILE = 254
+BLANK_TILE = 250
 MAP_ICON_UNEXPLORED = 192
 MAP_ICON_SPECIAL = 193
 MAP_ICON_EXPLORED = 194
@@ -676,8 +676,10 @@ converge:
 .proc draw_16bit_number
 NumberWord := R0
 CurrentDigit := R2
+LeadingCounter := R3
         lda #0
         sta CurrentDigit
+        sta LeadingCounter
 tens_of_thousands_loop:
         cmp16 NumberWord, #10000
         bcc display_tens_of_thousands
@@ -685,9 +687,17 @@ tens_of_thousands_loop:
         sub16w NumberWord, 10000
         jmp tens_of_thousands_loop
 display_tens_of_thousands:
+        lda LeadingCounter
+        ora CurrentDigit
+        sta LeadingCounter
+        beq blank_ten_thousands
         lda #NUMBERS_BASE
         clc
         adc CurrentDigit
+        jmp draw_ten_thousands
+blank_ten_thousands:
+        lda #BLANK_TILE
+draw_ten_thousands:
         sta VRAM_TABLE_START, y
         iny
 
@@ -700,9 +710,17 @@ thousands_loop:
         sub16w NumberWord, 1000
         jmp thousands_loop
 display_thousands:
+        lda LeadingCounter
+        ora CurrentDigit
+        sta LeadingCounter
+        beq blank_thousands
         lda #NUMBERS_BASE
         clc
         adc CurrentDigit
+        jmp draw_thousands
+blank_thousands:
+        lda #BLANK_TILE
+draw_thousands:
         sta VRAM_TABLE_START, y
         iny
 
@@ -715,9 +733,17 @@ hundreds_loop:
         sub16w NumberWord, 100
         jmp hundreds_loop
 display_hundreds:
+        lda LeadingCounter
+        ora CurrentDigit
+        sta LeadingCounter
+        beq blank_hundreds
         lda #NUMBERS_BASE
         clc
         adc CurrentDigit
+        jmp draw_hundreds
+blank_hundreds:
+        lda #BLANK_TILE
+draw_hundreds:
         sta VRAM_TABLE_START, y
         iny
 
@@ -730,9 +756,17 @@ tens_loop:
         sub16w NumberWord, 10
         jmp tens_loop
 display_tens:
+        lda LeadingCounter
+        ora CurrentDigit
+        sta LeadingCounter
+        beq blank_tens
         lda #NUMBERS_BASE
         clc
         adc CurrentDigit
+        jmp draw_tens
+blank_tens:
+        lda #BLANK_TILE
+draw_tens:
         sta VRAM_TABLE_START, y
         iny
 

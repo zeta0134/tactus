@@ -90,7 +90,6 @@ MetaSpriteIndex := R0
 
         ; The player should start with a standard L1-DAGGER
         lda #WEAPON_DAGGER
-        ;lda #WEAPON_BROADSWORD
         sta PlayerWeapon
         asl
         tax
@@ -101,9 +100,9 @@ MetaSpriteIndex := R0
         lda #1
         sta PlayerWeaponDmg
 
-        lda #6
+        lda #1
         sta PlayerHealth
-        lda #6
+        lda #4
         sta PlayerMaxHealth
         lda #0
         sta PlayerKeys
@@ -390,6 +389,9 @@ resolve_enemy_collision:
 
         ; Detect exits and, if necessary, transition to the next room
         jsr detect_exit
+
+        ; Detect being dead and, if necessary, transition to the end screen
+        jsr detect_critical_existence_failure
 
         rts
 .endproc
@@ -757,5 +759,16 @@ exit_bottom:
 converge:
         ; TODO: this probably needs to be a fade out state, rather than right to room init
         st16 GameMode, room_init
+        rts
+.endproc
+
+.proc detect_critical_existence_failure
+        lda PlayerHealth
+        bne existence_proven
+        ; Whelp; that's the end of the line
+        ; TODO: I dunno, screen shake? palette greyscale? SFX? Juice this up.
+        st16 FadeToGameMode, game_end_screen_prep
+        st16 GameMode, fade_to_game_mode
+existence_proven:
         rts
 .endproc

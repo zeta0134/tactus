@@ -579,7 +579,7 @@ el_advanced_slimes:
 
 el_debug_enemies:
         .byte 1
-        .byte TILE_BASIC_SLIME, 1
+        .byte TILE_MOLE_HOLE_BASIC, 1
 
 
 ; Each pool is a FIXED length:

@@ -1,6 +1,9 @@
         .include "nes.inc"
         .include "action53.inc"
 
+.zeropage
+action53_shadow: .res 1
+
 .segment "PRGFIXED_C000"
 
 .proc init_action53
