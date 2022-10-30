@@ -1,1 +1,3 @@
+.global init_game_end_screen
 .global update_title
+.global update_game_end_screen

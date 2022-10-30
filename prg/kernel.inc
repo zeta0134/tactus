@@ -2,6 +2,7 @@
 .globalzp FadeToGameMode
 .global CurrentBeatCounter
 .global DisplayedRowCounter
+.global AccumulatedGameBeats
 
 .global run_kernel
 .global init_engine
@@ -10,3 +11,4 @@
 .global fade_to_game_mode
 .global game_prep
 .global title_prep
+.global game_end_screen_prep
