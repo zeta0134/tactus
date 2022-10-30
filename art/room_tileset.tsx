@@ -15,13 +15,13 @@
  </tile>
  <tile id="2">
   <properties>
-   <property name="enemy_index" type="int" value="136"/>
+   <property name="enemy_index" type="int" value="140"/>
   </properties>
   <image width="16" height="16" source="static_tiles/wall_face.png"/>
  </tile>
  <tile id="3">
   <properties>
-   <property name="enemy_index" type="int" value="140"/>
+   <property name="enemy_index" type="int" value="136"/>
   </properties>
   <image width="16" height="16" source="static_tiles/wall_top.png"/>
  </tile>
