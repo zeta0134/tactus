@@ -82,7 +82,7 @@ DisplayedRowCounter: .res 1
         far_call FAR_init_floor
         ; Generate an open debug floor plan, with fixed spawn locations
         ;far_call FAR_demo_init_floor
-        
+
         st16 GameMode, room_init
         rts
 .endproc
@@ -91,6 +91,22 @@ DisplayedRowCounter: .res 1
         far_call FAR_init_current_room
         jsr despawn_unimportant_sprites
         st16 GameMode, beat_frame_1
+        rts
+.endproc
+
+.proc advance_to_next_floor
+        inc PlayerFloor
+        far_call FAR_init_floor
+        ; reset the player's position to the center of the room
+        lda #6
+        sta PlayerRow
+        sta PlayerCol
+        ; take away the player's key
+        lda #0
+        sta PlayerKeys
+        ; Now run room init and... we're good for now?
+        ; TODO: polish up this whole transition with some palette fades
+        st16 GameMode, room_init
         rts
 .endproc
 
