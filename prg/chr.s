@@ -10,7 +10,7 @@
 .segment "RAM"
 CurrentChrBank: .res 1
 
-.segment "PRG0_8000"
+.segment "PRG1_8000"
         ; player
         .include "../build/animated_tiles/player.chr"
         ; weapons
@@ -64,6 +64,12 @@ CurrentChrBank: .res 1
 
 hud_font:
         .incbin "../art/raw_chr/font_chicago_reduced.chr"
+
+title_chr:
+        .incbin "../art/raw_chr/title.chr"
+
+title_nametable:
+        .incbin "../art/raw_nametables/title_screen.nam"
 
 ANIMATED_TILE_TABLE_LENGTH = 17
 animated_tile_table:
