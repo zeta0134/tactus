@@ -297,6 +297,19 @@ MetaSpriteIndex := R0
 .endproc
 
 .proc advance_to_next_floor
+        ; If we were on the final floor, it's a victory!
+        lda PlayerZone
+        cmp #1 ; only the first floor is implemented for the demo
+        bne not_victory
+        lda PlayerFloor
+        cmp #4
+        bne not_victory
+
+        st16 FadeToGameMode, game_end_screen_prep
+        st16 GameMode, fade_to_game_mode
+        rts
+
+not_victory:
         inc PlayerFloor
         far_call FAR_init_floor
         ; reset the player's position to the center of the room

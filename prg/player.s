@@ -100,7 +100,7 @@ MetaSpriteIndex := R0
         lda #1
         sta PlayerWeaponDmg
 
-        lda #1
+        lda #4
         sta PlayerHealth
         lda #4
         sta PlayerMaxHealth
@@ -111,7 +111,7 @@ MetaSpriteIndex := R0
 
         lda #1
         sta PlayerZone
-        lda #1
+        lda #4
         sta PlayerFloor
 
         rts

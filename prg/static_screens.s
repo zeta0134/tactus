@@ -183,6 +183,8 @@ lowest_floor_text: .asciiz "LOWEST FLOOR:"
 gold_text:         .asciiz "GOLD COLLECTED:"
 time_text:         .asciiz "STEPS TAKEN:"
 hyphen_text: .asciiz "-"
+thank_you_text: .asciiz "THANK YOU FOR PLAYING!"
+
 
 ; This is called with rendering already disabled
 .proc init_game_end_screen
@@ -194,14 +196,39 @@ Digit := R0
         ; We don't know which nametable will be active, so
         ; all drawing commands will be run twice, once for each half
 
-        ; TODO: detect victory and draw different text here
+        lda PlayerHealth
+        jeq game_over
+victory:
+        set_ppuaddr #($2000 + $010C)
+        st16 StringPtr, victory_text
+        jsr draw_string_imm
+        set_ppuaddr #($2400 + $010C)
+        st16 StringPtr, victory_text
+        jsr draw_string_imm
+
+        set_ppuaddr #($2000 + $014A)
+        st16 StringPtr, demo_end_text
+        jsr draw_string_imm
+        set_ppuaddr #($2400 + $014A)
+        st16 StringPtr, demo_end_text
+        jsr draw_string_imm
+
+        set_ppuaddr #($2000 + $02C5)
+        st16 StringPtr, thank_you_text
+        jsr draw_string_imm
+        set_ppuaddr #($2400 + $02C5)
+        st16 StringPtr, thank_you_text
+        jsr draw_string_imm
+
+        jmp converge
+game_over:
         set_ppuaddr #($2000 + $010C)
         st16 StringPtr, game_over_text
         jsr draw_string_imm
         set_ppuaddr #($2400 + $010C)
         st16 StringPtr, game_over_text
         jsr draw_string_imm
-
+converge:
         ; Text labels for progress through the dungeon
         set_ppuaddr #($2000 + $01C7)
         st16 StringPtr, lowest_floor_text
