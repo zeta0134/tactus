@@ -208,7 +208,7 @@ ft_s2p1c5:
 
 ; Bank 0
 ft_s2p2c5:
-	.byte $E3, $0E, $1F, $09, $0F, $0B, $0F
+	.byte $E3, $0E, $1F, $09, $0F, $0B, $0E, $86, $03, $00, $00
 
 
 ; DPCM samples (located at DPCM segment)
