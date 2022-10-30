@@ -10,4 +10,4 @@
 .global FAR_update_brightness
 .global set_brightness
 
-GLOBAL_PALETTE_FADE_SPEED = 10
+GLOBAL_PALETTE_FADE_SPEED = 4
