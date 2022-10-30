@@ -1,4 +1,5 @@
         .setcpu "6502"
+        .include "action53.inc"
         .include "debug.inc"
         .include "bhop/bhop.inc"
         .include "far_call.inc"
@@ -29,7 +30,7 @@ NoiseSfxPtr: .res 2
 
 FADE_SPEED = 8
 
-        .segment "PRGFIXED_C000"
+        .segment "PRG2_8000"
 
 .export bhop_music_data
 bhop_music_data: ; TODO: deprecated label, remove later
@@ -64,13 +65,13 @@ track_table_variant_length:
         lda track_table_bank, x
         sta MusicCurrentBank
 
-        ; access_data_bank MusicCurrentBank
+        access_data_bank MusicCurrentBank
         ; TODO: if music lives on a different bank, swap that in
 
         lda track_table_song, x
         jsr bhop_init
 
-        ; restore_previous_bank
+        restore_previous_bank
 
         ; init some custom bhop features here as well
         lda #0
@@ -83,10 +84,10 @@ track_table_variant_length:
 
 .proc update_audio
         jsr update_fade
-        ; access_data_bank MusicCurrentBank
+        access_data_bank MusicCurrentBank
         jsr bhop_play
         jsr update_sfx
-        ; restore_previous_bank
+        restore_previous_bank
         rts
 .endproc
 
@@ -140,10 +141,10 @@ done:
         tax
         lda track_table_bank, x
         sta MusicCurrentBank
-        ;access_data_bank MusicCurrentBank
+        access_data_bank MusicCurrentBank
         lda track_table_song, x
         jsr bhop_init
-        ;restore_previous_bank
+        restore_previous_bank
         ; all new tracks should start with variant 0
         ; (the map load routine might override this immediately, but if it
         ; doesn't, we still need to clear the state from the previous track)
