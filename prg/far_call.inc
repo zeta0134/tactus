@@ -27,7 +27,7 @@
 .macro access_data_bank TargetBank
         lda CurrentBank
         pha
-        mmc3_select_bank 7, TargetBank
+        a53_set_prg TargetBank
         lda TargetBank
         sta CurrentBank
 .endmacro
@@ -35,5 +35,5 @@
 .macro restore_previous_bank
         pla
         sta CurrentBank
-        mmc3_select_bank 7, CurrentBank
+        a53_set_prg CurrentBank
 .endmacro
