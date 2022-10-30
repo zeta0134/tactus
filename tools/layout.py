@@ -153,7 +153,7 @@ def layout_bytes(tilemap):
   return raw_bytes
 
 def write_layout(tilemap, output_file):
-    output_file.write(ca65_label(tilemap.name) + "\n")
+    output_file.write(ca65_label("layout_"+tilemap.name) + "\n")
     pretty_print_table(layout_bytes(tilemap), output_file, tilemap.width)
     
 if __name__ == '__main__':

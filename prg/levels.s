@@ -374,155 +374,66 @@ EntityId := R1
 ; Floors - collections of rooms
 ; =============================
 
-test_floor:
-        .byte 1, 5, 5, 2
-        .byte 7, 0, 0, 8
-        .byte 7, 0, 0, 8
-        .byte 3, 6, 6, 4
-
-
 ; Room Layouts
 
+.include "../build/layouts/A0.incs"
+.include "../build/layouts/B0.incs"
+.include "../build/layouts/C0.incs"
+.include "../build/layouts/D0.incs"
+.include "../build/layouts/E0.incs"
+.include "../build/layouts/F0.incs"
+.include "../build/layouts/G0.incs"
+.include "../build/layouts/H0.incs"
+.include "../build/layouts/I0.incs"
+.include "../build/layouts/J0.incs"
+.include "../build/layouts/K0.incs"
+.include "../build/layouts/L0.incs"
+.include "../build/layouts/M0.incs"
+.include "../build/layouts/N0.incs"
+.include "../build/layouts/O0.incs"
+.include "../build/layouts/P0.incs"
+
 layouts_table:
-        .word test_layout_with_four_exits
-        .word test_layout_top_left
-        .word test_layout_top_right
-        .word test_layout_bottom_left
-        .word test_layout_bottom_right
-        .word test_layout_top_edge
-        .word test_layout_bottom_edge
-        .word test_layout_left_edge
-        .word test_layout_right_edge
+        .word layout_A0
+        .word layout_B0
+        .word layout_C0
+        .word layout_D0
+        .word layout_E0
+        .word layout_F0
+        .word layout_G0
+        .word layout_H0
+        .word layout_I0
+        .word layout_J0
+        .word layout_K0
+        .word layout_L0
+        .word layout_M0
+        .word layout_N0
+        .word layout_O0
+        .word layout_P0
 
-FL := TILE_REGULAR_FLOOR
-WF := TILE_WALL_FACE
-WT := TILE_WALL_TOP
-PE := TILE_PIT_EDGE
-PT := TILE_PIT
-BS := TILE_BASIC_SLIME
-IS := TILE_INTERMEDIATE_SLIME
-AS := TILE_ADVANCED_SLIME
-TC := TILE_TREASURE_CHEST
-BK := TILE_BIG_KEY
-HC := TILE_HEART_CONTAINER
-GS := TILE_GOLD_SACK
+; To make the hand-editing of floor layouts slightly less tedious
+A0 := 0
+B0 := 1
+C0 := 2
+D0 := 3
+E0 := 4
+F0 := 5
+G0 := 6
+H0 := 7
+I0 := 8
+J0 := 9
+K0 := 10
+L0 := 11
+M0 := 12
+N0 := 13
+O0 := 14
+P0 := 15
 
-test_layout_top_left:
-        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
-        .byte WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT ; 0
-        .byte WT, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WT ; 1
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 4
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
-        .byte PE, PE, PE, PE, FL, FL, FL, FL, FL, FL, PE, PE, PE, PE ; 9
-
-test_layout_top_right:
-        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
-        .byte WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT ; 0
-        .byte WT, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WT ; 1
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 2
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 3
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 4
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 5
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
-        .byte PE, PE, PE, PE, FL, FL, FL, FL, FL, FL, PE, PE, PE, PE ; 9
-
-test_layout_bottom_left:
-        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
-        .byte WT, WT, WT, WT, FL, FL, FL, FL, FL, FL, WT, WT, WT, WT ; 0
-        .byte WT, WF, WF, WF, FL, FL, FL, FL, FL, FL, WF, WF, WF, WT ; 1
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 4
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
-        .byte PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE ; 9
-
-test_layout_bottom_right:
-        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
-        .byte WT, WT, WT, WT, FL, FL, FL, FL, FL, FL, WT, WT, WT, WT ; 0
-        .byte WT, WF, WF, WF, FL, FL, FL, FL, FL, FL, WF, WF, WF, WT ; 1
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 2
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 3
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 4
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 5
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
-        .byte PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE ; 9
-
-test_layout_top_edge:
-        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
-        .byte WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT, WT ; 0
-        .byte WT, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WF, WT ; 1
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 4
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
-        .byte PE, PE, PE, PE, FL, FL, FL, FL, FL, FL, PE, PE, PE, PE ; 9
-
-test_layout_bottom_edge:
-        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
-        .byte WT, WT, WT, WT, FL, FL, FL, FL, FL, FL, WT, WT, WT, WT ; 0
-        .byte WT, WF, WF, WF, FL, FL, FL, FL, FL, FL, WF, WF, WF, WT ; 1
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 4
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
-        .byte PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE, PE ; 9
-
-test_layout_left_edge:
-        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
-        .byte WT, WT, WT, WT, FL, FL, FL, FL, FL, FL, WT, WT, WT, WT ; 0
-        .byte WT, WF, WF, WF, FL, FL, FL, FL, FL, FL, WF, WF, WF, WT ; 1
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 4
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
-        .byte PE, PE, PE, PE, FL, FL, FL, FL, FL, FL, PE, PE, PE, PE ; 9
-
-test_layout_right_edge:
-        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
-        .byte WT, WT, WT, WT, FL, FL, FL, FL, FL, FL, WT, WT, WT, WT ; 0
-        .byte WT, WF, WF, WF, FL, FL, FL, FL, FL, FL, WF, WF, WF, WT ; 1
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 2
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 3
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 4
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 5
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
-        .byte PE, PE, PE, PE, FL, FL, FL, FL, FL, FL, PE, PE, PE, PE ; 9
-
-test_layout_with_four_exits:
-        ;      0   1   2   3   4   5   6   7   8   9  10  11  12  13
-        .byte WT, WT, WT, WT, FL, FL, FL, FL, FL, FL, WT, WT, WT, WT ; 0
-        .byte WT, WF, WF, WF, FL, FL, FL, FL, FL, FL, WF, WF, WF, WT ; 1
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 2
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 3
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 4
-        .byte FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL ; 5
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 6
-        .byte WT, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WT ; 7
-        .byte WF, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, FL, WF ; 8
-        .byte PE, PE, PE, PE, FL, FL, FL, FL, FL, FL, PE, PE, PE, PE ; 9
+test_floor:
+        .byte F0, H0, H0, G0
+        .byte N0, P0, P0, O0
+        .byte N0, P0, P0, O0
+        .byte J0, H0, H0, K0
 
 
 ; =============================================
