@@ -78,8 +78,11 @@ DisplayedRowCounter: .res 1
 .endproc
 
 .proc zone_init
-        ; FOR NOW, do a demo init that generates a static floor
-        far_call FAR_demo_init_floor
+        ; Generate proper mazes and randomize player, exit, and boss
+        far_call FAR_init_floor
+        ; Generate an open debug floor plan, with fixed spawn locations
+        ;far_call FAR_demo_init_floor
+        
         st16 GameMode, room_init
         rts
 .endproc

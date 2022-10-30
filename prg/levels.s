@@ -25,6 +25,8 @@ enemies_active: .res 1
 
 .segment "PRG0_8000"
 
+; Initialize a fixed floor, fully open, with boss and exit stairs
+; in known, predictable locations. Useful for debugging
 .proc FAR_demo_init_floor
         ; clear out the room flags entirely
         lda #0
@@ -38,7 +40,7 @@ flag_loop:
         lda #0
         ldx #0
 room_loop:
-        lda test_floor, x
+        lda floor_test_floor, x
         sta room_layouts, x
         inx
         cpx #16
@@ -62,6 +64,105 @@ seed_loop:
         ldx #2
         lda #ROOM_FLAG_EXIT_STAIRS
         sta room_flags, x
+
+        rts
+.endproc
+
+; Generate a maze layout, and pick the player, boss, and exit locations
+.proc FAR_init_floor
+FloorPtr := R0
+BossIndex := R2
+        ; clear out the room flags entirely
+        lda #0
+        ldx #0
+flag_loop:
+        sta room_flags, x
+        inx
+        cpx #16
+        bne flag_loop
+
+        ; pick a random maze layout and load it in
+        ; TODO: maybe this could use a global seed? it'd be nice to have a game-level seed
+        ; ... though I guess also todo: write a 6502 maze generator
+        jsr next_rand
+        ; There are only 16 mazes in the game right now
+        and #$0F
+        asl
+        tax
+        lda maze_list, x
+        sta FloorPtr
+        lda maze_list+1, x
+        sta FloorPtr+1
+
+        ; Load in that floor's layout bytes
+        lda #0
+        ldy #0
+room_loop:
+        lda (FloorPtr), y
+        sta room_layouts, y
+        iny
+        cpy #16
+        bne room_loop
+
+        ; set each room up with its own RNG low byte
+        ldx #0
+seed_loop:
+        jsr next_rand
+        sta room_seeds, x
+        inx
+        cpx #16
+        bne seed_loop       
+
+        ; Okay now, pick a random room for the player to spawn in
+        jsr next_rand
+        and #$0F
+        sta PlayerRoomIndex
+        ; Mark the player's room as cleared, so they don't load in surrounded by mobs
+        tax
+        lda room_flags, x
+        ora #ROOM_FLAG_CLEARED
+        sta room_flags, x
+        ; if this is zone 1, floor 1, then allow the player to have one treasure when they start
+        ; (it will spawn right away)
+        lda PlayerZone
+        cmp #1
+        bne no_starting_treasure
+        lda PlayerFloor
+        cmp #1
+        bne no_starting_treasure
+        jmp done_with_player
+no_starting_treasure:
+        lda room_flags, x
+        ora #ROOM_FLAG_TREASURE_COLLECTED
+        sta room_flags, x
+done_with_player:
+
+        ; Next choose the boss location; importantly this should NOT be the
+        ; same room the player spawned in
+boss_loop:
+        jsr next_rand
+        and #$0F
+        cmp PlayerRoomIndex
+        beq boss_loop
+        tax
+        lda #ROOM_FLAG_BOSS
+        sta room_flags, x
+        stx BossIndex
+
+        ; Finally choose the exit stairs location; this should again not be the same
+        ; location as the player OR the boss
+exit_loop:
+        jsr next_rand
+        and #$0F
+        cmp PlayerRoomIndex
+        beq exit_loop
+        cmp BossIndex
+        beq exit_loop
+        tax
+        lda #ROOM_FLAG_EXIT_STAIRS
+        sta room_flags, x
+
+        ; Aaaand.... that's it? I think that's it
 
         rts
 .endproc
@@ -108,6 +209,7 @@ converge_treasure:
         and #ROOM_FLAG_EXIT_STAIRS
         beq no_exit_stairs
         jsr spawn_exit_block
+        ldx PlayerRoomIndex
 no_exit_stairs:
 
         ; Has the player already cleared this room?
@@ -411,29 +513,45 @@ layouts_table:
         .word layout_O0
         .word layout_P0
 
-; To make the hand-editing of floor layouts slightly less tedious
-A0 := 0
-B0 := 1
-C0 := 2
-D0 := 3
-E0 := 4
-F0 := 5
-G0 := 6
-H0 := 7
-I0 := 8
-J0 := 9
-K0 := 10
-L0 := 11
-M0 := 12
-N0 := 13
-O0 := 14
-P0 := 15
+; for debug mode we can force the layout to an open floor plan
+.include "../build/floors/test_floor.incs"
 
-test_floor:
-        .byte F0, H0, H0, G0
-        .byte N0, P0, P0, O0
-        .byte N0, P0, P0, O0
-        .byte J0, H0, H0, K0
+; for the actual game, we use one of a set of pregenerated mazes
+; (because I do not have time to write the maze generator in 6502)
+.include "../build/floors/maze_0.incs"
+.include "../build/floors/maze_1.incs"
+.include "../build/floors/maze_2.incs"
+.include "../build/floors/maze_3.incs"
+.include "../build/floors/maze_4.incs"
+.include "../build/floors/maze_5.incs"
+.include "../build/floors/maze_6.incs"
+.include "../build/floors/maze_7.incs"
+.include "../build/floors/maze_8.incs"
+.include "../build/floors/maze_9.incs"
+.include "../build/floors/maze_10.incs"
+.include "../build/floors/maze_11.incs"
+.include "../build/floors/maze_12.incs"
+.include "../build/floors/maze_13.incs"
+.include "../build/floors/maze_14.incs"
+.include "../build/floors/maze_15.incs"
+
+maze_list:
+        .word floor_maze_0
+        .word floor_maze_1
+        .word floor_maze_2
+        .word floor_maze_3
+        .word floor_maze_4
+        .word floor_maze_5
+        .word floor_maze_6
+        .word floor_maze_7
+        .word floor_maze_8
+        .word floor_maze_9
+        .word floor_maze_10
+        .word floor_maze_11
+        .word floor_maze_12
+        .word floor_maze_13
+        .word floor_maze_14
+        .word floor_maze_15
 
 
 ; =============================================

@@ -1,4 +1,5 @@
 .global FAR_demo_init_floor
+.global FAR_init_floor
 .global FAR_init_current_room
 .global FAR_handle_room_spawns
 
