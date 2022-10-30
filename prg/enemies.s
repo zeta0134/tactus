@@ -57,14 +57,18 @@ static_behaviors:
         .word update_smoke_puff      ; $00 - smoke puff
         .word update_slime           ; $04 - slime (idle pose)
         .word update_spider_base     ; $08 - spider (idle)
-        .word update_spider_anticipate ; $08 - spider (anticipate)
-        .word update_zombie_base     ; $08 - spider (idle)
-        .word update_zombie_anticipate ; $08 - spider (anticipate)
-        .word update_birb_left
-        .word update_birb_right
-        .word update_birb_flying_left
-        .word update_birb_flying_right
-        .repeat 22
+        .word update_spider_anticipate ; $0C - spider (anticipate)
+        .word update_zombie_base     ; $10 - spider (idle)
+        .word update_zombie_anticipate ; $14 - spider (anticipate)
+        .word update_birb_left       ; $18
+        .word update_birb_right      ; $1C
+        .word update_birb_flying_left   ; $20
+        .word update_birb_flying_right  ; $24
+        .word update_mole_hole          ; $28
+        .word update_mole_throwing      ; $2C
+        .word update_mole_idle          ; $30
+        .word update_wrench_projectile  ; $34
+        .repeat 18
         .word no_behavior ; unimplemented
         .endrepeat
         .word draw_disco_tile ; $80 - plain floor
@@ -89,7 +93,11 @@ direct_attack_behaviors:
         .word direct_attack_birb
         .word direct_attack_birb
         .word direct_attack_birb
-        .repeat 22
+        .word direct_attack_mole_hole
+        .word direct_attack_mole_throwing
+        .word direct_attack_mole_idle
+        .word no_behavior ; wrench projectile, cannot be attacked
+        .repeat 18
         .word no_behavior
         .endrepeat
         ; floors, statics, and technical tiles
@@ -121,7 +129,11 @@ indirect_attack_behaviors:
         .word indirect_attack_birb
         .word indirect_attack_birb
         .word indirect_attack_birb
-        .repeat 22
+        .word no_behavior ; moles - do not move, and therefore will never be indirectly attacked
+        .word no_behavior
+        .word no_behavior
+        .word no_behavior ; wrench projectile, cannot be attacked
+        .repeat 18
         .word no_behavior
         .endrepeat
         ; safety: fill out the rest of the table
@@ -140,7 +152,11 @@ bonk_behaviors:
         .word basic_enemy_attacks_player
         .word basic_enemy_attacks_player
         .word basic_enemy_attacks_player
-        .repeat 22
+        .word no_behavior ; mole holes, when unoccupied, do no damage
+        .word basic_enemy_attacks_player ; moles when bonked, mostly with the flail, *do* do damage
+        .word basic_enemy_attacks_player
+        .word projectile_attacks_player ; projectiles do damage, but also need to erase themselves
+        .repeat 18
         .word no_behavior
         .endrepeat
         .word no_behavior ; $80 - plain floor
@@ -1196,7 +1212,7 @@ CurrentTile := R15
 
         ldx CurrentTile
         bail_if_already_moved
-        
+
         lda CurrentTile
         sta TargetTile
 
@@ -1249,6 +1265,303 @@ proceed_with_jump:
         ldx CurrentRow
         jsr queue_row_x
         ldx TargetRow
+        jsr queue_row_x
+
+        rts
+.endproc
+
+MOLE_NORTH = 0
+MOLE_EAST = 1
+MOLE_SOUTH = 2
+MOLE_WEST = 3
+
+.proc update_mole_hole
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+        inc enemies_active
+
+        ldx CurrentTile
+        lda tile_data, x
+        cmp #2 ; TODO: pick a threshold based on zombie difficulty
+        bcc continue_waiting
+
+        ; Okay first, we cannot rise out of the ground if the player is too close,
+        ; both for engine and gameplay reasons, so compute that
+        jsr player_manhattan_distance
+        cmp #MOLE_SUPPRESSION_RADIUS
+        bcc do_nothing
+
+        ; Now, we only pop up if the player is in our line of sight, and we'll throw
+        ; a wrench at them (evenutally) so, first, does the player's column match ours?
+        lda PlayerCol
+        ldx CurrentTile
+        cmp tile_index_to_col_lut, x
+        beq line_of_sight_vertical
+
+        ; What about the row?
+        lda PlayerRow
+        cmp CurrentRow
+        beq line_of_sight_horizontal
+
+        ; Neither? Then continue waiting, we can't "see" them from here
+        jmp do_nothing
+line_of_sight_vertical:
+        ; if the player's row is less than ours...
+        lda PlayerRow
+        cmp CurrentRow
+        bpl south
+north:
+        ; ... then we will throw north
+        lda #MOLE_NORTH
+        sta tile_data, x
+        jmp switch_to_attack_pose
+south:
+        ; ... otherwise, we will throw south
+        lda #MOLE_SOUTH
+        sta tile_data, x
+        jmp switch_to_attack_pose
+
+line_of_sight_horizontal:
+        ; if the player's column is more than ours...
+        lda PlayerCol
+        ldx CurrentTile
+        cmp tile_index_to_col_lut, x
+        bmi west
+east:
+        ; ... then we will throw north
+        lda #MOLE_EAST
+        sta tile_data, x
+        jmp switch_to_attack_pose
+west:
+        ; ... otherwise, we will throw south
+        lda #MOLE_WEST
+        sta tile_data, x
+        jmp switch_to_attack_pose
+
+switch_to_attack_pose:
+        ; switch to our anticipation pose
+        ldx CurrentTile
+        lda battlefield, x
+        and #%00000011
+        ora #TILE_MOLE_THROWING
+        sta battlefield, x
+
+        ldx CurrentRow
+        jsr queue_row_x
+
+        ; And we're done, the tile_data is set up for the next frame, and we don't
+        ; need to bother with the flags byte this round
+
+        rts
+
+continue_waiting:
+        inc tile_data, x
+do_nothing:
+        rts
+.endproc
+
+.proc update_mole_throwing
+TargetRow := R0
+TargetTile := R1
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+        inc enemies_active
+
+        lda CurrentTile
+        sta TargetTile
+        lda CurrentRow
+        sta TargetRow
+        ; Using our tile data, determine which direction we will be attempting to throw
+        ldx CurrentTile
+        lda tile_data, x
+        cmp #MOLE_EAST
+        beq east
+        cmp #MOLE_SOUTH
+        beq south
+        cmp #MOLE_WEST
+        beq west
+north:
+        dec TargetRow
+        lda TargetTile
+        sec
+        sbc #::BATTLEFIELD_WIDTH
+        sta TargetTile
+        jmp attempt_to_spawn_wrench
+east:
+        inc TargetTile
+        jmp attempt_to_spawn_wrench
+south:
+        inc TargetRow
+        lda TargetTile
+        clc
+        adc #::BATTLEFIELD_WIDTH
+        sta TargetTile
+        jmp attempt_to_spawn_wrench
+west:
+        dec TargetTile
+attempt_to_spawn_wrench:
+        if_valid_destination spawn_wrench
+        jmp switch_to_idle_pose
+spawn_wrench:
+        ldx CurrentTile
+        ldy TargetTile
+
+        ; Draw a wrench at the chosen target location, using our palette from the
+        ; current location
+        lda battlefield, x
+        and #%00000011
+        ora #TILE_WRENCH_PROJECTILE
+        sta battlefield, y
+        ; Write the throw direction to the data byte for the wrench, that way
+        ; it keeps going in the same direction we threw it initially
+        lda tile_data, x
+        sta tile_data, y
+        ; Set the flags on the wrench to indicate that we have just moved,
+        ; this prevents us from going an extra square in the east/south directions
+        lda #%10000000
+        sta tile_flags, y
+        
+        ldx TargetRow
+        jsr queue_row_x
+
+switch_to_idle_pose:
+
+        ldx CurrentTile
+        lda battlefield, x
+        and #%00000011
+        ora #TILE_MOLE_IDLE
+        sta battlefield, x
+        ; reset tile_data to 0, it will be our counter for idle -> hole
+        lda #0
+        sta tile_data, x
+
+        ldx CurrentRow
+        jsr queue_row_x
+
+        rts
+.endproc
+
+.proc update_mole_idle
+TargetRow := R0
+TargetTile := R1
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+        inc enemies_active
+
+        ldx CurrentTile
+        bail_if_already_moved
+
+        lda tile_data, x
+        cmp #2 ; TODO: pick a threshold based on mole difficulty?
+        bcc continue_waiting
+
+        ; Switch back into our hole pose
+        ldx CurrentTile
+        lda battlefield, x
+        and #%00000011
+        ora #TILE_MOLE_HOLE_BASE
+        sta battlefield, x
+        ; Again reset our delay counter
+        lda #0
+        sta tile_data, x
+        ; Because we just went intangible this frame, mark ourselves as having "just moved"
+        ; This allows the player to attack us on what, to them, feels like the frame when we
+        ; were still above ground.
+        lda tile_flags, x
+        ora #%10000000
+        sta tile_flags, x
+        rts
+
+continue_waiting:
+        inc tile_data, x
+        rts
+.endproc
+
+.proc update_wrench_projectile
+TargetRow := R0
+TargetTile := R1
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+        inc enemies_active
+
+        ldx CurrentTile
+        bail_if_already_moved
+
+        ; Very similar to the mole's throwing pose, we first need to work out where the wrench
+        ; wants to GO from here...
+        lda CurrentTile
+        sta TargetTile
+        lda CurrentRow
+        sta TargetRow
+
+        ; Using our tile data, determine which direction we will be attempting to move
+        ldx CurrentTile
+        lda tile_data, x
+        cmp #MOLE_EAST
+        beq east
+        cmp #MOLE_SOUTH
+        beq south
+        cmp #MOLE_WEST
+        beq west
+north:
+        dec TargetRow
+        lda TargetTile
+        sec
+        sbc #::BATTLEFIELD_WIDTH
+        sta TargetTile
+        jmp attempt_to_spawn_wrench
+east:
+        inc TargetTile
+        jmp attempt_to_spawn_wrench
+south:
+        inc TargetRow
+        lda TargetTile
+        clc
+        adc #::BATTLEFIELD_WIDTH
+        sta TargetTile
+        jmp attempt_to_spawn_wrench
+west:
+        dec TargetTile
+attempt_to_spawn_wrench:
+        if_valid_destination spawn_new_wrench
+        jmp despawn_old_wrench
+spawn_new_wrench:
+        ldx CurrentTile
+        ldy TargetTile
+
+        ; Draw a wrench at the chosen target location, using our palette from the
+        ; current location
+        lda battlefield, x
+        and #%00000011
+        ora #TILE_WRENCH_PROJECTILE
+        sta battlefield, y
+        ; Write the throw direction to the data byte for the wrench, that way
+        ; it keeps going in the same direction we threw it initially
+        lda tile_data, x
+        sta tile_data, y
+        ; Set the new wrench as active, so it isn't ticked multiple times
+        lda #%10000000
+        sta tile_flags, y
+        
+        ldx TargetRow
+        jsr queue_row_x
+        
+despawn_old_wrench:
+        ; mark ourselves as floor; we're done
+        ; (no puff stool this time, projectiles can't be attacked)
+        ldx CurrentTile
+        lda #TILE_REGULAR_FLOOR
+        sta battlefield, x
+        ; clean up the other flags for posterity
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+
+        ldx CurrentRow
         jsr queue_row_x
 
         rts
@@ -1507,6 +1820,40 @@ die:
         rts
 .endproc
 
+.proc direct_attack_mole_idle
+EnemyHealth := R11
+        lda #4
+        sta EnemyHealth
+        jsr direct_attack_with_hp
+        rts
+.endproc
+
+.proc direct_attack_mole_throwing
+EnemyHealth := R11
+        lda #4
+        sta EnemyHealth
+        jsr direct_attack_with_hp
+        rts
+.endproc
+
+.proc direct_attack_mole_hole
+AttackSquare := R3
+EffectiveAttackSquare := R10 
+EnemyHealth := R11
+        ; Mole holes are intangible except on the frame they appear, since visually the mole
+        ; was above ground from the player's point of view. So, check for that here
+        ldx AttackSquare
+        lda tile_flags, x
+        bmi allow_attack
+        rts
+allow_attack:
+        lda #4
+        sta EnemyHealth
+        lda AttackSquare
+        sta EffectiveAttackSquare
+        jsr indirect_attack_with_hp
+        rts
+.endproc
 
 ; map all 5 weapons to 16 entries, for a mostly fair random type
 ; we'll give longswords one extra slot, as they're a fairly decent
@@ -1886,6 +2233,28 @@ no_puff_found:
         ; we should try to at least separate it from the player. (If this also fails the
         ; player will soft lock and die very quickly.)
         jsr forbid_player_movement
+        rts
+.endproc
+
+.proc projectile_attacks_player
+TargetIndex := R0
+TileId := R1
+TargetSquare := R13
+        ; All projectiles do 1 damage to the player on hit
+        jsr damage_player
+
+        ; Now, despawn the projectile:
+        ; draw a basic floor tile here, which will be underneath the player
+        lda TargetSquare
+        sta TargetIndex
+        lda #TILE_REGULAR_FLOOR
+        sta TileId
+        jsr draw_active_tile
+        ldx TargetSquare
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+
         rts
 .endproc
 
