@@ -1928,17 +1928,41 @@ die:
 .endproc
 
 .proc direct_attack_mole_idle
+AttackSquare := R3
 EnemyHealth := R11
+        ldx AttackSquare
+        lda battlefield, x
+        and #%00000011
+        cmp #%01
+        beq advanced_hp
+basic_hp:
         lda #2
         sta EnemyHealth
+        jmp done
+advanced_hp:
+        lda #6
+        sta EnemyHealth
+done:
         jsr direct_attack_with_hp
         rts
 .endproc
 
 .proc direct_attack_mole_throwing
+AttackSquare := R3
 EnemyHealth := R11
+        ldx AttackSquare
+        lda battlefield, x
+        and #%00000011
+        cmp #%01
+        beq advanced_hp
+basic_hp:
         lda #2
         sta EnemyHealth
+        jmp done
+advanced_hp:
+        lda #6
+        sta EnemyHealth
+done:
         jsr direct_attack_with_hp
         rts
 .endproc
@@ -1954,8 +1978,19 @@ EnemyHealth := R11
         bmi allow_attack
         rts
 allow_attack:
+        ldx AttackSquare
+        lda battlefield, x
+        and #%00000011
+        cmp #%01
+        beq advanced_hp
+basic_hp:
         lda #2
         sta EnemyHealth
+        jmp done
+advanced_hp:
+        lda #6
+        sta EnemyHealth
+done:
         lda AttackSquare
         sta EffectiveAttackSquare
         jsr indirect_attack_with_hp
