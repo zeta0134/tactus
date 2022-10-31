@@ -741,12 +741,81 @@ boss_pool_zone_1_floor_2:
 ; =============================================
 ;                Zone 3 - Basic
 ; =============================================
-;TODO
+
+el_slimes_and_imm_zombies:
+        .byte 5
+        .byte TILE_BASIC_SLIME, 1
+        .byte TILE_INTERMEDIATE_SLIME, 1
+        .byte TILE_ADVANCED_SLIME, 1
+        .byte TILE_ZOMBIE_BASIC, 1
+        .byte TILE_ZOMBIE_INTERMEDIATE, 3
+
+el_mole_and_friends:
+        .byte 4
+        .byte TILE_MOLE_HOLE_BASIC, 4
+        .byte TILE_BIRB_LEFT_INTERMEDIATE, 1
+        .byte TILE_BIRB_RIGHT_INTERMEDIATE, 1
+        .byte TILE_ZOMBIE_BASIC, 3
+
+el_mix3:
+        .byte 6
+        .byte TILE_MOLE_HOLE_BASIC, 2
+        .byte TILE_BIRB_LEFT_INTERMEDIATE, 1
+        .byte TILE_ZOMBIE_BASIC, 1
+        .byte TILE_ZOMBIE_INTERMEDIATE, 2
+        .byte TILE_SPIDER_BASIC, 1
+        .byte TILE_SPIDER_INTERMEDIATE, 2
+
+el_adv_slimes_and_spiders:
+        .byte 3
+        .byte TILE_ADVANCED_SLIME, 3
+        .byte TILE_SPIDER_BASIC, 3
+        .byte TILE_MOLE_HOLE_BASIC, 2
+
+basic_pool_zone_1_floor_3:
+        ; Make sure all sections add up to 16
+        .repeat 4
+        .word el_slimes_and_imm_zombies
+        .endrepeat
+
+        .repeat 4
+        .word el_mole_and_friends
+        .endrepeat
+
+        .repeat 4
+        .word el_mix3
+        .endrepeat
+
+        .repeat 4
+        .word el_adv_slimes_and_spiders
+        .endrepeat
 
 ; =============================================
 ;                Zone 3 - Boss
 ; =============================================
-;TODO
+
+el_aaaaaahhh_spiders:
+        .byte 4
+        .byte TILE_INTERMEDIATE_SLIME, 2
+        .byte TILE_SPIDER_BASIC, 4
+        .byte TILE_SPIDER_INTERMEDIATE, 5
+        .byte TILE_SPIDER_ADVANCED, 3
+
+el_mr_whiskers:
+        .byte 4
+        .byte TILE_MOLE_HOLE_BASIC, 6
+        .byte TILE_MOLE_HOLE_ADVANCED, 4
+        .byte TILE_BIRB_LEFT_INTERMEDIATE, 1
+        .byte TILE_BIRB_RIGHT_INTERMEDIATE, 1
+
+boss_pool_zone_1_floor_3:
+        ; Make sure sections add up to 4
+        .repeat 2
+        .word el_aaaaaahhh_spiders
+        .endrepeat
+        .repeat 2
+        .word el_mr_whiskers
+        .endrepeat
 
 ; =============================================
 ;                Zone 4 - Basic
@@ -765,13 +834,13 @@ boss_pool_zone_1_floor_2:
 zone_1_basic_pools:
         .word basic_pool_zone_1_floor_1 ; floor 1
         .word basic_pool_zone_1_floor_2 ; floor 2
-        .word basic_pool_zone_1_floor_1 ; floor 3
+        .word basic_pool_zone_1_floor_3 ; floor 3
         .word basic_pool_zone_1_floor_1 ; floor 4
 
 zone_1_boss_pools:
         .word boss_pool_zone_1_floor_1 ; floor 1
         .word boss_pool_zone_1_floor_2 ; floor 2
-        .word boss_pool_zone_1_floor_1 ; floor 3
+        .word boss_pool_zone_1_floor_3 ; floor 3
         .word boss_pool_zone_1_floor_1 ; floor 4
 
 ; And finally, here is the list of zone collections
