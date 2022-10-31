@@ -4,6 +4,7 @@
 .include "battlefield.inc"
 .include "bhop/bhop.inc"
 .include "chr.inc"
+.include "kernel.inc"
 .include "input.inc"
 .include "main.inc"
 .include "memory_util.inc"
@@ -118,8 +119,13 @@ all_frames:
         ora #(NT_2400)
 write_ppuctrl:
         sta PPUCTRL
-        lda #00
+       
+        ;lda #00
+        ;sta PPUSCROLL
+        ;sta PPUSCROLL
+        lda PpuScrollX
         sta PPUSCROLL
+        lda PpuScrollY
         sta PPUSCROLL
 
         a53_set_chr CurrentChrBank

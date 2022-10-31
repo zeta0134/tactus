@@ -707,6 +707,13 @@ TargetCol := R15
         lda PlayerHealth
         beq already_dead
         dec PlayerHealth
+
+        lda #2
+        sta ScreenShakeDepth
+        lda #8
+        sta ScreenShakeSpeed
+        sta ScreenShakeDecayCounter
+
 already_dead:
         rts
 .endproc

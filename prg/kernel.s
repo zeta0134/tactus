@@ -25,6 +25,12 @@
 GameMode: .res 2
 FadeToGameMode: .res 2
 
+ScreenShakeDepth: .res 1
+ScreenShakeSpeed: .res 1
+ScreenShakeDecayCounter: .res 1
+PpuScrollX: .res 1
+PpuScrollY: .res 1
+
 .segment "RAM"
 CurrentBeatCounter: .res 1
 CurrentBeat: .res 1
@@ -54,6 +60,10 @@ AccumulatedGameBeats: .res 2
 
 ; === Special game mode: fade brightness to 0 and THEN run the next state ===
 .proc fade_to_game_mode
+        lda #0
+        sta PpuScrollX
+        sta PpuScrollY
+
         lda #0
         sta TargetBrightness
         lda Brightness
@@ -534,6 +544,7 @@ continue_waiting:
         jsr draw_sprites
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
+        jsr update_screen_shake
 
         jsr wait_for_next_vblank
         rts
@@ -578,3 +589,65 @@ done_with_current_beat:
         rts
 .endproc
 
+.proc update_screen_shake
+DepthTemp := R0
+RandTemp := R1
+        lda ScreenShakeDepth
+        beq no_screen_shake
+        lda #8
+        sec
+        sbc ScreenShakeDepth
+        sta DepthTemp
+
+        ; X can use the rand value almost directly
+        jsr next_rand
+        sta RandTemp
+        ldx DepthTemp
+x_loop:
+        lsr
+        dex
+        bne x_loop
+        bit RandTemp
+        bmi minus_x
+        jmp done_with_x
+minus_x:
+        eor #$FF
+        clc
+        adc #1
+done_with_x:
+        sta PpuScrollX
+
+        ; Y should remain in the range 0-240, so the minus case is handled diffrently
+        jsr next_rand
+        sta RandTemp
+        ldx DepthTemp
+y_loop:
+        lsr
+        dex
+        bne y_loop
+        bit RandTemp
+        bmi minus_y
+        jmp done_with_y
+minus_y:
+        sta RandTemp
+        lda #239
+        sec
+        sbc RandTemp
+done_with_y:
+        sta PpuScrollY
+
+        ; Now process the decay speed for this screen shake
+        dec ScreenShakeDecayCounter
+        bne done
+        dec ScreenShakeDepth
+        lda ScreenShakeSpeed
+        sta ScreenShakeDecayCounter
+done:
+        rts
+
+no_screen_shake:
+        lda #0
+        sta PpuScrollX
+        sta PpuScrollY
+        rts
+.endproc

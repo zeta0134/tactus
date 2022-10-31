@@ -12,3 +12,10 @@
 .global game_prep
 .global title_prep
 .global game_end_screen_prep
+
+.globalzp PpuScrollX
+.globalzp PpuScrollY
+
+.global ScreenShakeDepth
+.global ScreenShakeSpeed
+.global ScreenShakeDecayCounter
