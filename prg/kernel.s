@@ -287,9 +287,9 @@ MetaSpriteIndex := R0
 
 .proc zone_init
         ; Generate proper mazes and randomize player, exit, and boss
-        far_call FAR_init_floor
+        ;far_call FAR_init_floor
         ; Generate an open debug floor plan, with fixed spawn locations
-        ;far_call FAR_demo_init_floor
+        far_call FAR_demo_init_floor
 
         st16 GameMode, room_init
         rts
@@ -325,6 +325,11 @@ not_victory:
         ; take away the player's key
         lda #0
         sta PlayerKeys
+        ; We faded out to get here, so fade back in
+        lda #0
+        sta set_brightness
+        lda #4
+        sta TargetBrightness
         ; Now run room init and... we're good for now?
         ; TODO: polish up this whole transition with some palette fades
         st16 GameMode, room_init

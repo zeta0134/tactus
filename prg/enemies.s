@@ -4,6 +4,7 @@
         .include "enemies.inc"
         .include "kernel.inc"
         .include "levels.inc"
+        .include "palette.inc"
         .include "player.inc"
         .include "prng.inc"
         .include "sound.inc"
@@ -2422,7 +2423,11 @@ TargetSquare := R13
 .endproc
 
 .proc descend_stairs
-        st16 GameMode, advance_to_next_floor
-        ; stubbed for now
+        st16 FadeToGameMode, advance_to_next_floor
+        st16 GameMode, fade_to_game_mode        
+        
+        st16 R0, sfx_teleport
+        jsr play_sfx_pulse1
+
         rts
 .endproc
