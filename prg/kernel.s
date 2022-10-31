@@ -204,10 +204,6 @@ MetaSpriteIndex := R0
         lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
         sta PPUCTRL
 
-        ; For now, play the click track on the game over screen
-        lda #1
-        jsr play_track
-
         rts
 .endproc
 

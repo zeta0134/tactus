@@ -8,6 +8,7 @@
         .include "nes.inc"
         .include "player.inc"
         .include "ppu.inc"
+        .include "sound.inc"
         .include "sprites.inc"
         .include "static_screens.inc"
         .include "vram_buffer.inc"
@@ -220,6 +221,10 @@ victory:
         st16 StringPtr, thank_you_text
         jsr draw_string_imm
 
+        ; TODO; replace this with the victory track, when and if we have one
+        lda #0
+        jsr play_track
+
         jmp converge
 game_over:
         set_ppuaddr #($2000 + $010C)
@@ -228,6 +233,14 @@ game_over:
         set_ppuaddr #($2400 + $010C)
         st16 StringPtr, game_over_text
         jsr draw_string_imm
+
+        st16 R0, sfx_death_splat_noise
+        jsr play_sfx_noise
+
+        ; TODO; replace this with the game over jingle, when and if we have one
+        lda #0
+        jsr play_track
+
 converge:
         ; Text labels for progress through the dungeon
         set_ppuaddr #($2000 + $01C7)
