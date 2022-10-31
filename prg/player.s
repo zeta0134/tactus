@@ -7,6 +7,7 @@
         .include "kernel.inc"
         .include "nes.inc"
         .include "player.inc"
+        .include "sound.inc"
         .include "sprites.inc"
         .include "weapons.inc"
         .include "word_util.inc"
@@ -713,7 +714,6 @@ TargetCol := R15
         lda #8
         sta ScreenShakeSpeed
         sta ScreenShakeDecayCounter
-
 already_dead:
         rts
 .endproc
@@ -776,6 +776,18 @@ converge:
         ; TODO: I dunno, screen shake? palette greyscale? SFX? Juice this up.
         st16 FadeToGameMode, game_end_screen_prep
         st16 GameMode, fade_to_game_mode
+
+        ; STOP the music
+        lda #0
+        sta play_track
+
+        ; Oops
+        st16 R0, sfx_death_spin_pulse
+        jsr play_sfx_pulse1
+        st16 R0, sfx_death_spin_pulse
+        jsr play_sfx_pulse1
+        st16 R0, sfx_death_spin_tri
+        jsr play_sfx_triangle
 existence_proven:
         rts
 .endproc
