@@ -99,6 +99,9 @@ continue_waiting:
 
 .proc title_prep
 MetaSpriteIndex := R0
+        lda #0
+        sta tempo_adjustment
+
         ; Play lovely silence while we're loading
         lda #0
         jsr play_track
@@ -173,6 +176,9 @@ MetaSpriteIndex := R0
 .endproc
 
 .proc game_end_screen_prep
+        lda #0
+        sta tempo_adjustment
+
         ; Play lovely silence while we're loading
         lda #0
         jsr play_track
@@ -224,6 +230,9 @@ MetaSpriteIndex := R0
 .endproc
 
 .proc game_prep
+        lda #0
+        sta tempo_adjustment
+
         ; play lovely silence while we load
         ; (this also ensures the music / beat counter are in a deterministic spot when we fade back in)
         lda #0
@@ -286,6 +295,9 @@ MetaSpriteIndex := R0
 .endproc
 
 .proc zone_init
+        lda #0
+        sta tempo_adjustment
+
         ; Generate proper mazes and randomize player, exit, and boss
         ;far_call FAR_init_floor
         ; Generate an open debug floor plan, with fixed spawn locations
@@ -330,9 +342,20 @@ not_victory:
         sta set_brightness
         lda #4
         sta TargetBrightness
+
+        ; Add a small boost to the music tempo based on the player's current floor
+        ; This causes the music to speed up (and thus gameplay to get more difficult)
+        ; as the player makes progress in the dungeon
+        lda PlayerFloor
+        sec
+        sbc #1 ; adjust to 0-3
+        asl
+        asl ; multiply by 4
+        sta tempo_adjustment
+
         ; Now run room init and... we're good for now?
-        ; TODO: polish up this whole transition with some palette fades
         st16 GameMode, room_init
+
         rts
 .endproc
 

@@ -431,10 +431,19 @@ EntityList := R4
         sbc #1 ; the lists are 0-based, but zones are 1-based
         asl ; the lists contain words
         tax
-        lda zone_list_boss, x
+
+        ; Use the real boss list
+        ;lda zone_list_boss, x
+        ;sta CollectionPtr
+        ;lda zone_list_boss+1, x
+        ;sta CollectionPtr+1
+
+        ; Use a fake list with fewer enemies, for quick testing
+        lda debug_boss_zone_list, x
         sta CollectionPtr
-        lda zone_list_boss+1, x
+        lda debug_boss_zone_list+1, x
         sta CollectionPtr+1
+
         ; Now load the appropriate pool list for this floor from the collection
         lda PlayerFloor
         sec
@@ -579,7 +588,11 @@ el_advanced_slimes:
 
 el_debug_enemies:
         .byte 1
-        .byte TILE_MOLE_HOLE_BASIC, 1
+        .byte TILE_INTERMEDIATE_SLIME, 1
+
+el_debug_boss_enemies:
+        .byte 1
+        .byte TILE_ADVANCED_SLIME, 1
 
 
 ; Each pool is a FIXED length:
@@ -604,6 +617,23 @@ debug_zone_list:
         .word debug_pool_collection
         .word debug_pool_collection
         .word debug_pool_collection
+
+debug_boss_pool:
+        .repeat 16
+        .word el_debug_boss_enemies
+        .endrepeat
+
+debug_boss_pool_collection:
+        .word debug_boss_pool
+        .word debug_boss_pool
+        .word debug_boss_pool
+        .word debug_boss_pool
+
+debug_boss_zone_list:
+        .word debug_boss_pool_collection        
+        .word debug_boss_pool_collection
+        .word debug_boss_pool_collection
+        .word debug_boss_pool_collection
 
 basic_pool_zone_1_floor_1:
         .word el_basic_slimes

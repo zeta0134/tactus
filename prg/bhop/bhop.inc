@@ -6,6 +6,6 @@
 .import bhop_mute_channel, bhop_unmute_channel, blarggsaw_irq, zetasaw_irq, irq_active, irq_enabled, manual_nmi_needed, manual_oam_needed
 
 ; dungeon-game specific variables
-.importzp current_music_variant, target_music_variant
+.importzp current_music_variant, target_music_variant, tempo_adjustment
 .import global_attenuation
 .import row_counter
