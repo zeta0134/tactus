@@ -152,8 +152,8 @@ MetaSpriteIndex := R0
         lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
         sta PPUCTRL
 
-        ; For now, play the click track on the title screen
-        lda #1
+        ; Play the title track on the title screen (duh)
+        lda #3
         jsr play_track
 
         rts
