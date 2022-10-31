@@ -16,6 +16,7 @@
 .zeropage
 DestPtr: .res 2
 GoldToAward: .res 1
+DamageSpriteCoordScratch: .res 2
 
 .segment "RAM"
 
@@ -2413,6 +2414,7 @@ PuffSquare := R12
 TargetSquare := R13
         ; All basic enemies do 1 damage to the player on hit
         jsr damage_player
+
         ; Now the tricky part: we need to scan the map and find this enemy's poof
         ; (It might not exist if we have a bugged board, so handle that safely)
         jsr find_puff_tile
@@ -2447,6 +2449,10 @@ TargetSquare := R13
 
         ; TODO: we just damaged the player. Spawn a hit sprite inbetween the enemy that dealt
         ; the damage and the player's position
+
+
+
+        
 
         rts
 no_puff_found:
@@ -2488,10 +2494,31 @@ TargetSquare := R13
 .proc forbid_player_movement
 TargetRow := R14
 TargetCol := R15
+        ; if our current and target position is already the same, bail; nothing to do
+        ; (this prevents getting caught in an infinite loop)
+        lda PlayerCol
+        cmp TargetCol
+        bne proceed_to_forbid
+        lda PlayerRow
+        cmp TargetRow
+        bne proceed_to_forbid
+        rts        
+
+proceed_to_forbid:
+        ; Make our target position the same as our *old* position
         lda PlayerCol
         sta TargetCol
         lda PlayerRow
         sta TargetRow
+
+        ; Now we need to check for damage again, this time at the square we just left.
+        ; If we don't do this, then enemies which moves into that square on this turn can
+        ; get stuck underneath us, causing general weirdness
+        jsr player_resolve_collision
+
+        ; TODO, BUGFIX: what happens if another enemy is now in our old position?
+        ; This seems to get us STUCK! We should definitely fix this at some point.
+
         rts
 .endproc
 
