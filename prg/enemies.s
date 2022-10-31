@@ -1823,7 +1823,7 @@ die:
 
 .proc direct_attack_mole_idle
 EnemyHealth := R11
-        lda #4
+        lda #2
         sta EnemyHealth
         jsr direct_attack_with_hp
         rts
@@ -1831,7 +1831,7 @@ EnemyHealth := R11
 
 .proc direct_attack_mole_throwing
 EnemyHealth := R11
-        lda #4
+        lda #2
         sta EnemyHealth
         jsr direct_attack_with_hp
         rts
@@ -1848,7 +1848,7 @@ EnemyHealth := R11
         bmi allow_attack
         rts
 allow_attack:
-        lda #4
+        lda #2
         sta EnemyHealth
         lda AttackSquare
         sta EffectiveAttackSquare
@@ -2418,6 +2418,12 @@ TargetSquare := R13
         lda room_flags, x
         ora #ROOM_FLAG_TREASURE_COLLECTED
         sta room_flags, x
+
+        ; Play a joyous SFX
+        st16 R0, sfx_equip_ability_pulse1
+        jsr play_sfx_pulse1
+        st16 R0, sfx_equip_ability_pulse2
+        jsr play_sfx_pulse2
 
         rts
 .endproc
