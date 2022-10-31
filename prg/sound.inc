@@ -13,6 +13,9 @@
 .global sfx_defeat_enemy_noise
 .global sfx_defeat_enemy_pulse
 .global sfx_coin
+.global sfx_heal
+.global sfx_key_pulse1
+.global sfx_key_pulse2
 
 ; old sounds from dungeon game
 ; if we decide to use any, move these ^ up there.

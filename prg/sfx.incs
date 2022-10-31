@@ -647,3 +647,40 @@ sfx_coin:
         pulse_cont_duty          $2,      $9,          0
         pulse_cont_duty          $2,      $7,          0
         pulse_cont_duty          $2,      $4,          0
+
+sfx_heal:
+        ; Length in rows
+        .byte 4
+        ;                 pitch,    duty,  volume,                            sweep, length
+        pulse_init_sweep  PITCH_F4,   $0,      $F, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      4
+        pulse_init_sweep  PITCH_F4,   $0,      $C, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      4
+        pulse_init_sweep  PITCH_F4,   $0,      $8, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      4
+        pulse_init_sweep  PITCH_F4,   $0,      $4, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      4
+
+sfx_key_pulse1:
+        ; Length in rows
+        .byte 8
+        ;           pitch,    duty,  volume,     length
+        pulse_init  PITCH_DS4,   $2,      $C,          0
+        pulse_cont_duty          $2,      $A,          0
+        pulse_cont_duty          $2,      $8,          0
+        pulse_init  PITCH_FS4,   $1,      $C,          0
+        pulse_cont_duty          $1,      $A,          0
+        pulse_cont_duty          $1,      $8,          0
+        pulse_init  PITCH_AS4,   $1,      $B,          0
+        pulse_cont_duty          $1,      $9,          0
+        pulse_cont_duty          $1,      $7,          0
+        
+sfx_key_pulse2:
+        ; Length in rows
+        .byte 8
+        ;           pitch,    duty,  volume,     length
+        pulse_init  PITCH_FS3,   $2,      $8,          0
+        pulse_cont_duty          $2,      $6,          0
+        pulse_cont_duty          $2,      $4,          0
+        pulse_init  PITCH_AS3,   $2,      $8,          0
+        pulse_cont_duty          $2,      $6,          0
+        pulse_cont_duty          $2,      $4,          0
+        pulse_init  PITCH_DS4,   $2,      $7,          0
+        pulse_cont_duty          $2,      $5,          0
+        pulse_cont_duty          $2,      $3,          0
