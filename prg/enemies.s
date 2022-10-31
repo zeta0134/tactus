@@ -2345,6 +2345,8 @@ TargetSquare := R13
         add16w PlayerGold, #100
 
         ; TODO: a nice SFX
+        st16 R0, sfx_coin
+        jsr play_sfx_pulse1
 
         ; Now, draw a basic floor tile here, which will be underneath the player
         lda TargetSquare
