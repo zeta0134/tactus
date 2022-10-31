@@ -299,9 +299,9 @@ MetaSpriteIndex := R0
         sta tempo_adjustment
 
         ; Generate proper mazes and randomize player, exit, and boss
-        ;far_call FAR_init_floor
+        far_call FAR_init_floor
         ; Generate an open debug floor plan, with fixed spawn locations
-        far_call FAR_demo_init_floor
+        ;far_call FAR_demo_init_floor
 
         st16 GameMode, room_init
         rts

@@ -1700,7 +1700,7 @@ EffectiveAttackSquare := R10
 
 .proc direct_attack_spider
 EnemyHealth := R11
-        lda #4
+        lda #2
         sta EnemyHealth
         jsr direct_attack_with_hp
         rts
@@ -1708,7 +1708,7 @@ EnemyHealth := R11
 
 .proc indirect_attack_spider
 EnemyHealth := R11
-        lda #4
+        lda #2
         sta EnemyHealth
         jsr indirect_attack_with_hp
         rts
@@ -1716,7 +1716,7 @@ EnemyHealth := R11
 
 .proc direct_attack_zombie
 EnemyHealth := R11
-        lda #4
+        lda #2
         sta EnemyHealth
         jsr direct_attack_with_hp
         rts
@@ -1724,7 +1724,7 @@ EnemyHealth := R11
 
 .proc indirect_attack_zombie
 EnemyHealth := R11
-        lda #4
+        lda #2
         sta EnemyHealth
         jsr indirect_attack_with_hp
         rts
@@ -1732,7 +1732,7 @@ EnemyHealth := R11
 
 .proc direct_attack_birb
 EnemyHealth := R11
-        lda #4
+        lda #2
         sta EnemyHealth
         jsr direct_attack_with_hp
         rts
@@ -1740,7 +1740,7 @@ EnemyHealth := R11
 
 .proc indirect_attack_birb
 EnemyHealth := R11
-        lda #4
+        lda #2
         sta EnemyHealth
         jsr indirect_attack_with_hp
         rts
