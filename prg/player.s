@@ -117,7 +117,7 @@ MetaSpriteIndex := R0
 
         lda #1
         sta PlayerZone
-        lda #1
+        lda #2
         sta PlayerFloor
 
         rts
