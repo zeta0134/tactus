@@ -379,16 +379,16 @@ EntityList := R4
         tax
 
         ; Use the real list
-        ;lda zone_list_basic, x
-        ;sta CollectionPtr
-        ;lda zone_list_basic+1, x
-        ;sta CollectionPtr+1
+        lda zone_list_basic, x
+        sta CollectionPtr
+        lda zone_list_basic+1, x
+        sta CollectionPtr+1
 
         ; DEBUG: use a fake list for testing new enemy types
-        lda debug_zone_list, x
-        sta CollectionPtr
-        lda debug_zone_list+1, x
-        sta CollectionPtr+1
+        ;lda debug_zone_list, x
+        ;sta CollectionPtr
+        ;lda debug_zone_list+1, x
+        ;sta CollectionPtr+1
 
         ; Now load the appropriate pool list for this floor from the collection
         lda PlayerFloor
@@ -433,16 +433,16 @@ EntityList := R4
         tax
 
         ; Use the real boss list
-        ;lda zone_list_boss, x
-        ;sta CollectionPtr
-        ;lda zone_list_boss+1, x
-        ;sta CollectionPtr+1
+        lda zone_list_boss, x
+        sta CollectionPtr
+        lda zone_list_boss+1, x
+        sta CollectionPtr+1
 
         ; Use a fake list with fewer enemies, for quick testing
-        lda debug_boss_zone_list, x
-        sta CollectionPtr
-        lda debug_boss_zone_list+1, x
-        sta CollectionPtr+1
+        ;lda debug_boss_zone_list, x
+        ;sta CollectionPtr
+        ;lda debug_boss_zone_list+1, x
+        ;sta CollectionPtr+1
 
         ; Now load the appropriate pool list for this floor from the collection
         lda PlayerFloor
@@ -571,20 +571,148 @@ maze_list:
 ; of spawns. ALL spawns will appear in a room that uses a list, so
 ; if you want to vary the amount, make several similar lists
 
-el_basic_slimes:
-        .byte 1 ; length
-        .byte TILE_BASIC_SLIME, 8
+; Each pool is a FIXED length:
+; - Basic pools have 16 entries
+; - Boss pools have 4 entries
+; If including fewer unique enemy lists, be sure
+; to duplicate the list so that it is the full size
 
+; =============================================
+;                Zone 1 - Basic
+; =============================================
 el_intermediate_slimes:
         .byte 2 ; length
         .byte TILE_BASIC_SLIME, 4
         .byte TILE_INTERMEDIATE_SLIME, 8
 
-el_advanced_slimes:
+el_zombies_and_slimes:
+        .byte 2 ; length
+        .byte TILE_ZOMBIE_BASIC, 3
+        .byte TILE_BASIC_SLIME, 3
+        .byte TILE_INTERMEDIATE_SLIME, 1
+
+el_spiders_and_slimes:
+        .byte 2 ; length
+        .byte TILE_SPIDER_BASIC, 3
+        .byte TILE_BASIC_SLIME, 2
+        .byte TILE_INTERMEDIATE_SLIME, 2
+
+el_zombies_and_spiders:
+        .byte 2 ; length
+        .byte TILE_SPIDER_BASIC, 2
+        .byte TILE_ZOMBIE_BASIC, 3
+
+el_basic_mix:
+        .byte 2 ; length
+        .byte TILE_SPIDER_BASIC, 2
+        .byte TILE_ZOMBIE_BASIC, 2
+        .byte TILE_BASIC_SLIME, 1
+        .byte TILE_INTERMEDIATE_SLIME, 2
+
+basic_pool_zone_1_floor_1:
+        ; Make sure all sections add up to 16
+        .repeat 3
+        .word el_intermediate_slimes
+        .endrepeat
+
+        .repeat 4
+        .word el_zombies_and_slimes
+        .endrepeat
+
+        .repeat 3
+        .word el_spiders_and_slimes
+        .endrepeat
+
+        .repeat 3
+        .word el_zombies_and_spiders
+        .endrepeat
+
+        .repeat 3
+        .word el_basic_mix
+        .endrepeat
+
+; =============================================
+;                Zone 1 - Boss
+; =============================================
+
+el_slime_pit:
         .byte 3 ; length
         .byte TILE_BASIC_SLIME, 2
-        .byte TILE_INTERMEDIATE_SLIME, 4
+        .byte TILE_INTERMEDIATE_SLIME, 6
         .byte TILE_ADVANCED_SLIME, 4
+
+
+boss_pool_zone_1_floor_1:
+        ; Make sure sections add up to 4
+        .repeat 4
+        .word el_slime_pit
+        .endrepeat
+
+; =============================================
+;                Zone 2 - Basic
+; =============================================
+;TODO
+
+; =============================================
+;                Zone 2 - Boss
+; =============================================
+;TODO
+
+; =============================================
+;                Zone 3 - Basic
+; =============================================
+;TODO
+
+; =============================================
+;                Zone 3 - Boss
+; =============================================
+;TODO
+
+; =============================================
+;                Zone 4 - Basic
+; =============================================
+;TODO
+
+; =============================================
+;                Zone 4 - Boss
+; =============================================
+;TODO
+
+
+
+; Each zone is a collection of pools, one pool for each floor
+
+zone_1_basic_pools:
+        .word basic_pool_zone_1_floor_1 ; floor 1
+        .word basic_pool_zone_1_floor_1 ; floor 2
+        .word basic_pool_zone_1_floor_1 ; floor 3
+        .word basic_pool_zone_1_floor_1 ; floor 4
+
+zone_1_boss_pools:
+        .word boss_pool_zone_1_floor_1 ; floor 1
+        .word boss_pool_zone_1_floor_1 ; floor 2
+        .word boss_pool_zone_1_floor_1 ; floor 3
+        .word boss_pool_zone_1_floor_1 ; floor 4
+
+; And finally, here is the list of zone collections
+; (Note: for demo purposes, only zone 1 actually exists; this
+; list is mostly useless as a result.)
+zone_list_basic:
+        .word zone_1_basic_pools ; zone 1
+        .word zone_1_basic_pools ; zone 2
+        .word zone_1_basic_pools ; zone 3
+        .word zone_1_basic_pools ; zone 4
+
+zone_list_boss:
+        .word zone_1_boss_pools ; zone 1
+        .word zone_1_boss_pools ; zone 2
+        .word zone_1_boss_pools ; zone 3
+        .word zone_1_boss_pools ; zone 4
+
+
+; ============================================================================================
+;                                     DEBUG ZONES BELOW
+; ============================================================================================
 
 el_debug_enemies:
         .byte 1
@@ -593,13 +721,6 @@ el_debug_enemies:
 el_debug_boss_enemies:
         .byte 1
         .byte TILE_ADVANCED_SLIME, 1
-
-
-; Each pool is a FIXED length:
-; - Basic pools have 16 entries
-; - Boss pools have 4 entries
-; If including fewer unique enemy lists, be sure
-; to duplicate the list so that it is the full size
 
 debug_pool:
         .repeat 16
@@ -634,54 +755,3 @@ debug_boss_zone_list:
         .word debug_boss_pool_collection
         .word debug_boss_pool_collection
         .word debug_boss_pool_collection
-
-basic_pool_zone_1_floor_1:
-        .word el_basic_slimes
-        .word el_basic_slimes
-        .word el_basic_slimes
-        .word el_basic_slimes
-        .word el_basic_slimes
-        .word el_basic_slimes
-        .word el_basic_slimes
-        .word el_basic_slimes
-        .word el_basic_slimes
-        .word el_basic_slimes
-        .word el_basic_slimes
-        .word el_basic_slimes
-        .word el_intermediate_slimes
-        .word el_intermediate_slimes
-        .word el_intermediate_slimes
-        .word el_intermediate_slimes
-
-boss_pool_zone_1_floor_1:
-        .word el_advanced_slimes
-        .word el_advanced_slimes
-        .word el_advanced_slimes
-        .word el_advanced_slimes
-
-; Each zone is a collection of pools, one pool for each floor
-
-zone_1_basic_pools:
-        .word basic_pool_zone_1_floor_1 ; floor 1
-        .word basic_pool_zone_1_floor_1 ; floor 2
-        .word basic_pool_zone_1_floor_1 ; floor 3
-        .word basic_pool_zone_1_floor_1 ; floor 4
-
-zone_1_boss_pools:
-        .word boss_pool_zone_1_floor_1 ; floor 1
-        .word boss_pool_zone_1_floor_1 ; floor 2
-        .word boss_pool_zone_1_floor_1 ; floor 3
-        .word boss_pool_zone_1_floor_1 ; floor 4
-
-; And finally, here is the list of zone collections
-zone_list_basic:
-        .word zone_1_basic_pools ; zone 1
-        .word zone_1_basic_pools ; zone 2
-        .word zone_1_basic_pools ; zone 3
-        .word zone_1_basic_pools ; zone 4
-
-zone_list_boss:
-        .word zone_1_boss_pools ; zone 1
-        .word zone_1_boss_pools ; zone 2
-        .word zone_1_boss_pools ; zone 3
-        .word zone_1_boss_pools ; zone 4
