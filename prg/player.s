@@ -95,8 +95,7 @@ MetaSpriteIndex := R0
         sta PlayerJumpHeightPos
 
         ; The player should start with a standard L1-DAGGER
-        ;lda #WEAPON_DAGGER
-        lda #WEAPON_FLAIL
+        lda #WEAPON_DAGGER
         sta PlayerWeapon
         asl
         tax
@@ -107,9 +106,9 @@ MetaSpriteIndex := R0
         lda #1
         sta PlayerWeaponDmg
 
-        lda #8
+        lda #4
         sta PlayerHealth
-        lda #8
+        lda #4
         sta PlayerMaxHealth
         lda #0
         sta PlayerKeys
