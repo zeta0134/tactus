@@ -299,9 +299,9 @@ ft_s2f2:
 ft_s2f3:
 	.word ft_s2p1c0, ft_s2p1c1, ft_s2p3c2, ft_s2p0c3, ft_s2p2c5, ft_s2p0c4
 ft_s2f4:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s2p4c2, ft_s2p2c3, ft_s2p3c5, ft_s0p0c0
+	.word ft_s0p0c0, ft_s0p0c0, ft_s2p4c2, ft_s2p2c3, ft_s2p3c5, ft_s2p0c4
 ft_s2f5:
-	.word ft_s0p0c0, ft_s2p3c1, ft_s2p4c2, ft_s2p2c3, ft_s2p4c5, ft_s0p0c0
+	.word ft_s0p0c0, ft_s2p3c1, ft_s2p4c2, ft_s2p2c3, ft_s2p4c5, ft_s2p0c4
 ft_s2f6:
 	.word ft_s2p4c0, ft_s2p4c1, ft_s2p4c2, ft_s2p2c3, ft_s2p5c5, ft_s2p0c4
 ft_s2f7:
@@ -339,7 +339,7 @@ ft_s2p0c3:
 
 ; Bank 0
 ft_s2p0c4:
-	.byte $96, $40, $00, $3F
+	.byte $82, $0F, $96, $40, $85, $78, $00, $85, $78, $00, $85, $78, $00, $83, $85, $78, $00, $0F
 
 ; Bank 0
 ft_s2p1c0:

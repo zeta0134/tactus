@@ -4,7 +4,8 @@ cmd_ptr: .word $0000
 ; dungeon-game specific variables
 current_music_variant: .byte $00
 target_music_variant: .byte $00
-.exportzp current_music_variant, target_music_variant
+tempo_adjustment: .byte $00
+.exportzp current_music_variant, target_music_variant, tempo_adjustment
 
         .segment BHOP_PLAYER_SEGMENT
 
@@ -256,6 +257,8 @@ done:
 
 .proc cmd_eff_tempo
         fetch_pattern_byte
+        clc
+        adc tempo_adjustment
         sta tempo
         rts
 .endproc
