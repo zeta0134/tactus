@@ -820,14 +820,107 @@ boss_pool_zone_1_floor_3:
 ; =============================================
 ;                Zone 4 - Basic
 ; =============================================
-;TODO
+
+el_advanced_slimes_and_zombies:
+        .byte 4
+        .byte TILE_ZOMBIE_INTERMEDIATE, 4
+        .byte TILE_ZOMBIE_ADVANCED, 2
+        .byte TILE_ADVANCED_SLIME, 2
+        .byte TILE_INTERMEDIATE_SLIME, 2
+
+el_oops_all_chasers:
+        .byte 6
+        .byte TILE_ZOMBIE_INTERMEDIATE, 2
+        .byte TILE_ZOMBIE_ADVANCED, 2
+        .byte TILE_SPIDER_INTERMEDIATE, 2
+        .byte TILE_SPIDER_ADVANCED, 3
+        .byte TILE_BIRB_LEFT_INTERMEDIATE, 1
+        .byte TILE_BIRB_RIGHT_ADVANCED, 1
+
+el_advanced_moles_and_friends:
+        .byte 5
+        .byte TILE_MOLE_HOLE_ADVANCED, 4
+        .byte TILE_SPIDER_ADVANCED, 2
+        .byte TILE_SPIDER_INTERMEDIATE, 1
+        .byte TILE_INTERMEDIATE_SLIME, 1
+        .byte TILE_ADVANCED_SLIME, 2
+
+el_zombie_hoard_round_2:
+        .byte 3
+        .byte TILE_INTERMEDIATE_SLIME, 3
+        .byte TILE_ZOMBIE_INTERMEDIATE, 5
+        .byte TILE_ZOMBIE_ADVANCED, 6
+
+el_extra_healthy_mix4:
+        .byte 6
+        .byte TILE_ZOMBIE_ADVANCED, 3
+        .byte TILE_ADVANCED_SLIME, 1
+        .byte TILE_SPIDER_ADVANCED, 1
+        .byte TILE_SPIDER_INTERMEDIATE, 2
+        .byte TILE_BIRB_RIGHT_ADVANCED, 2
+        .byte TILE_MOLE_HOLE_ADVANCED, 2
+
+basic_pool_zone_1_floor_4:
+        ; Make sure all sections add up to 16
+        .repeat 4
+        .word el_advanced_slimes_and_zombies
+        .endrepeat
+
+        .repeat 3
+        .word el_oops_all_chasers
+        .endrepeat
+
+        .repeat 3
+        .word el_advanced_moles_and_friends
+        .endrepeat
+
+        .repeat 3
+        .word el_zombie_hoard_round_2
+        .endrepeat
+
+        .repeat 3
+        .word el_extra_healthy_mix4
+        .endrepeat
 
 ; =============================================
 ;                Zone 4 - Boss
 ; =============================================
-;TODO
 
+el_reinforcements:
+        .byte 7
+        .byte TILE_ZOMBIE_ADVANCED, 6
+        .byte TILE_ZOMBIE_INTERMEDIATE, 2
+        .byte TILE_ZOMBIE_BASIC, 2
+        .byte TILE_SPIDER_ADVANCED, 4
+        .byte TILE_SPIDER_INTERMEDIATE, 2
+        .byte TILE_SPIDER_BASIC, 1
+        .byte TILE_ADVANCED_SLIME, 2
 
+el_family_reunion:
+        .byte 14
+        .byte TILE_BASIC_SLIME, 1
+        .byte TILE_INTERMEDIATE_SLIME, 1
+        .byte TILE_ADVANCED_SLIME, 2
+        .byte TILE_ZOMBIE_BASIC, 1
+        .byte TILE_ZOMBIE_INTERMEDIATE, 1
+        .byte TILE_ZOMBIE_ADVANCED, 3
+        .byte TILE_SPIDER_BASIC, 1
+        .byte TILE_SPIDER_INTERMEDIATE, 1
+        .byte TILE_SPIDER_ADVANCED, 2
+        .byte TILE_MOLE_HOLE_BASIC, 1
+        .byte TILE_MOLE_HOLE_ADVANCED, 2
+        .byte TILE_BIRB_LEFT_BASIC, 1
+        .byte TILE_BIRB_LEFT_INTERMEDIATE, 1
+        .byte TILE_BIRB_LEFT_ADVANCED, 2
+
+boss_pool_zone_1_floor_4:
+        ; Make sure sections add up to 4
+        .repeat 2
+        .word el_reinforcements
+        .endrepeat
+        .repeat 2
+        .word el_family_reunion
+        .endrepeat
 
 ; Each zone is a collection of pools, one pool for each floor
 
@@ -835,13 +928,13 @@ zone_1_basic_pools:
         .word basic_pool_zone_1_floor_1 ; floor 1
         .word basic_pool_zone_1_floor_2 ; floor 2
         .word basic_pool_zone_1_floor_3 ; floor 3
-        .word basic_pool_zone_1_floor_1 ; floor 4
+        .word basic_pool_zone_1_floor_4 ; floor 4
 
 zone_1_boss_pools:
         .word boss_pool_zone_1_floor_1 ; floor 1
         .word boss_pool_zone_1_floor_2 ; floor 2
         .word boss_pool_zone_1_floor_3 ; floor 3
-        .word boss_pool_zone_1_floor_1 ; floor 4
+        .word boss_pool_zone_1_floor_4 ; floor 4
 
 ; And finally, here is the list of zone collections
 ; (Note: for demo purposes, only zone 1 actually exists; this
