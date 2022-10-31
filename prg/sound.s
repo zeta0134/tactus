@@ -43,7 +43,7 @@ music_module:
         .segment "PRGFIXED_C000"
 
 track_table_bank:
-        .repeat 3
+        .repeat 4
         .lobytes .bank(music_module)
         .endrepeat
         
@@ -51,16 +51,19 @@ track_table_song:
         .byte 0 ; silence (used for transitions)
         .byte 1 ; click track (meant for debugging)
         .byte 2 ; level music
+        .byte 3 ; title music
 
 track_table_num_variants:
         .byte 1 ; silence 
         .byte 1 ; click_track
         .byte 1 ; level music
+        .byte 1 ; title music
 
 track_table_variant_length:
         .byte 0 ; silence
         .byte 0 ; click_track
         .byte 0 ; level music
+        .byte 0 ; title music
 
 .proc init_audio
         ; Always initialize the music engine with track 0 of the first module. This will

@@ -1693,6 +1693,9 @@ EffectiveAttackSquare := R10
         st16 R0, sfx_defeat_enemy_noise
         jsr play_sfx_noise
 
+        lda #1
+        sta EnemyDiedThisFrame
+
         rts
 .endproc
 
@@ -1923,6 +1926,9 @@ die:
         jsr play_sfx_pulse2
         st16 R0, sfx_defeat_enemy_noise
         jsr play_sfx_noise
+
+        lda #1
+        sta EnemyDiedThisFrame
 
         rts
 .endproc

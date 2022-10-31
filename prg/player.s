@@ -48,6 +48,8 @@ PlayerZone: .res 1
 PlayerFloor: .res 1
 PlayerRoomIndex: .res 1
 
+EnemyDiedThisFrame: .res 1
+
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
 DIRECTION_SOUTH = 3
@@ -456,6 +458,9 @@ TilesRemaining := R9
 EffectiveAttackSquare := R10
 TargetRow := R14
 TargetCol := R15
+        lda #0
+        sta EnemyDiedThisFrame
+
         ldx PlayerRow
         lda player_tile_index_table, x ; Row * Width
         clc
@@ -574,6 +579,16 @@ no_early_exit:
         jsr draw_multiple_hit_fx
 
 done_with_swing:
+        ; if an attack landed at all, play a weapon slash effect
+        lda AttackLanded
+        beq done
+        lda EnemyDiedThisFrame
+        bne done
+        
+        st16 R0, sfx_weapon_slash
+        jsr play_sfx_noise
+done:
+
         ; If there is any cleanup to do, do that here. Otherwise we're finished I think?
 
         rts

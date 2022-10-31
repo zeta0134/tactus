@@ -579,31 +579,31 @@ sfx_equip_ability_pulse1:
         ; Length in rows
         .byte 11
         ;                 pitch,    duty,  volume,                            sweep, length
-        pulse_init_sweep  PITCH_C3,   $0,      $E,         (S_PERIOD_0 | S_SHIFT_3),      0
-        pulse_cont_duty               $0,      $A,                                        0
+        pulse_init_sweep  PITCH_C3,   $0,      $F,         (S_PERIOD_0 | S_SHIFT_3),      0
+        pulse_cont_duty               $0,      $B,                                        0
         pulse_cont_duty               $0,      $0,                                        0
-        pulse_init_sweep  PITCH_G3,   $1,      $B, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      1
-        pulse_cont_duty               $1,      $9,                                        0
+        pulse_init_sweep  PITCH_G3,   $1,      $C, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      1
+        pulse_cont_duty               $1,      $B,                                        0
+        pulse_cont_duty               $1,      $A,                                        0
         pulse_cont_duty               $1,      $8,                                        0
         pulse_cont_duty               $1,      $7,                                        0
         pulse_cont_duty               $1,      $6,                                        0
-        pulse_cont_duty               $1,      $5,                                        0
-        pulse_cont_duty               $1,      $3,                                        0
-        pulse_cont_duty               $1,      $1,                                        0
+        pulse_cont_duty               $1,      $4,                                        0
+        pulse_cont_duty               $1,      $2,                                        0
 
 sfx_equip_ability_pulse2:
         ; Length in rows
         .byte 9
         ;                 pitch,    duty,  volume,                            sweep, length
         pulse_init_sweep  PITCH_C3,   $0,      $0,         (S_PERIOD_0 | S_SHIFT_3),      2
-        pulse_init_sweep  PITCH_E3,   $0,      $B, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      1
+        pulse_init_sweep  PITCH_E3,   $0,      $C, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      1
+        pulse_cont_duty               $0,      $A,                                        0
         pulse_cont_duty               $0,      $9,                                        0
         pulse_cont_duty               $0,      $8,                                        0
         pulse_cont_duty               $0,      $7,                                        0
         pulse_cont_duty               $0,      $6,                                        0
-        pulse_cont_duty               $0,      $5,                                        0
-        pulse_cont_duty               $0,      $3,                                        0
-        pulse_cont_duty               $0,      $1,                                        0
+        pulse_cont_duty               $0,      $4,                                        0
+        pulse_cont_duty               $0,      $2,                                        0
 
 
 sfx_defeat_enemy_noise:
@@ -684,3 +684,10 @@ sfx_key_pulse2:
         pulse_init  PITCH_DS4,   $2,      $7,          0
         pulse_cont_duty          $2,      $5,          0
         pulse_cont_duty          $2,      $3,          0
+
+sfx_weapon_slash:
+        .byte 4
+        noise_init    1,    $7,  $A,      0
+        noise_cont    1,    $8,  $D,      0
+        noise_cont    0,    $B,  $C,      0
+        noise_cont    0,    $D,  $A,      0

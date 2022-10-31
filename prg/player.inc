@@ -21,4 +21,6 @@
 .global PlayerFloor
 .global PlayerNextDirection
 
+.global EnemyDiedThisFrame
+
 MAX_HEARTS = 7

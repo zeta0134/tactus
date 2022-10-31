@@ -16,6 +16,7 @@
 .global sfx_heal
 .global sfx_key_pulse1
 .global sfx_key_pulse2
+.global sfx_weapon_slash
 
 ; old sounds from dungeon game
 ; if we decide to use any, move these ^ up there.
