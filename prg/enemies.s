@@ -1487,8 +1487,6 @@ TargetTile := R1
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
-        inc enemies_active
-
         ldx CurrentTile
         bail_if_already_moved
 
@@ -2287,7 +2285,8 @@ TargetSquare := R13
         sta PlayerMaxHealth
         sta PlayerHealth
 
-        ; TODO: a nice SFX
+        st16 R0, sfx_heal
+        jsr play_sfx_pulse1
 
         ; Now, draw a basic floor tile here, which will be underneath the player
         lda TargetSquare
@@ -2306,6 +2305,8 @@ TargetSquare := R13
         ora #ROOM_FLAG_TREASURE_COLLECTED
         sta room_flags, x
 
+
+
         rts
 .endproc
 
@@ -2317,6 +2318,10 @@ TargetSquare := R13
         sta PlayerKeys
 
         ; TODO: a nice SFX
+        st16 R0, sfx_key_pulse1
+        jsr play_sfx_pulse1
+        st16 R0, sfx_key_pulse2
+        jsr play_sfx_pulse2
 
         ; Now, draw a basic floor tile here, which will be underneath the player
         lda TargetSquare

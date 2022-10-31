@@ -709,9 +709,9 @@ TargetCol := R15
         beq already_dead
         dec PlayerHealth
 
-        lda #2
+        lda #1
         sta ScreenShakeDepth
-        lda #8
+        lda #16
         sta ScreenShakeSpeed
         sta ScreenShakeDecayCounter
 
