@@ -2496,8 +2496,25 @@ TargetSquare := R13
 TargetIndex := R0
 TileId := R1
 TargetSquare := R13
+        lda PlayerFloor
+        cmp #2
+        beq floor2
+        cmp #3
+        beq floor3
+        cmp #4
+        beq floor4
+floor_1:
         add16w PlayerGold, #100
-
+        jmp done_awarding_gold
+floor2:
+        add16w PlayerGold, #200
+        jmp done_awarding_gold
+floor3:
+        add16w PlayerGold, #300
+        jmp done_awarding_gold
+floor4:
+        add16w PlayerGold, #500
+done_awarding_gold:
         ; TODO: a nice SFX
         st16 R0, sfx_coin
         jsr play_sfx_pulse1
