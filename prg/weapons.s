@@ -11,8 +11,11 @@ weapon_class_table:
         .word spear
         .word flail
 
+NONE := $80
 FX_HZ := $1D
 FX_VT := $21
+SFX_HZ := $25 ; TODO: not the giant death sprite
+SFX_VT := $29
 
 ; Programmer notes: try to prefer clockwise update order, for consistency.
 ; That means single-hit weapons should prioritize the *player's* left
@@ -34,20 +37,20 @@ dagger:
         .word dagger_north, dagger_east, dagger_south, dagger_west
 
 dagger_north:
-        ;         X,  Y, TileId, Behavior
-        .lobytes  0, -1, FX_HZ, (WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, TileId,        Behavior
+        .lobytes  0, -1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 dagger_east:
         ;         X,  Y, TileId, Behavior
-        .lobytes  1,  0, FX_VT, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  0, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 dagger_south:
         ;         X,  Y, TileId, Behavior
-        .lobytes  0,  1, FX_HZ, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 dagger_west:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1,  0, FX_VT, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  0, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 ; Broadswords hit a wide field of 3 tiles in front of the player. Great
 ; for crowd control, but poor for escaping, as they are likely to cancel
@@ -65,27 +68,27 @@ broadsword:
 
 broadsword_north:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1, -1, FX_HZ, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  0, -1, FX_HZ, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  1, -1, FX_HZ, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1, -1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1, -1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 broadsword_east:
         ;         X,  Y, TileId, Behavior
-        .lobytes  1, -1, FX_VT, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  1,  0, FX_VT, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  1,  1, FX_VT, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1, -1, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  0, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  1, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 broadsword_south:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1,  1, FX_HZ, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  0,  1, FX_HZ, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  1,  1, FX_HZ, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 broadsword_west:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1,  1, FX_VT, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes -1,  0, FX_VT, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes -1, -1, FX_VT, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  1, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  0, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1, -1, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 
 ; Longswords are like daggers that hit an extra square in front of the player
@@ -102,23 +105,23 @@ longsword:
 
 longsword_north:
         ;         X,  Y, TileId, Behavior
-        .lobytes  0, -1, FX_VT, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  0, -2, FX_VT, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -1, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -2, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_east:
         ;         X,  Y, TileId, Behavior
-        .lobytes  1,  0, FX_HZ, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  2,  0, FX_HZ, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  0, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  2,  0, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_south:
         ;         X,  Y, TileId, Behavior
-        .lobytes  0,  1, FX_VT, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  0,  2, FX_VT, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  1, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  2, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_west:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1,  0, FX_HZ, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes -2,  0, FX_HZ, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  0, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -2,  0, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 ; Spears are almost identical to longswords, except they can only target one enemy
 ; at a time, prioritizing the enemy closest to the player
@@ -139,23 +142,23 @@ spear:
 
 spear_north:
         ;         X,  Y, TileId, Behavior
-        .lobytes  0, -1, FX_VT, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
-        .lobytes  0, -2, FX_VT, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        .lobytes  0, -1, FX_VT, SFX_VT, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        .lobytes  0, -2, FX_VT, SFX_VT, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
 
 spear_east:
         ;         X,  Y, TileId, Behavior
-        .lobytes  1,  0, FX_HZ, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
-        .lobytes  2,  0, FX_HZ, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        .lobytes  1,  0, FX_HZ, SFX_HZ, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        .lobytes  2,  0, FX_HZ, SFX_HZ, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
 
 spear_south:
         ;         X,  Y, TileId, Behavior
-        .lobytes  0,  1, FX_VT, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
-        .lobytes  0,  2, FX_VT, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        .lobytes  0,  1, FX_VT, SFX_VT, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        .lobytes  0,  2, FX_VT, SFX_VT, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
 
 spear_west:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1,  0, FX_HZ, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
-        .lobytes -2,  0, FX_HZ, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        .lobytes -1,  0, FX_HZ, SFX_HZ, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        .lobytes -2,  0, FX_HZ, SFX_HZ, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
 
 
 ; Flails have the widest attack pattern, hit a single enemy, and mostly
@@ -180,32 +183,32 @@ flail:
 
 flail_north:
         ;         X,  Y, TileId, Behavior
-        .lobytes -2, -1, FX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes  2, -1, FX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes -1, -1, FX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes  1, -1, FX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes  0, -1, FX_HZ, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
+        .lobytes -2, -1, FX_HZ, SFX_HZ, (WEAPON_SINGLE_TARGET)
+        .lobytes  2, -1, FX_HZ, SFX_HZ, (WEAPON_SINGLE_TARGET)
+        .lobytes -1, -1, FX_HZ, SFX_HZ, (WEAPON_SINGLE_TARGET)
+        .lobytes  1, -1, FX_HZ, SFX_HZ, (WEAPON_SINGLE_TARGET)
+        .lobytes  0, -1, FX_HZ, SFX_HZ, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
 
 flail_east:
         ;         X,  Y, TileId, Behavior
-        .lobytes  1, -2, FX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes  1,  2, FX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes  1, -1, FX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes  1,  1, FX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes  1,  0, FX_VT, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1, -2, FX_VT, SFX_VT, (WEAPON_SINGLE_TARGET)
+        .lobytes  1,  2, FX_VT, SFX_VT, (WEAPON_SINGLE_TARGET)
+        .lobytes  1, -1, FX_VT, SFX_VT, (WEAPON_SINGLE_TARGET)
+        .lobytes  1,  1, FX_VT, SFX_VT, (WEAPON_SINGLE_TARGET)
+        .lobytes  1,  0, FX_VT, SFX_VT, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
 
 flail_south:
         ;         X,  Y, TileId, Behavior
-        .lobytes -2,  1, FX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes  2,  1, FX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes -1,  1, FX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes  1,  1, FX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes  0,  1, FX_HZ, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
+        .lobytes -2,  1, FX_HZ, SFX_HZ, (WEAPON_SINGLE_TARGET)
+        .lobytes  2,  1, FX_HZ, SFX_HZ, (WEAPON_SINGLE_TARGET)
+        .lobytes -1,  1, FX_HZ, SFX_HZ, (WEAPON_SINGLE_TARGET)
+        .lobytes  1,  1, FX_HZ, SFX_HZ, (WEAPON_SINGLE_TARGET)
+        .lobytes  0,  1, FX_HZ, SFX_HZ, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
 
 flail_west:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1, -2, FX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes -1,  2, FX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes -1, -1, FX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes -1,  1, FX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes -1,  0, FX_VT, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1, -2, FX_VT, SFX_VT, (WEAPON_SINGLE_TARGET)
+        .lobytes -1,  2, FX_VT, SFX_VT, (WEAPON_SINGLE_TARGET)
+        .lobytes -1, -1, FX_VT, SFX_VT, (WEAPON_SINGLE_TARGET)
+        .lobytes -1,  1, FX_VT, SFX_VT, (WEAPON_SINGLE_TARGET)
+        .lobytes -1,  0, FX_VT, SFX_VT, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)

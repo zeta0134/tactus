@@ -11,6 +11,7 @@
         RelativePosX .byte
         RelativePosY .byte
         FxTileId .byte
+        SecondaryFxTileId .byte
         BehaviorFlags .byte
 .endstruct
 

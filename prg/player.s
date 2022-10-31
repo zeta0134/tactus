@@ -19,6 +19,8 @@ PlayerWeapon: .res 2
 PlayerWeaponPtr: .res 2
 
 FxTileId: .res 1
+SfxTileId: .res 1
+SingleHitAttackSquare: .res 1
 
 .segment "RAM"
 
@@ -92,7 +94,8 @@ MetaSpriteIndex := R0
         sta PlayerJumpHeightPos
 
         ; The player should start with a standard L1-DAGGER
-        lda #WEAPON_DAGGER
+        ;lda #WEAPON_DAGGER
+        lda #WEAPON_FLAIL
         sta PlayerWeapon
         asl
         tax
@@ -541,6 +544,9 @@ converge:
         lda (WeaponSquaresPtr), y
         sta FxTileId ; stash for if this hits
         iny
+        lda (WeaponSquaresPtr), y
+        sta SfxTileId ; stash for if this hits
+        iny
 
         lda (WeaponSquaresPtr), y ; Behavioral Flags for this tile
         sta WeaponProperties      ; Stash these here so the enemies can see them (if applicable)
@@ -567,7 +573,10 @@ check_early_exit:
         lda AttackLanded
         beq no_early_exit
         ; Then we are done with the swing, and should clean up
+        lda AttackSquare
+        sta SingleHitAttackSquare
         jsr draw_single_hit_fx
+        jsr draw_multiple_hit_sfx
         jmp done_with_swing
 no_early_exit:
         ; Otherwise, iterate to the next weapon square and continue
@@ -652,6 +661,9 @@ converge:
         lda (WeaponSquaresPtr), y
         sta FxTileId
         iny
+        lda (WeaponSquaresPtr), y
+        sta SfxTileId
+        iny
 
         ; Skip over the behavioral flags
         iny
@@ -659,6 +671,82 @@ converge:
 
         ; Now we have the attack square, we can draw the weapon FX 
         jsr spawn_fx_sprite_here
+        dec TilesRemaining
+        bne loop
+
+        rts
+.endproc
+
+; Variant used by spears and flails, for their non-hit sprites
+.proc draw_multiple_hit_sfx
+PlayerSquare := R2
+AttackSquare := R3
+WeaponSquaresIndex := R4
+WeaponSquaresPtr := R5 ; R6
+TilesRemaining := R9
+        ; For this we actually need to loop all the way back over the structure
+        ldy #WeaponClass::NumSquares
+        lda (PlayerWeaponPtr), y
+        sta TilesRemaining
+
+        ; Just like when swinging the weapon, we must compute the position of each square
+        lda #0
+        sta WeaponSquaresIndex
+        ldy #WeaponClass::NumSquares
+        lda (PlayerWeaponPtr), y
+        sta TilesRemaining
+loop:
+        ; Reset to the player's position
+        lda PlayerSquare
+        sta AttackSquare
+        ; Add the relative offset from the considered square
+        ldy WeaponSquaresIndex
+        lda (WeaponSquaresPtr), y ; X offset
+        clc
+        adc AttackSquare
+        sta AttackSquare
+        iny
+        lda (WeaponSquaresPtr), y ; Y offset
+        bmi negative_y
+positive_y:
+        tax        
+        lda player_tile_index_table, x
+        clc
+        adc AttackSquare
+        sta AttackSquare
+        jmp converge
+negative_y:
+        eor #$FF
+        tax
+        inx
+        sec
+        lda AttackSquare
+        sbc player_tile_index_table, x
+        sta AttackSquare
+converge:
+        iny
+
+        ; Read the FX ID, which we are about to draw
+        lda (WeaponSquaresPtr), y
+        sta FxTileId
+        iny
+        lda (WeaponSquaresPtr), y
+        sta SfxTileId
+        iny
+
+        ; Skip over the behavioral flags
+        iny
+        sty WeaponSquaresIndex
+
+        ; Now we have the attack square, we can draw the weapon FX 
+        ; But for SFX, only if this is NOT the square where the attack landed
+        ; (... and maybe not if it matches the player's location?)
+        lda AttackSquare
+        cmp SingleHitAttackSquare
+        beq skip_draw
+        jsr spawn_sfx_sprite_here
+skip_draw:
+
         dec TilesRemaining
         bne loop
 
@@ -696,6 +784,43 @@ AttackSquare := R3
         sta sprite_table + MetaSpriteState::PositionY, x
 
         lda FxTileId
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+sprite_failed:
+        rts
+.endproc
+
+.proc spawn_sfx_sprite_here
+MetaSpriteIndex := R0
+AttackSquare := R3
+        jsr find_unused_sprite
+        ldx MetaSpriteIndex
+        cpx #$FF
+        beq sprite_failed
+
+        lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_PAL_1)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+
+        ldy AttackSquare
+        lda tile_index_to_col_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_X
+        sta sprite_table + MetaSpriteState::PositionX, x
+
+        lda tile_index_to_row_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_Y
+        sta sprite_table + MetaSpriteState::PositionY, x
+
+        lda SfxTileId
         sta sprite_table + MetaSpriteState::TileIndex, x
 
 sprite_failed:
