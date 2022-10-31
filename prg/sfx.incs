@@ -648,7 +648,7 @@ sfx_coin:
         pulse_cont_duty          $2,      $7,          0
         pulse_cont_duty          $2,      $4,          0
 
-sfx_heal:
+sfx_heart_container:
         ; Length in rows
         .byte 4
         ;                 pitch,    duty,  volume,                            sweep, length
@@ -656,6 +656,17 @@ sfx_heal:
         pulse_init_sweep  PITCH_F4,   $0,      $C, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      4
         pulse_init_sweep  PITCH_F4,   $0,      $8, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      4
         pulse_init_sweep  PITCH_F4,   $0,      $4, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      4
+
+sfx_small_heart:
+        .byte 8 ; length of this sfx in rows
+        tri_init  PITCH_F4,   0
+        tri_cont  PITCH_D4,   0
+        tri_cont  PITCH_CS4,  0
+        tri_cont  PITCH_D4,   0
+        tri_cont  PITCH_E4,   0
+        tri_cont  PITCH_FS4,  0
+        tri_cont  PITCH_A4,   0
+        tri_cont  PITCH_AS4,  0
 
 sfx_key_pulse1:
         ; Length in rows

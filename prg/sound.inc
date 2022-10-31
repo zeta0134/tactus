@@ -13,7 +13,8 @@
 .global sfx_defeat_enemy_noise
 .global sfx_defeat_enemy_pulse
 .global sfx_coin
-.global sfx_heal
+.global sfx_heart_container
+.global sfx_small_heart
 .global sfx_key_pulse1
 .global sfx_key_pulse2
 .global sfx_weapon_slash

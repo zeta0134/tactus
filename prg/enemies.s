@@ -175,7 +175,7 @@ bonk_behaviors:
         .word collect_weapon ; $A4 - weapon shadow
         .word solid_tile_forbids_movement ; $A8 - exit block
         .word descend_stairs ; $AC - exit stairs
-        .word no_behavior ; $B0
+        .word collect_small_heart ; $B0
         .word no_behavior ; $B4
         .word no_behavior ; $B8
         .word no_behavior ; $BC
@@ -1783,12 +1783,28 @@ done:
 
 
         ; slimes all have 1 HP, so there is no health bar. Just delete
-        ; the slime by replacing it with a floor tile
+        ; the slime by replacing it
 
         lda EffectiveAttackSquare
         sta TargetIndex
+
+        ; If the player is at less than max health, we can try to spawn a small heart
+        lda PlayerMaxHealth
+        cmp PlayerHealth
+        beq drop_nothing
+        ; Slimes have a 1/16 chance to spawn a health tile (more than other enemies)
+        jsr next_rand
+        and #%00001111
+        beq drop_health
+drop_nothing:
         lda #TILE_REGULAR_FLOOR
         sta TileId
+        jmp done_with_drops
+drop_health:
+        lda #TILE_SMALL_HEART
+        sta TileId
+done_with_drops:
+
         jsr draw_active_tile
         ldx EffectiveAttackSquare
         lda #0
@@ -2057,8 +2073,24 @@ die:
         ; Replace ourselves with a regular floor, and spawn the usual death juice
         lda EffectiveAttackSquare
         sta TargetIndex
+
+        ; If the player is at less than max health, we can try to spawn a small heart
+        lda PlayerMaxHealth
+        cmp PlayerHealth
+        beq drop_nothing
+        ; Common enemies have a 1/32 chance to spawn a health tile when defeated
+        jsr next_rand
+        and #%00011111
+        beq drop_health
+drop_nothing:
         lda #TILE_REGULAR_FLOOR
         sta TileId
+        jmp done_with_drops
+drop_health:
+        lda #TILE_SMALL_HEART
+        sta TileId
+done_with_drops:
+
         jsr draw_active_tile
         ldx EffectiveAttackSquare
         lda #0
@@ -2620,7 +2652,7 @@ TargetSquare := R13
         sta PlayerMaxHealth
         sta PlayerHealth
 
-        st16 R0, sfx_heal
+        st16 R0, sfx_heart_container
         jsr play_sfx_pulse1
 
         ; Now, draw a basic floor tile here, which will be underneath the player
@@ -2783,6 +2815,41 @@ TargetSquare := R13
         jsr play_sfx_pulse1
         st16 R0, sfx_equip_ability_pulse2
         jsr play_sfx_pulse2
+
+        rts
+.endproc
+
+.proc collect_small_heart
+TargetIndex := R0
+TileId := R1
+TargetSquare := R13
+
+        ; Add 2 to the player's health pool
+        lda PlayerHealth
+        clc
+        adc #2
+        sta PlayerHealth
+        ; Now if we've just overhealed them...
+        lda PlayerHealth
+        cmp PlayerMaxHealth
+        bcc not_overhealed
+        ; ... then we set cap health to maximum
+        lda PlayerMaxHealth
+        sta PlayerHealth
+not_overhealed:
+        st16 R0, sfx_small_heart
+        jsr play_sfx_triangle
+
+        ; Now, draw a basic floor tile here, which will be underneath the player
+        lda TargetSquare
+        sta TargetIndex
+        lda #TILE_REGULAR_FLOOR
+        sta TileId
+        jsr draw_active_tile
+        ldx TargetSquare
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
 
         rts
 .endproc

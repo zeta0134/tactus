@@ -49,6 +49,7 @@ TILE_BIG_KEY = ($9C | %01)
 TILE_GOLD_SACK = ($A0 | %10)
 TILE_WEAPON_SHADOW = $A4
 TILE_HEART_CONTAINER = ($CC | %11)
+TILE_SMALL_HEART = ($B0 | %11)
 
 ; Interactable blocks
 TILE_EXIT_BLOCK = ($A8 | %01)
