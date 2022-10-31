@@ -1699,49 +1699,157 @@ EffectiveAttackSquare := R10
 ; TODO: all of these should have variable health based on difficulty
 
 .proc direct_attack_spider
+AttackSquare := R3
 EnemyHealth := R11
+        ldx AttackSquare
+        lda battlefield, x
+        and #%00000011
+        cmp #%10
+        beq intermediate_hp
+        cmp #%11
+        beq advanced_hp
+basic_hp:
         lda #2
         sta EnemyHealth
+        jmp done
+intermediate_hp:
+        lda #4
+        sta EnemyHealth
+        jmp done
+advanced_hp:
+        lda #6
+        sta EnemyHealth
+done:
         jsr direct_attack_with_hp
         rts
 .endproc
 
 .proc indirect_attack_spider
+EffectiveAttackSquare := R10 
 EnemyHealth := R11
+        ldx EffectiveAttackSquare
+        lda battlefield, x
+        and #%00000011
+        cmp #%10
+        beq intermediate_hp
+        cmp #%11
+        beq advanced_hp
+basic_hp:
         lda #2
         sta EnemyHealth
+        jmp done
+intermediate_hp:
+        lda #4
+        sta EnemyHealth
+        jmp done
+advanced_hp:
+        lda #6
+        sta EnemyHealth
+done:
         jsr indirect_attack_with_hp
         rts
 .endproc
 
 .proc direct_attack_zombie
+AttackSquare := R3
 EnemyHealth := R11
+        ldx AttackSquare
+        lda battlefield, x
+        and #%00000011
+        cmp #%10
+        beq intermediate_hp
+        cmp #%11
+        beq advanced_hp
+basic_hp:
         lda #2
         sta EnemyHealth
+        jmp done
+intermediate_hp:
+        lda #4
+        sta EnemyHealth
+        jmp done
+advanced_hp:
+        lda #6
+        sta EnemyHealth
+done:
         jsr direct_attack_with_hp
         rts
 .endproc
 
 .proc indirect_attack_zombie
+EffectiveAttackSquare := R10 
 EnemyHealth := R11
+        ldx EffectiveAttackSquare
+        lda battlefield, x
+        and #%00000011
+        cmp #%10
+        beq intermediate_hp
+        cmp #%11
+        beq advanced_hp
+basic_hp:
         lda #2
         sta EnemyHealth
+        jmp done
+intermediate_hp:
+        lda #4
+        sta EnemyHealth
+        jmp done
+advanced_hp:
+        lda #6
+        sta EnemyHealth
+done:
         jsr indirect_attack_with_hp
         rts
 .endproc
 
 .proc direct_attack_birb
+AttackSquare := R3
 EnemyHealth := R11
+        ldx AttackSquare
+        lda battlefield, x
+        and #%00000011
+        cmp #%01
+        beq intermediate_hp
+        cmp #%11
+        beq advanced_hp
+basic_hp:
+        lda #1
+        sta EnemyHealth
+        jmp done
+intermediate_hp:
         lda #2
         sta EnemyHealth
+        jmp done
+advanced_hp:
+        lda #4
+        sta EnemyHealth
+done:
         jsr direct_attack_with_hp
         rts
 .endproc
 
 .proc indirect_attack_birb
+EffectiveAttackSquare := R10 
 EnemyHealth := R11
+        ldx EffectiveAttackSquare
+        lda battlefield, x
+        and #%00000011
+        cmp #%01
+        beq intermediate_hp
+        cmp #%11
+        beq advanced_hp
+basic_hp:
+        lda #1
+        sta EnemyHealth
+        jmp done
+intermediate_hp:
         lda #2
         sta EnemyHealth
+        jmp done
+advanced_hp:
+        lda #4
+        sta EnemyHealth
+done:
         jsr indirect_attack_with_hp
         rts
 .endproc
