@@ -12,6 +12,7 @@
 ; rhythm game
 .global sfx_defeat_enemy_noise
 .global sfx_defeat_enemy_pulse
+.global sfx_coin
 
 ; old sounds from dungeon game
 ; if we decide to use any, move these ^ up there.
