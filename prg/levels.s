@@ -582,17 +582,17 @@ maze_list:
 ; =============================================
 el_intermediate_slimes:
         .byte 2 ; length
-        .byte TILE_BASIC_SLIME, 4
-        .byte TILE_INTERMEDIATE_SLIME, 8
+        .byte TILE_BASIC_SLIME, 3
+        .byte TILE_INTERMEDIATE_SLIME, 4
 
 el_zombies_and_slimes:
-        .byte 2 ; length
+        .byte 3 ; length
         .byte TILE_ZOMBIE_BASIC, 3
         .byte TILE_BASIC_SLIME, 3
         .byte TILE_INTERMEDIATE_SLIME, 1
 
 el_spiders_and_slimes:
-        .byte 2 ; length
+        .byte 3 ; length
         .byte TILE_SPIDER_BASIC, 3
         .byte TILE_BASIC_SLIME, 2
         .byte TILE_INTERMEDIATE_SLIME, 2
@@ -603,7 +603,7 @@ el_zombies_and_spiders:
         .byte TILE_ZOMBIE_BASIC, 3
 
 el_basic_mix:
-        .byte 2 ; length
+        .byte 4 ; length
         .byte TILE_SPIDER_BASIC, 2
         .byte TILE_ZOMBIE_BASIC, 2
         .byte TILE_BASIC_SLIME, 1
@@ -651,12 +651,92 @@ boss_pool_zone_1_floor_1:
 ; =============================================
 ;                Zone 2 - Basic
 ; =============================================
-;TODO
+
+el_zombies_and_spiders2:
+        .byte 4 ; length
+        .byte TILE_BASIC_SLIME, 1
+        .byte TILE_INTERMEDIATE_SLIME, 1
+        .byte TILE_SPIDER_BASIC, 3
+        .byte TILE_ZOMBIE_BASIC, 5
+
+el_birds_and_spiders:
+        .byte 3
+        .byte TILE_BIRB_LEFT_BASIC, 2
+        .byte TILE_BIRB_RIGHT_BASIC, 2
+        .byte TILE_SPIDER_BASIC, 3
+
+el_hello_mr_mole:
+        .byte 4
+        .byte TILE_MOLE_HOLE_BASIC, 2
+        .byte TILE_BASIC_SLIME, 1
+        .byte TILE_INTERMEDIATE_SLIME, 2
+        .byte TILE_ZOMBIE_BASIC, 3
+
+el_full_mix:
+        .byte 6
+        .byte TILE_MOLE_HOLE_BASIC, 1
+        .byte TILE_BASIC_SLIME, 2
+        .byte TILE_INTERMEDIATE_SLIME, 1
+        .byte TILE_ZOMBIE_BASIC, 2
+        .byte TILE_SPIDER_BASIC, 1
+        .byte TILE_BIRB_LEFT_BASIC, 1
+
+el_zombie_hoard:
+        .byte 2
+        .byte TILE_INTERMEDIATE_SLIME, 2
+        .byte TILE_ZOMBIE_BASIC, 7
+
+basic_pool_zone_1_floor_2:
+        ; Make sure all sections add up to 16
+        .repeat 3
+        .word el_zombies_and_spiders2
+        .endrepeat
+
+        .repeat 3
+        .word el_birds_and_spiders
+        .endrepeat
+
+        .repeat 4
+        .word el_hello_mr_mole
+        .endrepeat
+
+        .repeat 3
+        .word el_full_mix
+        .endrepeat
+
+        .repeat 3
+        .word el_zombie_hoard
+        .endrepeat
 
 ; =============================================
 ;                Zone 2 - Boss
 ; =============================================
-;TODO
+
+el_scary_scary_spiders:
+        .byte 3
+        .byte TILE_SPIDER_BASIC, 2
+        .byte TILE_SPIDER_INTERMEDIATE, 4
+        .byte TILE_MOLE_HOLE_BASIC, 4
+
+el_rockin_flock:
+        .byte 7
+        .byte TILE_ZOMBIE_INTERMEDIATE, 4
+        .byte TILE_BIRB_LEFT_BASIC, 1
+        .byte TILE_BIRB_RIGHT_BASIC, 1
+        .byte TILE_BIRB_LEFT_INTERMEDIATE, 2
+        .byte TILE_BIRB_RIGHT_INTERMEDIATE, 2
+        .byte TILE_BIRB_LEFT_ADVANCED, 1
+        .byte TILE_BIRB_RIGHT_ADVANCED, 1
+
+boss_pool_zone_1_floor_2:
+        ; Make sure sections add up to 4
+        .repeat 2
+        .word el_scary_scary_spiders
+        .endrepeat
+        .repeat 2
+        .word el_rockin_flock
+        .endrepeat
+
 
 ; =============================================
 ;                Zone 3 - Basic
@@ -684,13 +764,13 @@ boss_pool_zone_1_floor_1:
 
 zone_1_basic_pools:
         .word basic_pool_zone_1_floor_1 ; floor 1
-        .word basic_pool_zone_1_floor_1 ; floor 2
+        .word basic_pool_zone_1_floor_2 ; floor 2
         .word basic_pool_zone_1_floor_1 ; floor 3
         .word basic_pool_zone_1_floor_1 ; floor 4
 
 zone_1_boss_pools:
         .word boss_pool_zone_1_floor_1 ; floor 1
-        .word boss_pool_zone_1_floor_1 ; floor 2
+        .word boss_pool_zone_1_floor_2 ; floor 2
         .word boss_pool_zone_1_floor_1 ; floor 3
         .word boss_pool_zone_1_floor_1 ; floor 4
 
