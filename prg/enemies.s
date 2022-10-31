@@ -15,6 +15,7 @@
 
 .zeropage
 DestPtr: .res 2
+GoldToAward: .res 1
 
 .segment "RAM"
 
@@ -1670,7 +1671,26 @@ EffectiveAttackSquare := R10
         lda #1
         sta AttackLanded
 
-        ; FOR NOW, slimes have 1 HP, so there is no health bar. Just delete
+        ; Award some gold to the player, based on what kind of slime we are
+        ldx EffectiveAttackSquare
+        lda battlefield, x
+        and #%00000011
+        cmp #%10
+        beq intermediate
+        cmp #%11
+        beq advanced
+basic:
+        add16w PlayerGold, #1
+        jmp done
+intermediate:
+        add16w PlayerGold, #5
+        jmp done
+advanced:
+        add16w PlayerGold, #25
+done:
+
+
+        ; slimes all have 1 HP, so there is no health bar. Just delete
         ; the slime by replacing it with a floor tile
 
         lda EffectiveAttackSquare
