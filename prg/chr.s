@@ -26,6 +26,7 @@ CurrentChrBank: .res 1
         .include "../build/animated_tiles/vertical_slash_sfx.chr"
         ; sprite effects
         .include "../build/animated_tiles/death_skull.chr"
+        .include "../build/animated_tiles/damage_player.chr"
 
         ; enemies
         .include "../build/animated_tiles/slime_idle.chr"
@@ -73,7 +74,7 @@ title_chr:
 title_nametable:
         .incbin "../art/raw_nametables/title_screen.nam"
 
-ANIMATED_TILE_TABLE_LENGTH = 19
+ANIMATED_TILE_TABLE_LENGTH = 20
 animated_tile_table:
         .word $0000, smoke_puff
         .word $0040, slime_idle
@@ -96,6 +97,7 @@ animated_tile_table:
         .word $1200, vertical_slash
         .word $1240, horizontal_slash_sfx
         .word $1280, vertical_slash_sfx
+        .word $12C0, damage_player
 
 
 STATIC_TILE_TABLE_LENGTH = 22

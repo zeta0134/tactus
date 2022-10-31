@@ -16,7 +16,8 @@
 .zeropage
 DestPtr: .res 2
 GoldToAward: .res 1
-DamageSpriteCoordScratch: .res 2
+DamageSpriteCoordX: .res 2
+DamageSpriteCoordY: .res 2
 
 .segment "RAM"
 
@@ -247,6 +248,96 @@ EffectiveAttackSquare := R10
         sta sprite_table + MetaSpriteState::PositionY, x
 
         lda #SPRITES_DEATH_SKULL
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+sprite_failed:
+        rts
+.endproc
+
+.proc spawn_damage_sprite_here
+MetaSpriteIndex := R0
+PuffSquare := R12
+TargetSquare := R13
+        jsr find_unused_sprite
+        ldx MetaSpriteIndex
+        cpx #$FF
+        beq sprite_failed
+
+        ; Damage is red
+        lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_RISE | SPRITE_PAL_2)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+
+        lda #0
+        sta DamageSpriteCoordX
+        sta DamageSpriteCoordX+1
+        sta DamageSpriteCoordY
+        sta DamageSpriteCoordY+1
+        ; Damage sprites need to be drawn *between* the player and the enemy that did the damage. We'll do this
+        ; by adding both sprite coordinates, then dividing by 2.
+
+        ; First the X coordinate for the player:
+        ldy TargetSquare
+        lda tile_index_to_col_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_X
+        sta DamageSpriteCoordX
+        ; Now the Y coordinate for the player:
+        ldy TargetSquare
+        lda tile_index_to_row_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_Y
+        sta DamageSpriteCoordY
+
+        ; Now the X coordinate for the enemy's *puff* location, which we've just returned them to:
+        ldy PuffSquare
+        lda tile_index_to_col_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_X
+        clc
+        adc DamageSpriteCoordX
+        sta DamageSpriteCoordX
+        lda #0
+        adc DamageSpriteCoordX+1
+        sta DamageSpriteCoordX+1
+        ; And again, the Y coordinate of the puff square
+        ldy PuffSquare
+        lda tile_index_to_row_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_Y
+        clc
+        adc DamageSpriteCoordY
+        sta DamageSpriteCoordY
+        lda #0
+        adc DamageSpriteCoordY+1
+        sta DamageSpriteCoordY+1
+
+        ; Now shift to divide those by 2
+        lsr DamageSpriteCoordX+1
+        ror DamageSpriteCoordX
+        lsr DamageSpriteCoordY+1
+        ror DamageSpriteCoordY
+
+        ; And now we can apply the sprite position and properties
+        lda DamageSpriteCoordX
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda DamageSpriteCoordY
+        sta sprite_table + MetaSpriteState::PositionY, x
+
+        lda #SPRITES_DAMAGE_PLAYER
         sta sprite_table + MetaSpriteState::TileIndex, x
 
 sprite_failed:
@@ -1710,7 +1801,7 @@ done:
 
         ; Play an appropriately crunchy death sound
         st16 R0, sfx_defeat_enemy_pulse
-        jsr play_sfx_pulse2
+        jsr play_sfx_pulse1
         st16 R0, sfx_defeat_enemy_noise
         jsr play_sfx_noise
 
@@ -2449,10 +2540,7 @@ TargetSquare := R13
 
         ; TODO: we just damaged the player. Spawn a hit sprite inbetween the enemy that dealt
         ; the damage and the player's position
-
-
-
-        
+        jsr spawn_damage_sprite_here
 
         rts
 no_puff_found:
