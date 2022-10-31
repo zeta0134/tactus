@@ -50,6 +50,7 @@ PlayerZone: .res 1
 PlayerFloor: .res 1
 PlayerRoomIndex: .res 1
 
+; "Scratch" registers, because 16 was just not enough for some situations
 EnemyDiedThisFrame: .res 1
 
 DIRECTION_NORTH = 1
@@ -106,9 +107,9 @@ MetaSpriteIndex := R0
         lda #1
         sta PlayerWeaponDmg
 
-        lda #4
+        lda #8
         sta PlayerHealth
-        lda #4
+        lda #8
         sta PlayerMaxHealth
         lda #0
         sta PlayerKeys

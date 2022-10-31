@@ -3,6 +3,7 @@
 .global determine_player_intent
 .global update_player
 .global damage_player
+.global player_resolve_collision
 
 .global row_number_to_tile_index_lut
 
