@@ -714,6 +714,15 @@ TargetCol := R15
         lda #8
         sta ScreenShakeSpeed
         sta ScreenShakeDecayCounter
+
+        ; Taking damage is a *big deal*
+        st16 R0, sfx_weak_hit_pulse
+        jsr play_sfx_pulse1
+        st16 R0, sfx_weak_hit_tri
+        jsr play_sfx_triangle
+        st16 R0, sfx_weak_hit_noise
+        jsr play_sfx_noise
+
 already_dead:
         rts
 .endproc
