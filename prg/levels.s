@@ -957,10 +957,10 @@ zone_list_boss:
 ; ============================================================================================
 
 el_debug_enemies:
-        .byte 3
-        .byte TILE_BIRB_LEFT_BASIC, 1
-        .byte TILE_BIRB_LEFT_INTERMEDIATE, 1
-        .byte TILE_BIRB_LEFT_ADVANCED, 1
+        .byte 2
+        .byte TILE_MOLE_HOLE_BASIC, 1
+        .byte TILE_MOLE_HOLE_ADVANCED, 1
+        
 
 el_debug_boss_enemies:
         .byte 1
