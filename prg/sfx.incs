@@ -168,7 +168,7 @@ sfx_weak_hit_tri:
 
 sfx_weak_hit_noise:
         ; Length in rows
-        .byte 28
+        .byte 16
         ;          Mode Period  Vol  Length
         noise_init    1,    $4,  $9,      0
         noise_cont    0,    $3,  $6,      0
