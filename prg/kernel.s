@@ -373,8 +373,8 @@ not_victory:
         st16 GameMode, wait_for_player_draw_1
 
         ; - Resolve the player's action
-        jsr update_player
         far_call FAR_handle_room_spawns
+        jsr update_player
 
         ; - Queue up any changed squares to the **active** buffer
         ; - Begin playback of any sprite animations (?)
