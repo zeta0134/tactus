@@ -686,6 +686,7 @@ proceed_with_jump:
 ; Spiders store their beat counter in tile_data, and damage in the low 7 bits of tile_flags
 
 .proc update_spider_base
+IdleDelay := R0
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
@@ -694,9 +695,29 @@ CurrentTile := R15
         ldx CurrentTile
         bail_if_already_moved
 
+        ; Determine how many beats we should remain idle, based on difficulty
+        lda battlefield, x
+        and #%00000011
+        cmp #%10
+        beq intermediate
+        cmp #%11
+        beq advanced
+basic:
+        lda #3
+        sta IdleDelay
+        jmp done
+intermediate:
+        lda #2
+        sta IdleDelay
+        jmp done
+advanced:
+        lda #1
+        sta IdleDelay
+done:
+
         inc tile_data, x
         lda tile_data, x
-        cmp #2 ; TODO: pick a threshold based on spider difficulty
+        cmp IdleDelay ; TODO: pick a threshold based on spider difficulty
         bcc no_change
         ; switch to our anticipation pose
         lda battlefield, x
@@ -877,6 +898,7 @@ proceed_with_jump:
 ; Zombies work quite similarly to spiders, except they move cardinally instead of diagonally
 
 .proc update_zombie_base
+IdleDelay := R0
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
@@ -885,9 +907,29 @@ CurrentTile := R15
         ldx CurrentTile
         bail_if_already_moved
 
+        ; Determine how many beats we should remain idle, based on difficulty
+        lda battlefield, x
+        and #%00000011
+        cmp #%10
+        beq intermediate
+        cmp #%11
+        beq advanced
+basic:
+        lda #3
+        sta IdleDelay
+        jmp done
+intermediate:
+        lda #2
+        sta IdleDelay
+        jmp done
+advanced:
+        lda #1
+        sta IdleDelay
+done:
+
         inc tile_data, x
         lda tile_data, x
-        cmp #2 ; TODO: pick a threshold based on zombie difficulty
+        cmp IdleDelay ; TODO: pick a threshold based on zombie difficulty
         bcc no_change
         ; switch to our anticipation pose
         lda battlefield, x
