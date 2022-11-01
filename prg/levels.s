@@ -262,12 +262,12 @@ all_done:
 ; with reasonable speed and fairness
 random_row_table:
         .repeat 32, i
-        .byte (2 + (i .MOD (::BATTLEFIELD_HEIGHT - 4)))
+        .byte (3 + (i .MOD (::BATTLEFIELD_HEIGHT - 6)))
         .endrepeat
 
 random_col_table:
         .repeat 32, i
-        .byte (2 + (i .MOD (::BATTLEFIELD_WIDTH - 4)))
+        .byte (3 + (i .MOD (::BATTLEFIELD_WIDTH - 6)))
         .endrepeat
 
 ; Spawn the provided entity somewhere "safe" in the room.
