@@ -1412,14 +1412,29 @@ MOLE_SOUTH = 2
 MOLE_WEST = 3
 
 .proc update_mole_hole
+IdleDelay := R0
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
         inc enemies_active
 
+        ; Determine how many beats we should remain idle, based on difficulty
+        lda battlefield, x
+        and #%00000011
+        cmp #%01
+        beq advanced
+basic:
+        lda #2
+        sta IdleDelay
+        jmp done
+advanced:
+        lda #0 ; pop up quickly
+        sta IdleDelay
+done:
+
         ldx CurrentTile
         lda tile_data, x
-        cmp #2 ; TODO: pick a threshold based on zombie difficulty
+        cmp IdleDelay
         bcc continue_waiting
 
         ; Okay first, we cannot rise out of the ground if the player is too close,
@@ -1580,8 +1595,7 @@ switch_to_idle_pose:
 .endproc
 
 .proc update_mole_idle
-TargetRow := R0
-TargetTile := R1
+IdleDelay := R0
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
@@ -1590,8 +1604,22 @@ CurrentTile := R15
         ldx CurrentTile
         bail_if_already_moved
 
+        ; Determine how many beats we should remain idle, based on difficulty
+        lda battlefield, x
+        and #%00000011
+        cmp #%01
+        beq advanced
+basic:
+        lda #2
+        sta IdleDelay
+        jmp done
+advanced:
+        lda #1 ; return underground quickly
+        sta IdleDelay
+done:
+
         lda tile_data, x
-        cmp #2 ; TODO: pick a threshold based on mole difficulty?
+        cmp IdleDelay 
         bcc continue_waiting
 
         ; Switch back into our hole pose

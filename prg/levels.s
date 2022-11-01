@@ -379,16 +379,16 @@ EntityList := R4
         tax
 
         ; Use the real list
-        ;lda zone_list_basic, x
-        ;sta CollectionPtr
-        ;lda zone_list_basic+1, x
-        ;sta CollectionPtr+1
+        lda zone_list_basic, x
+        sta CollectionPtr
+        lda zone_list_basic+1, x
+        sta CollectionPtr+1
 
         ; DEBUG: use a fake list for testing new enemy types
-        lda debug_zone_list, x
-        sta CollectionPtr
-        lda debug_zone_list+1, x
-        sta CollectionPtr+1
+        ;lda debug_zone_list, x
+        ;sta CollectionPtr
+        ;lda debug_zone_list+1, x
+        ;sta CollectionPtr+1
 
         ; Now load the appropriate pool list for this floor from the collection
         lda PlayerFloor
@@ -957,10 +957,9 @@ zone_list_boss:
 ; ============================================================================================
 
 el_debug_enemies:
-        .byte 3
-        .byte TILE_SPIDER_BASIC, 1
-        .byte TILE_SPIDER_INTERMEDIATE, 1
-        .byte TILE_SPIDER_ADVANCED, 1
+        .byte 2
+        .byte TILE_MOLE_HOLE_BASIC, 1
+        .byte TILE_MOLE_HOLE_ADVANCED, 1
         
 
 el_debug_boss_enemies:
