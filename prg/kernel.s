@@ -529,11 +529,24 @@ StartingTile := R15
 .proc wait_for_the_next_beat
         ;- Variable Frames: wait for the next "beat" to begin
 
+        ; Special case: if the current room is marked as cleared, we do not need to wait
+        ; for the next beat. Check for that here
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_CLEARED
+        beq normal_gameplay_beat_checking
+room_cleared:
+        ; If the player's input has arrived...
+        lda PlayerNextDirection
+        ; ... then go ahead and process this beat early
+        bne process_next_beat_now
+        ; otherwise treat things normally, so the visual beat is unchanged(ish)
+        
+normal_gameplay_beat_checking:
         ; If it's not time for the next beat yet, then continue waiting no matter what
         lda CurrentBeat
         cmp LastBeat
         beq continue_waiting
-
         ; The time for the next beat has come.
         ; If the player's input HAS arrived:
         lda PlayerNextDirection
