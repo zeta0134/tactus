@@ -18,6 +18,7 @@ DestPtr: .res 2
 GoldToAward: .res 1
 DamageSpriteCoordX: .res 2
 DamageSpriteCoordY: .res 2
+HealthDroughtCounter: .res 1
 
 .segment "RAM"
 
@@ -1867,6 +1868,10 @@ done:
         lda PlayerMaxHealth
         cmp PlayerHealth
         beq drop_nothing
+        ; If we are in the middle of a health drought, force a health drop and clear the counter
+        lda HealthDroughtCounter
+        cmp #16
+        bcs drop_health
         ; Slimes have a 1/16 chance to spawn a health tile (more than other enemies)
         jsr next_rand
         and #%00001111
@@ -1874,10 +1879,13 @@ done:
 drop_nothing:
         lda #TILE_REGULAR_FLOOR
         sta TileId
+        inc HealthDroughtCounter
         jmp done_with_drops
 drop_health:
         lda #TILE_SMALL_HEART
         sta TileId
+        lda #0
+        sta HealthDroughtCounter
 done_with_drops:
 
         jsr draw_active_tile
@@ -2160,10 +2168,13 @@ die:
 drop_nothing:
         lda #TILE_REGULAR_FLOOR
         sta TileId
+        inc HealthDroughtCounter
         jmp done_with_drops
 drop_health:
         lda #TILE_SMALL_HEART
         sta TileId
+        lda #0
+        sta HealthDroughtCounter
 done_with_drops:
 
         jsr draw_active_tile

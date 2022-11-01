@@ -50,6 +50,7 @@ CurrentChrBank: .res 1
         .include "../build/static_tiles/wall_face.chr"
         .include "../build/static_tiles/wall_top.chr"
         .include "../build/static_tiles/pit_edge.chr"
+        .include "../build/static_tiles/pit_center.chr"
         .include "../build/static_tiles/exit_block.chr"
         .include "../build/static_tiles/exit_stairs.chr"
 
@@ -109,7 +110,7 @@ static_tile_table:
         .word $0880, wall_top
         .word $08C0, wall_face
         .word $0900, pit_edge
-        .word $0940, floor ; pit non-edge
+        .word $0940, pit_center ; pit non-edge
         ; treasures
         .word $0980, treasure_chest
         .word $09C0, big_key
