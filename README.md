@@ -2,7 +2,7 @@
 
 A rhythm-based dungeon crawler for original NES and FamiCom. Explore mysterious ruins, find powerful weapons, and **slay to the beat**. Maps and enemy placement are randomized each time you play, so no two runs are quite the same.
 
-- Screenshot 
+![tactus_github_screenshot](https://user-images.githubusercontent.com/1165075/215338385-2a936b0f-c962-4445-b475-1da690deacf2.png)
 
 This was my contest entry for the [NESDev Compo 2022](https://itch.io/jam/nesdev-2022). It is currently a demo, featuring a fairly basic zone with open rooms, and four floors of increasingly difficult combat encounters. You can check out the [contest entry](https://zeta0134.itch.io/tactus) with a released (and slightly buggy) build ready to play in most reasonably accurate NES emulators. Also there is a [live demo](https://rusticnes.reploid.cafe/wasm/?cartridge=tactus.nes) that should run in most modern browsers.
 
