@@ -30,6 +30,7 @@ ScreenShakeSpeed: .res 1
 ScreenShakeDecayCounter: .res 1
 PpuScrollX: .res 1
 PpuScrollY: .res 1
+PpuScrollNametable: .res 1
 
 .segment "RAM"
 CurrentBeatCounter: .res 1
@@ -63,6 +64,7 @@ AccumulatedGameBeats: .res 2
         lda #0
         sta PpuScrollX
         sta PpuScrollY
+        sta PpuScrollNametable
 
         lda #0
         sta TargetBrightness
@@ -655,11 +657,16 @@ x_loop:
         bne x_loop
         bit RandTemp
         bmi minus_x
+positive_x:
+        ldx #0
+        stx PpuScrollNametable
         jmp done_with_x
 minus_x:
         eor #$FF
         clc
         adc #1
+        ldx #1
+        stx PpuScrollNametable
 done_with_x:
         sta PpuScrollX
 
@@ -695,5 +702,6 @@ no_screen_shake:
         lda #0
         sta PpuScrollX
         sta PpuScrollY
+        sta PpuScrollNametable
         rts
 .endproc

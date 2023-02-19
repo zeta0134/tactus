@@ -113,10 +113,14 @@ all_frames:
         ;     will glitch pretty badly
         ; ===========================================================
 
-        lda #(VBLANK_NMI | BG_0000 | OBJ_1000 | OBJ_8X16)
-        ldx active_battlefield
-        beq write_ppuctrl
-        ora #(NT_2400)
+        lda active_battlefield
+        eor PpuScrollNametable
+        bne right_nametable
+left_nametable:
+        lda #(VBLANK_NMI | BG_0000 | OBJ_1000 | OBJ_8X16 | NT_2000)
+        jmp write_ppuctrl
+right_nametable:
+        lda #(VBLANK_NMI | BG_0000 | OBJ_1000 | OBJ_8X16 | NT_2400)
 write_ppuctrl:
         sta PPUCTRL
        
