@@ -52,6 +52,9 @@ mesen: dir $(ROM_NAME)
 beta: dir $(ROM_NAME)
 	/home/zeta0134/Downloads/MesenBeta/Mesen $(ROM_NAME)
 
+osx: dir $(ROM_NAME)
+	/Users/zeta0134/Github/Mesen2/bin/osx-arm64/Release/osx-arm64/publish/Mesen $(ROM_NAME)
+
 debug: dir $(ROM_NAME)
 	mono vendor/Mesen-X-v1.0.0.exe $(ROM_NAME) debug_entity_0.lua
 
