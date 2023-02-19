@@ -2,6 +2,7 @@
 
         .include "action53.inc"
         .include "battlefield.inc"
+        .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
         .include "chr.inc"
@@ -49,7 +50,8 @@ room_loop:
         ; set each room up with its own RNG low byte
         ldx #0
 seed_loop:
-        jsr next_rand
+        ; jsr next_rand
+        lda #42
         sta room_seeds, x
         inx
         cpx #16
@@ -378,17 +380,21 @@ EntityList := R4
         asl ; the lists contain words
         tax
 
+        
+
+        .if ::DEBUG_TEST_FLOOR
+        ; DEBUG: use a fake list for testing new enemy types
+        lda debug_zone_list, x
+        sta CollectionPtr
+        lda debug_zone_list+1, x
+        sta CollectionPtr+1
+        .else
         ; Use the real list
         lda zone_list_basic, x
         sta CollectionPtr
         lda zone_list_basic+1, x
         sta CollectionPtr+1
-
-        ; DEBUG: use a fake list for testing new enemy types
-        ;lda debug_zone_list, x
-        ;sta CollectionPtr
-        ;lda debug_zone_list+1, x
-        ;sta CollectionPtr+1
+        .endif
 
         ; Now load the appropriate pool list for this floor from the collection
         lda PlayerFloor
@@ -432,17 +438,19 @@ EntityList := R4
         asl ; the lists contain words
         tax
 
-        ; Use the real boss list
+        .if ::DEBUG_TEST_FLOOR
+        ; DEBUG: use a fake list for testing new enemy types
+        lda debug_boss_zone_list, x
+        sta CollectionPtr
+        lda debug_boss_zone_list+1, x
+        sta CollectionPtr+1
+        .else
+        ; Use the real list
         lda zone_list_boss, x
         sta CollectionPtr
         lda zone_list_boss+1, x
         sta CollectionPtr+1
-
-        ; Use a fake list with fewer enemies, for quick testing
-        ;lda debug_boss_zone_list, x
-        ;sta CollectionPtr
-        ;lda debug_boss_zone_list+1, x
-        ;sta CollectionPtr+1
+        .endif
 
         ; Now load the appropriate pool list for this floor from the collection
         lda PlayerFloor
@@ -957,14 +965,13 @@ zone_list_boss:
 ; ============================================================================================
 
 el_debug_enemies:
-        .byte 2
-        .byte TILE_MOLE_HOLE_BASIC, 1
-        .byte TILE_MOLE_HOLE_ADVANCED, 1
+        .byte 1
+        .byte TILE_BIRB_LEFT_BASIC, 8
         
 
 el_debug_boss_enemies:
         .byte 1
-        .byte TILE_ZOMBIE_BASIC, 1
+        .byte TILE_BIRB_LEFT_ADVANCED, 2
 
 debug_pool:
         .repeat 16

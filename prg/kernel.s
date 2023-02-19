@@ -282,9 +282,14 @@ MetaSpriteIndex := R0
         sta AccumulatedGameBeats
         sta AccumulatedGameBeats+1
 
+        .if ::DEBUG_TEST_FLOOR
+        lda #%00000001
+        sta global_rng_seed
+        .else
         jsr next_rand
         ora #%00000001
         sta global_rng_seed
+        .endif
 
         jsr initialize_sprites
         far_call FAR_init_hud
