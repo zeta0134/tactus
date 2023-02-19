@@ -1,10 +1,12 @@
         .setcpu "6502"
 
         .include "battlefield.inc"
+        .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
         .include "input.inc"
         .include "kernel.inc"
+        .include "bhop/longbranch.inc"
         .include "nes.inc"
         .include "player.inc"
         .include "sound.inc"
@@ -52,6 +54,8 @@ PlayerRoomIndex: .res 1
 
 ; "Scratch" registers, because 16 was just not enough for some situations
 EnemyDiedThisFrame: .res 1
+SafetyCol: .res 1
+SafetyRow: .res 1
 
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
@@ -94,22 +98,37 @@ MetaSpriteIndex := R0
         lda #JUMP_HEIGHT_END
         sta PlayerJumpHeightPos
 
+.if ::DEBUG_GOD_MODE
+        ; The player should start with whatever Zeta likes
+        lda #3
+        sta PlayerWeaponDmg
+        lda #WEAPON_FLAIL
+        sta PlayerWeapon
+.else
         ; The player should start with a standard L1-DAGGER
+        lda #1
+        sta PlayerWeaponDmg
         lda #WEAPON_DAGGER
         sta PlayerWeapon
+.endif
         asl
         tax
         lda weapon_class_table, x
         sta PlayerWeaponPtr
         lda weapon_class_table+1, x
         sta PlayerWeaponPtr+1
-        lda #1
-        sta PlayerWeaponDmg
+        
 
+.if ::DEBUG_GOD_MODE
         lda #14
         sta PlayerHealth
-        lda #14
         sta PlayerMaxHealth
+.else
+        lda #4
+        sta PlayerHealth
+        sta PlayerMaxHealth
+.endif
+
         lda #0
         sta PlayerKeys
         sta PlayerRoomIndex
@@ -514,13 +533,32 @@ loop:
         ; Reset to the player's position
         lda PlayerSquare
         sta AttackSquare
+        ; For safety, track the raw row/col as well
+        lda PlayerRow
+        sta SafetyRow
+        lda PlayerCol
+        sta SafetyCol
+
         ; Add the relative offset from the considered square
         ldy WeaponSquaresIndex
         lda (WeaponSquaresPtr), y ; X offset
         clc
         adc AttackSquare
         sta AttackSquare
+        
+        ; Also add it to our tracked SafetyCol
+        lda PlayerCol
+        clc
+        adc (WeaponSquaresPtr), y ; X offset
+        sta SafetyCol
+
         iny
+        ; For the SafetyRow, we can do simple arithmetic here
+        lda (WeaponSquaresPtr), y ; Y offset
+        clc
+        adc SafetyRow
+        sta SafetyRow
+        
         lda (WeaponSquaresPtr), y ; Y offset
         bmi negative_y
 positive_y:
@@ -552,7 +590,21 @@ converge:
         sta WeaponProperties      ; Stash these here so the enemies can see them (if applicable)
         iny
         sty WeaponSquaresIndex
+
+        ; Safety Dance: do NOT attack tiles that are out of bounds
+        lda SafetyCol
+        bmi skip_out_of_bounds
+        cmp #BATTLEFIELD_WIDTH
+        bcs skip_out_of_bounds
+        lda SafetyRow
+        bmi skip_out_of_bounds
+        cmp #BATTLEFIELD_HEIGHT
+        bcs skip_out_of_bounds
+
         far_call FAR_attack_enemy_tile
+skip_out_of_bounds:
+
+
 check_player_movement:
         ; If this weapon square could cancel movement
         lda #WEAPON_CANCEL_MOVEMENT
@@ -581,7 +633,7 @@ check_early_exit:
 no_early_exit:
         ; Otherwise, iterate to the next weapon square and continue
         dec TilesRemaining
-        bne loop
+        jne loop
 
         lda AttackLanded
         beq done_with_swing
@@ -630,13 +682,31 @@ loop:
         ; Reset to the player's position
         lda PlayerSquare
         sta AttackSquare
+        ; For safety, track the raw row/col as well
+        lda PlayerRow
+        sta SafetyRow
+        lda PlayerCol
+        sta SafetyCol
         ; Add the relative offset from the considered square
         ldy WeaponSquaresIndex
         lda (WeaponSquaresPtr), y ; X offset
         clc
         adc AttackSquare
         sta AttackSquare
+
+        ; Also add it to our tracked SafetyCol
+        lda PlayerCol
+        clc
+        adc (WeaponSquaresPtr), y ; X offset
+        sta SafetyCol
+
         iny
+        ; For the SafetyRow, we can do simple arithmetic here
+        lda (WeaponSquaresPtr), y ; Y offset
+        clc
+        adc SafetyRow
+        sta SafetyRow
+
         lda (WeaponSquaresPtr), y ; Y offset
         bmi negative_y
 positive_y:
@@ -669,8 +739,19 @@ converge:
         iny
         sty WeaponSquaresIndex
 
+        ; Safety Dance: do NOT draw tiles that are out of bounds
+        lda SafetyCol
+        bmi skip_out_of_bounds
+        cmp #BATTLEFIELD_WIDTH
+        bcs skip_out_of_bounds
+        lda SafetyRow
+        bmi skip_out_of_bounds
+        cmp #BATTLEFIELD_HEIGHT
+        bcs skip_out_of_bounds
+
         ; Now we have the attack square, we can draw the weapon FX 
         jsr spawn_fx_sprite_here
+skip_out_of_bounds:
         dec TilesRemaining
         bne loop
 
@@ -699,13 +780,31 @@ loop:
         ; Reset to the player's position
         lda PlayerSquare
         sta AttackSquare
+        ; For safety, track the raw row/col as well
+        lda PlayerRow
+        sta SafetyRow
+        lda PlayerCol
+        sta SafetyCol
         ; Add the relative offset from the considered square
         ldy WeaponSquaresIndex
         lda (WeaponSquaresPtr), y ; X offset
         clc
         adc AttackSquare
         sta AttackSquare
+
+        ; Also add it to our tracked SafetyCol
+        lda PlayerCol
+        clc
+        adc (WeaponSquaresPtr), y ; X offset
+        sta SafetyCol
+
         iny
+        ; For the SafetyRow, we can do simple arithmetic here
+        lda (WeaponSquaresPtr), y ; Y offset
+        clc
+        adc SafetyRow
+        sta SafetyRow
+
         lda (WeaponSquaresPtr), y ; Y offset
         bmi negative_y
 positive_y:
@@ -744,6 +843,17 @@ converge:
         lda AttackSquare
         cmp SingleHitAttackSquare
         beq skip_draw
+
+        ; Safety Dance: do NOT draw tiles that are out of bounds
+        lda SafetyCol
+        bmi skip_draw
+        cmp #BATTLEFIELD_WIDTH
+        bcs skip_draw
+        lda SafetyRow
+        bmi skip_draw
+        cmp #BATTLEFIELD_HEIGHT
+        bcs skip_draw
+
         jsr spawn_sfx_sprite_here
 skip_draw:
 
