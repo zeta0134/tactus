@@ -966,7 +966,7 @@ zone_list_boss:
 
 el_debug_enemies:
         .byte 1
-        .byte TILE_BIRB_LEFT_BASIC, 8
+        .byte TILE_ZOMBIE_BASIC, 4
         
 
 el_debug_boss_enemies:

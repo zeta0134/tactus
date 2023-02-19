@@ -569,8 +569,11 @@ proceed_with_jump:
         ; Finally, flag ourselves as having just moved; this signals to the player that our old
         ; position is a valid target, and it also signals to the engine that we shouldn't be ticked
         ; a second time, if our target square comes up while we're scanning
-        lda #%10000000
+        lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, y
+        ; And finally clear the data flags for the puff of smoke, just to keep things tidy
+        lda #FLAG_MOVED_THIS_FRAME
+        sta tile_flags, x
 
         ldx CurrentRow
         jsr queue_row_x
@@ -672,8 +675,11 @@ proceed_with_jump:
         ; Finally, flag ourselves as having just moved; this signals to the player that our old
         ; position is a valid target, and it also signals to the engine that we shouldn't be ticked
         ; a second time, if our target square comes up while we're scanning
-        lda #%10000000
+        lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, y
+        ; And finally clear the data flags for the puff of smoke, just to keep things tidy
+        lda #FLAG_MOVED_THIS_FRAME
+        sta tile_flags, x
 
         ldx CurrentRow
         jsr queue_row_x
@@ -885,11 +891,11 @@ proceed_with_jump:
         sta tile_data, x
 
         ; Move our data flags to the destination, and flag ourselves as having just moved
-        lda #%10000000
+        lda #FLAG_MOVED_THIS_FRAME
         ora tile_flags, x
         sta tile_flags, y
         ; And finally clear the data flags for the puff of smoke, just to keep things tidy
-        lda #0
+        lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
 
         ; Queue up both rows
@@ -1150,11 +1156,11 @@ proceed_with_jump:
         sta tile_data, x
 
         ; Move our data flags to the destination, and flag ourselves as having just moved
-        lda #%10000000
+        lda #FLAG_MOVED_THIS_FRAME
         ora tile_flags, x
         sta tile_flags, y
         ; And finally clear the data flags for the puff of smoke, just to keep things tidy
-        lda #0
+        lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
 
         ; Queue up both rows
@@ -1331,11 +1337,11 @@ proceed_with_jump:
         sta tile_data, x
 
         ; Move our data flags to the destination, and flag ourselves as having just moved
-        lda #%10000000
+        lda #FLAG_MOVED_THIS_FRAME
         ora tile_flags, x
         sta tile_flags, y
         ; And finally clear the data flags for the puff of smoke, just to keep things tidy
-        lda #0
+        lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
 
         ; Queue up both rows
@@ -1403,11 +1409,11 @@ proceed_with_jump:
         sta tile_data, x
 
         ; Move our data flags to the destination, and flag ourselves as having just moved
-        lda #%10000000
+        lda #FLAG_MOVED_THIS_FRAME
         ora tile_flags, x
         sta tile_flags, y
         ; And finally clear the data flags for the puff of smoke, just to keep things tidy
-        lda #0
+        lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
 
         ; Queue up both rows
@@ -1585,7 +1591,7 @@ spawn_wrench:
         sta tile_data, y
         ; Set the flags on the wrench to indicate that we have just moved,
         ; this prevents us from going an extra square in the east/south directions
-        lda #%10000000
+        lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, y
         
         ldx TargetRow
@@ -1649,7 +1655,7 @@ done:
         ; This allows the player to attack us on what, to them, feels like the frame when we
         ; were still above ground.
         lda tile_flags, x
-        ora #%10000000
+        ora #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
         rts
 
@@ -1720,7 +1726,7 @@ spawn_new_wrench:
         lda tile_data, x
         sta tile_data, y
         ; Set the new wrench as active, so it isn't ticked multiple times
-        lda #%10000000
+        lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, y
         
         ldx TargetRow
