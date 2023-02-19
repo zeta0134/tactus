@@ -5,3 +5,4 @@ build
 *.dbg
 audiodump.raw
 *.pyc
+*.DS_Store
