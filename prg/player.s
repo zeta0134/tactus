@@ -106,9 +106,9 @@ MetaSpriteIndex := R0
         lda #1
         sta PlayerWeaponDmg
 
-        lda #4
+        lda #14
         sta PlayerHealth
-        lda #4
+        lda #14
         sta PlayerMaxHealth
         lda #0
         sta PlayerKeys

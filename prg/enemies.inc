@@ -74,3 +74,5 @@ ZOMBIE_TARGET_RADIUS = 8
 ; stand on a mole hole *while* a mole is rising, which would deal way too much
 ; damage AND look weird)
 MOLE_SUPPRESSION_RADIUS = 2
+
+FLAG_MOVED_THIS_FRAME = %10000000
