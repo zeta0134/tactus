@@ -1,6 +1,8 @@
 DEBUG_MODE = 0
 DEBUG_TIME_WASTE = 0
-DEBUG_DISABLE_MUSIC = 0
+DEBUG_DISABLE_MUSIC = 1
+
+DEBUG_TEST_FLOOR = 0
 
 .macro debug_color flags
         .if ::DEBUG_MODE
@@ -8,3 +10,4 @@ DEBUG_DISABLE_MUSIC = 0
         sta PPUMASK
         .endif
 .endmacro
+
