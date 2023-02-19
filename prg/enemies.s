@@ -1290,6 +1290,9 @@ CurrentTile := R15
         lda CurrentTile
         sta TargetTile
 
+        lda CurrentRow
+        sta TargetRow
+
         ; CHAAAAAAAARGE blindly forward
         inc TargetTile
         if_valid_destination proceed_with_jump
@@ -1338,6 +1341,7 @@ proceed_with_jump:
         ; Queue up both rows
         ldx CurrentRow
         jsr queue_row_x
+
         ldx TargetRow
         jsr queue_row_x
 
@@ -1357,6 +1361,9 @@ CurrentTile := R15
 
         lda CurrentTile
         sta TargetTile
+
+        lda CurrentRow
+        sta TargetRow
 
         ; CHAAAAAAAARGE blindly forward
         dec TargetTile
@@ -1406,6 +1413,7 @@ proceed_with_jump:
         ; Queue up both rows
         ldx CurrentRow
         jsr queue_row_x
+        
         ldx TargetRow
         jsr queue_row_x
 
