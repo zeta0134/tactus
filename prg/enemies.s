@@ -2203,7 +2203,7 @@ done_with_drops:
 
         ; Play an appropriately crunchy death sound
         st16 R0, sfx_defeat_enemy_pulse
-        jsr play_sfx_pulse2
+        jsr play_sfx_pulse1
         st16 R0, sfx_defeat_enemy_noise
         jsr play_sfx_noise
 
