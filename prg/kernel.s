@@ -298,10 +298,14 @@ MetaSpriteIndex := R0
         lda #0
         sta tempo_adjustment
 
+        
+        .if ::DEBUG_TEST_FLOOR
+        ; Generate an open debug floor plan, with fixed spawn locations
+        far_call FAR_demo_init_floor
+        .else
         ; Generate proper mazes and randomize player, exit, and boss
         far_call FAR_init_floor
-        ; Generate an open debug floor plan, with fixed spawn locations
-        ;far_call FAR_demo_init_floor
+        .endif
 
         st16 GameMode, room_init
         rts
