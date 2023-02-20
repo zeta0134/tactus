@@ -95,8 +95,13 @@ static_behaviors:
         .word no_behavior     ; $88 - wall top
         .word no_behavior     ; $8C - wall face
         .word no_behavior     ; $90 - pit edge
+        .word no_behavior     ; $94 - pit center
+        .word no_behavior     ; $98 - treasure chest
+        .word no_behavior     ; $9C - big key
+        .word no_behavior     ; $A0 - gold sack
+        .word update_weapon_shadow ; $A4 - weapon shadow
         ; safety: fill out the rest of the table
-        .repeat 27
+        .repeat 22
         .word no_behavior
         .endrepeat
 

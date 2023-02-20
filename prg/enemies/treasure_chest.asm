@@ -28,7 +28,7 @@ TargetIndex := R0
 TileId := R1
 AttackSquare := R3
 AttackLanded := R7
-WeaponPtr := R12 
+WeaponPtr := R11 
         ; Register the attack as a hit
         lda #1
         sta AttackLanded
