@@ -1,3 +1,10 @@
+                        ; ssccccdd
+SHADOW_STATE_MASK      = %11000000
+SHADOW_WEAPON_MASK     = %00111100
+SHADOW_DMG_MASK        = %00000011
+SHADOW_STATE_ACTIVE    = %00000000
+SHADOW_STATE_COLLECTED = %01000000
+
 ; map all 5 weapons to 16 entries, for a mostly fair random type
 ; we'll give longswords one extra slot, as they're a fairly decent
 ; weapon type that many players will find success with
@@ -24,64 +31,49 @@ weapon_damage_lut:
         .byte 1, 2, 3, 3
 
 ; ============================================================================================================================
-; ===                                           Enemy Update Behaviors                                                     ===
+; ===                                           Utility Functions                                                          ===
 ; ============================================================================================================================
 
-; ... crickets ...
-
-; ============================================================================================================================
-; ===                                      Player Attacks Enemy Behaviors (... kindof)                                     ===
-; ============================================================================================================================
-
-.proc spawn_weapon
-MetaSpriteIndex := R0
+.proc roll_weapon
 WeaponClassTemp := R1
-TargetIndex := R0
-TileId := R1
-AttackSquare := R3
-AttackLanded := R7
-WeaponPtr := R12 
         ; First we need to roll a weapon class
         ; TODO: this should almost certainly use a FIXED seed. Without this, the player
         ; can leave and re-enter the room to try the roll again, which is scummy
         jsr next_fixed_rand
-        and #%00111111 ; low 2 bits = weapon strength, middle 4 bits = weapon type from table
+        and #(SHADOW_WEAPON_MASK | SHADOW_DMG_MASK) ; low 2 bits = weapon strength, middle 4 bits = weapon type from table
         sta WeaponClassTemp
         ; TODO: chests should spawn any treasure, not just a weapon. But as weapons are complicated...
         ; let's do those first.
         ; weapon strength should be clamped based on the current floor (and later, zone?)
-        and #%00000011 ; isolate the damage index
+        and #SHADOW_DMG_MASK ; isolate the damage index
         cmp PlayerFloor
         bcc zone_index_valid
         lda #0 ; force a lvl 1 weapon; this affects spawn rate of higher tier weapons on each floor
 zone_index_valid:
         tax
         lda WeaponClassTemp
-        and #%00111100 ; isolate weapon type
+        and #SHADOW_WEAPON_MASK   ; isolate weapon type
         ora weapon_damage_lut, x  ;  apply the damage bits here
         sta WeaponClassTemp
+        rts
+.endproc
 
-spawn_weapon:
-        ; Spawn a sprite to hold the weapon
-        jsr find_unused_sprite
-        ldx MetaSpriteIndex
-        cpx #$FF
-        beq sprite_failed
-        ; We need to despawn this later, so store the index in the data byte for this tile
-        ldy AttackSquare
-        txa
-        sta tile_data, y
+.proc draw_weapon_sprite
+MetaSpriteIndex := R0
+WeaponClassTemp := R1
+DestinationSquare := R3
+WeaponPtr := R11
         ; This is an active sprite, it does not move
         ; and the palette we choose here will be the same as the weapon class low 2 bits
         lda WeaponClassTemp
-        and #%00000011
+        and #SHADOW_DMG_MASK
         ora #(SPRITE_ACTIVE)
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
         lda #$FF ; irrelevant
         sta sprite_table + MetaSpriteState::LifetimeBeats, x
         ; the X and Y position will be based on our current location, very similar to
         ; how we spawn death sprites
-        ldy AttackSquare
+        ldy DestinationSquare
         lda tile_index_to_col_lut, y
         .repeat 4
         asl
@@ -116,14 +108,115 @@ spawn_weapon:
         lda (WeaponPtr), y
         ldx MetaSpriteIndex
         sta sprite_table + MetaSpriteState::TileIndex, x
-        ; *whew.* Okay, now we just need to preserve the WeaponClass byte as tile flags. for later use
+
+        rts
+.endproc
+
+; ============================================================================================================================
+; ===                                           Enemy Update Behaviors                                                     ===
+; ============================================================================================================================
+
+.proc update_weapon_shadow
+PlayerTile := R0
+MetaSpriteIndex := R0
+WeaponClassTemp := R1
+DestinationSquare := R3
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+
+check_collected_state:
+        ; If we are currently in a collected state...
+        ldx CurrentTile
+        lda tile_flags, x
+        and #SHADOW_STATE_MASK
+        cmp #SHADOW_STATE_COLLECTED
+        beq check_player_position
+        rts
+
+check_player_position:
+        ; ... and the player is not standing right on top of us ...
+        lda CurrentRow
+        cmp PlayerRow
+        bne spawn_old_weapon
+        ldx CurrentTile
+        lda tile_index_to_col_lut, x ; A is now effectively CurrentCol
+        cmp PlayerCol
+        bne spawn_old_weapon
+        rts
+
+spawn_old_weapon:
+        ; Spawn a sprite to hold the weapon
+        jsr find_unused_sprite
+        ldx MetaSpriteIndex
+        cpx #$FF
+        beq sprite_failed
+
+        ; We need to despawn this later, so store the index in the data byte for this tile
+        ldy CurrentTile
+        txa
+        sta tile_data, y
+
+        ; Draw the sprite based on the old weapon, which is stashed in the current tile_flags
+        lda tile_flags, y
+        and #(SHADOW_WEAPON_MASK | SHADOW_DMG_MASK)
+        sta WeaponClassTemp
+
+        lda CurrentTile
+        sta DestinationSquare
+
+        jsr draw_weapon_sprite
+
+        ; Okay, now we just need to preserve the WeaponClass byte as tile flags. for later use
         ; when this thing is collected by the player
+        ldx CurrentTile
         lda WeaponClassTemp
-        ldx AttackSquare
+        ora #(SHADOW_STATE_ACTIVE)
+        sta tile_flags, x
+        ; ... and... we're done?
+
+
+sprite_failed:
+        ; this really *shouldn't* happen, but if it does, try again next beat
+        rts
+.endproc
+
+; ============================================================================================================================
+; ===                                      Player Attacks Enemy Behaviors (... kindof)                                     ===
+; ============================================================================================================================
+
+.proc spawn_weapon
+MetaSpriteIndex := R0
+WeaponClassTemp := R1
+TargetIndex := R0
+TileId := R1
+DestinationSquare := R3
+WeaponPtr := R11 
+        jsr roll_weapon
+
+spawn_weapon:
+        ; Spawn a sprite to hold the weapon
+        jsr find_unused_sprite
+        ldx MetaSpriteIndex
+        cpx #$FF
+        beq sprite_failed
+
+        ; We need to despawn this later, so store the index in the data byte for this tile
+        ldy DestinationSquare
+        txa
+        sta tile_data, y
+
+        jsr draw_weapon_sprite
+
+        ; Okay, now we just need to preserve the WeaponClass byte as tile flags. for later use
+        ; when this thing is collected by the player
+        ldx DestinationSquare
+        lda WeaponClassTemp
+        ora #(SHADOW_STATE_ACTIVE)
         sta tile_flags, x
         ; and finally, set this tile to a weapon shadow
 
-        lda AttackSquare
+        lda DestinationSquare
         sta TargetIndex
         lda #TILE_WEAPON_SHADOW
         sta TileId
@@ -143,7 +236,27 @@ sprite_failed:
 .proc collect_weapon
 TargetIndex := R0
 TileId := R1
+OldWeaponTmp := R2
 TargetSquare := R13
+        ldx TargetSquare
+        lda tile_flags, x
+        and #SHADOW_STATE_MASK
+        cmp #SHADOW_STATE_ACTIVE
+        beq proceed_to_collect
+        rts
+
+proceed_to_collect:
+        ; First, compute the player's old weapon in tmp form, since we're about to overwrite it
+        lda PlayerWeapon ; ....wwww
+        asl
+        asl              ; ..wwww..
+        and #%00111100
+        sta OldWeaponTmp
+        lda PlayerWeaponDmg ; ......dd
+        and #%00000011
+        ora OldWeaponTmp
+        sta OldWeaponTmp
+
         ; We stuffed the WeaponClassTemp variable in tile_flags, so use that to determine
         ; the weapon properties
         ldx TargetSquare
@@ -174,15 +287,11 @@ TargetSquare := R13
         lda #0
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
 
-        ; Finally, draw a basic floor tile here
-        lda TargetSquare
-        sta TargetIndex
-        lda #TILE_REGULAR_FLOOR
-        sta TileId
-        jsr draw_active_tile
+        ; Switch our own state to "collected", so we can respawn the player's
+        ; original weapon when they move off this square
         ldx TargetSquare
-        lda #0
-        sta tile_data, x
+        lda OldWeaponTmp
+        ora #(SHADOW_STATE_COLLECTED)
         sta tile_flags, x
 
         ; We have *collected a treasure*! Mark this as such in the current room data
