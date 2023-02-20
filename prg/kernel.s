@@ -340,7 +340,15 @@ MetaSpriteIndex := R0
 
 not_victory:
         inc PlayerFloor
+        
+        .if ::DEBUG_TEST_FLOOR
+        ; Generate an open debug floor plan, with fixed spawn locations
+        far_call FAR_demo_init_floor
+        .else
+        ; Generate proper mazes and randomize player, exit, and boss
         far_call FAR_init_floor
+        .endif
+        
         ; reset the player's position to the center of the room
         lda #6
         sta PlayerRow
