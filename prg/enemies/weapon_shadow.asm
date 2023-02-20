@@ -14,18 +14,19 @@ cheaty_weapon_lut:
         .byte WEAPON_LONGSWORD
         .byte WEAPON_SPEAR
         .byte WEAPON_FLAIL
-        .byte WEAPON_DAGGER
-        .byte WEAPON_BROADSWORD
-        .byte WEAPON_LONGSWORD
-        .byte WEAPON_SPEAR
-        .byte WEAPON_FLAIL
-        .byte WEAPON_DAGGER
-        .byte WEAPON_BROADSWORD
-        .byte WEAPON_LONGSWORD
-        .byte WEAPON_SPEAR
-        .byte WEAPON_FLAIL
+
         ; bonus percent
+        .byte WEAPON_BROADSWORD
+        .byte WEAPON_BROADSWORD
+        .byte WEAPON_BROADSWORD
         .byte WEAPON_LONGSWORD
+        .byte WEAPON_LONGSWORD
+        .byte WEAPON_LONGSWORD
+        .byte WEAPON_SPEAR
+        .byte WEAPON_SPEAR
+        .byte WEAPON_SPEAR
+        .byte WEAPON_FLAIL
+        .byte WEAPON_FLAIL
 
 weapon_damage_lut:
         .byte 1, 2, 3, 3
