@@ -51,11 +51,11 @@ room_loop:
         ldx #0
 seed_loop:
         ; jsr next_rand
-        lda #42
+        lda #DEBUG_SEED
         sta room_seeds, x
         inx
         cpx #16
-        bne seed_loop        
+        bne seed_loop
         
         ; TODO: pick the boss, exit, and player spawn locations here
         ; FOR TESTING, the boss room will be slot 1

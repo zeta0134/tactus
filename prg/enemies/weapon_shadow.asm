@@ -36,14 +36,13 @@ weapon_damage_lut:
 
 .proc roll_weapon
 WeaponClassTemp := R1
+        jsr set_fixed_room_seed
+
+perform_roll:
         ; First we need to roll a weapon class
-        ; TODO: this should almost certainly use a FIXED seed. Without this, the player
-        ; can leave and re-enter the room to try the roll again, which is scummy
         jsr next_fixed_rand
         and #(SHADOW_WEAPON_MASK | SHADOW_DMG_MASK) ; low 2 bits = weapon strength, middle 4 bits = weapon type from table
         sta WeaponClassTemp
-        ; TODO: chests should spawn any treasure, not just a weapon. But as weapons are complicated...
-        ; let's do those first.
         ; weapon strength should be clamped based on the current floor (and later, zone?)
         and #SHADOW_DMG_MASK ; isolate the damage index
         cmp PlayerFloor
@@ -55,6 +54,25 @@ zone_index_valid:
         and #SHADOW_WEAPON_MASK   ; isolate weapon type
         ora weapon_damage_lut, x  ;  apply the damage bits here
         sta WeaponClassTemp
+check_reroll_condition:
+        ; If this weapon is a totally different class from the player's equipped weapon, then keep it
+        lda WeaponClassTemp
+        and #SHADOW_WEAPON_MASK
+        lsr
+        lsr
+        tax
+        lda cheaty_weapon_lut, x
+        cmp PlayerWeapon
+        bne keep_this_weapon
+        ; Since this is the same weapon class the player is holding, keep it only if it is an upgrade
+        lda WeaponClassTemp
+        and #SHADOW_DMG_MASK
+        cmp PlayerWeaponDmg
+        beq perform_roll
+        bcs keep_this_weapon
+        jmp perform_roll
+
+keep_this_weapon:
         rts
 .endproc
 
