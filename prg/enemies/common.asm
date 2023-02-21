@@ -333,6 +333,9 @@ done_with_drops:
         lda #1
         sta EnemyDiedThisFrame
 
+        ; because we updated ourselves this frame, but we are no longer, decrement ourselves again
+        dec enemies_active
+
         ; Reward the player with the amount of gold this enemy is worth
         add16b PlayerGold, GoldToAward
 

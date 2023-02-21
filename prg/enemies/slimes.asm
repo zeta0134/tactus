@@ -26,7 +26,6 @@ advanced:
 TargetTile := R0
 CurrentRow := R14
 CurrentTile := R15
-        ; TODO: make several slime variants, with behavior keyed by the palette color
 
         ; Intermediate slime: every 2 beats, move horizontally. We'll use these state
         ; bits, which normally start all zero:
@@ -319,6 +318,9 @@ done_with_drops:
 
         lda #1
         sta EnemyDiedThisFrame
+
+        ; because we updated ourselves this frame, but we are no longer, decrement ourselves again
+        dec enemies_active
 
         rts
 .endproc

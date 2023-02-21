@@ -348,7 +348,7 @@ not_victory:
         ; Generate proper mazes and randomize player, exit, and boss
         far_call FAR_init_floor
         .endif
-        
+
         ; reset the player's position to the center of the room
         lda #6
         sta PlayerRow
@@ -392,8 +392,8 @@ not_victory:
         st16 GameMode, wait_for_player_draw_1
 
         ; - Resolve the player's action
-        far_call FAR_handle_room_spawns
         jsr update_player
+        far_call FAR_handle_room_spawns
 
         ; - Queue up any changed squares to the **active** buffer
         ; - Begin playback of any sprite animations (?)

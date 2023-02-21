@@ -235,15 +235,25 @@ room_cleared:
 
 .proc FAR_handle_room_spawns
 EntityId := R1
+check_room_clear:
         lda enemies_active
         bne all_done
-        lda chest_spawned
-        bne all_done
-        ; This room was just cleared! Mark it so
+
+        ; Is this room already cleared?
         ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_CLEARED
+        bne check_chest_spawn
+
+        ; This room is freshly cleared! Mark it so
         lda room_flags, x
         ora #ROOM_FLAG_CLEARED
         sta room_flags, x
+        jmp all_done
+
+check_chest_spawn:
+        lda chest_spawned
+        bne all_done
 
         ; load the fixed seed for the players current room
         jsr set_fixed_room_seed
@@ -253,6 +263,7 @@ EntityId := R1
         jsr spawn_entity
         lda #1
         sta chest_spawned
+        
 all_done:
         ; reset the enemies active counter for the next beat
         lda #0

@@ -7,6 +7,7 @@
         .include "input.inc"
         .include "kernel.inc"
         .include "bhop/longbranch.inc"
+        .include "levels.inc"
         .include "nes.inc"
         .include "player.inc"
         .include "sound.inc"
@@ -1023,8 +1024,10 @@ exit_bottom:
         sta PlayerRow
         jmp converge
 converge:
-        ; TODO: this probably needs to be a fade out state, rather than right to room init
         st16 GameMode, room_init
+        ; mark the room as "busy", this prevents us clearing the next room prematurely
+        lda #1
+        sta enemies_active
         rts
 .endproc
 
