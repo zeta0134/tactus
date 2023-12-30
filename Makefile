@@ -64,7 +64,7 @@ profile: dir $(ROM_NAME)
 everdrive: dir $(ROM_NAME)
 	mono vendor/edlink-n8.exe $(ROM_NAME)
 
-$(ROM_NAME): $(SOURCEDIR)/action53.cfg $(O_FILES)
+$(ROM_NAME): $(SOURCEDIR)/rainbow.cfg $(O_FILES)
 	ld65 -m $(BUILDDIR)/map.txt --dbgfile $(DBG_NAME) -o $@ -C $^
 
 $(BUILDDIR)/%.o: $(SOURCEDIR)/%.s $(BIN_FILES) $(ANIMATED_CHR_FILES) $(STATIC_CHR_FILES) $(LAYOUT_INCS_FILES) $(FLOOR_INCS_FILES)

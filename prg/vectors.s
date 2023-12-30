@@ -1,6 +1,5 @@
 .include "nes.inc"
 
-.include "action53.inc"
 .include "battlefield.inc"
 .include "bhop/bhop.inc"
 .include "chr.inc"
@@ -9,6 +8,7 @@
 .include "main.inc"
 .include "memory_util.inc"
 .include "prng.inc"
+.include "rainbow.inc"
 .include "sound.inc"
 .include "vram_buffer.inc"
 .include "zeropage.inc"
@@ -32,7 +32,7 @@ reset:
         ldx #$ff       ; initialize stack
         txs
 
-        jsr init_action53
+        jsr rainbow_init
 
         ; Wait for the PPU to finish warming up
         spinwait_for_vblank
@@ -132,7 +132,7 @@ write_ppuctrl:
         lda PpuScrollY
         sta PPUSCROLL
 
-        a53_set_chr CurrentChrBank
+        rainbow_set_8k_chr CurrentChrBank
 
         ; poll for input *after* setting the scroll position
         jsr poll_input
@@ -140,18 +140,9 @@ write_ppuctrl:
         jsr next_rand
 
 nmi_soft_disable:
-        ; because audio can trigger bank switching, here we read and preserve the action53 shadow register
-        lda action53_shadow
-        pha
-
         ; Here we *only* update the audio engine, nothing else. This is mostly to
         ; smooth over transitions when loading a new level.
         jsr update_audio
-
-        ; And now we re-write that shadow, just in case
-        pla
-        sta action53_shadow
-        sta A53_REG_SELECT
 
         ; restore registers
         pla

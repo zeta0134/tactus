@@ -27,7 +27,7 @@
 .macro access_data_bank TargetBank
         lda CurrentBank
         pha
-        a53_set_prg TargetBank
+        rainbow_set_16k_prg TargetBank
         lda TargetBank
         sta CurrentBank
 .endmacro
@@ -35,5 +35,5 @@
 .macro restore_previous_bank
         pla
         sta CurrentBank
-        a53_set_prg CurrentBank
+        rainbow_set_16k_prg CurrentBank
 .endmacro

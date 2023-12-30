@@ -1,7 +1,7 @@
         .setcpu "6502"
-        .include "action53.inc"
         .include "far_call.inc"
         .include "nes.inc"
+        .include "rainbow.inc"
 
         .zeropage
 TargetBank: .byte $00
@@ -15,7 +15,7 @@ JumpTarget: .word $0000
         lda CurrentBank
         pha
 
-        a53_set_prg TargetBank
+        rainbow_set_16k_prg TargetBank
 
         lda TargetBank
         sta CurrentBank
@@ -31,7 +31,7 @@ return_from_indirect:
         ; restore the original bank
         pla
         sta CurrentBank
-        a53_set_prg CurrentBank
+        rainbow_set_16k_prg CurrentBank
 
 finished:
         rts

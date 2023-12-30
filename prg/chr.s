@@ -1,9 +1,9 @@
-        .include "action53.inc"
         .include "chr.inc"
         .include "compression.inc"
         .include "kernel.inc"
         .include "nes.inc"
         .include "ppu.inc"
+        .include "rainbow.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
 
@@ -180,7 +180,7 @@ tile_loop:
         lda #0
         sta ChrBank
 bank_loop:
-        a53_set_chr ChrBank
+        rainbow_set_8k_chr ChrBank
         lda #$02
         sta MemcpySourceAddr+1
         lda ChrBank
@@ -240,7 +240,7 @@ tile_loop:
         lda #0
         sta ChrBank
 bank_loop:
-        a53_set_chr ChrBank
+        rainbow_set_8k_chr ChrBank
         ; for static tiles, duplicate the decompressed result four times
         st16 MemcpySourceAddr, $0200
         st16 MemcpyLength, 64
@@ -273,7 +273,7 @@ ChrBank := R8
         lda #0
         sta ChrBank
 bank_loop:
-        a53_set_chr ChrBank
+        rainbow_set_8k_chr ChrBank
         st16 SourceAddr, hud_font
         st16 Length, $0300
         set_ppuaddr #$0D00
@@ -292,7 +292,7 @@ ChrBank := R8
         lda #0
         sta ChrBank
 bank_loop:
-        a53_set_chr ChrBank
+        rainbow_set_8k_chr ChrBank
         st16 SourceAddr, title_chr
         st16 Length, $1000
         set_ppuaddr #$0000

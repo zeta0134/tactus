@@ -1,6 +1,5 @@
         .macpack longbranch
 
-        .include "action53.inc"
         .include "battlefield.inc"
         .include "enemies.inc"
         .include "far_call.inc"
