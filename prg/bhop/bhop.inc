@@ -3,9 +3,10 @@
 ; will not pollute the global namespace.
 
 .import bhop_init, bhop_play
-.import bhop_mute_channel, bhop_unmute_channel, blarggsaw_irq, zetasaw_irq, irq_active, irq_enabled, manual_nmi_needed, manual_oam_needed
+.import bhop_set_module_bank
+.import bhop_mute_channel, bhop_unmute_channel, blarggsaw_irq, zetasaw_irq
 
-; dungeon-game specific variables
+; game specific variables
 .importzp current_music_variant, target_music_variant, tempo_adjustment
-.import global_attenuation
+.import global_attenuation ; UNIMPLEMENTED!
 .import row_counter

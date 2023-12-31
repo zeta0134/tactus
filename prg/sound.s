@@ -77,9 +77,10 @@ track_table_variant_length:
         sta MusicCurrentBank
 
         access_data_bank MusicCurrentBank
-        ; TODO: if music lives on a different bank, swap that in
 
         lda track_table_song, x
+        ldy #$80
+        ldx #$00
         jsr bhop_init
 
         restore_previous_bank
@@ -154,6 +155,8 @@ done:
         sta MusicCurrentBank
         access_data_bank MusicCurrentBank
         lda track_table_song, x
+        ldy #$80
+        ldx #$00
         jsr bhop_init
         restore_previous_bank
         ; all new tracks should start with variant 0

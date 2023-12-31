@@ -47,16 +47,6 @@ reset:
 
 
 .proc nmi
-        bit irq_active
-        bpl safe_to_run_nmi
-        dec manual_nmi_needed
-        rti ; exit immediately; IRQ will continue and call NMI when it is done
-safe_to_run_nmi:
-        jsr manual_nmi_handler
-        rti
-.endproc
-
-.proc manual_nmi_handler
         ; preserve registers
         pha
         txa
@@ -68,19 +58,12 @@ safe_to_run_nmi:
         lda NmiSoftDisable
         bne nmi_soft_disable
 
-        bit irq_enabled
-        bpl perform_oam_dma
-        dec manual_oam_needed ; Perform OAM DMA during the IRQ routine
-        ; allow interrupts during nmi as early as possible
-        cli
-        jmp done_with_oam
 perform_oam_dma:
         ; do the sprite thing
         lda #$00
         sta OAMADDR
         lda #$02
         sta OAM_DMA
-done_with_oam:
 
         lda GameloopCounter
         cmp LastNmi
@@ -151,22 +134,8 @@ nmi_soft_disable:
         tax
         pla
         ; all done
-        rts
+        rti
 .endproc
-
-.export manual_nmi_handler
-
-; TODO: Pick one of these, probably
-.align 64
-all_00_byte: .byte $00
-.align 64
-all_ff_byte: .byte $FF
-
-.export all_00_byte, all_ff_byte
-
-        ; This region is unused, and reserved for potential nesdev-2022 compo purposes
-        .org $FFD0
-        .res 30 
 
         ;
         ; Labels nmi/reset/irq are part of prg3_e000.s
@@ -174,4 +143,4 @@ all_ff_byte: .byte $FF
         .segment "VECTORS"
         .addr nmi
         .addr reset
-        .addr zetasaw_irq
+        .addr irq

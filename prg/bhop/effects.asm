@@ -20,7 +20,7 @@ scratch_target_frequency: .res 2
 ; table reversed / inverted, as appropriate, to generate the other 3 sections
 ; and complete the full waveform.
 
-; prep: 
+; prep:
 ;   x contains channel_index
 ; return:
 ;   a - vibrato strength, signed
@@ -61,7 +61,7 @@ invert_read:
         rts
 .endproc
 
-; prep: 
+; prep:
 ;   channel_index set for the desired channel
 ;   detuned_frequency contains base pitch
 ; effects:
@@ -77,7 +77,7 @@ invert_read:
         clc
         adc channel_vibrato_accumulator, x
         sta channel_vibrato_accumulator, x
-        
+
         ; now apply that to detuned_frequency
         jsr read_vibrato_lut ; does not clobber x
         sta scratch_byte
@@ -94,12 +94,64 @@ done:
         rts
 .endproc
 
-; prep: 
+; prep:
 ;   channel_index set for the desired channel
 ;   base_note contains the tracked note
 ; effects:
 ;   relative_frequency gets the arp'd note
 .proc update_arp
+        ldx channel_index
+        lda channel_pitch_effects_active, x
+        and #(PITCH_EFFECT_ARP)
+        beq done
+
+        ; the current arp counter determines which offset we apply to base_note
+        lda channel_arpeggio_counter, x
+        beq first_tick
+        cmp #1
+        beq second_tick
+third_tick:
+        ; add the low nybble to the base note
+        lda channel_arpeggio_settings, x
+        and #$0F
+        clc
+        adc channel_base_note, x
+        jmp apply_adjusted_note
+second_tick:
+        ; add the high nybble to the base note
+        lda channel_arpeggio_settings, x
+        lsr
+        lsr
+        lsr
+        lsr
+        clc
+        adc channel_base_note, x
+        jmp apply_adjusted_note
+first_tick:
+        ; use the base_note directly
+        lda channel_base_note, x
+        ; fall through to:
+apply_adjusted_note:
+        jsr set_channel_relative_frequency
+increment_arp_counter:
+        inc channel_arpeggio_counter, x
+        lda #3
+        cmp channel_arpeggio_counter, x
+        bne done
+        lda #0
+        sta channel_arpeggio_counter, x
+
+done:
+        rts
+.endproc
+
+.if ::BHOP_ZSAW_ENABLED
+; prep:
+;   channel_index set for the desired channel
+;   base_note contains the tracked note
+; effects:
+;   relative_frequency gets the arp'd note
+.proc update_arp_zsaw
         ldx channel_index
         lda channel_pitch_effects_active, x
         and #(PITCH_EFFECT_ARP)
@@ -135,10 +187,7 @@ first_tick:
         tay
         ; fall through to:
 apply_adjusted_note:
-        lda ntsc_period_low, y
-        sta channel_relative_frequency_low, x
-        lda ntsc_period_high, y
-        sta channel_relative_frequency_high, x
+        sty zsaw_relative_note
 increment_arp_counter:
         inc channel_arpeggio_counter, x
         lda #3
@@ -150,10 +199,11 @@ increment_arp_counter:
 done:
         rts
 .endproc
+.endif
 
 ; sortof a dispatch function, since pitch effects are all processed at
 ; the same time but have subtly different behavior
-; prep: 
+; prep:
 ;   channel_index set for the desired channel
 ;   base_note contains the triggered OR current target note (depending on effect)
 ;   relative_frequency contains the active frequency
@@ -165,7 +215,7 @@ done:
         lda channel_pitch_effects_active, x
         and #($FF - PITCH_EFFECT_ARP)
         beq done ; no effects active at all
-        
+
         ; here we abuse the flag layout for the effects; only one of these
         ; will ever be enabled at a time, and they are in this order:
         ;PITCH_EFFECT_UP           = %00000001
@@ -235,18 +285,16 @@ done:
 ; note: does not disable itself automatically (that's the "automatic" part)
 .proc update_portamento
         ; work out the target frequency based on the base_note
-        ldy channel_base_note, x
-        lda ntsc_period_low, y
-        sta scratch_target_frequency
-        lda ntsc_period_high, y
-        sta scratch_target_frequency+1
+        lda channel_base_note, x
+        jsr set_scratch_target_frequency
+
         ; determine if our current relative_frequency is above or below the target
 check_high:
         lda channel_relative_frequency_high, x
         cmp scratch_target_frequency+1
         beq check_low
         bcc pitch_up ; channel frequency (A) is lower than target (M)
-        jmp pitch_down   
+        jmp pitch_down
 check_low:
         lda channel_relative_frequency_low, x
         cmp scratch_target_frequency
@@ -346,7 +394,7 @@ apply_effect:
 disable_effect:
         lda #0
         sta channel_pitch_effects_active, x
-done:   
+done:
         rts
 .endproc
 
@@ -393,7 +441,7 @@ apply_effect:
 disable_effect:
         lda #0
         sta channel_pitch_effects_active, x
-done:   
+done:
         rts
 .endproc
 
@@ -437,7 +485,7 @@ no_tremolo:
 ; Read the "tremolo" LUT, which is actually a riff on the vibrato LUT. Here we only
 ; care about the first half of the table, so we need the mirroring logic, but not the
 ; negation logic.
-; prep: 
+; prep:
 ;   x contains channel_index
 ; return:
 ;   a - tremolo strength, unsigned
@@ -467,7 +515,7 @@ store_index:
         lda channel_tremolo_settings, x
         and #$F0
         ora scratch_byte
-        tay        
+        tay
 normal_read:
         lda vibrato_lut, y
         ; tremolo is at half-strength

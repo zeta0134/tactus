@@ -1,17 +1,18 @@
-.scope BHOP
 .include "bhop/config.inc"
+.if ::BHOP_ZSAW_ENABLED
+.include "bhop/zsaw.asm"
+.endif
+
+.scope BHOP
 .include "bhop/bhop_internal.inc"
 .include "bhop/longbranch.inc"
 
-NUM_CHANNELS = 6 ;  note: this might change with expansion support
-
 .include "bhop/commands.asm"
-.include "bhop/effects.asm"    
-.include "bhop/blarggsaw.asm"    
+.include "bhop/effects.asm"
 
         .segment BHOP_ZP_SEGMENT
 ; scratch ptr, used for all sorts of indirect reads
-bhop_ptr: .word $0000 
+bhop_ptr: .word $0000
 ; pattern pointers, read repeatedly when updating
 ; rows in a loop, we'll want access to these to be quick
 pattern_ptr: .word $0000
@@ -19,6 +20,7 @@ channel_index: .byte $00
 scratch_byte: .byte $00
 
         .segment BHOP_RAM_SEGMENT
+music_header_ptr: .word $0000
 tempo_counter: .word $0000
 tempo_cmp: .word $0000
 tempo: .byte $00
@@ -29,15 +31,32 @@ frame_cmp: .byte $00
 
 .export row_counter
 
+module_flags: .byte $00
+
+.if ::BHOP_ZSAW_ENABLED
+zsaw_relative_note: .byte $00
+.endif
+
+.if ::BHOP_PATTERN_BANKING
+module_bank: .byte $00
+current_music_bank: .byte $00
+.endif
 song_ptr: .word $0000
 frame_ptr: .word $0000
 
 shadow_pulse1_freq_hi: .byte $00
 shadow_pulse2_freq_hi: .byte $00
+.if ::BHOP_MMC5_ENABLED
+shadow_mmc5_pulse1_freq_hi: .byte $00
+shadow_mmc5_pulse2_freq_hi: .byte $00
+.endif
 
 ; channel state tables
 channel_pattern_ptr_low: .res BHOP::NUM_CHANNELS
 channel_pattern_ptr_high: .res BHOP::NUM_CHANNELS
+.if ::BHOP_PATTERN_BANKING
+channel_pattern_bank: .res BHOP::NUM_CHANNELS
+.endif
 channel_status: .res BHOP::NUM_CHANNELS
 channel_global_duration: .res BHOP::NUM_CHANNELS
 channel_row_delay_counter: .res BHOP::NUM_CHANNELS
@@ -56,6 +75,11 @@ channel_instrument_volume: .res BHOP::NUM_CHANNELS
 channel_instrument_duty: .res BHOP::NUM_CHANNELS
 channel_selected_instrument: .res BHOP::NUM_CHANNELS
 channel_pitch_effects_active: .res BHOP::NUM_CHANNELS
+
+channel_volume_mode: .res BHOP::NUM_CHANNELS
+
+; DPCM status
+dpcm_status: .byte $00
 
 ; sequence state tables
 sequences_enabled: .res BHOP::NUM_CHANNELS
@@ -79,8 +103,27 @@ duty_sequence_index: .res BHOP::NUM_CHANNELS
 ; memory for various effects
 effect_note_delay: .res BHOP::NUM_CHANNELS
 effect_cut_delay: .res BHOP::NUM_CHANNELS
+.if ::BHOP_DELAYED_RELEASE_ENABLED
+effect_release_delay: .res BHOP::NUM_CHANNELS
+.endif
 effect_skip_target: .byte $00
+
+; Oxx
+groove_index: .byte $00
+groove_position: .byte $00
+
+; Wxx
+effect_dpcm_pitch: .byte $00
+
+; Xxx
+effect_retrigger_period: .byte $00
+effect_retrigger_counter: .byte $00
+
+; Yxx
 effect_dpcm_offset: .byte $00
+
+; Zxx
+effect_dac_buffer: .byte $00
 
 global_attenuation: .byte $00
 TRIANGLE_ATTENUATION_THRESHOLD = 4
@@ -90,7 +133,7 @@ DPCM_ATTENUATION_THRESHOLD = 4
 
         .segment BHOP_PLAYER_SEGMENT
         ; global
-        .export bhop_init, bhop_play, bhop_mute_channel, bhop_unmute_channel
+        .export bhop_init, bhop_play, bhop_mute_channel, bhop_unmute_channel, bhop_set_module_bank
 
 .include "bhop/midi_lut.inc"
 
@@ -99,6 +142,18 @@ DPCM_ATTENUATION_THRESHOLD = 4
         sta bhop_ptr
         lda address+1
         sta bhop_ptr+1
+.endmacro
+
+.macro prepare_ptr_with_fixed_offset address, offset
+        prepare_ptr address
+        ldy #offset
+        lda (bhop_ptr), y
+        pha
+        iny
+        lda (bhop_ptr), y
+        sta bhop_ptr+1
+        pla
+        sta bhop_ptr
 .endmacro
 
 ; add a signed byte, stored in value, to a 16bit word
@@ -118,7 +173,7 @@ DPCM_ATTENUATION_THRESHOLD = 4
         lda value
         and #$80 ;extract the high bit
         beq positive
-        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry 
+        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry
         ; note: unless a signed overflow occurred, carry will usually be *set* in this case
 positive:
         ; the high bit was low; a contains #$00, so add that plus carry
@@ -128,14 +183,29 @@ positive:
 .endscope
 .endmacro
 
-; TODO: I believe the convention is to pick a song here?
-; right now lots of stuff is hard coded, that could instead
-; be read from the chosen song header
+.proc bhop_set_module_bank
+.if ::BHOP_PATTERN_BANKING
+        sta module_bank
+.endif
+        rts
+.endproc
 
 ; param: song index (a)
+;        Low byte pointer to the music data (x)
+;        High byte pointer to the music data (y)
 .proc bhop_init
         ; preserve parameters
         pha ; song index
+
+        ; initialize bhop_ptr with the song header
+        stx music_header_ptr
+        sty music_header_ptr+1
+
+.if ::BHOP_PATTERN_BANKING
+        lda module_bank
+        sta current_music_bank
+        jsr BHOP_PATTERN_SWITCH_ROUTINE
+.endif
 
         ; global initialization things
         lda #00
@@ -143,9 +213,10 @@ positive:
         sta tempo_counter+1
         sta row_counter
         sta frame_counter
+        sta groove_index
 
         ; switch to the requested song
-        prepare_ptr BHOP_MUSIC_BASE + FtModuleHeader::song_list
+        prepare_ptr_with_fixed_offset music_header_ptr, FtModuleHeader::song_list
 
         pla
         asl ; song list is made of words
@@ -156,12 +227,27 @@ positive:
         lda (bhop_ptr), y
         sta song_ptr+1
 
+.if ::BHOP_PATTERN_BANKING
+        ; load the module flags from the header before changing the pointer
+        prepare_ptr music_header_ptr
+        ldy #FtModuleHeader::flags
+        lda (bhop_ptr), y
+        sta module_flags
+.endif
+
         ; load speed and tempo from the requested song
         prepare_ptr song_ptr
         ldy #SongInfo::speed
         lda (bhop_ptr), y
+        beq song_uses_groove
+song_uses_speed:
         tax
         jsr set_speed
+song_uses_groove:
+        ldy #SongInfo::groove_position
+        lda (bhop_ptr), y
+        sta groove_index
+        sta groove_position
         ldy #SongInfo::tempo
         lda (bhop_ptr), y
         sta tempo
@@ -171,6 +257,13 @@ positive:
         ldy #SongInfo::pattern_length
         lda (bhop_ptr), y
         sta row_cmp
+
+        ; If this song has grooves enabled, then apply the first groove right away
+        jsr update_groove
+        ; Now, to work around an off-by-one startup condition with when advance_pattern_rows
+        ; gets called for the first time, reset the groove position
+        lda groove_index
+        sta groove_position
 
         ; initialize at the first frame, and prime our pattern pointers
         ldx #0
@@ -183,7 +276,21 @@ positive:
         sta channel_volume + PULSE_2_INDEX
         sta channel_volume + TRIANGLE_INDEX
         sta channel_volume + NOISE_INDEX
-        sta channel_volume + BLARGGSAW_INDEX
+        .if ::BHOP_ZSAW_ENABLED
+        sta channel_volume + ZSAW_INDEX
+        .endif
+        .if ::BHOP_MMC5_ENABLED
+        lda #$0F
+        sta channel_volume + MMC5_PULSE_1_INDEX
+        sta channel_volume + MMC5_PULSE_2_INDEX
+        .endif
+        .if ::BHOP_VRC6_ENABLED
+        lda #$0F
+        sta channel_volume + VRC6_PULSE_1_INDEX
+        sta channel_volume + VRC6_PULSE_2_INDEX
+        lda #$3F
+        sta channel_volume + VRC6_SAWTOOTH_INDEX
+        .endif
 
         ; disable any active effects
         lda #0
@@ -192,7 +299,18 @@ positive:
         sta channel_pitch_effects_active + TRIANGLE_INDEX
         sta channel_pitch_effects_active + NOISE_INDEX
         sta channel_pitch_effects_active + DPCM_INDEX
-        sta channel_pitch_effects_active + BLARGGSAW_INDEX
+        .if ::BHOP_ZSAW_ENABLED
+        sta channel_pitch_effects_active + ZSAW_INDEX
+        .endif
+        .if ::BHOP_MMC5_ENABLED
+        sta channel_pitch_effects_active + MMC5_PULSE_1_INDEX
+        sta channel_pitch_effects_active + MMC5_PULSE_2_INDEX
+        .endif
+        .if ::BHOP_VRC6_ENABLED
+        sta channel_pitch_effects_active + VRC6_PULSE_1_INDEX
+        sta channel_pitch_effects_active + VRC6_PULSE_2_INDEX
+        sta channel_pitch_effects_active + VRC6_SAWTOOTH_INDEX
+        .endif
 
         ; reset every channel's status
         lda #(CHANNEL_MUTED)
@@ -201,7 +319,29 @@ positive:
         sta channel_status + TRIANGLE_INDEX
         sta channel_status + NOISE_INDEX
         sta channel_status + DPCM_INDEX
-        sta channel_status + BLARGGSAW_INDEX
+        .if ::BHOP_ZSAW_ENABLED
+        sta channel_status + ZSAW_INDEX
+        .endif
+        .if ::BHOP_MMC5_ENABLED
+        sta channel_status + MMC5_PULSE_1_INDEX
+        sta channel_status + MMC5_PULSE_2_INDEX
+        .endif
+        .if ::BHOP_VRC6_ENABLED
+        sta channel_status + VRC6_PULSE_1_INDEX
+        sta channel_status + VRC6_PULSE_2_INDEX
+        sta channel_status + VRC6_SAWTOOTH_INDEX
+        .endif
+        
+        ; reset DPCM status
+        lda #$FF
+        sta effect_dac_buffer
+        .if ::BHOP_ZSAW_ENABLED
+        ; Z-Saw is enabled by default
+        lda #DPCM_ZSAW_ENABLED
+        .else
+        lda #0
+        .endif
+        sta dpcm_status
 
         ; clear out special effects
         lda #0
@@ -222,9 +362,24 @@ effect_init_loop:
         sta effect_skip_target
         sta effect_dpcm_offset
 
+        sta effect_retrigger_period
+        sta effect_retrigger_counter
+
+        .if ::BHOP_ZSAW_ENABLED
+        ; if zsaw happens to be playing, silence it
+        jsr zsaw_silence
+        ; Now fully re-initialize Z-Saw just in case
+        jsr zsaw_init
+        .endif
+
         ; finally, enable all channels except DMC
         lda #%00001111
         sta $4015
+
+        ; enable any expansion audio chips here, if they can be disabled
+        .if ::BHOP_VRC6_ENABLED
+        jsr bhop_vrc6_init
+        .endif
 
         rts
 .endproc
@@ -237,6 +392,28 @@ loop:
         add16 tempo_cmp, #150
         dex
         bne loop
+        rts
+.endproc
+
+.proc update_groove
+        lda groove_index
+        beq done
+
+        prepare_ptr_with_fixed_offset music_header_ptr, FtModuleHeader::groove_list
+
+        ldy groove_position
+        lda (bhop_ptr), y
+        bne apply_groove
+reached_end_of_groove:
+        ldy groove_index
+        lda (bhop_ptr), y
+apply_groove:
+        iny
+        sty groove_position
+        tax
+        jsr set_speed
+
+done:
         rts
 .endproc
 
@@ -307,13 +484,53 @@ loop:
         sta channel_pattern_ptr_high+NOISE_INDEX
         iny
 
-        ; BLARGGSAW
+        .if ::BHOP_ZSAW_ENABLED
         lda (bhop_ptr), y
-        sta channel_pattern_ptr_low+BLARGGSAW_INDEX
+        sta channel_pattern_ptr_low+ZSAW_INDEX
         iny
         lda (bhop_ptr), y
-        sta channel_pattern_ptr_high+BLARGGSAW_INDEX
+        sta channel_pattern_ptr_high+ZSAW_INDEX
         iny
+        .endif
+
+        .if ::BHOP_MMC5_ENABLED
+        lda (bhop_ptr), y
+        sta channel_pattern_ptr_low+MMC5_PULSE_1_INDEX
+        iny
+        lda (bhop_ptr), y
+        sta channel_pattern_ptr_high+MMC5_PULSE_1_INDEX
+        iny
+
+        lda (bhop_ptr), y
+        sta channel_pattern_ptr_low+MMC5_PULSE_2_INDEX
+        iny
+        lda (bhop_ptr), y
+        sta channel_pattern_ptr_high+MMC5_PULSE_2_INDEX
+        iny
+        .endif
+
+        .if ::BHOP_VRC6_ENABLED
+        lda (bhop_ptr), y
+        sta channel_pattern_ptr_low+VRC6_PULSE_1_INDEX
+        iny
+        lda (bhop_ptr), y
+        sta channel_pattern_ptr_high+VRC6_PULSE_1_INDEX
+        iny
+
+        lda (bhop_ptr), y
+        sta channel_pattern_ptr_low+VRC6_PULSE_2_INDEX
+        iny
+        lda (bhop_ptr), y
+        sta channel_pattern_ptr_high+VRC6_PULSE_2_INDEX
+        iny
+
+        lda (bhop_ptr), y
+        sta channel_pattern_ptr_low+VRC6_SAWTOOTH_INDEX
+        iny
+        lda (bhop_ptr), y
+        sta channel_pattern_ptr_high+VRC6_SAWTOOTH_INDEX
+        iny
+        .endif
 
         ; DPCM
         lda (bhop_ptr), y
@@ -323,19 +540,100 @@ loop:
         sta channel_pattern_ptr_high+DPCM_INDEX
         iny
 
+.if ::BHOP_PATTERN_BANKING
+        lda module_flags
+        and #MODULE_FLAGS_PATTERN_BANKING
+        beq banking_not_enabled
+
+        lda (bhop_ptr), y
+        sta channel_pattern_bank+PULSE_1_INDEX
+        iny
+        lda (bhop_ptr), y
+        sta channel_pattern_bank+PULSE_2_INDEX
+        iny
+        lda (bhop_ptr), y
+        sta channel_pattern_bank+TRIANGLE_INDEX
+        iny
+        lda (bhop_ptr), y
+        sta channel_pattern_bank+NOISE_INDEX
+        iny
+        .if ::BHOP_ZSAW_ENABLED
+        lda (bhop_ptr), y
+        sta channel_pattern_bank+ZSAW_INDEX
+        iny
+        .endif
+        .if ::BHOP_MMC5_ENABLED
+        lda (bhop_ptr), y
+        sta channel_pattern_bank+MMC5_PULSE_1_INDEX
+        iny
+        lda (bhop_ptr), y
+        sta channel_pattern_bank+MMC5_PULSE_2_INDEX
+        iny
+        .endif
+        .if ::BHOP_VRC6_ENABLED
+        lda (bhop_ptr), y
+        sta channel_pattern_bank+VRC6_PULSE_1_INDEX
+        iny
+        lda (bhop_ptr), y
+        sta channel_pattern_bank+VRC6_PULSE_2_INDEX
+        iny
+        lda (bhop_ptr), y
+        sta channel_pattern_bank+VRC6_SAWTOOTH_INDEX
+        iny
+        .endif
+        lda (bhop_ptr), y
+        sta channel_pattern_bank+DPCM_INDEX
+        iny
+        jmp done_with_banks
+banking_not_enabled:
+        ; this song doesn't use pattern banking, so it doesn't have valid bank
+        ; data here. Default all patterns to the module bank instead.
+        lda module_bank
+        sta channel_pattern_bank + PULSE_1_INDEX
+        sta channel_pattern_bank + PULSE_2_INDEX
+        sta channel_pattern_bank + TRIANGLE_INDEX
+        sta channel_pattern_bank + NOISE_INDEX
+        .if ::BHOP_ZSAW_ENABLED
+        sta channel_pattern_bank + ZSAW_INDEX
+        .endif
+        .if ::BHOP_MMC5_ENABLED
+        sta channel_pattern_bank + MMC5_PULSE_1_INDEX
+        sta channel_pattern_bank + MMC5_PULSE_2_INDEX
+        .endif
+        .if ::BHOP_VRC6_ENABLED
+        sta channel_pattern_bank + VRC6_PULSE_1_INDEX
+        sta channel_pattern_bank + VRC6_PULSE_2_INDEX
+        sta channel_pattern_bank + VRC6_SAWTOOTH_INDEX
+        .endif
+        sta channel_pattern_bank + DPCM_INDEX
+done_with_banks:
+.endif
+
         ; reset all the row counters to 0
         lda #0
         sta channel_row_delay_counter + PULSE_1_INDEX
         sta channel_row_delay_counter + PULSE_2_INDEX
         sta channel_row_delay_counter + TRIANGLE_INDEX
         sta channel_row_delay_counter + NOISE_INDEX
-        sta channel_row_delay_counter + BLARGGSAW_INDEX
+        .if ::BHOP_ZSAW_ENABLED
+        sta channel_row_delay_counter + ZSAW_INDEX
+        .endif
+        .if ::BHOP_MMC5_ENABLED
+        sta channel_row_delay_counter + MMC5_PULSE_1_INDEX
+        sta channel_row_delay_counter + MMC5_PULSE_2_INDEX
+        .endif
+        .if ::BHOP_VRC6_ENABLED
+        sta channel_row_delay_counter + VRC6_PULSE_1_INDEX
+        sta channel_row_delay_counter + VRC6_PULSE_2_INDEX
+        sta channel_row_delay_counter + VRC6_SAWTOOTH_INDEX
+        .endif
         sta channel_row_delay_counter + DPCM_INDEX
 
         rts
 .endproc
 
 .proc tick_frame_counter
+        clc
         add16 tempo_counter, tempo
         ; have we exceeded the tempo_counter?
         lda tempo_counter+1
@@ -395,13 +693,32 @@ done_advancing_rows:
         rts
 .endproc
 
-; prep: 
+; prep:
 ; - channel_index is set to desired channel
 .proc advance_channel_row
+        ; see CChannelHandler::PlayNote() in Dn-FT
+        ; check first if we still have lingering delay from the previous row
         ldx channel_index
+        lda effect_note_delay, x
+        beq skip_handle_delay
+        ; see CChannelHandler::HandleDelay() in Dn-FT
+        ; if so, advance one row to sync
+        lda #0
+        sta effect_note_delay, x
+        jsr advance_channel_row
+skip_handle_delay:
+        ldx channel_index ; the recursive call may have clobbered X
         lda channel_row_delay_counter, x
         cmp #0
         jne skip
+
+.if ::BHOP_PATTERN_BANKING
+        ; swap in the bank this pattern data lives in
+        lda channel_pattern_bank, x
+        switch_music_bank
+        ; that clobbered all registers, so reload X before continuing
+        ldx channel_index
+.endif
 
         ; prep the pattern pointer for reading
         lda channel_pattern_ptr_low, x
@@ -411,7 +728,7 @@ done_advancing_rows:
 
         ; implementation note: x now holds channel_index, and lots of this code
         ; assumes it will not be clobbered. Take care when refactoring.
-        
+
         ; continue reading bytecode, processing one command at a time,
         ; until a note is encountered. Any note command breaks out of the loop and
         ; signals the end of processing for this row.
@@ -452,19 +769,38 @@ quick_instrument_change:
         tya ; un-preserve
         and #$0F ; a now contains instrument index
         sta channel_selected_instrument, x
+
+.if ::BHOP_PATTERN_BANKING
+        ; Instruments live in the module bank, so we need to swap that in before processing them
+        lda module_bank
+        switch_music_bank
+.endif
         jsr load_instrument
+.if ::BHOP_PATTERN_BANKING
+        ; And now we need to switch back to the pattern bank before continuing
+        ldx channel_index
+        lda channel_pattern_bank, x
+        switch_music_bank
+        ldx channel_index ; un-clobber
+.endif
         ; ready to process the next bytecode
         jmp bytecode_loop
 
 handle_note:
         cmp #$00 ; note rest
-        beq done_with_bytecode
+        jeq done_with_bytecode
         cmp #$7F ; note off
         bne check_release
         ; a note off immediately mutes the channel
         lda channel_status, x
         ora #CHANNEL_MUTED
         sta channel_status, x
+        ; we also clear the delayed cut/release; this *is* a cut, it wins
+        lda #0
+        sta effect_cut_delay, x
+.if ::BHOP_DELAYED_RELEASE_ENABLED
+        sta effect_release_delay, x
+.endif
         jmp done_with_bytecode
 check_release:
         cmp #$7E
@@ -472,21 +808,34 @@ check_release:
         lda channel_status, x
         ora #CHANNEL_RELEASED
         sta channel_status, x
+.if ::BHOP_PATTERN_BANKING
+        ; Instruments live in the module bank, so we need to swap that in before processing them
+        lda module_bank
+        switch_music_bank
+.endif      
         jsr apply_release
+.if ::BHOP_PATTERN_BANKING
+        ; And now we need to switch back to the pattern bank before continuing
+        ldx channel_index
+        lda channel_pattern_bank, x
+        switch_music_bank
+        ldx channel_index ; un-clobber
+.endif
+.if ::BHOP_DELAYED_RELEASE_ENABLED
+        ; clear delayed release if any
+        lda #0
+        sta effect_release_delay, x
+.endif
         jmp done_with_bytecode
 note_trigger:
         ; a contains the selected note at this point
         sta channel_base_note, x
         ; use a to read the LUT and apply base_frequency
-        tay
-        lda ntsc_period_low, y
-        sta channel_base_frequency_low, x
-        lda ntsc_period_high, y
-        sta channel_base_frequency_high, x
+        jsr set_channel_base_frequency
 
         ; if portamento is active AND we are not currently muted,
         ; then skip writing the relative frequency
-        
+
         lda channel_status, x
         and #CHANNEL_MUTED
         bne write_relative_frequency
@@ -501,7 +850,34 @@ write_relative_frequency:
         lda channel_base_frequency_high, x
         sta channel_relative_frequency_high, x
 
+        .if ::BHOP_ZSAW_ENABLED
+        ; for Z-Saw only, we initialize the relative frequency here as a note index,
+        ; since it does not do pitch bends
+
+        cpx #ZSAW_INDEX
+        bne portamento_active
+        lda channel_base_note, x
+        sta zsaw_relative_note
+        .endif
+
 portamento_active:
+        ; if we have a delayed note cut queued up, cancel it. A new note takes priority,
+        ; and we don't want the unexpired cut to silence it inappropriately.
+        lda channel_status, x
+        and #CHANNEL_FRESH_DELAYED_CUT
+        bne preserve_fresh_cut
+        lda #0
+        sta effect_cut_delay, x
+preserve_fresh_cut:
+.if ::BHOP_DELAYED_RELEASE_ENABLED
+        ; ditto with delayed release
+        lda channel_status, x
+        and #CHANNEL_FRESH_DELAYED_RELEASE
+        bne preserve_release_delay
+        lda #0
+        sta effect_release_delay, x
+preserve_release_delay:
+.endif
         ; finally, set the channel status as triggered
         ; (this will be cleared after effects are processed)
         lda channel_status, x
@@ -509,12 +885,18 @@ portamento_active:
         ; also, un-mute  and un-release the channel
         and #($FF - (CHANNEL_MUTED | CHANNEL_RELEASED))
         sta channel_status, x
+        cpx #DPCM_INDEX
+        bne skip_sample_trigger
+        jsr trigger_sample
+skip_sample_trigger:
         ; reset the instrument envelopes to the beginning
         jsr reset_instrument ; clobbers a, y
         ; reset the instrument volume to 0xF (if this instrument has a volume
         ; sequence, this will be immediately overwritten with the first element)
         lda #$F
         sta channel_instrument_volume, x
+        lda #0
+        sta channel_volume_mode, x
         ; reset the instrument duty to the channel_duty (again, this will usually
         ; be overwritten by the instrument sequence)
         lda channel_duty, x
@@ -573,7 +955,7 @@ done:
 
         ; implementation note: x now holds channel_index, and lots of this code
         ; assumes it will not be clobbered. Take care when refactoring.
-        
+
         ; continue reading bytecode, processing one command at a time,
         ; until a note is encountered. Any note command breaks out of the loop and
         ; signals the end of processing for this row.
@@ -667,15 +1049,57 @@ done:
         jsr advance_channel_row
         jsr fix_noise_freq
 
-        ; BLARGGSAW
-        lda #BLARGGSAW_INDEX
+        .if ::BHOP_ZSAW_ENABLED
+        ; Z-Saw
+        lda #ZSAW_INDEX
         sta channel_index
         jsr advance_channel_row
+        .endif
+
+        .if ::BHOP_MMC5_ENABLED
+        ; MMC5
+        lda #MMC5_PULSE_1_INDEX
+        sta channel_index
+        jsr advance_channel_row
+
+        lda #MMC5_PULSE_2_INDEX
+        sta channel_index
+        jsr advance_channel_row
+        .endif
+
+        .if ::BHOP_VRC6_ENABLED
+        ; VRC6
+        lda #VRC6_PULSE_1_INDEX
+        sta channel_index
+        jsr advance_channel_row
+
+        lda #VRC6_PULSE_2_INDEX
+        sta channel_index
+        jsr advance_channel_row
+
+        lda #VRC6_SAWTOOTH_INDEX
+        sta channel_index
+        jsr advance_channel_row
+        .endif
 
         ; DPCM
         lda #DPCM_INDEX
         sta channel_index
+        ; reset retrigger period and Wxx upon new row
+        lda #0
+        sta effect_retrigger_period
+        lda #$FF
+        sta effect_dpcm_pitch
         jsr advance_channel_row
+
+.if ::BHOP_PATTERN_BANKING
+        ; Now that we're done with patterns, restore the module bank before continuing
+        lda module_bank
+        switch_music_bank
+.endif
+
+        ; Every time we update the pattern rows, also advance the groove sequence if enabled
+        jsr update_groove
 
         rts
 .endproc
@@ -701,27 +1125,44 @@ done:
         sta channel_index
         jsr skip_channel_row
 
-        ; BLARGGSAW
-        lda #BLARGGSAW_INDEX
+        .if ::BHOP_ZSAW_ENABLED
+        ; Z-Saw
+        lda #ZSAW_INDEX
         sta channel_index
         jsr skip_channel_row
+        .endif
+
+        .if ::BHOP_MMC5_ENABLED
+        ; MMC5
+        lda #MMC5_PULSE_1_INDEX
+        sta channel_index
+        jsr skip_channel_row
+
+        lda #MMC5_PULSE_2_INDEX
+        sta channel_index
+        jsr skip_channel_row
+        .endif
+
+        .if ::BHOP_VRC6_ENABLED
+        ; MMC5
+        lda #VRC6_PULSE_1_INDEX
+        sta channel_index
+        jsr skip_channel_row
+
+        lda #VRC6_PULSE_2_INDEX
+        sta channel_index
+        jsr skip_channel_row
+
+        lda #VRC6_SAWTOOTH_INDEX
+        sta channel_index
+        jsr skip_channel_row
+        .endif
 
         ; DPCM
         lda #DPCM_INDEX
         sta channel_index
         jsr skip_channel_row
 
-        rts
-.endproc
-
-.proc fix_noise_freq
-        lda channel_status + NOISE_INDEX
-        cmp #($FF - CHANNEL_TRIGGERED)
-        beq done
-        lda channel_base_note + NOISE_INDEX
-        sta channel_base_frequency_low + NOISE_INDEX
-        sta channel_relative_frequency_low + NOISE_INDEX
-done:
         rts
 .endproc
 
@@ -736,6 +1177,11 @@ done:
         ; so apply a note delay. In this case, tick the bytecode reader
         ; one time:
         jsr advance_channel_row
+.if ::BHOP_PATTERN_BANKING
+        ; That might have clobbered the module bank, so restore it before continuing
+        lda module_bank
+        switch_music_bank
+.endif
         ; if this is the noise channel, fix its frequency
         lda channel_index
         cmp #3
@@ -748,11 +1194,42 @@ done_with_note_delay:
         beq done_with_cut_delay
         dec effect_cut_delay, x
         bne done_with_cut_delay
-        ; apply a note cut, immediately silencing this channel
+        ; apply a note cut, immediately silencing this channel and cancel delayed release
+.if ::BHOP_DELAYED_RELEASE_ENABLED
+        lda #0
+        sta effect_release_delay, x
+.endif
         lda channel_status, x
+        and #($FF - CHANNEL_FRESH_DELAYED_CUT - CHANNEL_FRESH_DELAYED_RELEASE)
         ora #CHANNEL_MUTED
         sta channel_status, x
+        jne done_with_delays
 done_with_cut_delay:
+.if ::BHOP_DELAYED_RELEASE_ENABLED
+        lda effect_release_delay, x
+        beq done_with_delays
+        dec effect_release_delay, x
+        bne done_with_delays
+        ; note release
+        lda channel_status, x
+        and #($FF - CHANNEL_FRESH_DELAYED_RELEASE)
+        ora #CHANNEL_RELEASED
+        sta channel_status, x
+.if ::BHOP_PATTERN_BANKING
+        ; Instruments live in the module bank, so we need to swap that in before processing them
+        lda module_bank
+        switch_music_bank
+.endif      
+        jsr apply_release
+.if ::BHOP_PATTERN_BANKING
+        ; And now we need to switch back to the pattern bank before continuing
+        ldx channel_index
+        lda channel_pattern_bank, x
+        switch_music_bank
+        ldx channel_index ; un-clobber
+.endif
+.endif
+done_with_delays:
         rts
 .endproc
 
@@ -824,18 +1301,91 @@ done_with_cut_delay:
         sta channel_index
         jsr tick_delayed_effects
 
-        ; BLARGGSAW
-        lda #BLARGGSAW_INDEX
+.if ::BHOP_ZSAW_ENABLED
+        ; Z-Saw
+        lda #ZSAW_INDEX
         sta channel_index
-        jsr tick_delayed_effects        
+        jsr tick_delayed_effects
         jsr update_volume_effects
         jsr tick_volume_envelope
-        ; TODO:
-        ; blarggsaw can in theory support arp effects, but this
-        ; needs special handling because the concept of pitch doesn't exist.
-        ; I'm putting this off until the basics are working. 
-        ;jsr update_arp
-        ;jsr tick_arp_envelope
+        jsr tick_duty_envelope_zsaw
+        jsr update_arp_zsaw
+        jsr tick_arp_envelope_zsaw
+.endif
+
+.if ::BHOP_MMC5_ENABLED
+        lda #MMC5_PULSE_1_INDEX
+        sta channel_index
+        jsr tick_delayed_effects
+        jsr tick_volume_envelope
+        jsr tick_duty_envelope
+        jsr update_arp
+        jsr update_pitch_effects
+        jsr update_volume_effects
+        jsr tick_arp_envelope
+        jsr tick_pitch_envelope
+        initialize_detuned_frequency
+        jsr update_vibrato
+        jsr update_tuning
+
+        lda #MMC5_PULSE_2_INDEX
+        sta channel_index
+        jsr tick_delayed_effects
+        jsr tick_volume_envelope
+        jsr tick_duty_envelope
+        jsr update_arp
+        jsr update_pitch_effects
+        jsr update_volume_effects
+        jsr tick_arp_envelope
+        jsr tick_pitch_envelope
+        initialize_detuned_frequency
+        jsr update_vibrato
+        jsr update_tuning
+.endif
+
+.if ::BHOP_VRC6_ENABLED
+        lda #VRC6_PULSE_1_INDEX
+        sta channel_index
+        jsr tick_delayed_effects
+        jsr tick_volume_envelope
+        jsr tick_duty_envelope
+        jsr update_arp
+        jsr update_pitch_effects
+        jsr update_volume_effects
+        jsr tick_arp_envelope
+        jsr tick_pitch_envelope
+        initialize_detuned_frequency
+        jsr update_vibrato
+        jsr update_tuning
+
+        lda #VRC6_PULSE_2_INDEX
+        sta channel_index
+        jsr tick_delayed_effects
+        jsr tick_volume_envelope
+        jsr tick_duty_envelope
+        jsr update_arp
+        jsr update_pitch_effects
+        jsr update_volume_effects
+        jsr tick_arp_envelope
+        jsr tick_pitch_envelope
+        initialize_detuned_frequency
+        jsr update_vibrato
+        jsr update_tuning
+
+        lda #VRC6_SAWTOOTH_INDEX
+        sta channel_index
+        jsr tick_delayed_effects
+        jsr tick_volume_envelope
+        jsr tick_duty_envelope
+        jsr update_arp
+        jsr update_pitch_effects
+        jsr update_volume_effects
+        jsr tick_arp_envelope
+        jsr tick_pitch_envelope
+        initialize_detuned_frequency
+        jsr update_vibrato
+        jsr update_tuning
+.endif
 
         rts
 .endproc
@@ -857,11 +1407,11 @@ no_wrap:
 ; Initializes channel state for playback of a particular instrument.
 ; Loads sequence pointers (if enabled) and clears pointers to begin
 ; sequence playback from the beginning
-; setup: 
+; setup:
 ;   channel_index points to desired channel
 ;   channel_selected_instrument[channel_index] contains desired instrument index
 .proc load_instrument
-        prepare_ptr BHOP_MUSIC_BASE + FtModuleHeader::instrument_list
+        prepare_ptr_with_fixed_offset music_header_ptr, FtModuleHeader::instrument_list
         ldx channel_index
         lda channel_selected_instrument, x
         asl ; select one word
@@ -947,7 +1497,7 @@ done_loading_sequences:
 
 ; Re-initializes sequence pointers back to the beginning of their
 ; respective envelopes
-; setup: 
+; setup:
 ;   channel_index points to the active channel
 .proc reset_instrument
         ldy channel_index
@@ -970,7 +1520,7 @@ done_loading_sequences:
 ; If this channel has a volume envelope active, process that
 ; envelope. Upon return, instrument_volume will have the current
 ; element in the sequence.
-; setup: 
+; setup:
 ;   channel_index points to channel structure
 .proc tick_volume_envelope
         ldy channel_index
@@ -983,6 +1533,14 @@ done_loading_sequences:
         sta bhop_ptr
         lda volume_sequence_ptr_high, y
         sta bhop_ptr + 1
+
+.if ::BHOP_VRC6_ENABLED
+        ; grab and stash the mode byte, which some expansion instruments need
+        ldy #SequenceHeader::mode
+        lda (bhop_ptr), y
+        ldy channel_index
+        sta channel_volume_mode, y
+.endif
 
         ; read the current sequence byte, and set instrument_volume to this
         lda volume_sequence_index, y
@@ -1024,7 +1582,7 @@ done:
 
 ; If this channel has a duty envelope active, process that
 ; envelope. Upon return, instrument_duty is set
-; setup: 
+; setup:
 ;   channel_index points to channel structure
 .proc tick_duty_envelope
         ldy channel_index
@@ -1046,12 +1604,6 @@ done:
         adc #4
         tay
         lda (bhop_ptr), y
-        ; shift this into place before storing
-        ror
-        ror
-        ror
-        ; safety
-        and #%11000000
         ldy channel_index
         sta channel_instrument_duty, y
 
@@ -1064,7 +1616,7 @@ done:
         sta scratch_byte
         cpx scratch_byte
         bne end_not_reached
-        
+
         ; this sequence is finished! Disable the sequence flag and exit
         ldy channel_index
         lda sequences_active, y
@@ -1084,7 +1636,7 @@ done:
 
 ; If this channel has an arp envelope active, process that
 ; envelope. Upon return, base_note and relative_frequency are set
-; setup: 
+; setup:
 ;   channel_index, channel_index points to channel structure
 .proc tick_arp_envelope
         ldx channel_index
@@ -1108,7 +1660,7 @@ done:
         lda (bhop_ptr), y
         cmp scratch_byte
         bne end_not_reached
-        
+
         ; this sequence is finished! Disable the sequence flag
         lda sequences_active, x
         and #($FF - SEQUENCE_ARP)
@@ -1123,11 +1675,8 @@ done:
         ; apply the current base note as the channel frequency,
         ; then exit:
         lda channel_base_note, x
-        tay
-        lda ntsc_period_low, y
-        sta channel_relative_frequency_low, x
-        lda ntsc_period_high, y
-        sta channel_relative_frequency_high, x
+        jsr set_channel_relative_frequency
+
 early_exit:
         rts
 
@@ -1158,7 +1707,6 @@ arp_absolute:
         lda channel_base_note, x
         clc
         adc scratch_byte
-        tay
         jmp apply_arp
 arp_relative:
         ; were we just triggered? if so, reset the relative offset
@@ -1178,123 +1726,15 @@ not_triggered:
         clc
         adc channel_relative_note_offset, x
         ; stuff that result in y, and apply it
-        tay
         jmp apply_arp
 arp_fixed:
         ; the arp value +1 is the note to apply
         lda scratch_byte
         clc
         adc #1
-        tay
         ; fall through to apply_arp
 apply_arp:
-        lda ntsc_period_low, y
-        sta channel_relative_frequency_low, x
-        lda ntsc_period_high, y
-        sta channel_relative_frequency_high, x
-
-done_applying_arp:
-        pla ; unstash the sequence counter
-        tax ; move into x, which tick_sequence_counter expects
-
-        ; tick the sequence counter and exit
-        jsr tick_sequence_counter
-
-        ; write the new sequence index (should still be in x)
-        ldy channel_index
-        txa
-        sta arpeggio_sequence_index, y
-
-done:
-        rts
-.endproc
-
-; We need a special variant of this just for noise, which uses a different
-; means of frequency to base_note mapping
-; setup: 
-;   channel_index points to channel structure
-.proc tick_noise_arp_envelope
-        ldx channel_index
-        lda sequences_active, x
-        and #SEQUENCE_ARP
-        beq early_exit ; if sequence isn't enabled, bail fast
-
-        ; prepare the arp pointer for reading
-        lda arpeggio_sequence_ptr_low, x
-        sta bhop_ptr
-        lda arpeggio_sequence_ptr_high, x
-        sta bhop_ptr + 1
-
-        ; For arps, we need to "reset" the channel if the envelope finishes, so we're doing
-        ; the length check first thing
-
-        lda arpeggio_sequence_index, x
-        sta scratch_byte
-        ; have we reached the end of the sequence?
-        ldy #SequenceHeader::length
-        lda (bhop_ptr), y
-        cmp scratch_byte
-        bne end_not_reached
-        
-        ; this sequence is finished! Disable the sequence flag
-        lda sequences_active, x
-        and #($FF - SEQUENCE_ARP)
-        sta sequences_active, x
-
-        ; now apply the current base note as the channel frequency,
-        ; then exit:
-        lda channel_base_note, x
-        sta channel_relative_frequency_low, x
-early_exit:
-        rts
-
-end_not_reached:
-        ; read the current sequence byte, and set instrument_volume to this
-        lda arpeggio_sequence_index, x
-        pha ; stash for later
-        ; for reading the sequence, +4
-        clc
-        adc #4
-        tay
-        lda (bhop_ptr), y
-        sta scratch_byte ; will affect the note, depending on mode
-        clc
-
-        ; what we actually *do* with the arp byte depends on the mode
-        ldy #SequenceHeader::mode
-        lda (bhop_ptr), y
-        cmp #ARP_MODE_ABSOLUTE
-        beq arp_absolute
-        cmp #ARP_MODE_RELATIVE
-        beq arp_relative
-        cmp #ARP_MODE_FIXED
-        beq arp_fixed
-        ; ARP SCHEME, unimplemented! for now, treat this just like absolute
-arp_absolute:
-        ; arp is an offset from base note to apply each frame
-        lda channel_base_note, x
-        clc
-        adc scratch_byte
-        tay
-        jmp apply_arp
-arp_relative:
-        ; arp accumulates an offset each frame, from the previous frame
-        lda channel_base_note, x
-        clc
-        adc scratch_byte
-        sta channel_base_note, x
-        tay
-        jmp apply_arp
-arp_fixed:
-        ; the arp value +1 is the note to apply
-        lda scratch_byte
-        clc
-        adc #1
-        tay
-        ; fall through to apply_arp
-apply_arp:
-        tya ; for noise, we'll use the value directly
-        sta channel_relative_frequency_low, x
+        jsr set_channel_relative_frequency
 
 done_applying_arp:
         pla ; unstash the sequence counter
@@ -1314,7 +1754,7 @@ done:
 
 ; If this channel has a pitch envelope active, process that
 ; envelope. Upon return, relative_pitch is set
-; setup: 
+; setup:
 ;   channel_index points to channel structure
 .proc tick_pitch_envelope
         ldy channel_index
@@ -1328,7 +1768,7 @@ done:
         lda pitch_sequence_ptr_high, y
         sta bhop_ptr + 1
 
-        ; read the current sequence byte, and set instrument_volume to this        
+        ; read the current sequence byte, and set instrument_volume to this
         lda pitch_sequence_index, y
         tax ; stash for later
         ; for reading the sequence, +4
@@ -1362,6 +1802,7 @@ relative_pitch_mode:
         ; add this data to relative_pitch
         ldy channel_index
         sadd16_split_y channel_relative_frequency_low, channel_relative_frequency_high, scratch_byte
+        ; TODO: if we were to implement bounds checks, they would go here
 
 done_applying_pitch:
         ; tick the sequence counter and exit
@@ -1373,7 +1814,7 @@ done_applying_pitch:
         sta scratch_byte
         cpx scratch_byte
         bne end_not_reached
-        
+
         ; this sequence is finished! Disable the sequence flag and exit
         ldy channel_index
         lda sequences_active, y
@@ -1431,6 +1872,12 @@ end_not_reached:
         sta scratch_byte
         cpx scratch_byte
         bne release_point_not_reached
+        
+        ; are we released?
+        ldy channel_index
+        lda channel_status, y
+        and #CHANNEL_RELEASED
+        bne done
 
         ; is there a loop point?
         ldy #SequenceHeader::loop_point
@@ -1475,6 +1922,8 @@ done:
         beq done_with_sequence
         ; set the sequence index to the release point immediately
         ; (it will be ticked *past* this point on the next cycle)
+        sec
+        sbc #1
         sta pitch_sequence_index, x
 done_with_sequence:
 .endscope
@@ -1482,7 +1931,7 @@ done_with_sequence:
 
 ; If this channel has any envelopes, and those envelopes
 ; have a release point, jump to it immediately
-; setup: 
+; setup:
 ;   channel_index points to channel structure
 ;   x contains channel_index
 .proc apply_release
@@ -1501,6 +1950,14 @@ tick_pulse1:
         bne tick_pulse2
         bmi pulse1_muted
 
+        ; add in the duty
+        lda channel_instrument_duty + PULSE_1_INDEX
+        ror
+        ror
+        ror
+        and #%11000000
+        sta scratch_byte
+        
         ; apply the combined channel and instrument volume
         lda channel_tremolo_volume + PULSE_1_INDEX
         asl
@@ -1511,7 +1968,7 @@ tick_pulse1:
         tax
         lda volume_table, x
 
-        ; dungeon-game specific: apply global fade here
+        ; game specific: apply global fade here
         beq pulse1_nofix
         sec
         sbc global_attenuation
@@ -1522,9 +1979,8 @@ pulse1_fix:
         lda #1
 pulse1_nofix:
 
-        ; add in the duty
-        ora channel_instrument_duty + PULSE_1_INDEX
         ora #%00110000 ; disable length counter and envelope
+        ora scratch_byte
         sta $4000
 
         ; disable the sweep unit
@@ -1563,6 +2019,13 @@ tick_pulse2:
         bne tick_triangle
         bmi pulse2_muted
 
+        ; add in the duty
+        lda channel_instrument_duty + PULSE_2_INDEX
+        ror
+        ror
+        ror
+        and #%11000000
+        sta scratch_byte
 
         ; apply the combined channel and instrument volume
         lda channel_tremolo_volume + PULSE_2_INDEX
@@ -1585,9 +2048,8 @@ pulse2_fix:
         lda #1
 pulse2_nofix:
 
-        ; add in the duty
-        ora channel_instrument_duty + PULSE_2_INDEX
-        ora #%00110000 ; set a duty, disable length counter and envelope
+        ora #%00110000 ; disable length counter and envelope
+        ora scratch_byte
         sta $4004
 
         ; disable the sweep unit
@@ -1634,8 +2096,8 @@ tick_triangle:
         ldx channel_instrument_volume + TRIANGLE_INDEX
         beq triangle_muted
 
-        ; dungeon-game specific
-        ; mute the triangle above a global attenuation of 4ish
+        ; game specific:
+        ; mute the triangle when below its global attenuation threshold
         lda global_attenuation
         cmp #TRIANGLE_ATTENUATION_THRESHOLD
         bcs triangle_muted
@@ -1659,7 +2121,7 @@ triangle_muted:
 tick_noise:
         lda #CHANNEL_SUPPRESSED
         bit channel_status + NOISE_INDEX
-        bne cleanup
+        bne tick_dpcm
         bmi noise_muted
 
         ; apply the combined channel and instrument volume
@@ -1672,7 +2134,7 @@ tick_noise:
         tax
         lda volume_table, x
 
-        ; dungeon-game specific: apply global fade here
+        ; game specific: apply global fade here
         beq noise_nofix
         sec
         sbc global_attenuation
@@ -1699,7 +2161,8 @@ noise_nofix:
 
         ; the low bit of channel duty becomes mode bit 1
         lda channel_instrument_duty + NOISE_INDEX
-        asl
+        ror
+        ror
         and #%10000000 ; safety mask
         ora scratch_byte
 
@@ -1708,18 +2171,27 @@ noise_nofix:
         ; finally, ensure the note is actually playing with a length
         ; counter that is not zero
         lda #%11111000
-        sta $400F  
-        jmp cleanup
+        sta $400F
+        jmp tick_dpcm
 noise_muted:
         ; if the channel is muted, little else matters, but ensure
         ; we set the volume to 0
         lda #%00110000
         sta $400C
 
-cleanup:
+tick_dpcm:
         jsr play_dpcm_samples
-        jsr play_blarggsaw
+.if ::BHOP_ZSAW_ENABLED
+        jsr play_zsaw
+.endif
+.if ::BHOP_MMC5_ENABLED
+        jsr play_mmc5
+.endif
+.if ::BHOP_VRC6_ENABLED
+        jsr play_vrc6
+.endif
 
+cleanup:
         ; clear the triggered flag from every instrument
         lda channel_status + PULSE_1_INDEX
         and #($FF - CHANNEL_TRIGGERED)
@@ -1737,9 +2209,35 @@ cleanup:
         and #($FF - CHANNEL_TRIGGERED)
         sta channel_status + NOISE_INDEX
 
-        lda channel_status + BLARGGSAW_INDEX
+        .if ::BHOP_ZSAW_ENABLED
+        lda channel_status + ZSAW_INDEX
         and #($FF - CHANNEL_TRIGGERED)
-        sta channel_status + BLARGGSAW_INDEX
+        sta channel_status + ZSAW_INDEX
+        .endif
+
+        .if ::BHOP_MMC5_ENABLED
+        lda channel_status + MMC5_PULSE_1_INDEX
+        and #($FF - CHANNEL_TRIGGERED)
+        sta channel_status + MMC5_PULSE_1_INDEX
+
+        lda channel_status + MMC5_PULSE_2_INDEX
+        and #($FF - CHANNEL_TRIGGERED)
+        sta channel_status + MMC5_PULSE_2_INDEX
+        .endif
+
+        .if ::BHOP_VRC6_ENABLED
+        lda channel_status + VRC6_PULSE_1_INDEX
+        and #($FF - CHANNEL_TRIGGERED)
+        sta channel_status + VRC6_PULSE_1_INDEX
+
+        lda channel_status + VRC6_PULSE_2_INDEX
+        and #($FF - CHANNEL_TRIGGERED)
+        sta channel_status + VRC6_PULSE_2_INDEX
+
+        lda channel_status + VRC6_SAWTOOTH_INDEX
+        and #($FF - CHANNEL_TRIGGERED)
+        sta channel_status + VRC6_SAWTOOTH_INDEX
+        .endif
 
         lda channel_status + DPCM_INDEX
         and #($FF - CHANNEL_TRIGGERED)
@@ -1751,23 +2249,60 @@ cleanup:
 .proc play_dpcm_samples
         lda channel_status + DPCM_INDEX
         and #CHANNEL_SUPPRESSED
-        bne done
+        jne done
 
-        lda channel_status + DPCM_INDEX
-        and #(CHANNEL_MUTED | CHANNEL_RELEASED)
-        bne dpcm_muted
-
-        ; dungeon-game specific
+        ; game specific: auto-mute DPCM below its threshold
         lda global_attenuation
         cmp #DPCM_ATTENUATION_THRESHOLD
-        bcs dpcm_muted
+        jcs dpcm_muted
 
+; Xxx handling; see CDPCMChan::RefreshChannel() in Dn-FT
+; decrement effect_retrigger_counter while effect_retrigger_counter != zero
+; if retrigger counter is 0, then time to trigger the sample again
+        lda effect_retrigger_period
+        beq next
+        dec effect_retrigger_counter
+        lda effect_retrigger_counter
+        bne next
+        lda effect_retrigger_period
+        sta effect_retrigger_counter
+        lda dpcm_status
+        ora #DPCM_ENABLED
+        sta dpcm_status
+        lda channel_status + DPCM_INDEX
+        ora #CHANNEL_TRIGGERED
+        sta channel_status + DPCM_INDEX
+next:
+
+; handle note cut and note release
+; see CDPCMChan::RefreshChannel() in Dn-FT 
+        lda channel_status + DPCM_INDEX
+        and #(CHANNEL_MUTED | CHANNEL_RELEASED)
+        jne dpcm_muted
+
+; check if channel is enabled in the first place
+        lda dpcm_status
+        and #DPCM_ENABLED
+        jeq done
+
+; make arrangements to write to the specific registers
         lda channel_status + DPCM_INDEX
         and #CHANNEL_TRIGGERED
-        beq done
+        jeq check_for_inactive
+
+        .if ::BHOP_ZSAW_ENABLED
+        ; We're about to trigger a DPCM sample, so silence zsaw. DPCM
+        ; will always have higher priority
+        jsr zsaw_silence
+        ; Disable Z-Saw, so it knows not to queue
+        ; up another note and ruin our work
+        lda dpcm_status
+        and #($FF - (DPCM_ZSAW_ENABLED))
+        sta dpcm_status
+        .endif
 
         ; using the current note, read the sample table
-        prepare_ptr BHOP_MUSIC_BASE + FtModuleHeader::sample_list
+        prepare_ptr_with_fixed_offset music_header_ptr, FtModuleHeader::sample_list
         lda channel_base_note + DPCM_INDEX
 
         sta scratch_byte
@@ -1785,23 +2320,42 @@ cleanup:
         ; - nnnnnnnn - iNdex into sample table
         lda (bhop_ptr), y
         iny
+        sta scratch_byte
+        lda effect_dpcm_pitch ; check for Wxx
+        bmi skip_pitch ; != -1? then Wxx takes precedence
+        lda scratch_byte
+        and #$F0
+        ora effect_dpcm_pitch
+        sta scratch_byte
+skip_pitch:
+        lda scratch_byte
         and #%01111111 ; do NOT enable IRQs
         sta $4010      ; write rate and loop enable
         lda (bhop_ptr), y
         iny
-        bpl no_delta_set
+        sta scratch_byte
+        lda effect_dac_buffer ; check for Zxx
+        bpl skip_dac ; != -1? then it was already written
+        lda scratch_byte
+        bmi skip_dac
         sta $4011
-no_delta_set:
+skip_dac:
+        lda #$FF
+        sta effect_dac_buffer
+
         lda (bhop_ptr), y
         ; this is the index into the samples table, here it is pre-multiplied
         ; so we can use it directly
+        ; save the y value since it is scratched by the prepare_ptr
+        pha
+        prepare_ptr_with_fixed_offset music_header_ptr, FtModuleHeader::samples
+        pla
         tay
-        prepare_ptr BHOP_MUSIC_BASE + FtModuleHeader::samples
         ; the sample table should contain, in order:
         ; - location byte
         ; - size byte
         ; - bank to switch in
-        
+
         lda (bhop_ptr), y
         ; cheaper to just do this unconditionally
         clc
@@ -1812,7 +2366,7 @@ no_delta_set:
         lda (bhop_ptr), y
         sta $4013
 
-.if BHOP::BHOP_DPCM_BANKING
+.if ::BHOP_DPCM_BANKING
         iny
         lda (bhop_ptr), y
         jsr BHOP_DPCM_SWITCH_ROUTINE
@@ -1824,117 +2378,99 @@ no_delta_set:
         sta $4015
         lda #$1F
         sta $4015
+
 done:
         rts
 
 dpcm_muted:
+        .if ::BHOP_ZSAW_ENABLED
+        ; Only take action if Z-Saw is currently disabled...
+        lda dpcm_status
+        and #DPCM_ZSAW_ENABLED
+        bne done
+        .endif
         ; simply disable the channel and exit (whatever is in the sample playback buffer will
         ; finish, up to 8 bits, there is no way to disable this)
-        ;lda #%00001111
-        ;sta $4015
+        lda #%00001111
+        sta $4015
+
+        lda channel_status + DPCM_INDEX
+        and #CHANNEL_MUTED
+        bne dpcm_cut
+        lda channel_status + DPCM_INDEX
+        and #($FF - CHANNEL_RELEASED) ; release release note if note released
+        sta channel_status + DPCM_INDEX
+        jmp dpcm_release
+dpcm_cut:
+        lda #0 ; regain full volume for TN
+        sta $4011
+dpcm_release:
+        lda dpcm_status
+        .if ::BHOP_ZSAW_ENABLED
+        and #($FF - (DPCM_ZSAW_ENABLED))
+        .endif
+        and #($FF - (DPCM_ENABLED))
+        sta dpcm_status
+
+check_for_inactive:
+        .if ::BHOP_ZSAW_ENABLED
+        ; Only take action if Z-Saw is disabled...
+        lda dpcm_status
+        and #DPCM_ZSAW_ENABLED
+        bne done
+
+        ; See if that DPCM playback has finished:
+        lda $4015
+        and #%00010000
+        bne done
+
+        ; If it has, enable the Z-Saw channel
+        ; to initiate playback on the next tick
+        lda dpcm_status
+        ora #DPCM_ZSAW_ENABLED
+        sta dpcm_status
+        .endif
 
         rts
 .endproc
 
-.proc play_blarggsaw
-        lda #CHANNEL_SUPPRESSED
-        bit channel_status + BLARGGSAW_INDEX
-        bne skip
-        bmi blarggsaw_muted
-
-        ; apply the combined channel and instrument volume
-        lda channel_tremolo_volume + BLARGGSAW_INDEX
-        asl
-        asl
-        asl
-        asl
-        ora channel_instrument_volume + BLARGGSAW_INDEX
-        tax
-        lda volume_table, x
-
-        ; dungeon-game specific: apply global fade here
-        beq saw_nofix
-        sec
-        sbc global_attenuation
-        bmi saw_fix
-        beq saw_fix
-        jmp saw_nofix
-saw_fix:
-        lda #1
-saw_nofix:
-
-        ; go from 4-bit to 6-bit
-        asl
-        asl
-        ;sta saw_volume
-        sta zetasaw_volume
-        beq blarggsaw_muted
-
-        ; blarggsaw will use the tracked note directly
-        lda channel_base_note + BLARGGSAW_INDEX
-        asl
-        tax
-
-        sei ; briefly disable interrupts, for pointer safety
-        lda blarggsaw_note_lists, x 
-        sta zetasaw_ptr
-        lda blarggsaw_note_lists+1, x 
-        sta zetasaw_ptr+1
-        cli ; the pointer is valid, it should be safe to re-enable interrupts again
-
-        ; Now, if we were just triggered, start the sample playback from scratch
-        lda channel_status + BLARGGSAW_INDEX
-        and #CHANNEL_TRIGGERED
-        beq skip
-
-        sei ; briefly disable interrupts (again) to start a new note
-        lda #0
-        sta zetasaw_pos
-        lda #1
-        sta zetasaw_count
-
-        ; set up the sample address and size
-        lda #<((all_00_byte - $C000) >> 6)
-        sta $4012
-        lda #0
-        sta $4013
-        ; start it up (the IRQ will take over future starts after this)
-        lda #$8F
-        sta $4010
-        lda #$1F
-        sta $4015
-
-        ; in... *theory* that's enough?
-        cli ; enable interrupts
-        ; tell the NMI handler that interrupts are active
-        lda #$FF
-        sta irq_enabled 
+; resets the retrigger logic upon a new DPCM sample note
+; see CDPCMChan::triggerSample() in Dn-FT
+.proc trigger_sample
+        lda dpcm_status
+        ora #DPCM_ENABLED
+        sta dpcm_status
+        lda channel_status + DPCM_INDEX
+        ora #CHANNEL_TRIGGERED
+        sta channel_status + DPCM_INDEX
+        jsr queue_sample
         rts
+.endproc
 
-blarggsaw_muted:
-        ; halt playback
-        lda #$0F
-        sta $4015
-        ; disable interrupt
+; If effect_retrigger_period != 0, this initializes retriggering. Otherwise reset effect_retrigger_counter.
+.proc queue_sample
+        lda effect_retrigger_period
+        beq reset_counter
+        sta effect_retrigger_counter
+        inc effect_retrigger_counter
+        rts
+reset_counter:
         lda #0
-        sta $4010
-        ; acknowledge interrupt?
-
-        sei ; disable interrupts
-        ; Tell the NMI handler that interrupts are no longer active
-        ; (It'll need to do its own OAM DMA)
-        lda #$00
-        sta irq_enabled
-skip:
-        ; Do not pass go. Do not collect $200
+        sta effect_retrigger_counter
         rts
 .endproc
 
 .proc bhop_play
+.if ::BHOP_PATTERN_BANKING
+        lda module_bank
+        sta current_music_bank
+        jsr BHOP_PATTERN_SWITCH_ROUTINE
+.endif
+
         jsr tick_frame_counter
         jsr tick_envelopes_and_effects
         jsr tick_registers
-        ; D:
+        ; :D
         rts
 .endproc
 
@@ -1969,6 +2505,19 @@ done:
         rts
 .endproc
 
+.include "bhop/util.asm"
+.include "bhop/2a03_noise.asm"
+.if ::BHOP_ZSAW_ENABLED
+.include "bhop/2a03_zsaw.asm"
+.endif
+.if ::BHOP_MMC5_ENABLED
+.include "bhop/mmc5.asm"
+.endif
+.if ::BHOP_VRC6_ENABLED
+.include "bhop/vrc6.asm"
+.endif
+
+
 volume_table:
         .byte $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0
         .byte $0, $1, $1, $1, $1, $1, $1, $1, $1, $1, $1, $1, $1, $1, $1, $1
@@ -1978,12 +2527,12 @@ volume_table:
         .byte $0, $1, $1, $1, $1, $1, $2, $2, $2, $3, $3, $3, $4, $4, $4, $5
         .byte $0, $1, $1, $1, $1, $2, $2, $2, $3, $3, $4, $4, $4, $5, $5, $6
         .byte $0, $1, $1, $1, $1, $2, $2, $3, $3, $4, $4, $5, $5, $6, $6, $7
-        .byte $0, $1, $1, $1, $2, $2, $3, $3, $4, $4, $5, $5, $6, $6, $7, $8 
-        .byte $0, $1, $1, $1, $2, $3, $3, $4, $4, $5, $6, $6, $7, $7, $8, $9 
-        .byte $0, $1, $1, $2, $2, $3, $4, $4, $5, $6, $6, $7, $8, $8, $9, $A 
-        .byte $0, $1, $1, $2, $2, $3, $4, $5, $5, $6, $7, $8, $8, $9, $A, $B 
-        .byte $0, $1, $1, $2, $3, $4, $4, $5, $6, $7, $8, $8, $9, $A, $B, $C 
-        .byte $0, $1, $1, $2, $3, $4, $5, $6, $6, $7, $8, $9, $A, $B, $C, $D 
+        .byte $0, $1, $1, $1, $2, $2, $3, $3, $4, $4, $5, $5, $6, $6, $7, $8
+        .byte $0, $1, $1, $1, $2, $3, $3, $4, $4, $5, $6, $6, $7, $7, $8, $9
+        .byte $0, $1, $1, $2, $2, $3, $4, $4, $5, $6, $6, $7, $8, $8, $9, $A
+        .byte $0, $1, $1, $2, $2, $3, $4, $5, $5, $6, $7, $8, $8, $9, $A, $B
+        .byte $0, $1, $1, $2, $3, $4, $4, $5, $6, $7, $8, $8, $9, $A, $B, $C
+        .byte $0, $1, $1, $2, $3, $4, $5, $6, $6, $7, $8, $9, $A, $B, $C, $D
         .byte $0, $1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $A, $B, $C, $D, $E
         .byte $0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $A, $B, $C, $D, $E, $F
 

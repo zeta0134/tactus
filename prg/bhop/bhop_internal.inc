@@ -23,26 +23,67 @@
         initial_bank .byte
 .endstruct
 
-PULSE_1_INDEX = 0
-PULSE_2_INDEX = 1
-TRIANGLE_INDEX = 2
-NOISE_INDEX = 3
-;DPCM_INDEX = 4
-BLARGGSAW_INDEX = 4
-DPCM_INDEX = 5
+_channel_index .set 0
+
+PULSE_1_INDEX = _channel_index
+_channel_index .set (_channel_index+1)
+
+PULSE_2_INDEX = _channel_index
+_channel_index .set (_channel_index+1)
+
+TRIANGLE_INDEX = _channel_index
+_channel_index .set (_channel_index+1)
+
+NOISE_INDEX = _channel_index
+_channel_index .set (_channel_index+1)
+
+.if ::BHOP_ZSAW_ENABLED
+ZSAW_INDEX = _channel_index
+_channel_index .set (_channel_index+1)
+.endif
+
+.if ::BHOP_MMC5_ENABLED
+MMC5_PULSE_1_INDEX = _channel_index
+_channel_index .set (_channel_index+1)
+
+MMC5_PULSE_2_INDEX = _channel_index
+_channel_index .set (_channel_index+1)
+.endif
+
+.if ::BHOP_VRC6_ENABLED
+VRC6_PULSE_1_INDEX = _channel_index
+_channel_index .set (_channel_index+1)
+
+VRC6_PULSE_2_INDEX = _channel_index
+_channel_index .set (_channel_index+1)
+
+VRC6_SAWTOOTH_INDEX = _channel_index
+_channel_index .set (_channel_index+1)
+.endif
+
+DPCM_INDEX = _channel_index
+_channel_index .set (_channel_index+1)
+
+NUM_CHANNELS = _channel_index
 
 ; various status flags
-CHANNEL_MUTED           = %10000000
-CHANNEL_GLOBAL_DURATION = %01000000
-CHANNEL_TRIGGERED       = %00100000
-CHANNEL_RELEASED        = %00010000
-CHANNEL_SUPPRESSED      = %00001000
+CHANNEL_MUTED                 = %10000000
+CHANNEL_GLOBAL_DURATION       = %01000000
+CHANNEL_TRIGGERED             = %00100000
+CHANNEL_RELEASED              = %00010000
+CHANNEL_SUPPRESSED            = %00001000
+CHANNEL_FRESH_DELAYED_CUT     = %00000100
+CHANNEL_FRESH_DELAYED_RELEASE = %00000010
 
 SEQUENCE_VOLUME  = %00000001
 SEQUENCE_ARP     = %00000010
 SEQUENCE_PITCH   = %00000100
 SEQUENCE_HIPITCH = %00001000
 SEQUENCE_DUTY    = %00010000
+
+; DPCM state flags
+DPCM_ENABLED      = %00000001
+DPCM_ZSAW_ENABLED = %00000010
 
 ; for active effects
 PITCH_EFFECT_UP           = %00000001
@@ -60,6 +101,8 @@ ARP_MODE_SCHEME =   $03
 
 PITCH_MODE_RELATIVE = $00
 PITCH_MODE_ABSOLUTE = $01
+
+MODULE_FLAGS_PATTERN_BANKING = %00000001
 
 .struct InstrumentHeader
         type .byte
@@ -85,6 +128,18 @@ PITCH_MODE_ABSOLUTE = $01
         bne done
         inc pattern_ptr+1
 done:
+.endscope
+.endmacro
+
+; note: target bank in A
+; MUST assume all registers are clobbered
+.macro switch_music_bank
+.scope
+        cmp current_music_bank
+        beq all_done
+        sta current_music_bank
+        jsr BHOP_PATTERN_SWITCH_ROUTINE
+all_done:
 .endscope
 .endmacro
 
@@ -132,6 +187,10 @@ done:
     CMD_EFF_GROOVE
     CMD_EFF_DELAYED_VOLUME
     CMD_EFF_TRANSPOSE
+    CMD_EFF_PHASE_RESET
+    CMD_EFF_DPCM_PHASE_RESET
+    CMD_EFF_HARMONIC
+    CMD_EFF_TARGET_VOL_SLIDE
     CMD_EFF_VRC7_PATCH
     CMD_EFF_VRC7_PORT
     CMD_EFF_VRC7_WRITE
@@ -170,7 +229,7 @@ no_carry:
 
 .macro dec16 addr
 .scope
-        bit addr 
+        bit addr
         dec addr
         lda #$FF
         cmp addr
@@ -218,7 +277,7 @@ no_carry:
         lda value
         and #$80 ;extract the high bit
         beq positive
-        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry 
+        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry
         ; note: unless a signed overflow occurred, carry will usually be *set* in this case
 positive:
         ; the high bit was low; a contains #$00, so add that plus carry
@@ -242,7 +301,7 @@ positive:
         pla
         and #$80 ;extract the high bit
         beq positive
-        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry 
+        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry
         ; note: unless a signed overflow occurred, carry will usually be *set* in this case
 positive:
         ; the high bit was low; a contains #$00, so add that plus carry
@@ -263,7 +322,7 @@ positive:
         lda value
         and #$80 ;extract the high bit
         beq positive
-        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry 
+        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry
         ; note: unless a signed overflow occurred, carry will usually be *set* in this case
 positive:
         ; the high bit was low; a contains #$00, so add that plus carry
@@ -285,7 +344,7 @@ positive:
         lda value
         and #$80 ;extract the high bit
         beq positive
-        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry 
+        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry
         ; note: unless a signed overflow occurred, carry will usually be *set* in this case
 positive:
         ; the high bit was low; a contains #$00, so add that plus carry
@@ -310,7 +369,7 @@ positive:
         lda value
         and #$80 ;extract the high bit
         beq positive
-        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry 
+        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry
         ; note: unless a signed overflow occurred, carry will usually be *set* in this case
 positive:
         ; the high bit was low; a contains #$00, so add that plus carry
@@ -334,7 +393,7 @@ positive:
         lda value
         and #$80 ;extract the high bit
         beq positive
-        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry 
+        lda #$FF ; the high bit was high, so set high byte to 0xFF, then add that plus carry
         ; note: unless a signed overflow occurred, carry will usually be *set* in this case
 positive:
         ; the high bit was low; a contains #$00, so add that plus carry
@@ -351,3 +410,4 @@ positive:
         sbc #0
         sta addr+1
 .endmacro
+
