@@ -5,7 +5,7 @@ SAMPLE_STARVATION_THRESHOLD = 128
 
 function clock_cpu()
 	cycles_since_last_sample = cycles_since_last_sample + 1
-	if first_sample_written and cycles_since_last_sample > SAMPLE_STARVATION_THRESHOLD then
+	if first_sample_written == true and cycles_since_last_sample > SAMPLE_STARVATION_THRESHOLD then
 		emu.log("Audio starvation! Pausing NOW!")
 		emu.breakExecution()
 		first_sample_written = false

@@ -13,6 +13,7 @@
         .include "vram_buffer.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
 .segment "RAM"
 
@@ -32,6 +33,7 @@ enemies_active: .res 1
         lda #0
         ldx #0
 flag_loop:
+        perform_zpcm_inc
         sta room_flags, x
         inx
         cpx #16
@@ -77,6 +79,7 @@ BossIndex := R2
         lda #0
         ldx #0
 flag_loop:
+        perform_zpcm_inc
         sta room_flags, x
         inx
         cpx #16
@@ -99,6 +102,7 @@ flag_loop:
         lda #0
         ldy #0
 room_loop:
+        perform_zpcm_inc
         lda (FloorPtr), y
         sta room_layouts, y
         iny
@@ -108,6 +112,7 @@ room_loop:
         ; set each room up with its own RNG low byte
         ldx #0
 seed_loop:
+        perform_zpcm_inc
         jsr next_rand
         sta room_seeds, x
         inx
@@ -141,6 +146,7 @@ done_with_player:
         ; Next choose the boss location; importantly this should NOT be the
         ; same room the player spawned in
 boss_loop:
+        perform_zpcm_inc
         jsr next_rand
         and #$0F
         cmp PlayerRoomIndex
@@ -153,6 +159,7 @@ boss_loop:
         ; Finally choose the exit stairs location; this should again not be the same
         ; location as the player OR the boss
 exit_loop:
+        perform_zpcm_inc
         jsr next_rand
         and #$0F
         cmp PlayerRoomIndex
@@ -164,6 +171,7 @@ exit_loop:
         sta room_flags, x
 
         ; Aaaand.... that's it? I think that's it
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -238,6 +246,8 @@ check_room_clear:
         lda enemies_active
         bne all_done
 
+        perform_zpcm_inc
+
         ; Is this room already cleared?
         ldx PlayerRoomIndex
         lda room_flags, x
@@ -254,6 +264,8 @@ check_chest_spawn:
         lda chest_spawned
         bne all_done
 
+        perform_zpcm_inc
+
         ; load the fixed seed for the players current room
         jsr set_fixed_room_seed
         ; spawn in a chest
@@ -264,6 +276,7 @@ check_chest_spawn:
         sta chest_spawned
         
 all_done:
+        perform_zpcm_inc
         ; reset the enemies active counter for the next beat
         lda #0
         sta enemies_active

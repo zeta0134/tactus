@@ -57,6 +57,7 @@ VRC6_FREQ_CTRL = $9003
 .endproc
 
 .proc play_vrc6
+        perform_zpcm_inc
 tick_pulse1:
         lda #CHANNEL_SUPPRESSED
         bit channel_status + VRC6_PULSE_1_INDEX
@@ -107,6 +108,8 @@ pulse1_muted:
         lda #%00000000
         sta VRC6_REG_PULSE1_CTRL
 
+        perform_zpcm_inc
+
 tick_pulse2:
         lda #CHANNEL_SUPPRESSED
         bit channel_status + VRC6_PULSE_2_INDEX
@@ -156,6 +159,8 @@ pulse2_muted:
         ; we set the volume to 0
         lda #%00000000
         sta VRC6_REG_PULSE2_CTRL
+
+        perform_zpcm_inc
 
 tick_sawtooth:
         ; TODO: support 6bit volume mode... somehow!
@@ -219,6 +224,8 @@ sawtooth_muted:
         lda #%00000000
         sta VRC6_REG_SAWTOOTH_ACC
         
+        perform_zpcm_inc
+
 done:
         rts
 .endproc

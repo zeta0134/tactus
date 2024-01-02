@@ -251,6 +251,7 @@ MetaSpriteIndex := R0
         lda #0
         sta MetaSpriteIndex
 loop:
+        perform_zpcm_inc
         ldx MetaSpriteIndex
         lda sprite_table + MetaSpriteState::BehaviorFlags, x
         and #SPRITE_ACTIVE
@@ -275,6 +276,7 @@ MetaSpriteIndex := R0
         lda #0
         sta MetaSpriteIndex
 loop:
+        perform_zpcm_inc
         ldx MetaSpriteIndex
         ; first off, if this sprite isn't active, do nothing
         lda sprite_table + MetaSpriteState::BehaviorFlags, x
@@ -305,6 +307,7 @@ skip:
         sta MetaSpriteIndex
         jmp loop
 done:
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -315,6 +318,7 @@ MetaSpriteIndex := R0
         sta MetaSpriteIndex
         ldy #0
 loop:
+        perform_zpcm_inc
         lda MetaSpriteIndex
         cmp PlayerSpriteIndex
         beq skip
@@ -332,5 +336,6 @@ skip:
         sta MetaSpriteIndex
         jmp loop
 done:
+        perform_zpcm_inc
         rts
 .endproc

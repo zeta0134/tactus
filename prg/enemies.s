@@ -246,6 +246,7 @@ loop:
 .proc FAR_clear_active_move_flags
         ldx #0
 loop:
+        perform_zpcm_inc
         lda tile_flags, x
         and #%01111111
         sta tile_flags, x
@@ -268,6 +269,8 @@ TilesRemaining := R9
 ; We don't use these, but we should know not to clobber them
 TargetRow := R14
 TargetCol := R15
+        
+        perform_zpcm_inc
 
         ldx AttackSquare
         lda battlefield, x
@@ -281,6 +284,8 @@ TargetCol := R15
         lda direct_attack_behaviors+1, x
         sta DestPtr+1
         jsr __trampoline
+
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -302,6 +307,7 @@ TargetCol := R15
         sta DestPtr
         lda bonk_behaviors+1, x
         sta DestPtr+1
+        perform_zpcm_inc
         jsr __trampoline
 
         rts

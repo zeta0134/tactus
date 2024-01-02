@@ -97,12 +97,18 @@ attribute_loop:
 .endproc
 
 .proc FAR_queue_battlefield_updates
+        perform_zpcm_inc
         lda #0
         sta queued_bytes_counter
+        perform_zpcm_inc
         jsr queue_active_tiles
+        perform_zpcm_inc
         jsr queue_inactive_tiles
+        perform_zpcm_inc
         jsr queue_active_attributes
+        perform_zpcm_inc
         jsr queue_inactive_attributes
+        perform_zpcm_inc
         rts
 .endproc
 

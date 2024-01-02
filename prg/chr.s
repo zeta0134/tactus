@@ -6,6 +6,7 @@
         .include "rainbow.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
 .segment "RAM"
 CurrentChrBank: .res 1
@@ -141,6 +142,7 @@ SourceAddr := R0
 Length := R2
         ldy #0
 loop:
+        perform_zpcm_inc
         lda (SourceAddr), y
         sta PPUDATA
         inc16 SourceAddr
@@ -339,6 +341,7 @@ Length := R0
         st16 Length, $0800
         set_ppuaddr #$2000
 loop:
+        perform_zpcm_inc
         lda #$80 ; static tile 0
         sta PPUDATA
         dec16 Length
@@ -355,6 +358,7 @@ Length := R2
         
         ldy #0
 loop:
+        perform_zpcm_inc
         lda (DataAddr), y ; static tile 0
         sta PPUDATA
         dec16 Length
@@ -362,6 +366,7 @@ loop:
         lda Length
         ora Length+1
         bne loop
+        perform_zpcm_inc
         rts
 .endproc
 

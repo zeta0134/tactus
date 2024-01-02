@@ -8,6 +8,7 @@
         .include "compression.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
         .segment "PRGFIXED_C000"
         ;.org $e000
@@ -29,6 +30,7 @@
 SourceAddr := R0
 TargetAddr := R2
 JumpTarget := R14
+        perform_zpcm_inc
         ldy #0
         ; nab the compression type
         fetch_one_byte SourceAddr
@@ -61,6 +63,7 @@ Length := R14
         sta Length+1
         ; y is already 0 from the parent routine
 loop:
+        perform_zpcm_inc
         fetch_one_byte SourceAddr
         sta (TargetAddr), y
         inc16 TargetAddr
@@ -99,6 +102,7 @@ loop:
         ; y is already 0 from the parent routine
         
 packet_loop:
+        perform_zpcm_inc
         ; load and decode one data packet
         lda (SourceAddr), y
         and #%00000111
@@ -126,6 +130,7 @@ pointer_packet:
         sta PointerAddr+1
         ; From here, read up to PacketOffset bytes, and write those to TargetAddr
 pointer_loop:
+        perform_zpcm_inc
         lda (PointerAddr), y
         sta (TargetAddr), y
         inc16 PointerAddr
@@ -141,6 +146,7 @@ pointer_loop:
 
 data_packet:
 data_packet_loop:
+        perform_zpcm_inc
         ; Starting immediately after the DataPacket header, copy PacketLength bytes
         ; to the TargetAddr
         lda (SourceAddr), y
@@ -157,5 +163,6 @@ data_packet_loop:
         jmp packet_loop
 
 all_done:
+        perform_zpcm_inc
         rts
 .endproc

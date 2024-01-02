@@ -407,10 +407,15 @@ done:
 .endproc
 
 .proc update_sfx
+        perform_zpcm_inc
         jsr update_pulse1
+        perform_zpcm_inc
         jsr update_pulse2
+        perform_zpcm_inc
         jsr update_triangle
+        perform_zpcm_inc
         jsr update_noise
+        perform_zpcm_inc
         rts
 .endproc
 

@@ -55,8 +55,8 @@ beta: dir $(ROM_NAME)
 osx: dir $(ROM_NAME)
 	/Users/zeta0134/Github/Mesen2/bin/osx-arm64/Release/osx-arm64/publish/Mesen $(ROM_NAME)
 
-debug: dir $(ROM_NAME)
-	mono vendor/Mesen-X-v1.0.0.exe $(ROM_NAME) debug_entity_0.lua
+debugzpcm: dir $(ROM_NAME)
+	/home/zeta0134/Downloads/Rainbow/Mesen2/bin/linux-x64/Release/Mesen $(ROM_NAME) debug_zpcm_timing.lua
 
 profile: dir $(ROM_NAME)
 	mono vendor/Mesen-X-v1.0.0.exe $(ROM_NAME) debug_color_performance.lua

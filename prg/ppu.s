@@ -5,6 +5,7 @@
         .include "ppu.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
         .segment "PRGFIXED_C000"
 
@@ -29,6 +30,7 @@ title_palette:
         st16 R0, ($1000)
         dec16 R0
 loop:
+        perform_zpcm_inc
         lda #0
         sta PPUDATA
         dec16 R0 ; sets A to 0xFF
@@ -55,6 +57,7 @@ loop:
         lda #$0F
         ldx #0
 palette_loop:
+        perform_zpcm_inc
         sta PPUDATA
         inx
         cpx #32
@@ -77,6 +80,7 @@ palette_loop:
 .endproc
 
 .proc initialize_game_palettes
+        perform_zpcm_inc
         ; Copy palette data into the palette manager
 
         ldx #0
@@ -86,6 +90,8 @@ obj_loop:
         inx
         cpx #16
         bne obj_loop
+
+        perform_zpcm_inc
 
         ldx #0
 bg_loop:
@@ -94,10 +100,14 @@ bg_loop:
         inx
         cpx #16
         bne bg_loop
+
+        perform_zpcm_inc
+
         rts
 .endproc
 
 .proc initialize_title_palettes
+        perform_zpcm_inc
         ; Copy palette data into the palette manager
 
         ldx #0
@@ -108,6 +118,8 @@ obj_loop:
         cpx #16
         bne obj_loop
 
+        perform_zpcm_inc
+
         ldx #0
 bg_loop:
         lda title_palette, x
@@ -115,5 +127,8 @@ bg_loop:
         inx
         cpx #16
         bne bg_loop
+
+        perform_zpcm_inc
+
         rts
 .endproc

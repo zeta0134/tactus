@@ -307,6 +307,8 @@ MetaSpriteIndex := R0
         lda #0
         sta tempo_adjustment
 
+        perform_zpcm_inc
+
         
         .if ::DEBUG_TEST_FLOOR
         ; Generate an open debug floor plan, with fixed spawn locations
@@ -321,8 +323,11 @@ MetaSpriteIndex := R0
 .endproc
 
 .proc room_init
+        perform_zpcm_inc
         far_call FAR_init_current_room
+        perform_zpcm_inc
         far_call FAR_despawn_unimportant_sprites
+        perform_zpcm_inc
         st16 GameMode, beat_frame_1
         rts
 .endproc
@@ -381,6 +386,7 @@ not_victory:
 .endproc
 
 .proc beat_frame_1
+        perform_zpcm_inc
         inc16 AccumulatedGameBeats
         inc CurrentBeatCounter
         lda CurrentBeat
@@ -390,6 +396,8 @@ not_victory:
         ; - Swap the active and inactive buffers
         far_call FAR_swap_battlefield_buffers
 
+        perform_zpcm_inc
+
         ; Set the next kernel mode early; the player might override this
         st16 GameMode, wait_for_player_draw_1
 
@@ -397,14 +405,19 @@ not_victory:
         jsr update_player
         far_call FAR_handle_room_spawns
 
+        perform_zpcm_inc
+
         ; - Queue up any changed squares to the **active** buffer
         ; - Begin playback of any sprite animations (?)
 
         ; - clear "moved this frame" flags from all tiles, permitting
         ;   the updates we will perform over the next few frames
         far_call FAR_clear_active_move_flags
+        perform_zpcm_inc
         far_call FAR_age_sprites
+        perform_zpcm_inc
         far_call FAR_refresh_hud
+        perform_zpcm_inc
         jsr every_gameloop
         rts
 .endproc
@@ -593,16 +606,25 @@ continue_waiting:
 .endproc
 
 .proc every_gameloop
+        perform_zpcm_inc
         jsr update_beat_counters
         far_call FAR_sync_chr_bank_to_music
+        perform_zpcm_inc
         far_call FAR_queue_battlefield_updates
+        perform_zpcm_inc
         far_call FAR_queue_hud
+        perform_zpcm_inc
         jsr determine_player_intent
         jsr draw_player
+        perform_zpcm_inc
         far_call FAR_draw_sprites
+        perform_zpcm_inc
         far_call FAR_update_brightness
+        perform_zpcm_inc
         far_call FAR_refresh_palettes_gameloop
+        perform_zpcm_inc
         jsr update_screen_shake
+        perform_zpcm_inc
 
         jsr wait_for_next_vblank
         rts

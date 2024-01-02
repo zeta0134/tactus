@@ -78,6 +78,7 @@ vram_32:
         lda #VRAM_DOWN
         sta PPUCTRL
 converge:
+        perform_zpcm_inc
         jmp (PopSlideAddress)
 done_with_transfer:
         dec VRAM_TABLE_ENTRIES

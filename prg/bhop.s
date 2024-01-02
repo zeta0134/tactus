@@ -200,6 +200,8 @@ positive:
         ; preserve parameters
         pha ; song index
 
+        perform_zpcm_inc
+
         ; initialize bhop_ptr with the song header
         stx music_header_ptr
         sty music_header_ptr+1
@@ -238,6 +240,8 @@ positive:
         sta module_flags
 .endif
 
+        perform_zpcm_inc
+
         ; load speed and tempo from the requested song
         prepare_ptr song_ptr
         ldy #SongInfo::speed
@@ -261,6 +265,8 @@ song_uses_groove:
         lda (bhop_ptr), y
         sta row_cmp
 
+        perform_zpcm_inc
+
         ; If this song has grooves enabled, then apply the first groove right away
         jsr update_groove
         ; Now, to work around an off-by-one startup condition with when advance_pattern_rows
@@ -268,10 +274,14 @@ song_uses_groove:
         lda groove_index
         sta groove_position
 
+        perform_zpcm_inc
+
         ; initialize at the first frame, and prime our pattern pointers
         ldx #0
         jsr jump_to_frame
         jsr load_frame_patterns
+
+        perform_zpcm_inc
 
         ; initialize every channel's volume to 15 (some songs seem to rely on this)
         lda #$0F
@@ -295,6 +305,8 @@ song_uses_groove:
         sta channel_volume + VRC6_SAWTOOTH_INDEX
         .endif
 
+        perform_zpcm_inc
+
         ; disable any active effects
         lda #0
         sta channel_pitch_effects_active + PULSE_1_INDEX
@@ -315,6 +327,8 @@ song_uses_groove:
         sta channel_pitch_effects_active + VRC6_SAWTOOTH_INDEX
         .endif
 
+        perform_zpcm_inc
+
         ; reset every channel's status
         lda #(CHANNEL_MUTED)
         sta channel_status + PULSE_1_INDEX
@@ -334,6 +348,8 @@ song_uses_groove:
         sta channel_status + VRC6_PULSE_2_INDEX
         sta channel_status + VRC6_SAWTOOTH_INDEX
         .endif
+
+        perform_zpcm_inc
         
         ; reset DPCM status
         lda #$FF
@@ -350,6 +366,7 @@ song_uses_groove:
         lda #0
         ldx #NUM_CHANNELS
 effect_init_loop:
+        perform_zpcm_inc
         dex
         sta effect_note_delay, x
         sta sequences_enabled, x
@@ -383,6 +400,8 @@ effect_init_loop:
         .if ::BHOP_VRC6_ENABLED
         jsr bhop_vrc6_init
         .endif
+
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -2124,6 +2143,8 @@ pulse1_muted:
         lda #%00110000
         sta $4000
 
+        perform_zpcm_inc
+
 tick_pulse2:
         lda #CHANNEL_SUPPRESSED
         bit channel_status + PULSE_2_INDEX
@@ -2193,6 +2214,8 @@ pulse2_muted:
         lda #%00110000
         sta $4004
 
+        perform_zpcm_inc
+
 tick_triangle:
         lda #CHANNEL_SUPPRESSED
         bit channel_status + TRIANGLE_INDEX
@@ -2228,6 +2251,8 @@ triangle_muted:
         ; best we can do without conflicting with the DMC channel
         lda #$80
         sta $4008
+
+        perform_zpcm_inc
 
 tick_noise:
         lda #CHANNEL_SUPPRESSED
@@ -2289,6 +2314,8 @@ noise_muted:
         ; we set the volume to 0
         lda #%00110000
         sta $400C
+
+        perform_zpcm_inc
 
 tick_dpcm:
         jsr play_dpcm_samples

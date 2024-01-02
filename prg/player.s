@@ -15,6 +15,7 @@
         .include "weapons.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
 .zeropage
 
@@ -168,6 +169,7 @@ sprite_failed:
         beq done
         inc PlayerJumpHeightPos
 done:
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -258,6 +260,7 @@ no_valid_press:
 .proc lerp_player_to_target_coordinates
 CurrentPos := R0
 TargetPos := R2
+        perform_zpcm_inc
         lda PlayerCurrentX
         sta CurrentPos
         lda PlayerCurrentX+1
@@ -272,6 +275,8 @@ TargetPos := R2
         lda CurrentPos+1
         sta PlayerCurrentX+1
 
+        perform_zpcm_inc
+
         lda PlayerCurrentY
         sta CurrentPos
         lda PlayerCurrentY+1
@@ -285,6 +290,8 @@ TargetPos := R2
         sta PlayerCurrentY
         lda CurrentPos+1
         sta PlayerCurrentY+1
+
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -315,6 +322,8 @@ Distance := R4
         beq arrived_at_target
         cmp #$FF
         beq arrived_at_target
+
+        perform_zpcm_inc
 
         ; this is a signed comparison, and it's much easier to simply split the code here
         lda Distance+2
@@ -944,6 +953,7 @@ TargetSquare := R13
 ; regardless, this is where we want to go on this frame. What happens when we land?
 TargetRow := R14
 TargetCol := R15
+        perform_zpcm_inc
         ldx TargetRow
         lda player_tile_index_table, x ; Row * Width
         clc

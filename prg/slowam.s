@@ -41,6 +41,7 @@ the_rts_at_the_end:
 DestPtr := R0
 BlockCounter := R2
 ByteCounter := R3
+    perform_zpcm_inc
     st16 DestPtr, SPRITE_TRANSFER_BASE
     lda #16
     sta BlockCounter
@@ -50,6 +51,7 @@ block_loop:
     lda #16
     sta ByteCounter
 byte_loop:
+    perform_zpcm_inc
     .repeat 5, i
     lda one_sprite_byte+i
     sta (DestPtr), y
@@ -68,6 +70,7 @@ byte_loop:
     ; now at the end, finally copy in the RTS and we're done
     lda the_rts_at_the_end
     sta (DestPtr), y
+    perform_zpcm_inc
     rts
 .endproc
 

@@ -2,6 +2,7 @@
         .include "prng.inc"
         .include "player.inc"
         .include "levels.inc"
+        .include "zpcm.inc"
 ;
 ; 6502 LFSR PRNG - 16-bit
 ; Brad Smith, 2019
@@ -87,6 +88,7 @@ next_fixed_rand:
 	rts
 
 .proc set_fixed_room_seed
+	perform_zpcm_inc
         lda global_rng_seed
         sta fixed_seed
         ldx PlayerRoomIndex
@@ -95,6 +97,8 @@ next_fixed_rand:
         ; I've noticed that the first number pulled can be a *mite* predictable, so to
         ; resolve this run the routine twice before returning
         jsr next_fixed_rand
+        perform_zpcm_inc
         jsr next_fixed_rand
+        perform_zpcm_inc
         rts
 .endproc

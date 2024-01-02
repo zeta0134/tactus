@@ -14,6 +14,7 @@
         .include "weapons.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
 .segment "RAM"
 
@@ -255,6 +256,7 @@ CurrentHeart := R0
 RoomIndex := R0
 FullHeartThreshold := R1
 HalfHeartThreshold := R2
+        perform_zpcm_inc
         ; up to 10 hearts
         lda #0
         sta CurrentHeart
@@ -263,6 +265,7 @@ HalfHeartThreshold := R2
         lda #1
         sta HalfHeartThreshold
 loop:
+        perform_zpcm_inc
         lda PlayerHealth
         cmp FullHeartThreshold
         bcc check_half_heart
@@ -311,10 +314,14 @@ converge:
         cmp #MAX_HEARTS
         bne loop
 
+        perform_zpcm_inc
+
         ; For now, just pad out the remainder
         lda #10
         sta PaddingAmount
         jsr draw_padding
+
+        perform_zpcm_inc
 
         ; At the end, draw the second set of four tiles of the minimap
         lda #8
@@ -330,6 +337,9 @@ converge:
         clc
         adc #28
         sta queued_bytes_counter
+
+        perform_zpcm_inc
+
         rts
 .endproc
 
@@ -352,6 +362,7 @@ StringPtr := R0
         sta HalfHeartThreshold
         
 loop:
+        perform_zpcm_inc
         lda PlayerHealth
         cmp FullHeartThreshold
         bcc check_half_heart
@@ -400,16 +411,22 @@ converge:
         cmp #MAX_HEARTS
         bne loop
 
+        perform_zpcm_inc
+
         ; Draw the player's gold counter
         st16 StringPtr, money_text
         jsr draw_string
         mov16 NumberWord, PlayerGold
         jsr draw_16bit_number
 
+        perform_zpcm_inc
+
         ; For now, just pad out the remainder
         lda #3
         sta PaddingAmount
         jsr draw_padding
+
+        perform_zpcm_inc
 
         ; At the end, draw the second set of four tiles of the minimap
         lda #12
@@ -425,6 +442,8 @@ converge:
         clc
         adc #28
         sta queued_bytes_counter
+
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -457,6 +476,7 @@ PaddingAmount := R0
         beq skip
         lda #BLANK_TILE
 loop:
+        perform_zpcm_inc
         sta VRAM_TABLE_START, y
         iny
         dec PaddingAmount
@@ -470,6 +490,7 @@ StringPtr := R0
 VramIndex := R2
         sty VramIndex ; preserve
 loop:
+        perform_zpcm_inc
         ldy #0
         lda (StringPtr), y
         beq end_of_string
@@ -500,6 +521,8 @@ PaddingAmount := R0
 StringPtr := R0
 Digit := R0
 RoomIndex := R0
+        perform_zpcm_inc
+
         ; 0123456789012345678901234567
         ; ZONE W-L  L-N WWWWWWWWWW
         ; Zone area, indicating our overall game state
@@ -525,6 +548,8 @@ no_key:
         sta PaddingAmount
         jsr draw_padding
 done_with_keys:
+        perform_zpcm_inc
+
         ; Fixed padding between zone end and weapon area begin
         lda #1
         sta PaddingAmount
@@ -534,12 +559,14 @@ done_with_keys:
         lda weapon_padding_table, x
         sta PaddingAmount
         jsr draw_padding
+        perform_zpcm_inc
         ; Weapon level
         st16 StringPtr, weapon_level_text
         jsr draw_string
         lda PlayerWeaponDmg ; TODO: use the actual level number
         sta Digit
         jsr draw_single_digit
+        perform_zpcm_inc
         ; Finally the weapon name
         lda PlayerWeapon
         asl
@@ -549,10 +576,12 @@ done_with_keys:
         lda weapon_name_table+1, x
         sta StringPtr+1
         jsr draw_string
+        perform_zpcm_inc
         ; One space between the weapon name and the minimap
         lda #1
         sta PaddingAmount
         jsr draw_padding
+        perform_zpcm_inc
         ; At the end, draw the second set of four tiles of the minimap
         lda #4
         sta RoomIndex
@@ -566,20 +595,26 @@ done_with_keys:
         adc #28
         sta queued_bytes_counter
 
+        perform_zpcm_inc
+
         rts
 .endproc
 
 .proc FAR_queue_hud_topmost_row
 PaddingAmount := R0
 RoomIndex := R0
+        perform_zpcm_inc
         ; This row is mostly padding
         lda #24
         sta PaddingAmount
         jsr draw_padding
+        perform_zpcm_inc
         ; At the end, draw the first four tiles of the minimap
         lda #0
         sta RoomIndex
         jsr draw_map_tiles
+
+        perform_zpcm_inc
 
         sty VRAM_TABLE_INDEX
         inc VRAM_TABLE_ENTRIES
@@ -588,6 +623,8 @@ RoomIndex := R0
         clc
         adc #28
         sta queued_bytes_counter
+
+        perform_zpcm_inc
 
         rts
 .endproc

@@ -7,6 +7,7 @@
         .include "ppu.inc"
         .include "vram_buffer.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
         .segment "RAM"
 BgPaletteDirty: .res 1
@@ -110,6 +111,7 @@ PalIndex := R2
         bcc continue
         rts ; the queue is full; bail immediately
 continue:
+        perform_zpcm_inc
 
         lda Brightness
         asl
@@ -126,6 +128,7 @@ continue:
         lda #0
         sta PalIndex
 bg_loop:
+        perform_zpcm_inc
         ; for the first entry, always use the global BG color
         ldx #0
         ldx PalIndex           ; From the original buffer
@@ -160,6 +163,7 @@ check_obj_palette:
         lda #0
         sta PalIndex
 obj_loop:
+        perform_zpcm_inc
        ; for the first entry, always use the global *BG* color
         ldx #0
         ldx PalIndex           ; From the original buffer
@@ -187,6 +191,7 @@ obj_loop:
         inc VRAM_TABLE_ENTRIES
 
 done:
+        perform_zpcm_inc
         lda #0
         sta BgPaletteDirty
         sta ObjPaletteDirty
