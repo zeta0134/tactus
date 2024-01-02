@@ -451,6 +451,7 @@ done:
 .endproc
 
 .proc load_frame_patterns
+        perform_zpcm_inc
         ;initialize all the pattern rows from the current frame pointer
         prepare_ptr frame_ptr
         ldy #0
@@ -486,6 +487,8 @@ done:
         lda (bhop_ptr), y
         sta channel_pattern_ptr_high+NOISE_INDEX
         iny
+
+        perform_zpcm_inc
 
         .if ::BHOP_ZSAW_ENABLED
         lda (bhop_ptr), y
@@ -542,6 +545,8 @@ done:
         lda (bhop_ptr), y
         sta channel_pattern_ptr_high+DPCM_INDEX
         iny
+
+        perform_zpcm_inc
 
 .if ::BHOP_PATTERN_BANKING
         lda module_flags
@@ -610,6 +615,7 @@ banking_not_enabled:
         .endif
         sta channel_pattern_bank + DPCM_INDEX
 done_with_banks:
+        perform_zpcm_inc
 .endif
 
         ; reset all the row counters to 0
@@ -631,6 +637,8 @@ done_with_banks:
         sta channel_row_delay_counter + VRC6_SAWTOOTH_INDEX
         .endif
         sta channel_row_delay_counter + DPCM_INDEX
+
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -1510,6 +1518,7 @@ no_wrap:
 ;   channel_index points to desired channel
 ;   channel_selected_instrument[channel_index] contains desired instrument index
 .proc load_instrument
+        perform_zpcm_inc
         prepare_ptr_with_fixed_offset music_header_ptr, FtModuleHeader::instrument_list
         ldx channel_index
         lda channel_selected_instrument, x
@@ -1557,6 +1566,7 @@ check_arp:
         iny
 
 check_pitch:
+        perform_zpcm_inc
         lsr scratch_byte
         bcc check_hipitch
 
@@ -1579,6 +1589,7 @@ check_hipitch:
         iny
 
 check_duty:
+        perform_zpcm_inc
         lsr scratch_byte
         bcc done_loading_sequences
 
@@ -1599,6 +1610,7 @@ done_loading_sequences:
 ; setup:
 ;   channel_index points to the active channel
 .proc reset_instrument
+        perform_zpcm_inc
         ldy channel_index
         lda #0
         sta volume_sequence_index, y

@@ -1,6 +1,7 @@
         .setcpu "6502"
         .include "input.inc"
         .include "nes.inc"
+        .include "zpcm.inc"
 
 
 
@@ -17,6 +18,7 @@ ButtonsHeld: .byte $00
 
 .macro read_controller controller_port, result_dest
 .scope
+        perform_zpcm_inc
         ; pulse P1 high to latch buttons
         lda #$01
         sta controller_port

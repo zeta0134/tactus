@@ -6,6 +6,7 @@
         .include "sound.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
         .segment "RAM"
 Pulse1RowCounter: .res 1
@@ -97,13 +98,17 @@ track_table_variant_length:
 .proc update_audio
         jsr update_fade
         access_data_bank MusicCurrentBank
+        perform_zpcm_inc
         jsr bhop_play
+        perform_zpcm_inc
         jsr update_sfx
         restore_previous_bank
+        perform_zpcm_inc
         rts
 .endproc
 
 .proc update_fade
+        perform_zpcm_inc
         ; If there is no track to switch to, don't bother fading to it
         lda MusicTargetTrack
         cmp MusicCurrentTrack
@@ -128,6 +133,7 @@ done_with_fade:
 
 ; inputs: track number in A
 .proc fade_to_track
+        perform_zpcm_inc
         sta MusicTargetTrack
         lda #FADE_SPEED
         sta FadeCounter
@@ -142,6 +148,7 @@ done:
 
 ; inputs: track number in A
 .proc play_track
+        perform_zpcm_inc
         .if ::DEBUG_DISABLE_MUSIC
         ; ignore the requested track, and queue up the click track instead
         lda #1

@@ -14,6 +14,7 @@
 .include "sound.inc"
 .include "vram_buffer.inc"
 .include "zeropage.inc"
+.include "zpcm.inc"
 
         .segment "PRGFIXED_C000"
 
@@ -102,9 +103,6 @@ right_nametable:
 write_ppuctrl:
         sta PPUCTRL
        
-        ;lda #00
-        ;sta PPUSCROLL
-        ;sta PPUSCROLL
         lda PpuScrollX
         sta PPUSCROLL
         lda PpuScrollY
@@ -132,6 +130,7 @@ nmi_soft_disable:
         ; smooth over transitions when loading a new level.
         
         jsr update_audio
+        perform_zpcm_inc
 
         ; restore registers
         pla
