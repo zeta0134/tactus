@@ -47,7 +47,7 @@ run: dir $(ROM_NAME)
 	rusticnes-sdl $(ROM_NAME)
 
 mesen: dir $(ROM_NAME)
-	mono vendor/Mesen-X-v1.0.0.exe $(ROM_NAME)
+	/home/zeta0134/Downloads/Rainbow/Mesen2/bin/linux-x64/Release/Mesen $(ROM_NAME)
 
 beta: dir $(ROM_NAME)
 	/home/zeta0134/Downloads/MesenBeta/Mesen $(ROM_NAME)

@@ -7,6 +7,7 @@
         .include "slowam.inc"
         .include "sprites.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
 .zeropage
 current_sprite_ptr: .res 2
@@ -26,9 +27,11 @@ SHUFFLE_MASK = %00111111
 
 .proc FAR_initialize_sprites
 MetaSpriteIndex := R0
+        perform_zpcm_inc
         lda #0
         sta MetaSpriteIndex
 loop:
+        perform_zpcm_inc
         ldx MetaSpriteIndex
         lda #0
         sta sprite_table + MetaSpriteState::PositionX, x
@@ -44,12 +47,14 @@ loop:
         sta MetaSpriteIndex
         jmp loop
 done:
+        perform_zpcm_inc
         rts
 .endproc
 
 .proc disable_all_oam_entries
         ldx #0
 loop:
+        perform_zpcm_inc
         lda sprite_ptr_lut_low, x
         sta current_sprite_ptr+0
         lda sprite_ptr_lut_high, x
@@ -81,6 +86,7 @@ check_beat_counter:
         lda sprite_table + MetaSpriteState::LifetimeBeats, x
         bne do_not_draw
 draw:
+        perform_zpcm_inc
         ldy CurrentOamIndex
         lda sprite_ptr_lut_low, y
         sta current_sprite_ptr+0
@@ -101,6 +107,8 @@ draw:
         ;sta SHADOW_OAM + ONE_SPRITE + OAM_X_POS, y
         ldy #(SelfModifiedSprite::PosX + .sizeof(SelfModifiedSprite))
         sta (current_sprite_ptr), y
+
+        perform_zpcm_inc
 
         ; Y position might be modified if we are in RISE mode
         lda sprite_table + MetaSpriteState::BehaviorFlags, x
@@ -142,6 +150,8 @@ write_sprite_y:
         ldy #(SelfModifiedSprite::PosY + .sizeof(SelfModifiedSprite))
         sta (current_sprite_ptr), y
 
+        perform_zpcm_inc
+
         ; Sprite tile may be inverted if we are horizontally flipped
         lda sprite_table + MetaSpriteState::BehaviorFlags, x
         and #SPRITE_HORIZ_FLIP
@@ -160,6 +170,8 @@ no_horizontal_flip:
         ldy #(SelfModifiedSprite::TileId + .sizeof(SelfModifiedSprite))
         sta (current_sprite_ptr), y
 
+        perform_zpcm_inc
+
         jmp attribute_byte
 horizontal_flip:
         lda sprite_table + MetaSpriteState::TileIndex, x
@@ -175,6 +187,8 @@ horizontal_flip:
         ldy #SelfModifiedSprite::TileId
         sta (current_sprite_ptr), y
 
+        perform_zpcm_inc
+
 attribute_byte:
         ; The attribute byte is always a straight copy
         lda sprite_table + MetaSpriteState::BehaviorFlags, x
@@ -186,6 +200,8 @@ attribute_byte:
         ;sta SHADOW_OAM + ONE_SPRITE + OAM_ATTRIBUTES, y
         ldy #(SelfModifiedSprite::Attributes + .sizeof(SelfModifiedSprite))
         sta (current_sprite_ptr), y
+
+        perform_zpcm_inc
 
         ; finally, we did a draw, so advance the OAM index
         lda CurrentOamIndex
@@ -206,6 +222,7 @@ CurrentOamIndex := R1
         lda starting_oam_index
         sta CurrentOamIndex
 loop:
+        perform_zpcm_inc
         jsr draw_sprite
         lda #.sizeof(MetaSpriteState)
         clc
@@ -215,6 +232,7 @@ loop:
         sta MetaSpriteIndex
         jmp loop
 done:
+        perform_zpcm_inc
         ; shuffle our starting OAM index every frame
         lda starting_oam_index
         clc

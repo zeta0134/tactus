@@ -13,6 +13,7 @@
         .include "weapons.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
 .zeropage
 DestPtr: .res 2
@@ -210,6 +211,7 @@ bonk_behaviors:
         .endrepeat
 
 .proc __trampoline
+        perform_zpcm_inc
         jmp (DestPtr)
         ; tail call
 .endproc

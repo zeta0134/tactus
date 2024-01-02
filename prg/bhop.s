@@ -10,6 +10,9 @@
 .include "bhop/commands.asm"
 .include "bhop/effects.asm"
 
+; game specific
+.include "zpcm.inc"
+
         .segment BHOP_ZP_SEGMENT
 ; scratch ptr, used for all sorts of indirect reads
 bhop_ptr: .word $0000
@@ -696,6 +699,7 @@ done_advancing_rows:
 ; prep:
 ; - channel_index is set to desired channel
 .proc advance_channel_row
+        perform_zpcm_inc
         ; see CChannelHandler::PlayNote() in Dn-FT
         ; check first if we still have lingering delay from the previous row
         ldx channel_index
@@ -733,6 +737,7 @@ skip_handle_delay:
         ; until a note is encountered. Any note command breaks out of the loop and
         ; signals the end of processing for this row.
 bytecode_loop:
+        perform_zpcm_inc
         fetch_pattern_byte
         cmp #0 ; needed to set negative flag based on command byte currently in a
         bpl handle_note ; if the high bit is clear, this is some kind of note
@@ -813,6 +818,7 @@ check_release:
         lda module_bank
         switch_music_bank
 .endif      
+        perform_zpcm_inc
         jsr apply_release
 .if ::BHOP_PATTERN_BANKING
         ; And now we need to switch back to the pattern bank before continuing
@@ -1245,146 +1251,239 @@ done_with_delays:
         ; PULSE 1
         lda #PULSE_1_INDEX
         sta channel_index
+        perform_zpcm_inc
         jsr tick_delayed_effects
+        perform_zpcm_inc
         jsr tick_volume_envelope
+        perform_zpcm_inc
         jsr tick_duty_envelope
+        perform_zpcm_inc
         ; the order of pitch updates matters a lot to match FT behavior
         jsr update_arp
+        perform_zpcm_inc
         jsr update_pitch_effects
+        perform_zpcm_inc
         jsr update_volume_effects
+        perform_zpcm_inc
         jsr tick_arp_envelope
+        perform_zpcm_inc
         jsr tick_pitch_envelope
+        perform_zpcm_inc
         initialize_detuned_frequency
+        perform_zpcm_inc
         jsr update_vibrato
+        perform_zpcm_inc
         jsr update_tuning
+        perform_zpcm_inc
 
         ; PULSE 2
         lda #PULSE_2_INDEX
         sta channel_index
         jsr tick_delayed_effects
+        perform_zpcm_inc
         jsr tick_volume_envelope
+        perform_zpcm_inc
         jsr tick_duty_envelope
+        perform_zpcm_inc
         jsr update_arp
+        perform_zpcm_inc
         jsr update_pitch_effects
+        perform_zpcm_inc
         jsr update_volume_effects
+        perform_zpcm_inc
         jsr tick_arp_envelope
+        perform_zpcm_inc
         jsr tick_pitch_envelope
+        perform_zpcm_inc
         initialize_detuned_frequency
         jsr update_vibrato
+        perform_zpcm_inc
         jsr update_tuning
+        perform_zpcm_inc
 
         ; TRIANGLE
         lda #TRIANGLE_INDEX
         sta channel_index
         jsr tick_delayed_effects
+        perform_zpcm_inc
         jsr tick_volume_envelope
+        perform_zpcm_inc
         jsr update_arp
+        perform_zpcm_inc
         jsr update_pitch_effects
+        perform_zpcm_inc
         jsr tick_arp_envelope
+        perform_zpcm_inc
         jsr tick_pitch_envelope
+        perform_zpcm_inc
         initialize_detuned_frequency
         jsr update_vibrato
+        perform_zpcm_inc
         jsr update_tuning
+        perform_zpcm_inc
 
         ; NOISE
         lda #NOISE_INDEX
         sta channel_index
         jsr tick_delayed_effects
+        perform_zpcm_inc
         jsr update_volume_effects
+        perform_zpcm_inc
         jsr tick_volume_envelope
+        perform_zpcm_inc
         jsr tick_duty_envelope
+        perform_zpcm_inc
         jsr tick_noise_arp_envelope
+        perform_zpcm_inc
         jsr tick_pitch_envelope
+        perform_zpcm_inc
 
         ; DPCM
         lda #DPCM_INDEX
         sta channel_index
         jsr tick_delayed_effects
+        perform_zpcm_inc
 
 .if ::BHOP_ZSAW_ENABLED
         ; Z-Saw
         lda #ZSAW_INDEX
         sta channel_index
         jsr tick_delayed_effects
+        perform_zpcm_inc
         jsr update_volume_effects
+        perform_zpcm_inc
         jsr tick_volume_envelope
+        perform_zpcm_inc
         jsr tick_duty_envelope_zsaw
+        perform_zpcm_inc
         jsr update_arp_zsaw
+        perform_zpcm_inc
         jsr tick_arp_envelope_zsaw
+        perform_zpcm_inc
 .endif
 
 .if ::BHOP_MMC5_ENABLED
         lda #MMC5_PULSE_1_INDEX
         sta channel_index
         jsr tick_delayed_effects
+        perform_zpcm_inc
         jsr tick_volume_envelope
+        perform_zpcm_inc
         jsr tick_duty_envelope
+        perform_zpcm_inc
         jsr update_arp
+        perform_zpcm_inc
         jsr update_pitch_effects
+        perform_zpcm_inc
         jsr update_volume_effects
+        perform_zpcm_inc
         jsr tick_arp_envelope
+        perform_zpcm_inc
         jsr tick_pitch_envelope
+        perform_zpcm_inc
         initialize_detuned_frequency
         jsr update_vibrato
+        perform_zpcm_inc
         jsr update_tuning
+        perform_zpcm_inc
 
         lda #MMC5_PULSE_2_INDEX
         sta channel_index
         jsr tick_delayed_effects
+        perform_zpcm_inc
         jsr tick_volume_envelope
+        perform_zpcm_inc
         jsr tick_duty_envelope
+        perform_zpcm_inc
         jsr update_arp
+        perform_zpcm_inc
         jsr update_pitch_effects
+        perform_zpcm_inc
         jsr update_volume_effects
+        perform_zpcm_inc
         jsr tick_arp_envelope
+        perform_zpcm_inc
         jsr tick_pitch_envelope
+        perform_zpcm_inc
         initialize_detuned_frequency
         jsr update_vibrato
+        perform_zpcm_inc
         jsr update_tuning
+        perform_zpcm_inc
 .endif
 
 .if ::BHOP_VRC6_ENABLED
         lda #VRC6_PULSE_1_INDEX
         sta channel_index
         jsr tick_delayed_effects
+        perform_zpcm_inc
         jsr tick_volume_envelope
+        perform_zpcm_inc
         jsr tick_duty_envelope
+        perform_zpcm_inc
         jsr update_arp
+        perform_zpcm_inc
         jsr update_pitch_effects
+        perform_zpcm_inc
         jsr update_volume_effects
+        perform_zpcm_inc
         jsr tick_arp_envelope
+        perform_zpcm_inc
         jsr tick_pitch_envelope
+        perform_zpcm_inc
         initialize_detuned_frequency
         jsr update_vibrato
+        perform_zpcm_inc
         jsr update_tuning
+        perform_zpcm_inc
 
         lda #VRC6_PULSE_2_INDEX
         sta channel_index
         jsr tick_delayed_effects
+        perform_zpcm_inc
         jsr tick_volume_envelope
+        perform_zpcm_inc
         jsr tick_duty_envelope
+        perform_zpcm_inc
         jsr update_arp
+        perform_zpcm_inc
         jsr update_pitch_effects
+        perform_zpcm_inc
         jsr update_volume_effects
+        perform_zpcm_inc
         jsr tick_arp_envelope
+        perform_zpcm_inc
         jsr tick_pitch_envelope
+        perform_zpcm_inc
         initialize_detuned_frequency
         jsr update_vibrato
+        perform_zpcm_inc
         jsr update_tuning
+        perform_zpcm_inc
 
         lda #VRC6_SAWTOOTH_INDEX
         sta channel_index
         jsr tick_delayed_effects
+        perform_zpcm_inc
         jsr tick_volume_envelope
+        perform_zpcm_inc
         jsr tick_duty_envelope
+        perform_zpcm_inc
         jsr update_arp
+        perform_zpcm_inc
         jsr update_pitch_effects
+        perform_zpcm_inc
         jsr update_volume_effects
+        perform_zpcm_inc
         jsr tick_arp_envelope
+        perform_zpcm_inc
         jsr tick_pitch_envelope
+        perform_zpcm_inc
         initialize_detuned_frequency
         jsr update_vibrato
+        perform_zpcm_inc
         jsr update_tuning
+        perform_zpcm_inc
 .endif
 
         rts
@@ -2338,7 +2437,7 @@ skip_pitch:
         bpl skip_dac ; != -1? then it was already written
         lda scratch_byte
         bmi skip_dac
-        sta $4011
+        ;sta $4011
 skip_dac:
         lda #$FF
         sta effect_dac_buffer
@@ -2403,7 +2502,7 @@ dpcm_muted:
         jmp dpcm_release
 dpcm_cut:
         lda #0 ; regain full volume for TN
-        sta $4011
+        ;sta $4011
 dpcm_release:
         lda dpcm_status
         .if ::BHOP_ZSAW_ENABLED
@@ -2466,10 +2565,13 @@ reset_counter:
         sta current_music_bank
         jsr BHOP_PATTERN_SWITCH_ROUTINE
 .endif
-
+        perform_zpcm_inc
         jsr tick_frame_counter
+        perform_zpcm_inc
         jsr tick_envelopes_and_effects
+        perform_zpcm_inc
         jsr tick_registers
+        perform_zpcm_inc
         ; :D
         rts
 .endproc

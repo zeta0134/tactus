@@ -3,6 +3,7 @@
 .include "slowam.inc"
 .include "word_util.inc"
 .include "zeropage.inc"
+.include "zpcm.inc"
 
 ; Cursed Slow OAM "DMA", in 1632 cycles
 ; Drink responsibly
@@ -31,7 +32,7 @@ one_sprite_byte:
     lda #0 ; 2 bytes
     sta $2004 ; 3 bytes
 one_zpcm_op:
-    inc $4011
+    perform_zpcm_inc
 the_rts_at_the_end:
     rts
 
@@ -90,11 +91,11 @@ byte_loop:
     pha
     ; disable rendering
     ; (note: adjust scanline+offset to land this in the 320-340 window)
-    lda #(LIGHTGRAY)
+    lda #0
     sta PPUMASK
     ; perform one audio update, then launch the slow OAM transfer,
     ; which will perform more as it goes
-    inc $4011
+    perform_zpcm_inc
     lda #$00
     sta $2003
     jsr SPRITE_TRANSFER_BASE

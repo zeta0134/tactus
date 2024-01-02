@@ -3,6 +3,7 @@
 .include "battlefield.inc"
 .include "bhop/bhop.inc"
 .include "chr.inc"
+.include "debug.inc"
 .include "kernel.inc"
 .include "input.inc"
 .include "main.inc"
@@ -124,9 +125,12 @@ write_ppuctrl:
         ; Advance the global pRNG once every frame
         jsr next_rand
 
+        debug_color (TINT_R | LIGHTGRAY)
+
 nmi_soft_disable:
         ; Here we *only* update the audio engine, nothing else. This is mostly to
         ; smooth over transitions when loading a new level.
+        
         jsr update_audio
 
         ; restore registers

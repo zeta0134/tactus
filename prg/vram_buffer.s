@@ -3,6 +3,7 @@
         .include "word_util.inc"
         .include "zeropage.inc"
         .include "vram_buffer.inc"
+        .include "zpcm.inc"
 
         .zeropage
 PopSlideAddress: .word $0000
@@ -58,6 +59,7 @@ vram_zipper:
         txs
         lda PPUSTATUS ; reset the PPUADDR latch (throw this byte away)
 section_loop:
+        perform_zpcm_inc
         ; the first two bytes are always the target address
         pla
         sta PPUADDR
@@ -80,6 +82,7 @@ converge:
 done_with_transfer:
         dec VRAM_TABLE_ENTRIES
         bne section_loop
+        perform_zpcm_inc
         ; restore the original stack pointer from memory
         ldx VRAM_TABLE_INDEX
         txs
@@ -103,6 +106,7 @@ all_done:
         ldx #<(VRAM_TABLE_START)
         lda PPUSTATUS ; reset the PPUADDR latch (throw this byte away)
 section_loop:
+        perform_zpcm_inc
         ; the first two bytes are always the target address
         lda $100, x
         sta PPUADDR
@@ -131,6 +135,7 @@ converge:
         tay
 
 slowboat_loop:
+        perform_zpcm_inc
         ; perform the transfer the slow way
         lda $100, x
         sta PPUDATA
@@ -140,6 +145,7 @@ slowboat_loop:
         bne slowboat_loop
 
 done_with_transfer:
+        perform_zpcm_inc
         dec VRAM_TABLE_ENTRIES
         bne section_loop
         

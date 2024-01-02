@@ -10,6 +10,7 @@
         .include "vram_buffer.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
 .segment "RAM"
 
@@ -29,6 +30,7 @@ active_battlefield: .res 1
 LayoutPtr := R0
         ldy #0
 loop:
+        perform_zpcm_inc
         lda (LayoutPtr), y
         sta battlefield, y
         lda #0
@@ -49,6 +51,8 @@ tile_loop:
         iny
         cpy #::BATTLEFIELD_HEIGHT
         bne tile_loop
+
+        perform_zpcm_inc
 
         ldy #0
 attribute_loop:
@@ -72,6 +76,8 @@ tile_loop:
         cpy #::BATTLEFIELD_HEIGHT
         bne tile_loop
 
+        perform_zpcm_inc
+
         ldy #0
 attribute_loop:
         lda inactive_attribute_queue, y
@@ -79,6 +85,8 @@ attribute_loop:
         iny
         cpy #(::BATTLEFIELD_HEIGHT / 2)
         bne attribute_loop
+
+        perform_zpcm_inc
 
         ; now reset the inactive queue, setting it up for a full draw
         jsr reset_inactive_queue
@@ -113,6 +121,7 @@ RowCounter := R5
 second_nametable:
         st16 NametableAddr, $2482
 row_loop:
+        perform_zpcm_inc
         lda queued_bytes_counter
         cmp #(MAXIMUM_QUEUE_SIZE - 28 - 28)
         bcc continue
@@ -159,6 +168,7 @@ RowCounter := R5
 second_nametable:
         st16 NametableAddr, $2482
 row_loop:
+        perform_zpcm_inc
         lda queued_bytes_counter
         cmp #(MAXIMUM_QUEUE_SIZE - 28 - 28)
         bcc continue
@@ -201,6 +211,7 @@ RowCounter := R5
         lda #::BATTLEFIELD_WIDTH
         sta RowCounter
 top_row_loop:
+        perform_zpcm_inc
         ; top left
         lda battlefield, x
         and #%11111100
@@ -225,6 +236,7 @@ top_row_loop:
         lda #::BATTLEFIELD_WIDTH
         sta RowCounter
 bottom_row_loop:
+        perform_zpcm_inc
         ; bottom left
         lda battlefield, x
         and #%11111100
@@ -268,6 +280,7 @@ RowCounter := R5
 second_nametable:
         st16 NametableAddr, $27C8
 row_loop:
+        perform_zpcm_inc
         lda queued_bytes_counter
         cmp #(MAXIMUM_QUEUE_SIZE - 8)
         bcc continue
@@ -314,6 +327,7 @@ RowCounter := R5
 second_nametable:
         st16 NametableAddr, $27C8
 row_loop:
+        perform_zpcm_inc
         lda queued_bytes_counter
         cmp #(MAXIMUM_QUEUE_SIZE - 8)
         bcc continue
@@ -389,6 +403,7 @@ AttributeByte := R6
         lda #6
         sta RowCounter
 inner_loop:
+        perform_zpcm_inc
         ; top left
         lda battlefield, x
         lsr
@@ -421,6 +436,8 @@ inner_loop:
         inx
         dec RowCounter
         bne inner_loop
+
+        perform_zpcm_inc
 
         ; right bookend, here the rightmost tiles are always %00
         ; top left
