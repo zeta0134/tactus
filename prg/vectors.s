@@ -9,6 +9,7 @@
 .include "memory_util.inc"
 .include "prng.inc"
 .include "rainbow.inc"
+.include "slowam.inc"
 .include "sound.inc"
 .include "vram_buffer.inc"
 .include "zeropage.inc"
@@ -23,7 +24,7 @@ loop:
 .endscope
 .endmacro
 
-irq:
+null_irq:
         rti
 
 reset:
@@ -57,13 +58,6 @@ reset:
         ; is NMI disabled? if so get outta here fast
         lda NmiSoftDisable
         bne nmi_soft_disable
-
-perform_oam_dma:
-        ; do the sprite thing
-        lda #$00
-        sta OAMADDR
-        lda #$02
-        sta OAM_DMA
 
         lda GameloopCounter
         cmp LastNmi
@@ -117,7 +111,15 @@ write_ppuctrl:
 
         rainbow_set_8k_chr CurrentChrBank
 
+        ; re-enable rendering (the IRQ may have disabled it, if it ran)
+        lda #$1E
+        sta PPUMASK
+
+        ; setup raster shenanigans; in this case, slow OAM transfers
+        jsr setup_slowam_irq
+
         ; poll for input *after* setting the scroll position
+        ; TODO: move this to the game loop
         jsr poll_input
         ; Advance the global pRNG once every frame
         jsr next_rand
@@ -143,4 +145,4 @@ nmi_soft_disable:
         .segment "VECTORS"
         .addr nmi
         .addr reset
-        .addr irq
+        .addr slowam_irq

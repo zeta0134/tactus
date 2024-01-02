@@ -4,8 +4,12 @@
         .include "kernel.inc"
         .include "nes.inc"
         .include "player.inc"
+        .include "slowam.inc"
         .include "sprites.inc"
         .include "zeropage.inc"
+
+.zeropage
+current_sprite_ptr: .res 2
 
 .segment "RAM"
 sprite_table:
@@ -14,12 +18,13 @@ sprite_table:
         .endrepeat
 starting_oam_index: .res 1
 
-SHUFFLE_NEXT_SPRITE = (11 * 8)
-SHUFFLE_NEXT_FRAME = (19 * 8)
+SHUFFLE_NEXT_SPRITE = (11 * 2)
+SHUFFLE_NEXT_FRAME = (19 * 2)
+SHUFFLE_MASK = %00111111
 
-.segment "PRGFIXED_C000"
+.segment "PRG0_8000"
 
-.proc initialize_sprites
+.proc FAR_initialize_sprites
 MetaSpriteIndex := R0
         lda #0
         sta MetaSpriteIndex
@@ -44,13 +49,16 @@ done:
 
 .proc disable_all_oam_entries
         ldx #0
-        lda #$F8
 loop:
-        sta SHADOW_OAM + OAM_Y_POS, x
+        lda sprite_ptr_lut_low, x
+        sta current_sprite_ptr+0
+        lda sprite_ptr_lut_high, x
+        sta current_sprite_ptr+1
+        ldy #SelfModifiedSprite::PosY
+        lda #$F8
+        sta (current_sprite_ptr), y
         inx
-        inx
-        inx
-        inx
+        cpx #64
         bne loop
         rts
 .endproc
@@ -74,13 +82,26 @@ check_beat_counter:
         bne do_not_draw
 draw:
         ldy CurrentOamIndex
+        lda sprite_ptr_lut_low, y
+        sta current_sprite_ptr+0
+        lda sprite_ptr_lut_high, y
+        sta current_sprite_ptr+1
+
         ; X position is always a straight copy for the left tile
         lda sprite_table + MetaSpriteState::PositionX, x
-        sta SHADOW_OAM + OAM_X_POS, y
+
+        ;sta SHADOW_OAM + OAM_X_POS, y
+        ldy #SelfModifiedSprite::PosX
+        sta (current_sprite_ptr), y
+
         ; And that same position +8 for the right tile
         clc
         adc #8
-        sta SHADOW_OAM + ONE_SPRITE + OAM_X_POS, y
+
+        ;sta SHADOW_OAM + ONE_SPRITE + OAM_X_POS, y
+        ldy #(SelfModifiedSprite::PosX + .sizeof(SelfModifiedSprite))
+        sta (current_sprite_ptr), y
+
         ; Y position might be modified if we are in RISE mode
         lda sprite_table + MetaSpriteState::BehaviorFlags, x
         and #SPRITE_RISE
@@ -112,40 +133,71 @@ write_sprite_y:
         sec
         sbc #1
         ; perform the write
-        sta SHADOW_OAM + OAM_Y_POS, y
-        sta SHADOW_OAM + ONE_SPRITE + OAM_Y_POS, y
+
+        ;sta SHADOW_OAM + OAM_Y_POS, y
+        ldy #SelfModifiedSprite::PosY
+        sta (current_sprite_ptr), y
+
+        ;sta SHADOW_OAM + ONE_SPRITE + OAM_Y_POS, y
+        ldy #(SelfModifiedSprite::PosY + .sizeof(SelfModifiedSprite))
+        sta (current_sprite_ptr), y
+
         ; Sprite tile may be inverted if we are horizontally flipped
         lda sprite_table + MetaSpriteState::BehaviorFlags, x
         and #SPRITE_HORIZ_FLIP
         bne horizontal_flip
 no_horizontal_flip:
         lda sprite_table + MetaSpriteState::TileIndex, x
-        sta SHADOW_OAM + OAM_TILE, y
+        
+        ;sta SHADOW_OAM + OAM_TILE, y
+        ldy #SelfModifiedSprite::TileId
+        sta (current_sprite_ptr), y
+
         clc
         adc #2
-        sta SHADOW_OAM + ONE_SPRITE + OAM_TILE, y
+        
+        ;sta SHADOW_OAM + ONE_SPRITE + OAM_TILE, y
+        ldy #(SelfModifiedSprite::TileId + .sizeof(SelfModifiedSprite))
+        sta (current_sprite_ptr), y
+
         jmp attribute_byte
 horizontal_flip:
         lda sprite_table + MetaSpriteState::TileIndex, x
-        sta SHADOW_OAM + ONE_SPRITE + OAM_TILE, y
+        
+        ;sta SHADOW_OAM + ONE_SPRITE + OAM_TILE, y
+        ldy #(SelfModifiedSprite::TileId + .sizeof(SelfModifiedSprite))
+        sta (current_sprite_ptr), y
+
         clc
         adc #2
-        sta SHADOW_OAM + OAM_TILE, y
+        
+        ;sta SHADOW_OAM + OAM_TILE, y
+        ldy #SelfModifiedSprite::TileId
+        sta (current_sprite_ptr), y
+
 attribute_byte:
         ; The attribute byte is always a straight copy
         lda sprite_table + MetaSpriteState::BehaviorFlags, x
-        sta SHADOW_OAM + OAM_ATTRIBUTES, y
-        sta SHADOW_OAM + ONE_SPRITE + OAM_ATTRIBUTES, y
+        
+        ;sta SHADOW_OAM + OAM_ATTRIBUTES, y
+        ldy #SelfModifiedSprite::Attributes
+        sta (current_sprite_ptr), y
+
+        ;sta SHADOW_OAM + ONE_SPRITE + OAM_ATTRIBUTES, y
+        ldy #(SelfModifiedSprite::Attributes + .sizeof(SelfModifiedSprite))
+        sta (current_sprite_ptr), y
+
         ; finally, we did a draw, so advance the OAM index
         lda CurrentOamIndex
         clc
         adc #SHUFFLE_NEXT_SPRITE
+        and #SHUFFLE_MASK
         sta CurrentOamIndex
 done:
         rts
 .endproc
 
-.proc draw_sprites
+.proc FAR_draw_sprites
 MetaSpriteIndex := R0
 CurrentOamIndex := R1
         jsr disable_all_oam_entries
@@ -167,6 +219,7 @@ done:
         lda starting_oam_index
         clc
         adc #SHUFFLE_NEXT_FRAME
+        and #SHUFFLE_MASK
         sta starting_oam_index
         rts 
 .endproc
@@ -175,7 +228,7 @@ done:
 ; from the beginning. If a sprite is found, its index will be returned in
 ; R0. If no sprite is found, $FF is returned instead; check for this if you
 ; need to handle failure.
-.proc find_unused_sprite
+.proc FAR_find_unused_sprite
 MetaSpriteIndex := R0
         lda #0
         sta MetaSpriteIndex
@@ -199,7 +252,7 @@ found:
 .endproc
 
 ; Call this at the start of each beat
-.proc age_sprites
+.proc FAR_age_sprites
 MetaSpriteIndex := R0
         lda #0
         sta MetaSpriteIndex
@@ -238,7 +291,7 @@ done:
 .endproc
 
 ; If it's not the player sprite or the hud sprite, kill it with fire
-.proc despawn_unimportant_sprites
+.proc FAR_despawn_unimportant_sprites
 MetaSpriteIndex := R0
         lda #0
         sta MetaSpriteIndex

@@ -11,7 +11,7 @@
 .global PlayerCol
 .global PlayerMaxHealth
 .global PlayerHealth
-.global PlayerWeapon
+.globalzp PlayerWeapon
 .global PlayerWeaponDmg
 .globalzp PlayerWeaponPtr
 .global PlayerRoomIndex

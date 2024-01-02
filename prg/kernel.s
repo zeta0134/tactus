@@ -20,6 +20,7 @@
         .include "static_screens.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
         .zeropage
 GameMode: .res 2
@@ -46,6 +47,7 @@ AccumulatedGameBeats: .res 2
         debug_color 0
         inc GameloopCounter
 @loop:
+        perform_zpcm_inc
         lda LastNmi
         cmp GameloopCounter
         bne @loop
@@ -126,8 +128,8 @@ MetaSpriteIndex := R0
         far_call FAR_copy_title_nametable
 
         ; Set up a player sprite, which will act as our cursor
-        jsr initialize_sprites
-        jsr find_unused_sprite
+        far_call FAR_initialize_sprites
+        far_call FAR_find_unused_sprite
         ; this runs on an empty set, so it ought to succeed
         lda #(SPRITE_ACTIVE)
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
@@ -167,7 +169,7 @@ MetaSpriteIndex := R0
 
         jsr update_beat_counters_title
         far_call FAR_sync_chr_bank_to_music
-        jsr draw_sprites
+        far_call FAR_draw_sprites
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
 
@@ -196,7 +198,7 @@ MetaSpriteIndex := R0
         lda #4
         sta TargetBrightness
 
-        jsr initialize_sprites
+        far_call FAR_initialize_sprites
         jsr init_game_end_screen
 
         ; Enable NMI first (but not rendering)
@@ -221,7 +223,7 @@ MetaSpriteIndex := R0
 
         jsr update_beat_counters_title
         far_call FAR_sync_chr_bank_to_music
-        jsr draw_sprites
+        far_call FAR_draw_sprites
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
 
@@ -293,7 +295,7 @@ MetaSpriteIndex := R0
         sta global_rng_seed
         .endif
 
-        jsr initialize_sprites
+        far_call FAR_initialize_sprites
         far_call FAR_init_hud
         jsr init_player
 
@@ -320,7 +322,7 @@ MetaSpriteIndex := R0
 
 .proc room_init
         far_call FAR_init_current_room
-        jsr despawn_unimportant_sprites
+        far_call FAR_despawn_unimportant_sprites
         st16 GameMode, beat_frame_1
         rts
 .endproc
@@ -401,7 +403,7 @@ not_victory:
         ; - clear "moved this frame" flags from all tiles, permitting
         ;   the updates we will perform over the next few frames
         far_call FAR_clear_active_move_flags
-        jsr age_sprites
+        far_call FAR_age_sprites
         far_call FAR_refresh_hud
         jsr every_gameloop
         rts
@@ -597,7 +599,7 @@ continue_waiting:
         far_call FAR_queue_hud
         jsr determine_player_intent
         jsr draw_player
-        jsr draw_sprites
+        far_call FAR_draw_sprites
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
         jsr update_screen_shake

@@ -62,7 +62,7 @@ MetaSpriteIndex := R0
         sta HudGoldDisplay+4
 
         ; spawn in the weapon sprite
-        jsr find_unused_sprite
+        near_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
         cpx #$FF
         beq sprite_failed

@@ -11,6 +11,7 @@
         .include "nes.inc"
         .include "ppu.inc"
         .include "prng.inc"
+        .include "slowam.inc"
         .include "sound.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
@@ -33,6 +34,8 @@ start:
         jsr initialize_palettes
         jsr initialize_ppu
         jsr init_audio
+
+        far_call FAR_init_slowam
 
         ; disable unusual IRQ sources
         lda #%01000000

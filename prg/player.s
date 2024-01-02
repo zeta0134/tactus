@@ -72,7 +72,7 @@ jump_height_table:
 .proc init_player
 MetaSpriteIndex := R0
         ; spawn in the player sprite
-        jsr find_unused_sprite
+        far_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
         cpx #$FF
         beq sprite_failed
@@ -867,7 +867,7 @@ skip_draw:
 .proc spawn_fx_sprite_here
 MetaSpriteIndex := R0
 AttackSquare := R3
-        jsr find_unused_sprite
+        far_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
         cpx #$FF
         beq sprite_failed
@@ -904,7 +904,7 @@ sprite_failed:
 .proc spawn_sfx_sprite_here
 MetaSpriteIndex := R0
 AttackSquare := R3
-        jsr find_unused_sprite
+        far_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
         cpx #$FF
         beq sprite_failed

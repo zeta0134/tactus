@@ -17,6 +17,6 @@
 .globalzp PpuScrollY
 .globalzp PpuScrollNametable
 
-.global ScreenShakeDepth
-.global ScreenShakeSpeed
-.global ScreenShakeDecayCounter
+.globalzp ScreenShakeDepth
+.globalzp ScreenShakeSpeed
+.globalzp ScreenShakeDecayCounter

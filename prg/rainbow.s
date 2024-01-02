@@ -47,5 +47,9 @@
 	sta MAP_NT_B_BANK
 	sta MAP_NT_D_BANK
 
+	; for audio, we use zpcm like REAL MEN
+	lda #%00000100 ; zpcm on, exp6 off, exp9 off
+	sta MAP_SND_EXP_CTRL
+
 	rts
 .endproc

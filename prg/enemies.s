@@ -2,6 +2,7 @@
 
         .include "battlefield.inc"
         .include "enemies.inc"
+        .include "far_call.inc"
         .include "kernel.inc"
         .include "levels.inc"
         .include "palette.inc"
