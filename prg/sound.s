@@ -200,6 +200,7 @@ invalid_variant:
 
 .proc play_sfx_pulse1
 SfxPtr := R0
+        perform_zpcm_inc
         lda SfxPtr
         sta Pulse1SfxPtr
         lda SfxPtr+1
@@ -212,11 +213,13 @@ SfxPtr := R0
         sta Pulse1DelayCounter
         lda #0
         jsr bhop_mute_channel
+        perform_zpcm_inc
         rts
 .endproc
 
 .proc play_sfx_pulse2
 SfxPtr := R0
+        perform_zpcm_inc
         lda SfxPtr
         sta Pulse2SfxPtr
         lda SfxPtr+1
@@ -229,11 +232,13 @@ SfxPtr := R0
         sta Pulse2DelayCounter
         lda #1
         jsr bhop_mute_channel
+        perform_zpcm_inc
         rts
 .endproc
 
 .proc play_sfx_triangle
 SfxPtr := R0
+        perform_zpcm_inc
         lda SfxPtr
         sta TriangleSfxPtr
         lda SfxPtr+1
@@ -246,11 +251,13 @@ SfxPtr := R0
         sta Pulse2DelayCounter
         lda #2
         jsr bhop_mute_channel
+        perform_zpcm_inc
         rts
 .endproc
 
 .proc play_sfx_noise
 SfxPtr := R0
+        perform_zpcm_inc
         lda SfxPtr
         sta NoiseSfxPtr
         lda SfxPtr+1
@@ -263,6 +270,7 @@ SfxPtr := R0
         sta Pulse2DelayCounter
         lda #3
         jsr bhop_mute_channel
+        perform_zpcm_inc
         rts
 .endproc
 
