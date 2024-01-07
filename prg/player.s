@@ -219,6 +219,7 @@ no_valid_press:
 .endproc
 
 .proc set_player_target_coordinates
+        perform_zpcm_inc
         lda PlayerCol
         .repeat 4
         asl
@@ -238,7 +239,7 @@ no_valid_press:
         sta PlayerTargetY + 1
         lda #0
         sta PlayerTargetY
-
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -490,6 +491,7 @@ TilesRemaining := R9
 EffectiveAttackSquare := R10
 TargetRow := R14
 TargetCol := R15
+        perform_zpcm_inc
         lda #0
         sta EnemyDiedThisFrame
 
@@ -526,6 +528,7 @@ check_west:
         ldy #WeaponClass::WestSquaresPtr
 
 done_choosing_direction:
+        perform_zpcm_inc
         lda (PlayerWeaponPtr), y
         sta WeaponSquaresPtr
         iny
@@ -540,6 +543,7 @@ done_choosing_direction:
         lda (PlayerWeaponPtr), y
         sta TilesRemaining
 loop:
+        perform_zpcm_inc
         ; Reset to the player's position
         lda PlayerSquare
         sta AttackSquare
@@ -588,6 +592,7 @@ negative_y:
         sta AttackSquare
 converge:
         iny
+        perform_zpcm_inc
 
         lda (WeaponSquaresPtr), y
         sta FxTileId ; stash for if this hits
@@ -611,9 +616,10 @@ converge:
         cmp #BATTLEFIELD_HEIGHT
         bcs skip_out_of_bounds
 
+        perform_zpcm_inc
         far_call FAR_attack_enemy_tile
 skip_out_of_bounds:
-
+        perform_zpcm_inc
 
 check_player_movement:
         ; If this weapon square could cancel movement
@@ -650,6 +656,7 @@ no_early_exit:
         jsr draw_multiple_hit_fx
 
 done_with_swing:
+        perform_zpcm_inc
         ; if an attack landed at all, play a weapon slash effect
         lda AttackLanded
         beq done
@@ -661,7 +668,7 @@ done_with_swing:
 done:
 
         ; If there is any cleanup to do, do that here. Otherwise we're finished I think?
-
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -689,6 +696,7 @@ TilesRemaining := R9
         lda (PlayerWeaponPtr), y
         sta TilesRemaining
 loop:
+        perform_zpcm_inc
         ; Reset to the player's position
         lda PlayerSquare
         sta AttackSquare
@@ -736,6 +744,7 @@ negative_y:
         sta AttackSquare
 converge:
         iny
+        perform_zpcm_inc
 
         ; Read the FX ID, which we are about to draw
         lda (WeaponSquaresPtr), y
@@ -787,6 +796,7 @@ TilesRemaining := R9
         lda (PlayerWeaponPtr), y
         sta TilesRemaining
 loop:
+        perform_zpcm_inc
         ; Reset to the player's position
         lda PlayerSquare
         sta AttackSquare
@@ -834,6 +844,7 @@ negative_y:
         sta AttackSquare
 converge:
         iny
+        perform_zpcm_inc
 
         ; Read the FX ID, which we are about to draw
         lda (WeaponSquaresPtr), y
@@ -876,10 +887,13 @@ skip_draw:
 .proc spawn_fx_sprite_here
 MetaSpriteIndex := R0
 AttackSquare := R3
+        perform_zpcm_inc
         far_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
         cpx #$FF
         beq sprite_failed
+
+        perform_zpcm_inc
 
         lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_PAL_1)
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
@@ -907,16 +921,20 @@ AttackSquare := R3
         sta sprite_table + MetaSpriteState::TileIndex, x
 
 sprite_failed:
+        perform_zpcm_inc
         rts
 .endproc
 
 .proc spawn_sfx_sprite_here
 MetaSpriteIndex := R0
 AttackSquare := R3
+        perform_zpcm_inc
         far_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
         cpx #$FF
         beq sprite_failed
+
+        perform_zpcm_inc
 
         lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_PAL_1)
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
@@ -944,6 +962,7 @@ AttackSquare := R3
         sta sprite_table + MetaSpriteState::TileIndex, x
 
 sprite_failed:
+        perform_zpcm_inc
         rts
 .endproc
 

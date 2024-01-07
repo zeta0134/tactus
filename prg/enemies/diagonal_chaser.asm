@@ -32,6 +32,7 @@ add_col_distance:
         clc
         adc PlayerDistance
         sta PlayerDistance
+        perform_zpcm_inc
         rts
 .endproc
 

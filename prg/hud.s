@@ -714,6 +714,7 @@ converge:
 NumberWord := R0
 CurrentDigit := R2
 LeadingCounter := R3
+        perform_zpcm_inc
         lda #0
         sta CurrentDigit
         sta LeadingCounter
@@ -738,6 +739,8 @@ draw_ten_thousands:
         sta VRAM_TABLE_START, y
         iny
 
+        perform_zpcm_inc
+
         lda #0
         sta CurrentDigit
 thousands_loop:
@@ -760,6 +763,8 @@ blank_thousands:
 draw_thousands:
         sta VRAM_TABLE_START, y
         iny
+
+        perform_zpcm_inc
 
         lda #0
         sta CurrentDigit
@@ -784,6 +789,8 @@ draw_hundreds:
         sta VRAM_TABLE_START, y
         iny
 
+        perform_zpcm_inc
+
         lda #0
         sta CurrentDigit
 tens_loop:
@@ -807,6 +814,8 @@ draw_tens:
         sta VRAM_TABLE_START, y
         iny
 
+        perform_zpcm_inc
+
         lda #0
         sta CurrentDigit
 ones_loop:
@@ -821,6 +830,8 @@ display_ones:
         adc CurrentDigit
         sta VRAM_TABLE_START, y
         iny
+
+        perform_zpcm_inc
 
         rts
 .endproc

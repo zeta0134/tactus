@@ -681,6 +681,7 @@ RandTemp := R1
 
         ; X can use the rand value almost directly
         jsr next_rand
+        perform_zpcm_inc
         sta RandTemp
         ldx DepthTemp
 x_loop:
@@ -704,6 +705,7 @@ done_with_x:
 
         ; Y should remain in the range 0-240, so the minus case is handled diffrently
         jsr next_rand
+        perform_zpcm_inc
         sta RandTemp
         ldx DepthTemp
 y_loop:

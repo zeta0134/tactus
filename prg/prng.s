@@ -57,6 +57,7 @@ next_rand:
 	asl
 	eor seed+0
 	sta seed+0
+	perform_zpcm_inc
 	rts
 
 next_fixed_rand:
@@ -85,6 +86,7 @@ next_fixed_rand:
 	asl
 	eor fixed_seed+0
 	sta fixed_seed+0
+	perform_zpcm_inc
 	rts
 
 .proc set_fixed_room_seed
@@ -97,8 +99,6 @@ next_fixed_rand:
         ; I've noticed that the first number pulled can be a *mite* predictable, so to
         ; resolve this run the routine twice before returning
         jsr next_fixed_rand
-        perform_zpcm_inc
         jsr next_fixed_rand
-        perform_zpcm_inc
         rts
 .endproc

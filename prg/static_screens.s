@@ -14,6 +14,7 @@
         .include "vram_buffer.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
 .segment "PRGFIXED_C000"
 
@@ -38,6 +39,7 @@ StringPtr := R0
 VramIndex := R2
         sty VramIndex ; preserve
 loop:
+        perform_zpcm_inc
         ldy #0
         lda (StringPtr), y
         beq end_of_string
@@ -54,6 +56,7 @@ Digit := R0
         clc
         adc Digit
         sta PPUDATA
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -71,6 +74,8 @@ Digit := R0
 NumberWord := R0
 CurrentDigit := R2
 LeadingCounter := R3
+        perform_zpcm_inc
+
         lda #0
         sta CurrentDigit
         sta LeadingCounter
@@ -94,6 +99,8 @@ blank_ten_thousands:
 draw_ten_thousands:
         sta PPUDATA
 
+        perform_zpcm_inc
+
         lda #0
         sta CurrentDigit
 thousands_loop:
@@ -115,6 +122,8 @@ blank_thousands:
         lda #BLANK_TILE
 draw_thousands:
         sta PPUDATA
+
+        perform_zpcm_inc
 
         lda #0
         sta CurrentDigit
@@ -138,6 +147,8 @@ blank_hundreds:
 draw_hundreds:
         sta PPUDATA
 
+        perform_zpcm_inc
+
         lda #0
         sta CurrentDigit
 tens_loop:
@@ -160,6 +171,8 @@ blank_tens:
 draw_tens:
         sta PPUDATA
 
+        perform_zpcm_inc
+
         lda #0
         sta CurrentDigit
 ones_loop:
@@ -173,6 +186,8 @@ display_ones:
         clc
         adc CurrentDigit
         sta PPUDATA
+
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -306,6 +321,7 @@ converge:
         lda #%01010101
         ldx #64
 attribute_loop_left:
+        perform_zpcm_inc
         sta PPUDATA
         dex
         bne attribute_loop_left
@@ -314,6 +330,7 @@ attribute_loop_left:
         lda #%01010101
         ldx #64
 attribute_loop_right:
+        perform_zpcm_inc
         sta PPUDATA
         dex
         bne attribute_loop_right

@@ -208,6 +208,7 @@ TargetSquare := R13
         sta PuffSquare
         ldx #0
 loop:
+        perform_zpcm_inc
         ; is this a poof?
         lda battlefield, x
         and #%11111100
@@ -225,6 +226,7 @@ not_our_puff:
         cpx #::BATTLEFIELD_SIZE
         bne loop
 done:
+        perform_zpcm_inc
         rts
 .endproc
 

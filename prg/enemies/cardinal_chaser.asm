@@ -164,6 +164,7 @@ advanced:
         lda #1
         sta IdleDelay
 done:
+        perform_zpcm_inc
 
         inc tile_data, x
         lda tile_data, x
@@ -179,6 +180,7 @@ done:
         jsr queue_row_x
 
 no_change:
+        perform_zpcm_inc
         rts
 .endproc
 
