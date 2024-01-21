@@ -220,7 +220,7 @@ track_table_variant_length:
         .byte 0 ; title music
 
 ; Everything else goes in the switched bank
-        .segment "CODE_SOUND_ENGINE"
+        .segment "CODE_SOUND"
 
 .proc FAR_init_audio
         ; Always initialize the music engine with track 0 of the first module. This will
