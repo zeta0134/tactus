@@ -16,7 +16,7 @@
         .include "word_util.inc"
         .include "zeropage.inc"
 
-.segment "PRGFIXED_C000"
+.segment "PRGFIXED_E000"
 
 start:
         lda #$00
@@ -33,8 +33,8 @@ start:
 
         jsr initialize_palettes
         jsr initialize_ppu
-        jsr init_audio
 
+        far_call FAR_init_audio
         far_call FAR_init_slowam
 
         ; disable unusual IRQ sources

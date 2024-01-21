@@ -10,7 +10,7 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
-        .segment "PRGFIXED_C000"
+        .segment "PRGFIXED_E000"
         ;.org $e000
 
 ; asssumes y is already 0

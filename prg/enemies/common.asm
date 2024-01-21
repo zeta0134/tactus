@@ -77,7 +77,7 @@ CurrentTile := R15
 MetaSpriteIndex := R0
 AttackSquare := R3
 EffectiveAttackSquare := R10
-        near_call FAR_find_unused_sprite
+        far_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
         cpx #$FF
         beq sprite_failed
@@ -115,7 +115,7 @@ sprite_failed:
 MetaSpriteIndex := R0
 PuffSquare := R12
 TargetSquare := R13
-        near_call FAR_find_unused_sprite
+        far_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
         cpx #$FF
         beq sprite_failed

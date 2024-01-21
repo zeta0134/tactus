@@ -16,7 +16,7 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
-.segment "PRGFIXED_C000"
+.segment "PRGFIXED_E000"
 
 BLANK_TILE = 250
 

@@ -7,7 +7,7 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
-        .segment "PRGFIXED_C000"
+        .segment "PRGFIXED_E000"
 
 bg_palette:
         .incbin "../art/test_palette.pal"

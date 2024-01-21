@@ -1,5 +1,3 @@
-.global init_audio
-.global update_audio
 .global play_track
 .global play_variant
 .global fade_to_track
@@ -8,6 +6,9 @@
 .global play_sfx_triangle
 .global play_sfx_noise
 .global play_sfx_dpcm
+
+.global FAR_init_audio
+.global FAR_update_audio
 
 ; rhythm game
 .global sfx_defeat_enemy_noise

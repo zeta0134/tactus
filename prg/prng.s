@@ -25,7 +25,7 @@
 seed: .res 2 ; seed can be 2-4 bytes
 fixed_seed: .res 2
 
-        .segment "PRGFIXED_C000"
+        .segment "PRGFIXED_E000"
 
 ; overlapped version, computes all 8 iterations in an overlapping fashion
 ; 69 cycles

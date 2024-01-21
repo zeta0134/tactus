@@ -1,5 +1,6 @@
         .include "chr.inc"
         .include "compression.inc"
+        .include "far_call.inc"
         .include "kernel.inc"
         .include "nes.inc"
         .include "ppu.inc"
@@ -11,7 +12,18 @@
 .segment "RAM"
 CurrentChrBank: .res 1
 
-.segment "PRG1_8000"
+.segment "DATA_0"
+
+hud_font:
+        .incbin "../art/raw_chr/font_chicago_reduced.chr"
+
+title_chr:
+        .incbin "../art/raw_chr/title.chr"
+
+title_nametable:
+        .incbin "../art/raw_nametables/title_screen.nam"
+
+.segment "DATA_1"
         ; player
         .include "../build/animated_tiles/player.chr"
         ; weapons
@@ -67,15 +79,6 @@ CurrentChrBank: .res 1
         .include "../build/static_tiles/half_heart.chr"
         .include "../build/static_tiles/full_heart.chr" ; also the treasure icon
         .include "../build/static_tiles/map_icons.chr"
-
-hud_font:
-        .incbin "../art/raw_chr/font_chicago_reduced.chr"
-
-title_chr:
-        .incbin "../art/raw_chr/title.chr"
-
-title_nametable:
-        .incbin "../art/raw_nametables/title_screen.nam"
 
 ANIMATED_TILE_TABLE_LENGTH = 20
 animated_tile_table:
@@ -135,6 +138,7 @@ static_tile_table:
         ; static enemy poses
         .word $0280, mole_hole
 
+.segment "CODE_0"
 
 ; note: set PPUADDR and PPUCTRL appropriately before calling
 .proc memcpy_ppudata
@@ -165,6 +169,8 @@ SpriteTableLength := R6
 SpriteTableIndex := R7
 
 ChrBank := R8
+        access_data_bank #<.bank(animated_tile_table)
+
         lda #ANIMATED_TILE_TABLE_LENGTH
         sta SpriteTableLength
         lda #0
@@ -210,6 +216,7 @@ bank_loop:
         sta SpriteTableIndex
         jmp tile_loop
 done:
+        restore_previous_bank
         rts
 .endproc
 
@@ -225,6 +232,8 @@ SpriteTableLength := R6
 SpriteTableIndex := R7
 
 ChrBank := R8
+        access_data_bank #<.bank(static_tile_table)
+
         lda #STATIC_TILE_TABLE_LENGTH
         sta SpriteTableLength
         lda #0
@@ -265,6 +274,7 @@ bank_loop:
         sta SpriteTableIndex
         jmp tile_loop
 done:
+        restore_previous_bank
         rts
 .endproc
 
@@ -272,6 +282,8 @@ done:
 SourceAddr := R0
 Length := R2
 ChrBank := R8
+        access_data_bank #<.bank(hud_font)
+
         lda #0
         sta ChrBank
 bank_loop:
@@ -284,6 +296,8 @@ bank_loop:
         lda ChrBank
         cmp #4
         bne bank_loop
+
+        restore_previous_bank
         rts
 .endproc
 
@@ -291,6 +305,8 @@ bank_loop:
 SourceAddr := R0
 Length := R2
 ChrBank := R8
+        access_data_bank #<.bank(title_chr)
+
         lda #0
         sta ChrBank
 bank_loop:
@@ -303,6 +319,8 @@ bank_loop:
         lda ChrBank
         cmp #4
         bne bank_loop
+
+        restore_previous_bank
         rts
 .endproc
 
@@ -372,6 +390,8 @@ loop:
 
 .proc FAR_copy_title_nametable
 DataAddr := R0
+        access_data_bank #<.bank(title_nametable)
+
         lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
         sta PPUCTRL ; set VRAM increment to +1
 
@@ -387,6 +407,7 @@ DataAddr := R0
         st16 DataAddr, title_nametable
         jsr write_nametable
 
+        restore_previous_bank
         rts
 .endproc
 

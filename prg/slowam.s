@@ -11,7 +11,7 @@
 ; where the routine should go
 SPRITE_TRANSFER_BASE = $6000
 
-.segment "PRG0_8000"
+.segment "CODE_0"
 
 ; to access an individual sprite quickly
 sprite_ptr_lut_low:
@@ -74,7 +74,7 @@ byte_loop:
     rts
 .endproc
 
-.segment "PRGFIXED_C000"
+.segment "PRGFIXED_E000"
 
 ; mostly for debugging / prototyping, we eventually want to move this to NMI
 

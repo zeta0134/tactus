@@ -64,7 +64,7 @@ DIRECTION_EAST  = 2
 DIRECTION_SOUTH = 3
 DIRECTION_WEST  = 4
 
-.segment "PRGFIXED_C000"
+.segment "PRGFIXED_E000"
 
 JUMP_HEIGHT_END = 5
 jump_height_table:

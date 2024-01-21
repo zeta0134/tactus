@@ -8,7 +8,7 @@
         .zeropage
 PopSlideAddress: .word $0000
 
-        .segment "PRGFIXED_C000"
+        .segment "PRGFIXED_E000"
 
 ; Applies a buffer of PPUDATA writes stored in the stack area, and
 ; rapidly copies this data. The list should begin with a length byte,

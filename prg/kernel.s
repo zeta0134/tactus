@@ -40,7 +40,7 @@ LastBeat: .res 1
 DisplayedRowCounter: .res 1
 AccumulatedGameBeats: .res 2
 
-.segment "PRGFIXED_C000"
+.segment "PRGFIXED_E000"
 
 ; === Utility Functions ===
 .proc wait_for_next_vblank

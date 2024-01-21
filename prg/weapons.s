@@ -2,7 +2,8 @@
 
         .include "weapons.inc"
 
-.segment "PRGFIXED_C000"
+; TODO: move this to a data bank. Or maybe colocate it with the player code?
+.segment "PRGFIXED_E000"
 
 weapon_class_table:
         .word dagger

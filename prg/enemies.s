@@ -24,7 +24,7 @@ HealthDroughtCounter: .res 1
 
 .segment "RAM"
 
-.segment "PRGFIXED_C000"
+.segment "PRGFIXED_E000"
 
 .proc draw_active_tile
 TargetIndex := R0
@@ -58,7 +58,7 @@ tile_index_to_col_lut:
         .endrepeat
         .endrepeat
 
-.segment "PRG0_8000"
+.segment "CODE_2"
 
 .include "enemies/common.asm"
 

@@ -166,7 +166,7 @@ check_player_position:
 
 spawn_old_weapon:
         ; Spawn a sprite to hold the weapon
-        near_call FAR_find_unused_sprite
+        far_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
         cpx #$FF
         beq sprite_failed
@@ -215,7 +215,7 @@ WeaponPtr := R11
 
 spawn_weapon:
         ; Spawn a sprite to hold the weapon
-        near_call FAR_find_unused_sprite
+        far_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
         cpx #$FF
         beq sprite_failed

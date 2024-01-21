@@ -12,7 +12,7 @@ ButtonsDown: .byte $00
 ButtonsUp: .byte $00
 ButtonsHeld: .byte $00
 
-        .segment "PRGFIXED_C000"
+        .segment "PRGFIXED_E000"
         ;.org $e000
 
 

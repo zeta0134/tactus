@@ -4,6 +4,7 @@
 .include "bhop/bhop.inc"
 .include "chr.inc"
 .include "debug.inc"
+.include "far_call.inc"
 .include "kernel.inc"
 .include "input.inc"
 .include "main.inc"
@@ -16,7 +17,7 @@
 .include "zeropage.inc"
 .include "zpcm.inc"
 
-        .segment "PRGFIXED_C000"
+        .segment "PRGFIXED_E000"
 
 .macro spinwait_for_vblank
 .scope
@@ -129,8 +130,24 @@ nmi_soft_disable:
         ; Here we *only* update the audio engine, nothing else. This is mostly to
         ; smooth over transitions when loading a new level.
         
-        jsr update_audio
+        ; because bhop will potentially change the current code and data bank,
+        ; first preserve them to the stack
+        lda code_bank_shadow
+        sta NmiCurrentBank ; might as well initialize the NMI call stack with the current bank
+        pha
+        lda data_bank_shadow
+        pha
+
+        far_call_nmi FAR_update_audio
         perform_zpcm_inc
+
+        pla
+        sta data_bank_shadow
+        sta MAP_PRG_A_LO
+        pla
+        sta code_bank_shadow
+        sta MAP_PRG_8_LO
+
 
         ; restore registers
         pla

@@ -10,6 +10,7 @@
         .include "player.inc"
         .include "ppu.inc"
         .include "prng.inc"
+        .include "rainbow.inc"
         .include "vram_buffer.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
@@ -24,11 +25,13 @@ room_seeds: .res 16
 chest_spawned: .res 1
 enemies_active: .res 1
 
-.segment "PRG0_8000"
+.segment "CODE_1"
 
 ; Initialize a fixed floor, fully open, with boss and exit stairs
 ; in known, predictable locations. Useful for debugging
 .proc FAR_demo_init_floor
+        access_data_bank #<.bank(layouts_table)
+
         ; clear out the room flags entirely
         lda #0
         ldx #0
@@ -68,6 +71,7 @@ seed_loop:
         lda #ROOM_FLAG_EXIT_STAIRS
         sta room_flags, x
 
+        restore_previous_bank
         rts
 .endproc
 
@@ -75,6 +79,8 @@ seed_loop:
 .proc FAR_init_floor
 FloorPtr := R0
 BossIndex := R2
+        access_data_bank #<.bank(layouts_table)
+
         ; clear out the room flags entirely
         lda #0
         ldx #0
@@ -173,12 +179,15 @@ exit_loop:
         ; Aaaand.... that's it? I think that's it
         perform_zpcm_inc
 
+        restore_previous_bank
         rts
 .endproc
 
 .proc FAR_init_current_room
 LayoutPtr := R0
 EntityList := R4
+        access_data_bank #<.bank(layouts_table)
+
         ; Load this room into the current battlefield
         ldx PlayerRoomIndex
         lda room_layouts, x
@@ -188,7 +197,7 @@ EntityList := R4
         sta LayoutPtr
         lda layouts_table+1, x
         sta LayoutPtr+1
-        near_call FAR_initialize_battlefield
+        far_call FAR_initialize_battlefield
 
         ; Mark this room as visited
         ldx PlayerRoomIndex
@@ -237,11 +246,14 @@ spawn_boss_enemies:
         jmp room_cleared
 room_cleared:
 
+        restore_previous_bank
         rts
 .endproc
 
 .proc FAR_handle_room_spawns
 EntityId := R1
+        access_data_bank #<.bank(layouts_table)
+
 check_room_clear:
         lda enemies_active
         bne all_done
@@ -280,6 +292,8 @@ all_done:
         ; reset the enemies active counter for the next beat
         lda #0
         sta enemies_active
+
+        restore_previous_bank
         rts
 .endproc
 
@@ -511,6 +525,8 @@ EntityId := R1
         jsr spawn_entity
         rts
 .endproc
+
+        .segment "DATA_3"
 
 ; =============================
 ; Floors - collections of rooms

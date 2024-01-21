@@ -1,20 +1,34 @@
 .include "rainbow.inc"
 
-.segment "PRGFIXED_C000"
+.zeropage
+code_bank_shadow: .res 1
+data_bank_shadow: .res 1
+
+.segment "PRGFIXED_E000"
 
 .proc rainbow_init
 	; for PRG, our starting bank0 initially controls 32k from $8000
-	; we want it to control 16k from $8000, and we want bank1 to control
-	; everything from $C000 onwards
+	; we want to switch to 8k banking, which means we'll want to use
+	; 0, 1, 2, and 3 across banks 8, A, C, and E. This setup allows us
+	; to switch modes without losing the code we're currently running
 	lda #0
 	sta MAP_PRG_8_HI
-	sta MAP_PRG_8_LO
+	sta MAP_PRG_A_HI
 	sta MAP_PRG_C_HI
+	sta MAP_PRG_E_HI
+
+	lda #0
+	sta MAP_PRG_8_LO
 	lda #1
+	sta MAP_PRG_A_LO
+	lda #2
 	sta MAP_PRG_C_LO
-	; now we can switch to 16k banking, and $C000 behaves like our "fixed" bank, while
-	; $8000 behaves like our old swappable bank:
-	lda #(PRG_RAM_MODE_0 | PRG_ROM_MODE_1)
+	lda #3
+	sta MAP_PRG_E_LO
+	
+	; now we can switch to 8k banking, and $E000 behaves like our "fixed" bank, while
+	; the others behave as switchable banks
+	lda #(PRG_RAM_MODE_0 | PRG_ROM_MODE_3)
 	sta MAP_PRG_CONTROL
 	; Ideally we didn't just crash [fingers crossed] and can continue with setup XD
 

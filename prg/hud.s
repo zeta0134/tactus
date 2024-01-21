@@ -26,7 +26,7 @@ HudAttrDirty: .res 1
 HudGoldDisplay: .res 5
 HudWeaponSpriteIndex: .res 1
 
-.segment "PRG0_8000"
+.segment "CODE_0"
 
 HUD_TOPMOST_ROW_LEFT = $2302
 HUD_UPPER_ROW_LEFT  = $2342

@@ -31,7 +31,7 @@ NoiseSfxPtr: .res 2
 
 FADE_SPEED = 8
 
-        .segment "PRG2_8000"
+        .segment "DATA_2"
 
 .export bhop_music_data
 bhop_music_data: ; TODO: deprecated label, remove later
@@ -41,95 +41,9 @@ music_module:
         .include "../art/music/music.asm"
         .endscope
 
-        .segment "PRGFIXED_C000"
-
-track_table_bank:
-        .repeat 4
-        .lobytes .bank(music_module)
-        .endrepeat
-        
-track_table_song:
-        .byte 0 ; silence (used for transitions)
-        .byte 1 ; click track (meant for debugging)
-        .byte 2 ; level music
-        .byte 3 ; title music
-
-track_table_num_variants:
-        .byte 1 ; silence 
-        .byte 1 ; click_track
-        .byte 1 ; level music
-        .byte 1 ; title music
-
-track_table_variant_length:
-        .byte 0 ; silence
-        .byte 0 ; click_track
-        .byte 0 ; level music
-        .byte 0 ; title music
-
-.proc init_audio
-        ; Always initialize the music engine with track 0 of the first module. This will
-        ; be the first song that begins playing immediately; ideally fill it with silence.
-        lda #0
-        sta MusicCurrentTrack
-        sta MusicTargetTrack
-
-        ldx MusicCurrentTrack
-        lda track_table_bank, x
-        sta MusicCurrentBank
-
-        access_data_bank MusicCurrentBank
-
-        lda track_table_song, x
-        ldy #$80
-        ldx #$00
-        jsr bhop_init
-
-        restore_previous_bank
-
-        ; init some custom bhop features here as well
-        lda #0
-        sta target_music_variant
-        lda #0
-        sta global_attenuation
-
-        rts
-.endproc
-
-.proc update_audio
-        jsr update_fade
-        access_data_bank MusicCurrentBank
-        perform_zpcm_inc
-        jsr bhop_play
-        perform_zpcm_inc
-        jsr update_sfx
-        restore_previous_bank
-        perform_zpcm_inc
-        rts
-.endproc
-
-.proc update_fade
-        perform_zpcm_inc
-        ; If there is no track to switch to, don't bother fading to it
-        lda MusicTargetTrack
-        cmp MusicCurrentTrack
-        beq done_with_fade
-        ; Handle fade speed
-        dec FadeCounter
-        bne done_with_fade
-        lda #FADE_SPEED
-        sta FadeCounter
-        ; Each tick, increase global attenuation by one
-        inc global_attenuation
-        lda global_attenuation
-        ; If we aren't fully attenuated yet, we're done
-        cmp #8
-        bne done_with_fade
-        ; Otherwise, switch to the target track
-        lda MusicTargetTrack
-        jsr play_track
-done_with_fade:
-        rts
-.endproc
+; interface functions should mostly live in fixed; we'll call these often, and several
+; need A to remain unclobbered
+        .segment "PRGFIXED_E000"
 
 ; inputs: track number in A
 .proc fade_to_track
@@ -162,10 +76,9 @@ done:
         sta MusicCurrentBank
         access_data_bank MusicCurrentBank
         lda track_table_song, x
-        ldy #$80
-        ldx #$00
-        jsr bhop_init
-        restore_previous_bank
+        ldy #>music_module
+        ldx #<music_module
+        far_call bhop_init
         ; all new tracks should start with variant 0
         ; (the map load routine might override this immediately, but if it
         ; doesn't, we still need to clear the state from the previous track)
@@ -173,6 +86,7 @@ done:
         sta target_music_variant
         lda #0
         sta global_attenuation
+        restore_previous_bank
 no_change:
         rts
 .endproc
@@ -201,6 +115,7 @@ invalid_variant:
 .proc play_sfx_pulse1
 SfxPtr := R0
         perform_zpcm_inc
+        access_data_bank #<.bank(sfx_data)
         lda SfxPtr
         sta Pulse1SfxPtr
         lda SfxPtr+1
@@ -212,7 +127,8 @@ SfxPtr := R0
         lda #0
         sta Pulse1DelayCounter
         lda #0
-        jsr bhop_mute_channel
+        far_call bhop_mute_channel
+        restore_previous_bank
         perform_zpcm_inc
         rts
 .endproc
@@ -220,6 +136,7 @@ SfxPtr := R0
 .proc play_sfx_pulse2
 SfxPtr := R0
         perform_zpcm_inc
+        access_data_bank #<.bank(sfx_data)
         lda SfxPtr
         sta Pulse2SfxPtr
         lda SfxPtr+1
@@ -231,7 +148,8 @@ SfxPtr := R0
         lda #0
         sta Pulse2DelayCounter
         lda #1
-        jsr bhop_mute_channel
+        far_call bhop_mute_channel
+        restore_previous_bank
         perform_zpcm_inc
         rts
 .endproc
@@ -239,6 +157,7 @@ SfxPtr := R0
 .proc play_sfx_triangle
 SfxPtr := R0
         perform_zpcm_inc
+        access_data_bank #<.bank(sfx_data)
         lda SfxPtr
         sta TriangleSfxPtr
         lda SfxPtr+1
@@ -250,7 +169,8 @@ SfxPtr := R0
         lda #0
         sta Pulse2DelayCounter
         lda #2
-        jsr bhop_mute_channel
+        far_call bhop_mute_channel
+        restore_previous_bank
         perform_zpcm_inc
         rts
 .endproc
@@ -258,6 +178,7 @@ SfxPtr := R0
 .proc play_sfx_noise
 SfxPtr := R0
         perform_zpcm_inc
+        access_data_bank #<.bank(sfx_data)
         lda SfxPtr
         sta NoiseSfxPtr
         lda SfxPtr+1
@@ -269,8 +190,106 @@ SfxPtr := R0
         lda #0
         sta Pulse2DelayCounter
         lda #3
-        jsr bhop_mute_channel
+        far_call bhop_mute_channel
+        restore_previous_bank
         perform_zpcm_inc
+        rts
+.endproc
+
+track_table_bank:
+        .repeat 4
+        .lobytes .bank(music_module)
+        .endrepeat
+        
+track_table_song:
+        .byte 0 ; silence (used for transitions)
+        .byte 1 ; click track (meant for debugging)
+        .byte 2 ; level music
+        .byte 3 ; title music
+
+track_table_num_variants:
+        .byte 1 ; silence 
+        .byte 1 ; click_track
+        .byte 1 ; level music
+        .byte 1 ; title music
+
+track_table_variant_length:
+        .byte 0 ; silence
+        .byte 0 ; click_track
+        .byte 0 ; level music
+        .byte 0 ; title music
+
+; Everything else goes in the switched bank
+        .segment "CODE_SOUND_ENGINE"
+
+.proc FAR_init_audio
+        ; Always initialize the music engine with track 0 of the first module. This will
+        ; be the first song that begins playing immediately; ideally fill it with silence.
+        lda #0
+        sta MusicCurrentTrack
+        sta MusicTargetTrack
+
+        ldx MusicCurrentTrack
+        lda track_table_bank, x
+        sta MusicCurrentBank
+
+        access_data_bank MusicCurrentBank
+
+        lda track_table_song, x
+        ldy #>music_module
+        ldx #<music_module
+        far_call bhop_init
+
+        ; init some custom bhop features here as well
+        lda #0
+        sta target_music_variant
+        lda #0
+        sta global_attenuation
+
+        restore_previous_bank
+
+        rts
+.endproc
+
+.proc FAR_update_audio
+        near_call update_fade
+        
+        access_data_bank MusicCurrentBank
+        perform_zpcm_inc
+        far_call_nmi bhop_play
+        restore_previous_bank
+
+        perform_zpcm_inc
+
+        access_data_bank #<.bank(sfx_data)
+        near_call update_sfx
+        restore_previous_bank
+
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc update_fade
+        perform_zpcm_inc
+        ; If there is no track to switch to, don't bother fading to it
+        lda MusicTargetTrack
+        cmp MusicCurrentTrack
+        beq done_with_fade
+        ; Handle fade speed
+        dec FadeCounter
+        bne done_with_fade
+        lda #FADE_SPEED
+        sta FadeCounter
+        ; Each tick, increase global attenuation by one
+        inc global_attenuation
+        lda global_attenuation
+        ; If we aren't fully attenuated yet, we're done
+        cmp #8
+        bne done_with_fade
+        ; Otherwise, switch to the target track
+        lda MusicTargetTrack
+        jsr play_track
+done_with_fade:
         rts
 .endproc
 
@@ -304,7 +323,7 @@ last_command:
 
 silence:
         lda #0
-        jsr bhop_unmute_channel
+        far_call_nmi bhop_unmute_channel
 done:
         rts
 .endproc
@@ -339,7 +358,7 @@ last_command:
 
 silence:
         lda #1
-        jsr bhop_unmute_channel
+        far_call_nmi bhop_unmute_channel
 done:
         rts
 .endproc
@@ -374,7 +393,7 @@ last_command:
 
 silence:
         lda #2
-        jsr bhop_unmute_channel
+        far_call_nmi bhop_unmute_channel
 done:
         rts
 .endproc
@@ -409,22 +428,26 @@ last_command:
 
 silence:
         lda #3
-        jsr bhop_unmute_channel
+        far_call_nmi bhop_unmute_channel
 done:
         rts
 .endproc
 
 .proc update_sfx
         perform_zpcm_inc
-        jsr update_pulse1
+        near_call update_pulse1
         perform_zpcm_inc
-        jsr update_pulse2
+        near_call update_pulse2
         perform_zpcm_inc
-        jsr update_triangle
+        near_call update_triangle
         perform_zpcm_inc
-        jsr update_noise
+        near_call update_noise
         perform_zpcm_inc
         rts
 .endproc
 
-.include "sfx.incs"
+
+.segment "DATA_4"
+
+sfx_data:
+        .include "sfx.incs"

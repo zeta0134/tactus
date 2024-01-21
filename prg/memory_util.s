@@ -3,7 +3,7 @@
         .include "word_util.inc"
         .include "zeropage.inc"
 
-        .segment "PRGFIXED_C000"
+        .segment "PRGFIXED_E000"
 
 ; Arguments:
 ; R0 - starting address (16bit)

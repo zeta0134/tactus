@@ -24,8 +24,9 @@ inactive_attribute_queue: .res (::BATTLEFIELD_HEIGHT / 2)
 queued_bytes_counter: .res 1
 active_battlefield: .res 1
 
-.segment "PRG0_8000"
+.segment "CODE_0"
 
+; TODO: this is really part of level loading, move it there?
 .proc FAR_initialize_battlefield
 LayoutPtr := R0
         ldy #0

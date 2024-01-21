@@ -23,7 +23,7 @@ SHUFFLE_NEXT_SPRITE = (11 * 2)
 SHUFFLE_NEXT_FRAME = (19 * 2)
 SHUFFLE_MASK = %00111111
 
-.segment "PRG0_8000"
+.segment "CODE_0"
 
 .proc FAR_initialize_sprites
 MetaSpriteIndex := R0

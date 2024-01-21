@@ -18,7 +18,7 @@ Brightness: .res 1
 TargetBrightness: .res 1
 BrightnessDelay: .res 1
 
-        .segment "PRG0_8000"
+        .segment "CODE_0"
 
 white_palette:
         .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30
@@ -86,7 +86,7 @@ brightness_table:
         .word white_palette
 
 
-.segment "PRGFIXED_C000"
+.segment "PRGFIXED_E000"
 
 ; call with desired brightness in a
 .proc set_brightness
@@ -97,7 +97,7 @@ brightness_table:
         rts
 .endproc
 
-.segment "PRG0_8000"
+.segment "CODE_0"
 
 .proc FAR_refresh_palettes_gameloop
 PalAddr := R0
