@@ -33,17 +33,70 @@ FADE_SPEED = 8
 
         .segment "DATA_2"
 
-.export bhop_music_data
-bhop_music_data: ; TODO: deprecated label, remove later
-
-music_module:
-        .scope
+        .proc zeta_tactus_ost
         .include "../art/music/music.asm"
-        .endscope
+        .endproc
+
+        .segment "DATA_5"
+
+        .proc persune_tactus_ost
+        .include "../art/music/persune.asm"
+        .endproc
+
+        .segment "PRGFIXED_E000"
+
+; todo: figure out if we can move this elsewhere? it might grow
+
+track_table_module_low:
+        .repeat 4
+        .lobytes zeta_tactus_ost
+        .endrepeat
+        .lobytes persune_tactus_ost
+
+track_table_module_high:
+        .repeat 4
+        .hibytes zeta_tactus_ost
+        .endrepeat
+        .hibytes persune_tactus_ost
+
+track_table_bank:
+        .repeat 4
+        .lobytes .bank(zeta_tactus_ost)
+        .endrepeat
+        .lobytes .bank(persune_tactus_ost)
+        
+track_table_song:
+        .byte 0 ; silence (used for transitions)
+        .byte 1 ; click track (meant for debugging)
+        .byte 2 ; level music
+        .byte 3 ; title music
+        .byte 0 ; in another world (warp zone)
+
+track_table_num_variants:
+        .byte 1 ; silence 
+        .byte 1 ; click_track
+        .byte 1 ; level music
+        .byte 1 ; title music
+        .byte 1 ; in another world (warp zone)
+
+track_table_variant_length:
+        .byte 0 ; silence
+        .byte 0 ; click_track
+        .byte 0 ; level music
+        .byte 0 ; title music
+        .byte 0 ; in another world (warp zone)
+
+; bhop calls these functions for bank swapping and ZPCM tomfoolery
+.proc bhop_enable_zpcm
+        rts
+.endproc
+
+.proc bhop_disable_zpcm
+        rts
+.endproc
 
 ; interface functions should mostly live in fixed; we'll call these often, and several
 ; need A to remain unclobbered
-        .segment "PRGFIXED_E000"
 
 ; inputs: track number in A
 .proc fade_to_track
@@ -75,9 +128,12 @@ done:
         lda track_table_bank, x
         sta MusicCurrentBank
         access_data_bank MusicCurrentBank
+
+        lda track_table_module_low, x
+        ldy track_table_module_high, x
+        far_call bhop_set_module_addr
+
         lda track_table_song, x
-        ldy #>music_module
-        ldx #<music_module
         far_call bhop_init
         ; all new tracks should start with variant 0
         ; (the map load routine might override this immediately, but if it
@@ -196,29 +252,6 @@ SfxPtr := R0
         rts
 .endproc
 
-track_table_bank:
-        .repeat 4
-        .lobytes .bank(music_module)
-        .endrepeat
-        
-track_table_song:
-        .byte 0 ; silence (used for transitions)
-        .byte 1 ; click track (meant for debugging)
-        .byte 2 ; level music
-        .byte 3 ; title music
-
-track_table_num_variants:
-        .byte 1 ; silence 
-        .byte 1 ; click_track
-        .byte 1 ; level music
-        .byte 1 ; title music
-
-track_table_variant_length:
-        .byte 0 ; silence
-        .byte 0 ; click_track
-        .byte 0 ; level music
-        .byte 0 ; title music
-
 ; Everything else goes in the switched bank
         .segment "CODE_SOUND"
 
@@ -235,9 +268,11 @@ track_table_variant_length:
 
         access_data_bank MusicCurrentBank
 
+        lda track_table_module_low, x
+        ldy track_table_module_high, x
+        far_call bhop_set_module_addr
+
         lda track_table_song, x
-        ldy #>music_module
-        ldx #<music_module
         far_call bhop_init
 
         ; init some custom bhop features here as well

@@ -157,7 +157,11 @@ MetaSpriteIndex := R0
         sta PPUCTRL
 
         ; Play the title track on the title screen (duh)
-        lda #3
+        ;lda #3
+        ;jsr play_track
+
+        ; (actually play other tracks for debugging)
+        lda #4
         jsr play_track
 
         rts

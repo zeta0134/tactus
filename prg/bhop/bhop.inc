@@ -3,7 +3,7 @@
 ; will not pollute the global namespace.
 
 .import bhop_init, bhop_play
-.import bhop_set_module_bank
+.import bhop_set_module_bank, bhop_set_module_addr
 .import bhop_mute_channel, bhop_unmute_channel, blarggsaw_irq, zetasaw_irq
 
 ; game specific variables
