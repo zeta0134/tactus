@@ -18,6 +18,18 @@
     __oamdata4 .word 
 .endstruct
 
+.struct SpriteRunWithSample
+    Sprite0 .byte .sizeof(SelfModifiedSprite)
+    Sprite1 .byte .sizeof(SelfModifiedSprite)
+    Sprite2 .byte .sizeof(SelfModifiedSprite)
+    Sprite3 .byte .sizeof(SelfModifiedSprite)
+    __inc .byte
+    __zpcm_addr .word
+.endstruct
+
 .global run_slowam, slowam_irq, setup_slowam_irq
 .global FAR_init_slowam
 .global sprite_ptr_lut_low, sprite_ptr_lut_high
+
+; where the routine should go
+SPRITE_TRANSFER_BASE = $6000

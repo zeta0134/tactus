@@ -196,10 +196,13 @@ NT_BANK_IDX           = %00111111
 	sta MAP_CHR_0_LO
 .endmacro
 
+.import __BANK_MASK__
+.import __BANK_OFFSET__
+
 .macro rainbow_set_code_bank bank_value
 	lda bank_value
-	; TODO: deal with alternate universes here
-	; (ORA/AND depending on if we're in ZPCM mode or not)
+	and #<__BANK_MASK__
+	ora #<__BANK_OFFSET__
 	sta code_bank_shadow
 	sta MAP_PRG_8_LO
 .endmacro
@@ -208,11 +211,6 @@ NT_BANK_IDX           = %00111111
 	lda bank_value
 	sta data_bank_shadow
 	sta MAP_PRG_A_LO
-.endmacro
-
-.macro rainbow_set_dpcm_bank bank_value
-	lda bank_value
-	sta MAP_PRG_C_LO
 .endmacro
 
 .macro rainbow_set_fixed_bank bank_value

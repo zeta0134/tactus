@@ -3,6 +3,7 @@
         .include "bhop/bhop.inc"
         .include "far_call.inc"
         .include "rainbow.inc"
+        .include "slowam.inc"
         .include "sound.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
@@ -28,6 +29,8 @@ Pulse1SfxPtr: .res 2
 Pulse2SfxPtr: .res 2
 TriangleSfxPtr: .res 2
 NoiseSfxPtr: .res 2
+
+NmiSafePtr: .res 2
 
 FADE_SPEED = 8
 
@@ -88,12 +91,64 @@ track_table_variant_length:
 
 ; bhop calls these functions for bank swapping and ZPCM tomfoolery
 .proc bhop_enable_zpcm
+ScratchPtr := NmiSafePtr
+        ; set the PCM address to $4011 when doing slow OAM transfers
+        st16 ScratchPtr, SPRITE_TRANSFER_BASE
+        ldx #16
+        ldy #(SpriteRunWithSample::__zpcm_addr + 1)
+loop:
+        lda #$40
+        sta (ScratchPtr), y
+        add16b ScratchPtr, #.sizeof(SpriteRunWithSample)
+        dex
+        bne loop
+
+        ; switch both the current code bank and the fixed code bank
+        ; to the zpcm-enabled universe
+        lda code_bank_shadow
+        and #<__BANK_MASK__
+        ora #0
+        sta MAP_PRG_8_LO
+
+        lda #(3 + 0)
+        sta MAP_PRG_E_LO
+
         rts
 .endproc
+.export bhop_enable_zpcm
 
 .proc bhop_disable_zpcm
+ScratchPtr := NmiSafePtr
+        ; set the PCM address to $5011 when doing slow OAM transfers
+        st16 ScratchPtr, SPRITE_TRANSFER_BASE
+        ldx #16
+        ldy #(SpriteRunWithSample::__zpcm_addr + 1)
+loop:
+        lda #$50
+        sta (ScratchPtr), y
+        add16b ScratchPtr, #.sizeof(SpriteRunWithSample)
+        dex
+        bne loop
+
+        ; switch both the current code bank and the fixed code bank
+        ; to the zpcm-enabled universe
+        lda code_bank_shadow
+        and #<__BANK_MASK__
+        ora #8
+        sta MAP_PRG_8_LO
+
+        lda #(3 + 8)
+        sta MAP_PRG_E_LO
+
         rts
 .endproc
+.export bhop_disable_zpcm
+
+.proc bhop_apply_dpcm_bank
+        sta MAP_PRG_C_LO
+        rts
+.endproc
+.export bhop_apply_dpcm_bank
 
 ; interface functions should mostly live in fixed; we'll call these often, and several
 ; need A to remain unclobbered

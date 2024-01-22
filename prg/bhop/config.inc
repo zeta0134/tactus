@@ -27,7 +27,7 @@ BHOP_PATTERN_SWITCH_ROUTINE = bhop_apply_music_bank
 ; A register before calling. It does not expect any registers
 ; or flags to be preserved.
 
-BHOP_DPCM_BANKING = 0
+BHOP_DPCM_BANKING = 1
 
 .if ::BHOP_DPCM_BANKING
 .import bhop_apply_dpcm_bank
@@ -53,14 +53,14 @@ BHOP_VRC6_ENABLED = 1
 
 BHOP_ZSAW_ENABLED = 0   ; generates custom waveforms using looping DPCM samples
 
-BHOP_ZPCM_ENABLED = 0   ; outputs expansion audio to DPCM via inc $4011
+BHOP_ZPCM_ENABLED = 1   ; outputs expansion audio to DPCM via inc $4011
     ; If using an advanced mapper that supports ZPCM, normally the DPCM channel is
     ; suppressed by the ZPCM activity. If you want to play DPCM samples, ZPCM must
     ; be temporarily disabled. Enable this feature if you want bhop to support this
     ; behavior, and provide your project-specific mechanism to temporarily disable
     ; and enable ZPCM updates by exporting the two symbols below. These routines
     ; will accept no arguments, and may clobber any registers.
-    BHOP_ZPCM_CONFLICT_AVOIDANCE = 0
+    BHOP_ZPCM_CONFLICT_AVOIDANCE = 1
 
     .if ::BHOP_ZPCM_CONFLICT_AVOIDANCE
     .import bhop_enable_zpcm, bhop_disable_zpcm

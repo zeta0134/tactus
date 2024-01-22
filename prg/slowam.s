@@ -8,9 +8,6 @@
 ; Cursed Slow OAM "DMA", in 1632 cycles
 ; Drink responsibly
 
-; where the routine should go
-SPRITE_TRANSFER_BASE = $6000
-
 .segment "CODE_0"
 
 ; to access an individual sprite quickly
