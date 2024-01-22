@@ -208,9 +208,7 @@ positive:
         ; preserve parameters
         pha ; song index
 
-        ; initialize bhop_ptr with the song header
-        ;stx music_header_ptr
-        ;sty music_header_ptr+1
+        perform_zpcm_inc
 
 .if ::BHOP_PATTERN_BANKING
         lda module_bank
@@ -246,6 +244,8 @@ positive:
         sta module_flags
 .endif
 
+        perform_zpcm_inc
+
         ; load speed and tempo from the requested song
         prepare_ptr song_ptr
         ldy #SongInfo::speed
@@ -269,6 +269,8 @@ song_uses_groove:
         lda (bhop_ptr), y
         sta row_cmp
 
+        perform_zpcm_inc
+
         ; If this song has grooves enabled, then apply the first groove right away
         jsr update_groove
         ; Now, to work around an off-by-one startup condition with when advance_pattern_rows
@@ -276,10 +278,14 @@ song_uses_groove:
         lda groove_index
         sta groove_position
 
+        perform_zpcm_inc
+
         ; initialize at the first frame, and prime our pattern pointers
         ldx #0
         jsr jump_to_frame
         jsr load_frame_patterns
+
+        perform_zpcm_inc
 
         ; initialize every channel's volume to 15 (some songs seem to rely on this)
         lda #$0F
@@ -303,6 +309,8 @@ song_uses_groove:
         sta channel_volume + VRC6_SAWTOOTH_INDEX
         .endif
 
+        perform_zpcm_inc
+
         ; disable any active effects
         lda #0
         sta channel_pitch_effects_active + PULSE_1_INDEX
@@ -323,6 +331,8 @@ song_uses_groove:
         sta channel_pitch_effects_active + VRC6_SAWTOOTH_INDEX
         .endif
 
+        perform_zpcm_inc
+
         ; reset every channel's status
         lda #(CHANNEL_MUTED)
         sta channel_status + PULSE_1_INDEX
@@ -342,6 +352,8 @@ song_uses_groove:
         sta channel_status + VRC6_PULSE_2_INDEX
         sta channel_status + VRC6_SAWTOOTH_INDEX
         .endif
+
+        perform_zpcm_inc
         
         ; reset DPCM status
         lda #$FF
@@ -355,6 +367,7 @@ song_uses_groove:
         lda #0
         ldx #NUM_CHANNELS
 effect_init_loop:
+        perform_zpcm_inc
         dex
         sta effect_note_delay, x
         sta sequences_enabled, x
@@ -395,6 +408,8 @@ effect_init_loop:
         .if ::BHOP_VRC6_ENABLED
         jsr bhop_vrc6_init
         .endif
+
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -1118,6 +1133,8 @@ done:
         sta effect_dpcm_pitch
         jsr advance_channel_row
 
+        perform_zpcm_inc
+
 .if ::BHOP_PATTERN_BANKING
         ; Now that we're done with patterns, restore the module bank before continuing
         lda module_bank
@@ -1126,6 +1143,8 @@ done:
 
         ; Every time we update the pattern rows, also advance the groove sequence if enabled
         jsr update_groove
+
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -2382,6 +2401,8 @@ cleanup:
         and #CHANNEL_SUPPRESSED
         jne done
 
+        perform_zpcm_inc
+
         ; Xxx handling; see CDPCMChan::RefreshChannel() in Dn-FT
         ; decrement effect_retrigger_counter while effect_retrigger_counter != zero
         lda effect_retrigger_period
@@ -2415,6 +2436,8 @@ next:
         and #CHANNEL_TRIGGERED
         jeq check_for_inactive
 
+        perform_zpcm_inc
+
         ; We're about to trigger a DPCM sample,
         ; so silence virtual Z channels.
         ; DPCM will always have higher priority
@@ -2423,6 +2446,8 @@ next:
         .elseif ::BHOP_ZPCM_ENABLED
         jsr zpcm_disable
         .endif
+
+        perform_zpcm_inc
 
         ; using the current note, read the sample table
         prepare_ptr_with_fixed_offset music_header_ptr, FtModuleHeader::sample_list
@@ -2450,6 +2475,9 @@ next:
         and #$F0
         ora effect_dpcm_pitch
         sta scratch_byte
+
+        perform_zpcm_inc
+
 skip_pitch:
         lda scratch_byte
         and #%01111111 ; do NOT enable IRQs
@@ -2465,6 +2493,8 @@ skip_pitch:
 skip_dac:
         lda #$FF
         sta effect_dac_buffer
+
+        perform_zpcm_inc
 
         lda (bhop_ptr), y
         ; this is the index into the samples table, here it is pre-multiplied
@@ -2488,6 +2518,8 @@ skip_dac:
 
         lda (bhop_ptr), y
         sta $4013
+
+        perform_zpcm_inc
 
 .if ::BHOP_DPCM_BANKING
         iny
@@ -2521,6 +2553,8 @@ dpcm_muted:
         lda #%00001111
         sta $4015
 
+        perform_zpcm_inc
+
         lda channel_status + DPCM_INDEX
         and #CHANNEL_MUTED
         bne dpcm_cut
@@ -2553,6 +2587,8 @@ check_for_inactive:
             jsr zpcm_enable
             .endif
         .endif
+
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -2633,6 +2669,7 @@ done:
 
 ; resets the retrigger logic upon a new DPCM sample note
 .proc trigger_sample
+        perform_zpcm_inc
         .if ::BHOP_ZPCM_ENABLED
         .if .not ::BHOP_ZPCM_CONFLICT_AVOIDANCE
         ; since we don't have any means to disable ZPCM,

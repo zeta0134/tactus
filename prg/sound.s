@@ -97,6 +97,7 @@ ScratchPtr := NmiSafePtr
         ldx #16
         ldy #(SpriteRunWithSample::__zpcm_addr + 1)
 loop:
+        perform_zpcm_inc
         lda #$40
         sta (ScratchPtr), y
         add16b ScratchPtr, #.sizeof(SpriteRunWithSample)
@@ -113,6 +114,8 @@ loop:
         lda #(3 + 0)
         sta MAP_PRG_E_LO
 
+        perform_zpcm_inc
+
         rts
 .endproc
 .export bhop_enable_zpcm
@@ -124,6 +127,7 @@ ScratchPtr := NmiSafePtr
         ldx #16
         ldy #(SpriteRunWithSample::__zpcm_addr + 1)
 loop:
+        perform_zpcm_inc
         lda #$50
         sta (ScratchPtr), y
         add16b ScratchPtr, #.sizeof(SpriteRunWithSample)
@@ -139,6 +143,8 @@ loop:
 
         lda #(3 + 8)
         sta MAP_PRG_E_LO
+
+        perform_zpcm_inc
 
         rts
 .endproc
