@@ -157,12 +157,12 @@ MetaSpriteIndex := R0
         sta PPUCTRL
 
         ; Play the title track on the title screen (duh)
-        ;lda #3
-        ;jsr play_track
+        lda #3
+        jsr play_track
 
         ; (actually play other tracks for debugging)
-        lda #4
-        jsr play_track
+        ;lda #4
+        ;jsr play_track
 
         rts
 .endproc
@@ -280,8 +280,12 @@ MetaSpriteIndex := R0
 .endproc
 
 .proc game_init
-        lda #2
+        ; shower groove
+        ;lda #2
+        ; in another world
+        lda #4
         jsr play_track
+
         lda #0
         sta DisplayedRowCounter
         sta CurrentBeat
