@@ -11,7 +11,6 @@
         .include "sound.inc"
         .include "sprites.inc"
         .include "static_screens.inc"
-        .include "vram_buffer.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"

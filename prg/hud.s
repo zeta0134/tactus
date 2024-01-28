@@ -10,7 +10,6 @@
         .include "player.inc"
         .include "ppu.inc"
         .include "sprites.inc"
-        .include "vram_buffer.inc"
         .include "weapons.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
@@ -22,33 +21,37 @@ HudTopmostRowDirty: .res 1
 HudTopRowDirty: .res 1
 HudMiddleRowDirty: .res 1
 HudBottomRowDirty: .res 1
-HudAttrDirty: .res 1
 HudGoldDisplay: .res 5
 HudWeaponSpriteIndex: .res 1
 
 .segment "CODE_0"
 
-HUD_TOPMOST_ROW_LEFT = $2302
-HUD_UPPER_ROW_LEFT  = $2342
-HUD_MIDDLE_ROW_LEFT = $2362
-HUD_LOWER_ROW_LEFT  = $2322
+HUD_TOPMOST_ROW_LEFT = $5302
+HUD_UPPER_ROW_LEFT   = $5342
+HUD_MIDDLE_ROW_LEFT  = $5362
+HUD_LOWER_ROW_LEFT   = $5322
 
-HUD_TOPMOST_ROW_RIGHT = $2702
-HUD_UPPER_ROW_RIGHT  = $2742
-HUD_MIDDLE_ROW_RIGHT = $2762
-HUD_LOWER_ROW_RIGHT  = $2722
+HUD_TOPMOST_ROW_RIGHT = $5702
+HUD_UPPER_ROW_RIGHT   = $5742
+HUD_MIDDLE_ROW_RIGHT  = $5762
+HUD_LOWER_ROW_RIGHT   = $5722
 
-HUD_ATTR_LEFT = $23F0
-HUD_ATTR_RIGHT = $27F0
+HUD_ATTR_OFFSET = $0800
 
-HEART_FULL_TILE = 204
-HEART_HALF_TILE = 200
-HEART_EMPTY_TILE = 196
-BLANK_TILE = 250
+HEART_FULL_TILE     = 204
+HEART_HALF_TILE     = 200
+HEART_EMPTY_TILE    = 196
+BLANK_TILE          = 250
 MAP_ICON_UNEXPLORED = 192
-MAP_ICON_SPECIAL = 193
-MAP_ICON_EXPLORED = 194
-MAP_ICON_CURRENT = 195
+MAP_ICON_SPECIAL    = 193
+MAP_ICON_EXPLORED   = 194
+MAP_ICON_CURRENT    = 195
+
+WORLD_PAL  = %00000000
+TEXT_PAL   = %01000000 ; text and blue are the same, the blue palette will
+BLUE_PAL   = %01000000 ; always contain white in slot 3 for simple UI elements
+YELLOW_PAL = %10000000
+RED_PAL    = %11000000
 
 weapon_palette_table:
         .byte %00, %01, %10, %11
@@ -89,7 +92,6 @@ sprite_failed:
         sta HudTopRowDirty
         sta HudMiddleRowDirty
         sta HudBottomRowDirty
-        sta HudAttrDirty
         jsr update_weapon_sprite
         rts
 .endproc
@@ -108,14 +110,19 @@ sprite_failed:
 .endproc
 
 .proc FAR_queue_hud
+NametableAddr := R12
+AttributeAddr := R14
         lda HudTopmostRowDirty
         and #%00000001
         beq skip_topmost_row_left
         lda queued_bytes_counter
         cmp #(MAXIMUM_QUEUE_SIZE - 28)
         bcs skip_topmost_row_left
-        write_vram_header_imm HUD_TOPMOST_ROW_LEFT, #28, VRAM_INC_1
-        ldy VRAM_TABLE_INDEX
+        
+        st16 NametableAddr, (HUD_TOPMOST_ROW_LEFT)
+        st16 AttributeAddr, (HUD_TOPMOST_ROW_LEFT | HUD_ATTR_OFFSET)
+        ldy #0
+
         near_call FAR_queue_hud_topmost_row
         lda HudTopmostRowDirty
         and #%11111110
@@ -127,8 +134,11 @@ skip_topmost_row_left:
         lda queued_bytes_counter
         cmp #(MAXIMUM_QUEUE_SIZE - 28)
         bcs skip_top_row_left
-        write_vram_header_imm HUD_UPPER_ROW_LEFT, #28, VRAM_INC_1
-        ldy VRAM_TABLE_INDEX
+        
+        st16 NametableAddr, (HUD_UPPER_ROW_LEFT)
+        st16 AttributeAddr, (HUD_UPPER_ROW_LEFT | HUD_ATTR_OFFSET)
+        ldy #0
+
         near_call FAR_queue_hud_top_row
         lda HudTopRowDirty
         and #%11111110
@@ -140,8 +150,11 @@ skip_top_row_left:
         lda queued_bytes_counter
         cmp #(MAXIMUM_QUEUE_SIZE - 28)
         bcs skip_middle_row_left
-        write_vram_header_imm HUD_MIDDLE_ROW_LEFT, #28, VRAM_INC_1
-        ldy VRAM_TABLE_INDEX
+        
+        st16 NametableAddr, (HUD_MIDDLE_ROW_LEFT)
+        st16 AttributeAddr, (HUD_MIDDLE_ROW_LEFT | HUD_ATTR_OFFSET)
+        ldy #0
+
         near_call FAR_queue_hud_middle_row
         lda HudMiddleRowDirty
         and #%11111110
@@ -153,8 +166,11 @@ skip_middle_row_left:
         lda queued_bytes_counter
         cmp #(MAXIMUM_QUEUE_SIZE - 28)
         bcs skip_bottom_row_left
-        write_vram_header_imm HUD_LOWER_ROW_LEFT, #28, VRAM_INC_1
-        ldy VRAM_TABLE_INDEX
+        
+        st16 NametableAddr, (HUD_LOWER_ROW_LEFT)
+        st16 AttributeAddr, (HUD_LOWER_ROW_LEFT | HUD_ATTR_OFFSET)
+        ldy #0
+
         near_call FAR_queue_hud_bottom_row
         lda HudBottomRowDirty
         and #%11111110
@@ -166,8 +182,11 @@ skip_bottom_row_left:
         lda queued_bytes_counter
         cmp #(MAXIMUM_QUEUE_SIZE - 28)
         bcs skip_topmost_row_right
-        write_vram_header_imm HUD_TOPMOST_ROW_RIGHT, #28, VRAM_INC_1
-        ldy VRAM_TABLE_INDEX
+        
+        st16 NametableAddr, (HUD_TOPMOST_ROW_RIGHT)
+        st16 AttributeAddr, (HUD_TOPMOST_ROW_RIGHT | HUD_ATTR_OFFSET)
+        ldy #0
+
         near_call FAR_queue_hud_topmost_row
         lda HudTopmostRowDirty
         and #%11111101
@@ -179,8 +198,11 @@ skip_topmost_row_right:
         lda queued_bytes_counter
         cmp #(MAXIMUM_QUEUE_SIZE - 28)
         bcs skip_top_row_right
-        write_vram_header_imm HUD_UPPER_ROW_RIGHT, #28, VRAM_INC_1
-        ldy VRAM_TABLE_INDEX
+        
+        st16 NametableAddr, (HUD_UPPER_ROW_RIGHT)
+        st16 AttributeAddr, (HUD_UPPER_ROW_RIGHT | HUD_ATTR_OFFSET)
+        ldy #0
+
         near_call FAR_queue_hud_top_row
         lda HudTopRowDirty
         and #%11111101
@@ -192,8 +214,11 @@ skip_top_row_right:
         lda queued_bytes_counter
         cmp #(MAXIMUM_QUEUE_SIZE - 28)
         bcs skip_middle_row_right
-        write_vram_header_imm HUD_MIDDLE_ROW_RIGHT, #28, VRAM_INC_1
-        ldy VRAM_TABLE_INDEX
+        
+        st16 NametableAddr, (HUD_MIDDLE_ROW_RIGHT)
+        st16 AttributeAddr, (HUD_MIDDLE_ROW_RIGHT | HUD_ATTR_OFFSET)
+        ldy #0
+
         near_call FAR_queue_hud_middle_row
         lda HudMiddleRowDirty
         and #%11111101
@@ -205,57 +230,31 @@ skip_middle_row_right:
         lda queued_bytes_counter
         cmp #(MAXIMUM_QUEUE_SIZE - 28)
         bcs skip_bottom_row_right
-        write_vram_header_imm HUD_LOWER_ROW_RIGHT, #28, VRAM_INC_1
-        ldy VRAM_TABLE_INDEX
+        
+        st16 NametableAddr, (HUD_LOWER_ROW_RIGHT)
+        st16 AttributeAddr, (HUD_LOWER_ROW_RIGHT | HUD_ATTR_OFFSET)
+        ldy #0
+
         near_call FAR_queue_hud_bottom_row
         lda HudBottomRowDirty
         and #%11111101
         sta HudBottomRowDirty
 skip_bottom_row_right:
-        lda HudAttrDirty
-        and #%00000001
-        beq skip_attributes_left
-        lda queued_bytes_counter
-        cmp #(MAXIMUM_QUEUE_SIZE - 8)
-        bcs skip_attributes_left
-        write_vram_header_imm HUD_ATTR_LEFT, #8, VRAM_INC_1
-        ldy VRAM_TABLE_INDEX
-        near_call FAR_queue_attributes
-        lda HudAttrDirty
-        and #%11111110
-        sta HudAttrDirty
-skip_attributes_left:
-        lda HudAttrDirty
-        and #%00000010
-        beq skip_attributes_right
-        lda queued_bytes_counter
-        cmp #(MAXIMUM_QUEUE_SIZE - 8)
-        bcs skip_attributes_right
-        write_vram_header_imm HUD_ATTR_RIGHT, #8, VRAM_INC_1
-        ldy VRAM_TABLE_INDEX
-        near_call FAR_queue_attributes
-        lda HudAttrDirty
-        and #%11111100
-        sta HudAttrDirty
-skip_attributes_right:
-
         
         rts
 .endproc
 
-.proc FAR_queue_hud_attributes
-        ; TODO: this
-        rts
-.endproc
-
-; Note: Expects a VRAM header to aleady be written, and Y to be loaded with the index
-; DOES close out this header upon completion
+; Note: Expects Y to be loaded with the tile index
 .proc FAR_queue_hud_top_row
 PaddingAmount := R0
 CurrentHeart := R0
 RoomIndex := R0
 FullHeartThreshold := R1
 HalfHeartThreshold := R2
+
+NametableAddr := R12
+AttributeAddr := R14
+
         perform_zpcm_inc
         ; up to 10 hearts
         lda #0
@@ -270,20 +269,28 @@ loop:
         cmp FullHeartThreshold
         bcc check_half_heart
         lda #(HEART_FULL_TILE+0)
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
         lda #(HEART_FULL_TILE+2)
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
         jmp converge
 check_half_heart:
         cmp HalfHeartThreshold
         bcc check_heart_container
         lda #(HEART_HALF_TILE+0)
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
         lda #(HEART_HALF_TILE+2)
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
         jmp converge
 check_heart_container:
@@ -291,20 +298,30 @@ check_heart_container:
         cmp HalfHeartThreshold
         bcc draw_nothing
         lda #(HEART_EMPTY_TILE+0)
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
         lda #(HEART_EMPTY_TILE+2)
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
         jmp converge
 draw_nothing:
+        ; draw two blank tiles; the upper attribute
+        ; byte doesn't matter much here, but we draw it anyway
         lda #BLANK_TILE
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
-        sta VRAM_TABLE_START, y
+        lda #BLANK_TILE
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
 converge:
-        ; DRAW TWO BLANK TILES
         inc FullHeartThreshold
         inc FullHeartThreshold
         inc HalfHeartThreshold
@@ -328,9 +345,6 @@ converge:
         sta RoomIndex
         jsr draw_map_tiles
 
-        sty VRAM_TABLE_INDEX
-        inc VRAM_TABLE_ENTRIES
-
         ; TODO: gold counter (6 more tiles)
 
         lda queued_bytes_counter
@@ -343,8 +357,7 @@ converge:
         rts
 .endproc
 
-; Note: Expects a VRAM header to aleady be written, and Y to be loaded with the index
-; DOES close out this header upon completion
+; Note: Expects Y to be loaded with the tile index
 .proc FAR_queue_hud_middle_row
 PaddingAmount := R0
 CurrentHeart := R0
@@ -353,6 +366,9 @@ FullHeartThreshold := R1
 HalfHeartThreshold := R2
 NumberWord := R0
 StringPtr := R0
+
+NametableAddr := R12
+AttributeAddr := R14
         ; up to 10 hearts
         lda #0
         sta CurrentHeart
@@ -367,20 +383,28 @@ loop:
         cmp FullHeartThreshold
         bcc check_half_heart
         lda #(HEART_FULL_TILE+1)
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
         lda #(HEART_FULL_TILE+3)
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
         jmp converge
 check_half_heart:
         cmp HalfHeartThreshold
         bcc check_heart_container
         lda #(HEART_HALF_TILE+1)
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
         lda #(HEART_HALF_TILE+3)
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
         jmp converge
 check_heart_container:
@@ -388,20 +412,28 @@ check_heart_container:
         cmp HalfHeartThreshold
         bcc draw_nothing
         lda #(HEART_EMPTY_TILE+1)
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
         lda #(HEART_EMPTY_TILE+3)
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
         jmp converge
 draw_nothing:
         lda #BLANK_TILE
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
-        sta VRAM_TABLE_START, y
+        lda #BLANK_TILE
+        sta (NametableAddr), y
+        lda #RED_PAL
+        sta (AttributeAddr), y
         iny
-converge:
-        ; DRAW TWO BLANK TILES
+converge:        
         inc FullHeartThreshold
         inc FullHeartThreshold
         inc HalfHeartThreshold
@@ -432,9 +464,6 @@ converge:
         lda #12
         sta RoomIndex
         jsr draw_map_tiles
-
-        sty VRAM_TABLE_INDEX
-        inc VRAM_TABLE_ENTRIES
 
         ; TODO: gold counter (6 more tiles)
 
@@ -472,12 +501,18 @@ weapon_padding_table:
 
 .proc draw_padding
 PaddingAmount := R0
+
+NametableAddr := R12
+AttributeAddr := R14
+
         lda PaddingAmount
         beq skip
-        lda #BLANK_TILE
 loop:
         perform_zpcm_inc
-        sta VRAM_TABLE_START, y
+        lda #BLANK_TILE
+        sta (NametableAddr), y
+        lda #TEXT_PAL
+        sta (AttributeAddr), y
         iny
         dec PaddingAmount
         bne loop
@@ -488,6 +523,10 @@ skip:
 .proc draw_string
 StringPtr := R0
 VramIndex := R2
+
+NametableAddr := R12
+AttributeAddr := R14
+
         sty VramIndex ; preserve
 loop:
         perform_zpcm_inc
@@ -495,7 +534,9 @@ loop:
         lda (StringPtr), y
         beq end_of_string
         ldy VramIndex
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #TEXT_PAL
+        sta (AttributeAddr), y
         inc VramIndex
         inc16 StringPtr
         jmp loop
@@ -506,10 +547,15 @@ end_of_string:
 
 .proc draw_single_digit
 Digit := R0
+
+NametableAddr := R12
+AttributeAddr := R14
         lda #NUMBERS_BASE
         clc
         adc Digit
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #TEXT_PAL
+        sta (AttributeAddr), y
         iny
         rts
 .endproc
@@ -521,6 +567,10 @@ PaddingAmount := R0
 StringPtr := R0
 Digit := R0
 RoomIndex := R0
+
+NametableAddr := R12
+AttributeAddr := R14
+
         perform_zpcm_inc
 
         ; 0123456789012345678901234567
@@ -586,9 +636,6 @@ done_with_keys:
         lda #4
         sta RoomIndex
         jsr draw_map_tiles
-        ; And that's the whole top row, we just need to close out the vram buffer 
-        sty VRAM_TABLE_INDEX
-        inc VRAM_TABLE_ENTRIES
 
         lda queued_bytes_counter
         clc
@@ -603,6 +650,11 @@ done_with_keys:
 .proc FAR_queue_hud_topmost_row
 PaddingAmount := R0
 RoomIndex := R0
+
+; not used, but included here for consistency
+NametableAddr := R12
+AttributeAddr := R14
+
         perform_zpcm_inc
         ; This row is mostly padding
         lda #24
@@ -616,9 +668,6 @@ RoomIndex := R0
 
         perform_zpcm_inc
 
-        sty VRAM_TABLE_INDEX
-        inc VRAM_TABLE_ENTRIES
-
         lda queued_bytes_counter
         clc
         adc #28
@@ -629,38 +678,16 @@ RoomIndex := R0
         rts
 .endproc
 
-; Note: Expects a VRAM header to aleady be written, and Y to be loaded with the index
-; DOES close out this header upon completion
-.proc FAR_queue_attributes
-        ; heart cells (7+padding) on the bottom, text (01) on the top
-        lda #%11110101
-        .repeat 4
-        sta VRAM_TABLE_START, y
-        iny
-        .endrepeat
-        ; everything else will be pure text
-        lda #%01010101
-        .repeat 4
-        sta VRAM_TABLE_START, y
-        iny
-        .endrepeat
-        sty VRAM_TABLE_INDEX
-        inc VRAM_TABLE_ENTRIES
-
-        lda queued_bytes_counter
-        clc
-        adc #8
-        sta queued_bytes_counter
-
-        rts
-.endproc
-
 ; Note: called by the bigger row specific functions
 ; Put the starting index in R0, and leave Y pointing
 ; the vram index
 .proc draw_map_tiles
 RoomIndex := R0
 Counter := R1
+
+NametableAddr := R12
+AttributeAddr := R14
+
         lda #4
         sta Counter
 loop:
@@ -670,7 +697,9 @@ loop:
         bne visited
 unvisited:
         lda #MAP_ICON_UNEXPLORED
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #YELLOW_PAL
+        sta (AttributeAddr), y
         iny
         jmp converge
 visited:
@@ -681,17 +710,23 @@ visited:
         bne special_room
 standard_room:
         lda #MAP_ICON_EXPLORED
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #YELLOW_PAL
+        sta (AttributeAddr), y
         iny
         jmp converge
 special_room:
         lda #MAP_ICON_SPECIAL
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #YELLOW_PAL
+        sta (AttributeAddr), y
         iny
         jmp converge
 current_room:
         lda #MAP_ICON_CURRENT
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #YELLOW_PAL
+        sta (AttributeAddr), y
         iny
 converge:
         inc RoomIndex
@@ -714,6 +749,10 @@ converge:
 NumberWord := R0
 CurrentDigit := R2
 LeadingCounter := R3
+
+NametableAddr := R12
+AttributeAddr := R14
+
         perform_zpcm_inc
         lda #0
         sta CurrentDigit
@@ -736,7 +775,9 @@ display_tens_of_thousands:
 blank_ten_thousands:
         lda #BLANK_TILE
 draw_ten_thousands:
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #TEXT_PAL
+        sta (AttributeAddr), y
         iny
 
         perform_zpcm_inc
@@ -761,7 +802,9 @@ display_thousands:
 blank_thousands:
         lda #BLANK_TILE
 draw_thousands:
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #TEXT_PAL
+        sta (AttributeAddr), y
         iny
 
         perform_zpcm_inc
@@ -786,7 +829,9 @@ display_hundreds:
 blank_hundreds:
         lda #BLANK_TILE
 draw_hundreds:
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #TEXT_PAL
+        sta (AttributeAddr), y
         iny
 
         perform_zpcm_inc
@@ -811,7 +856,9 @@ display_tens:
 blank_tens:
         lda #BLANK_TILE
 draw_tens:
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #TEXT_PAL
+        sta (AttributeAddr), y
         iny
 
         perform_zpcm_inc
@@ -828,7 +875,9 @@ display_ones:
         lda #NUMBERS_BASE
         clc
         adc CurrentDigit
-        sta VRAM_TABLE_START, y
+        sta (NametableAddr), y
+        lda #TEXT_PAL
+        sta (AttributeAddr), y
         iny
 
         perform_zpcm_inc

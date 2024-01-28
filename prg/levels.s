@@ -11,7 +11,6 @@
         .include "ppu.inc"
         .include "prng.inc"
         .include "rainbow.inc"
-        .include "vram_buffer.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
