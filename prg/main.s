@@ -9,6 +9,7 @@
         .include "main.inc"
         .include "memory_util.inc"
         .include "nes.inc"
+        .include "palette.inc"
         .include "ppu.inc"
         .include "prng.inc"
         .include "slowam.inc"
@@ -49,6 +50,7 @@ start:
         sta fixed_seed
 
         far_call FAR_init_nametables
+        far_call FAR_init_palettes
 
         ; now enable rendering and proceed to the main game loop
         lda #$1E

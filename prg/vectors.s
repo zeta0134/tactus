@@ -9,11 +9,11 @@
 .include "input.inc"
 .include "main.inc"
 .include "memory_util.inc"
+.include "palette.inc"
 .include "prng.inc"
 .include "rainbow.inc"
 .include "slowam.inc"
 .include "sound.inc"
-.include "vram_buffer.inc"
 .include "zeropage.inc"
 .include "zpcm.inc"
 
@@ -72,10 +72,8 @@ reset:
         ;     could break things
         ; ===========================================================
 
-        ; Copy buffered PPU bytes into PPU address space, as quickly as possible
-        jsr vram_zipper
-        ; Update palette memory if required
-        ;jsr refresh_palettes
+        ; Update palette memory very quickly
+        jsr refresh_palettes_nmi
         ; Read controller registers and update button status
         ; This signals to the gameloop that it may continue
         lda GameloopCounter

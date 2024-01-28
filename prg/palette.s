@@ -5,9 +5,11 @@
         .include "nes.inc"
         .include "palette.inc"
         .include "ppu.inc"
-        .include "vram_buffer.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
+
+        .zeropage
+staging_palette: .res 32
 
         .segment "RAM"
 BgPaletteDirty: .res 1
@@ -97,11 +99,36 @@ brightness_table:
         rts
 .endproc
 
+.proc refresh_palettes_nmi 
+    lda #$3F
+    sta PPUADDR
+    lda #$00
+    sta PPUADDR
+    .repeat 32,i
+    lda staging_palette+i
+    sta PPUDATA
+    .endrepeat
+    rts
+.endproc
+
 .segment "CODE_0"
+
+.proc FAR_init_palettes
+        lda #$0F
+        ldx #0
+loop:
+        sta staging_palette, x
+        inx
+        cpx #32
+        bne loop
+
+        rts
+.endproc
 
 .proc FAR_refresh_palettes_gameloop
 PalAddr := R0
-PalIndex := R2
+SourcePalIndex := R2
+DestPalIndex := R3
         lda BgPaletteDirty
         ora ObjPaletteDirty
         jeq done
@@ -124,71 +151,69 @@ continue:
         lda BgPaletteDirty
         beq check_obj_palette
 
-        write_vram_header_imm $3F00, #16, VRAM_INC_1
+        
         lda #0
-        sta PalIndex
+        sta SourcePalIndex
+        sta DestPalIndex
 bg_loop:
         perform_zpcm_inc
         ; for the first entry, always use the global BG color
-        ldx #0
-        ldx PalIndex           ; From the original buffer
+        ldx SourcePalIndex     ; From the original buffer
         ldy BgPaletteBuffer, x ; Grab a palette color
         lda (PalAddr), y       ; And use it to index the brightness table we picked
-        ldx VRAM_TABLE_INDEX
-        sta VRAM_TABLE_START,x
-        inc VRAM_TABLE_INDEX
-        inc PalIndex
+        ldx DestPalIndex
+        sta staging_palette, x
+        inc SourcePalIndex
+        inc DestPalIndex
 
         ; for subsequent entries, use the palette colors
         .repeat 3
-        ldx PalIndex           ; From the original buffer
+        ldx SourcePalIndex           ; From the original buffer
         ldy BgPaletteBuffer, x ; Grab a palette color
         lda (PalAddr), y       ; And use it to index the brightness table we picked
-        ldx VRAM_TABLE_INDEX
-        sta VRAM_TABLE_START,x
-        inc VRAM_TABLE_INDEX
-        inc PalIndex
+        ldx DestPalIndex
+        sta staging_palette, x
+        inc SourcePalIndex
+        inc DestPalIndex
         .endrepeat
 
         lda #16
-        cmp PalIndex
+        cmp SourcePalIndex
         bne bg_loop
-        inc VRAM_TABLE_ENTRIES
 
 check_obj_palette:
         lda ObjPaletteDirty
         beq done
 
-        write_vram_header_imm $3F10, #16, VRAM_INC_1
         lda #0
-        sta PalIndex
+        sta SourcePalIndex
+        lda #16
+        sta DestPalIndex
 obj_loop:
         perform_zpcm_inc
        ; for the first entry, always use the global *BG* color
-        ldx #0
-        ldx PalIndex           ; From the original buffer
+        ldx SourcePalIndex
         ldy BgPaletteBuffer, x ; Grab a palette color
         lda (PalAddr), y       ; And use it to index the brightness table we picked
-        ldx VRAM_TABLE_INDEX
-        sta VRAM_TABLE_START,x
-        inc VRAM_TABLE_INDEX
-        inc PalIndex
+        ldx DestPalIndex
+        sta staging_palette, x
+        inc SourcePalIndex
+        inc DestPalIndex
 
         ; for subsequent entries, use the Obj palette colors
         .repeat 3
-        ldx PalIndex           ; From the original buffer
+        ldx SourcePalIndex           ; From the original buffer
         ldy ObjPaletteBuffer, x ; Grab a palette color
         lda (PalAddr), y       ; And use it to index the brightness table we picked
-        ldx VRAM_TABLE_INDEX
-        sta VRAM_TABLE_START,x
-        inc VRAM_TABLE_INDEX
-        inc PalIndex
+        ldx DestPalIndex
+        sta staging_palette, x
+        inc SourcePalIndex
+        inc DestPalIndex
         .endrepeat
 
         lda #16
-        cmp PalIndex
+        cmp SourcePalIndex
         bne obj_loop
-        inc VRAM_TABLE_ENTRIES
 
 done:
         perform_zpcm_inc
