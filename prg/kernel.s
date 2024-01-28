@@ -15,6 +15,7 @@
         .include "player.inc"
         .include "prng.inc"
         .include "ppu.inc"
+        .include "rainbow.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "static_screens.inc"
@@ -123,6 +124,14 @@ MetaSpriteIndex := R0
         lda #4
         sta TargetBrightness
 
+        ; the title screen for now doesn't use extended attributes, so
+        ; turn those off
+        lda #(NT_FPGA_RAM | NT_NO_EXT)
+        sta MAP_NT_A_CONTROL
+        sta MAP_NT_B_CONTROL
+        sta MAP_NT_C_CONTROL
+        sta MAP_NT_D_CONTROL
+
         ; copy the initial batch of graphics into CHR RAM
         far_call FAR_initialize_chr_ram_title
         far_call FAR_copy_title_nametable
@@ -202,6 +211,13 @@ MetaSpriteIndex := R0
         lda #4
         sta TargetBrightness
 
+        ; the end screens use typical 16x16 attributes for now, so set those up again
+        lda #(NT_FPGA_RAM | NT_NO_EXT)
+        sta MAP_NT_A_CONTROL
+        sta MAP_NT_B_CONTROL
+        sta MAP_NT_C_CONTROL
+        sta MAP_NT_D_CONTROL
+
         far_call FAR_initialize_sprites
         jsr init_game_end_screen
 
@@ -251,6 +267,14 @@ MetaSpriteIndex := R0
 
         lda #1
         sta NmiSoftDisable
+
+        ; the game screen uses ExAttr for palette access, so set that up here
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_AT)
+        sta MAP_NT_A_CONTROL
+        sta MAP_NT_C_CONTROL
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_AT)
+        sta MAP_NT_B_CONTROL
+        sta MAP_NT_D_CONTROL
 
         ; set the game palette
         jsr initialize_game_palettes
@@ -410,8 +434,10 @@ not_victory:
         st16 GameMode, wait_for_player_draw_1
 
         ; - Resolve the player's action
+        debug_color (TINT_B | LIGHTGRAY)
         jsr update_player
         far_call FAR_handle_room_spawns
+        debug_color LIGHTGRAY
 
         perform_zpcm_inc
 
@@ -420,7 +446,9 @@ not_victory:
 
         ; - clear "moved this frame" flags from all tiles, permitting
         ;   the updates we will perform over the next few frames
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
         far_call FAR_clear_active_move_flags
+        debug_color LIGHTGRAY
         perform_zpcm_inc
         far_call FAR_age_sprites
         perform_zpcm_inc
@@ -436,6 +464,9 @@ StartingTile := R15
         ; Do nothing! The player probably updated several rows, and
         ; we should give them a frame or two to draw before we do enemies again.
         ; If we draw enemies too quickly, we can get things slightly out of sync
+        
+        ; TODO: once we draw player tiles to FPGA RAM, this wait state should
+        ; no longer be needed
 
         jsr every_gameloop
         st16 GameMode, wait_for_player_draw_2
@@ -449,6 +480,9 @@ StartingTile := R15
         ; we should give them a frame or two to draw before we do enemies again.
         ; If we draw enemies too quickly, we can get things slightly out of sync
 
+        ; TODO: once we draw player tiles to FPGA RAM, this wait state should
+        ; no longer be needed
+
         jsr every_gameloop
         st16 GameMode, update_enemies_1
         rts
@@ -457,6 +491,9 @@ StartingTile := R15
 .proc update_enemies_1
 StartingRow := R14
 StartingTile := R15
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+
         ;- 1 frame: Update rows 0-3 of static enemies
         lda #0
         sta StartingRow
@@ -482,6 +519,8 @@ StartingTile := R15
         sta StartingTile
         far_call FAR_update_static_enemy_row
 
+        debug_color LIGHTGRAY
+
         jsr every_gameloop
         st16 GameMode, update_enemies_2
         rts
@@ -490,6 +529,9 @@ StartingTile := R15
 .proc update_enemies_2
 StartingRow := R14
 StartingTile := R15
+        
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+
         ;- 1 frame: Update rows 4-5 of static enemies, 0-1 of dynamic enemies, queue rows 0-1 to inactive buffer
         lda #4
         sta StartingRow
@@ -503,6 +545,8 @@ StartingTile := R15
         sta StartingTile
         far_call FAR_update_static_enemy_row
 
+        debug_color LIGHTGRAY
+
         jsr every_gameloop
         st16 GameMode, update_enemies_3
         rts
@@ -511,6 +555,9 @@ StartingTile := R15
 .proc update_enemies_3
 StartingRow := R14
 StartingTile := R15
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+
         ;- 1 frame: Update rows 6-7 of static enemies, 2-3 of dynamic enemies, queue rows 2-3 to inactive buffer
         lda #6
         sta StartingRow
@@ -524,6 +571,8 @@ StartingTile := R15
         sta StartingTile
         far_call FAR_update_static_enemy_row
 
+        debug_color LIGHTGRAY
+
         jsr every_gameloop
         st16 GameMode, update_enemies_4
         rts
@@ -532,6 +581,9 @@ StartingTile := R15
 .proc update_enemies_4
 StartingRow := R14
 StartingTile := R15
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+
         ;- 1 frame: Update rows 8-9 of static enemies, 4-5 of dynamic enemies, queue rows 4-5 to inactive buffer
         lda #8
         sta StartingRow
@@ -545,6 +597,8 @@ StartingTile := R15
         sta StartingTile
         far_call FAR_update_static_enemy_row
 
+        debug_color LIGHTGRAY
+
         jsr every_gameloop
         st16 GameMode, update_enemies_5
         rts
@@ -553,6 +607,10 @@ StartingTile := R15
 .proc update_enemies_5
 StartingRow := R14
 StartingTile := R15
+
+        ; TODO: the concept of static/dynamic updates never really got implemented. Do
+        ; we need it? If not, this wait state is unnecessary
+
         ;- 1 frame: Update rows 6-7 of dynamic enemies, queue rows 6-7 to inactive buffer
         jsr every_gameloop
         st16 GameMode, update_enemies_6
@@ -562,6 +620,10 @@ StartingTile := R15
 .proc update_enemies_6
 StartingRow := R14
 StartingTile := R15
+
+        ; TODO: the concept of static/dynamic updates never really got implemented. Do
+        ; we need it? If not, this wait state is unnecessary
+
         ;- 1 frame: Update rows 8-9 of dynamic enemies, queue rows 8-9 to inactive buffer
         jsr every_gameloop
         st16 GameMode, wait_for_the_next_beat
@@ -618,14 +680,22 @@ continue_waiting:
         jsr update_beat_counters
         far_call FAR_sync_chr_bank_to_music
         perform_zpcm_inc
+
+        debug_color (TINT_G | LIGHTGRAY)
         far_call FAR_queue_battlefield_updates
+        debug_color LIGHTGRAY
+
         perform_zpcm_inc
         far_call FAR_queue_hud
         perform_zpcm_inc
         jsr determine_player_intent
         jsr draw_player
         perform_zpcm_inc
+
+        debug_color (TINT_G | TINT_B | LIGHTGRAY)
         far_call FAR_draw_sprites
+        debug_color LIGHTGRAY
+
         perform_zpcm_inc
         far_call FAR_update_brightness
         perform_zpcm_inc

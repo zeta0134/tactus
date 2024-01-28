@@ -7,7 +7,6 @@
         .include "levels.inc"
         .include "nes.inc"
         .include "ppu.inc"
-        .include "vram_buffer.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
@@ -101,32 +100,37 @@ attribute_loop:
         perform_zpcm_inc
         lda #0
         sta queued_bytes_counter
+
         perform_zpcm_inc
-        jsr queue_active_tiles
+        jsr draw_active_tiles
         perform_zpcm_inc
-        jsr queue_inactive_tiles
+        jsr draw_inactive_tiles
         perform_zpcm_inc
-        jsr queue_active_attributes
-        perform_zpcm_inc
-        jsr queue_inactive_attributes
-        perform_zpcm_inc
+
         rts
 .endproc
 
-.proc queue_active_tiles
+; TODO: will we be using this long term? We might replace it
+; with a "draw specific active tile" routine to perform less
+; work after vertical strikes. If we do that, maybe we can
+; remove this function.
+.proc draw_active_tiles
 CurrentRow := R0
 NametableAddr := R2
 CurrentTile := R4
 RowCounter := R5
+AttributeAddr := R6
         lda #0
         sta CurrentRow
         sta CurrentTile
         lda active_battlefield
         bne second_nametable
-        st16 NametableAddr, $2082
+        st16 NametableAddr, $5082
+        st16 AttributeAddr, $5882
         jmp row_loop
 second_nametable:
-        st16 NametableAddr, $2482
+        st16 NametableAddr, $5482
+        st16 AttributeAddr, $5C82
 row_loop:
         perform_zpcm_inc
         lda queued_bytes_counter
@@ -140,11 +144,12 @@ continue:
         lda #0
         sta active_tile_queue, x
 
-        jsr _queue_tiles_common
+        jsr _draw_tiles_common
         jmp converge
 
 skip:
         add16b NametableAddr, #64
+        add16b AttributeAddr, #64
 converge:
         clc
         lda CurrentTile
@@ -160,20 +165,23 @@ done:
         rts
 .endproc
 
-.proc queue_inactive_tiles
+.proc draw_inactive_tiles
 CurrentRow := R0
 NametableAddr := R2
 CurrentTile := R4
 RowCounter := R5
+AttributeAddr := R6
         lda #0
         sta CurrentRow
         sta CurrentTile
         lda active_battlefield
         beq second_nametable
-        st16 NametableAddr, $2082
+        st16 NametableAddr, $5082
+        st16 AttributeAddr, $5882
         jmp row_loop
 second_nametable:
-        st16 NametableAddr, $2482
+        st16 NametableAddr, $5482
+        st16 AttributeAddr, $5C82
 row_loop:
         perform_zpcm_inc
         lda queued_bytes_counter
@@ -187,11 +195,12 @@ continue:
         lda #0
         sta inactive_tile_queue, x
 
-        jsr _queue_tiles_common
+        jsr _draw_tiles_common
         jmp converge
 
 skip:
         add16b NametableAddr, #64
+        add16b AttributeAddr, #64
 converge:
         clc
         lda CurrentTile
@@ -207,281 +216,136 @@ done:
         rts
 .endproc
 
-.proc _queue_tiles_common
+PALETTE_MASK  := %11000000
+LIGHTING_MASK := %00110000
+CORNER_MASK   := %11111100
+
+TOP_LEFT_BITS     := %00 ; not actually used
+TOP_RIGHT_BITS    := %10
+BOTTOM_LEFT_BITS  := %01
+BOTTOM_RIGHT_BITS := %11
+
+.proc _draw_tiles_common
+; used by outer function; no touch
 CurrentRow := R0
+
+; destination nametable addr for this row, set by calling code
+; this routine will add #64 to this address
 NametableAddr := R2
+; current tile, set by outer calling code, indexes
+; into battlefield state. use this to read drawing
+; details, clobber at will
 CurrentTile := R4
+; scratch, used to keep track of how many tiles we've drawn
 RowCounter := R5
-        write_vram_header_ptr NametableAddr, #28, VRAM_INC_1
+; new: destination exattr for this row, set by calling code
+; this routine will add #64 to this address
+AttributeAddr := R6
+; used to hold the (shared) upper attribute byte, for palettes
+; and (later) the extended CHR page. Does not hold lighting bits!
+ScratchAttrByte := R8
+
         ldx CurrentTile
-        ldy VRAM_TABLE_INDEX
+        ldy #0
         lda #::BATTLEFIELD_WIDTH
         sta RowCounter
+
 top_row_loop:
         perform_zpcm_inc
-        ; top left
+
+        ; first, let's compute the base attribute byte
+        ; for now, this is just the two palette bits, we won't
+        ; implement an upper TileID page until we have more than 64 tile types
+        lda battlefield, x ; xxxxxxpp
+        ror                ; cxxxxxxp
+        ror                ; pcxxxxxx
+        ror                ; ppcxxxxx
+        and #%11000000     ; pp000000
+        sta ScratchAttrByte
+
+
+        ; top left tile
         lda battlefield, x
-        and #%11111100
-        sta VRAM_TABLE_START, y
+        and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
+        ; ora #TOP_LEFT_BITS   ; this would be a nop
+        sta (NametableAddr), y  ; store that to our regular nametable
+        ; top-left attribute
+        lda (AttributeAddr), y
+        and #LIGHTING_MASK      ; keep only lighting bits
+        ora ScratchAttrByte     ; apply palette and high tile bits
+        sta (AttributeAddr), y  ;
         iny
-        ; top right
-        clc
-        adc #2
-        sta VRAM_TABLE_START, y
-        iny
+
+        ; top right tile
+        lda battlefield, x
+        and #CORNER_MASK
+        ora #TOP_RIGHT_BITS
+        sta (NametableAddr), y
+        ; top-right attribute
+        lda (AttributeAddr), y
+        and #LIGHTING_MASK      ; keep only lighting bits
+        ora ScratchAttrByte     ; apply palette and high tile bits
+        sta (AttributeAddr), y  ;
+        iny 
+
         inx
         dec RowCounter
         bne top_row_loop
-        sty VRAM_TABLE_INDEX
-        inc VRAM_TABLE_ENTRIES
 
         add16b NametableAddr, #32
+        add16b AttributeAddr, #32
 
-        write_vram_header_ptr NametableAddr, #28, VRAM_INC_1
         ldx CurrentTile
-        ldy VRAM_TABLE_INDEX
+        ldy #0
         lda #::BATTLEFIELD_WIDTH
         sta RowCounter
 bottom_row_loop:
         perform_zpcm_inc
-        ; bottom left
+
+        ; first, let's compute the base attribute byte
+        ; for now, this is just the two palette bits, we won't
+        ; implement an upper TileID page until we have more than 64 tile types
+        lda battlefield, x ; xxxxxxpp
+        ror                ; cxxxxxxp
+        ror                ; pcxxxxxx
+        ror                ; ppcxxxxx
+        and #%11000000     ; pp000000
+        sta ScratchAttrByte
+
+        ; bottom left tile
         lda battlefield, x
-        and #%11111100
-        clc
-        adc #1
-        sta VRAM_TABLE_START, y
+        and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
+        ora #BOTTOM_LEFT_BITS
+        sta (NametableAddr), y  ; store that to our regular nametable
+        ; bottom-left attribute
+        lda (AttributeAddr), y
+        and #LIGHTING_MASK      ; keep only lighting bits
+        ora ScratchAttrByte     ; apply palette and high tile bits
+        sta (AttributeAddr), y  ;
         iny
-        ; bottom right
-        clc
-        adc #2
-        sta VRAM_TABLE_START, y
+
+        ; bottom right tile
+        lda battlefield, x
+        and #CORNER_MASK
+        ora #BOTTOM_RIGHT_BITS
+        sta (NametableAddr), y
+        ; top-right attribute
+        lda (AttributeAddr), y
+        and #LIGHTING_MASK      ; keep only lighting bits
+        ora ScratchAttrByte     ; apply palette and high tile bits
+        sta (AttributeAddr), y  ;
         iny
+
         inx
         dec RowCounter
         bne bottom_row_loop
-        sty VRAM_TABLE_INDEX
-        inc VRAM_TABLE_ENTRIES
         
         add16b NametableAddr, #32
+        add16b AttributeAddr, #32
 
         clc
         lda queued_bytes_counter
         adc #(28 + 28)
-        sta queued_bytes_counter
-
-        rts
-.endproc
-
-.proc queue_active_attributes
-CurrentRow := R0
-NametableAddr := R2
-CurrentTile := R4
-RowCounter := R5
-        lda #0
-        sta CurrentRow
-        sta CurrentTile
-        lda active_battlefield
-        bne second_nametable
-        st16 NametableAddr, $23C8
-        jmp row_loop
-second_nametable:
-        st16 NametableAddr, $27C8
-row_loop:
-        perform_zpcm_inc
-        lda queued_bytes_counter
-        cmp #(MAXIMUM_QUEUE_SIZE - 8)
-        bcc continue
-        rts ; the queue is full; bail immediately
-continue:
-        ldx CurrentRow
-        lda active_attribute_queue, x
-        jeq skip
-        lda #0
-        sta active_attribute_queue, x
-
-        jsr _queue_attributes_common
-        jmp converge
-
-skip:
-        add16b NametableAddr, #8
-converge:
-        clc
-        lda CurrentTile
-        adc #(::BATTLEFIELD_WIDTH * 2)
-        sta CurrentTile
-        inc CurrentRow
-        lda CurrentRow
-        cmp #(::BATTLEFIELD_HEIGHT / 2)
-        beq done
-        jmp row_loop
-
-done:
-        rts
-.endproc
-
-.proc queue_inactive_attributes
-CurrentRow := R0
-NametableAddr := R2
-CurrentTile := R4
-RowCounter := R5
-        lda #0
-        sta CurrentRow
-        sta CurrentTile
-        lda active_battlefield
-        beq second_nametable
-        st16 NametableAddr, $23C8
-        jmp row_loop
-second_nametable:
-        st16 NametableAddr, $27C8
-row_loop:
-        perform_zpcm_inc
-        lda queued_bytes_counter
-        cmp #(MAXIMUM_QUEUE_SIZE - 8)
-        bcc continue
-        rts ; the queue is full; bail immediately
-continue:
-        ldx CurrentRow
-        lda inactive_attribute_queue, x
-        jeq skip
-        lda #0
-        sta inactive_attribute_queue, x
-
-        jsr _queue_attributes_common
-        jmp converge
-
-skip:
-        add16b NametableAddr, #8
-converge:
-        clc
-        lda CurrentTile
-        adc #(::BATTLEFIELD_WIDTH * 2)
-        sta CurrentTile
-        inc CurrentRow
-        lda CurrentRow
-        cmp #(::BATTLEFIELD_HEIGHT / 2)
-        beq done
-        jmp row_loop
-
-done:
-        rts
-.endproc
-
-.proc _queue_attributes_common
-CurrentRow := R0
-NametableAddr := R2
-CurrentTile := R4
-RowCounter := R5
-AttributeByte := R6
-
-        write_vram_header_ptr NametableAddr, #8, VRAM_INC_1
-        ldx CurrentTile
-        ldy VRAM_TABLE_INDEX
-
-        ; left bookend, the left attributes here are always %00
-        ; top left
-        clc
-        ror AttributeByte
-        clc
-        ror AttributeByte
-        ; top right
-        lda battlefield, x
-        lsr
-        ror AttributeByte
-        lsr
-        ror AttributeByte
-        ; bottom left
-        clc
-        ror AttributeByte
-        clc
-        ror AttributeByte
-        ; bottom right
-        lda battlefield + ::BATTLEFIELD_WIDTH, x
-        lsr
-        ror AttributeByte
-        lsr
-        ror AttributeByte
-        lda AttributeByte
-        sta VRAM_TABLE_START, y
-        iny
-
-        inx
-
-        ; inner loop, repeat this 6 times for tiles 01 - 12
-        lda #6
-        sta RowCounter
-inner_loop:
-        perform_zpcm_inc
-        ; top left
-        lda battlefield, x
-        lsr
-        ror AttributeByte
-        lsr
-        ror AttributeByte
-        ; top right
-        lda battlefield + 1, x
-        lsr
-        ror AttributeByte
-        lsr
-        ror AttributeByte
-        ; bottom left
-        lda battlefield + ::BATTLEFIELD_WIDTH, x
-        lsr
-        ror AttributeByte
-        lsr
-        ror AttributeByte
-        ; bottom right
-        lda battlefield + ::BATTLEFIELD_WIDTH + 1, x
-        lsr
-        ror AttributeByte
-        lsr
-        ror AttributeByte
-
-        lda AttributeByte
-        sta VRAM_TABLE_START, y
-        iny
-        inx
-        inx
-        dec RowCounter
-        bne inner_loop
-
-        perform_zpcm_inc
-
-        ; right bookend, here the rightmost tiles are always %00
-        ; top left
-        lda battlefield, x
-        lsr
-        ror AttributeByte
-        lsr
-        ror AttributeByte
-        ; top right
-        clc
-        ror AttributeByte
-        clc
-        ror AttributeByte
-        ; bottom left
-        lda battlefield + ::BATTLEFIELD_WIDTH, x
-        lsr
-        ror AttributeByte
-        lsr
-        ror AttributeByte
-        ; bottom right
-        clc
-        ror AttributeByte
-        clc
-        ror AttributeByte
-
-        lda AttributeByte
-        sta VRAM_TABLE_START, y
-        iny
-
-        sty VRAM_TABLE_INDEX
-        inc VRAM_TABLE_ENTRIES
-        
-        add16b NametableAddr, #8
-
-        clc
-        lda queued_bytes_counter
-        adc #(8)
         sta queued_bytes_counter
 
         rts
