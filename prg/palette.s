@@ -104,10 +104,17 @@ brightness_table:
     sta PPUADDR
     lda #$00
     sta PPUADDR
-    .repeat 32,i
+    perform_zpcm_inc
+    .repeat 16,i
     lda staging_palette+i
     sta PPUDATA
     .endrepeat
+    perform_zpcm_inc
+    .repeat 16,i
+    lda staging_palette+i+16
+    sta PPUDATA
+    .endrepeat
+    perform_zpcm_inc
     rts
 .endproc
 
@@ -117,6 +124,7 @@ brightness_table:
         lda #$0F
         ldx #0
 loop:
+        perform_zpcm_inc
         sta staging_palette, x
         inx
         cpx #32
@@ -129,6 +137,7 @@ loop:
 PalAddr := R0
 SourcePalIndex := R2
 DestPalIndex := R3
+        perform_zpcm_inc
         lda BgPaletteDirty
         ora ObjPaletteDirty
         jeq done

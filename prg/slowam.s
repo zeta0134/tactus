@@ -71,39 +71,4 @@ byte_loop:
     rts
 .endproc
 
-.segment "PRGFIXED_E000"
-
-; mostly for debugging / prototyping, we eventually want to move this to NMI
-
-; call this at the tail end of NMI on any non-lag frame
-.proc setup_slowam_irq
-    lda #224
-    sta MAP_PPU_IRQ_LATCH
-    lda #$87
-    sta MAP_PPU_IRQ_OFFSET
-    sta MAP_PPU_IRQ_ENABLE
-    cli
-    rts
-.endproc
-
-.proc slowam_irq
-    ; preserve registers (we only clobber A here)
-    pha
-    ; disable rendering
-    ; (note: adjust scanline+offset to land this in the 320-340 window)
-    lda #0
-    sta PPUMASK
-    ; perform one audio update, then launch the slow OAM transfer,
-    ; which will perform more as it goes
-    perform_zpcm_inc
-    lda #$00
-    sta $2003
-    jsr SPRITE_TRANSFER_BASE
-    ; acknowledge and disable scanline IRQ
-    sta MAP_PPU_IRQ_DISABLE
-    ; restore registers and exit
-    ; note that rendering stays disabled; NMI will turn it back on
-    pla
-    rti
-.endproc
 

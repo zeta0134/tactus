@@ -72,6 +72,11 @@ reset:
         ;     could break things
         ; ===========================================================
 
+        ; Slow OAM, which will take nearly all of the budget
+        perform_zpcm_inc
+        lda #$00
+        sta $2003
+        jsr SPRITE_TRANSFER_BASE
         ; Update palette memory very quickly
         jsr refresh_palettes_nmi
         ; Read controller registers and update button status
@@ -112,9 +117,6 @@ write_ppuctrl:
         ; re-enable rendering (the IRQ may have disabled it, if it ran)
         lda #$1E
         sta PPUMASK
-
-        ; setup raster shenanigans; in this case, slow OAM transfers
-        jsr setup_slowam_irq
 
         ; poll for input *after* setting the scroll position
         ; TODO: move this to the game loop
@@ -163,4 +165,4 @@ nmi_soft_disable:
         .segment "VECTORS"
         .addr nmi
         .addr reset
-        .addr slowam_irq
+        .addr null_irq
