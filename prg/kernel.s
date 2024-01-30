@@ -501,17 +501,29 @@ StartingTile := R15
         sta StartingTile
         far_call FAR_update_static_enemy_row
 
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+
         lda #1
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 1)
         sta StartingTile
         far_call FAR_update_static_enemy_row
 
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+
         lda #2
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 2)
         sta StartingTile
         far_call FAR_update_static_enemy_row
+
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
 
         lda #3
         sta StartingRow
@@ -539,6 +551,10 @@ StartingTile := R15
         sta StartingTile
         far_call FAR_update_static_enemy_row
 
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+
         lda #5
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 5)
@@ -565,6 +581,10 @@ StartingTile := R15
         sta StartingTile
         far_call FAR_update_static_enemy_row
 
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+
         lda #7
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 7)
@@ -590,6 +610,10 @@ StartingTile := R15
         lda #(::BATTLEFIELD_WIDTH * 8)
         sta StartingTile
         far_call FAR_update_static_enemy_row
+
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
 
         lda #9
         sta StartingRow
