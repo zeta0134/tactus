@@ -83,21 +83,22 @@ function frame_start()
   end
   table.insert(frames_this_beat, {["name"]=frame_name,["profiles"]=profiles_this_frame})
   profiles_this_frame = {}
+  emu.selectDrawSurface(emu.drawSurface.scriptHud, 2)
   draw_profiles()
-  
   draw_all_metrics()
 end
 
 function draw_profiles()
-  emu.selectDrawSurface(emu.drawSurface.scriptHud, 2)
-  
+  if graph_state ~= 0 then
+  	return
+  end
   for i = 1, 12 do
     x_offset = 36
     y_offset = 360 + i * 9
-    if i < #frames_this_beat then
+    if i <= #frames_this_beat then
 		emu.drawString(x_offset+1, y_offset+1, frames_this_beat[i]["name"], 0x00FFFFFF, 0x20200020)
 		draw_timing_bar(x_offset+40, y_offset, frames_this_beat[i]["profiles"])
-    elseif i < #frames_last_beat then
+    elseif i <= #frames_last_beat then
     	emu.drawString(x_offset+1, y_offset+1, frames_last_beat[i]["name"], 0x00E0E0E0, 0x40201020)
 		draw_timing_bar(x_offset+40, y_offset, frames_last_beat[i]["profiles"])
     end
@@ -162,27 +163,36 @@ function draw_timing_bar(pos_x, pos_y, frame_profiles)
 end
 
 old_panel_key_state = false
-visible_metric = 0
+old_graphs_key_state = false
+metric_state = 0
+graph_state = 0
 
 function update_input()
 	local panel_key_state = emu.isKeyPressed("C")
+	local graphs_key_state = emu.isKeyPressed("V")
+	
 	if panel_key_state == true and old_panel_key_state == false then
-		visible_metric = (visible_metric + 1) % 5	
+		metric_state = (metric_state + 1) % 5	
 	end
+	if graphs_key_state == true and old_graphs_key_state == false then
+		graph_state = (graph_state + 1) % 2	
+	end
+	
 	old_panel_key_state = panel_key_state
+	old_graphs_key_state = graphs_key_state
 end
 
 function draw_all_metrics()
-    if visible_metric == 1 then
+    if metric_state == 1 then
 		draw_metrics("segment", 10, 10, computed_metrics)
 	end
-	if visible_metric == 2 then
+	if metric_state == 2 then
 		draw_metrics("frame", 10, 10, computed_metrics)
 	end
-	if visible_metric == 3 then
+	if metric_state == 3 then
 		draw_metrics("beat", 10, 10, computed_metrics)
 	end
-	if visible_metric == 4 then
+	if metric_state == 4 then
 		draw_metrics("segment", 10, 10, computed_metrics)
 		draw_metrics("frame", 100, 10, computed_metrics)
 		draw_metrics("beat", 190, 10, computed_metrics)
@@ -335,4 +345,5 @@ function compute_beat_metrics(beat_frames, color_index)
 end
 
 emu.addEventCallback(frame_start, emu.eventType.nmi)
-emu.addMemoryCallback(ppumask_write, emu.callbackType.write, 0x2001)
+emu.addMemoryCallback(ppumask_write, emu.callbackType.write, 0x2001) -- NES mode, reads PPUMASK writes
+emu.addMemoryCallback(ppumask_write, emu.callbackType.write, 0xFEED) -- MESEN mode, reads arbitrary ROM writes

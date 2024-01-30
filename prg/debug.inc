@@ -1,4 +1,5 @@
 DEBUG_MODE = 1
+DEBUG_MESEN_MODE = 1
 DEBUG_TIME_WASTE = 0
 DEBUG_DISABLE_MUSIC = 0
 DEBUG_TEST_FLOOR = 0
@@ -8,8 +9,12 @@ DEBUG_SEED = 42
 
 .macro debug_color flags
         .if ::DEBUG_MODE
-        lda #(BG_ON | OBJ_ON | BG_CLIP | OBJ_CLIP | flags)
-        sta PPUMASK
+                lda #(BG_ON | OBJ_ON | BG_CLIP | OBJ_CLIP | flags)
+                .if ::DEBUG_MESEN_MODE
+                sta $FEED
+                .else
+                sta PPUMASK
+                .endif
         .endif
 .endmacro
 

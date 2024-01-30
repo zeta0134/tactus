@@ -128,7 +128,7 @@ ScratchPtr := NmiSafePtr
         ldy #(SpriteRunWithSample::__zpcm_addr + 1)
 loop:
         perform_zpcm_inc
-        lda #$50
+        lda #$FF
         sta (ScratchPtr), y
         add16b ScratchPtr, #.sizeof(SpriteRunWithSample)
         dex

@@ -66,7 +66,7 @@ everdrive: dir $(ROM_NAME)
 
 $(ROM_NAME): $(SOURCEDIR)/rainbow.cfg $(O_FILES)
 	ld65 -m $(BUILDDIR)/map.txt --dbgfile $(DBG_NAME) --define "__ZPCM_ADDRESS__=0x4011" --define "__BANK_MASK__=0x07" --define "__BANK_OFFSET__=0x00" -o "build/tactus-zpcm.bin" -C $^
-	ld65 -m $(BUILDDIR)/map.txt                       --define "__ZPCM_ADDRESS__=0x5011" --define "__BANK_MASK__=0x07" --define "__BANK_OFFSET__=0x08" -o "build/tactus-base.bin" -C $^
+	ld65 -m $(BUILDDIR)/map.txt                       --define "__ZPCM_ADDRESS__=0xFF11" --define "__BANK_MASK__=0x07" --define "__BANK_OFFSET__=0x08" -o "build/tactus-base.bin" -C $^
 	# We need to talk about
 	tools/parallel_universes.py build/tactus-zpcm.bin build/tactus-base.bin 65536 $@
 
