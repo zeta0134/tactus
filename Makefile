@@ -59,7 +59,7 @@ debugzpcm: dir $(ROM_NAME)
 	vendor/Mesen.AppImage $(ROM_NAME) debug_zpcm_timing.lua
 
 profile: dir $(ROM_NAME)
-	mono vendor/Mesen-X-v1.0.0.exe $(ROM_NAME) debug_color_performance.lua
+	vendor/Mesen.AppImage $(ROM_NAME) debug_profile.lua
 
 everdrive: dir $(ROM_NAME)
 	mono vendor/edlink-n8.exe $(ROM_NAME)
