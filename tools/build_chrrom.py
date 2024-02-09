@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from PIL import Image
-import pathlib, math, os
+import pathlib, math, os, re
+from ca65 import ca65_byte_literal, ca65_word_literal
 
 # 4k pages range from 0-63, with the upper 2 bits reserved to specify
 # the palette. Outer pages range from 0-3. All outer pages will be swapped
@@ -231,8 +232,30 @@ for sprite_filename in sprite_filenames:
   test_destination = "../build/expanded_tiles/sprite_"+sprite_filename.name
   expanded_tile.save(test_destination)
 
-  
+def constant_name(filename):
+  file_str = str(pathlib.PurePath(pathlib.PurePath(filename).name).stem)
+  return re.sub('[^A-Z0-9_]', '', file_str.upper())
 
+with open('../build/tile_defs.inc', 'w') as definitions:
+  print("; background tiles", file=definitions)
+  for i in range(0, len(background_filenames)):
+    metatile_id = (i % 64) * 4
+    bank_id = math.floor(i / 64) * 4 + BACKGROUND_REGION_BASE
+    tiledef = (bank_id << 8) + metatile_id
+    print("BG_TILE_%s = %s" % (constant_name(background_filenames[i]), ca65_word_literal(tiledef)), file=definitions)
+  print("", file=definitions)
+  print("; sprite tiles", file=definitions)
+  for i in range(0, len(sprite_filenames)):
+    metatile_id = (i % 64) * 4
+    bank_id = math.floor(i / 64) + SPRITE_REGION_BASE
+    tiledef = (bank_id << 8) + metatile_id
+    print("SPRITE_TILE_%s = %s" % (constant_name(sprite_filenames[i]), ca65_word_literal(tiledef)), file=definitions)
+  print("", file=definitions)
+  print("; raw_chr banks", file=definitions)
+  for i in range(0, len(raw_chr_filenames)):
+    bank_id = i + RAW_CHR_REGION_BASE
+    print("CHR_BANK_%s = %s" % (constant_name(raw_chr_filenames[i]), ca65_byte_literal(bank_id)), file=definitions)
+  print("", file=definitions)
 
 
 
