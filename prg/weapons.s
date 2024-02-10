@@ -1,5 +1,7 @@
         .setcpu "6502"
 
+        .include "../build/tile_defs.inc"
+
         .include "weapons.inc"
 
 ; TODO: move this to a data bank. Or maybe colocate it with the player code?
@@ -34,7 +36,7 @@ SFX_VT := $29
 
 dagger:
         ;       Tile, Length
-        .byte    $09,    $01
+        .byte   <SPRITE_TILE_DAGGER, $01
         .word dagger_north, dagger_east, dagger_south, dagger_west
 
 dagger_north:
@@ -64,7 +66,7 @@ dagger_west:
 
 broadsword:
         ;       Tile, Length
-        .byte    $0D,    $03
+        .byte   <SPRITE_TILE_BROADSWORD, $03
         .word broadsword_north, broadsword_east, broadsword_south, broadsword_west
 
 broadsword_north:
@@ -101,7 +103,7 @@ broadsword_west:
 
 longsword:
         ;       Tile, Length
-        .byte    $11,    $02
+        .byte   <SPRITE_TILE_LONGSWORD, $02
         .word longsword_north, longsword_east, longsword_south, longsword_west
 
 longsword_north:
@@ -138,7 +140,7 @@ longsword_west:
 
 spear:
         ;       Tile, Length
-        .byte    $15,    $02
+        .byte   <SPRITE_TILE_SPEAR, $02
         .word spear_north, spear_east, spear_south, spear_west
 
 spear_north:
@@ -179,7 +181,7 @@ spear_west:
 
 flail:
         ;       Tile, Length
-        .byte    $19,    $05
+        .byte   <SPRITE_TILE_FLAIL, $05
         .word flail_north, flail_east, flail_south, flail_west
 
 flail_north:

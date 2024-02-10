@@ -55,7 +55,7 @@ start:
         ; now enable rendering and proceed to the main game loop
         lda #$1E
         sta PPUMASK
-        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        lda #(VBLANK_NMI | BG_1000 | OBJ_0000)
         sta PPUCTRL
 
         cli ; enable interrupts

@@ -1,5 +1,7 @@
         .setcpu "6502"
 
+        .include "../build/tile_defs.inc"
+
         .include "bhop/bhop.inc"
         .include "battlefield.inc"
         .include "chr.inc"
@@ -131,9 +133,11 @@ MetaSpriteIndex := R0
         sta MAP_NT_B_CONTROL
         sta MAP_NT_C_CONTROL
         sta MAP_NT_D_CONTROL
+        lda #CHR_BANK_TITLE
+        sta MAP_CHR_1_LO
 
         ; copy the initial batch of graphics into CHR RAM
-        far_call FAR_initialize_chr_ram_title
+        jsr clear_fpga_ram
         far_call FAR_copy_title_nametable
 
         ; Set up a player sprite, which will act as our cursor
@@ -148,7 +152,7 @@ MetaSpriteIndex := R0
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #71
         sta sprite_table + MetaSpriteState::PositionY, x
-        lda #SPRITES_PLAYER_IDLE
+        lda #<SPRITE_TILE_PLAYER
         sta sprite_table + MetaSpriteState::TileIndex, x
 
 
@@ -162,7 +166,7 @@ MetaSpriteIndex := R0
         ; NOW it is safe to re-enable rendering
         lda #$1E
         sta PPUMASK
-        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        lda #(VBLANK_NMI | BG_1000 | OBJ_0000)
         sta PPUCTRL
 
         ; Play the title track on the title screen (duh)
@@ -217,7 +221,10 @@ MetaSpriteIndex := R0
         sta MAP_NT_B_CONTROL
         sta MAP_NT_C_CONTROL
         sta MAP_NT_D_CONTROL
+        lda #CHR_BANK_OLD_CHRRAM
+        sta MAP_CHR_1_LO
 
+        jsr clear_fpga_ram
         far_call FAR_initialize_sprites
         jsr init_game_end_screen
 
@@ -231,7 +238,7 @@ MetaSpriteIndex := R0
         ; NOW it is safe to re-enable rendering
         lda #$1E
         sta PPUMASK
-        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        lda #(VBLANK_NMI | BG_1000 | OBJ_0000)
         sta PPUCTRL
 
         rts
@@ -269,12 +276,12 @@ MetaSpriteIndex := R0
         sta NmiSoftDisable
 
         ; the game screen uses ExAttr for palette access, so set that up here
-        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_AT)
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
         sta MAP_NT_A_CONTROL
         sta MAP_NT_C_CONTROL
-        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_AT)
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG_AT)
         sta MAP_NT_B_CONTROL
-        sta MAP_NT_D_CONTROL
+        sta MAP_NT_D_CONTROL        
 
         ; set the game palette
         jsr initialize_game_palettes
@@ -284,7 +291,7 @@ MetaSpriteIndex := R0
         sta TargetBrightness
 
         ; copy the initial batch of graphics into CHR RAM
-        far_call FAR_initialize_chr_ram_game
+        jsr clear_fpga_ram
         far_call FAR_init_nametables
 
         ; Enable NMI first (but not rendering)
@@ -297,7 +304,7 @@ MetaSpriteIndex := R0
         ; NOW it is safe to re-enable rendering
         lda #$1E
         sta PPUMASK
-        lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
+        lda #(VBLANK_NMI | BG_1000 | OBJ_0000)
         sta PPUCTRL
 
         rts

@@ -1,5 +1,7 @@
         .macpack longbranch
 
+        .include "../build/tile_defs.inc"
+
         .include "battlefield.inc"
         .include "charmap.inc"
         .include "far_call.inc"
@@ -47,11 +49,11 @@ MAP_ICON_SPECIAL    = 193
 MAP_ICON_EXPLORED   = 194
 MAP_ICON_CURRENT    = 195
 
-WORLD_PAL  = %00000000
-TEXT_PAL   = %01000000 ; text and blue are the same, the blue palette will
-BLUE_PAL   = %01000000 ; always contain white in slot 3 for simple UI elements
-YELLOW_PAL = %10000000
-RED_PAL    = %11000000
+WORLD_PAL  = %00000000 | CHR_BANK_OLD_CHRRAM
+TEXT_PAL   = %01000000 | CHR_BANK_OLD_CHRRAM ; text and blue are the same, the blue palette will
+BLUE_PAL   = %01000000 | CHR_BANK_OLD_CHRRAM ; always contain white in slot 3 for simple UI elements
+YELLOW_PAL = %10000000 | CHR_BANK_OLD_CHRRAM
+RED_PAL    = %11000000 | CHR_BANK_OLD_CHRRAM
 
 weapon_palette_table:
         .byte %00, %01, %10, %11

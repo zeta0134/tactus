@@ -1,5 +1,7 @@
         .setcpu "6502"
 
+        .include "../build/tile_defs.inc"
+
         .include "battlefield.inc"
         .include "enemies.inc"
         .include "far_call.inc"

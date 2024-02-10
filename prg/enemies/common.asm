@@ -104,7 +104,7 @@ EffectiveAttackSquare := R10
         adc #BATTLEFIELD_OFFSET_Y
         sta sprite_table + MetaSpriteState::PositionY, x
 
-        lda #SPRITES_DEATH_SKULL
+        lda #<SPRITE_TILE_DEATH_SKULL
         sta sprite_table + MetaSpriteState::TileIndex, x
 
 sprite_failed:
@@ -194,7 +194,7 @@ TargetSquare := R13
         lda DamageSpriteCoordY
         sta sprite_table + MetaSpriteState::PositionY, x
 
-        lda #SPRITES_DAMAGE_PLAYER
+        lda #<SPRITE_TILE_DAMAGE_PLAYER
         sta sprite_table + MetaSpriteState::TileIndex, x
 
 sprite_failed:

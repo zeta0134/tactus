@@ -19,6 +19,10 @@ STATIC_PNG_FILES := $(wildcard $(ARTDIR)/static_tiles/*.png)
 STATIC_CHR_FILES := \
 	$(patsubst $(ARTDIR)/static_tiles/%.png,$(BUILDDIR)/static_tiles/%.chr,$(STATIC_PNG_FILES)) \
 
+BACKGROUND_PNG_FILES := $(wildcard $(ARTDIR)/background_tiles/*.png)
+SPRITE_PNG_FILES := $(wildcard $(ARTDIR)/sprite_tiles/*.png)
+RAW_CHR_TILES := $(wildcard $(ARTDIR)/raw_chr/*.chr)
+
 LAYOUT_TMX_FILES := $(wildcard $(ARTDIR)/layouts/*.tmx)
 LAYOUT_INCS_FILES := \
 	$(patsubst $(ARTDIR)/layouts/%.tmx,$(BUILDDIR)/layouts/%.incs,$(LAYOUT_TMX_FILES)) \
@@ -64,9 +68,9 @@ profile: dir $(ROM_NAME)
 everdrive: dir $(ROM_NAME)
 	mono vendor/edlink-n8.exe $(ROM_NAME)
 
-$(ROM_NAME): $(SOURCEDIR)/rainbow.cfg $(O_FILES)
-	ld65 -m $(BUILDDIR)/map.txt --dbgfile $(DBG_NAME) --define "__ZPCM_ADDRESS__=0x4011" --define "__BANK_MASK__=0x07" --define "__BANK_OFFSET__=0x00" -o "build/tactus-zpcm.bin" -C $^
-	ld65 -m $(BUILDDIR)/map.txt                       --define "__ZPCM_ADDRESS__=0xFF11" --define "__BANK_MASK__=0x07" --define "__BANK_OFFSET__=0x08" -o "build/tactus-base.bin" -C $^
+$(ROM_NAME): $(BUILDDIR)/output_chr.bin $(SOURCEDIR)/rainbow.cfg $(O_FILES)
+	ld65 -m $(BUILDDIR)/map.txt --dbgfile $(DBG_NAME) --define "__ZPCM_ADDRESS__=0x4011" --define "__BANK_MASK__=0x07" --define "__BANK_OFFSET__=0x00" -o "build/tactus-zpcm.bin" -C $(SOURCEDIR)/rainbow.cfg $(O_FILES)
+	ld65 -m $(BUILDDIR)/map.txt                       --define "__ZPCM_ADDRESS__=0xFF11" --define "__BANK_MASK__=0x07" --define "__BANK_OFFSET__=0x08" -o "build/tactus-base.bin" -C $(SOURCEDIR)/rainbow.cfg $(O_FILES)
 	# We need to talk about
 	tools/parallel_universes.py build/tactus-zpcm.bin build/tactus-base.bin 65536 $@
 
@@ -84,3 +88,6 @@ $(BUILDDIR)/layouts/%.incs: $(ARTDIR)/layouts/%.tmx
 
 $(BUILDDIR)/floors/%.incs: $(ARTDIR)/floors/%.tmx
 	tools/floor.py $< $@
+
+$(BUILDDIR)/output_chr.bin: $(BACKGROUND_PNG_FILES) $(SPRITE_PNG_FILES) $(RAW_CHR_TILES)
+	tools/build_chrrom.py

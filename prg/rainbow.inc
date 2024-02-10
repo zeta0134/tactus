@@ -191,8 +191,13 @@ NT_BANK_IDX           = %00111111
 ;################################################################################
 ; Tactus-specific macros and utility functions
 
-.macro rainbow_set_8k_chr bank_value
+.macro rainbow_set_upper_chr bank_value, sprite_page
 	lda bank_value
+	sta MAP_BG_EXT_BANK
+	.repeat 6
+	asl
+	.endrepeat
+	ora sprite_page
 	sta MAP_CHR_0_LO
 .endmacro
 
@@ -218,6 +223,6 @@ NT_BANK_IDX           = %00111111
 	sta MAP_PRG_E_LO
 .endmacro
 
-.global rainbow_init
+.global rainbow_init, clear_fpga_ram
 .globalzp code_bank_shadow
 .globalzp data_bank_shadow

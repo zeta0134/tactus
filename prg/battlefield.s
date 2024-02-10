@@ -217,7 +217,7 @@ done:
 .endproc
 
 PALETTE_MASK  := %11000000
-LIGHTING_MASK := %00110000
+LIGHTING_MASK := %00000011
 CORNER_MASK   := %11111100
 
 TOP_LEFT_BITS     := %00 ; not actually used

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 from PIL import Image
 import pathlib, math, os, re
 from ca65 import ca65_byte_literal, ca65_word_literal
@@ -209,34 +210,39 @@ def generate_chr(background_tiles, sprite_tiles, raw_chr_banks):
 
   return chr_bytes
 
-background_filenames = sorted(list(pathlib.Path('../art/background_tiles').glob('*.png')))
-sprite_filenames = sorted(list(pathlib.Path('../art/sprite_tiles').glob('*.png')))
-raw_chr_filenames = sorted(list(pathlib.Path('../art/raw_chr').glob('*.chr')))
+background_filenames = sorted(list(pathlib.Path('art/background_tiles').glob('*.png')))
+sprite_filenames = sorted(list(pathlib.Path('art/sprite_tiles').glob('*.png')))
+raw_chr_filenames = sorted(list(pathlib.Path('art/raw_chr').glob('*.chr')))
 
 background_tiles = [read_background_tile(f) for f in background_filenames]
 sprite_tiles = [read_sprite_tile(f) for f in sprite_filenames]
 raw_chr_banks = [read_raw_chr(f) for f in raw_chr_filenames]
 chr_bytes = generate_chr(background_tiles, sprite_tiles, raw_chr_banks)
 
-os.makedirs("../build/expanded_tiles",exist_ok=True)
+os.makedirs("build/expanded_tiles",exist_ok=True)
 
-with open('../build/output_chr.bin', 'wb') as chr_file:
+with open('build/output_chr.bin', 'wb') as chr_file:
   chr_file.write(bytes(chr_bytes))
 
 for background_filename in background_filenames:
   expanded_tile = read_background_tile(background_filename)
-  test_destination = "../build/expanded_tiles/bg_"+background_filename.name
+  test_destination = "build/expanded_tiles/bg_"+background_filename.name
   expanded_tile.save(test_destination)
 for sprite_filename in sprite_filenames:
   expanded_tile = read_sprite_tile(sprite_filename)
-  test_destination = "../build/expanded_tiles/sprite_"+sprite_filename.name
+  test_destination = "build/expanded_tiles/sprite_"+sprite_filename.name
   expanded_tile.save(test_destination)
 
 def constant_name(filename):
   file_str = str(pathlib.PurePath(pathlib.PurePath(filename).name).stem)
   return re.sub('[^A-Z0-9_]', '', file_str.upper())
 
-with open('../build/tile_defs.inc', 'w') as definitions:
+with open('build/tile_defs.inc', 'w') as definitions:
+  print("; segment definitions")
+  print("BACKGROUND_REGION_BASE = %s" % (ca65_byte_literal(BACKGROUND_REGION_BASE)), file=definitions)
+  print("SPRITE_REGION_BASE = %s" % (ca65_byte_literal(SPRITE_REGION_BASE)), file=definitions)
+  print("RAW_CHR_REGION_BASE = %s" % (ca65_byte_literal(RAW_CHR_REGION_BASE)), file=definitions)
+  print("", file=definitions)
   print("; background tiles", file=definitions)
   for i in range(0, len(background_filenames)):
     metatile_id = (i % 64) * 4

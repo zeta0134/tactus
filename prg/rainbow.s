@@ -1,4 +1,5 @@
 .include "rainbow.inc"
+.include "../build/tile_defs.inc"
 
 .zeropage
 code_bank_shadow: .res 1
@@ -33,12 +34,17 @@ data_bank_shadow: .res 1
 	; Ideally we didn't just crash [fingers crossed] and can continue with setup XD
 
 	; for CHR we want our 32k of CHR RAM accessible (for now) in big 8k chunks:
-	lda #(CHR_CHIP_RAM | CHR_MODE_0)
+	lda #(CHR_CHIP_ROM | CHR_MODE_1)
 	sta MAP_CHR_CONTROL
-	;  let's default to bank 0 just in case
+	;  for now, place the same sprite bank into both 4k regions
+	lda #SPRITE_REGION_BASE
+	sta MAP_CHR_0_LO
 	lda #0
 	sta MAP_CHR_0_HI
-	sta MAP_CHR_0_LO
+	lda #SPRITE_REGION_BASE
+	sta MAP_CHR_1_LO
+	lda #0
+	sta MAP_CHR_1_HI
 
 	; for PRG RAM, just map in all 8k in one big chunk
 	; this stuff is battery backed, so we'll put save files here
@@ -65,5 +71,30 @@ data_bank_shadow: .res 1
 	lda #%00000100 ; zpcm on, exp6 off, exp9 off
 	sta MAP_SND_EXP_CTRL
 
+	rts
+.endproc
+
+.proc clear_fpga_ram
+	lda #0
+	ldx #0
+loop:
+	sta $5000,x
+	sta $5100,x
+	sta $5200,x
+	sta $5300,x
+	sta $5400,x
+	sta $5500,x
+	sta $5600,x
+	sta $5700,x
+	sta $5800,x
+	sta $5900,x
+	sta $5A00,x
+	sta $5B00,x
+	sta $5C00,x
+	sta $5D00,x
+	sta $5E00,x
+	sta $5F00,x
+	inx
+	bne loop
 	rts
 .endproc

@@ -1,5 +1,7 @@
 .include "nes.inc"
 
+.include "../build/tile_defs.inc"
+
 .include "battlefield.inc"
 .include "bhop/bhop.inc"
 .include "chr.inc"
@@ -100,10 +102,10 @@ all_frames:
         eor PpuScrollNametable
         bne right_nametable
 left_nametable:
-        lda #(VBLANK_NMI | BG_0000 | OBJ_1000 | OBJ_8X16 | NT_2000)
+        lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | OBJ_8X16 | NT_2000)
         jmp write_ppuctrl
 right_nametable:
-        lda #(VBLANK_NMI | BG_0000 | OBJ_1000 | OBJ_8X16 | NT_2400)
+        lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | OBJ_8X16 | NT_2400)
 write_ppuctrl:
         sta PPUCTRL
        
@@ -112,7 +114,8 @@ write_ppuctrl:
         lda PpuScrollY
         sta PPUSCROLL
 
-        rainbow_set_8k_chr CurrentChrBank
+
+        rainbow_set_upper_chr CurrentChrBank, #SPRITE_REGION_BASE
 
         ; re-enable rendering (the IRQ may have disabled it, if it ran)
         lda #$1E

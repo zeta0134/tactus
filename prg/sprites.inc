@@ -32,10 +32,6 @@ SPRITE_ONE_BEAT    = %00000100
 .global FAR_find_unused_sprite
 .global FAR_despawn_unimportant_sprites
 
-SPRITES_PLAYER_IDLE = $01
-SPRITES_DEATH_SKULL = $05
-SPRITES_DAMAGE_PLAYER = $2D
-
 SPRITE_PAL_0 = %00
 SPRITE_PAL_1 = %01
 SPRITE_PAL_2 = %10

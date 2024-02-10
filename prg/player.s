@@ -1,5 +1,7 @@
         .setcpu "6502"
 
+        .include "../build/tile_defs.inc"
+
         .include "battlefield.inc"
         .include "debug.inc"
         .include "enemies.inc"
@@ -86,7 +88,7 @@ MetaSpriteIndex := R0
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #$FF ; intentionally offscreen
         sta sprite_table + MetaSpriteState::PositionY, x
-        lda #SPRITES_PLAYER_IDLE
+        lda #<SPRITE_TILE_PLAYER
         sta sprite_table + MetaSpriteState::TileIndex, x
 
         ; For now, init the player to position 6, 6 (for no particular reason)
