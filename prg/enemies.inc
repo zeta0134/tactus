@@ -1,3 +1,9 @@
+PAL_WORLD  = %00000000
+PAL_BLUE   = %01000000
+PAL_YELLOW = %10000000
+PAL_RED    = %11000000
+
+; TODO: not this!
 ; Every entity has an ID, and in this game it also doubles as their starting tile in CHR space.
 TILE_SMOKE_PUFF = $00 ; debug sprite
 TILE_SLIME_BASE = $04

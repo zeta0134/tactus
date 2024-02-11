@@ -15,10 +15,10 @@ weapon_class_table:
         .word flail
 
 NONE := $80
-FX_HZ := $1D
-FX_VT := $21
-SFX_HZ := $25 ; TODO: not the giant death sprite
-SFX_VT := $29
+FX_HZ := <SPRITE_TILE_HORIZONTAL_SLASH
+FX_VT := <SPRITE_TILE_VERTICAL_SLASH
+SFX_HZ := <SPRITE_TILE_HORIZONTAL_SLASH_SFX
+SFX_VT := <SPRITE_TILE_VERTICAL_SLASH_SFX
 
 ; Programmer notes: try to prefer clockwise update order, for consistency.
 ; That means single-hit weapons should prioritize the *player's* left

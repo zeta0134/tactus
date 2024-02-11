@@ -11,14 +11,6 @@ PRG_ASM_FILES := $(wildcard $(SOURCEDIR)/*.s)
 O_FILES := \
   $(patsubst $(SOURCEDIR)/%.s,$(BUILDDIR)/%.o,$(PRG_ASM_FILES))
 
-ANIMATED_PNG_FILES := $(wildcard $(ARTDIR)/animated_tiles/*.png)
-ANIMATED_CHR_FILES := \
-	$(patsubst $(ARTDIR)/animated_tiles/%.png,$(BUILDDIR)/animated_tiles/%.chr,$(ANIMATED_PNG_FILES)) \
-
-STATIC_PNG_FILES := $(wildcard $(ARTDIR)/static_tiles/*.png)
-STATIC_CHR_FILES := \
-	$(patsubst $(ARTDIR)/static_tiles/%.png,$(BUILDDIR)/static_tiles/%.chr,$(STATIC_PNG_FILES)) \
-
 BACKGROUND_PNG_FILES := $(wildcard $(ARTDIR)/background_tiles/*.png)
 SPRITE_PNG_FILES := $(wildcard $(ARTDIR)/sprite_tiles/*.png)
 RAW_CHR_TILES := $(wildcard $(ARTDIR)/raw_chr/*.chr)
@@ -31,14 +23,12 @@ FLOOR_TMX_FILES := $(wildcard $(ARTDIR)/floors/*.tmx)
 FLOOR_INCS_FILES := \
 	$(patsubst $(ARTDIR)/floors/%.tmx,$(BUILDDIR)/floors/%.incs,$(FLOOR_TMX_FILES)) \
 
-.PRECIOUS: $(BIN_FILES) $(ANIMATED_CHR_FILES) $(STATIC_CHR_FILES) $(LAYOUT_INCS_FILES) $(FLOOR_INCS_FILES)
+.PRECIOUS: $(BIN_FILES) $(LAYOUT_INCS_FILES) $(FLOOR_INCS_FILES)
 
 all: dir $(ROM_NAME)
 
 dir:
 	@mkdir -p build
-	@mkdir -p build/animated_tiles
-	@mkdir -p build/static_tiles
 	@mkdir -p build/layouts
 	@mkdir -p build/floors
 
@@ -74,7 +64,7 @@ $(ROM_NAME): $(BUILDDIR)/output_chr.bin $(SOURCEDIR)/rainbow.cfg $(O_FILES)
 	# We need to talk about
 	tools/parallel_universes.py build/tactus-zpcm.bin build/tactus-base.bin 65536 $@
 
-$(BUILDDIR)/%.o: $(SOURCEDIR)/%.s $(BIN_FILES) $(ANIMATED_CHR_FILES) $(STATIC_CHR_FILES) $(LAYOUT_INCS_FILES) $(FLOOR_INCS_FILES)
+$(BUILDDIR)/%.o: $(SOURCEDIR)/%.s $(BIN_FILES) $(LAYOUT_INCS_FILES) $(FLOOR_INCS_FILES)
 	ca65 -g -o $@ $<
 
 $(BUILDDIR)/animated_tiles/%.chr: $(ARTDIR)/animated_tiles/%.png

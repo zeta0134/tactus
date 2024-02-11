@@ -11,11 +11,15 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
-.segment "RAM"
+.segment "PRGRAM"
 
 battlefield: .res ::BATTLEFIELD_SIZE
 tile_data: .res ::BATTLEFIELD_SIZE
 tile_flags: .res ::BATTLEFIELD_SIZE
+
+tile_patterns: .res ::BATTLEFIELD_SIZE
+tile_attributes: .res ::BATTLEFIELD_SIZE
+
 active_tile_queue: .res ::BATTLEFIELD_HEIGHT
 inactive_tile_queue: .res ::BATTLEFIELD_HEIGHT
 active_attribute_queue: .res (::BATTLEFIELD_HEIGHT / 2)
@@ -25,25 +29,7 @@ active_battlefield: .res 1
 
 .segment "CODE_0"
 
-; TODO: this is really part of level loading, move it there?
-.proc FAR_initialize_battlefield
-LayoutPtr := R0
-        ldy #0
-loop:
-        perform_zpcm_inc
-        lda (LayoutPtr), y
-        sta battlefield, y
-        lda #0
-        sta tile_data
-        sta tile_flags
-        iny
-        cpy #::BATTLEFIELD_SIZE
-        bne loop
-        jsr reset_inactive_queue
-        rts
-.endproc
-
-.proc reset_inactive_queue
+.proc FAR_reset_inactive_queue
         lda #1
         ldy #0
 tile_loop:
@@ -89,7 +75,7 @@ attribute_loop:
         perform_zpcm_inc
 
         ; now reset the inactive queue, setting it up for a full draw
-        jsr reset_inactive_queue
+        near_call FAR_reset_inactive_queue
         lda active_battlefield
         eor #%00000001
         sta active_battlefield
@@ -254,18 +240,26 @@ top_row_loop:
         perform_zpcm_inc
 
         ; first, let's compute the base attribute byte
-        ; for now, this is just the two palette bits, we won't
-        ; implement an upper TileID page until we have more than 64 tile types
+        ; for now, the palette is stored in the low 2 bits of the battlefield behavior
+        ; ID (it determines enemy difficulty) so extract that and move it into the right
+        ; place:
         lda battlefield, x ; xxxxxxpp
         ror                ; cxxxxxxp
         ror                ; pcxxxxxx
         ror                ; ppcxxxxx
         and #%11000000     ; pp000000
         sta ScratchAttrByte
+        ; now the upper 6 bits of the tile attribute get added in, to choose the 4k graphics
+        ; page for this tile:
+        lda tile_attributes, x
+        and #%00111111
+        ora ScratchAttrByte
+        sta ScratchAttrByte
+        ; we'll keep that around, and add in the lighting bits as we go
 
 
         ; top left tile
-        lda battlefield, x
+        lda tile_patterns, x
         and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
         ; ora #TOP_LEFT_BITS   ; this would be a nop
         sta (NametableAddr), y  ; store that to our regular nametable
@@ -277,7 +271,7 @@ top_row_loop:
         iny
 
         ; top right tile
-        lda battlefield, x
+        lda tile_patterns, x
         and #CORNER_MASK
         ora #TOP_RIGHT_BITS
         sta (NametableAddr), y
@@ -311,9 +305,16 @@ bottom_row_loop:
         ror                ; ppcxxxxx
         and #%11000000     ; pp000000
         sta ScratchAttrByte
+        ; now the upper 6 bits of the tile attribute get added in, to choose the 4k graphics
+        ; page for this tile:
+        lda tile_attributes, x
+        and #%00111111
+        ora ScratchAttrByte
+        sta ScratchAttrByte
+        ; we'll keep that around, and add in the lighting bits as we go
 
         ; bottom left tile
-        lda battlefield, x
+        lda tile_patterns, x
         and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
         ora #BOTTOM_LEFT_BITS
         sta (NametableAddr), y  ; store that to our regular nametable
@@ -325,7 +326,7 @@ bottom_row_loop:
         iny
 
         ; bottom right tile
-        lda battlefield, x
+        lda tile_patterns, x
         and #CORNER_MASK
         ora #BOTTOM_RIGHT_BITS
         sta (NametableAddr), y

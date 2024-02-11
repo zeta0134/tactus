@@ -30,10 +30,10 @@ HealthDroughtCounter: .res 1
 
 .proc draw_active_tile
 TargetIndex := R0
-TileId := R1
+        ; TODO: dissolve the concept of a row queue, and actually
+        ; *draw* the tile, right now. We can do that, the nametable
+        ; is accessible to the CPU on this mapper!
         ldx TargetIndex
-        lda TileId
-        sta battlefield, x
         lda tile_index_to_row_lut, x
         tax
         lda #1
