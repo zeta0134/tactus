@@ -303,6 +303,8 @@ room_cleared:
 
 .proc FAR_handle_room_spawns
 EntityId := R1
+EntityPattern := R2
+EntityAttribute := R3
         access_data_bank #<.bank(layouts_table)
 
 check_room_clear:
@@ -334,6 +336,10 @@ check_chest_spawn:
         ; spawn in a chest
         lda #TILE_TREASURE_CHEST
         sta EntityId
+        lda #<BG_TILE_TREASURE_CHEST
+        sta EntityPattern
+        lda #(>BG_TILE_TREASURE_CHEST | PAL_YELLOW)
+        sta EntityAttribute
         jsr spawn_entity
         lda #1
         sta chest_spawned
@@ -591,9 +597,15 @@ done:
 
 .proc spawn_exit_block
 EntityId := R1
+EntityPattern := R2
+EntityAttribute := R3
         jsr set_fixed_room_seed
         lda #TILE_EXIT_BLOCK
         sta EntityId
+        lda #<BG_TILE_EXIT_BLOCK
+        sta EntityPattern
+        lda #(>BG_TILE_EXIT_BLOCK | PAL_BLUE)
+        sta EntityAttribute
         jsr spawn_entity
         rts
 .endproc
