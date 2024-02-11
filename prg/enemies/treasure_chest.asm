@@ -79,15 +79,21 @@ AttackSquare := R3
 
 okay_to_spawn:
         ; Super easy: replace the chest with a heart container tile
-        lda AttackSquare
-        sta TargetIndex
-        lda #TILE_HEART_CONTAINER
-        sta TileId
-        jsr draw_active_tile
         ldx AttackSquare
+        stx TargetIndex
+
+        lda #TILE_HEART_CONTAINER
+        sta battlefield, x
+        lda #<BG_TILE_FULL_HEART
+        sta tile_patterns, x
+        lda #(>BG_TILE_FULL_HEART | PAL_RED)
+        sta tile_attributes, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
+
+        jsr draw_active_tile
+        
         rts
 .endproc
 
@@ -96,15 +102,21 @@ TargetIndex := R0
 TileId := R1
 AttackSquare := R3
         ; Super easy: replace the chest with a gold sack tile
-        lda AttackSquare
-        sta TargetIndex
-        lda #TILE_GOLD_SACK
-        sta TileId
-        jsr draw_active_tile
         ldx AttackSquare
+        stx TargetIndex
+
+        lda #TILE_GOLD_SACK
+        sta battlefield, x
+        lda #<BG_TILE_GOLD_SACK
+        sta tile_patterns, x
+        lda #(>BG_TILE_GOLD_SACK | PAL_YELLOW)
+        sta tile_attributes, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
+
+        jsr draw_active_tile
+        
         rts
 .endproc
 
@@ -113,15 +125,21 @@ TargetIndex := R0
 TileId := R1
 AttackSquare := R3
         ; Super easy: replace the chest with a big key tile
-        lda AttackSquare
-        sta TargetIndex
-        lda #TILE_BIG_KEY
-        sta TileId
-        jsr draw_active_tile
         ldx AttackSquare
+        stx TargetIndex
+
+        lda #TILE_BIG_KEY
+        sta battlefield, x
+        lda #<BG_TILE_BIG_KEY
+        sta tile_patterns, x
+        lda #(>BG_TILE_BIG_KEY | PAL_BLUE)
+        sta tile_attributes, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
+
+        jsr draw_active_tile
+
         rts
 .endproc
 
@@ -143,23 +161,27 @@ TargetSquare := R13
         jsr play_sfx_pulse1
 
         ; Now, draw a basic floor tile here, which will be underneath the player
-        lda TargetSquare
-        sta TargetIndex
-        lda #TILE_REGULAR_FLOOR
-        sta TileId
-        jsr draw_active_tile
         ldx TargetSquare
+        stx TargetIndex
+
+        lda #TILE_REGULAR_FLOOR
+        sta battlefield, x
+        lda #<BG_TILE_FLOOR
+        sta tile_patterns, x
+        lda #(>BG_TILE_FLOOR | PAL_WORLD)
+        sta tile_attributes, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
+
+        jsr draw_active_tile
+        
 
         ; We have *collected a treasure*! Mark this as such in the current room data
         ldx PlayerRoomIndex
         lda room_flags, x
         ora #ROOM_FLAG_TREASURE_COLLECTED
         sta room_flags, x
-
-
 
         rts
 .endproc
@@ -178,15 +200,20 @@ TargetSquare := R13
         jsr play_sfx_pulse2
 
         ; Now, draw a basic floor tile here, which will be underneath the player
-        lda TargetSquare
-        sta TargetIndex
-        lda #TILE_REGULAR_FLOOR
-        sta TileId
-        jsr draw_active_tile
         ldx TargetSquare
+        stx TargetIndex
+        
+        lda #TILE_REGULAR_FLOOR
+        sta battlefield, x
+        lda #<BG_TILE_FLOOR
+        sta tile_patterns, x
+        lda #(>BG_TILE_FLOOR | PAL_WORLD)
+        sta tile_attributes, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
+
+        jsr draw_active_tile
 
         ; We have *collected a treasure*! Mark this as such in the current room data
         ldx PlayerRoomIndex
@@ -225,15 +252,20 @@ done_awarding_gold:
         jsr play_sfx_pulse1
 
         ; Now, draw a basic floor tile here, which will be underneath the player
-        lda TargetSquare
-        sta TargetIndex
-        lda #TILE_REGULAR_FLOOR
-        sta TileId
-        jsr draw_active_tile
         ldx TargetSquare
+        stx TargetIndex
+        
+        lda #TILE_REGULAR_FLOOR
+        sta battlefield, x
+        lda #<BG_TILE_FLOOR
+        sta tile_patterns, x
+        lda #(>BG_TILE_FLOOR | PAL_WORLD)
+        sta tile_attributes, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
+
+        jsr draw_active_tile
 
         ; We have *collected a treasure*! Mark this as such in the current room data
         ldx PlayerRoomIndex

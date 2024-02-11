@@ -81,6 +81,12 @@ done:
         and #%00000011
         ora #TILE_SPIDER_ANTICIPATE
         sta battlefield, x
+        lda #<BG_TILE_SPIDER_ANTICIPATE
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_SPIDER_ANTICIPATE
+        sta tile_attributes, x
 
         ldx CurrentRow
         jsr queue_row_x
@@ -169,6 +175,13 @@ jump_failed:
         and #%00000011
         ora #TILE_SPIDER_BASE
         sta battlefield, x
+        lda #<BG_TILE_SPIDER
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_SPIDER
+        sta tile_attributes, x
+
         ; Zero out our delay counter, so we start fresh
         lda #0
         sta tile_data, x
@@ -187,6 +200,12 @@ proceed_with_jump:
         and #%00000011
         ora #TILE_SPIDER_BASE
         sta battlefield, y
+        lda #<BG_TILE_SPIDER
+        sta tile_patterns, y
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_SPIDER
+        sta tile_attributes, y
 
         ; Fix our counter at the destination tile so we start fresh
         lda #0
@@ -198,6 +217,12 @@ proceed_with_jump:
         and #%00000011
         ora #TILE_SMOKE_PUFF
         sta battlefield, x
+        lda #<BG_TILE_SMOKE_PUFF
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_SMOKE_PUFF
+        sta tile_attributes, x
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
         sta tile_data, x

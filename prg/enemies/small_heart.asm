@@ -24,15 +24,22 @@ not_overhealed:
         jsr play_sfx_triangle
 
         ; Now, draw a basic floor tile here, which will be underneath the player
-        lda TargetSquare
-        sta TargetIndex
-        lda #TILE_REGULAR_FLOOR
-        sta TileId
-        jsr draw_active_tile
         ldx TargetSquare
+        stx TargetIndex
+
+        lda #TILE_REGULAR_FLOOR
+        sta battlefield, x
+        lda #<BG_TILE_FLOOR
+        sta tile_patterns, x
+        lda #(>BG_TILE_FLOOR | PAL_WORLD)
+        sta tile_attributes, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
+
+        jsr draw_active_tile
+        
+        
 
         rts
 .endproc

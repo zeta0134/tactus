@@ -25,6 +25,12 @@ chaaaaaaaaarge:
         and #%00000011
         ora #TILE_BIRB_LEFT_FLYING
         sta battlefield, x
+        lda #<BG_TILE_BIRB_FLYING_LEFT
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_BIRB_FLYING_LEFT
+        sta tile_attributes, x
 
         ldx CurrentRow
         jsr queue_row_x
@@ -48,6 +54,12 @@ face_to_the_right:
         and #%00000011
         ora #TILE_BIRB_RIGHT_BASE
         sta battlefield, x
+        lda #<BG_TILE_BIRB_IDLE_RIGHT
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_BIRB_IDLE_RIGHT
+        sta tile_attributes, x
 
         ldx CurrentRow
         jsr queue_row_x
@@ -80,6 +92,13 @@ chaaaaaaaaarge:
         and #%00000011
         ora #TILE_BIRB_RIGHT_FLYING
         sta battlefield, x
+        lda #<BG_TILE_BIRB_FLYING_RIGHT
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_BIRB_FLYING_RIGHT
+        sta tile_attributes, x
+
 
         ldx CurrentRow
         jsr queue_row_x
@@ -103,6 +122,12 @@ face_to_the_left:
         and #%00000011
         ora #TILE_BIRB_LEFT_BASE
         sta battlefield, x
+        lda #<BG_TILE_BIRB_IDLE_LEFT
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_BIRB_IDLE_LEFT
+        sta tile_attributes, x
 
         ldx CurrentRow
         jsr queue_row_x
@@ -140,6 +165,12 @@ jump_failed:
         and #%00000011
         ora #TILE_BIRB_RIGHT_BASE
         sta battlefield, x
+        lda #<BG_TILE_BIRB_IDLE_RIGHT
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_BIRB_IDLE_RIGHT
+        sta tile_attributes, x
 
         ldx CurrentRow
         jsr queue_row_x
@@ -155,6 +186,12 @@ proceed_with_jump:
         and #%00000011
         ora #TILE_BIRB_RIGHT_FLYING
         sta battlefield, y
+        lda #<BG_TILE_BIRB_FLYING_RIGHT
+        sta tile_patterns, y
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_BIRB_FLYING_RIGHT
+        sta tile_attributes, y
 
         ; Now, draw a puff of smoke at our current location
         ; this should use the same palette that we use
@@ -162,6 +199,13 @@ proceed_with_jump:
         and #%00000011
         ora #TILE_SMOKE_PUFF
         sta battlefield, x
+        lda #<BG_TILE_SMOKE_PUFF
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_SMOKE_PUFF
+        sta tile_attributes, x
+
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
         sta tile_data, x
@@ -212,6 +256,12 @@ jump_failed:
         and #%00000011
         ora #TILE_BIRB_LEFT_BASE
         sta battlefield, x
+        lda #<BG_TILE_BIRB_IDLE_LEFT
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_BIRB_IDLE_LEFT
+        sta tile_attributes, x
 
         ldx CurrentRow
         jsr queue_row_x
@@ -227,6 +277,12 @@ proceed_with_jump:
         and #%00000011
         ora #TILE_BIRB_LEFT_FLYING
         sta battlefield, y
+        lda #<BG_TILE_BIRB_FLYING_LEFT
+        sta tile_patterns, y
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_BIRB_FLYING_LEFT
+        sta tile_attributes, y
 
         ; Now, draw a puff of smoke at our current location
         ; this should use the same palette that we use
@@ -234,6 +290,12 @@ proceed_with_jump:
         and #%00000011
         ora #TILE_SMOKE_PUFF
         sta battlefield, x
+        lda #<BG_TILE_SMOKE_PUFF
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_SMOKE_PUFF
+        sta tile_attributes, x
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
         sta tile_data, x

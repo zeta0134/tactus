@@ -20,12 +20,25 @@ CurrentTile := R15
         and #%00000001
         bne disco_tile
 regular_tile:
+        ldx CurrentTile
         lda #TILE_REGULAR_FLOOR
-        jsr draw_tile_here
-        rts
+        sta battlefield, x
+        lda #<BG_TILE_FLOOR
+        sta tile_patterns, x
+        lda #(>BG_TILE_FLOOR | PAL_WORLD)
+        sta tile_attributes, x
+        jmp converge
 disco_tile:
+        ldx CurrentTile
         lda #TILE_DISCO_FLOOR
-        jsr draw_tile_here
+        sta battlefield, x
+        lda #<BG_TILE_DISCO_FLOOR
+        sta tile_patterns, x
+        lda #(>BG_TILE_DISCO_FLOOR | PAL_WORLD)
+        sta tile_attributes, x
+converge:
+        ldx CurrentRow
+        jsr queue_row_x
         rts
 .endproc
 

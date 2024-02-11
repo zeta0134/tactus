@@ -45,23 +45,6 @@ continue:
 failure:
 .endmacro
 
-; input tile in A
-.proc draw_tile_here
-CurrentRow := R14
-CurrentTile := R15
-        ldx CurrentTile
-        sta battlefield, x
-        ldx CurrentRow
-        lda #1
-        sta inactive_tile_queue, x
-        txa
-        lsr
-        tax
-        lda #1
-        sta inactive_attribute_queue, x
-        rts
-.endproc
-
 .proc queue_row_x
         lda #1
         sta inactive_tile_queue, x
@@ -287,14 +270,14 @@ EnemyHealth := R11
         cmp EnemyHealth
         bcs die
         ; TODO: if we implement health bars, we should draw one right now
-        ; TODO: should we have a "weapon hit something" SFX?
-        ; otherwise we're done
+        ; TODO: can we build a system that palette cycles enemies once they take damage? just a quick
+        ; rotation through the four palettes, at frame speed rather than beat speed
         rts
 
 die:
         ; Replace ourselves with a regular floor, and spawn the usual death juice
-        lda EffectiveAttackSquare
-        sta TargetIndex
+        ldx EffectiveAttackSquare
+        stx TargetIndex
 
         ; If the player is at less than max health, we can try to spawn a small heart
         lda PlayerMaxHealth
@@ -306,16 +289,23 @@ die:
         beq drop_health
 drop_nothing:
         lda #TILE_REGULAR_FLOOR
-        sta TileId
+        sta battlefield, x
+        lda #<BG_TILE_FLOOR
+        sta tile_patterns, x
+        lda #(>BG_TILE_FLOOR | PAL_WORLD)
+        sta tile_attributes, x
         inc HealthDroughtCounter
         jmp done_with_drops
 drop_health:
         lda #TILE_SMALL_HEART
-        sta TileId
+        sta battlefield, x
+        lda #<BG_TILE_SMALL_HEART
+        sta tile_patterns, x
+        lda #(>BG_TILE_SMALL_HEART | PAL_RED)
+        sta tile_attributes, x
         lda #0
         sta HealthDroughtCounter
 done_with_drops:
-
         jsr draw_active_tile
         ldx EffectiveAttackSquare
         lda #0
@@ -363,33 +353,38 @@ TargetSquare := R13
         cmp #$FF
         beq no_puff_found
         ; Copy ourselves over the puff tile, to cancel our own movement
-        lda PuffSquare
-        sta TargetIndex
-        ldx TargetSquare
-        lda battlefield, x
-        sta TileId
-        jsr draw_active_tile
-
         ldx TargetSquare
         ldy PuffSquare
+        lda battlefield, x
+        sta battlefield, y
         lda tile_data, x
         sta tile_data, y
         lda tile_flags, x
         sta tile_flags, y
+        lda tile_patterns, x
+        sta tile_patterns, y
+        lda tile_attributes, x
+        sta tile_attributes, y
+
+        lda PuffSquare
+        sta TargetIndex
+        jsr draw_active_tile
 
         ; Now, draw a basic floor tile here, which will be underneath the player
-        lda TargetSquare
-        sta TargetIndex
-        lda #TILE_REGULAR_FLOOR
-        sta TileId
-        jsr draw_active_tile
         ldx TargetSquare
+        stx TargetIndex
+        lda #TILE_REGULAR_FLOOR
+        sta battlefield, x
+        lda #<BG_TILE_FLOOR
+        sta tile_patterns, x
+        lda #(>BG_TILE_FLOOR | PAL_WORLD)
+        sta tile_attributes, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
-
-        ; TODO: we just damaged the player. Spawn a hit sprite inbetween the enemy that dealt
-        ; the damage and the player's position
+        jsr draw_active_tile
+        
+        ; Since we just damaged the player, spawn a hit sprite
         jsr spawn_damage_sprite_here
 
         rts

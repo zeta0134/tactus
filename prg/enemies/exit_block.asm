@@ -16,15 +16,22 @@ AttackLanded := R7
         sta AttackLanded
 
         ; Replace the exit block with the stairs down
-        lda AttackSquare
-        sta TargetIndex
-        lda #TILE_EXIT_STAIRS
-        sta TileId
-        jsr draw_active_tile
         ldx AttackSquare
+        stx TargetIndex
+        lda #TILE_EXIT_STAIRS
+        sta battlefield, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
+        lda #<BG_TILE_EXIT_STAIRS
+        sta tile_patterns, x
+        ; just in case, let's preserve the block color and draw the stairs the same way
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_EXIT_STAIRS
+        sta tile_attributes, x
+        ; For attacks, immediately draw the resulting change
+        jsr draw_active_tile
 
 no_key:
         rts

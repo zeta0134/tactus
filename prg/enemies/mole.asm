@@ -93,7 +93,12 @@ switch_to_attack_pose:
         and #%00000011
         ora #TILE_MOLE_THROWING
         sta battlefield, x
-
+        lda #<BG_TILE_MOLE_THROWING
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_MOLE_THROWING
+        sta tile_attributes, x
         ldx CurrentRow
         jsr queue_row_x
 
@@ -161,6 +166,13 @@ spawn_wrench:
         and #%00000011
         ora #TILE_WRENCH_PROJECTILE
         sta battlefield, y
+        lda #<BG_TILE_WRENCH_PROJECTILE
+        sta tile_patterns, y
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_WRENCH_PROJECTILE
+        sta tile_attributes, y
+
         ; Write the throw direction to the data byte for the wrench, that way
         ; it keeps going in the same direction we threw it initially
         lda tile_data, x
@@ -180,6 +192,13 @@ switch_to_idle_pose:
         and #%00000011
         ora #TILE_MOLE_IDLE
         sta battlefield, x
+        lda #<BG_TILE_MOLE_IDLE
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_MOLE_IDLE
+        sta tile_attributes, x
+
         ; reset tile_data to 0, it will be our counter for idle -> hole
         lda #0
         sta tile_data, x
@@ -224,6 +243,12 @@ done:
         and #%00000011
         ora #TILE_MOLE_HOLE_BASE
         sta battlefield, x
+        lda #<BG_TILE_MOLE_HOLE
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_MOLE_HOLE
+        sta tile_attributes, x
         ; Again reset our delay counter
         lda #0
         sta tile_data, x
@@ -297,6 +322,13 @@ spawn_new_wrench:
         and #%00000011
         ora #TILE_WRENCH_PROJECTILE
         sta battlefield, y
+        lda #<BG_TILE_WRENCH_PROJECTILE
+        sta tile_patterns, y
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_WRENCH_PROJECTILE
+        sta tile_attributes, y
+
         ; Write the throw direction to the data byte for the wrench, that way
         ; it keeps going in the same direction we threw it initially
         lda tile_data, x
@@ -314,6 +346,10 @@ despawn_old_wrench:
         ldx CurrentTile
         lda #TILE_REGULAR_FLOOR
         sta battlefield, x
+        lda #<BG_TILE_FLOOR
+        sta tile_patterns, x
+        lda #(>BG_TILE_FLOOR | PAL_WORLD)
+        sta tile_attributes, x
         ; clean up the other flags for posterity
         lda #0
         sta tile_data, x
@@ -424,15 +460,19 @@ TargetSquare := R13
 
         ; Now, despawn the projectile:
         ; draw a basic floor tile here, which will be underneath the player
-        lda TargetSquare
-        sta TargetIndex
-        lda #TILE_REGULAR_FLOOR
-        sta TileId
-        jsr draw_active_tile
         ldx TargetSquare
+        stx TargetIndex
+        lda #TILE_REGULAR_FLOOR
+        sta battlefield, x
+        lda #<BG_TILE_FLOOR
+        sta tile_patterns, x
+        lda #(>BG_TILE_FLOOR | PAL_WORLD)
+        sta tile_attributes, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
+        ; draw it now!
+        jsr draw_active_tile
 
         rts
 .endproc

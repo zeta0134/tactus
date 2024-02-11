@@ -235,10 +235,15 @@ spawn_weapon:
         sta tile_flags, x
         ; and finally, set this tile to a weapon shadow
 
-        lda DestinationSquare
-        sta TargetIndex
+        ldx DestinationSquare
+        stx TargetIndex
         lda #TILE_WEAPON_SHADOW
-        sta TileId
+        sta battlefield, x
+        lda #<BG_TILE_WEAPON_SHADOW
+        sta tile_patterns, x
+        lda #(>BG_TILE_WEAPON_SHADOW | PAL_WORLD)
+        sta tile_attributes, x
+
         jsr draw_active_tile
         ; ... we're done?
         rts
