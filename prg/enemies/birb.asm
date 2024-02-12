@@ -21,16 +21,7 @@ CurrentTile := R15
 chaaaaaaaaarge:
         ; Turn ourselves into our flying state
         ldx CurrentTile
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_BIRB_LEFT_FLYING
-        sta battlefield, x
-        lda #<BG_TILE_BIRB_FLYING_LEFT
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_BIRB_FLYING_LEFT
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_BIRB_LEFT_FLYING, BG_TILE_BIRB_FLYING_LEFT
 
         ldx CurrentRow
         jsr queue_row_x
@@ -50,16 +41,7 @@ do_not_charge:
 face_to_the_right:
         ; Turn to face the player. That's cute, and certainly not creepy at all!
         ldx CurrentTile
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_BIRB_RIGHT_BASE
-        sta battlefield, x
-        lda #<BG_TILE_BIRB_IDLE_RIGHT
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_BIRB_IDLE_RIGHT
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_BIRB_RIGHT_BASE, BG_TILE_BIRB_IDLE_RIGHT
 
         ldx CurrentRow
         jsr queue_row_x
@@ -88,16 +70,7 @@ CurrentTile := R15
 chaaaaaaaaarge:
         ; Turn ourselves into our flying state
         ldx CurrentTile
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_BIRB_RIGHT_FLYING
-        sta battlefield, x
-        lda #<BG_TILE_BIRB_FLYING_RIGHT
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_BIRB_FLYING_RIGHT
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_BIRB_RIGHT_FLYING, BG_TILE_BIRB_FLYING_RIGHT
 
 
         ldx CurrentRow
@@ -118,16 +91,7 @@ do_not_charge:
 face_to_the_left:
         ; Turn to face the player. That's cute, and certainly not creepy at all!
         ldx CurrentTile
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_BIRB_LEFT_BASE
-        sta battlefield, x
-        lda #<BG_TILE_BIRB_IDLE_LEFT
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_BIRB_IDLE_LEFT
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_BIRB_LEFT_BASE, BG_TILE_BIRB_IDLE_LEFT
 
         ldx CurrentRow
         jsr queue_row_x
@@ -161,16 +125,7 @@ jump_failed:
 
         ; Turn ourselves back into an idle pose
         ldx CurrentTile
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_BIRB_RIGHT_BASE
-        sta battlefield, x
-        lda #<BG_TILE_BIRB_IDLE_RIGHT
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_BIRB_IDLE_RIGHT
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_BIRB_RIGHT_BASE, BG_TILE_BIRB_IDLE_RIGHT
 
         ldx CurrentRow
         jsr queue_row_x
@@ -182,29 +137,11 @@ proceed_with_jump:
         ldx CurrentTile
         ldy TargetTile
         ; Draw ourselves at the target (keep our color palette)
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_BIRB_RIGHT_FLYING
-        sta battlefield, y
-        lda #<BG_TILE_BIRB_FLYING_RIGHT
-        sta tile_patterns, y
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_BIRB_FLYING_RIGHT
-        sta tile_attributes, y
+        draw_at_y_with_pal_x TILE_BIRB_RIGHT_FLYING, BG_TILE_BIRB_FLYING_RIGHT
 
         ; Now, draw a puff of smoke at our current location
         ; this should use the same palette that we use
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_SMOKE_PUFF
-        sta battlefield, x
-        lda #<BG_TILE_SMOKE_PUFF
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_SMOKE_PUFF
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_SMOKE_PUFF, BG_TILE_SMOKE_PUFF
 
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
@@ -252,16 +189,7 @@ jump_failed:
 
         ; Turn ourselves back into an idle pose
         ldx CurrentTile
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_BIRB_LEFT_BASE
-        sta battlefield, x
-        lda #<BG_TILE_BIRB_IDLE_LEFT
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_BIRB_IDLE_LEFT
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_BIRB_LEFT_BASE, BG_TILE_BIRB_IDLE_LEFT
 
         ldx CurrentRow
         jsr queue_row_x
@@ -273,29 +201,11 @@ proceed_with_jump:
         ldx CurrentTile
         ldy TargetTile
         ; Draw ourselves at the target (keep our color palette)
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_BIRB_LEFT_FLYING
-        sta battlefield, y
-        lda #<BG_TILE_BIRB_FLYING_LEFT
-        sta tile_patterns, y
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_BIRB_FLYING_LEFT
-        sta tile_attributes, y
+        draw_at_y_with_pal_x TILE_BIRB_LEFT_FLYING, BG_TILE_BIRB_FLYING_LEFT 
 
         ; Now, draw a puff of smoke at our current location
         ; this should use the same palette that we use
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_SMOKE_PUFF
-        sta battlefield, x
-        lda #<BG_TILE_SMOKE_PUFF
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_SMOKE_PUFF
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_SMOKE_PUFF, BG_TILE_SMOKE_PUFF
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
         sta tile_data, x

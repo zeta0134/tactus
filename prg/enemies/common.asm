@@ -45,6 +45,48 @@ continue:
 failure:
 .endmacro
 
+; Various battlefield drawing macros, mostly to cut down on repetition and copy/pasta errors
+
+; Draw a given entity/tile into the battlefield at position X. Preserves the original
+; palette at this location
+.macro draw_at_x_keeppal entity_type, tile_id
+        lda battlefield, x
+        and #%00000011
+        ora #entity_type
+        sta battlefield, x
+        lda #<tile_id
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>tile_id
+        sta tile_attributes, x
+.endmacro
+
+; Note: does not set the palette bits in entity_type, somewhat
+; on purpose, as our long term plan is to remove these bits and
+; switch to 8bit entity IDs
+.macro draw_at_x_withpal entity_type, tile_id, palette_index
+        lda #entity_type
+        sta battlefield, x
+        lda #<tile_id
+        sta tile_patterns, x
+        lda #(>tile_id | palette_index)
+        sta tile_attributes, x
+.endmacro
+
+.macro draw_at_y_with_pal_x entity_type, tile_id
+        lda battlefield, x
+        and #%00000011
+        ora #entity_type
+        sta battlefield, y
+        lda #<tile_id
+        sta tile_patterns, y
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>tile_id
+        sta tile_attributes, y
+.endmacro
+
 .proc queue_row_x
         lda #1
         sta inactive_tile_queue, x

@@ -77,16 +77,7 @@ done:
         cmp IdleDelay ; TODO: pick a threshold based on spider difficulty
         bcc no_change
         ; switch to our anticipation pose
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_SPIDER_ANTICIPATE
-        sta battlefield, x
-        lda #<BG_TILE_SPIDER_ANTICIPATE
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_SPIDER_ANTICIPATE
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_SPIDER_ANTICIPATE, BG_TILE_SPIDER_ANTICIPATE
 
         ldx CurrentRow
         jsr queue_row_x
@@ -171,16 +162,8 @@ jump_failed:
 
         ; Turn ourselves back into an idle pose
         ldx CurrentTile
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_SPIDER_BASE
-        sta battlefield, x
-        lda #<BG_TILE_SPIDER
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_SPIDER
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_SPIDER_BASE, BG_TILE_SPIDER
+
 
         ; Zero out our delay counter, so we start fresh
         lda #0
@@ -196,16 +179,7 @@ proceed_with_jump:
         ldx CurrentTile
         ldy TargetTile
         ; Draw ourselves at the target (keep our color palette)
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_SPIDER_BASE
-        sta battlefield, y
-        lda #<BG_TILE_SPIDER
-        sta tile_patterns, y
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_SPIDER
-        sta tile_attributes, y
+        draw_at_y_with_pal_x TILE_SPIDER_BASE, BG_TILE_SPIDER
 
         ; Fix our counter at the destination tile so we start fresh
         lda #0
@@ -213,16 +187,7 @@ proceed_with_jump:
 
         ; Now, draw a puff of smoke at our current location
         ; this should use the same palette that we use
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_SMOKE_PUFF
-        sta battlefield, x
-        lda #<BG_TILE_SMOKE_PUFF
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_SMOKE_PUFF
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_SMOKE_PUFF, BG_TILE_SMOKE_PUFF
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
         sta tile_data, x

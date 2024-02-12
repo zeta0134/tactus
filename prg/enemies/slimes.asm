@@ -71,16 +71,7 @@ proceed_with_jump:
         ldx CurrentTile
         ldy TargetTile
         ; Draw ourselves at the target (keep our color palette)
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_SLIME_BASE
-        sta battlefield, y
-        lda #<BG_TILE_SLIME_IDLE
-        sta tile_patterns, y
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_SLIME_IDLE
-        sta tile_attributes, y
+        draw_at_y_with_pal_x TILE_SLIME_BASE, BG_TILE_SLIME_IDLE
 
         ; Set up our attributes for the next jump
         lda tile_data, x
@@ -90,16 +81,7 @@ proceed_with_jump:
 
         ; Now, draw a puff of smoke at our current location
         ; this should use the same palette that we use
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_SMOKE_PUFF
-        sta battlefield, x
-        lda #<BG_TILE_SMOKE_PUFF
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_SMOKE_PUFF
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_SMOKE_PUFF, BG_TILE_SMOKE_PUFF
 
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
@@ -187,16 +169,7 @@ proceed_with_jump:
         ldx CurrentTile
         ldy TargetTile
         ; Draw ourselves at the target (keep our color palette)
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_SLIME_BASE
-        sta battlefield, y
-        lda #<BG_TILE_SLIME_IDLE
-        sta tile_patterns, y
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_SLIME_IDLE
-        sta tile_attributes, y
+        draw_at_y_with_pal_x TILE_SLIME_BASE, BG_TILE_SLIME_IDLE
 
         ; Set up our attributes for the next jump
         lda tile_data, x
@@ -209,16 +182,7 @@ proceed_with_jump:
 
         ; Now, draw a puff of smoke at our current location
         ; this should use the same palette that we use
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_SMOKE_PUFF
-        sta battlefield, x
-        lda #<BG_TILE_SMOKE_PUFF
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_SMOKE_PUFF
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_SMOKE_PUFF, BG_TILE_SMOKE_PUFF
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
         sta tile_data, x
@@ -314,21 +278,11 @@ done:
         and #%00001111
         beq drop_health
 drop_nothing:
-        lda #TILE_REGULAR_FLOOR
-        sta battlefield, x
-        lda #<BG_TILE_FLOOR
-        sta tile_patterns, x
-        lda #(>BG_TILE_FLOOR | PAL_WORLD)
-        sta tile_attributes, x
+        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
         inc HealthDroughtCounter
         jmp done_with_drops
 drop_health:
-        lda #TILE_SMALL_HEART
-        sta battlefield, x
-        lda #<BG_TILE_SMALL_HEART
-        sta tile_patterns, x
-        lda #(>BG_TILE_SMALL_HEART | PAL_RED)
-        sta tile_attributes, x
+        draw_at_x_withpal TILE_SMALL_HEART, BG_TILE_SMALL_HEART, PAL_RED
         lda #0
         sta HealthDroughtCounter
 done_with_drops:
