@@ -5,12 +5,31 @@
 
     .segment "RAM"
 
+current_lighting_counter: .res 1
 current_lighting_row: .res 1
 
 
     .segment "CODE_3"
     ; TODO: use more than just one of these
     .include "../build/torchlight.incs"
+
+torchlight_update_table:
+  .byte $0d, $08, $0f, $04, $06, $0b, $13, $01, $0e, $11, $02, $12, $00, $03, $10, $07
+  .byte $0a, $09, $05, $0c, $08, $09, $10, $04, $11, $0d, $0f, $05, $0a, $0e, $07, $12
+  .byte $06, $0c, $0b, $02, $13, $03, $01, $00, $07, $05, $06, $0b, $10, $00, $0d, $13
+  .byte $0c, $01, $11, $04, $09, $12, $08, $02, $03, $0a, $0f, $0e, $02, $08, $00, $05
+  .byte $07, $06, $0c, $0f, $01, $0e, $11, $0b, $10, $09, $0d, $12, $13, $03, $0a, $04
+  .byte $12, $01, $06, $0c, $02, $0b, $10, $07, $13, $0a, $11, $05, $0d, $03, $0e, $00
+  .byte $09, $04, $0f, $08, $0c, $13, $02, $08, $03, $0d, $00, $0f, $0e, $01, $12, $0b
+  .byte $07, $10, $04, $0a, $05, $11, $06, $09, $08, $01, $05, $0b, $12, $0d, $0f, $04
+  .byte $13, $02, $09, $00, $07, $03, $11, $0e, $0c, $06, $0a, $10, $08, $13, $04, $0c
+  .byte $0f, $0d, $0e, $03, $02, $01, $11, $06, $09, $10, $0a, $07, $00, $0b, $12, $05
+  .byte $13, $00, $0e, $0a, $04, $06, $08, $10, $07, $03, $0d, $0f, $12, $01, $02, $05
+  .byte $09, $0b, $0c, $11, $07, $0c, $06, $05, $02, $0f, $13, $08, $0b, $0a, $0d, $00
+  .byte $03, $11, $12, $10, $04, $09, $0e, $01, $11, $04, $02, $10, $0d, $01, $0f, $06
+  .byte $0e, $08, $07, $0c, $0a, $03, $0b, $12, $05, $09, $13, $00, $13, $01, $10, $02
+  .byte $06, $08, $0b, $04, $03, $07, $0e, $0a, $00, $05, $11, $0f, $09, $0c, $0d, $12
+  .byte $11, $03, $10, $06, $02, $00, $05, $09, $0f, $0d, $01, $08, $07, $04, $0e, $0c
 
 .proc FAR_init_torchlight
     lda #0
@@ -24,13 +43,10 @@ current_lighting_row: .res 1
     jsr draw_one_torchlight_row
 
     ; TODO: can we make this update in a pseudorandom order?
-    inc current_lighting_row
-    lda #20
-    cmp current_lighting_row
-    bne done
-    lda #0
+    inc current_lighting_counter
+    ldx current_lighting_counter
+    lda torchlight_update_table, x
     sta current_lighting_row
-done:
     rts
 .endproc
 
