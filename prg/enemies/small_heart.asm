@@ -26,13 +26,8 @@ not_overhealed:
         ; Now, draw a basic floor tile here, which will be underneath the player
         ldx TargetSquare
         stx TargetIndex
-
-        lda #TILE_REGULAR_FLOOR
-        sta battlefield, x
-        lda #<BG_TILE_FLOOR
-        sta tile_patterns, x
-        lda #(>BG_TILE_FLOOR | PAL_WORLD)
-        sta tile_attributes, x
+        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
+        
         lda #0
         sta tile_data, x
         sta tile_flags, x

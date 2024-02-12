@@ -1090,12 +1090,14 @@ zone_list_boss:
 
 el_debug_enemies:
         .byte 1
-        .byte TILE_ZOMBIE_BASIC, <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_WORLD), 4
-        
+        .byte TILE_BASIC_SLIME, <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_BLUE), 1
+        ;.byte TILE_ZOMBIE_BASIC, <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_WORLD), 4
+        ;.byte TILE_MOLE_HOLE_BASIC, <BG_TILE_MOLE_HOLE, (>BG_TILE_MOLE_HOLE | PAL_RED), 2
+        ;.byte TILE_MOLE_HOLE_ADVANCED, <BG_TILE_MOLE_HOLE, (>BG_TILE_MOLE_HOLE | PAL_BLUE), 2
 
 el_debug_boss_enemies:
         .byte 1
-        .byte TILE_BIRB_LEFT_ADVANCED, <BG_TILE_BIRB_IDLE_LEFT, (>BG_TILE_BIRB_IDLE_LEFT | PAL_RED), 2
+        .byte TILE_ADVANCED_SLIME, <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_RED), 1
 
 debug_pool:
         .repeat 16

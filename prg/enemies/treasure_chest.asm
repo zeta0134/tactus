@@ -81,13 +81,8 @@ okay_to_spawn:
         ; Super easy: replace the chest with a heart container tile
         ldx AttackSquare
         stx TargetIndex
+        draw_at_x_withpal TILE_HEART_CONTAINER, BG_TILE_FULL_HEART, PAL_RED
 
-        lda #TILE_HEART_CONTAINER
-        sta battlefield, x
-        lda #<BG_TILE_FULL_HEART
-        sta tile_patterns, x
-        lda #(>BG_TILE_FULL_HEART | PAL_RED)
-        sta tile_attributes, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
@@ -104,13 +99,8 @@ AttackSquare := R3
         ; Super easy: replace the chest with a gold sack tile
         ldx AttackSquare
         stx TargetIndex
+        draw_at_x_withpal TILE_GOLD_SACK, BG_TILE_GOLD_SACK, PAL_YELLOW
 
-        lda #TILE_GOLD_SACK
-        sta battlefield, x
-        lda #<BG_TILE_GOLD_SACK
-        sta tile_patterns, x
-        lda #(>BG_TILE_GOLD_SACK | PAL_YELLOW)
-        sta tile_attributes, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
@@ -127,13 +117,8 @@ AttackSquare := R3
         ; Super easy: replace the chest with a big key tile
         ldx AttackSquare
         stx TargetIndex
+        draw_at_x_withpal TILE_BIG_KEY, BG_TILE_BIG_KEY, PAL_BLUE
 
-        lda #TILE_BIG_KEY
-        sta battlefield, x
-        lda #<BG_TILE_BIG_KEY
-        sta tile_patterns, x
-        lda #(>BG_TILE_BIG_KEY | PAL_BLUE)
-        sta tile_attributes, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
@@ -163,13 +148,8 @@ TargetSquare := R13
         ; Now, draw a basic floor tile here, which will be underneath the player
         ldx TargetSquare
         stx TargetIndex
+        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
 
-        lda #TILE_REGULAR_FLOOR
-        sta battlefield, x
-        lda #<BG_TILE_FLOOR
-        sta tile_patterns, x
-        lda #(>BG_TILE_FLOOR | PAL_WORLD)
-        sta tile_attributes, x
         lda #0
         sta tile_data, x
         sta tile_flags, x
@@ -202,13 +182,8 @@ TargetSquare := R13
         ; Now, draw a basic floor tile here, which will be underneath the player
         ldx TargetSquare
         stx TargetIndex
-        
-        lda #TILE_REGULAR_FLOOR
-        sta battlefield, x
-        lda #<BG_TILE_FLOOR
-        sta tile_patterns, x
-        lda #(>BG_TILE_FLOOR | PAL_WORLD)
-        sta tile_attributes, x
+        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
+
         lda #0
         sta tile_data, x
         sta tile_flags, x
@@ -254,13 +229,8 @@ done_awarding_gold:
         ; Now, draw a basic floor tile here, which will be underneath the player
         ldx TargetSquare
         stx TargetIndex
-        
-        lda #TILE_REGULAR_FLOOR
-        sta battlefield, x
-        lda #<BG_TILE_FLOOR
-        sta tile_patterns, x
-        lda #(>BG_TILE_FLOOR | PAL_WORLD)
-        sta tile_attributes, x
+        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
+
         lda #0
         sta tile_data, x
         sta tile_flags, x

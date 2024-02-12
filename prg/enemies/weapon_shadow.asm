@@ -237,12 +237,7 @@ spawn_weapon:
 
         ldx DestinationSquare
         stx TargetIndex
-        lda #TILE_WEAPON_SHADOW
-        sta battlefield, x
-        lda #<BG_TILE_WEAPON_SHADOW
-        sta tile_patterns, x
-        lda #(>BG_TILE_WEAPON_SHADOW | PAL_WORLD)
-        sta tile_attributes, x
+        draw_at_x_withpal TILE_WEAPON_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_WORLD
 
         jsr draw_active_tile
         ; ... we're done?

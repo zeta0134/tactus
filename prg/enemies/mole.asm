@@ -89,16 +89,8 @@ west:
 switch_to_attack_pose:
         ; switch to our anticipation pose
         ldx CurrentTile
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_MOLE_THROWING
-        sta battlefield, x
-        lda #<BG_TILE_MOLE_THROWING
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_MOLE_THROWING
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_MOLE_THROWING, BG_TILE_MOLE_THROWING
+
         ldx CurrentRow
         jsr queue_row_x
 
@@ -162,16 +154,7 @@ spawn_wrench:
 
         ; Draw a wrench at the chosen target location, using our palette from the
         ; current location
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_WRENCH_PROJECTILE
-        sta battlefield, y
-        lda #<BG_TILE_WRENCH_PROJECTILE
-        sta tile_patterns, y
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_WRENCH_PROJECTILE
-        sta tile_attributes, y
+        draw_at_y_with_pal_x TILE_WRENCH_PROJECTILE, BG_TILE_WRENCH_PROJECTILE
 
         ; Write the throw direction to the data byte for the wrench, that way
         ; it keeps going in the same direction we threw it initially
@@ -186,18 +169,8 @@ spawn_wrench:
         jsr queue_row_x
 
 switch_to_idle_pose:
-
         ldx CurrentTile
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_MOLE_IDLE
-        sta battlefield, x
-        lda #<BG_TILE_MOLE_IDLE
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_MOLE_IDLE
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_MOLE_IDLE, BG_TILE_MOLE_IDLE
 
         ; reset tile_data to 0, it will be our counter for idle -> hole
         lda #0
@@ -239,16 +212,8 @@ done:
 
         ; Switch back into our hole pose
         ldx CurrentTile
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_MOLE_HOLE_BASE
-        sta battlefield, x
-        lda #<BG_TILE_MOLE_HOLE
-        sta tile_patterns, x
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_MOLE_HOLE
-        sta tile_attributes, x
+        draw_at_x_keeppal TILE_MOLE_HOLE_BASE, BG_TILE_MOLE_HOLE
+
         ; Again reset our delay counter
         lda #0
         sta tile_data, x
@@ -318,16 +283,7 @@ spawn_new_wrench:
 
         ; Draw a wrench at the chosen target location, using our palette from the
         ; current location
-        lda battlefield, x
-        and #%00000011
-        ora #TILE_WRENCH_PROJECTILE
-        sta battlefield, y
-        lda #<BG_TILE_WRENCH_PROJECTILE
-        sta tile_patterns, y
-        lda tile_attributes, x
-        and #PAL_MASK
-        ora #>BG_TILE_WRENCH_PROJECTILE
-        sta tile_attributes, y
+        draw_at_y_with_pal_x TILE_WRENCH_PROJECTILE, BG_TILE_WRENCH_PROJECTILE
 
         ; Write the throw direction to the data byte for the wrench, that way
         ; it keeps going in the same direction we threw it initially
@@ -344,12 +300,8 @@ despawn_old_wrench:
         ; mark ourselves as floor; we're done
         ; (no puff stool this time, projectiles can't be attacked)
         ldx CurrentTile
-        lda #TILE_REGULAR_FLOOR
-        sta battlefield, x
-        lda #<BG_TILE_FLOOR
-        sta tile_patterns, x
-        lda #(>BG_TILE_FLOOR | PAL_WORLD)
-        sta tile_attributes, x
+        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD 
+
         ; clean up the other flags for posterity
         lda #0
         sta tile_data, x
@@ -462,15 +414,12 @@ TargetSquare := R13
         ; draw a basic floor tile here, which will be underneath the player
         ldx TargetSquare
         stx TargetIndex
-        lda #TILE_REGULAR_FLOOR
-        sta battlefield, x
-        lda #<BG_TILE_FLOOR
-        sta tile_patterns, x
-        lda #(>BG_TILE_FLOOR | PAL_WORLD)
-        sta tile_attributes, x
+        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
+
         lda #0
         sta tile_data, x
         sta tile_flags, x
+        
         ; draw it now!
         jsr draw_active_tile
 
