@@ -21,6 +21,7 @@
         .include "sound.inc"
         .include "sprites.inc"
         .include "static_screens.inc"
+        .include "torchlight.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
@@ -274,6 +275,8 @@ MetaSpriteIndex := R0
 
         lda #1
         sta NmiSoftDisable
+
+        far_call FAR_init_torchlight
 
         ; the game screen uses ExAttr for palette access, so set that up here
         lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
@@ -725,6 +728,10 @@ continue_waiting:
 
         debug_color (TINT_G | TINT_B | LIGHTGRAY)
         far_call FAR_draw_sprites
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
+        far_call FAR_update_torchlight
         debug_color LIGHTGRAY
 
         perform_zpcm_inc

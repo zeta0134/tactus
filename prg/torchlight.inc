@@ -1,0 +1,2 @@
+.global FAR_init_torchlight
+.global FAR_update_torchlight
