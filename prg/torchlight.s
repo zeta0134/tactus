@@ -2,6 +2,7 @@
     .include "torchlight.inc"
     .include "word_util.inc"
     .include "zeropage.inc"
+    .include "zpcm.inc"
 
     .segment "RAM"
 
@@ -39,14 +40,17 @@ torchlight_update_table:
 
 ; For now, each call to update_torchlight should draw one (1) row and exit
 .proc FAR_update_torchlight
+    perform_zpcm_inc
     jsr setup_torchlight_pointers
     jsr draw_one_torchlight_row
+    perform_zpcm_inc
 
     ; TODO: can we make this update in a pseudorandom order?
     inc current_lighting_counter
     ldx current_lighting_counter
     lda torchlight_update_table, x
     sta current_lighting_row
+    perform_zpcm_inc
     rts
 .endproc
 
@@ -148,6 +152,7 @@ TorchlightPtr := R4
     ora (TorchlightPtr), y      ; 5
     sta (SecondNametablePtr), y ; 5
     iny                         ; 2
+    perform_zpcm_inc
     .endrepeat
 
     rts

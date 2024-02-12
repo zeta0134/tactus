@@ -314,10 +314,9 @@ MetaSpriteIndex := R0
 .endproc
 
 .proc game_init
-        ; shower groove
-        ;lda #2
-        ; in another world
-        lda #4
+        lda #2 ; shower groove
+        ;lda #4 ; in another world
+
         jsr play_track
 
         lda #0
@@ -705,6 +704,18 @@ process_next_beat_now:
         st16 GameMode, beat_frame_1
         rts ; do that now
 continue_waiting:
+        ; We have LOTS of time on this particular frame, so update the torchlight a whole
+        ; heck of a bunch to catch it up with the player's current location
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
+        far_call FAR_update_torchlight
+        debug_color LIGHTGRAY
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
+        far_call FAR_update_torchlight
+        debug_color LIGHTGRAY
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
+        far_call FAR_update_torchlight
+        debug_color LIGHTGRAY
+
         jsr every_gameloop
         rts
 .endproc
