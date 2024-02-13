@@ -51,8 +51,6 @@ def make_torchlight_image(width, height, torchlight):
 
 os.makedirs("build/torchlight",exist_ok=True)
 
-torchlight_luts = []
-
 for radius_index in range(0, 32):
     if radius_index == 0:
         radius = -10.0 # total darkness
@@ -62,14 +60,12 @@ for radius_index in range(0, 32):
         radius = 0.75 + (radius_index * 0.25) + (radius_index * radius_index * 0.03)
 
     torchlight = generate_torchlight(64, 40, radius)
-    torchlight_luts.append(torchlight)
     im = make_torchlight_image(64, 40, torchlight)
     im.save("build/torchlight/test_%s.png" % radius_index)
 
-# for now, output just one of these things for rapid testing
-with open("build/torchlight.incs", "w") as lut_file:
-    print(ca65_label("torchlight_test_lut"), file=lut_file)
-    pretty_print_table(torchlight_luts[10], lut_file, width=64)
+    with open("build/torchlight/torchlight_%s.incs" % radius_index, "w") as lut_file:
+        print(ca65_label("torchlight_lut_%s" % radius_index), file=lut_file)
+        pretty_print_table(torchlight, lut_file, width=64)
 
 
 # also give me a table of random noise!
@@ -78,5 +74,5 @@ ordered_rows = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
 for i in range(0, 13):
     shuffled_rows += random.sample(ordered_rows, k=len(ordered_rows))
 shuffled_rows = shuffled_rows[0:256]
-pretty_print_table(shuffled_rows, output_file=sys.stdout)
+# pretty_print_table(shuffled_rows, output_file=sys.stdout)
 

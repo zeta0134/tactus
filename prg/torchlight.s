@@ -1,4 +1,6 @@
+    .include "far_call.inc"
     .include "player.inc"
+    .include "rainbow.inc"
     .include "torchlight.inc"
     .include "word_util.inc"
     .include "zeropage.inc"
@@ -8,11 +10,65 @@
 
 current_lighting_counter: .res 1
 current_lighting_row: .res 1
+current_radius: .res 1
 
+torchlight_bank: .res 1
+
+    .segment "TORCHLIGHT_0"
+    .include "../build/torchlight/torchlight_0.incs"
+    .include "../build/torchlight/torchlight_1.incs"
+    .include "../build/torchlight/torchlight_2.incs"
+
+    .segment "TORCHLIGHT_1"
+    .include "../build/torchlight/torchlight_3.incs"
+    .include "../build/torchlight/torchlight_4.incs"
+    .include "../build/torchlight/torchlight_5.incs"
+
+    .segment "TORCHLIGHT_2"
+    .include "../build/torchlight/torchlight_6.incs"
+    .include "../build/torchlight/torchlight_7.incs"
+    .include "../build/torchlight/torchlight_8.incs"
+
+    .segment "TORCHLIGHT_3"
+    .include "../build/torchlight/torchlight_9.incs"
+    .include "../build/torchlight/torchlight_10.incs"
+    .include "../build/torchlight/torchlight_11.incs"
+
+    .segment "TORCHLIGHT_4"
+    .include "../build/torchlight/torchlight_12.incs"
+    .include "../build/torchlight/torchlight_13.incs"
+    .include "../build/torchlight/torchlight_14.incs"
+
+    .segment "TORCHLIGHT_5"
+    .include "../build/torchlight/torchlight_15.incs"
+    .include "../build/torchlight/torchlight_16.incs"
+    .include "../build/torchlight/torchlight_17.incs"
+
+    .segment "TORCHLIGHT_6"
+    .include "../build/torchlight/torchlight_18.incs"
+    .include "../build/torchlight/torchlight_19.incs"
+    .include "../build/torchlight/torchlight_20.incs"
+
+    .segment "TORCHLIGHT_7"
+    .include "../build/torchlight/torchlight_21.incs"
+    .include "../build/torchlight/torchlight_22.incs"
+    .include "../build/torchlight/torchlight_23.incs"
+
+    .segment "TORCHLIGHT_8"
+    .include "../build/torchlight/torchlight_24.incs"
+    .include "../build/torchlight/torchlight_25.incs"
+    .include "../build/torchlight/torchlight_26.incs"
+
+    .segment "TORCHLIGHT_9"
+    .include "../build/torchlight/torchlight_27.incs"
+    .include "../build/torchlight/torchlight_28.incs"
+    .include "../build/torchlight/torchlight_29.incs"
+
+    .segment "TORCHLIGHT_A"
+    .include "../build/torchlight/torchlight_30.incs"
+    .include "../build/torchlight/torchlight_31.incs"
 
     .segment "CODE_3"
-    ; TODO: use more than just one of these
-    .include "../build/torchlight.incs"
 
 torchlight_update_table:
   .byte $0d, $08, $0f, $04, $06, $0b, $13, $01, $0e, $11, $02, $12, $00, $03, $10, $07
@@ -32,9 +88,24 @@ torchlight_update_table:
   .byte $06, $08, $0b, $04, $03, $07, $0e, $0a, $00, $05, $11, $0f, $09, $0c, $0d, $12
   .byte $11, $03, $10, $06, $02, $00, $05, $09, $0f, $0d, $01, $08, $07, $04, $0e, $0c
 
+torchlight_luts_low:
+    .repeat 32, i
+    .byte <.ident(.concat("torchlight_lut_", .string(i)))
+    .endrepeat
+torchlight_luts_high:
+    .repeat 32, i
+    .byte >.ident(.concat("torchlight_lut_", .string(i)))
+    .endrepeat
+torchlight_luts_bank:
+    .repeat 32, i
+    .byte <.bank(.ident(.concat("torchlight_lut_", .string(i))))
+    .endrepeat
+
 .proc FAR_init_torchlight
     lda #0
     sta current_lighting_row
+    lda #10
+    sta current_radius
     rts
 .endproc
 
@@ -42,8 +113,11 @@ torchlight_update_table:
 .proc FAR_update_torchlight
     perform_zpcm_inc
     jsr setup_torchlight_pointers
+
+    access_data_bank torchlight_bank
     jsr draw_one_torchlight_row
     perform_zpcm_inc
+    restore_previous_bank
 
     ; TODO: can we make this update in a pseudorandom order?
     inc current_lighting_counter
@@ -88,7 +162,15 @@ Scratch := R6
 
     ; Compute the index into the lookup table, which is based on the current
     ; lighting row and the player's current position
-    st16 TorchlightPtr, torchlight_test_lut
+    
+    ;st16 TorchlightPtr, torchlight_10_lut
+    ldx current_radius
+    lda torchlight_luts_low, x
+    sta TorchlightPtr+0
+    lda torchlight_luts_high, x
+    sta TorchlightPtr+1
+    lda torchlight_luts_bank, x
+    sta torchlight_bank
 
     ; The torchlight LUT is 64x40, which is twice the size of the battlefield.
     ; Light is centered in this LUT, such that a 2x2 square at position 31, 19
@@ -116,8 +198,8 @@ Scratch := R6
     lda Scratch
     adc TorchlightPtr+1
     sta TorchlightPtr+1
-    ; X = 31 - PlayerCol * 2
-    lda #31
+    ; X = 31 - PlayerCol * 2 - 2
+    lda #(31 - 2)
     sec
     sbc PlayerCol
     sbc PlayerCol

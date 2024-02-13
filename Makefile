@@ -58,7 +58,7 @@ profile: dir $(ROM_NAME)
 everdrive: dir $(ROM_NAME)
 	mono vendor/edlink-n8.exe $(ROM_NAME)
 
-$(ROM_NAME): $(BUILDDIR)/output_chr.bin $(BUILDDIR)/torchlight.incs $(SOURCEDIR)/rainbow.cfg $(O_FILES)
+$(ROM_NAME): $(BUILDDIR)/output_chr.bin $(BUILDDIR)/torchlight/torchlight_0.incs $(SOURCEDIR)/rainbow.cfg $(O_FILES)
 	ld65 -m $(BUILDDIR)/map.txt --dbgfile $(DBG_NAME) --define "__ZPCM_ADDRESS__=0x4011" --define "__BANK_MASK__=0x07" --define "__BANK_OFFSET__=0x00" -o "build/tactus-zpcm.bin" -C $(SOURCEDIR)/rainbow.cfg $(O_FILES)
 	ld65 -m $(BUILDDIR)/map.txt                       --define "__ZPCM_ADDRESS__=0xFF11" --define "__BANK_MASK__=0x07" --define "__BANK_OFFSET__=0x08" -o "build/tactus-base.bin" -C $(SOURCEDIR)/rainbow.cfg $(O_FILES)
 	# We need to talk about
@@ -82,5 +82,5 @@ $(BUILDDIR)/floors/%.incs: $(ARTDIR)/floors/%.tmx
 $(BUILDDIR)/output_chr.bin: $(BACKGROUND_PNG_FILES) $(SPRITE_PNG_FILES) $(RAW_CHR_TILES)
 	tools/build_chrrom.py
 
-$(BUILDDIR)/torchlight.incs: dir
+$(BUILDDIR)/torchlight/torchlight_0.incs: dir
 	tools/lighting.py
