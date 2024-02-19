@@ -707,13 +707,13 @@ continue_waiting:
         ; We have LOTS of time on this particular frame, so update the torchlight a whole
         ; heck of a bunch to catch it up with the player's current location
         debug_color (TINT_R | TINT_G | LIGHTGRAY)
-        far_call FAR_update_torchlight
+        far_call FAR_draw_torchlight
         debug_color LIGHTGRAY
         debug_color (TINT_R | TINT_G | LIGHTGRAY)
-        far_call FAR_update_torchlight
+        far_call FAR_draw_torchlight
         debug_color LIGHTGRAY
         debug_color (TINT_R | TINT_G | LIGHTGRAY)
-        far_call FAR_update_torchlight
+        far_call FAR_draw_torchlight
         debug_color LIGHTGRAY
 
         jsr every_gameloop
@@ -743,6 +743,7 @@ continue_waiting:
 
         debug_color (TINT_R | TINT_G | LIGHTGRAY)
         far_call FAR_update_torchlight
+        far_call FAR_draw_torchlight
         debug_color LIGHTGRAY
 
         perform_zpcm_inc

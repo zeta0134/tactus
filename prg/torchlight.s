@@ -1,3 +1,4 @@
+    .include "bhop/bhop.inc"
     .include "far_call.inc"
     .include "player.inc"
     .include "rainbow.inc"
@@ -11,6 +12,10 @@
 current_lighting_counter: .res 1
 current_lighting_row: .res 1
 current_radius: .res 1
+
+current_base_radius: .res 1
+target_counter: .res 1
+target_radius: .res 1
 
 torchlight_bank: .res 1
 
@@ -101,16 +106,37 @@ torchlight_luts_bank:
     .byte <.bank(.ident(.concat("torchlight_lut_", .string(i))))
     .endrepeat
 
+breathing_lut:
+    ;.byte 2, 3, 3, 4, 4, 4, 3, 3, 2, 1, 1, 0, 0, 0, 1, 1 ; strength 2
+    ;.byte 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0, 1 ; strength 1
+    .byte 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ; strength 0.5, synced to music
+
+
 .proc FAR_init_torchlight
     lda #0
     sta current_lighting_row
-    lda #10
+
+    ; initialize all counters to 1, so they update right away
+    ; when decremented the first time
+    lda #1
+    sta target_counter
+
+    lda #1
     sta current_radius
+    sta current_base_radius
+
+    lda #11
+    sta target_radius
     rts
 .endproc
 
 ; For now, each call to update_torchlight should draw one (1) row and exit
 .proc FAR_update_torchlight
+    jsr update_current_radius
+    rts
+.endproc
+
+.proc FAR_draw_torchlight
     perform_zpcm_inc
     jsr setup_torchlight_pointers
 
@@ -125,6 +151,39 @@ torchlight_luts_bank:
     lda torchlight_update_table, x
     sta current_lighting_row
     perform_zpcm_inc
+    rts
+.endproc
+
+.proc update_current_radius
+    dec target_counter
+    bne skip_update_target
+    lda #20
+    sta target_counter
+    lda target_radius
+    cmp current_base_radius
+    beq skip_update_target
+    bcc decrease_current
+increase_current:
+    inc current_base_radius
+    jmp skip_update_target
+decrease_current:
+    dec current_base_radius
+skip_update_target:
+
+    lda row_counter
+    and #%00001111
+    tax
+
+    lda current_base_radius
+    clc
+    adc breathing_lut, x
+    cmp #31
+    bcs overflow
+    sta current_radius
+    rts
+overflow:
+    lda #31
+    sta current_radius
     rts
 .endproc
 
