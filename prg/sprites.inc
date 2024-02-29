@@ -31,6 +31,7 @@ SPRITE_ONE_BEAT    = %00000100
 .global FAR_age_sprites
 .global FAR_find_unused_sprite
 .global FAR_despawn_unimportant_sprites
+.global FAR_disable_all_oam_entries
 
 SPRITE_PAL_0 = %00
 SPRITE_PAL_1 = %01

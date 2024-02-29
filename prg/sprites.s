@@ -1,5 +1,6 @@
         .setcpu "6502"
 
+        .include "far_call.inc"
         .include "hud.inc"
         .include "kernel.inc"
         .include "nes.inc"
@@ -51,7 +52,7 @@ done:
         rts
 .endproc
 
-.proc disable_all_oam_entries
+.proc FAR_disable_all_oam_entries
         ldx #0
 loop:
         perform_zpcm_inc
@@ -216,7 +217,7 @@ done:
 .proc FAR_draw_sprites
 MetaSpriteIndex := R0
 CurrentOamIndex := R1
-        jsr disable_all_oam_entries
+        near_call FAR_disable_all_oam_entries
         lda #0
         sta MetaSpriteIndex
         lda starting_oam_index

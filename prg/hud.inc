@@ -4,3 +4,5 @@
 
 .global HudDirty, HudAttrDirty, HudGoldDisplay
 .global HudWeaponSpriteIndex
+
+.global FAR_debug_nametable_header

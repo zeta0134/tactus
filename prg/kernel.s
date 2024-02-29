@@ -141,6 +141,10 @@ MetaSpriteIndex := R0
         jsr clear_fpga_ram
         far_call FAR_copy_title_nametable
 
+        .if ::DEBUG_NAMETABLES
+        far_call FAR_debug_nametable_header
+        .endif
+
         ; Set up a player sprite, which will act as our cursor
         far_call FAR_initialize_sprites
         far_call FAR_find_unused_sprite
@@ -229,6 +233,10 @@ MetaSpriteIndex := R0
         far_call FAR_initialize_sprites
         jsr init_game_end_screen
 
+        .if ::DEBUG_NAMETABLES
+        far_call FAR_debug_nametable_header
+        .endif
+
         ; Enable NMI first (but not rendering)
         lda #0
         sta NmiSoftDisable
@@ -296,6 +304,10 @@ MetaSpriteIndex := R0
         ; copy the initial batch of graphics into CHR RAM
         jsr clear_fpga_ram
         far_call FAR_init_nametables
+
+        .if ::DEBUG_NAMETABLES
+        far_call FAR_debug_nametable_header
+        .endif
 
         ; Enable NMI first (but not rendering)
         lda #0
@@ -726,6 +738,8 @@ continue_waiting:
         far_call FAR_sync_chr_bank_to_music
         perform_zpcm_inc
 
+        lda #0
+        sta queued_bytes_counter
         debug_color (TINT_G | LIGHTGRAY)
         far_call FAR_queue_battlefield_updates
         debug_color LIGHTGRAY

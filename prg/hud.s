@@ -88,6 +88,29 @@ sprite_failed:
         rts
 .endproc
 
+; This is here mostly because it relies on the string drawing functions
+nametable_2000_string: .asciiz "NAMETABLE AT $2000"
+nametable_2400_string: .asciiz "NAMETABLE AT $2400"
+
+.proc FAR_debug_nametable_header
+StringPtr := R0
+NametableAddr := R12
+AttributeAddr := R14
+        st16 NametableAddr, $5020
+        st16 AttributeAddr, $5820
+        st16 StringPtr, nametable_2000_string
+        ldy #0
+        jsr draw_string
+
+        st16 NametableAddr, $5420
+        st16 AttributeAddr, $5C20
+        st16 StringPtr, nametable_2400_string
+        ldy #0
+        jsr draw_string
+
+        rts
+.endproc
+
 .proc FAR_refresh_hud
         lda #%00000011
         sta HudTopmostRowDirty
