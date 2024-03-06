@@ -22,36 +22,49 @@ HudState: .res 2
 
 .segment "CODE_0"
 
-HUD_TOP_BORDER_ROW_LEFT    = $52E2
-HUD_TOPMOST_ROW_LEFT       = $5302
-HUD_UPPER_ROW_LEFT         = $5342
-HUD_MIDDLE_ROW_LEFT        = $5362
-HUD_LOWER_ROW_LEFT         = $5322
-HUD_LOWER_BORDER_ROW_LEFT  = $52E2
+HUD_TILE_BASE        = $5300
+HUD_NAMETABLE_OFFSET = $0400
+HUD_ATTR_OFFSET      = $0800
 
-HUD_TOP_BORDER_ROW_RIGHT   = $57E2
-HUD_TOPMOST_ROW_RIGHT      = $5702
-HUD_UPPER_ROW_RIGHT        = $5742
-HUD_MIDDLE_ROW_RIGHT       = $5762
-HUD_LOWER_ROW_RIGHT        = $5722
-HUD_LOWER_BORDER_ROW_RIGHT = $57E2
+ROW_0 = (32*0)
+ROW_1 = (32*1)
+ROW_2 = (32*2)
+ROW_3 = (32*3)
+ROW_4 = (32*4)
+ROW_5 = (32*5)
 
-HUD_ATTR_OFFSET = $0800
+.macro tile_offset ident, tile_x, tile_y
+ident = ((tile_y * 16) + tile_x)
+.endmacro
 
-HEART_FULL_TILE     = 204
-HEART_HALF_TILE     = 200
-HEART_EMPTY_TILE    = 196
-BLANK_TILE          = 250
-MAP_ICON_UNEXPLORED = 192
-MAP_ICON_SPECIAL    = 193
-MAP_ICON_EXPLORED   = 194
-MAP_ICON_CURRENT    = 195
+tile_offset BLANK_TILE, 0, 0
 
-WORLD_PAL  = %00000000 | CHR_BANK_OLD_CHRRAM
-TEXT_PAL   = %01000000 | CHR_BANK_OLD_CHRRAM ; text and blue are the same, the blue palette will
-BLUE_PAL   = %01000000 | CHR_BANK_OLD_CHRRAM ; always contain white in slot 3 for simple UI elements
-YELLOW_PAL = %10000000 | CHR_BANK_OLD_CHRRAM
-RED_PAL    = %11000000 | CHR_BANK_OLD_CHRRAM
+tile_offset MAP_BORDER_TL, 6,  8
+tile_offset MAP_BORDER_TM, 7,  8
+tile_offset MAP_BORDER_TR, 8,  8
+tile_offset MAP_BORDER_ML, 6,  9
+tile_offset MAP_BORDER_MR, 8,  9
+tile_offset MAP_BORDER_BL, 6, 10
+tile_offset MAP_BORDER_BM, 7, 10
+tile_offset MAP_BORDER_BR, 8, 10
+
+tile_offset COIN_ICON, 0, 7
+tile_offset COIN_X,    1, 7
+
+.macro draw_tile_at_x row, tile_id, attr
+        lda tile_id
+        sta HUD_TILE_BASE + row, x
+        sta HUD_TILE_BASE + row + HUD_NAMETABLE_OFFSET, x
+        lda attr
+        sta HUD_TILE_BASE + HUD_ATTR_OFFSET + row, x
+        sta HUD_TILE_BASE + HUD_ATTR_OFFSET + row + HUD_NAMETABLE_OFFSET, x
+.endmacro
+
+WORLD_PAL  = %00000000
+TEXT_PAL   = %01000000 ; text and blue are the same, the blue palette will
+BLUE_PAL   = %01000000 ; always contain white in slot 3 for simple UI elements
+YELLOW_PAL = %10000000
+RED_PAL    = %11000000
 
 weapon_palette_table:
         .byte %00, %01, %10, %11
@@ -81,11 +94,52 @@ weapon_palette_table:
 ; States!
 
 .proc hud_state_init
-        ; For now, do NOTHING!
+        jsr draw_static_hud_elements
+        st16 HudState, hud_state_update
         rts
 .endproc
 
+.proc hud_state_update
+        ; for now, do nothing!
+        rts
+.endproc
 
+; Drawing and update functions!
+
+.proc draw_static_hud_elements
+        ; first, draw the border around the minimap
+        ldx #19
+        ; left side
+        draw_tile_at_x ROW_0, #MAP_BORDER_TL, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_1, #MAP_BORDER_ML, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_2, #MAP_BORDER_ML, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, #MAP_BORDER_ML, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #MAP_BORDER_ML, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_5, #MAP_BORDER_BL, #(BLUE_PAL | CHR_BANK_HUD)
+        inx
+        ; center loop
+loop:
+        draw_tile_at_x ROW_0, #MAP_BORDER_TM, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_5, #MAP_BORDER_BM, #(BLUE_PAL | CHR_BANK_HUD)
+        inx
+        cpx #30
+        bne loop
+        ; right side
+        draw_tile_at_x ROW_0, #MAP_BORDER_TR, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_1, #MAP_BORDER_MR, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_2, #MAP_BORDER_MR, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, #MAP_BORDER_MR, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #MAP_BORDER_MR, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_5, #MAP_BORDER_BR, #(BLUE_PAL | CHR_BANK_HUD)
+
+        ; coin counter, static tiles
+        ldx #14
+        draw_tile_at_x ROW_4, #COIN_ICON, #(YELLOW_PAL | CHR_BANK_HUD)
+        ldx #15
+        draw_tile_at_x ROW_4, #COIN_X, #(BLUE_PAL | CHR_BANK_HUD)
+
+        rts
+.endproc
 
 
 ; OLD CODE BELOW!!
