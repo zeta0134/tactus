@@ -64,6 +64,20 @@ def convert_to_chr(image):
     chr_bytes = chr_bytes + tile
   return chr_bytes
 
+def convert_to_raw_chr(image):
+  chr_tiles = []
+  for tile_y in range(0, math.floor(image.height / 8)):
+    for tile_x in range(0, 16):
+      left = tile_x * 8
+      top = tile_y * 8
+      right = left + 8
+      bottom = top + 8
+      chr_tiles.append(hardware_tile_to_bitplane(image.crop((left, top, right, bottom)).getdata()))
+  chr_bytes = []
+  for tile in chr_tiles:
+    chr_bytes = chr_bytes + tile
+  return chr_bytes
+
 def duplicate_static_frames(image):
   if image.width == 64:
     return image
@@ -162,6 +176,15 @@ def read_raw_chr(filename):
       raw_bytes = raw_bytes + bytes([0] * ((4 * 1024) - len(raw_bytes)))
     return list(raw_bytes)
 
+# we can define entire 4k CHR banks as .png instead, and this permits animations
+# to boot. here, treat it the same as a rather large sprite
+def read_png_chr(filename):
+  im = Image.open(filename)
+  assert im.getpalette() != None, "Non-paletted tile found! This is unsupported: " + filename
+  assert im.width in [128], "PNG CHR files must be 128 pixels wide! Bailing. " + filename
+  assert im.height in [128,512], "PNG CHR files must be 128 or 16384 pixels tall! Bailing. " + filename
+  return convert_to_raw_chr(im)
+
 def background_tile_base_address(tile_id):
   # location of the top-left tile, within the 0th lighting page,
   # on the 0th animation outer bank. Start with this and tweak
@@ -201,23 +224,29 @@ def generate_chr(background_tiles, sprite_tiles, raw_chr_banks):
         dest_addr = (animation_frame * 256 * 1024) + metatile_base_addr + (tile_id * 16)
         chr_addr = (animation_frame * 16 * 4) + (tile_id * 16)
         chr_bytes[dest_addr:dest_addr+16] = chr_data[chr_addr:chr_addr+16]
-  # finally, raw chr banks are just written right into place in all four animation banks
+  # chr banks are just written right into place in all four animation banks
   for i in range(0, len(raw_chr_banks)):
     for animation_frame in range(0, 4):
       chr_addr = chr_bank_base_address(i)
       dest_addr = (animation_frame * 256 * 1024) + chr_addr
-      chr_bytes[dest_addr:dest_addr+4096] = raw_chr_banks[i]
-
+      if len(raw_chr_banks[i]) <= 4096:
+        chr_bytes[dest_addr:dest_addr+4096] = raw_chr_banks[i]
+      elif len(raw_chr_banks[i]) == 4096*4:
+        chr_bytes[dest_addr:dest_addr+4096] = raw_chr_banks[i][animation_frame*4096:animation_frame*4096+4096]
+      else:
+        raise "Wrong length for raw chr data!"
   return chr_bytes
 
 background_filenames = sorted(list(pathlib.Path('art/background_tiles').glob('*.png')))
 sprite_filenames = sorted(list(pathlib.Path('art/sprite_tiles').glob('*.png')))
 raw_chr_filenames = sorted(list(pathlib.Path('art/raw_chr').glob('*.chr')))
+png_chr_filenames = sorted(list(pathlib.Path('art/raw_chr').glob('*.png')))
 
 background_tiles = [read_background_tile(f) for f in background_filenames]
 sprite_tiles = [read_sprite_tile(f) for f in sprite_filenames]
 raw_chr_banks = [read_raw_chr(f) for f in raw_chr_filenames]
-chr_bytes = generate_chr(background_tiles, sprite_tiles, raw_chr_banks)
+png_chr_banks = [read_png_chr(f) for f in png_chr_filenames]
+chr_bytes = generate_chr(background_tiles, sprite_tiles, raw_chr_banks + png_chr_banks)
 
 os.makedirs("build/expanded_tiles",exist_ok=True)
 
@@ -238,7 +267,7 @@ def constant_name(filename):
   return re.sub('[^A-Z0-9_]', '', file_str.upper())
 
 with open('build/tile_defs.inc', 'w') as definitions:
-  print("; segment definitions")
+  print("; segment definitions", file=definitions)
   print("BACKGROUND_REGION_BASE = %s" % (ca65_byte_literal(BACKGROUND_REGION_BASE)), file=definitions)
   print("SPRITE_REGION_BASE = %s" % (ca65_byte_literal(SPRITE_REGION_BASE)), file=definitions)
   print("RAW_CHR_REGION_BASE = %s" % (ca65_byte_literal(RAW_CHR_REGION_BASE)), file=definitions)
@@ -258,9 +287,10 @@ with open('build/tile_defs.inc', 'w') as definitions:
     print("SPRITE_TILE_%s = %s" % (constant_name(sprite_filenames[i]), ca65_word_literal(tiledef)), file=definitions)
   print("", file=definitions)
   print("; raw_chr banks", file=definitions)
-  for i in range(0, len(raw_chr_filenames)):
+  combined_chr_filenames = raw_chr_filenames + png_chr_filenames
+  for i in range(0, len(combined_chr_filenames)):
     bank_id = i + RAW_CHR_REGION_BASE
-    print("CHR_BANK_%s = %s" % (constant_name(raw_chr_filenames[i]), ca65_byte_literal(bank_id)), file=definitions)
+    print("CHR_BANK_%s = %s" % (constant_name(combined_chr_filenames[i]), ca65_byte_literal(bank_id)), file=definitions)
   print("", file=definitions)
 
 
