@@ -2,6 +2,7 @@
 
         .include "../build/tile_defs.inc"
 
+        .include "bhop/bhop.inc"
         .include "battlefield.inc"
         .include "charmap.inc"
         .include "far_call.inc"
@@ -19,6 +20,9 @@
 
 .segment "RAM"
 HudState: .res 2
+
+HeartDisplayTarget: .res 6
+HeartDisplayCurrent: .res 6
 
 .segment "CODE_0"
 
@@ -51,6 +55,19 @@ tile_offset MAP_BORDER_BR, 8, 10
 tile_offset COIN_ICON, 0, 7
 tile_offset COIN_X,    1, 7
 
+tile_offset FULL_HEART_BASE,          0, 5
+tile_offset FULL_HEART_BEATING,       2, 5
+tile_offset ARMORED_HEART_BASE,       4, 5
+tile_offset ARMORED_HEART_BEATING,    6, 5
+tile_offset ARMORED_HEART_DEPLETED,   8, 5
+tile_offset FRAGILE_HEART_BASE,      10, 5
+tile_offset FRAGILE_HEART_BEATING,   12, 5
+tile_offset HEART_CONTAINER_BASE,    12, 7
+tile_offset HEART_CONTAINER_BEATING, 14, 7
+
+TILE_COL_OFFSET = 1
+TILE_ROW_OFFSET = 16
+
 .macro draw_tile_at_x row, tile_id, attr
         lda tile_id
         sta HUD_TILE_BASE + row, x
@@ -82,6 +99,8 @@ weapon_palette_table:
 ; the first frame of a given beat. Use this to update any state
 ; related to the player's most recent activities
 .proc FAR_refresh_hud
+        jsr update_heart_state
+
         rts
 .endproc
 
@@ -100,11 +119,232 @@ weapon_palette_table:
 .endproc
 
 .proc hud_state_update
-        ; for now, do nothing!
+        jsr draw_hearts
         rts
 .endproc
 
-; Drawing and update functions!
+; Update functions!
+
+; the top 5 bits are the type of heart this is,
+; and the lower 2 bits describe a "fullness" in quarter-hearts
+HEART_STATE_NONE    = $00
+HEART_STATE_REGULAR = $10
+; bit 2 is used for beat tracking, to have the hearts pulse along
+; with the rhythm
+HEART_STATE_BEATING = $08
+
+.proc update_heart_state
+CurrentBeat := R0
+TargetHealth := R1
+        ; if the player has more than 4 hearts, use an 8-beat pattern
+        lda PlayerMaxHealth
+        cmp #17
+        bcs use_8_beats
+use_4_beats:
+        lda row_counter
+        and #%00011000
+        jmp done_picking_beat_length
+use_8_beats:
+        lda row_counter
+        and #%00111000
+done_picking_beat_length:
+        .repeat 3
+        lsr
+        .endrepeat
+        sta CurrentBeat
+
+        ; TODO: player health needs to be pretty much completely rethought.
+        ; This gets the old half-heart system working, but we want to transition
+        ; to quarter-heart display later, and eventually treat each heart container
+        ; as its own bespoke entity.
+
+        ldx #0 ; heart container
+loop:
+        lda PlayerMaxHealth
+        lsr
+        lsr
+        sta TargetHealth
+        cpx TargetHealth
+        bcs empty_heart
+
+        ; for now, treat player health as half-hearts
+        ; if health is >= than the current slot number, then
+        ; fill all quarter-hearts
+        lda PlayerHealth
+        lsr
+        lsr
+        sta TargetHealth
+        cpx TargetHealth
+        bcc full_quarter_hearts
+        beq variable_quarter_hearts
+empty_quarter_hearts:
+        lda #(%00000000 | HEART_STATE_REGULAR)
+        jmp apply_beat_counter
+full_quarter_hearts:
+        lda #(%00000100 | HEART_STATE_REGULAR)
+        jmp apply_beat_counter
+variable_quarter_hearts:
+        ; mask the player's health and display that number
+        ; of quarter-hearts here
+        lda PlayerHealth
+        and #%00000011
+        ora #HEART_STATE_REGULAR
+        jmp apply_beat_counter
+apply_beat_counter:
+        ; if we are on the curernt beat, this will be a beating heart
+        cpx CurrentBeat
+        bne converge
+        ora #HEART_STATE_BEATING
+        jmp converge
+empty_heart:
+        lda #HEART_STATE_NONE
+converge:
+        sta HeartDisplayTarget, x
+        inx
+        cpx #6
+        bne loop
+        rts
+.endproc
+
+; Drawing functions!
+
+.proc draw_hearts
+        ldx #2 ; current heart offset in the HUD row
+        ldy #0 ; current heart index in the current/target state lists
+loop:
+        lda HeartDisplayTarget, y
+        cmp HeartDisplayCurrent, y
+        beq skip_heart
+        ; we're about to draw this heart, so update the target state
+        sta HeartDisplayCurrent, y
+        ; now perform the draw; first, branch based on the heart type
+        and #%11110000
+        cmp #HEART_STATE_NONE
+        beq empty_heart
+        cmp #HEART_STATE_REGULAR
+        beq regular_heart
+        ; if we got here, something went wrong! draw nothing
+        inx
+        inx
+        jmp done_with_this_heart
+empty_heart:
+        jsr draw_empty_heart
+        jmp done_with_this_heart
+regular_heart:
+        jsr draw_regular_heart
+        jmp done_with_this_heart
+skip_heart:
+        inx
+        inx
+done_with_this_heart:
+        iny
+        cpy #6
+        bne loop
+        rts
+.endproc
+
+; note: all heart drawing functions expect Y to contain
+; the heart index, and X to contain the current tile column for drawing.
+; upon completion, Y is left alone, and X is incremented twice
+.proc draw_empty_heart
+        draw_tile_at_x ROW_3, #BLANK_TILE, #(RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #BLANK_TILE, #(RED_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_at_x ROW_3, #BLANK_TILE, #(RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #BLANK_TILE, #(RED_PAL | CHR_BANK_HUD)
+        inx
+        rts
+.endproc
+
+.proc draw_regular_heart
+HeartFullBase := R3
+HeartEmptyBase := R4
+TileId := R5
+        ; is this a beating heart?
+        lda HeartDisplayTarget, y
+        and #%00001000
+        beq inert_heart
+beating_heart:
+        lda #FULL_HEART_BEATING
+        sta HeartFullBase
+        lda #HEART_CONTAINER_BEATING
+        sta HeartEmptyBase
+        jmp done_with_beating_checks
+inert_heart:
+        lda #FULL_HEART_BASE
+        sta HeartFullBase
+        lda #HEART_CONTAINER_BASE
+        sta HeartEmptyBase
+done_with_beating_checks:
+
+top_left:
+        lda HeartDisplayTarget, y
+        and #%00000111 ; is the top-left quarter empty?
+        cmp #1
+        bcc top_left_empty
+top_left_full:
+        lda HeartFullBase
+        jmp draw_top_left
+top_left_empty:
+        lda HeartEmptyBase
+draw_top_left:
+        sta TileId
+        draw_tile_at_x ROW_2, TileId, #(RED_PAL | CHR_BANK_HUD)
+
+bottom_left:
+        lda HeartDisplayTarget, y
+        and #%00000111 ; is the top-left quarter empty?
+        cmp #2
+        bcc bottom_left_empty
+bottom_left_full:
+        lda HeartFullBase
+        jmp draw_bottom_left
+bottom_left_empty:
+        lda HeartEmptyBase
+draw_bottom_left:
+        clc
+        adc #TILE_ROW_OFFSET
+        sta TileId
+        draw_tile_at_x ROW_3, TileId, #(RED_PAL | CHR_BANK_HUD)
+
+        inx
+
+top_right:
+        lda HeartDisplayTarget, y
+        and #%00000111 ; is the top-left quarter empty?
+        cmp #4
+        bcc top_right_empty
+top_right_full:
+        lda HeartFullBase
+        jmp draw_top_right
+top_right_empty:
+        lda HeartEmptyBase
+draw_top_right:
+        clc
+        adc #TILE_COL_OFFSET
+        sta TileId
+        draw_tile_at_x ROW_2, TileId, #(RED_PAL | CHR_BANK_HUD)
+
+bottom_right:
+        lda HeartDisplayTarget, y
+        and #%00000111 ; is the top-left quarter empty?
+        cmp #3
+        bcc bottom_right_empty
+bottom_right_full:
+        lda HeartFullBase
+        jmp draw_bottom_right
+bottom_right_empty:
+        lda HeartEmptyBase
+draw_bottom_right:
+        clc
+        adc #TILE_COL_OFFSET + TILE_ROW_OFFSET
+        sta TileId
+        draw_tile_at_x ROW_3, TileId, #(RED_PAL | CHR_BANK_HUD)
+
+        inx
+
+        rts
+.endproc
 
 .proc draw_static_hud_elements
         ; first, draw the border around the minimap
@@ -140,6 +380,7 @@ loop:
 
         rts
 .endproc
+
 
 
 ; OLD CODE BELOW!!

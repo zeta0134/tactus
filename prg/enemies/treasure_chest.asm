@@ -70,7 +70,7 @@ TileId := R1
 AttackSquare := R3
         ; If the player is already at max hearts...
         lda PlayerMaxHealth
-        cmp #(MAX_HEARTS * 2)
+        cmp #(MAX_HEARTS * 4)
         bne okay_to_spawn
         ; ... then we must not increase their health any further.
         ; Spawn a gold sack instead
@@ -138,7 +138,7 @@ TileId := R1
 TargetSquare := R13
         lda PlayerMaxHealth
         clc
-        adc #2
+        adc #4
         sta PlayerMaxHealth
         sta PlayerHealth
 

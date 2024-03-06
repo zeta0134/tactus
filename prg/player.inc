@@ -24,4 +24,4 @@
 
 .global EnemyDiedThisFrame
 
-MAX_HEARTS = 7
+MAX_HEARTS = 5

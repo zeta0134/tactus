@@ -124,11 +124,11 @@ MetaSpriteIndex := R0
         
 
 .if ::DEBUG_GOD_MODE
-        lda #14
+        lda #20
         sta PlayerHealth
         sta PlayerMaxHealth
 .else
-        lda #4
+        lda #12
         sta PlayerHealth
         sta PlayerMaxHealth
 .endif
