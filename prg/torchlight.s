@@ -157,7 +157,7 @@ breathing_lut:
 .proc update_current_radius
     dec target_counter
     bne skip_update_target
-    lda #20
+    lda #8
     sta target_counter
     lda target_radius
     cmp current_base_radius

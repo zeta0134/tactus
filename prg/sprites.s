@@ -312,7 +312,7 @@ done:
         rts
 .endproc
 
-; If it's not the player sprite or the hud sprite, kill it with fire
+; If it's not the player sprite or a hud sprite, kill it with fire
 .proc FAR_despawn_unimportant_sprites
 MetaSpriteIndex := R0
         lda #0
@@ -323,8 +323,14 @@ loop:
         lda MetaSpriteIndex
         cmp PlayerSpriteIndex
         beq skip
-        cmp HudWeaponSpriteIndex
-        beq skip
+
+        ; TODO: populate this with any sprites spawned by the HUD
+        ; oooooorrrrr, we could add an "important" flag to the sprite's
+        ; metadata... y'know. *fix this*
+
+        ;cmp HudWeaponSpriteIndex
+        ;beq skip
+
         lda #0
         ldx MetaSpriteIndex
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
