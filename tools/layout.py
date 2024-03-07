@@ -38,6 +38,7 @@ class Layout:
     width: int
     height: int
     tiles: [TiledTile]
+    exit_id: int
     
 def read_boolean_properties(tile_element):
     boolean_properties = {}
@@ -137,14 +138,24 @@ def read_layout(map_filename):
     for layer_element in layer_elements:
         only_layer = read_layer(layer_element, tilesets)
 
-  
+    # construct the exit ID from the four exit booleans, if present
+    exit_id = 0
+    flags = read_boolean_properties(map_element)
+    if "exit_north" in flags and flags["exit_north"] == True:
+        exit_id |= 0b0001 # Never
+    if "exit_east" in flags and flags["exit_east"] == True:
+        exit_id |= 0b0010 # Eat
+    if "exit_south" in flags and flags["exit_south"] == True:
+        exit_id |= 0b0100 # Soggy
+    if "exit_west" in flags and flags["exit_west"] == True:
+        exit_id |= 0b1000 # Waffles  
 
     # finally let's make the name something useful
     (_, plain_filename) = os.path.split(map_filename)
     (base_filename, _) = os.path.splitext(plain_filename)
     safe_label = re.sub(r'[^A-Za-z0-9\-\_]', '_', base_filename)
 
-    return Layout(name=safe_label, width=map_width, height=map_height, tiles=only_layer)
+    return Layout(name=safe_label, width=map_width, height=map_height, tiles=only_layer, exit_id=exit_id)
 
 def layout_bytes(tilemap):
   raw_bytes = []
@@ -154,7 +165,9 @@ def layout_bytes(tilemap):
 
 def write_layout(tilemap, output_file):
     output_file.write(ca65_label("layout_"+tilemap.name) + "\n")
+    output_file.write("  ; room IDs\n")
     pretty_print_table(layout_bytes(tilemap), output_file, tilemap.width)
+    output_file.write("  .byte " + ca65_byte_literal(tilemap.exit_id) + " ; exits\n")
     
 if __name__ == '__main__':
     # DEBUG TEST THINGS

@@ -81,7 +81,7 @@ loop:
 ; Initialize a fixed floor, fully open, with boss and exit stairs
 ; in known, predictable locations. Useful for debugging
 .proc FAR_demo_init_floor
-        access_data_bank #<.bank(layouts_table)
+        access_data_bank #<.bank(floor_test_floor)
 
         ; clear out the room flags entirely
         lda #0
