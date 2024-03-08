@@ -388,8 +388,11 @@ loop:
 
 
 ; This is here mostly because it relies on the string drawing functions
-nametable_2000_string: .asciiz "NAMETABLE AT $2000"
-nametable_2400_string: .asciiz "NAMETABLE AT $2400"
+nametable_5000_string: .asciiz "NAMETABLE AT $5000         "
+nametable_5400_string: .asciiz "NAMETABLE AT $5400         "
+
+nametable_2000_string: .asciiz " - $2000"
+nametable_2400_string: .asciiz " - $2400"
 
 .proc FAR_debug_nametable_header
 StringPtr := R0
@@ -397,16 +400,45 @@ NametableAddr := R12
 AttributeAddr := R14
         st16 NametableAddr, $5020
         st16 AttributeAddr, $5820
-        st16 StringPtr, nametable_2000_string
+        st16 StringPtr, nametable_5000_string
         ldy #0
         jsr draw_string
 
         st16 NametableAddr, $5420
         st16 AttributeAddr, $5C20
-        st16 StringPtr, nametable_2400_string
+        st16 StringPtr, nametable_5400_string
         ldy #0
         jsr draw_string
 
+        ; note: rendering is disabled, so we're allowed to do this here
+        st16 NametableAddr, $2032
+        st16 StringPtr, nametable_2000_string
+        ldy #0
+        jsr draw_string_ppudata
+
+        st16 NametableAddr, $2432
+        st16 StringPtr, nametable_2400_string
+        ldy #0
+        jsr draw_string_ppudata
+
+        rts
+.endproc
+
+; remarkably slow and inefficient; it's fine, it's a debug function
+.proc draw_string_ppudata
+StringPtr := R0
+NametableAddr := R12
+loop:
+        perform_zpcm_inc
+        set_ppuaddr NametableAddr
+        ldy #0
+        lda (StringPtr), y
+        beq end_of_string
+        sta PPUDATA
+        inc16 StringPtr
+        inc16 NametableAddr
+        jmp loop
+end_of_string:
         rts
 .endproc
 
@@ -446,7 +478,7 @@ loop:
         beq end_of_string
         ldy VramIndex
         sta (NametableAddr), y
-        lda #TEXT_PAL
+        lda #(TEXT_PAL | CHR_BANK_OLD_CHRRAM)
         sta (AttributeAddr), y
         inc VramIndex
         inc16 StringPtr
