@@ -53,6 +53,11 @@ data_bank_shadow: .res 1
 	lda #0
 	sta MAP_PRG_6_LO
 
+	; For FPGA RAM, be sure we are using the lower bank. (This isn't
+	; reliably set at poweron/reset)
+	lda #0
+	sta MAP_PRG_5
+
 	; for nametables, set up something resembling vertical mirroring, but using FPGA RAM as the
 	; backing memory (instead of the more typical CIRAM)
 	lda #(NT_FPGA_RAM | NT_NO_EXT)
