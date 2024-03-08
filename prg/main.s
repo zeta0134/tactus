@@ -24,12 +24,15 @@ start:
         sta PPUMASK ; disable rendering
         sta PPUCTRL ; and NMI
 
-        ; Clear out main memory regions
-        st16 R0, ($0000)
-        st16 R2, ($0100)
-        jsr clear_memory
-        st16 R0, ($0200)
+        ; Clear out large memory regions (the reset vector handles zp/stack)
+        st16 R0, ($0200) ; internal RAM from 0x200 - 0x7FF
         st16 R2, ($0600)
+        jsr clear_memory
+        st16 R0, ($5000) ; FPGA RAM from 0x5000 - 0x5FFF
+        st16 R2, ($1000)
+        jsr clear_memory
+        st16 R0, ($6000) ; PRG RAM from 0x6000 - 0x7FFF
+        st16 R2, ($2000)
         jsr clear_memory
 
         jsr initialize_palettes

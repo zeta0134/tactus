@@ -29,10 +29,11 @@ loop:
 .endscope
 .endmacro
 
-null_irq:
+.proc null_irq
         rti
+.endproc
 
-reset:
+.proc reset
         sei            ; Disable interrupts
         cld            ; make sure decimal mode is off (not that it does anything)
         ldx #$ff       ; initialize stack
@@ -50,7 +51,7 @@ reset:
 
         ; Jump to main
         jmp start
-
+.endproc
 
 .proc nmi
         ; preserve registers
