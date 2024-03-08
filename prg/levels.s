@@ -3,10 +3,11 @@
         .include "../build/tile_defs.inc"
 
         .include "battlefield.inc"
+        .include "chr.inc"
         .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
-        .include "chr.inc"
+        .include "hud.inc"
         .include "levels.inc"
         .include "nes.inc"
         .include "player.inc"
@@ -21,8 +22,9 @@
 
 global_rng_seed: .res 1
 room_layouts: .res 16
-room_flags: .res 16
+room_flags: .res 16 ; what did we spawn in here? what is the current status of those things?
 room_seeds: .res 16
+room_properties: .res 16 ; what are the BASE properties of this room? (exits, lighting, special render modes, etc)
 chest_spawned: .res 1
 enemies_active: .res 1
 
@@ -102,6 +104,9 @@ room_loop:
         cpx #16
         bne room_loop
 
+        ; Load in the properties byte from each selected layout
+        jsr load_floor_properties
+
         ; set each room up with its own RNG low byte
         ldx #0
 seed_loop:
@@ -166,6 +171,9 @@ room_loop:
         cpy #16
         bne room_loop
 
+        ; Load in the properties byte from each selected layout
+        jsr load_floor_properties
+
         ; set each room up with its own RNG low byte
         ldx #0
 seed_loop:
@@ -213,7 +221,7 @@ boss_loop:
         sta room_flags, x
         stx BossIndex
 
-        ; Finally choose the exit stairs location; this should again not be the same
+        ; Choose the exit stairs location; this should again not be the same
         ; location as the player OR the boss
 exit_loop:
         perform_zpcm_inc
@@ -231,6 +239,38 @@ exit_loop:
         perform_zpcm_inc
 
         restore_previous_bank
+        rts
+.endproc
+
+.proc load_floor_properties
+LayoutPtr := R0
+RoomIndex := R2
+        access_data_bank #<.bank(layouts_table)
+
+        lda #0
+        sta RoomIndex
+loop:
+        perform_zpcm_inc
+        ldx RoomIndex
+        lda room_layouts, x
+        asl
+        tax
+        lda layouts_table, x
+        sta LayoutPtr
+        lda layouts_table+1, x
+        sta LayoutPtr+1
+
+        ldx RoomIndex
+        ldy #Layout::RoomProperties
+        lda (LayoutPtr), y
+        sta room_properties, x
+        inc RoomIndex
+        lda RoomIndex
+        cmp #16
+        bne loop
+
+        restore_previous_bank
+
         rts
 .endproc
 
@@ -255,6 +295,8 @@ EntityList := R4
         lda room_flags, x
         ora #ROOM_FLAG_VISITED
         sta room_flags, x
+        lda #1
+        sta HudMapDirty
 
         ; If the player has already collected this room's treausre, then don't allow
         ; another one to spawn

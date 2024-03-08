@@ -24,6 +24,9 @@ HudState: .res 2
 HeartDisplayTarget: .res 6
 HeartDisplayCurrent: .res 6
 
+HudMapDirty: .res 1
+CurrentMapIndex: .res 1
+
 .segment "CODE_0"
 
 HUD_TILE_BASE        = $5300
@@ -92,6 +95,10 @@ weapon_palette_table:
 ; play session.
 .proc FAR_init_hud
         st16 HudState, hud_state_init
+        lda #1
+        sta HudMapDirty
+        lda #0
+        sta CurrentMapIndex
         rts
 .endproc
 
@@ -120,6 +127,7 @@ weapon_palette_table:
 
 .proc hud_state_update
         jsr draw_hearts
+        jsr draw_map_tiles
         rts
 .endproc
 
@@ -289,7 +297,7 @@ top_left_empty:
         lda HeartEmptyBase
 draw_top_left:
         sta TileId
-        draw_tile_at_x ROW_2, TileId, #(RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, TileId, #(RED_PAL | CHR_BANK_HUD)
 
 bottom_left:
         lda HeartDisplayTarget, y
@@ -305,7 +313,7 @@ draw_bottom_left:
         clc
         adc #TILE_ROW_OFFSET
         sta TileId
-        draw_tile_at_x ROW_3, TileId, #(RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, TileId, #(RED_PAL | CHR_BANK_HUD)
 
         inx
 
@@ -323,7 +331,7 @@ draw_top_right:
         clc
         adc #TILE_COL_OFFSET
         sta TileId
-        draw_tile_at_x ROW_2, TileId, #(RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, TileId, #(RED_PAL | CHR_BANK_HUD)
 
 bottom_right:
         lda HeartDisplayTarget, y
@@ -339,7 +347,7 @@ draw_bottom_right:
         clc
         adc #TILE_COL_OFFSET + TILE_ROW_OFFSET
         sta TileId
-        draw_tile_at_x ROW_3, TileId, #(RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, TileId, #(RED_PAL | CHR_BANK_HUD)
 
         inx
 
@@ -381,7 +389,108 @@ loop:
         rts
 .endproc
 
+MINIMAP_BASE = (ROW_1+24)
 
+.proc draw_minimap_tile
+RoomIndex := R0
+DrawIndex := R1
+DrawTile := R2
+NametableAddr := R12
+AttributeAddr := R14
+        ; compute the destination tile based on the room index
+        ; TODO: adjust this for 8x4 mode when we implement that, currently
+        ; it's tuned for 4x4
+        lda RoomIndex
+        and #%00001100 ; isolate the row, which is currently x4
+        asl ; x8
+        asl ;x16
+        asl ;x32
+        sta DrawIndex
+        lda RoomIndex
+        and #%00000011 ; isolate the column
+        ora DrawIndex
+        sta DrawIndex
+
+        ; Figure out what tile we should draw here
+        ldx RoomIndex
+        lda room_flags, x
+        
+        ; can we see this room at all? any room that has been either
+        ; visited OR revealed should be displayed
+        ;and #(ROOM_FLAG_VISITED | ROOM_FLAG_REVEALED)
+        ;beq room_hidden
+        ; DEBUG: all rooms start at least 'revealed' for testing
+
+normal_room:
+        ; Start with the room's "revealed" tile
+        lda room_properties, x
+        and #%00001111
+        sta DrawTile
+        ; If the player hasn't visited this room, we're done
+        lda room_flags, x
+        and #ROOM_FLAG_VISITED
+        beq draw_tile
+        ; If the player HAS visited the room, start by moving to the "visited" row
+        lda DrawTile
+        clc
+        adc #16
+        sta DrawTile
+        ; if this is a "lit" room, add another 16 to move to that row
+        ; (DEBUG: all rooms are lit for now)
+        lda DrawTile
+        clc
+        adc #16
+        sta DrawTile
+        ; finally, if this is our current room, then we need to jump to the "flashing cursor" tile
+        lda PlayerRoomIndex
+        cmp RoomIndex
+        bne draw_tile
+        lda DrawTile
+        clc
+        adc #32
+        sta DrawTile
+
+        jmp draw_tile
+
+room_hidden:
+        lda #BLANK_TILE
+        sta DrawTile
+        ; fall through
+draw_tile:
+        ldx DrawIndex
+        draw_tile_at_x MINIMAP_BASE, DrawTile, #(YELLOW_PAL | CHR_BANK_HUD)
+
+        rts
+.endproc
+
+.proc draw_map_tiles
+RoomIndex := R0
+        ; sanity check: is the map in need of drawing?
+        ; if the index is 0 AND the map is not currently dirty...
+        lda CurrentMapIndex
+        bne proceed_to_draw ; we've already started a draw, see it through
+        lda HudMapDirty
+        bne begin_to_draw
+        ; ... then continue waiting
+        rts
+begin_to_draw:
+        ; clear the dirty flag, as we just consumed it
+        lda #0
+        sta HudMapDirty
+proceed_to_draw:
+        ; TODO: this does one tile per update, which is a bit slow. we could probably
+        ; call this in a loop, tuned for performance
+        sta RoomIndex
+        jsr draw_minimap_tile
+        inc CurrentMapIndex
+        lda CurrentMapIndex
+        cmp #16
+        bne done
+        lda #0
+        sta CurrentMapIndex
+done:
+        rts
+.endproc
 
 ; OLD CODE BELOW!!
 

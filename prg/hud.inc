@@ -2,7 +2,6 @@
 .global FAR_queue_hud
 .global FAR_refresh_hud
 
-.global HudDirty, HudAttrDirty, HudGoldDisplay
-.global HudWeaponSpriteIndex
+.global HudMapDirty
 
 .global FAR_debug_nametable_header
