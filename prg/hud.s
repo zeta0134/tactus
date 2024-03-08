@@ -391,6 +391,16 @@ loop:
 
 MINIMAP_BASE = (ROW_1+24)
 
+tile_offset BOSS_ROOM, 0, 1
+tile_offset DOOR_ROOM, 0, 2
+tile_offset SHOP_ROOM, 0, 3
+tile_offset WARP_ROOM, 0, 4
+
+tile_offset BOSS_ROOM_CURRENT, 14, 5
+tile_offset DOOR_ROOM_CURRENT, 15, 5
+tile_offset SHOP_ROOM_CURRENT, 14, 6
+tile_offset WARP_ROOM_CURRENT, 15, 6
+
 .proc draw_minimap_tile
 RoomIndex := R0
 DrawIndex := R1
@@ -420,6 +430,51 @@ AttributeAddr := R14
         ;and #(ROOM_FLAG_VISITED | ROOM_FLAG_REVEALED)
         ;beq room_hidden
         ; DEBUG: all rooms start at least 'revealed' for testing
+
+        ; check for special room types, which right now include boss
+        ; rooms and exit doors
+        lda room_flags, x
+        and #ROOM_FLAG_BOSS
+        bne boss_room
+        lda room_flags, x
+        and #ROOM_FLAG_EXIT_STAIRS
+        bne door_room
+        jmp normal_room
+
+boss_room:
+        ; If the boss has been cleared, draw this like a normal room instead
+        lda room_flags, x
+        and #ROOM_FLAG_CLEARED
+        bne normal_room
+
+        ; load the appropriate boss tile, based on whether the player is
+        ; currently in this room or not
+        lda PlayerRoomIndex
+        cmp RoomIndex
+        beq current_boss_room
+regular_boss_room:
+        lda #BOSS_ROOM
+        sta DrawTile
+        jmp draw_tile
+current_boss_room:
+        lda #BOSS_ROOM_CURRENT
+        sta DrawTile
+        jmp draw_tile
+
+door_room:
+        ; load the appropriate door tile, based on whether the player is
+        ; currently in this room or not
+        lda PlayerRoomIndex
+        cmp RoomIndex
+        beq current_door_room
+regular_door_room:
+        lda #DOOR_ROOM
+        sta DrawTile
+        jmp draw_tile
+current_door_room:
+        lda #DOOR_ROOM_CURRENT
+        sta DrawTile
+        jmp draw_tile
 
 normal_room:
         ; Start with the room's "revealed" tile
