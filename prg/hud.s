@@ -27,6 +27,11 @@ HeartDisplayCurrent: .res 6
 HudMapDirty: .res 1
 CurrentMapIndex: .res 1
 
+ZoneTarget: .res 1
+ZoneCurrent: .res 1
+FloorTarget: .res 1
+FloorCurrent: .res 1
+
 .segment "CODE_0"
 
 HUD_TILE_BASE        = $5300
@@ -95,10 +100,6 @@ weapon_palette_table:
 ; play session.
 .proc FAR_init_hud
         st16 HudState, hud_state_init
-        lda #1
-        sta HudMapDirty
-        lda #0
-        sta CurrentMapIndex
         rts
 .endproc
 
@@ -107,6 +108,7 @@ weapon_palette_table:
 ; related to the player's most recent activities
 .proc FAR_refresh_hud
         jsr update_heart_state
+        jsr update_zone_state
 
         rts
 .endproc
@@ -120,6 +122,14 @@ weapon_palette_table:
 ; States!
 
 .proc hud_state_init
+        lda #1
+        sta HudMapDirty
+        lda #0
+        sta CurrentMapIndex
+        lda #$FF
+        sta ZoneCurrent
+        sta FloorCurrent
+
         jsr draw_static_hud_elements
         st16 HudState, hud_state_update
         rts
@@ -128,6 +138,7 @@ weapon_palette_table:
 .proc hud_state_update
         jsr draw_hearts
         jsr draw_map_tiles
+        jsr draw_current_zone
         rts
 .endproc
 
@@ -544,6 +555,94 @@ proceed_to_draw:
         lda #0
         sta CurrentMapIndex
 done:
+        rts
+.endproc
+
+.proc update_zone_state
+        ; TODO: rethink zones entirely, update this logic (maybe consume player zone directly)
+        lda PlayerZone
+        sec
+        sbc #1
+        sta ZoneTarget
+        lda PlayerFloor
+        sec
+        sbc #1
+        sta FloorTarget
+        rts
+.endproc
+
+.proc draw_current_zone
+BannerBase := R0
+DrawTile := R1
+        lda ZoneTarget
+        cmp ZoneCurrent
+        bne proceed_to_draw
+        lda FloorTarget
+        cmp FloorCurrent
+        bne proceed_to_draw
+        rts
+proceed_to_draw:
+        lda ZoneTarget
+        sta ZoneCurrent
+        lda FloorTarget
+        sta FloorCurrent
+
+        ; The banner base is determined by the current zone index
+        lda ZoneCurrent
+        asl
+        sta BannerBase
+
+        ; first draw the top banner. the row is determined by the
+        ; current floor index, from 0-4:
+        lda FloorCurrent
+        .repeat 4
+        asl
+        .endrepeat
+        ora BannerBase
+        sta DrawTile
+
+        ldx #20
+        draw_tile_at_x ROW_1, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+        inc DrawTile
+        inx
+        draw_tile_at_x ROW_1, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+
+        ; now proceed with the rest of the banner, which is always at a
+        ; fixed "row" of 5 within the banner graphics
+        lda #(5*16)
+        ora BannerBase
+        sta DrawTile
+
+        ldx #20
+        draw_tile_at_x ROW_2, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+        inc DrawTile
+        inx
+        draw_tile_at_x ROW_2, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+
+        clc
+        lda DrawTile
+        adc #15
+        sta DrawTile
+
+        ldx #20
+        draw_tile_at_x ROW_3, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+        inc DrawTile
+        inx
+        draw_tile_at_x ROW_3, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+
+        clc
+        lda DrawTile
+        adc #15
+        sta DrawTile
+
+        ldx #20
+        draw_tile_at_x ROW_4, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+        inc DrawTile
+        inx
+        draw_tile_at_x ROW_4, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+
+        ; and that should be it!
+
         rts
 .endproc
 
