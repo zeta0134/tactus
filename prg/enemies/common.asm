@@ -370,10 +370,6 @@ done_with_drops:
         ; because we updated ourselves this frame, but we are no longer, decrement ourselves again
         dec enemies_active
 
-        ; Reward the player with the amount of gold this enemy is worth
-        add16b PlayerGold, GoldToAward
-        clamp16 PlayerGold, #MAX_GOLD
-
         rts
 .endproc
 

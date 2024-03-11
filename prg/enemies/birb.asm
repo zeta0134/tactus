@@ -245,20 +245,14 @@ EnemyHealth := R11
 basic_hp:
         lda #1
         sta EnemyHealth
-        lda #5
-        sta GoldToAward
         jmp done
 intermediate_hp:
         lda #2
-        sta EnemyHealth
-        lda #10
-        sta GoldToAward
+        sta EnemyHealth        
         jmp done
 advanced_hp:
         lda #4
         sta EnemyHealth
-        lda #20
-        sta GoldToAward
 done:
         jsr direct_attack_with_hp
         rts
@@ -277,20 +271,14 @@ EnemyHealth := R11
 basic_hp:
         lda #1
         sta EnemyHealth
-        lda #5
-        sta GoldToAward
         jmp done
 intermediate_hp:
         lda #2
         sta EnemyHealth
-        lda #10
-        sta GoldToAward
         jmp done
 advanced_hp:
         lda #4
         sta EnemyHealth
-        lda #20
-        sta GoldToAward
 done:
         jsr indirect_attack_with_hp
         rts

@@ -20,7 +20,6 @@
 
 .zeropage
 DestPtr: .res 2
-GoldToAward: .res 1
 DamageSpriteCoordX: .res 2
 DamageSpriteCoordY: .res 2
 HealthDroughtCounter: .res 1

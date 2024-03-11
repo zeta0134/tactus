@@ -211,19 +211,19 @@ TargetSquare := R13
         cmp #4
         jeq floor4
 floor_1:
-        add16w PlayerGold, #100
+        add16w PlayerGold, #10
         clamp16 PlayerGold, #MAX_GOLD
         jmp done_awarding_gold
 floor2:
-        add16w PlayerGold, #200
+        add16w PlayerGold, #20
         clamp16 PlayerGold, #MAX_GOLD
         jmp done_awarding_gold
 floor3:
-        add16w PlayerGold, #300
+        add16w PlayerGold, #30
         clamp16 PlayerGold, #MAX_GOLD
         jmp done_awarding_gold
 floor4:
-        add16w PlayerGold, #500
+        add16w PlayerGold, #50
         clamp16 PlayerGold, #MAX_GOLD
 done_awarding_gold:
         ; TODO: a nice SFX

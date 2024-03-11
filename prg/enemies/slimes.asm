@@ -240,28 +240,6 @@ EffectiveAttackSquare := R10
         lda #1
         sta AttackLanded
 
-        ; Award some gold to the player, based on what kind of slime we are
-        ldx EffectiveAttackSquare
-        lda battlefield, x
-        and #%00000011
-        cmp #%10
-        beq intermediate
-        cmp #%11
-        beq advanced
-basic:
-        add16w PlayerGold, #1
-        clamp16 PlayerGold, #MAX_GOLD
-        jmp done
-intermediate:
-        add16w PlayerGold, #5
-        clamp16 PlayerGold, #MAX_GOLD
-        jmp done
-advanced:
-        add16w PlayerGold, #25
-        clamp16 PlayerGold, #MAX_GOLD
-done:
-
-
         ; slimes all have 1 HP, so there is no health bar. Just delete
         ; the slime by replacing it
 
