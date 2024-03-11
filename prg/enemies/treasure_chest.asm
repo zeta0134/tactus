@@ -212,15 +212,19 @@ TargetSquare := R13
         beq floor4
 floor_1:
         add16w PlayerGold, #100
+        clamp16 PlayerGold, #MAX_GOLD
         jmp done_awarding_gold
 floor2:
         add16w PlayerGold, #200
+        clamp16 PlayerGold, #MAX_GOLD
         jmp done_awarding_gold
 floor3:
         add16w PlayerGold, #300
+        clamp16 PlayerGold, #MAX_GOLD
         jmp done_awarding_gold
 floor4:
         add16w PlayerGold, #500
+        clamp16 PlayerGold, #MAX_GOLD
 done_awarding_gold:
         ; TODO: a nice SFX
         st16 R0, sfx_coin

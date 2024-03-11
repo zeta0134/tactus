@@ -161,4 +161,23 @@ done:
 .endscope
 .endmacro
 
+.macro clamp16 addr, max_value
+.scope
+        cmp16 addr, max_value
+        bcc done
+.if (.match (.left (1, {max_value}), #))
+        lda #<(.right (.tcount ({max_value})-1, {max_value}))
+        sta addr
+        lda #>(.right (.tcount ({max_value})-1, {max_value}))
+        sta addr+1
+.else
+        lda max_value
+        sta addr
+        lda max_value+1
+        sta addr
+.endif
+done:
+.endscope
+.endmacro
+
 .endif

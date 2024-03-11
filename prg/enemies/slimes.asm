@@ -250,12 +250,15 @@ EffectiveAttackSquare := R10
         beq advanced
 basic:
         add16w PlayerGold, #1
+        clamp16 PlayerGold, #MAX_GOLD
         jmp done
 intermediate:
         add16w PlayerGold, #5
+        clamp16 PlayerGold, #MAX_GOLD
         jmp done
 advanced:
         add16w PlayerGold, #25
+        clamp16 PlayerGold, #MAX_GOLD
 done:
 
 

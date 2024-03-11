@@ -25,3 +25,4 @@
 .global EnemyDiedThisFrame
 
 MAX_HEARTS = 5
+MAX_GOLD = 999
