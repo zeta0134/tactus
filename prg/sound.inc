@@ -35,6 +35,7 @@
 .global sfx_dash_pulse, sfx_dash_noise
 .global sfx_landing
 .global sfx_dive_underwater_pulse, sfx_dive_underwater_noise
+.global sfx_cash_flow
 
 .global sfx_mortal_blow_noise
 .global sfx_death_spin_pulse

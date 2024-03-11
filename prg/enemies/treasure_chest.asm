@@ -209,7 +209,7 @@ TargetSquare := R13
         cmp #3
         beq floor3
         cmp #4
-        beq floor4
+        jeq floor4
 floor_1:
         add16w PlayerGold, #100
         clamp16 PlayerGold, #MAX_GOLD

@@ -180,4 +180,14 @@ done:
 .endscope
 .endmacro
 
+.macro sub16w addr, value
+        sec
+        lda addr
+        sbc #<value
+        sta addr
+        lda addr+1
+        sbc #>value
+        sta addr+1
+.endmacro
+
 .endif

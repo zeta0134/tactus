@@ -12,6 +12,7 @@
         .include "nes.inc"
         .include "player.inc"
         .include "ppu.inc"
+        .include "sound.inc"
         .include "sprites.inc"
         .include "weapons.inc"
         .include "word_util.inc"
@@ -31,6 +32,9 @@ ZoneTarget: .res 1
 ZoneCurrent: .res 1
 FloorTarget: .res 1
 FloorCurrent: .res 1
+
+DisplayedGold: .res 2
+GoldSfxCooldown: .res 1
 
 .segment "CODE_0"
 
@@ -131,6 +135,8 @@ weapon_palette_table:
         sta FloorCurrent
 
         jsr draw_static_hud_elements
+        mov16 DisplayedGold, PlayerGold
+        jsr draw_coin_counter
         st16 HudState, hud_state_update
         rts
 .endproc
@@ -139,6 +145,7 @@ weapon_palette_table:
         jsr draw_hearts
         jsr draw_map_tiles
         jsr draw_current_zone
+        jsr update_coin_counter
         rts
 .endproc
 
@@ -646,6 +653,133 @@ proceed_to_draw:
         rts
 .endproc
 
+; Reacts to the game state to perform a slow, rolling update of the
+; coin counter when the player picks up gold, or loses it (via the
+; yet-unimplemented shop mechanic)
+.proc update_coin_counter
+NumberWord := R0
+OnesDigit := R2
+TensDigit := R3
+HundredsDigit := R4
+ThousandsDigit := R5
+TenThousandsDigit := R6
+        ; always perform the visual update, so we increase/decrease the counter
+        ; at 1 gold / frame
+        cmp16 PlayerGold, DisplayedGold
+        beq done
+        bcc decrease_needed
+increase_needed:
+        inc16 DisplayedGold
+        jmp converge
+decrease_needed:
+        dec16 DisplayedGold
+        jmp converge
+converge:
+        jsr draw_coin_counter 
+
+        ; only play the cash SFX if we haven't started it within some number of frames, just
+        ; to make sure it isn't trampling all over itself
+        lda GoldSfxCooldown
+        beq play_coin_sfx
+        dec GoldSfxCooldown
+        rts
+        
+play_coin_sfx:
+        st16 R0, sfx_cash_flow
+        jsr play_sfx_pulse1
+
+        lda #3
+        sta GoldSfxCooldown
+        rts
+done:
+        ; be sure to reset the cooldown, so that the next time our gold changes, the SFX starts
+        ; playing right away
+        lda #0
+        sta GoldSfxCooldown
+        rts
+.endproc
+
+; Draws the coin counter immediately. Make sure DisplayedGold is set first!
+.proc draw_coin_counter
+NumberWord := R0
+OnesDigit := R2
+TensDigit := R3
+HundredsDigit := R4
+ThousandsDigit := R5
+TenThousandsDigit := R6
+        mov16 NumberWord, DisplayedGold
+        jsr base_10
+        ldx #16
+        draw_tile_at_x ROW_4, HundredsDigit, #(TEXT_PAL | CHR_BANK_OLD_CHRRAM)
+        ldx #17
+        draw_tile_at_x ROW_4, TensDigit, #(TEXT_PAL | CHR_BANK_OLD_CHRRAM)
+        ldx #18
+        draw_tile_at_x ROW_4, OnesDigit, #(TEXT_PAL | CHR_BANK_OLD_CHRRAM)
+        rts
+.endproc
+
+; given a 16bit number, computes the individual digit tiles (in base 10)
+; does not actually draw the number, meant to be consumed by other routines
+; that perform this task
+.proc base_10
+NumberWord := R0
+OnesDigit := R2
+TensDigit := R3
+HundredsDigit := R4
+ThousandsDigit := R5
+TenThousandsDigit := R6
+        perform_zpcm_inc
+
+        lda #NUMBERS_BASE
+        sta TenThousandsDigit
+ten_thousands_loop:
+        cmp16 NumberWord, #10000
+        bcc compute_thousands
+        inc TenThousandsDigit
+        sub16w NumberWord, 10000
+        jmp ten_thousands_loop
+
+compute_thousands:
+        lda #NUMBERS_BASE
+        sta ThousandsDigit
+thousands_loop:
+        cmp16 NumberWord, #1000
+        bcc compute_hundreds
+        inc ThousandsDigit
+        sub16w NumberWord, 1000
+        jmp thousands_loop
+
+compute_hundreds:
+        lda #NUMBERS_BASE
+        sta HundredsDigit
+hundreds_loop:
+        cmp16 NumberWord, #100
+        bcc compute_tens
+        inc HundredsDigit
+        sub16w NumberWord, 100
+        jmp hundreds_loop
+
+compute_tens:
+        lda #NUMBERS_BASE
+        sta TensDigit
+tens_loop:
+        cmp16 NumberWord, #10
+        bcc compute_ones
+        inc TensDigit
+        sub16w NumberWord, 10
+        jmp tens_loop
+
+compute_ones:
+        ; at this stage, NumberWord's lowest byte is already
+        ; between 0 and 9, so just use it directly
+        lda NumberWord+0
+        clc
+        adc #NUMBERS_BASE
+        sta OnesDigit
+
+        rts
+.endproc
+
 ; OLD CODE BELOW!!
 
 
@@ -765,16 +899,6 @@ AttributeAddr := R14
         iny
         rts
 .endproc
-
-.macro sub16w addr, value
-        sec
-        lda addr
-        sbc #<value
-        sta addr
-        lda addr+1
-        sbc #>value
-        sta addr+1
-.endmacro
 
 .proc draw_16bit_number
 NumberWord := R0

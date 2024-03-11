@@ -369,3 +369,11 @@ sfx_weapon_slash:
         noise_cont    1,    $8,  $D,      0
         noise_cont    0,    $B,  $C,      0
         noise_cont    0,    $D,  $A,      0
+
+sfx_cash_flow:
+        ; Length in rows
+        .byte 3
+        ;           pitch,    duty,  volume,     length
+        pulse_init  PITCH_D6,   $2,      $8,          0
+        pulse_init  PITCH_G6,   $1,      $6,          0
+        pulse_init  PITCH_D7,   $0,      $4,          0

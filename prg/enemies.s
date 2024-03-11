@@ -3,6 +3,7 @@
         .include "../build/tile_defs.inc"
 
         .include "battlefield.inc"
+        .include "branch_util.inc"
         .include "enemies.inc"
         .include "far_call.inc"
         .include "kernel.inc"

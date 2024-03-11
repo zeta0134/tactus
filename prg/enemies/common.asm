@@ -372,6 +372,7 @@ done_with_drops:
 
         ; Reward the player with the amount of gold this enemy is worth
         add16b PlayerGold, GoldToAward
+        clamp16 PlayerGold, #MAX_GOLD
 
         rts
 .endproc
