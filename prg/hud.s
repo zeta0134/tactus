@@ -36,6 +36,21 @@ FloorCurrent: .res 1
 DisplayedGold: .res 2
 GoldSfxCooldown: .res 1
 
+WeaponDisplayTarget: .res 1
+WeaponDisplayCurrent: .res 1
+TorchDisplayTarget: .res 1
+TorchDisplayCurrent: .res 1
+ArmorDisplayTarget: .res 1
+ArmorDisplayCurrent: .res 1
+AccessoryDisplayTarget: .res 1
+AccessoryDisplayCurrent: .res 1
+BootsDisplayTarget: .res 1
+BootsDisplayCurrent: .res 1
+SpellDisplayTarget: .res 1
+SpellDisplayCurrent: .res 1
+ItemDisplayTarget: .res 1
+ItemDisplayCurrent: .res 1
+
 .segment "CODE_0"
 
 HUD_TILE_BASE        = $5300
@@ -77,6 +92,97 @@ tile_offset FRAGILE_HEART_BEATING,   12, 5
 tile_offset HEART_CONTAINER_BASE,    12, 7
 tile_offset HEART_CONTAINER_BEATING, 14, 7
 
+tile_offset SPELL_A_DISABLED,   0, 14
+tile_offset SPELL_B_DISABLED,   0, 15
+tile_offset SPELL_A_ENABLED,    2, 14
+tile_offset SPELL_B_ENABLED,    2, 15
+
+tile_offset SPELL_DISABLED_BL_CORNER, 1, 14
+
+tile_offset EQUIPMENT_NONE,    0, 0
+tile_offset EQUIPMENT_TORCH_1, 2, 0
+tile_offset EQUIPMENT_TORCH_2, 4, 0
+tile_offset EQUIPMENT_TORCH_3, 6, 0
+
+tile_offset EQUIPMENT_WEAPON_DAGGER,     0, 2
+tile_offset EQUIPMENT_WEAPON_BROADSWORD, 2, 2
+tile_offset EQUIPMENT_WEAPON_LONGSWORD,  4, 2
+tile_offset EQUIPMENT_WEAPON_SPEAR,      6, 2
+tile_offset EQUIPMENT_WEAPON_FLAIL,      8, 2
+
+tile_offset EQUIPMENT_ARMOR_1, 0, 4
+tile_offset EQUIPMENT_ARMOR_2, 2, 4
+tile_offset EQUIPMENT_ARMOR_3, 4, 4
+tile_offset EQUIPMENT_ARMOR_4, 6, 4
+
+tile_offset EQUIPMENT_ACCESSORY_1, 0, 6
+tile_offset EQUIPMENT_ACCESSORY_2, 2, 6
+tile_offset EQUIPMENT_ACCESSORY_3, 4, 6
+tile_offset EQUIPMENT_ACCESSORY_4, 6, 6
+
+tile_offset EQUIPMENT_BOOTS_1, 0, 8
+tile_offset EQUIPMENT_BOOTS_2, 2, 8
+tile_offset EQUIPMENT_BOOTS_3, 4, 8
+tile_offset EQUIPMENT_BOOTS_4, 6, 8
+
+tile_offset EQUIPMENT_SPELL_1, 0, 12
+tile_offset EQUIPMENT_SPELL_2, 2, 12
+tile_offset EQUIPMENT_SPELL_3, 4, 12
+
+tile_offset EQUIPMENT_ITEM_1, 4, 14
+tile_offset EQUIPMENT_ITEM_2, 6, 14
+tile_offset EQUIPMENT_ITEM_3, 8, 14
+
+; the only one of the above that's implemented at the moment is weapon, so
+; deal with that here
+
+weapon_tile_table:
+        .byte EQUIPMENT_NONE
+        .byte EQUIPMENT_WEAPON_DAGGER
+        .byte EQUIPMENT_WEAPON_BROADSWORD
+        .byte EQUIPMENT_WEAPON_LONGSWORD
+        .byte EQUIPMENT_WEAPON_SPEAR
+        .byte EQUIPMENT_WEAPON_FLAIL
+
+torch_tile_table:
+        .byte EQUIPMENT_NONE
+        .byte EQUIPMENT_TORCH_1
+        .byte EQUIPMENT_TORCH_2
+        .byte EQUIPMENT_TORCH_3
+
+armor_tile_table:
+        .byte EQUIPMENT_NONE
+        .byte EQUIPMENT_ARMOR_1
+        .byte EQUIPMENT_ARMOR_2
+        .byte EQUIPMENT_ARMOR_3
+        .byte EQUIPMENT_ARMOR_4
+
+accessory_tile_table:
+        .byte EQUIPMENT_NONE
+        .byte EQUIPMENT_ACCESSORY_1
+        .byte EQUIPMENT_ACCESSORY_2
+        .byte EQUIPMENT_ACCESSORY_3
+        .byte EQUIPMENT_ACCESSORY_4
+
+boots_tile_table:
+        .byte EQUIPMENT_NONE
+        .byte EQUIPMENT_BOOTS_1
+        .byte EQUIPMENT_BOOTS_2
+        .byte EQUIPMENT_BOOTS_3
+        .byte EQUIPMENT_BOOTS_4
+
+spell_tile_table:
+        .byte EQUIPMENT_NONE    ; note: needs a special case to deal with the BL corner
+        .byte EQUIPMENT_SPELL_1
+        .byte EQUIPMENT_SPELL_2
+        .byte EQUIPMENT_SPELL_3
+
+item_tile_table:
+        .byte EQUIPMENT_NONE    ; note: needs a special case to deal with the BL corner
+        .byte EQUIPMENT_ITEM_1
+        .byte EQUIPMENT_ITEM_2
+        .byte EQUIPMENT_ITEM_3
+
 TILE_COL_OFFSET = 1
 TILE_ROW_OFFSET = 16
 
@@ -113,7 +219,7 @@ weapon_palette_table:
 .proc FAR_refresh_hud
         jsr update_heart_state
         jsr update_zone_state
-
+        jsr update_equipment
         rts
 .endproc
 
@@ -133,6 +239,13 @@ weapon_palette_table:
         lda #$FF
         sta ZoneCurrent
         sta FloorCurrent
+        sta WeaponDisplayCurrent
+        sta TorchDisplayCurrent
+        sta ArmorDisplayCurrent
+        sta AccessoryDisplayCurrent
+        sta BootsDisplayCurrent
+        sta SpellDisplayCurrent
+        sta ItemDisplayCurrent
 
         jsr draw_static_hud_elements
         mov16 DisplayedGold, PlayerGold
@@ -145,6 +258,7 @@ weapon_palette_table:
         jsr draw_hearts
         jsr draw_map_tiles
         jsr draw_current_zone
+        jsr draw_equipment
         jsr update_coin_counter
         rts
 .endproc
@@ -780,8 +894,246 @@ compute_ones:
         rts
 .endproc
 
-; OLD CODE BELOW!!
+.proc update_equipment
+        lda PlayerWeapon
+        clc
+        adc #1
+        sta WeaponDisplayTarget
 
+        ; hardcode a torch for now
+        lda #1
+        sta TorchDisplayTarget
+
+        ; nothing else exists, so zero it out
+        lda #0
+        sta ArmorDisplayTarget
+        sta BootsDisplayTarget
+        sta AccessoryDisplayTarget
+        sta SpellDisplayTarget
+        sta ItemDisplayTarget
+
+        rts
+.endproc
+
+.proc draw_equipment
+DrawTile := R0
+
+check_weapon:
+        lda WeaponDisplayTarget
+        cmp WeaponDisplayCurrent
+        beq check_torch
+        sta WeaponDisplayCurrent
+
+        ldx WeaponDisplayCurrent
+        lda weapon_tile_table, x
+        sta DrawTile
+        ldx #2
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        inc DrawTile
+        ldx #3
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        clc
+        lda DrawTile
+        adc #15
+        sta DrawTile
+        ldx #2
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        inc DrawTile
+        ldx #3
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+
+check_torch:
+        lda TorchDisplayTarget
+        cmp TorchDisplayCurrent
+        beq check_armor
+        sta TorchDisplayCurrent
+
+        ldx TorchDisplayCurrent
+        lda torch_tile_table, x
+        sta DrawTile
+        ldx #4
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        inc DrawTile
+        ldx #5
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        clc
+        lda DrawTile
+        adc #15
+        sta DrawTile
+        ldx #4
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        inc DrawTile
+        ldx #5
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+
+check_armor:
+        lda ArmorDisplayTarget
+        cmp ArmorDisplayCurrent
+        beq check_boots
+        sta ArmorDisplayCurrent
+
+        ldx ArmorDisplayCurrent
+        lda armor_tile_table, x
+        sta DrawTile
+        ldx #6
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        inc DrawTile
+        ldx #7
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        clc
+        lda DrawTile
+        adc #15
+        sta DrawTile
+        ldx #6
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        inc DrawTile
+        ldx #7
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+
+check_boots:
+        lda BootsDisplayTarget
+        cmp BootsDisplayCurrent
+        beq check_accessory
+        sta BootsDisplayCurrent
+
+        ldx BootsDisplayCurrent
+        lda boots_tile_table, x
+        sta DrawTile
+        ldx #8
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        inc DrawTile
+        ldx #9
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        clc
+        lda DrawTile
+        adc #15
+        sta DrawTile
+        ldx #8
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        inc DrawTile
+        ldx #9
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+
+check_accessory:
+        lda AccessoryDisplayTarget
+        cmp AccessoryDisplayCurrent
+        beq check_item
+        sta AccessoryDisplayCurrent
+
+        ldx AccessoryDisplayCurrent
+        lda accessory_tile_table, x
+        sta DrawTile
+        ldx #10
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        inc DrawTile
+        ldx #11
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        clc
+        lda DrawTile
+        adc #15
+        sta DrawTile
+        ldx #10
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        inc DrawTile
+        ldx #11
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+
+check_item:
+        lda ItemDisplayTarget
+        cmp ItemDisplayCurrent
+        jeq check_spell
+        sta ItemDisplayCurrent
+
+        ; here we need to handle the little tab as a special case
+        ldx ItemDisplayCurrent
+        cpx #0
+        bne item_equipped
+no_item_equipped:
+        ldx #13
+        draw_tile_at_x ROW_2, #SPELL_B_DISABLED, #(TEXT_PAL | CHR_BANK_ITEMS)
+        ldx #14
+        draw_tile_at_x ROW_2, #SPELL_DISABLED_BL_CORNER, #(TEXT_PAL | CHR_BANK_ITEMS)
+        ldx ItemDisplayCurrent
+        lda item_tile_table, x
+        clc
+        adc #16
+        sta DrawTile
+        jmp draw_untabbed_item_tiles
+item_equipped:
+        ldx #13
+        draw_tile_at_x ROW_2, #SPELL_B_ENABLED, #(TEXT_PAL | CHR_BANK_ITEMS)
+        ldx ItemDisplayCurrent
+        lda item_tile_table, x
+        clc
+        adc #16
+        sta DrawTile
+        ldx #14
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+draw_untabbed_item_tiles:
+        inc DrawTile
+        ldx #15
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        sec
+        lda DrawTile
+        sbc #17
+        sta DrawTile
+        ldx #14
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        inc DrawTile
+        ldx #15
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+
+check_spell:
+        lda SpellDisplayTarget
+        cmp SpellDisplayCurrent
+        jeq done
+        sta SpellDisplayCurrent
+
+        ; here we need to handle the little tab as a special case
+        ldx SpellDisplayCurrent
+        cpx #0
+        bne spell_equipped
+no_spell_equipped:
+        ldx #16
+        draw_tile_at_x ROW_2, #SPELL_A_DISABLED, #(TEXT_PAL | CHR_BANK_ITEMS)
+        ldx #17
+        draw_tile_at_x ROW_2, #SPELL_DISABLED_BL_CORNER, #(TEXT_PAL | CHR_BANK_ITEMS)
+        ldx SpellDisplayCurrent
+        lda spell_tile_table, x
+        clc
+        adc #16
+        sta DrawTile
+        jmp draw_untabbed_spell_tiles
+spell_equipped:
+        ldx #16
+        draw_tile_at_x ROW_2, #SPELL_A_ENABLED, #(TEXT_PAL | CHR_BANK_ITEMS)
+        ldx SpellDisplayCurrent
+        lda spell_tile_table, x
+        clc
+        adc #16
+        sta DrawTile
+        ldx #17
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+draw_untabbed_spell_tiles:
+        inc DrawTile
+        ldx #18
+        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        sec
+        lda DrawTile
+        sbc #17
+        sta DrawTile
+        ldx #17
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        inc DrawTile
+        ldx #18
+        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+
+done:
+        rts
+.endproc
+
+
+; OLD CODE BELOW!!
 
 
 ; This is here mostly because it relies on the string drawing functions
