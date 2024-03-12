@@ -109,7 +109,8 @@ torchlight_luts_bank:
 breathing_lut:
     ;.byte 2, 3, 3, 4, 4, 4, 3, 3, 2, 1, 1, 0, 0, 0, 1, 1 ; strength 2
     ;.byte 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0, 1 ; strength 1
-    .byte 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ; strength 0.5, synced to music
+    ;.byte 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ; strength 0.5, synced to music
+    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; completely off (it's distracting?)
 
 
 .proc FAR_init_torchlight
@@ -125,7 +126,7 @@ breathing_lut:
     sta current_radius
     sta current_base_radius
 
-    lda #11
+    lda #12
     sta target_radius
     rts
 .endproc
