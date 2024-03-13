@@ -195,7 +195,7 @@ MetaSpriteIndex := R0
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
 
-        jsr update_title
+        far_call FAR_update_title
 
         jsr wait_for_next_vblank
         rts
@@ -231,7 +231,7 @@ MetaSpriteIndex := R0
 
         jsr clear_fpga_ram
         far_call FAR_initialize_sprites
-        jsr init_game_end_screen
+        far_call FAR_init_game_end_screen
 
         .if ::DEBUG_NAMETABLES
         far_call FAR_debug_nametable_header
@@ -263,7 +263,7 @@ MetaSpriteIndex := R0
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
 
-        jsr update_game_end_screen
+        far_call FAR_update_game_end_screen
 
         jsr wait_for_next_vblank
         rts

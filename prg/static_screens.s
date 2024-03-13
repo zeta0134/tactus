@@ -15,11 +15,11 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
-.segment "PRGFIXED_E000"
+.segment "CODE_1"
 
 BLANK_TILE = 250
 
-.proc update_title
+.proc FAR_update_title
         lda #KEY_START
         and ButtonsDown
         beq stay_here
@@ -192,7 +192,7 @@ thank_you_text: .asciiz "THANK YOU FOR PLAYING!"
 
 
 ; This is called with rendering already disabled
-.proc init_game_end_screen
+.proc FAR_init_game_end_screen
 StringPtr := R0
 NumberWord := R0
 Digit := R0
@@ -327,7 +327,7 @@ attribute_loop_right:
         rts
 .endproc
 
-.proc update_game_end_screen
+.proc FAR_update_game_end_screen
         ; For now, the same as the title screen; just wait for START then proceed,
         ; in this case back to the title
 
