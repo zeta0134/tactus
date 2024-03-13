@@ -69,9 +69,9 @@ start:
 
         ; hand control over to the kernel, which will manage game mode management
         ; for the rest of runtime
-main_loop:
-        debug_color LIGHTGRAY
-        jsr run_kernel
-        jmp main_loop
+        far_call FAR_kernel_game_loop
 
+        ; this should never be reached
+panic_and_spin:
+        jmp panic_and_spin
 

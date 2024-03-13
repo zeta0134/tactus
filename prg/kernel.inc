@@ -4,7 +4,10 @@
 .global DisplayedRowCounter
 .global AccumulatedGameBeats
 
-.global run_kernel
+; subroutines
+.global FAR_kernel_game_loop
+
+; kernel states
 .global init_engine
 .global room_init
 .global advance_to_next_floor

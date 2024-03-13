@@ -44,7 +44,7 @@ LastBeat: .res 1
 DisplayedRowCounter: .res 1
 AccumulatedGameBeats: .res 2
 
-.segment "PRGFIXED_E000"
+.segment "CODE_1"
 
 ; === Utility Functions ===
 .proc wait_for_next_vblank
@@ -59,6 +59,13 @@ AccumulatedGameBeats: .res 2
 .endproc
 
 ; === Kernel Entrypoint ===
+.proc FAR_kernel_game_loop
+main_loop:
+        debug_color LIGHTGRAY
+        jsr run_kernel
+        jmp main_loop
+.endproc
+
 .proc run_kernel
         ; whatever game mode we are currently in, run one loop of that and exit
         jmp (GameMode)
@@ -195,7 +202,7 @@ MetaSpriteIndex := R0
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
 
-        far_call FAR_update_title
+        near_call FAR_update_title
 
         jsr wait_for_next_vblank
         rts
@@ -231,7 +238,7 @@ MetaSpriteIndex := R0
 
         jsr clear_fpga_ram
         far_call FAR_initialize_sprites
-        far_call FAR_init_game_end_screen
+        near_call FAR_init_game_end_screen
 
         .if ::DEBUG_NAMETABLES
         far_call FAR_debug_nametable_header
@@ -263,7 +270,7 @@ MetaSpriteIndex := R0
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
 
-        far_call FAR_update_game_end_screen
+        near_call FAR_update_game_end_screen
 
         jsr wait_for_next_vblank
         rts
@@ -350,7 +357,7 @@ MetaSpriteIndex := R0
 
         far_call FAR_initialize_sprites
         far_call FAR_init_hud
-        far_call FAR_init_player
+        near_call FAR_init_player
 
         st16 GameMode, zone_init
         rts
@@ -368,7 +375,7 @@ MetaSpriteIndex := R0
         far_call FAR_demo_init_floor
         .else
         ; Generate proper mazes and randomize player, exit, and boss
-        far_call FAR_init_floor
+        near_call FAR_init_floor
         .endif
 
         st16 GameMode, room_init
@@ -377,7 +384,7 @@ MetaSpriteIndex := R0
 
 .proc room_init
         perform_zpcm_inc
-        far_call FAR_init_current_room
+        near_call FAR_init_current_room
         perform_zpcm_inc
         far_call FAR_despawn_unimportant_sprites
         perform_zpcm_inc
@@ -406,7 +413,7 @@ not_victory:
         far_call FAR_demo_init_floor
         .else
         ; Generate proper mazes and randomize player, exit, and boss
-        far_call FAR_init_floor
+        near_call FAR_init_floor
         .endif
 
         ; reset the player's position to the center of the room
@@ -456,8 +463,8 @@ not_victory:
 
         ; - Resolve the player's action
         debug_color (TINT_B | LIGHTGRAY)
-        far_call FAR_update_player
-        far_call FAR_handle_room_spawns
+        near_call FAR_update_player
+        near_call FAR_handle_room_spawns
         debug_color LIGHTGRAY
 
         perform_zpcm_inc
@@ -747,8 +754,8 @@ continue_waiting:
         perform_zpcm_inc
         far_call FAR_queue_hud
         perform_zpcm_inc
-        far_call FAR_determine_player_intent
-        far_call FAR_draw_player
+        near_call FAR_determine_player_intent
+        near_call FAR_draw_player
         perform_zpcm_inc
 
         debug_color (TINT_G | TINT_B | LIGHTGRAY)
