@@ -1,9 +1,9 @@
-.global init_player
-.global draw_player
-.global determine_player_intent
-.global update_player
-.global damage_player
-.global player_resolve_collision
+.global FAR_init_player
+.global FAR_draw_player
+.global FAR_determine_player_intent
+.global FAR_update_player
+.global FAR_damage_player
+.global FAR_player_resolve_collision
 
 .global row_number_to_tile_index_lut
 

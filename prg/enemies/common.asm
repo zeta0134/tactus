@@ -383,7 +383,7 @@ TileId := R1
 PuffSquare := R12
 TargetSquare := R13
         ; All basic enemies do 1 damage to the player on hit
-        jsr damage_player
+        far_call FAR_damage_player
 
         ; Now the tricky part: we need to scan the map and find this enemy's poof
         ; (It might not exist if we have a bugged board, so handle that safely)
@@ -464,7 +464,7 @@ proceed_to_forbid:
         ; Now we need to check for damage again, this time at the square we just left.
         ; If we don't do this, then enemies which moves into that square on this turn can
         ; get stuck underneath us, causing general weirdness
-        jsr player_resolve_collision
+        far_call FAR_player_resolve_collision
 
         ; TODO, BUGFIX: what happens if another enemy is now in our old position?
         ; This seems to get us STUCK! We should definitely fix this at some point.

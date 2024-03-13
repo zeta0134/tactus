@@ -68,11 +68,20 @@ DIRECTION_WEST  = 4
 
 .segment "PRGFIXED_E000"
 
+; For rapidly computing the tile row
+row_number_to_tile_index_lut:
+player_tile_index_table:
+        .repeat ::BATTLEFIELD_HEIGHT, i
+        .byte (::BATTLEFIELD_WIDTH * i)
+        .endrepeat
+
+.segment "CODE_1"
+
 JUMP_HEIGHT_END = 5
 jump_height_table:
         .byte 6, 8, 7, 4, 1, 0
 
-.proc init_player
+.proc FAR_init_player
 MetaSpriteIndex := R0
         ; spawn in the player sprite
         far_call FAR_find_unused_sprite
@@ -151,7 +160,7 @@ sprite_failed:
 .endproc
 
 ; Called once every frame
-.proc draw_player
+.proc FAR_draw_player
         ; For now, always lerp the player's current position to their target position
         jsr lerp_player_to_target_coordinates
 
@@ -178,7 +187,7 @@ done:
 ; Called once every frame, after input has been processed.
 ; Updates variables related to the desired direction and 
 ; whether a down press has occurred at all this frame
-.proc determine_player_intent
+.proc FAR_determine_player_intent
         lda #(KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT)
         bit ButtonsDown
         bne handle_button_press
@@ -384,7 +393,7 @@ arrived_at_target:
 .endproc
 
 ; Called once at the beginning of every beat
-.proc update_player
+.proc FAR_update_player
 TargetRow := R14
 TargetCol := R15
         lda PlayerRow
@@ -411,7 +420,7 @@ move_player:
         jsr player_move
 
 resolve_enemy_collision:
-        jsr player_resolve_collision
+        near_call FAR_player_resolve_collision
 
         ; Now we may finalize the player's position and draw
         lda TargetRow
@@ -471,13 +480,6 @@ done_choosing_target:
 
         rts
 .endproc
-
-; For rapidly computing the tile row
-row_number_to_tile_index_lut:
-player_tile_index_table:
-        .repeat ::BATTLEFIELD_HEIGHT, i
-        .byte (::BATTLEFIELD_WIDTH * i)
-        .endrepeat
 
 .proc player_swing_weapon
 ; R0 and R1 are reserved for the enemy behaviors to use
@@ -968,7 +970,7 @@ sprite_failed:
         rts
 .endproc
 
-.proc player_resolve_collision
+.proc FAR_player_resolve_collision
 TargetSquare := R13
 ; This is our target position after movement. It might be the same as our player position;
 ; regardless, this is where we want to go on this frame. What happens when we land?
@@ -986,7 +988,7 @@ TargetCol := R15
         rts
 .endproc
 
-.proc damage_player
+.proc FAR_damage_player
         lda PlayerHealth
         beq already_dead
         dec PlayerHealth

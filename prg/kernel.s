@@ -350,7 +350,7 @@ MetaSpriteIndex := R0
 
         far_call FAR_initialize_sprites
         far_call FAR_init_hud
-        jsr init_player
+        far_call FAR_init_player
 
         st16 GameMode, zone_init
         rts
@@ -456,7 +456,7 @@ not_victory:
 
         ; - Resolve the player's action
         debug_color (TINT_B | LIGHTGRAY)
-        jsr update_player
+        far_call FAR_update_player
         far_call FAR_handle_room_spawns
         debug_color LIGHTGRAY
 
@@ -747,8 +747,8 @@ continue_waiting:
         perform_zpcm_inc
         far_call FAR_queue_hud
         perform_zpcm_inc
-        jsr determine_player_intent
-        jsr draw_player
+        far_call FAR_determine_player_intent
+        far_call FAR_draw_player
         perform_zpcm_inc
 
         debug_color (TINT_G | TINT_B | LIGHTGRAY)

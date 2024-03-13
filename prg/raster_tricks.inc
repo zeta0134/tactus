@@ -1,0 +1,2 @@
+.global init_irq_subsystem
+.global irq_palette_swap

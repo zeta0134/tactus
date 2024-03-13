@@ -396,7 +396,7 @@ TargetIndex := R0
 TileId := R1
 TargetSquare := R13
         ; All projectiles do 1 damage to the player on hit
-        jsr damage_player
+        far_call FAR_damage_player
 
         ; Now, despawn the projectile:
         ; draw a basic floor tile here, which will be underneath the player

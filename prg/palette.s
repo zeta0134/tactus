@@ -20,6 +20,8 @@ Brightness: .res 1
 TargetBrightness: .res 1
 BrightnessDelay: .res 1
 
+hud_palette: .res 32
+
         .segment "CODE_0"
 
 white_palette:
