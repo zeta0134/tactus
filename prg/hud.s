@@ -217,7 +217,6 @@ weapon_palette_table:
 ; the first frame of a given beat. Use this to update any state
 ; related to the player's most recent activities
 .proc FAR_refresh_hud
-        jsr update_heart_state
         jsr update_zone_state
         jsr update_equipment
         rts
@@ -255,6 +254,7 @@ weapon_palette_table:
 .endproc
 
 .proc hud_state_update
+        jsr update_heart_state
         jsr draw_hearts
         jsr draw_map_tiles
         jsr draw_current_zone

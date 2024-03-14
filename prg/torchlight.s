@@ -204,7 +204,7 @@ Scratch := R6
     sta Scratch
     lda current_lighting_row
     clc
-    adc #4 ; the battlefield starts on row 2 of the nametable, and spans its full width
+    adc #2 ; the battlefield starts on row 2 of the nametable, and spans its full width
     .repeat 5
     asl
     rol Scratch

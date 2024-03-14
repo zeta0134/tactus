@@ -329,6 +329,11 @@ MetaSpriteIndex := R0
         lda #(VBLANK_NMI | BG_1000 | OBJ_0000)
         sta PPUCTRL
 
+        ; because background slivers fetch from normal CHR during the palette swap for
+        ; 3 slivers, make those 3 slivers blank tiles:
+        lda #$FF
+        sta MAP_CHR_1_LO
+
         rts
 .endproc
 

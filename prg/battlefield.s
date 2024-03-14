@@ -111,12 +111,12 @@ AttributeAddr := R6
         sta CurrentTile
         lda active_battlefield
         bne second_nametable
-        st16 NametableAddr, $5082
-        st16 AttributeAddr, $5882
+        st16 NametableAddr, $5042
+        st16 AttributeAddr, $5842
         jmp row_loop
 second_nametable:
-        st16 NametableAddr, $5482
-        st16 AttributeAddr, $5C82
+        st16 NametableAddr, $5442
+        st16 AttributeAddr, $5C42
 row_loop:
         perform_zpcm_inc
         lda queued_bytes_counter
@@ -162,12 +162,12 @@ AttributeAddr := R6
         sta CurrentTile
         lda active_battlefield
         beq second_nametable
-        st16 NametableAddr, $5082
-        st16 AttributeAddr, $5882
+        st16 NametableAddr, $5042
+        st16 AttributeAddr, $5842
         jmp row_loop
 second_nametable:
-        st16 NametableAddr, $5482
-        st16 AttributeAddr, $5C82
+        st16 NametableAddr, $5442
+        st16 AttributeAddr, $5C42
 row_loop:
         perform_zpcm_inc
         lda queued_bytes_counter

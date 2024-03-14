@@ -36,8 +36,7 @@ raster_tricks_enabled: .res 1
         lda raster_tricks_enabled
         beq disabled
 
-        ; a total guess, we'll work on this later
-        lda #180
+        lda #176
         sta MAP_PPU_IRQ_LATCH
         lda #0
         sta MAP_PPU_IRQ_OFFSET
@@ -77,15 +76,15 @@ return_from_delay:
         lda PPUSTATUS ; 4, ensure w=0
         lda #$3F      ; 2
         ldx #$00      ; 2
+        ldy #(LIGHTGRAY) ; 2
 
         ; ppu dot here: 247
         ; target dot: 311, need to delay: 64 dots, 22 cycles
         jsr delay_20
-        nop ; 2
 
         ; ppu dot here: 313
 
-        stx PPUMASK ; 4, disable rendering, write lands on 322 at the earliest, 334 at the latest (due to DPCM jitter)
+        sty PPUMASK ; 4, disable rendering, write lands on 322 at the earliest, 334 at the latest (due to DPCM jitter)
         sta PPUADDR ; 4, w=0
         stx PPUADDR ; 4, w=1, set palette address to #$3F00 (no visible change)
 
@@ -198,7 +197,7 @@ return_from_delay:
 
         ; Draw the left-side nametable, starting at the top of the HUD graphics
 HUD_SCROLL_X = 0
-HUD_SCROLL_Y = 184
+HUD_SCROLL_Y = 194
 HUD_NAMETABLE = 0
 HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         lda #HUD_NAMETABLE  ; 2

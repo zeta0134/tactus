@@ -33,7 +33,7 @@ data_bank_shadow: .res 1
 	sta MAP_PRG_CONTROL
 	; Ideally we didn't just crash [fingers crossed] and can continue with setup XD
 
-	; for CHR we want our 32k of CHR RAM accessible (for now) in big 8k chunks:
+	; for CHR we want our CHR ROM accessible (for now) in big 4k chunks:
 	lda #(CHR_CHIP_ROM | CHR_MODE_1)
 	sta MAP_CHR_CONTROL
 	;  for now, place the same sprite bank into both 4k regions
@@ -41,10 +41,12 @@ data_bank_shadow: .res 1
 	sta MAP_CHR_0_LO
 	lda #0
 	sta MAP_CHR_0_HI
-	lda #SPRITE_REGION_BASE
+
+	lda #$FF
 	sta MAP_CHR_1_LO
 	lda #0
 	sta MAP_CHR_1_HI
+	; for backgrounds, 
 
 	; for PRG RAM, just map in all 8k in one big chunk
 	; this stuff is battery backed, so we'll put save files here
