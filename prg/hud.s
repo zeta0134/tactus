@@ -352,6 +352,7 @@ converge:
         ldx #2 ; current heart offset in the HUD row
         ldy #0 ; current heart index in the current/target state lists
 loop:
+        perform_zpcm_inc
         lda HeartDisplayTarget, y
         cmp HeartDisplayCurrent, y
         beq skip_heart
@@ -387,6 +388,7 @@ done_with_this_heart:
 ; the heart index, and X to contain the current tile column for drawing.
 ; upon completion, Y is left alone, and X is incremented twice
 .proc draw_empty_heart
+        perform_zpcm_inc
         draw_tile_at_x ROW_3, #BLANK_TILE, #(RED_PAL | CHR_BANK_HUD)
         draw_tile_at_x ROW_4, #BLANK_TILE, #(RED_PAL | CHR_BANK_HUD)
         inx
@@ -400,6 +402,7 @@ done_with_this_heart:
 HeartFullBase := R3
 HeartEmptyBase := R4
 TileId := R5
+        perform_zpcm_inc
         ; is this a beating heart?
         lda HeartDisplayTarget, y
         and #%00001000
@@ -417,6 +420,8 @@ inert_heart:
         sta HeartEmptyBase
 done_with_beating_checks:
 
+        perform_zpcm_inc
+
 top_left:
         lda HeartDisplayTarget, y
         and #%00000111 ; is the top-left quarter empty?
@@ -430,6 +435,8 @@ top_left_empty:
 draw_top_left:
         sta TileId
         draw_tile_at_x ROW_3, TileId, #(RED_PAL | CHR_BANK_HUD)
+
+        perform_zpcm_inc
 
 bottom_left:
         lda HeartDisplayTarget, y
@@ -447,6 +454,7 @@ draw_bottom_left:
         sta TileId
         draw_tile_at_x ROW_4, TileId, #(RED_PAL | CHR_BANK_HUD)
 
+        perform_zpcm_inc
         inx
 
 top_right:
@@ -465,6 +473,8 @@ draw_top_right:
         sta TileId
         draw_tile_at_x ROW_3, TileId, #(RED_PAL | CHR_BANK_HUD)
 
+        perform_zpcm_inc
+
 bottom_right:
         lda HeartDisplayTarget, y
         and #%00000111 ; is the top-left quarter empty?
@@ -481,12 +491,14 @@ draw_bottom_right:
         sta TileId
         draw_tile_at_x ROW_4, TileId, #(RED_PAL | CHR_BANK_HUD)
 
+        perform_zpcm_inc
         inx
 
         rts
 .endproc
 
 .proc draw_static_hud_elements
+        perform_zpcm_inc
         ; first, draw the border around the minimap
         ldx #19
         ; left side
@@ -499,11 +511,14 @@ draw_bottom_right:
         inx
         ; center loop
 loop:
+        perform_zpcm_inc
         draw_tile_at_x ROW_0, #MAP_BORDER_TM, #(BLUE_PAL | CHR_BANK_HUD)
         draw_tile_at_x ROW_5, #MAP_BORDER_BM, #(BLUE_PAL | CHR_BANK_HUD)
         inx
         cpx #30
         bne loop
+
+        perform_zpcm_inc
         ; right side
         draw_tile_at_x ROW_0, #MAP_BORDER_TR, #(BLUE_PAL | CHR_BANK_HUD)
         draw_tile_at_x ROW_1, #MAP_BORDER_MR, #(BLUE_PAL | CHR_BANK_HUD)
@@ -517,6 +532,8 @@ loop:
         draw_tile_at_x ROW_4, #COIN_ICON, #(YELLOW_PAL | CHR_BANK_HUD)
         ldx #15
         draw_tile_at_x ROW_4, #COIN_X, #(BLUE_PAL | CHR_BANK_HUD)
+
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -703,6 +720,7 @@ DrawTile := R1
         bne proceed_to_draw
         rts
 proceed_to_draw:
+        perform_zpcm_inc
         lda ZoneTarget
         sta ZoneCurrent
         lda FloorTarget
@@ -728,6 +746,8 @@ proceed_to_draw:
         inx
         draw_tile_at_x ROW_1, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
 
+        perform_zpcm_inc
+
         ; now proceed with the rest of the banner, which is always at a
         ; fixed "row" of 5 within the banner graphics
         lda #(5*16)
@@ -751,6 +771,8 @@ proceed_to_draw:
         inx
         draw_tile_at_x ROW_3, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
 
+        perform_zpcm_inc
+
         clc
         lda DrawTile
         adc #15
@@ -763,6 +785,7 @@ proceed_to_draw:
         draw_tile_at_x ROW_4, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
 
         ; and that should be it!
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -917,6 +940,7 @@ compute_ones:
 
 .proc draw_equipment
 DrawTile := R0
+        perform_zpcm_inc
 
 check_weapon:
         lda WeaponDisplayTarget
@@ -941,6 +965,7 @@ check_weapon:
         inc DrawTile
         ldx #3
         draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        perform_zpcm_inc
 
 check_torch:
         lda TorchDisplayTarget
@@ -965,6 +990,7 @@ check_torch:
         inc DrawTile
         ldx #5
         draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        perform_zpcm_inc
 
 check_armor:
         lda ArmorDisplayTarget
@@ -989,6 +1015,7 @@ check_armor:
         inc DrawTile
         ldx #7
         draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        perform_zpcm_inc
 
 check_boots:
         lda BootsDisplayTarget
@@ -1013,6 +1040,7 @@ check_boots:
         inc DrawTile
         ldx #9
         draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        perform_zpcm_inc
 
 check_accessory:
         lda AccessoryDisplayTarget
@@ -1037,6 +1065,7 @@ check_accessory:
         inc DrawTile
         ldx #11
         draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        perform_zpcm_inc
 
 check_item:
         lda ItemDisplayTarget
@@ -1082,6 +1111,7 @@ draw_untabbed_item_tiles:
         inc DrawTile
         ldx #15
         draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        perform_zpcm_inc
 
 check_spell:
         lda SpellDisplayTarget
@@ -1127,8 +1157,10 @@ draw_untabbed_spell_tiles:
         inc DrawTile
         ldx #18
         draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        perform_zpcm_inc
 
 done:
+        perform_zpcm_inc
         rts
 .endproc
 

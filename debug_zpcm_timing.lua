@@ -22,5 +22,5 @@ emu.addMemoryCallback(clock_cpu, emu.callbackType.write, 0x0000, 0xFFFF)
 -- the real audio increment happens here:
 emu.addMemoryCallback(write_sample, emu.callbackType.write, 0x4011, 0x4011)
 -- a fake one happens over here, which we will count for starvation purposes
-emu.addMemoryCallback(write_sample, emu.callbackType.write, 0x5011, 0x5011)
+emu.addMemoryCallback(write_sample, emu.callbackType.write, 0xFF11, 0xFF11)
 

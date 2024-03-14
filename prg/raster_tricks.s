@@ -47,7 +47,8 @@ disabled:
         rts
 .endproc
 
-.proc irq_palette_swap
+.proc irq_palette_swap ; 7
+        perform_zpcm_inc ; 6
         ; very quickly read the delay jitter register
         pha                    ; 3
         lda MAP_PPU_IRQ_M2_CNT ; 4
@@ -65,7 +66,7 @@ disabled:
         iny                       ; 2
         lda (delay_table_addr), y ; 5
         sta delay_routine_addr+1  ; 3
-        jmp (delay_routine_addr)  ; 5 + 3 + [inverse of measured IRQ jitter, range: 16 - 0]
+        jmp (delay_routine_addr)  ; 5 + 3 + [inverse of measured IRQ jitter, range: 10 - 0]
 return_from_delay:
         ; worst case for the above takes 73 cycles
         ; if we trigger the interrupt on PPU dot 4, then at this exact moment we are at:
@@ -78,9 +79,11 @@ return_from_delay:
         ldx #$00      ; 2
         ldy #(LIGHTGRAY) ; 2
 
-        ; ppu dot here: 247
-        ; target dot: 311, need to delay: 64 dots, 22 cycles
-        jsr delay_20
+        ; ppu dot here: 253
+        ; target dot: 311, 20 cycles
+        perform_zpcm_inc ; 6
+        jsr delay_12     ; 12
+        nop              ; 2
 
         ; ppu dot here: 313
 
@@ -259,6 +262,7 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         pla
         tax
         pla
+        perform_zpcm_inc
         rti
 .endproc
 
@@ -267,9 +271,8 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
 .endproc
 
 .proc delay_20 ; 6
-        .repeat 4
+        perform_zpcm_inc ; 6
         nop    ; 2
-        .endrepeat
         rts    ; 6
 .endproc
 
@@ -279,29 +282,31 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
 ; a shorter live section of the table, and using smaller delay amounts
 .align 256
 inverted_delay_table:
-        .addr inv_delay_16 ; 7 cycles for the IRQ service routine
-        .addr inv_delay_16
-        .addr inv_delay_16
-        .addr inv_delay_16
-        .addr inv_delay_16
-        .addr inv_delay_16
-        .addr inv_delay_16
-
-        .addr inv_delay_16 ; 3 cycles to PHA
-        .addr inv_delay_16
-        .addr inv_delay_16
-
-        .addr inv_delay_16 ; 4 cycles to LDA MAP_PPU_IRQ_M2_CNT
-        .addr inv_delay_16
-        .addr inv_delay_16
-        .addr inv_delay_16 ; READ OCCURS HERE
-
-        .addr inv_delay_15 ; first real entry in the table
-        .addr inv_delay_14
-        .addr inv_delay_13
-        .addr inv_delay_12
-        .addr inv_delay_11
+        .addr inv_delay_10 ; 7 cycles for the IRQ service routine
         .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+
+        .addr inv_delay_10 ; 6 cycles for inc $4011
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+
+        .addr inv_delay_10 ; 3 cycles to PHA
+        .addr inv_delay_10
+        .addr inv_delay_10
+
+        .addr inv_delay_10 ; 4 cycles to LDA MAP_PPU_IRQ_M2_CNT
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10 ; READ OCCURS HERE
+
+        .addr inv_delay_10 ; first real entry in the table
         .addr inv_delay_9
         .addr inv_delay_8
         .addr inv_delay_7
@@ -312,7 +317,7 @@ inverted_delay_table:
         .addr inv_delay_2
         .addr inv_delay_0 ; we can't encode a delay amount of 1 cycle, but that's okay
 
-        .repeat (128-7-3-4-15); fill out the rest of the table for safety
+        .repeat (128-7-6-3-4-10); fill out the rest of the table for safety
         .addr inv_delay_0
         .endrepeat
 

@@ -194,6 +194,8 @@ done:
         ldy track_table_module_high, x
         far_call bhop_set_module_addr
 
+        perform_zpcm_inc
+
         lda track_table_song, x
         far_call bhop_init
         ; all new tracks should start with variant 0
@@ -317,6 +319,7 @@ SfxPtr := R0
         .segment "CODE_SOUND"
 
 .proc FAR_init_audio
+        perform_zpcm_inc
         ; Always initialize the music engine with track 0 of the first module. This will
         ; be the first song that begins playing immediately; ideally fill it with silence.
         lda #0
@@ -332,6 +335,8 @@ SfxPtr := R0
         lda track_table_module_low, x
         ldy track_table_module_high, x
         far_call bhop_set_module_addr
+
+        perform_zpcm_inc
 
         lda track_table_song, x
         far_call bhop_init

@@ -1,5 +1,6 @@
 .include "rainbow.inc"
 .include "../build/tile_defs.inc"
+.include "zpcm.inc"
 
 .zeropage
 code_bank_shadow: .res 1
@@ -85,6 +86,7 @@ data_bank_shadow: .res 1
 	lda #0
 	ldx #0
 loop:
+	perform_zpcm_inc
 	sta $5000,x
 	sta $5100,x
 	sta $5200,x

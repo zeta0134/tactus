@@ -104,10 +104,9 @@ bg_loop:
         cpx #16
         bne bg_loop
 
-        perform_zpcm_inc
-
         ldx #0
 hud_loop:
+        perform_zpcm_inc
         lda hud_palette, x
         sta HudPaletteBuffer, x
         inx
