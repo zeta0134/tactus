@@ -662,7 +662,7 @@ room_hidden:
         ; fall through
 draw_tile:
         ldx DrawIndex
-        draw_tile_at_x MINIMAP_BASE, DrawTile, #(YELLOW_PAL | CHR_BANK_HUD)
+        draw_tile_at_x MINIMAP_BASE, DrawTile, #(TEXT_PAL | CHR_BANK_HUD)
 
         rts
 .endproc
