@@ -20,7 +20,8 @@ Brightness: .res 1
 TargetBrightness: .res 1
 BrightnessDelay: .res 1
 
-hud_palette: .res 32
+; not sure I'll use all of this, but we'll allocate the whole 32 bytes just in case
+HudPaletteBuffer: .res 32
 
         .segment "CODE_0"
 

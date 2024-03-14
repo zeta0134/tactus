@@ -13,6 +13,9 @@ bg_palette:
         .incbin "../art/test_palette.pal"
 obj_palette:
         .incbin "../art/sprite_palette.pal"
+hud_palette:
+        .incbin "../art/hud_bg.pal"
+        .incbin "../art/hud_obj.pal"
 
 title_palette:
         .incbin "../art/title_bg_palette.pal"
@@ -100,6 +103,16 @@ bg_loop:
         inx
         cpx #16
         bne bg_loop
+
+        perform_zpcm_inc
+
+        ldx #0
+hud_loop:
+        lda hud_palette, x
+        sta HudPaletteBuffer, x
+        inx
+        cpx #32
+        bne hud_loop
 
         perform_zpcm_inc
 

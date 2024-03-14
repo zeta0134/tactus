@@ -12,6 +12,7 @@
         .include "palette.inc"
         .include "ppu.inc"
         .include "prng.inc"
+        .include "raster_tricks.inc"
         .include "slowam.inc"
         .include "sound.inc"
         .include "word_util.inc"
@@ -37,6 +38,7 @@ start:
 
         jsr initialize_palettes
         jsr initialize_ppu
+        jsr init_irq_subsystem
 
         far_call FAR_init_audio
         far_call FAR_init_slowam

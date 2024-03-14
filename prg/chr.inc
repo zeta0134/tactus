@@ -6,3 +6,5 @@
 .global FAR_copy_title_nametable
 
 .global CurrentChrBank
+
+.global chr_frame_pacing

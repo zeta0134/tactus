@@ -20,6 +20,11 @@ CurrentChrBank: .res 1
 title_nametable:
         .incbin "../art/raw_nametables/title_screen.nam"
 
+.segment "PRGFIXED_E000"
+
+chr_frame_pacing:
+        .byte 0, 1, 1, 2, 2, 3, 3, 3
+
 .segment "CODE_0"
 
 ; note: set PPUADDR and PPUCTRL appropriately before calling
@@ -97,9 +102,6 @@ DataAddr := R0
         restore_previous_bank
         rts
 .endproc
-
-chr_frame_pacing:
-        .byte 0, 1, 1, 2, 2, 3, 3, 3
 
 .proc FAR_sync_chr_bank_to_music
         lda DisplayedRowCounter

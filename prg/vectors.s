@@ -14,6 +14,7 @@
 .include "palette.inc"
 .include "prng.inc"
 .include "rainbow.inc"
+.include "raster_tricks.inc"
 .include "slowam.inc"
 .include "sound.inc"
 .include "zeropage.inc"
@@ -83,8 +84,7 @@ loop:
         jsr SPRITE_TRANSFER_BASE
         debug_color 0
         ; Update palette memory very quickly
-        jsr refresh_palettes_nmi
-        ; Read controller registers and update button status
+        jsr refresh_palettes_nmi        
         ; This signals to the gameloop that it may continue
         lda GameloopCounter
         sta LastNmi
@@ -92,7 +92,12 @@ loop:
 
 lag_frame:
         ; If necessary: actions to be performed only on lag frames
-        ; (Currently nothing)
+        
+        ; Update palette memory, even on lag frames, because we may
+        ; have clobbered it during the raster split (if we are partway
+        ; through a palette update and we cause lag, oh well! try not
+        ; to do that.)
+        jsr refresh_palettes_nmi
 
 all_frames:
         ; ===========================================================
@@ -133,6 +138,10 @@ write_ppuctrl:
 
         debug_color (TINT_R | LIGHTGRAY)
 
+        ; always run this (whether it does anything meaningful is controlled with a flag)
+        jsr setup_irq_during_nmi
+        cli ; always enable interrupts; whether they get generated is up to the routine above
+
 nmi_soft_disable:
         ; Here we *only* update the audio engine, nothing else. This is mostly to
         ; smooth over transitions when loading a new level.
@@ -172,4 +181,4 @@ nmi_soft_disable:
         .segment "VECTORS"
         .addr nmi
         .addr reset
-        .addr null_irq
+        .addr irq_palette_swap

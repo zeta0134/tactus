@@ -3,6 +3,7 @@
 .global ObjPaletteDirty
 .global BgPaletteBuffer
 .global ObjPaletteBuffer
+.global HudPaletteBuffer
 .global Brightness
 .global TargetBrightness
 
