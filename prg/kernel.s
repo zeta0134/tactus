@@ -18,6 +18,7 @@
         .include "prng.inc"
         .include "ppu.inc"
         .include "rainbow.inc"
+        .include "raster_tricks.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "static_screens.inc"
@@ -167,6 +168,9 @@ MetaSpriteIndex := R0
         lda #<SPRITE_TILE_PLAYER
         sta sprite_table + MetaSpriteState::TileIndex, x
 
+        ; The title screen does not (currently) use IRQs
+        lda #0
+        sta raster_tricks_enabled
 
         ; Enable NMI first (but not rendering)
         lda #0
@@ -244,6 +248,10 @@ MetaSpriteIndex := R0
         far_call FAR_debug_nametable_header
         .endif
 
+        ; The end screens do not (currently) use IRQs
+        lda #0
+        sta raster_tricks_enabled
+
         ; Enable NMI first (but not rendering)
         lda #0
         sta NmiSoftDisable
@@ -315,6 +323,10 @@ MetaSpriteIndex := R0
         .if ::DEBUG_NAMETABLES
         far_call FAR_debug_nametable_header
         .endif
+
+        ; Gameplay does use IRQs
+        lda #1
+        sta raster_tricks_enabled
 
         ; Enable NMI first (but not rendering)
         lda #0

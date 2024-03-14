@@ -26,7 +26,7 @@ raster_tricks_enabled: .res 1
         lda #>inverted_delay_table
         sta delay_table_addr+1
 
-        lda #1
+        lda #0
         sta raster_tricks_enabled
 
         rts
@@ -75,9 +75,9 @@ return_from_delay:
 
         ; setup to disable rendering and switch palette memory to #$3F00
         lda PPUSTATUS ; 4, ensure w=0
-        lda #$3F      ; 2
+        lda #$3F      ; 2 - PPUADDR
         ldx #$00      ; 2
-        ldy #(LIGHTGRAY) ; 2
+        ldy #$00      ; 2 - PPUMASK
 
         ; ppu dot here: 253
         ; target dot: 311, 20 cycles
