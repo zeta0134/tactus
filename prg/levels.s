@@ -120,7 +120,7 @@ seed_loop:
         ; TODO: pick the boss, exit, and player spawn locations here
         ; FOR TESTING, the boss room will be slot 1
         ldx #1
-        lda #ROOM_FLAG_BOSS
+        lda #(ROOM_FLAG_BOSS | ROOM_FLAG_REVEALED)
         sta room_flags, x
         ; FOR TESTING, the exit room shall be slot 2
         ldx #2
@@ -217,7 +217,7 @@ boss_loop:
         cmp PlayerRoomIndex
         beq boss_loop
         tax
-        lda #ROOM_FLAG_BOSS
+        lda #(ROOM_FLAG_BOSS | ROOM_FLAG_REVEALED)
         sta room_flags, x
         stx BossIndex
 
@@ -365,6 +365,8 @@ check_room_clear:
         lda room_flags, x
         ora #ROOM_FLAG_CLEARED
         sta room_flags, x
+        lda #1
+        sta HudMapDirty
         jmp all_done
 
 check_chest_spawn:

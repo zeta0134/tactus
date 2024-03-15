@@ -7,6 +7,7 @@
         .include "enemies.inc"
         .include "far_call.inc"
         .include "kernel.inc"
+        .include "hud.inc"
         .include "levels.inc"
         .include "palette.inc"
         .include "player.inc"

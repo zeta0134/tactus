@@ -576,8 +576,8 @@ AttributeAddr := R14
         
         ; can we see this room at all? any room that has been either
         ; visited OR revealed should be displayed
-        ;and #(ROOM_FLAG_VISITED | ROOM_FLAG_REVEALED)
-        ;beq room_hidden
+        and #(ROOM_FLAG_VISITED | ROOM_FLAG_REVEALED)
+        beq room_hidden
         ; DEBUG: all rooms start at least 'revealed' for testing
 
         ; check for special room types, which right now include boss

@@ -196,6 +196,25 @@ TargetSquare := R13
         ora #ROOM_FLAG_TREASURE_COLLECTED
         sta room_flags, x
 
+        ; This is the big key! Now that we have it, reveal the location of the exit
+        ; stairs (this stops the player from needing to do a brute-force search)
+        ldx #0
+find_exit_loop:
+        perform_zpcm_inc
+        lda room_flags, x
+        and #ROOM_FLAG_EXIT_STAIRS
+        beq next_room
+        lda room_flags, x
+        ora #ROOM_FLAG_REVEALED
+        sta room_flags, x
+next_room:
+        inx
+        cpx #16
+        bne find_exit_loop
+
+        lda #1
+        sta HudMapDirty
+
         rts
 .endproc
 
