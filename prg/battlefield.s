@@ -22,31 +22,18 @@ tile_attributes: .res ::BATTLEFIELD_SIZE
 
 active_tile_queue: .res ::BATTLEFIELD_HEIGHT
 inactive_tile_queue: .res ::BATTLEFIELD_HEIGHT
-active_attribute_queue: .res (::BATTLEFIELD_HEIGHT / 2)
-inactive_attribute_queue: .res (::BATTLEFIELD_HEIGHT / 2)
 queued_bytes_counter: .res 1
 active_battlefield: .res 1
 
 .segment "CODE_0"
 
 .proc FAR_reset_inactive_queue
-        lda #1
-        ldy #0
-tile_loop:
-        sta inactive_tile_queue, y
-        iny
-        cpy #::BATTLEFIELD_HEIGHT
-        bne tile_loop
-
         perform_zpcm_inc
-
-        ldy #0
-attribute_loop:
-        sta inactive_attribute_queue, y
-        iny
-        cpy #(::BATTLEFIELD_HEIGHT / 2)
-        bne attribute_loop
-
+        lda #1
+        .repeat ::BATTLEFIELD_HEIGHT, i
+        sta inactive_tile_queue+i
+        .endrepeat
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -62,15 +49,7 @@ tile_loop:
         cpy #::BATTLEFIELD_HEIGHT
         bne tile_loop
 
-        perform_zpcm_inc
 
-        ldy #0
-attribute_loop:
-        lda inactive_attribute_queue, y
-        sta active_attribute_queue, y
-        iny
-        cpy #(::BATTLEFIELD_HEIGHT / 2)
-        bne attribute_loop
 
         perform_zpcm_inc
 

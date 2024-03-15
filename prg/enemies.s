@@ -39,11 +39,6 @@ TargetIndex := R0
         tax
         lda #1
         sta active_tile_queue, x
-        txa
-        lsr
-        tax
-        lda #1
-        sta active_attribute_queue, x
         rts
 .endproc
 

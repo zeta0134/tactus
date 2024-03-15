@@ -87,14 +87,10 @@ failure:
         sta tile_attributes, y
 .endmacro
 
+; TODO: for heck's sake, inline this
 .proc queue_row_x
         lda #1
         sta inactive_tile_queue, x
-        txa
-        lsr
-        tax
-        lda #1
-        sta inactive_attribute_queue, x
         rts
 .endproc
 
