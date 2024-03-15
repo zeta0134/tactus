@@ -41,23 +41,20 @@ active_battlefield: .res 1
         ; first, copy the inactive queue to the active queue
         ; rationalle: anything we didn't get around to updating still needs to be drawn, we'll
         ; just be drawing it late with a visible glitch. It's fine
-        ldy #0
-tile_loop:
-        lda inactive_tile_queue, y
-        sta active_tile_queue, y
-        iny
-        cpy #::BATTLEFIELD_HEIGHT
-        bne tile_loop
-
-
-
         perform_zpcm_inc
+        
+        .repeat ::BATTLEFIELD_HEIGHT, i
+        lda inactive_tile_queue+i
+        sta active_tile_queue+i
+        .endrepeat
 
         ; now reset the inactive queue, setting it up for a full draw
         near_call FAR_reset_inactive_queue
+
         lda active_battlefield
         eor #%00000001
         sta active_battlefield
+
         rts
 .endproc
 
@@ -212,10 +209,8 @@ ScratchAttrByte := R8
 
         ldx CurrentTile
         ldy #0
-        lda #::BATTLEFIELD_WIDTH
-        sta RowCounter
 
-top_row_loop:
+.repeat ::BATTLEFIELD_WIDTH, i
         perform_zpcm_inc
 
         ; top left tile
@@ -243,8 +238,7 @@ top_row_loop:
         iny 
 
         inx
-        dec RowCounter
-        bne top_row_loop
+.endrepeat
 
 
         add16b NametableAddr, #32
@@ -252,9 +246,8 @@ top_row_loop:
 
         ldx CurrentTile
         ldy #0
-        lda #::BATTLEFIELD_WIDTH
-        sta RowCounter
-bottom_row_loop:
+
+.repeat ::BATTLEFIELD_WIDTH, i
         perform_zpcm_inc
 
         ; bottom left tile
@@ -282,8 +275,7 @@ bottom_row_loop:
         iny
 
         inx
-        dec RowCounter
-        bne bottom_row_loop
+.endrepeat
         
         add16b NametableAddr, #32
         add16b AttributeAddr, #32
