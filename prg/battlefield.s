@@ -239,25 +239,6 @@ ScratchAttrByte := R8
 top_row_loop:
         perform_zpcm_inc
 
-        ; first, let's compute the base attribute byte
-        ; for now, the palette is stored in the low 2 bits of the battlefield behavior
-        ; ID (it determines enemy difficulty) so extract that and move it into the right
-        ; place:
-        lda battlefield, x ; xxxxxxpp
-        ror                ; cxxxxxxp
-        ror                ; pcxxxxxx
-        ror                ; ppcxxxxx
-        and #%11000000     ; pp000000
-        sta ScratchAttrByte
-        ; now the upper 6 bits of the tile attribute get added in, to choose the 4k graphics
-        ; page for this tile:
-        lda tile_attributes, x
-        and #%00111111
-        ora ScratchAttrByte
-        sta ScratchAttrByte
-        ; we'll keep that around, and add in the lighting bits as we go
-
-
         ; top left tile
         lda tile_patterns, x
         and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
@@ -265,8 +246,8 @@ top_row_loop:
         sta (NametableAddr), y  ; store that to our regular nametable
         ; top-left attribute
         lda (AttributeAddr), y
-        and #LIGHTING_MASK      ; keep only lighting bits
-        ora ScratchAttrByte     ; apply palette and high tile bits
+        and #LIGHTING_MASK      ; keep only lighting bits        
+        ora tile_attributes, x  ; NEW apply palette and high tile bits
         sta (AttributeAddr), y  ;
         iny
 
@@ -278,13 +259,14 @@ top_row_loop:
         ; top-right attribute
         lda (AttributeAddr), y
         and #LIGHTING_MASK      ; keep only lighting bits
-        ora ScratchAttrByte     ; apply palette and high tile bits
+        ora tile_attributes, x  ; NEW apply palette and high tile bits
         sta (AttributeAddr), y  ;
         iny 
 
         inx
         dec RowCounter
         bne top_row_loop
+
 
         add16b NametableAddr, #32
         add16b AttributeAddr, #32
@@ -296,23 +278,6 @@ top_row_loop:
 bottom_row_loop:
         perform_zpcm_inc
 
-        ; first, let's compute the base attribute byte
-        ; for now, this is just the two palette bits, we won't
-        ; implement an upper TileID page until we have more than 64 tile types
-        lda battlefield, x ; xxxxxxpp
-        ror                ; cxxxxxxp
-        ror                ; pcxxxxxx
-        ror                ; ppcxxxxx
-        and #%11000000     ; pp000000
-        sta ScratchAttrByte
-        ; now the upper 6 bits of the tile attribute get added in, to choose the 4k graphics
-        ; page for this tile:
-        lda tile_attributes, x
-        and #%00111111
-        ora ScratchAttrByte
-        sta ScratchAttrByte
-        ; we'll keep that around, and add in the lighting bits as we go
-
         ; bottom left tile
         lda tile_patterns, x
         and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
@@ -320,8 +285,8 @@ bottom_row_loop:
         sta (NametableAddr), y  ; store that to our regular nametable
         ; bottom-left attribute
         lda (AttributeAddr), y
-        and #LIGHTING_MASK      ; keep only lighting bits
-        ora ScratchAttrByte     ; apply palette and high tile bits
+        and #LIGHTING_MASK      ; keep only lighting bits        
+        ora tile_attributes, x  ; NEW apply palette and high tile bits
         sta (AttributeAddr), y  ;
         iny
 
@@ -333,7 +298,7 @@ bottom_row_loop:
         ; top-right attribute
         lda (AttributeAddr), y
         and #LIGHTING_MASK      ; keep only lighting bits
-        ora ScratchAttrByte     ; apply palette and high tile bits
+        ora tile_attributes, x  ; NEW apply palette and high tile bits
         sta (AttributeAddr), y  ;
         iny
 
