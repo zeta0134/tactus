@@ -19,7 +19,8 @@ done:
 ; TODO: do we really need to duplicate the entire arp structure here? noise isn't
 ; the only channel that will need special treatment, but it's a tiny bit of this
 ; code that changes and the rest is hard to keep in sync...
-.proc tick_noise_arp_envelope
+.macro inline_tick_noise_arp_envelope
+.scope
         ldx channel_index
         lda sequences_active, x
         and #SEQUENCE_ARP
@@ -58,7 +59,7 @@ done:
         lda channel_base_note, x
         sta channel_relative_frequency_low, x
 early_exit:
-        rts
+        jmp done
 
 end_not_reached:
         ; read the current sequence byte, and set instrument_volume to this
@@ -121,5 +122,5 @@ done_applying_arp:
         sta arpeggio_sequence_index, y
 
 done:
-        rts
-.endproc
+.endscope
+.endmacro

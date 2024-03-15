@@ -140,6 +140,17 @@ DPCM_ATTENUATION_THRESHOLD = 4
 
 .include "bhop/midi_lut.inc"
 
+; ##############################################################################
+; ##############################################################################
+; ##############################################################################
+; ###                                                                        ###
+; ###                               MACRO LAND                               ###
+; ###                                                                        ###
+; ##############################################################################
+; ##############################################################################
+; ##############################################################################
+
+
 .macro prepare_ptr address
         lda address
         sta bhop_ptr
@@ -185,6 +196,443 @@ positive:
         dey
 .endscope
 .endmacro
+
+; If this channel has a volume envelope active, process that
+; envelope. Upon return, instrument_volume will have the current
+; element in the sequence.
+; setup:
+;   channel_index points to channel structure
+.macro inline_tick_volume_envelope
+.scope
+        ldy channel_index
+        lda sequences_active, y
+        and #SEQUENCE_VOLUME
+        beq done ; if volume sequence isn't enabled, bail fast
+
+        ; prepare the volume pointer for reading
+        lda volume_sequence_ptr_low, y
+        sta bhop_ptr
+        lda volume_sequence_ptr_high, y
+        sta bhop_ptr + 1
+
+.if ::BHOP_VRC6_ENABLED
+        ; grab and stash the mode byte, which some expansion instruments need
+        ldy #SequenceHeader::mode
+        lda (bhop_ptr), y
+        ldy channel_index
+        sta channel_volume_mode, y
+.endif
+
+        ; read the current sequence byte, and set instrument_volume to this
+        lda volume_sequence_index, y
+        tax ; stash for later
+        ; for reading the sequence, +4
+        clc
+        adc #4
+        tay
+        lda (bhop_ptr), y
+        ldy channel_index
+        sta channel_instrument_volume, y
+
+        ; tick the sequence counter and exit
+        jsr tick_sequence_counter
+
+        ; have we reached the end of the sequence?
+        ldy #SequenceHeader::length
+        lda (bhop_ptr), y
+        sta scratch_byte
+        cpx scratch_byte
+        bne end_not_reached
+
+        ; this sequence is finished! Disable the sequence flag and exit
+        ldy channel_index
+        lda sequences_active, y
+        and #($FF - SEQUENCE_VOLUME)
+        sta sequences_active, y
+        jmp done
+
+end_not_reached:
+        ; write the new sequence index (should be in x)
+        ldy channel_index
+        txa
+        sta volume_sequence_index, y
+
+done:
+.endscope
+.endmacro
+
+; If this channel has a duty envelope active, process that
+; envelope. Upon return, instrument_duty is set
+; setup:
+;   channel_index points to channel structure
+.macro inline_tick_duty_envelope
+.scope
+        ldy channel_index
+        lda sequences_active, y
+        and #SEQUENCE_DUTY
+        beq done ; if sequence isn't enabled, bail fast
+
+        ; prepare the duty pointer for reading
+        lda duty_sequence_ptr_low, y
+        sta bhop_ptr
+        lda duty_sequence_ptr_high, y
+        sta bhop_ptr + 1
+
+        ; read the current sequence byte, and set instrument_volume to this
+        lda duty_sequence_index, y
+        tax ; stash for later
+        ; for reading the sequence, +4
+        clc
+        adc #4
+        tay
+        lda (bhop_ptr), y
+        ldy channel_index
+        sta channel_instrument_duty, y
+
+        ; tick the sequence counter and exit
+        jsr tick_sequence_counter
+
+        ; have we reached the end of the sequence?
+        ldy #SequenceHeader::length
+        lda (bhop_ptr), y
+        sta scratch_byte
+        cpx scratch_byte
+        bne end_not_reached
+
+        ; this sequence is finished! Disable the sequence flag and exit
+        ldy channel_index
+        lda sequences_active, y
+        and #($FF - SEQUENCE_DUTY)
+        sta sequences_active, y
+        jmp done
+
+end_not_reached:
+        ; write the new sequence index (should still be in x)
+        ldy channel_index
+        txa
+        sta duty_sequence_index, y
+
+done:
+.endscope
+.endmacro
+
+; If this channel has an arp envelope active, process that
+; envelope. Upon return, base_note and relative_frequency are set
+; setup:
+;   channel_index, channel_index points to channel structure
+.macro inline_tick_arp_envelope
+.scope
+        ldx channel_index
+        lda sequences_active, x
+        and #SEQUENCE_ARP
+        beq early_exit ; if sequence isn't enabled, bail fast
+
+        ; prepare the arp pointer for reading
+        lda arpeggio_sequence_ptr_low, x
+        sta bhop_ptr
+        lda arpeggio_sequence_ptr_high, x
+        sta bhop_ptr + 1
+
+        ; For fixed arps, we need to "reset" the channel if the envelope finishes, so we're doing
+        ; the length check first thing
+
+        lda arpeggio_sequence_index, x
+        sta scratch_byte
+        ; have we reached the end of the sequence?
+        ldy #SequenceHeader::length
+        lda (bhop_ptr), y
+        cmp scratch_byte
+        bne end_not_reached
+
+        ; this sequence is finished! Disable the sequence flag
+        lda sequences_active, x
+        and #($FF - SEQUENCE_ARP)
+        sta sequences_active, x
+
+        ; is this a fixed arp?
+        ldy #SequenceHeader::mode
+        lda (bhop_ptr), y
+        cmp #ARP_MODE_FIXED
+        bne early_exit
+
+        ; apply the current base note as the channel frequency,
+        ; then exit:
+        lda channel_base_note, x
+        jsr set_channel_relative_frequency
+
+; ???
+early_exit:
+        jmp done
+
+end_not_reached:
+        ; read the current sequence byte, and set instrument_volume to this
+        lda arpeggio_sequence_index, x
+        pha ; stash for later
+        ; for reading the sequence, +4
+        clc
+        adc #4
+        tay
+        lda (bhop_ptr), y
+        sta scratch_byte ; will affect the note, depending on mode
+        clc
+
+        ; what we actually *do* with the arp byte depends on the mode
+        ldy #SequenceHeader::mode
+        lda (bhop_ptr), y
+        cmp #ARP_MODE_ABSOLUTE
+        beq arp_absolute
+        cmp #ARP_MODE_RELATIVE
+        beq arp_relative
+        cmp #ARP_MODE_FIXED
+        beq arp_fixed
+        ; ARP SCHEME, unimplemented! for now, treat this just like absolute
+arp_absolute:
+        ; arp is an offset from base note to apply each frame
+        lda channel_base_note, x
+        clc
+        adc scratch_byte
+        jmp apply_arp
+arp_relative:
+        ; were we just triggered? if so, reset the relative offset
+        lda channel_status, x
+        and #CHANNEL_TRIGGERED
+        beq not_triggered
+        lda #0
+        sta channel_relative_note_offset, x
+not_triggered:
+        ; arp accumulates an offset each frame, from the previous frame
+        lda channel_relative_note_offset, x
+        clc
+        adc scratch_byte
+        sta channel_relative_note_offset, x
+        ; this offset is then applied to base_note
+        lda channel_base_note, x
+        clc
+        adc channel_relative_note_offset, x
+        ; stuff that result in y, and apply it
+        jmp apply_arp
+arp_fixed:
+        ; the arp value +1 is the note to apply
+        lda scratch_byte
+        clc
+        adc #1
+        ; fall through to apply_arp
+apply_arp:
+        jsr set_channel_relative_frequency
+
+done_applying_arp:
+        pla ; unstash the sequence counter
+        tax ; move into x, which tick_sequence_counter expects
+
+        ; tick the sequence counter and exit
+        jsr tick_sequence_counter
+
+        ; write the new sequence index (should still be in x)
+        ldy channel_index
+        txa
+        sta arpeggio_sequence_index, y
+
+done:
+.endscope
+.endmacro
+
+; If this channel has a pitch envelope active, process that
+; envelope. Upon return, relative_pitch is set
+; setup:
+;   channel_index points to channel structure
+.macro inline_tick_pitch_envelope
+.scope
+        ldy channel_index
+        lda sequences_active, y
+        and #SEQUENCE_PITCH
+        beq done ; if sequence isn't enabled, bail fast
+
+        ; prepare the pitch pointer for reading
+        lda pitch_sequence_ptr_low, y
+        sta bhop_ptr
+        lda pitch_sequence_ptr_high, y
+        sta bhop_ptr + 1
+
+        ; read the current sequence byte, and set instrument_volume to this
+        lda pitch_sequence_index, y
+        tax ; stash for later
+        ; for reading the sequence, +4
+        clc
+        adc #4
+        tay
+        lda (bhop_ptr), y
+        sta scratch_byte
+
+        ; what we do here depends on the mode
+        ldy #SequenceHeader::mode
+        lda (bhop_ptr), y
+        cmp #PITCH_MODE_RELATIVE
+        beq relative_pitch_mode
+absolute_pitch_mode:
+        ; additional guard: if we are currently running an arp
+        ; envelope, then temporarily pretend to be in relative_pitch mode
+        ; (otherwise we cancel out the arp)
+        ldy channel_index
+        lda sequences_active, y
+        and #SEQUENCE_ARP
+        bne relative_pitch_mode
+
+        ; in absolute mode, reset to base_frequency before
+        ; performing the addition
+        lda channel_base_frequency_low, y
+        sta channel_relative_frequency_low, y
+        lda channel_base_frequency_high, y
+        sta channel_relative_frequency_high, y
+relative_pitch_mode:
+        ; add this data to relative_pitch
+        ldy channel_index
+        sadd16_split_y channel_relative_frequency_low, channel_relative_frequency_high, scratch_byte
+        ; TODO: if we were to implement bounds checks, they would go here
+
+done_applying_pitch:
+        ; tick the sequence counter and exit
+        jsr tick_sequence_counter
+
+        ; have we reached the end of the sequence?
+        ldy #SequenceHeader::length
+        lda (bhop_ptr), y
+        sta scratch_byte
+        cpx scratch_byte
+        bne end_not_reached
+
+        ; this sequence is finished! Disable the sequence flag and exit
+        ldy channel_index
+        lda sequences_active, y
+        and #($FF - SEQUENCE_PITCH)
+        sta sequences_active, y
+        jmp done
+
+end_not_reached:
+        ; write the new sequence index (should still be in x)
+        ldy channel_index
+        txa
+        sta pitch_sequence_index, y
+
+done:
+.endscope
+.endmacro
+
+.macro inline_tick_delayed_effects
+.scope
+        ; Gxx: delayed pattern row
+        ldx channel_index
+        lda effect_note_delay, x
+        beq done_with_note_delay
+        dec effect_note_delay, x
+        bne done_with_note_delay
+        ; we just decremented the effect counter from 1 -> 0,
+        ; so apply a note delay. In this case, tick the bytecode reader
+        ; one time:
+        jsr advance_channel_row
+.if ::BHOP_PATTERN_BANKING
+        ; That might have clobbered the module bank, so restore it before continuing
+        lda module_bank
+        switch_music_bank
+.endif
+        ; if this is the noise channel, fix its frequency
+        lda channel_index
+        cmp #3
+        bne done_with_note_delay
+        jsr fix_noise_freq
+done_with_note_delay:
+        ; Sxx: delayed note cut
+        ldx channel_index
+        lda effect_cut_delay, x
+        beq done_with_cut_delay
+        dec effect_cut_delay, x
+        bne done_with_cut_delay
+        ; apply a note cut, immediately silencing this channel and cancel delayed release
+.if ::BHOP_DELAYED_RELEASE_ENABLED
+        lda #0
+        sta effect_release_delay, x
+.endif
+        lda channel_status, x
+        and #($FF - CHANNEL_FRESH_DELAYED_CUT - CHANNEL_FRESH_DELAYED_RELEASE)
+        ora #CHANNEL_MUTED
+        sta channel_status, x
+        jne done_with_delays
+done_with_cut_delay:
+.if ::BHOP_DELAYED_RELEASE_ENABLED
+        lda effect_release_delay, x
+        beq done_with_delays
+        dec effect_release_delay, x
+        bne done_with_delays
+        ; note release
+        lda channel_status, x
+        and #($FF - CHANNEL_FRESH_DELAYED_RELEASE)
+        ora #CHANNEL_RELEASED
+        sta channel_status, x
+.if ::BHOP_PATTERN_BANKING
+        ; Instruments live in the module bank, so we need to swap that in before processing them
+        lda module_bank
+        switch_music_bank
+.endif      
+        jsr apply_release
+.if ::BHOP_PATTERN_BANKING
+        ; And now we need to switch back to the pattern bank before continuing
+        ldx channel_index
+        lda channel_pattern_bank, x
+        switch_music_bank
+        ldx channel_index ; un-clobber
+.endif
+.endif
+done_with_delays:    
+.endscope    
+.endmacro
+
+.macro initialize_detuned_frequency
+        ldx channel_index
+        lda channel_relative_frequency_low, x
+        sta channel_detuned_frequency_low, x
+        lda channel_relative_frequency_high, x
+        sta channel_detuned_frequency_high, x
+.endmacro
+
+.macro release_sequence sequence_type, sequence_ptr_low, sequence_ptr_high, pitch_sequence_index
+.scope
+        lda sequences_active, x
+        and #sequence_type
+        beq done_with_sequence ; if sequence isn't enabled, bail fast
+
+        ; prepare the pitch pointer for reading
+        lda sequence_ptr_low, x
+        sta bhop_ptr
+        lda sequence_ptr_high, x
+        sta bhop_ptr + 1
+
+        ; do we have a release point enabled?
+        ldy #SequenceHeader::release_point
+        lda (bhop_ptr), y
+        beq done_with_sequence
+        ; set the sequence index to the release point immediately
+        ; (it will be ticked *past* this point on the next cycle)
+        sec
+        sbc #1
+        sta pitch_sequence_index, x
+done_with_sequence:
+.endscope
+.endmacro
+
+; ##############################################################################
+; ##############################################################################
+; ##############################################################################
+
+.include "bhop/util.asm"
+.include "bhop/2a03_noise.asm"
+.if ::BHOP_ZSAW_ENABLED
+.include "bhop/2a03_zsaw.asm"
+.endif
+.if ::BHOP_MMC5_ENABLED
+.include "bhop/mmc5.asm"
+.endif
+.if ::BHOP_VRC6_ENABLED
+.include "bhop/vrc6.asm"
+.endif
 
 .proc bhop_set_module_bank
 .if ::BHOP_PATTERN_BANKING
@@ -1211,318 +1659,100 @@ done:
         rts
 .endproc
 
-.proc tick_delayed_effects
-        ; Gxx: delayed pattern row
-        ldx channel_index
-        lda effect_note_delay, x
-        beq done_with_note_delay
-        dec effect_note_delay, x
-        bne done_with_note_delay
-        ; we just decremented the effect counter from 1 -> 0,
-        ; so apply a note delay. In this case, tick the bytecode reader
-        ; one time:
-        jsr advance_channel_row
-.if ::BHOP_PATTERN_BANKING
-        ; That might have clobbered the module bank, so restore it before continuing
-        lda module_bank
-        switch_music_bank
-.endif
-        ; if this is the noise channel, fix its frequency
-        lda channel_index
-        cmp #3
-        bne done_with_note_delay
-        jsr fix_noise_freq
-done_with_note_delay:
-        ; Sxx: delayed note cut
-        ldx channel_index
-        lda effect_cut_delay, x
-        beq done_with_cut_delay
-        dec effect_cut_delay, x
-        bne done_with_cut_delay
-        ; apply a note cut, immediately silencing this channel and cancel delayed release
-.if ::BHOP_DELAYED_RELEASE_ENABLED
-        lda #0
-        sta effect_release_delay, x
-.endif
-        lda channel_status, x
-        and #($FF - CHANNEL_FRESH_DELAYED_CUT - CHANNEL_FRESH_DELAYED_RELEASE)
-        ora #CHANNEL_MUTED
-        sta channel_status, x
-        jne done_with_delays
-done_with_cut_delay:
-.if ::BHOP_DELAYED_RELEASE_ENABLED
-        lda effect_release_delay, x
-        beq done_with_delays
-        dec effect_release_delay, x
-        bne done_with_delays
-        ; note release
-        lda channel_status, x
-        and #($FF - CHANNEL_FRESH_DELAYED_RELEASE)
-        ora #CHANNEL_RELEASED
-        sta channel_status, x
-.if ::BHOP_PATTERN_BANKING
-        ; Instruments live in the module bank, so we need to swap that in before processing them
-        lda module_bank
-        switch_music_bank
-.endif      
-        jsr apply_release
-.if ::BHOP_PATTERN_BANKING
-        ; And now we need to switch back to the pattern bank before continuing
-        ldx channel_index
-        lda channel_pattern_bank, x
-        switch_music_bank
-        ldx channel_index ; un-clobber
-.endif
-.endif
-done_with_delays:
+.proc tick_melodic_effects
+        perform_zpcm_inc
+        inline_tick_delayed_effects
+        perform_zpcm_inc
+        inline_tick_volume_envelope
+        perform_zpcm_inc
+        inline_tick_duty_envelope
+        perform_zpcm_inc
+        inline_update_arp
+        perform_zpcm_inc
+        inline_update_pitch_effects
+        perform_zpcm_inc
+        inline_update_volume_effects
+        perform_zpcm_inc
+        inline_tick_arp_envelope
+        perform_zpcm_inc
+        inline_tick_pitch_envelope
+        perform_zpcm_inc
+        initialize_detuned_frequency
+        inline_update_vibrato
+        perform_zpcm_inc
+        inline_update_tuning
+        perform_zpcm_inc
         rts
 .endproc
 
-.macro initialize_detuned_frequency
-        ldx channel_index
-        lda channel_relative_frequency_low, x
-        sta channel_detuned_frequency_low, x
-        lda channel_relative_frequency_high, x
-        sta channel_detuned_frequency_high, x
-.endmacro
+.proc tick_tnd_effects
+        lda #TRIANGLE_INDEX
+        sta channel_index
+        inline_tick_delayed_effects
+        perform_zpcm_inc
+        inline_tick_volume_envelope
+        perform_zpcm_inc
+        inline_update_arp
+        perform_zpcm_inc
+        inline_update_pitch_effects
+        perform_zpcm_inc
+        inline_tick_arp_envelope
+        perform_zpcm_inc
+        inline_tick_pitch_envelope
+        perform_zpcm_inc
+        initialize_detuned_frequency
+        inline_update_vibrato
+        perform_zpcm_inc
+        inline_update_tuning
+        perform_zpcm_inc
+
+        lda #NOISE_INDEX
+        sta channel_index
+        inline_tick_delayed_effects
+        perform_zpcm_inc
+        inline_update_volume_effects
+        perform_zpcm_inc
+        inline_tick_volume_envelope
+        perform_zpcm_inc
+        inline_tick_duty_envelope
+        perform_zpcm_inc
+        inline_tick_noise_arp_envelope
+        perform_zpcm_inc
+        inline_tick_pitch_envelope
+        perform_zpcm_inc
+
+        lda #DPCM_INDEX
+        sta channel_index
+        inline_tick_delayed_effects
+        perform_zpcm_inc
+        rts
+.endproc
 
 .proc tick_envelopes_and_effects
         ; PULSE 1
         lda #PULSE_1_INDEX
         sta channel_index
-        perform_zpcm_inc
-        jsr tick_delayed_effects
-        perform_zpcm_inc
-        jsr tick_volume_envelope
-        perform_zpcm_inc
-        jsr tick_duty_envelope
-        perform_zpcm_inc
-        ; the order of pitch updates matters a lot to match FT behavior
-        jsr update_arp
-        perform_zpcm_inc
-        jsr update_pitch_effects
-        perform_zpcm_inc
-        jsr update_volume_effects
-        perform_zpcm_inc
-        jsr tick_arp_envelope
-        perform_zpcm_inc
-        jsr tick_pitch_envelope
-        perform_zpcm_inc
-        initialize_detuned_frequency
-        perform_zpcm_inc
-        jsr update_vibrato
-        perform_zpcm_inc
-        jsr update_tuning
-        perform_zpcm_inc
-
+        jsr tick_melodic_effects
+       
         ; PULSE 2
         lda #PULSE_2_INDEX
         sta channel_index
-        jsr tick_delayed_effects
-        perform_zpcm_inc
-        jsr tick_volume_envelope
-        perform_zpcm_inc
-        jsr tick_duty_envelope
-        perform_zpcm_inc
-        jsr update_arp
-        perform_zpcm_inc
-        jsr update_pitch_effects
-        perform_zpcm_inc
-        jsr update_volume_effects
-        perform_zpcm_inc
-        jsr tick_arp_envelope
-        perform_zpcm_inc
-        jsr tick_pitch_envelope
-        perform_zpcm_inc
-        initialize_detuned_frequency
-        jsr update_vibrato
-        perform_zpcm_inc
-        jsr update_tuning
-        perform_zpcm_inc
+        jsr tick_melodic_effects
 
-        ; TRIANGLE
-        lda #TRIANGLE_INDEX
-        sta channel_index
-        jsr tick_delayed_effects
-        perform_zpcm_inc
-        jsr tick_volume_envelope
-        perform_zpcm_inc
-        jsr update_arp
-        perform_zpcm_inc
-        jsr update_pitch_effects
-        perform_zpcm_inc
-        jsr tick_arp_envelope
-        perform_zpcm_inc
-        jsr tick_pitch_envelope
-        perform_zpcm_inc
-        initialize_detuned_frequency
-        jsr update_vibrato
-        perform_zpcm_inc
-        jsr update_tuning
-        perform_zpcm_inc
-
-        ; NOISE
-        lda #NOISE_INDEX
-        sta channel_index
-        jsr tick_delayed_effects
-        perform_zpcm_inc
-        jsr update_volume_effects
-        perform_zpcm_inc
-        jsr tick_volume_envelope
-        perform_zpcm_inc
-        jsr tick_duty_envelope
-        perform_zpcm_inc
-        jsr tick_noise_arp_envelope
-        perform_zpcm_inc
-        jsr tick_pitch_envelope
-        perform_zpcm_inc
-
-        ; DPCM
-        lda #DPCM_INDEX
-        sta channel_index
-        jsr tick_delayed_effects
-        perform_zpcm_inc
-
-.if ::BHOP_ZSAW_ENABLED
-        ; Z-Saw
-        lda #ZSAW_INDEX
-        sta channel_index
-        jsr tick_delayed_effects
-        perform_zpcm_inc
-        jsr update_volume_effects
-        perform_zpcm_inc
-        jsr tick_volume_envelope
-        perform_zpcm_inc
-        jsr tick_duty_envelope_zsaw
-        perform_zpcm_inc
-        jsr update_arp_zsaw
-        perform_zpcm_inc
-        jsr tick_arp_envelope_zsaw
-        perform_zpcm_inc
-.endif
-
-.if ::BHOP_MMC5_ENABLED
-        lda #MMC5_PULSE_1_INDEX
-        sta channel_index
-        jsr tick_delayed_effects
-        perform_zpcm_inc
-        jsr tick_volume_envelope
-        perform_zpcm_inc
-        jsr tick_duty_envelope
-        perform_zpcm_inc
-        jsr update_arp
-        perform_zpcm_inc
-        jsr update_pitch_effects
-        perform_zpcm_inc
-        jsr update_volume_effects
-        perform_zpcm_inc
-        jsr tick_arp_envelope
-        perform_zpcm_inc
-        jsr tick_pitch_envelope
-        perform_zpcm_inc
-        initialize_detuned_frequency
-        jsr update_vibrato
-        perform_zpcm_inc
-        jsr update_tuning
-        perform_zpcm_inc
-
-        lda #MMC5_PULSE_2_INDEX
-        sta channel_index
-        jsr tick_delayed_effects
-        perform_zpcm_inc
-        jsr tick_volume_envelope
-        perform_zpcm_inc
-        jsr tick_duty_envelope
-        perform_zpcm_inc
-        jsr update_arp
-        perform_zpcm_inc
-        jsr update_pitch_effects
-        perform_zpcm_inc
-        jsr update_volume_effects
-        perform_zpcm_inc
-        jsr tick_arp_envelope
-        perform_zpcm_inc
-        jsr tick_pitch_envelope
-        perform_zpcm_inc
-        initialize_detuned_frequency
-        jsr update_vibrato
-        perform_zpcm_inc
-        jsr update_tuning
-        perform_zpcm_inc
-.endif
+        jsr tick_tnd_effects
 
 .if ::BHOP_VRC6_ENABLED
         lda #VRC6_PULSE_1_INDEX
         sta channel_index
-        jsr tick_delayed_effects
-        perform_zpcm_inc
-        jsr tick_volume_envelope
-        perform_zpcm_inc
-        jsr tick_duty_envelope
-        perform_zpcm_inc
-        jsr update_arp
-        perform_zpcm_inc
-        jsr update_pitch_effects
-        perform_zpcm_inc
-        jsr update_volume_effects
-        perform_zpcm_inc
-        jsr tick_arp_envelope
-        perform_zpcm_inc
-        jsr tick_pitch_envelope
-        perform_zpcm_inc
-        initialize_detuned_frequency
-        jsr update_vibrato
-        perform_zpcm_inc
-        jsr update_tuning
-        perform_zpcm_inc
+        jsr tick_melodic_effects
 
         lda #VRC6_PULSE_2_INDEX
         sta channel_index
-        jsr tick_delayed_effects
-        perform_zpcm_inc
-        jsr tick_volume_envelope
-        perform_zpcm_inc
-        jsr tick_duty_envelope
-        perform_zpcm_inc
-        jsr update_arp
-        perform_zpcm_inc
-        jsr update_pitch_effects
-        perform_zpcm_inc
-        jsr update_volume_effects
-        perform_zpcm_inc
-        jsr tick_arp_envelope
-        perform_zpcm_inc
-        jsr tick_pitch_envelope
-        perform_zpcm_inc
-        initialize_detuned_frequency
-        jsr update_vibrato
-        perform_zpcm_inc
-        jsr update_tuning
-        perform_zpcm_inc
+        jsr tick_melodic_effects
 
         lda #VRC6_SAWTOOTH_INDEX
         sta channel_index
-        jsr tick_delayed_effects
-        perform_zpcm_inc
-        jsr tick_volume_envelope
-        perform_zpcm_inc
-        jsr tick_duty_envelope
-        perform_zpcm_inc
-        jsr update_arp
-        perform_zpcm_inc
-        jsr update_pitch_effects
-        perform_zpcm_inc
-        jsr update_volume_effects
-        perform_zpcm_inc
-        jsr tick_arp_envelope
-        perform_zpcm_inc
-        jsr tick_pitch_envelope
-        perform_zpcm_inc
-        initialize_detuned_frequency
-        jsr update_vibrato
-        perform_zpcm_inc
-        jsr update_tuning
-        perform_zpcm_inc
+        jsr tick_melodic_effects
 .endif
 
         rts
@@ -1659,321 +1889,6 @@ done_loading_sequences:
         rts
 .endproc
 
-; If this channel has a volume envelope active, process that
-; envelope. Upon return, instrument_volume will have the current
-; element in the sequence.
-; setup:
-;   channel_index points to channel structure
-.proc tick_volume_envelope
-        ldy channel_index
-        lda sequences_active, y
-        and #SEQUENCE_VOLUME
-        beq done ; if volume sequence isn't enabled, bail fast
-
-        ; prepare the volume pointer for reading
-        lda volume_sequence_ptr_low, y
-        sta bhop_ptr
-        lda volume_sequence_ptr_high, y
-        sta bhop_ptr + 1
-
-.if ::BHOP_VRC6_ENABLED
-        ; grab and stash the mode byte, which some expansion instruments need
-        ldy #SequenceHeader::mode
-        lda (bhop_ptr), y
-        ldy channel_index
-        sta channel_volume_mode, y
-.endif
-
-        ; read the current sequence byte, and set instrument_volume to this
-        lda volume_sequence_index, y
-        tax ; stash for later
-        ; for reading the sequence, +4
-        clc
-        adc #4
-        tay
-        lda (bhop_ptr), y
-        ldy channel_index
-        sta channel_instrument_volume, y
-
-        ; tick the sequence counter and exit
-        jsr tick_sequence_counter
-
-        ; have we reached the end of the sequence?
-        ldy #SequenceHeader::length
-        lda (bhop_ptr), y
-        sta scratch_byte
-        cpx scratch_byte
-        bne end_not_reached
-
-        ; this sequence is finished! Disable the sequence flag and exit
-        ldy channel_index
-        lda sequences_active, y
-        and #($FF - SEQUENCE_VOLUME)
-        sta sequences_active, y
-        rts
-
-end_not_reached:
-        ; write the new sequence index (should be in x)
-        ldy channel_index
-        txa
-        sta volume_sequence_index, y
-
-done:
-        rts
-.endproc
-
-; If this channel has a duty envelope active, process that
-; envelope. Upon return, instrument_duty is set
-; setup:
-;   channel_index points to channel structure
-.proc tick_duty_envelope
-        ldy channel_index
-        lda sequences_active, y
-        and #SEQUENCE_DUTY
-        beq done ; if sequence isn't enabled, bail fast
-
-        ; prepare the duty pointer for reading
-        lda duty_sequence_ptr_low, y
-        sta bhop_ptr
-        lda duty_sequence_ptr_high, y
-        sta bhop_ptr + 1
-
-        ; read the current sequence byte, and set instrument_volume to this
-        lda duty_sequence_index, y
-        tax ; stash for later
-        ; for reading the sequence, +4
-        clc
-        adc #4
-        tay
-        lda (bhop_ptr), y
-        ldy channel_index
-        sta channel_instrument_duty, y
-
-        ; tick the sequence counter and exit
-        jsr tick_sequence_counter
-
-        ; have we reached the end of the sequence?
-        ldy #SequenceHeader::length
-        lda (bhop_ptr), y
-        sta scratch_byte
-        cpx scratch_byte
-        bne end_not_reached
-
-        ; this sequence is finished! Disable the sequence flag and exit
-        ldy channel_index
-        lda sequences_active, y
-        and #($FF - SEQUENCE_DUTY)
-        sta sequences_active, y
-        rts
-
-end_not_reached:
-        ; write the new sequence index (should still be in x)
-        ldy channel_index
-        txa
-        sta duty_sequence_index, y
-
-done:
-        rts
-.endproc
-
-; If this channel has an arp envelope active, process that
-; envelope. Upon return, base_note and relative_frequency are set
-; setup:
-;   channel_index, channel_index points to channel structure
-.proc tick_arp_envelope
-        ldx channel_index
-        lda sequences_active, x
-        and #SEQUENCE_ARP
-        beq early_exit ; if sequence isn't enabled, bail fast
-
-        ; prepare the arp pointer for reading
-        lda arpeggio_sequence_ptr_low, x
-        sta bhop_ptr
-        lda arpeggio_sequence_ptr_high, x
-        sta bhop_ptr + 1
-
-        ; For fixed arps, we need to "reset" the channel if the envelope finishes, so we're doing
-        ; the length check first thing
-
-        lda arpeggio_sequence_index, x
-        sta scratch_byte
-        ; have we reached the end of the sequence?
-        ldy #SequenceHeader::length
-        lda (bhop_ptr), y
-        cmp scratch_byte
-        bne end_not_reached
-
-        ; this sequence is finished! Disable the sequence flag
-        lda sequences_active, x
-        and #($FF - SEQUENCE_ARP)
-        sta sequences_active, x
-
-        ; is this a fixed arp?
-        ldy #SequenceHeader::mode
-        lda (bhop_ptr), y
-        cmp #ARP_MODE_FIXED
-        bne early_exit
-
-        ; apply the current base note as the channel frequency,
-        ; then exit:
-        lda channel_base_note, x
-        jsr set_channel_relative_frequency
-
-early_exit:
-        rts
-
-end_not_reached:
-        ; read the current sequence byte, and set instrument_volume to this
-        lda arpeggio_sequence_index, x
-        pha ; stash for later
-        ; for reading the sequence, +4
-        clc
-        adc #4
-        tay
-        lda (bhop_ptr), y
-        sta scratch_byte ; will affect the note, depending on mode
-        clc
-
-        ; what we actually *do* with the arp byte depends on the mode
-        ldy #SequenceHeader::mode
-        lda (bhop_ptr), y
-        cmp #ARP_MODE_ABSOLUTE
-        beq arp_absolute
-        cmp #ARP_MODE_RELATIVE
-        beq arp_relative
-        cmp #ARP_MODE_FIXED
-        beq arp_fixed
-        ; ARP SCHEME, unimplemented! for now, treat this just like absolute
-arp_absolute:
-        ; arp is an offset from base note to apply each frame
-        lda channel_base_note, x
-        clc
-        adc scratch_byte
-        jmp apply_arp
-arp_relative:
-        ; were we just triggered? if so, reset the relative offset
-        lda channel_status, x
-        and #CHANNEL_TRIGGERED
-        beq not_triggered
-        lda #0
-        sta channel_relative_note_offset, x
-not_triggered:
-        ; arp accumulates an offset each frame, from the previous frame
-        lda channel_relative_note_offset, x
-        clc
-        adc scratch_byte
-        sta channel_relative_note_offset, x
-        ; this offset is then applied to base_note
-        lda channel_base_note, x
-        clc
-        adc channel_relative_note_offset, x
-        ; stuff that result in y, and apply it
-        jmp apply_arp
-arp_fixed:
-        ; the arp value +1 is the note to apply
-        lda scratch_byte
-        clc
-        adc #1
-        ; fall through to apply_arp
-apply_arp:
-        jsr set_channel_relative_frequency
-
-done_applying_arp:
-        pla ; unstash the sequence counter
-        tax ; move into x, which tick_sequence_counter expects
-
-        ; tick the sequence counter and exit
-        jsr tick_sequence_counter
-
-        ; write the new sequence index (should still be in x)
-        ldy channel_index
-        txa
-        sta arpeggio_sequence_index, y
-
-done:
-        rts
-.endproc
-
-; If this channel has a pitch envelope active, process that
-; envelope. Upon return, relative_pitch is set
-; setup:
-;   channel_index points to channel structure
-.proc tick_pitch_envelope
-        ldy channel_index
-        lda sequences_active, y
-        and #SEQUENCE_PITCH
-        beq done ; if sequence isn't enabled, bail fast
-
-        ; prepare the pitch pointer for reading
-        lda pitch_sequence_ptr_low, y
-        sta bhop_ptr
-        lda pitch_sequence_ptr_high, y
-        sta bhop_ptr + 1
-
-        ; read the current sequence byte, and set instrument_volume to this
-        lda pitch_sequence_index, y
-        tax ; stash for later
-        ; for reading the sequence, +4
-        clc
-        adc #4
-        tay
-        lda (bhop_ptr), y
-        sta scratch_byte
-
-        ; what we do here depends on the mode
-        ldy #SequenceHeader::mode
-        lda (bhop_ptr), y
-        cmp #PITCH_MODE_RELATIVE
-        beq relative_pitch_mode
-absolute_pitch_mode:
-        ; additional guard: if we are currently running an arp
-        ; envelope, then temporarily pretend to be in relative_pitch mode
-        ; (otherwise we cancel out the arp)
-        ldy channel_index
-        lda sequences_active, y
-        and #SEQUENCE_ARP
-        bne relative_pitch_mode
-
-        ; in absolute mode, reset to base_frequency before
-        ; performing the addition
-        lda channel_base_frequency_low, y
-        sta channel_relative_frequency_low, y
-        lda channel_base_frequency_high, y
-        sta channel_relative_frequency_high, y
-relative_pitch_mode:
-        ; add this data to relative_pitch
-        ldy channel_index
-        sadd16_split_y channel_relative_frequency_low, channel_relative_frequency_high, scratch_byte
-        ; TODO: if we were to implement bounds checks, they would go here
-
-done_applying_pitch:
-        ; tick the sequence counter and exit
-        jsr tick_sequence_counter
-
-        ; have we reached the end of the sequence?
-        ldy #SequenceHeader::length
-        lda (bhop_ptr), y
-        sta scratch_byte
-        cpx scratch_byte
-        bne end_not_reached
-
-        ; this sequence is finished! Disable the sequence flag and exit
-        ldy channel_index
-        lda sequences_active, y
-        and #($FF - SEQUENCE_PITCH)
-        sta sequences_active, y
-        rts
-
-end_not_reached:
-        ; write the new sequence index (should still be in x)
-        ldy channel_index
-        txa
-        sta pitch_sequence_index, y
-
-done:
-        rts
-.endproc
-
 ; setup:
 ;   channel_index points to channel structure
 ;   bhop_ptr points to start of sequence data
@@ -2045,31 +1960,6 @@ release_point_not_reached:
 done:
         rts
 .endproc
-
-.macro release_sequence sequence_type, sequence_ptr_low, sequence_ptr_high, pitch_sequence_index
-.scope
-        lda sequences_active, x
-        and #sequence_type
-        beq done_with_sequence ; if sequence isn't enabled, bail fast
-
-        ; prepare the pitch pointer for reading
-        lda sequence_ptr_low, x
-        sta bhop_ptr
-        lda sequence_ptr_high, x
-        sta bhop_ptr + 1
-
-        ; do we have a release point enabled?
-        ldy #SequenceHeader::release_point
-        lda (bhop_ptr), y
-        beq done_with_sequence
-        ; set the sequence index to the release point immediately
-        ; (it will be ticked *past* this point on the next cycle)
-        sec
-        sbc #1
-        sta pitch_sequence_index, x
-done_with_sequence:
-.endscope
-.endmacro
 
 ; If this channel has any envelopes, and those envelopes
 ; have a release point, jump to it immediately
@@ -2751,19 +2641,6 @@ done:
         sta channel_status, x
         rts
 .endproc
-
-.include "bhop/util.asm"
-.include "bhop/2a03_noise.asm"
-.if ::BHOP_ZSAW_ENABLED
-.include "bhop/2a03_zsaw.asm"
-.endif
-.if ::BHOP_MMC5_ENABLED
-.include "bhop/mmc5.asm"
-.endif
-.if ::BHOP_VRC6_ENABLED
-.include "bhop/vrc6.asm"
-.endif
-
 
 volume_table:
         .byte $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0

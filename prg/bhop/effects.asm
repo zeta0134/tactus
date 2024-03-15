@@ -67,7 +67,8 @@ invert_read:
 ; effects:
 ;   detuned_frequency has vibrato strength applied to it
 ; clobbers: x, y, scratch_byte
-.proc update_vibrato
+.macro inline_update_vibrato
+.scope
         ldx channel_index
         lda channel_vibrato_settings, x
         beq done ; bail early if vibrato is disabled
@@ -83,23 +84,23 @@ invert_read:
         sta scratch_byte
         sadd16_split_x channel_detuned_frequency_low, channel_detuned_frequency_high, scratch_byte
 done:
-        rts
-.endproc
+.endscope
+.endmacro
 
-.proc update_tuning
+.macro inline_update_tuning
         ldx channel_index
         lda channel_tuning, x
         sta scratch_byte
         sadd16_split_x channel_detuned_frequency_low, channel_detuned_frequency_high, scratch_byte
-        rts
-.endproc
+.endmacro
 
 ; prep:
 ;   channel_index set for the desired channel
 ;   base_note contains the tracked note
 ; effects:
 ;   relative_frequency gets the arp'd note
-.proc update_arp
+.macro inline_update_arp
+.scope
         ldx channel_index
         lda channel_pitch_effects_active, x
         and #(PITCH_EFFECT_ARP)
@@ -142,8 +143,8 @@ increment_arp_counter:
         sta channel_arpeggio_counter, x
 
 done:
-        rts
-.endproc
+.endscope        
+.endmacro
 
 .if ::BHOP_ZSAW_ENABLED
 ; prep:
@@ -210,7 +211,8 @@ done:
 ; effects:
 ;   relative_frequency gets the adjusted frequency
 ;   on trigger, base_note might be adjusted (depends on effect)
-.proc update_pitch_effects
+.macro inline_update_pitch_effects
+.scope
         ldx channel_index
         lda channel_pitch_effects_active, x
         and #($FF - PITCH_EFFECT_ARP)
@@ -230,29 +232,29 @@ check_slide_up:
         lsr
         bcc check_slide_down
         jsr update_pitch_slide_up
-        rts
+        jmp done
 check_slide_down:
         lsr
         bcc check_portamento
         jsr update_pitch_slide_down
-        rts
+        jmp done
 check_portamento:
         lsr
         bcc check_note_up
         jsr update_portamento
-        rts
+        jmp done
 check_note_up:
         lsr
         bcc check_note_down
         jsr update_pitch_note_slide_up
-        rts
+        jmp done
 check_note_down:
         lsr
         bcc done
         jsr update_pitch_note_slide_down
 done:
-        rts
-.endproc
+.endscope
+.endmacro
 
 ; 1xx: unconditional slide upwards; amount in xx
 .proc update_pitch_slide_up
@@ -445,12 +447,12 @@ done:
         rts
 .endproc
 
-.proc update_volume_effects
+; TODO: REALLY now
+.macro inline_update_volume_effects
         ldx channel_index
         jsr update_tremolo
         jsr update_volume_slide
-        rts
-.endproc
+.endmacro
 
 .proc update_tremolo
         lda channel_tremolo_settings, x

@@ -323,7 +323,7 @@ function compute_beat_metrics(beat_frames, color_index)
 		end
 		table.insert(historical_beat_metrics[color_index], beat_duration)
 		-- if that made this table larger than 16 beats, fix it
-		if #historical_beat_metrics[color_index] > 16 then
+		if #historical_beat_metrics[color_index] > 128 then
 			table.remove(historical_beat_metrics[color_index], 1)
 		end
 		-- now loop over the HISTORICAL table and compute our metrics from there
