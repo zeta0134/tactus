@@ -80,9 +80,9 @@ loop:
         perform_zpcm_inc
         lda #$00
         sta $2003
-        debug_color (TINT_G | LIGHTGRAY)
+        ;debug_color (TINT_G | LIGHTGRAY)
         jsr SPRITE_TRANSFER_BASE
-        debug_color 0
+        ;debug_color 0
         ; Update palette memory very quickly
         jsr refresh_palettes_nmi        
         ; This signals to the gameloop that it may continue
@@ -131,7 +131,7 @@ write_ppuctrl:
 
         ; poll for input *after* setting the scroll position
         ; TODO: move this to the game loop
-        debug_color (TINT_B | LIGHTGRAY)
+        ;debug_color (TINT_B | LIGHTGRAY)
         jsr poll_input
         ; Advance the global pRNG once every frame
         jsr next_rand

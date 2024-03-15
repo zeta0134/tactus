@@ -345,5 +345,5 @@ function compute_beat_metrics(beat_frames, color_index)
 end
 
 emu.addEventCallback(frame_start, emu.eventType.nmi)
-emu.addMemoryCallback(ppumask_write, emu.callbackType.write, 0x2001) -- NES mode, reads PPUMASK writes
+--emu.addMemoryCallback(ppumask_write, emu.callbackType.write, 0x2001) -- NES mode, reads PPUMASK writes
 emu.addMemoryCallback(ppumask_write, emu.callbackType.write, 0xFEED) -- MESEN mode, reads arbitrary ROM writes
