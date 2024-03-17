@@ -281,11 +281,11 @@ TargetHealth := R1
         cmp #17
         bcs use_8_beats
 use_4_beats:
-        lda row_counter
+        lda currently_playing_row
         and #%00011000
         jmp done_picking_beat_length
 use_8_beats:
-        lda row_counter
+        lda currently_playing_row
         and #%00111000
 done_picking_beat_length:
         .repeat 3

@@ -9,4 +9,6 @@
 ; game specific variables
 .importzp current_music_variant, target_music_variant, tempo_adjustment
 .import global_attenuation ; UNIMPLEMENTED!
-.import row_counter
+
+;.import row_counter
+.import currently_playing_row

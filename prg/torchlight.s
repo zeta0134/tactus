@@ -171,7 +171,7 @@ decrease_current:
     dec current_base_radius
 skip_update_target:
 
-    lda row_counter
+    lda currently_playing_row
     and #%00001111
     tax
 

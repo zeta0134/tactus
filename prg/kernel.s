@@ -730,7 +730,7 @@ input_received:
 no_input_received:        
         ; The player's input might arrive late, so give them some time. If we get to
         ; an actual row of 3 or more, THEN process the beat without waiting any longer:
-        lda row_counter
+        lda currently_playing_row
         and #%00000111
         cmp #2
         bcs process_next_beat_now
@@ -799,7 +799,7 @@ continue_waiting:
 ; Utility Functions
 
 .proc update_beat_counters_title
-        lda row_counter
+        lda currently_playing_row
         and #%00000111
         sta DisplayedRowCounter
         rts
@@ -811,7 +811,7 @@ continue_waiting:
         cmp #7
         bcs done_with_displayed_row_counter
         ; If the displayed row counter does not equal the actual row counter
-        lda row_counter
+        lda currently_playing_row
         and #%00000111
         cmp DisplayedRowCounter
         beq done_with_displayed_row_counter
@@ -819,7 +819,7 @@ continue_waiting:
         inc DisplayedRowCounter
 done_with_displayed_row_counter:
         ; If the current row_counter is 0...
-        lda row_counter
+        lda currently_playing_row
         and #%00000111
         bne done_with_current_beat
         ; ... and current and last beat ARE the same

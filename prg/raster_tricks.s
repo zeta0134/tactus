@@ -216,7 +216,7 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
 
         ; since we have time to kill, we might as well compute the musical beat and set
         ; the new animation frame right here
-        lda row_counter         ; 4
+        lda currently_playing_row         ; 4
         and #%00000111          ; 2
         tax                     ; 2
         lda chr_frame_pacing, x ; 4

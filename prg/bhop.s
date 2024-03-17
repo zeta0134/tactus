@@ -32,7 +32,9 @@ row_cmp: .byte $00
 frame_counter: .byte $00
 frame_cmp: .byte $00
 
-.export row_counter
+currently_playing_row: .byte $00
+
+.export currently_playing_row
 
 module_flags: .byte $00
 
@@ -669,6 +671,7 @@ done_with_sequence:
         sta tempo_counter
         sta tempo_counter+1
         sta row_counter
+        sta currently_playing_row
         sta frame_counter
         sta groove_index
 
@@ -1174,6 +1177,12 @@ no_frame_advance:
         ; process the bytecode for the next pattern row
         jsr advance_pattern_rows
         ; advance the row counter *after* running the bytecode
+        
+        ; TACTUS Specific: preserve the row we just played into a variable
+        ; which we can use to track the musical beat
+        lda row_counter
+        sta currently_playing_row
+
         inc row_counter
 done_advancing_rows:
         rts
