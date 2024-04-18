@@ -106,7 +106,7 @@ def generate_lighting_variants_smooth(image):
   for x in range(0, 64):
     for y in range(0, 64):
       metatile_row = math.floor(y / 16)
-      old_palette_index = new_image.getpixel((x, y))
+      old_palette_index = new_image.getpixel((x, y)) % 4
       adjusted_palette_index = max(old_palette_index - metatile_row, 0)
       new_image.putpixel((x, y), adjusted_palette_index)
   return new_image
@@ -127,13 +127,13 @@ def generate_lighting_variants_dithered(image):
     # for the first variant, we'll decrease all colors by 1 stage in a checkerboard pattern
     for y in range(16, 32):
       if ((x + y) % 2) == 0:
-        old_palette_index = new_image.getpixel((x, y))
+        old_palette_index = new_image.getpixel((x, y)) % 4
         adjusted_palette_index = max(old_palette_index - 1, 0)
         new_image.putpixel((x, y), adjusted_palette_index)
     # for the second variant, always decrease the colors by 1 stage, and in a checkerboard
     # pattern decrease by one additional stage
     for y in range(32, 48):
-      old_palette_index = new_image.getpixel((x, y))
+      old_palette_index = new_image.getpixel((x, y)) % 4
       adjusted_palette_index = max(old_palette_index - 1, 0)
       if ((x + y) % 2) == 0:
         adjusted_palette_index = max(adjusted_palette_index - 1, 0)
@@ -237,7 +237,11 @@ def generate_chr(background_tiles, sprite_tiles, raw_chr_banks):
         raise "Wrong length for raw chr data!"
   return chr_bytes
 
-background_filenames = sorted(list(pathlib.Path('art/background_tiles').glob('*.png')))
+disco_filenames = sorted(list(pathlib.Path('art/disco_tiles').glob('*.png')))
+map_filenames = sorted(list(pathlib.Path('art/map_tiles').glob('*.png')))
+loose_background_filenames = sorted(list(pathlib.Path('art/background_tiles').glob('*.png')))
+background_filenames = disco_filenames + map_filenames + loose_background_filenames
+
 sprite_filenames = sorted(list(pathlib.Path('art/sprite_tiles').glob('*.png')))
 raw_chr_filenames = sorted(list(pathlib.Path('art/raw_chr').glob('*.chr')))
 png_chr_filenames = sorted(list(pathlib.Path('art/raw_chr').glob('*.png')))
