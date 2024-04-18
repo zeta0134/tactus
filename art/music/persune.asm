@@ -807,6 +807,7 @@ ft_s0p17c0:
 ; DPCM samples (located at DPCM segment)
 
 	.segment "DPCM_0"
+	.align 64
 ft_sample_0: ; bd01
 	.byte $15, $F0, $7F, $F9, $FF, $FF, $FF, $FF, $83, $FB, $05, $02, $08, $04, $00, $00, $00, $00, $00, $00
 	.byte $00, $00, $00, $00, $FC, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $01, $00, $00, $00, $00, $00, $00
