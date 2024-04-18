@@ -21,15 +21,15 @@ CurrentTile := R15
         bne disco_tile
 regular_tile:
         ldx CurrentTile
-        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
+        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_DISCO_FLOOR_TILES_0000, PAL_WORLD
         jmp converge
 disco_tile:
         ldx CurrentTile
-        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_DISCO_FLOOR, PAL_WORLD
+        draw_at_x_withpal TILE_REGULAR_FLOOR, (BG_TILE_DISCO_FLOOR_TILES_0000 | $400), PAL_WORLD
         jmp converge
 cleared_tile:
         ldx CurrentTile
-        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_CLEARED_FLOOR, PAL_WORLD
+        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_DISCO_FLOOR_TILES_0018, PAL_WORLD
 converge:
         ldx CurrentRow
         jsr queue_row_x
