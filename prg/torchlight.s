@@ -122,11 +122,11 @@ breathing_lut:
     lda #1
     sta target_counter
 
-    lda #1
+    lda #30
     sta current_radius
     sta current_base_radius
 
-    lda #12
+    lda #30
     sta target_radius
     rts
 .endproc

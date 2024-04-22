@@ -19,6 +19,13 @@ R12: .byte $00
 R13: .byte $00
 R14: .byte $00
 R15: .byte $00
+
+R16: .byte $00
+R17: .byte $00
+R18: .byte $00
+R19: .byte $00
+R20: .byte $00
+
 ; Gameplay and graphics globals
 GameloopCounter: .byte $00
 LastNmi: .byte $00

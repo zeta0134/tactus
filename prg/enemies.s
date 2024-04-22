@@ -12,6 +12,7 @@
         .include "palette.inc"
         .include "player.inc"
         .include "prng.inc"
+        .include "settings.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "weapons.inc"

@@ -19,6 +19,7 @@
         .include "ppu.inc"
         .include "rainbow.inc"
         .include "raster_tricks.inc"
+        .include "settings.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "static_screens.inc"
@@ -298,6 +299,8 @@ MetaSpriteIndex := R0
 
         lda #1
         sta NmiSoftDisable
+
+        near_call FAR_init_settings
 
         far_call FAR_init_torchlight
 
