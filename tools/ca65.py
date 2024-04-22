@@ -26,3 +26,20 @@ def pretty_print_table(raw_bytes, output_file, width=16):
   if len(final_row) > 0:
     final_row_text = ", ".join(final_row)
     print("  .byte %s" % final_row_text, file=output_file)
+
+def pretty_print_table_str(raw_entries, output_file, width=16):
+  """ Formats a string array as a big block
+
+  Works just like pretty_print_table but without formatting things as byte
+  literals. Useful if you need to emit a bunch of symbols for link-time 
+  assembly
+  """
+  formatted_bytes = raw_entries
+  for table_row in range(0, int(len(formatted_bytes) / width)):
+    row_text = ", ".join(formatted_bytes[table_row * width : table_row * width + width])
+    print("  .byte %s" % row_text, file=output_file)
+
+  final_row = formatted_bytes[int(len(formatted_bytes) / width) * width : ]
+  if len(final_row) > 0:
+    final_row_text = ", ".join(final_row)
+    print("  .byte %s" % final_row_text, file=output_file)

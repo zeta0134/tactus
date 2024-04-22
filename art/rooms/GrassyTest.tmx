@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="14" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="2" nextobjectid="1">
  <properties>
-  <property name="room_palette" value=""/>
+  <property name="exit_east" type="bool" value="true"/>
+  <property name="exit_north" type="bool" value="false"/>
+  <property name="exit_south" type="bool" value="false"/>
+  <property name="exit_west" type="bool" value="true"/>
+  <property name="room_palette" value="grassy_palette"/>
  </properties>
  <tileset firstgid="1" source="../MapTiles.tsx"/>
  <tileset firstgid="33" source="../DiscoFloorTiles.tsx"/>
