@@ -189,10 +189,10 @@ TILE_ROW_OFFSET = 16
 .macro draw_tile_at_x row, tile_id, attr
         lda tile_id
         sta HUD_TILE_BASE + row, x
-        sta HUD_TILE_BASE + row + HUD_NAMETABLE_OFFSET, x
+        ;sta HUD_TILE_BASE + row + HUD_NAMETABLE_OFFSET, x
         lda attr
         sta HUD_TILE_BASE + HUD_ATTR_OFFSET + row, x
-        sta HUD_TILE_BASE + HUD_ATTR_OFFSET + row + HUD_NAMETABLE_OFFSET, x
+        ;sta HUD_TILE_BASE + HUD_ATTR_OFFSET + row + HUD_NAMETABLE_OFFSET, x
 .endmacro
 
 WORLD_PAL  = %00000000
