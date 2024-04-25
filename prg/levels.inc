@@ -16,6 +16,14 @@
     RoomProperties .byte
 .endstruct
 
+.struct Room
+    Exits .byte 1
+    TileIDsLow .byte 140
+    TileAttrsHigh .byte 140
+    BehaviorIDs .byte 140
+    FlagBytes .byte 140
+.endstruct
+
 ROOM_FLAG_VISITED            = %10000000 ; mostly for minimap purposes
 ROOM_FLAG_TREASURE_COLLECTED = %01000000 ; so the player can't infinitely farm
 ROOM_FLAG_EXIT_STAIRS        = %00100000 ; shows on the minimap, also tells the game engine when to spawn these

@@ -51,7 +51,7 @@
 .macro access_data_bank TargetDataBank
         lda CurrentDataBank
         pha
-        rainbow_set_data_bank TargetDataBank
+        rainbow_set_data_bank {TargetDataBank}
         lda TargetDataBank
         sta CurrentDataBank
 .endmacro

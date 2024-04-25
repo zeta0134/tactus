@@ -80,6 +80,44 @@ loop:
         rts
 .endproc
 
+.proc initialize_battlefield_new
+RoomPtr := R0
+TileIdPtr := R2
+TileAddrPtr := R4
+BehaviorIdPtr := R6
+FlagsPtr := R8
+        mov16 TileIdPtr, RoomPtr
+        add16w TileIdPtr, #Room::TileIDsLow
+        mov16 TileAddrPtr, RoomPtr
+        add16w TileAddrPtr, #Room::TileAttrsHigh
+        mov16 BehaviorIdPtr, RoomPtr
+        add16w BehaviorIdPtr, #Room::BehaviorIDs
+        ;mov16 FlagsPtr, RoomPtr
+        ;add16w FlagsPtr, #Room::FlagBytes
+
+        ldy #0
+loop:
+        lda (TileIdPtr), y
+        sta tile_patterns, y   ; current tile ID (low byte)
+        sta tile_detail, y     ; original, mostly for disco tiles
+        lda (TileAddrPtr), y
+        sta tile_attributes, y ; current attributes (palette, lighting, high tile ID, etc)
+        lda (BehaviorIdPtr), y
+        sta battlefield, y     ; behavior (indexes into AI lookup tables)
+        ; would do flags bytes here, maybe?
+        ; TODO: ah, this is where we would roll for detail tiles, I think
+        ; (When we do this, don't forget to set the ROOM SEED)
+        lda #0
+        sta tile_data, y
+        sta tile_flags, y
+
+        iny
+        cpy #::BATTLEFIELD_SIZE
+        bne loop
+        far_call FAR_reset_inactive_queue
+        rts
+.endproc
+
 ; Initialize a fixed floor, fully open, with boss and exit stairs
 ; in known, predictable locations. Useful for debugging
 .proc FAR_demo_init_floor
@@ -275,20 +313,35 @@ loop:
 .endproc
 
 .proc FAR_init_current_room
-LayoutPtr := R0
+;LayoutPtr := R0
+RoomPtr := R0
 EntityList := R4
         access_data_bank #<.bank(layouts_table)
 
-        ; Load this room into the current battlefield
+        ; OLD: load a "layout" from a static maze floor
+        ;ldx PlayerRoomIndex
+        ;lda room_layouts, x
+        ;asl
+        ;tax
+        ;lda layouts_table, x
+        ;sta LayoutPtr
+        ;lda layouts_table+1, x
+        ;sta LayoutPtr+1
+        ;jsr initialize_battlefield
+
+        ; NEW: load a "room", still from a static maze floor
         ldx PlayerRoomIndex
         lda room_layouts, x
         asl
+        asl
         tax
-        lda layouts_table, x
-        sta LayoutPtr
-        lda layouts_table+1, x
-        sta LayoutPtr+1
-        jsr initialize_battlefield
+        lda temporary_rooms_table+0, x
+        sta RoomPtr+0
+        lda temporary_rooms_table+1, x
+        sta RoomPtr+1
+        access_data_bank {temporary_rooms_table+2, x}
+        jsr initialize_battlefield_new
+        restore_previous_bank
 
         ; Mark this room as visited
         ldx PlayerRoomIndex
@@ -655,6 +708,51 @@ EntityAttribute := R3
 .endproc
 
         .segment "DATA_3"
+
+.include "../build/rooms/GrassyTest_Standard_E.incs"
+.include "../build/rooms/GrassyTest_Standard_W.incs"
+.include "../build/rooms/GrassyTest_Standard_EW.incs"
+.include "../build/rooms/GrassyTest_Standard_S.incs"
+.include "../build/rooms/GrassyTest_Standard_ES.incs"
+.include "../build/rooms/GrassyTest_Standard_SW.incs"
+.include "../build/rooms/GrassyTest_Standard_ESW.incs"
+.include "../build/rooms/GrassyTest_Standard_N.incs"
+.include "../build/rooms/GrassyTest_Standard_NE.incs"
+.include "../build/rooms/GrassyTest_Standard_NW.incs"
+.include "../build/rooms/GrassyTest_Standard_NEW.incs"
+.include "../build/rooms/GrassyTest_Standard_NS.incs"
+.include "../build/rooms/GrassyTest_Standard_NES.incs"
+.include "../build/rooms/GrassyTest_Standard_NSW.incs"
+
+        .segment "DATA_4"
+
+.include "../build/rooms/GrassyTest_Standard_NESW.incs"
+
+; In the form of layouts table, which is soon to be rewritten
+; entirely in a form that looks nothing like this
+.macro temporary_room_entry room_label
+        .addr room_label
+        .byte <.bank(room_label), >.bank(room_label)
+.endmacro
+
+temporary_rooms_table:
+        temporary_room_entry room_GrassyTest_Standard_NESW ; 0, never used
+        temporary_room_entry room_GrassyTest_Standard_E
+        temporary_room_entry room_GrassyTest_Standard_W
+        temporary_room_entry room_GrassyTest_Standard_EW
+        temporary_room_entry room_GrassyTest_Standard_S
+        temporary_room_entry room_GrassyTest_Standard_ES
+        temporary_room_entry room_GrassyTest_Standard_SW
+        temporary_room_entry room_GrassyTest_Standard_ESW
+        temporary_room_entry room_GrassyTest_Standard_N
+        temporary_room_entry room_GrassyTest_Standard_NE
+        temporary_room_entry room_GrassyTest_Standard_NW
+        temporary_room_entry room_GrassyTest_Standard_NEW
+        temporary_room_entry room_GrassyTest_Standard_NS
+        temporary_room_entry room_GrassyTest_Standard_NES
+        temporary_room_entry room_GrassyTest_Standard_NSW
+        temporary_room_entry room_GrassyTest_Standard_NESW
+
 
 ; =============================
 ; Floors - collections of rooms

@@ -2,43 +2,6 @@
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
 
-; FOR NOW, use a very static detail table
-; (this will soon be replaced by the new map loading routine, I just want to
-; see it work in the very short term)
-
-disco_detail_lut:
-        ; top two rows have no detail; if floor is drawn it is blank
-        .repeat 14 * 2
-        .byte <BG_TILE_DISCO_FLOOR_TILES_0000
-        .endrepeat
-        ; third row starts a square, with corners 1 tile in
-        .byte <BG_TILE_DISCO_FLOOR_TILES_0000, <BG_TILE_DISCO_FLOOR_TILES_0001
-        .repeat 10
-        .byte <BG_TILE_DISCO_FLOOR_TILES_0002
-        .endrepeat
-        .byte <BG_TILE_DISCO_FLOOR_TILES_0003, <BG_TILE_DISCO_FLOOR_TILES_0000
-
-        ; every row inbetween is the sides of the square, and some... mushrooms
-        ; so we can see the dancing animation at work
-        .repeat 5
-        .byte <BG_TILE_DISCO_FLOOR_TILES_0000, <BG_TILE_DISCO_FLOOR_TILES_0017
-        .repeat 10
-        .byte <BG_TILE_DISCO_FLOOR_TILES_0000
-        .endrepeat
-        .byte <BG_TILE_DISCO_FLOOR_TILES_0019, <BG_TILE_DISCO_FLOOR_TILES_0000
-        .endrepeat
-
-        ; second to last row is the lower bit of the square
-        .byte <BG_TILE_DISCO_FLOOR_TILES_0000, <BG_TILE_DISCO_FLOOR_TILES_0033
-        .repeat 10
-        .byte <BG_TILE_DISCO_FLOOR_TILES_0034
-        .endrepeat
-        .byte <BG_TILE_DISCO_FLOOR_TILES_0035, <BG_TILE_DISCO_FLOOR_TILES_0000
-        ; bottom row is, again, nothing
-        .repeat 14
-        .byte <BG_TILE_DISCO_FLOOR_TILES_0000
-        .endrepeat
-
 .proc draw_disco_tile
 CurrentRow := R14
 CurrentTile := R15
@@ -48,7 +11,7 @@ TileAttrHigh := R17
 
         ; first, load the detail variant for this floor, we'll use this as our base
         ldx CurrentTile
-        lda disco_detail_lut, x
+        lda tile_detail, x
         sta TileIdLow
 
         ; If the current room is cleared, we release the player from the perils of the tempo, and the

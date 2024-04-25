@@ -19,6 +19,7 @@ tile_flags: .res ::BATTLEFIELD_SIZE
 
 tile_patterns: .res ::BATTLEFIELD_SIZE
 tile_attributes: .res ::BATTLEFIELD_SIZE
+tile_detail: .res ::BATTLEFIELD_SIZE
 
 active_tile_queue: .res ::BATTLEFIELD_HEIGHT
 inactive_tile_queue: .res ::BATTLEFIELD_HEIGHT
