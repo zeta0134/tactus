@@ -17,7 +17,8 @@
 .endstruct
 
 .struct Room
-    Exits .byte 1
+    Exits .byte
+    Palette .word
     TileIDsLow .byte 140
     TileAttrsHigh .byte 140
     BehaviorIDs .byte 140

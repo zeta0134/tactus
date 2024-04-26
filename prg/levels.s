@@ -10,6 +10,7 @@
         .include "hud.inc"
         .include "levels.inc"
         .include "nes.inc"
+        .include "palette.inc"
         .include "player.inc"
         .include "ppu.inc"
         .include "prng.inc"
@@ -29,6 +30,9 @@ chest_spawned: .res 1
 enemies_active: .res 1
 
 .segment "CODE_1"
+
+grassy_palette:
+        .incbin "../art/grassy_palette.pal"
 
 ; TODO: there is little reason for the various "wall" types to occupy
 ; different behavioral IDs, collapse these at some point
@@ -77,6 +81,30 @@ loop:
         cpy #::BATTLEFIELD_SIZE
         bne loop
         far_call FAR_reset_inactive_queue
+        rts
+.endproc
+
+.proc load_room_palette
+RoomPtr := R0
+PalettePtr := R2
+        ldy #Room::Palette
+        lda (RoomPtr), y
+        sta PalettePtr+0
+        iny
+        lda (RoomPtr), y
+        sta PalettePtr+1
+
+        ldy #0
+loop:
+        lda (PalettePtr), y
+        sta BgPaletteBuffer, y
+        iny
+        cpy #16
+        bne loop
+
+        lda #1
+        sta BgPaletteDirty
+
         rts
 .endproc
 
@@ -341,6 +369,7 @@ EntityList := R4
         sta RoomPtr+1
         access_data_bank {temporary_rooms_table+2, x}
         jsr initialize_battlefield_new
+        jsr load_room_palette
         restore_previous_bank
 
         ; Mark this room as visited

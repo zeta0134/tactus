@@ -39,6 +39,7 @@ class Room:
     height: int
     tiles: [TiledTile]
     exit_id: int
+    palette: str
     
 def read_boolean_properties(tile_element):
     boolean_properties = {}
@@ -148,14 +149,17 @@ def read_room(map_filename):
     if "exit_south" in flags and flags["exit_south"] == True:
         exit_id |= 0b0100 # Soggy
     if "exit_west" in flags and flags["exit_west"] == True:
-        exit_id |= 0b1000 # Waffles  
+        exit_id |= 0b1000 # Waffles
+
+    string_properties = read_string_properties(map_element)
+    room_palette = string_properties.get("room_palette","grassy_palette")
 
     # finally let's make the name something useful
     (_, plain_filename) = os.path.split(map_filename)
     (base_filename, _) = os.path.splitext(plain_filename)
     safe_label = re.sub(r'[^A-Za-z0-9\-\_]', '_', base_filename)
 
-    return Room(name=safe_label, width=map_width, height=map_height, tiles=only_layer, exit_id=exit_id)
+    return Room(name=safe_label, width=map_width, height=map_height, tiles=only_layer, exit_id=exit_id, palette=room_palette)
 
 def tile_id_bytes(tilemap):
   raw_bytes = []
@@ -173,10 +177,11 @@ def tile_attr_bytes(tilemap):
   # TODO: color attributes, somehow?
   raw_bytes = []
   for tile in tilemap.tiles:
+    palette_index = tile.integer_properties.get("palette_index",0) << 6
     if tile.type == "floor":
-        raw_bytes.append(f">BG_TILE_DISCO_FLOOR_TILES_{tile.tiled_index:04}")
+        raw_bytes.append(f">(BG_TILE_DISCO_FLOOR_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
     elif tile.type == "map":
-        raw_bytes.append(f">BG_TILE_MAP_TILES_{tile.tiled_index:04}")
+        raw_bytes.append(f">(BG_TILE_MAP_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
     else:
         print(f"Unrecognized tile type: {tile.type}, activating my panic and spin routines. PANIC AND SPIN!")
         sys.exit(-1)
@@ -206,6 +211,7 @@ def behavior_flag_bytes(tilemap):
 def write_room(tilemap, output_file):
     output_file.write(ca65_label("room_"+tilemap.name) + "\n")
     output_file.write("  .byte " + ca65_byte_literal(tilemap.exit_id) + " ; exits\n")
+    output_file.write("  .addr " + tilemap.palette + " ; palette for this room\n")
     output_file.write("  ; Drawn Tile IDs, LOW\n")
     pretty_print_table_str(tile_id_bytes(tilemap), output_file, tilemap.width)
     output_file.write("  ; Drawn Tile IDs, HIGH + Attributes\n")
