@@ -39,7 +39,8 @@ class Room:
     height: int
     tiles: [TiledTile]
     exit_id: int
-    palette: str
+    bg_palette: str
+    obj_palette: str
     
 def read_boolean_properties(tile_element):
     boolean_properties = {}
@@ -152,14 +153,16 @@ def read_room(map_filename):
         exit_id |= 0b1000 # Waffles
 
     string_properties = read_string_properties(map_element)
-    room_palette = string_properties.get("room_palette","grassy_palette")
+    room_bg_palette = string_properties.get("room_palette","grassy_palette")
+    room_obj_palette = string_properties.get("room_obj_palette","sprite_palette_overworld")
 
     # finally let's make the name something useful
     (_, plain_filename) = os.path.split(map_filename)
     (base_filename, _) = os.path.splitext(plain_filename)
     safe_label = re.sub(r'[^A-Za-z0-9\-\_]', '_', base_filename)
 
-    return Room(name=safe_label, width=map_width, height=map_height, tiles=only_layer, exit_id=exit_id, palette=room_palette)
+    return Room(name=safe_label, width=map_width, height=map_height, tiles=only_layer, exit_id=exit_id, 
+        bg_palette=room_bg_palette, obj_palette=room_obj_palette)
 
 def tile_id_bytes(tilemap):
   raw_bytes = []
@@ -211,7 +214,8 @@ def behavior_flag_bytes(tilemap):
 def write_room(tilemap, output_file):
     output_file.write(ca65_label("room_"+tilemap.name) + "\n")
     output_file.write("  .byte " + ca65_byte_literal(tilemap.exit_id) + " ; exits\n")
-    output_file.write("  .addr " + tilemap.palette + " ; palette for this room\n")
+    output_file.write("  .addr " + tilemap.bg_palette + " ; BG palette for this room\n")
+    output_file.write("  .addr " + tilemap.obj_palette + " ; OBJ palette for this room\n")
     output_file.write("  ; Drawn Tile IDs, LOW\n")
     pretty_print_table_str(tile_id_bytes(tilemap), output_file, tilemap.width)
     output_file.write("  ; Drawn Tile IDs, HIGH + Attributes\n")

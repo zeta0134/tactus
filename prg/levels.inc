@@ -18,7 +18,8 @@
 
 .struct Room
     Exits .byte
-    Palette .word
+    BgPalette .word
+    ObjPalette .word
     TileIDsLow .byte 140
     TileAttrsHigh .byte 140
     BehaviorIDs .byte 140

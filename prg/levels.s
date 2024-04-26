@@ -31,6 +31,9 @@ enemies_active: .res 1
 
 .segment "CODE_1"
 
+sprite_palette_overworld:
+        .incbin "../art/sprite_palette_overworld.pal"
+
 grassy_palette:
         .incbin "../art/grassy_palette.pal"
 
@@ -87,7 +90,7 @@ loop:
 .proc load_room_palette
 RoomPtr := R0
 PalettePtr := R2
-        ldy #Room::Palette
+        ldy #Room::BgPalette
         lda (RoomPtr), y
         sta PalettePtr+0
         iny
@@ -95,15 +98,31 @@ PalettePtr := R2
         sta PalettePtr+1
 
         ldy #0
-loop:
+bg_loop:
         lda (PalettePtr), y
         sta BgPaletteBuffer, y
         iny
         cpy #16
-        bne loop
+        bne bg_loop
+
+        ldy #Room::ObjPalette
+        lda (RoomPtr), y
+        sta PalettePtr+0
+        iny
+        lda (RoomPtr), y
+        sta PalettePtr+1
+
+        ldy #0
+obj_loop:
+        lda (PalettePtr), y
+        sta ObjPaletteBuffer, y
+        iny
+        cpy #16
+        bne obj_loop
 
         lda #1
         sta BgPaletteDirty
+        sta ObjPaletteDirty
 
         rts
 .endproc
