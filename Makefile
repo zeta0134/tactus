@@ -43,7 +43,7 @@ clean:
 	-@rm -f $(DBG_NAME)
 
 run: dir $(ROM_NAME)
-	rusticnes-sdl $(ROM_NAME)
+	rustico-sdl $(ROM_NAME)
 
 mesen: dir $(ROM_NAME)
 	vendor/Mesen.AppImage $(ROM_NAME)

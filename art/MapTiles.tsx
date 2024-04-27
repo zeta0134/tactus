@@ -17,16 +17,8 @@
  <tile id="13" type="map"/>
  <tile id="14" type="map"/>
  <tile id="15" type="map"/>
- <tile id="16" type="map">
-  <properties>
-   <property name="palette_index" type="int" value="2"/>
-  </properties>
- </tile>
- <tile id="17" type="map">
-  <properties>
-   <property name="palette_index" type="int" value="2"/>
-  </properties>
- </tile>
+ <tile id="16" type="map"/>
+ <tile id="17" type="map"/>
  <tile id="18" type="map"/>
  <tile id="19" type="map"/>
  <tile id="20" type="map"/>

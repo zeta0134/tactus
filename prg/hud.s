@@ -53,7 +53,7 @@ ItemDisplayCurrent: .res 1
 
 .segment "CODE_0"
 
-HUD_TILE_BASE        = $5300
+HUD_TILE_BASE        = $52C0
 HUD_NAMETABLE_OFFSET = $0400
 HUD_ATTR_OFFSET      = $0800
 

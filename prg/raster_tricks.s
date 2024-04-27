@@ -200,7 +200,12 @@ return_from_delay:
 
         ; Draw the left-side nametable, starting at the top of the HUD graphics
 HUD_SCROLL_X = 0
-HUD_SCROLL_Y = 194
+;HUD_SCROLL_Y = 182
+
+;HUD_SCROLL_Y = 175 ; does not cause jitter (does cause a visible glitch)
+HUD_SCROLL_Y = 176 ; the value I want, but this causes jitter
+;HUD_SCROLL_Y = 177 ; causes neither jitter nor a visible glitch
+
 HUD_NAMETABLE = 0
 HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         lda #HUD_NAMETABLE  ; 2

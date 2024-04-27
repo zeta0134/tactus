@@ -114,6 +114,40 @@ def nice_label(full_path_and_filename):
   safe_label = re.sub(r'[^A-Za-z0-9\-\_]', '_', base_filename)
   return safe_label
 
+def combine_tile_properties(graphics_tile, supplementary_tiles):
+    combined_tile = TiledTile(
+        ordinal_index=graphics_tile.ordinal_index,
+        tiled_index=graphics_tile.tiled_index,
+        boolean_properties=dict(graphics_tile.boolean_properties),
+        integer_properties=dict(graphics_tile.integer_properties),
+        string_properties=dict(graphics_tile.string_properties),
+        type=graphics_tile.type
+    )
+    for supplementary_tile in supplementary_tiles:
+        combined_tile.integer_properties = combined_tile.integer_properties | supplementary_tile.integer_properties
+        combined_tile.boolean_properties = combined_tile.boolean_properties | supplementary_tile.boolean_properties
+        combined_tile.string_properties = combined_tile.string_properties | supplementary_tile.string_properties
+    return combined_tile
+
+# Given a list of layer elements, parses the layer contents, then
+# combines common attributes, using the "Graphics" layer as a base.
+def read_and_combine_layers(layer_elements, tilesets):
+    layers = {}
+    for layer_element in layer_elements:
+        layers[layer_element.get("name")] = read_layer(layer_element, tilesets)
+
+    # At this point we should have at least one layer named "Base", if we don't
+    # we can't continue and must bail
+    graphics_layer = layers.pop("Base")
+    supplementary_layers = layers
+
+    combined_tiles = []
+    for tile_index in range(0, len(graphics_layer)):
+        graphics_tile = graphics_layer[tile_index]
+        supplementary_tiles = [supplementary_layers[layer_name][tile_index] for layer_name in supplementary_layers]
+        combined_tiles.append(combine_tile_properties(graphics_tile, supplementary_tiles))
+    return combined_tiles
+
 def read_room(map_filename):
     map_element = ElementTree.parse(map_filename).getroot()
     map_width = int(map_element.get("width"))
@@ -133,12 +167,8 @@ def read_room(map_filename):
     
     # then read in all map layers. Using the raw index data and the first gids, we can
     # translate the lists to the actual tiles they reference
-
-    # (hack: this converter only expects one layer, so ignore the name)
-    only_layer = None
-    layer_elements = map_element.findall("layer")
-    for layer_element in layer_elements:
-        only_layer = read_layer(layer_element, tilesets)
+    layers = map_element.findall("layer")
+    combined_tiles = read_and_combine_layers(layers, tilesets)
 
     # construct the exit ID from the four exit booleans, if present
     exit_id = 0
@@ -161,7 +191,7 @@ def read_room(map_filename):
     (base_filename, _) = os.path.splitext(plain_filename)
     safe_label = re.sub(r'[^A-Za-z0-9\-\_]', '_', base_filename)
 
-    return Room(name=safe_label, width=map_width, height=map_height, tiles=only_layer, exit_id=exit_id, 
+    return Room(name=safe_label, width=map_width, height=map_height, tiles=combined_tiles, exit_id=exit_id, 
         bg_palette=room_bg_palette, obj_palette=room_obj_palette)
 
 def tile_id_bytes(tilemap):
