@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="14" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="2" nextobjectid="1">
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="16" height="11" tilewidth="16" tileheight="16" infinite="0" nextlayerid="2" nextobjectid="1">
  <properties>
   <property name="exit_east" type="bool" value="true"/>
   <property name="exit_north" type="bool" value="false"/>
@@ -9,18 +9,19 @@
  </properties>
  <tileset firstgid="1" source="../MapTiles.tsx"/>
  <tileset firstgid="33" source="../DiscoFloorTiles.tsx"/>
- <layer id="1" name="Tile Layer 1" width="14" height="10">
+ <layer id="1" name="Tile Layer 1" width="16" height="11">
   <data encoding="csv">
-3,26,25,50,33,33,33,33,33,33,52,25,20,3,
-3,17,17,50,33,33,33,33,33,33,52,17,17,3,
-3,34,35,54,33,33,33,33,33,33,53,35,36,24,
-3,50,33,33,33,33,33,33,33,33,33,33,52,3,
-3,50,33,33,33,33,33,33,33,33,33,33,52,23,
-24,50,33,33,33,33,33,33,33,33,33,33,52,3,
-3,50,33,33,33,33,33,33,33,33,33,33,52,3,
-21,50,33,33,33,33,33,33,33,33,33,33,52,22,
-18,66,67,38,33,33,33,33,33,33,37,67,68,18,
-7,8,8,50,33,33,33,33,33,33,52,8,8,7
+3,3,3,3,50,33,33,33,33,33,33,52,3,3,3,3,
+3,3,26,25,50,33,33,33,33,33,33,52,25,20,3,3,
+3,3,17,17,50,33,33,33,33,33,33,52,17,17,3,3,
+3,3,34,35,54,33,33,33,33,33,33,53,35,36,24,3,
+3,3,50,33,33,33,33,33,33,33,33,33,33,52,3,3,
+3,3,50,33,33,33,33,33,33,33,33,33,33,52,23,3,
+3,24,50,33,33,33,33,33,33,33,33,33,33,52,3,3,
+3,3,50,33,33,33,33,33,33,33,33,33,33,52,3,3,
+3,24,50,33,33,33,33,33,33,33,33,33,33,52,24,3,
+3,3,66,67,38,33,33,33,33,33,33,37,67,68,3,3,
+3,3,3,3,50,33,33,33,33,33,33,52,3,3,3,3
 </data>
  </layer>
 </map>

@@ -58,7 +58,7 @@ outlined_disco_tile:
         jmp converge
 
 converge:
-        ora #$80
+        ;ora #$80
         sta TileAttrHigh
         ; TODO: what if this room needs a different palette for floor tiles?
         ; Ideally we could specify this as part of the map data... there's 2 free bits

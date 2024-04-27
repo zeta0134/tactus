@@ -680,8 +680,15 @@ StartingTile := R15
 StartingRow := R14
 StartingTile := R15
 
-        ; TODO: the concept of static/dynamic updates never really got implemented. Do
-        ; we need it? If not, this wait state is unnecessary
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+
+        lda #10
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 10)
+        sta StartingTile
+        far_call FAR_update_static_enemy_row
+
+        debug_color LIGHTGRAY
 
         ;- 1 frame: Update rows 6-7 of dynamic enemies, queue rows 6-7 to inactive buffer
         jsr every_gameloop

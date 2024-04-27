@@ -7,11 +7,11 @@
 .global battlefield, tile_data, tile_flags, tile_patterns, tile_attributes, tile_detail
 .global active_battlefield, queued_bytes_counter
 
-BATTLEFIELD_WIDTH = 14
-BATTLEFIELD_HEIGHT = 10
+BATTLEFIELD_WIDTH = 16
+BATTLEFIELD_HEIGHT = 11
 BATTLEFIELD_SIZE = (BATTLEFIELD_WIDTH*BATTLEFIELD_HEIGHT)
 MAXIMUM_QUEUE_SIZE = 128
 
-BATTLEFIELD_OFFSET_X = 16
-BATTLEFIELD_OFFSET_Y = 16
+BATTLEFIELD_OFFSET_X = 0
+BATTLEFIELD_OFFSET_Y = 0
 

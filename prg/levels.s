@@ -35,7 +35,8 @@ sprite_palette_overworld:
         .incbin "../art/sprite_palette_overworld.pal"
 
 grassy_palette:
-        .incbin "../art/grassy_palette.pal"
+        ;.incbin "../art/grassy_palette.pal"
+        .incbin "../art/extra_grassy_palette.pal"
 
 ; TODO: there is little reason for the various "wall" types to occupy
 ; different behavioral IDs, collapse these at some point
@@ -123,6 +124,12 @@ obj_loop:
         lda #1
         sta BgPaletteDirty
         sta ObjPaletteDirty
+
+        ; dirty fix: copy $0F into all three HUD colors, for parking between the raster split
+        lda #$0F
+        sta BgPaletteBuffer+4
+        sta BgPaletteBuffer+8
+        sta BgPaletteBuffer+12
 
         rts
 .endproc
@@ -768,12 +775,12 @@ EntityAttribute := R3
 .include "../build/rooms/GrassyTest_Standard_NE.incs"
 .include "../build/rooms/GrassyTest_Standard_NW.incs"
 .include "../build/rooms/GrassyTest_Standard_NEW.incs"
-.include "../build/rooms/GrassyTest_Standard_NS.incs"
-.include "../build/rooms/GrassyTest_Standard_NES.incs"
-.include "../build/rooms/GrassyTest_Standard_NSW.incs"
 
         .segment "DATA_4"
 
+.include "../build/rooms/GrassyTest_Standard_NS.incs"
+.include "../build/rooms/GrassyTest_Standard_NES.incs"
+.include "../build/rooms/GrassyTest_Standard_NSW.incs"
 .include "../build/rooms/GrassyTest_Standard_NESW.incs"
 
 ; In the form of layouts table, which is soon to be rewritten

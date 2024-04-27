@@ -20,10 +20,10 @@
     Exits .byte
     BgPalette .word
     ObjPalette .word
-    TileIDsLow .byte 140
-    TileAttrsHigh .byte 140
-    BehaviorIDs .byte 140
-    FlagBytes .byte 140
+    TileIDsLow .byte 176
+    TileAttrsHigh .byte 176
+    BehaviorIDs .byte 176
+    FlagBytes .byte 176
 .endstruct
 
 ROOM_FLAG_VISITED            = %10000000 ; mostly for minimap purposes
