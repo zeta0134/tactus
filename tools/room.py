@@ -201,6 +201,8 @@ def tile_id_bytes(tilemap):
         raw_bytes.append(f"<BG_TILE_DISCO_FLOOR_TILES_{tile.tiled_index:04}")
     elif tile.type == "map":
         raw_bytes.append(f"<BG_TILE_MAP_TILES_{tile.tiled_index:04}")
+    elif tile.type == "detail":
+        raw_bytes.append(f"<{tile.string_properties.get('detail')}")
     else:
         print(f"Unrecognized tile type: {tile.type}, activating my panic and spin routines. PANIC AND SPIN!")
         sys.exit(-1)
@@ -215,6 +217,8 @@ def tile_attr_bytes(tilemap):
         raw_bytes.append(f">(BG_TILE_DISCO_FLOOR_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
     elif tile.type == "map":
         raw_bytes.append(f">(BG_TILE_MAP_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
+    elif tile.type == "detail":
+        raw_bytes.append(f"${palette_index:02X}")
     else:
         print(f"Unrecognized tile type: {tile.type}, activating my panic and spin routines. PANIC AND SPIN!")
         sys.exit(-1)
@@ -225,20 +229,26 @@ def behavior_id_bytes(tilemap):
   # to override those... somehow. Punting complexity to my future self? Wheeee!
   raw_bytes = []
   for tile in tilemap.tiles:
-    if tile.type == "floor":
-        raw_bytes.append(f"TILE_REGULAR_FLOOR")
-    elif tile.type == "map":
-        raw_bytes.append(f"TILE_WALL_FACE")
+    if "behavior" in tile.string_properties:
+        raw_bytes.append(tile.string_properties["behavior"])
     else:
-        print(f"Unrecognized tile type: {tile.type}, activating my panic and spin routines. PANIC AND SPIN!")
-        sys.exit(-1)
+        if tile.type == "floor":
+            raw_bytes.append(f"TILE_REGULAR_FLOOR")
+        elif tile.type == "map":
+            raw_bytes.append(f"TILE_WALL_FACE")
+        else:
+            print(f"Unrecognized tile type: {tile.type}, activating my panic and spin routines. PANIC AND SPIN!")
+            sys.exit(-1)
   return raw_bytes
 
 def behavior_flag_bytes(tilemap):
   # TODO: yeah all of this
   raw_bytes = []
   for tile in tilemap.tiles:
-    raw_bytes.append("$00")
+    if tile.type == "detail":
+        raw_bytes.append(f"TILE_FLAG_DETAIL")
+    else:
+        raw_bytes.append("$00")
   return raw_bytes
 
 def write_room(tilemap, output_file):

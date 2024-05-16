@@ -64,30 +64,6 @@ layout_attributes:
         .byte >BG_TILE_PIT_EDGE
         .byte >BG_TILE_PIT_CENTER
 
-.proc initialize_battlefield
-LayoutPtr := R0
-        ldy #0
-loop:
-        perform_zpcm_inc
-        lda (LayoutPtr), y
-        tax
-        lda layout_behavior_ids, x
-        sta battlefield, y
-        lda #0
-        sta tile_data, y
-        sta tile_flags, y
-        lda layout_patterns, x
-        sta tile_patterns, y
-        lda layout_attributes, x
-        sta tile_attributes, y
-
-        iny
-        cpy #::BATTLEFIELD_SIZE
-        bne loop
-        far_call FAR_reset_inactive_queue
-        rts
-.endproc
-
 .proc load_room_palette
 RoomPtr := R0
 PalettePtr := R2
@@ -134,23 +110,31 @@ obj_loop:
         rts
 .endproc
 
-.proc initialize_battlefield_new
+.proc initialize_battlefield
 RoomPtr := R0
 TileIdPtr := R2
 TileAddrPtr := R4
 BehaviorIdPtr := R6
 FlagsPtr := R8
+CurrentRoomId := R10
+        ; Detail needs to be regenerated the same for each room when we (re-)enter, so
+        ; set that here
+        jsr set_fixed_room_seed
+
         mov16 TileIdPtr, RoomPtr
         add16w TileIdPtr, #Room::TileIDsLow
         mov16 TileAddrPtr, RoomPtr
         add16w TileAddrPtr, #Room::TileAttrsHigh
         mov16 BehaviorIdPtr, RoomPtr
         add16w BehaviorIdPtr, #Room::BehaviorIDs
-        ;mov16 FlagsPtr, RoomPtr
-        ;add16w FlagsPtr, #Room::FlagBytes
+        mov16 FlagsPtr, RoomPtr
+        add16w FlagsPtr, #Room::FlagBytes
 
         ldy #0
+        sty CurrentRoomId
 loop:
+        ; load static details for this tile
+        ldy CurrentRoomId
         lda (TileIdPtr), y
         sta tile_patterns, y   ; current tile ID (low byte)
         sta tile_detail, y     ; original, mostly for disco tiles
@@ -158,17 +142,199 @@ loop:
         sta tile_attributes, y ; current attributes (palette, lighting, high tile ID, etc)
         lda (BehaviorIdPtr), y
         sta battlefield, y     ; behavior (indexes into AI lookup tables)
-        ; would do flags bytes here, maybe?
-        ; TODO: ah, this is where we would roll for detail tiles, I think
-        ; (When we do this, don't forget to set the ROOM SEED)
+        ; initialize runtime state for this tile
         lda #0
         sta tile_data, y
         sta tile_flags, y
-
-        iny
-        cpy #::BATTLEFIELD_SIZE
+        ; check for special spawn behavior flags and run those as needed here
+        lda (FlagsPtr), y
+        and #TILE_FLAG_DETAIL
+        beq no_detail
+        jsr roll_for_detail
+no_detail:
+        inc CurrentRoomId
+        lda CurrentRoomId
+        cmp #::BATTLEFIELD_SIZE
         bne loop
+
         far_call FAR_reset_inactive_queue
+        rts
+.endproc
+
+TILE_FLAG_DETAIL = %10000000
+
+DETAIL_SPARSE_GRASS         = 0
+DETAIL_SPARSE_SHROOMS       = 2
+DETAIL_SPARSE_GRASS_SHROOMS = 4
+DETAIL_CAVE                 = 6
+DETAIL_CAVE_SHROOMS         = 8
+DETAIL_SAND                 = 10
+DETAIL_GRASS_WALL_BORDER    = 12
+DETAIL_GRASS_WALL           = 14
+
+; indexed by the direct values above
+detail_variants_table:
+        .addr detail_sparse_grass
+        .addr detail_sparse_shrooms
+        .addr detail_sparse_grass_shrooms
+        .addr detail_cave
+        .addr detail_cave_shrooms
+        .addr detail_sand
+        .addr detail_grass_wall_border
+        .addr detail_grass_wall
+
+; FOR NOW, every detail table has exactly 32 entries in it, which controls 
+; overall detail density with a reasonable degree of fine-tuning
+detail_sparse_grass:
+        .repeat 27
+        .word BG_TILE_DISCO_FLOOR_TILES_0000 ; blank floor
+        .endrepeat
+        .word BG_TILE_DISCO_FLOOR_TILES_0022 ; 2-bladed grass tuft
+        .word BG_TILE_DISCO_FLOOR_TILES_0022 ; 2-bladed grass tuft
+        .word BG_TILE_DISCO_FLOOR_TILES_0023 ; 3-bladed grass tuft
+        .word BG_TILE_DISCO_FLOOR_TILES_0023 ; 3-bladed grass tuft
+        .word BG_TILE_DISCO_FLOOR_TILES_0024 ; thick grass tuft
+
+detail_sparse_shrooms:
+        .repeat 26
+        .word BG_TILE_DISCO_FLOOR_TILES_0000 ; blank floor
+        .endrepeat
+        .word BG_TILE_DISCO_FLOOR_TILES_0006 ; plain mushroom
+        .word BG_TILE_DISCO_FLOOR_TILES_0006 ; plain mushroom
+        .word BG_TILE_DISCO_FLOOR_TILES_0007 ; tall mushroom
+        .word BG_TILE_DISCO_FLOOR_TILES_0007 ; tall mushroom
+        .word BG_TILE_DISCO_FLOOR_TILES_0008 ; two mushrooms
+        .word BG_TILE_DISCO_FLOOR_TILES_0008 ; two mushrooms
+
+detail_sparse_grass_shrooms:
+        .repeat 26
+        .word BG_TILE_DISCO_FLOOR_TILES_0000 ; blank floor
+        .endrepeat
+        .word BG_TILE_DISCO_FLOOR_TILES_0006 ; plain mushroom
+        .word BG_TILE_DISCO_FLOOR_TILES_0007 ; tall mushroom
+        .word BG_TILE_DISCO_FLOOR_TILES_0008 ; two mushrooms
+        .word BG_TILE_DISCO_FLOOR_TILES_0022 ; 2-bladed grass tuft
+        .word BG_TILE_DISCO_FLOOR_TILES_0023 ; 3-bladed grass tuft        
+        .word BG_TILE_DISCO_FLOOR_TILES_0024 ; thick grass tuft
+
+detail_cave:
+        .repeat 16
+        .word BG_TILE_DISCO_FLOOR_TILES_0000 ; blank floor
+        .endrepeat
+        .repeat 11
+        .word BG_TILE_DISCO_FLOOR_TILES_0018 ; pocked floor
+        .endrepeat
+        .word BG_TILE_DISCO_FLOOR_TILES_0038 ; round rock
+        .word BG_TILE_DISCO_FLOOR_TILES_0039 ; many pocks
+        .word BG_TILE_DISCO_FLOOR_TILES_0039 ; many pocks
+        .word BG_TILE_DISCO_FLOOR_TILES_0039 ; many pocks
+        .word BG_TILE_DISCO_FLOOR_TILES_0040 ; two rocks
+
+detail_cave_shrooms:
+        .repeat 16
+        .word BG_TILE_DISCO_FLOOR_TILES_0000 ; blank floor
+        .endrepeat
+        .repeat 9
+        .word BG_TILE_DISCO_FLOOR_TILES_0018 ; pocked floor
+        .endrepeat
+        .word BG_TILE_DISCO_FLOOR_TILES_0038 ; round rock
+        .word BG_TILE_DISCO_FLOOR_TILES_0039 ; many pocks
+        .word BG_TILE_DISCO_FLOOR_TILES_0039 ; many pocks
+        .word BG_TILE_DISCO_FLOOR_TILES_0040 ; two rocks
+        .word BG_TILE_DISCO_FLOOR_TILES_0006 ; plain mushroom
+        .word BG_TILE_DISCO_FLOOR_TILES_0007 ; tall mushroom
+        .word BG_TILE_DISCO_FLOOR_TILES_0008 ; two mushrooms
+
+detail_sand:
+        .repeat 29
+        .word BG_TILE_DISCO_FLOOR_TILES_0036 ; plain sand
+        .endrepeat
+        .repeat 3
+        .word BG_TILE_DISCO_FLOOR_TILES_0018 ; sand with seashell
+        .endrepeat
+
+detail_grass_wall_border:
+        .repeat 19
+        .word BG_TILE_MAP_TILES_0018 ; plain grass wall border
+        .endrepeat
+        .word BG_TILE_MAP_TILES_0019 ; grass wall border w/ cattails
+        .word BG_TILE_MAP_TILES_0019 ; grass wall border w/ cattails
+        .word BG_TILE_MAP_TILES_0023 ; grass wall border w/ dancing flower
+        .word BG_TILE_MAP_TILES_0023 ; grass wall border w/ dancing flower
+        .word BG_TILE_MAP_TILES_0020 ; grass wall border w/ short grass, low
+        .word BG_TILE_MAP_TILES_0020 ; grass wall border w/ short grass, low
+        .word BG_TILE_MAP_TILES_0020 ; grass wall border w/ short grass, low
+        .word BG_TILE_MAP_TILES_0021 ; grass wall border w/ tall grass
+        .word BG_TILE_MAP_TILES_0021 ; grass wall border w/ tall grass
+        .word BG_TILE_MAP_TILES_0021 ; grass wall border w/ tall grass
+        .word BG_TILE_MAP_TILES_0022 ; grass wall border w/ short grass, high
+        .word BG_TILE_MAP_TILES_0022 ; grass wall border w/ short grass, high
+        .word BG_TILE_MAP_TILES_0022 ; grass wall border w/ short grass, high
+
+detail_grass_wall:
+        .repeat 19
+        .word BG_TILE_MAP_TILES_0002 ; plain light grey solid
+        .endrepeat
+        .word BG_TILE_MAP_TILES_0024 ; light grey w/ cattails
+        .word BG_TILE_MAP_TILES_0024 ; light grey w/ cattails
+        .word BG_TILE_MAP_TILES_0028 ; light grey w/ dancing flower
+        .word BG_TILE_MAP_TILES_0028 ; light grey w/ dancing flower
+        .word BG_TILE_MAP_TILES_0025 ; light grey w/ short grass, low
+        .word BG_TILE_MAP_TILES_0025 ; light grey w/ short grass, low
+        .word BG_TILE_MAP_TILES_0025 ; light grey w/ short grass, low
+        .word BG_TILE_MAP_TILES_0026 ; light grey w/ tall grass
+        .word BG_TILE_MAP_TILES_0026 ; light grey w/ tall grass
+        .word BG_TILE_MAP_TILES_0026 ; light grey w/ tall grass
+        .word BG_TILE_MAP_TILES_0027 ; light grey w/ short grass, high
+        .word BG_TILE_MAP_TILES_0027 ; light grey w/ short grass, high
+        .word BG_TILE_MAP_TILES_0027 ; light grey w/ short grass, high
+
+.proc roll_for_detail
+; in-use by the battlefield routine, don't clobber these
+RoomPtr := R0
+TileIdPtr := R2
+TileAddrPtr := R4
+BehaviorIdPtr := R6
+FlagsPtr := R8
+CurrentRoomId := R10
+; scratch for this routine
+DetailTablePtr := R12
+ScratchPal := R14
+        
+        ; the detail index should have been copied to the current room index, so
+        ; get that loaded
+        ldy CurrentRoomId
+        lda tile_patterns, y
+        ; use that to setup the detail pointer, from our fixed table
+        tax
+        lda detail_variants_table+0, x
+        sta DetailTablePtr+0
+        lda detail_variants_table+1, x
+        sta DetailTablePtr+1
+
+        ; now we roll for detail out of the selected table, always in
+        ; a range from 0-31
+        jsr next_fixed_rand ; result in A, clobbers Y
+        and #$1F ; clamp to max of 31
+        asl ; and multiply by 2, to index a table of words
+        tay
+        ldx CurrentRoomId
+        ; the first byte is the low byte of the pattern, use this directly
+        lda (DetailTablePtr), y
+        sta tile_patterns, x
+        sta tile_detail, x
+        ; the second byte is the high byte of the pattern, we'll need to
+        ; preserve the attribute bits that are already in the table
+        iny
+        lda tile_attributes, x
+        and #PAL_MASK
+        sta ScratchPal
+        lda (DetailTablePtr), y
+        and #($FF - PAL_MASK)
+        ora ScratchPal
+        sta tile_attributes, x
+        ; ... and we're done?
+
         rts
 .endproc
 
@@ -367,21 +533,9 @@ loop:
 .endproc
 
 .proc FAR_init_current_room
-;LayoutPtr := R0
 RoomPtr := R0
 EntityList := R4
         access_data_bank #<.bank(layouts_table)
-
-        ; OLD: load a "layout" from a static maze floor
-        ;ldx PlayerRoomIndex
-        ;lda room_layouts, x
-        ;asl
-        ;tax
-        ;lda layouts_table, x
-        ;sta LayoutPtr
-        ;lda layouts_table+1, x
-        ;sta LayoutPtr+1
-        ;jsr initialize_battlefield
 
         ; NEW: load a "room", still from a static maze floor
         ldx PlayerRoomIndex
@@ -394,7 +548,7 @@ EntityList := R4
         lda temporary_rooms_table+1, x
         sta RoomPtr+1
         access_data_bank {temporary_rooms_table+2, x}
-        jsr initialize_battlefield_new
+        jsr initialize_battlefield
         jsr load_room_palette
         restore_previous_bank
 
@@ -1329,4 +1483,5 @@ debug_boss_zone_list:
         .word debug_boss_pool_collection
         .word debug_boss_pool_collection
         .word debug_boss_pool_collection
+
 

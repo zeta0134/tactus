@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="8" height="4" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
+ <tileset firstgid="1" source="../LayoutTiles.tsx"/>
+ <layer id="1" name="Maze Shape" width="8" height="4">
+  <data encoding="csv">
+7,15,15,15,15,15,15,13,
+8,16,16,16,16,16,16,14,
+8,16,16,16,16,16,16,14,
+4,12,12,12,12,12,12,10
+</data>
+ </layer>
+ <layer id="2" name="Room Properties" width="8" height="4">
+  <data encoding="csv">
+17,17,17,17,17,17,17,17,
+17,17,17,17,17,17,17,17,
+17,17,17,17,17,17,17,17,
+17,17,17,17,17,17,17,17
+</data>
+ </layer>
+</map>
