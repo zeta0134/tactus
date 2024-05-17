@@ -45,7 +45,7 @@ class Room:
 def read_boolean_properties(tile_element):
     boolean_properties = {}
     properties_element = tile_element.find("properties")
-    if properties_element:
+    if properties_element is not None:
         for prop in properties_element.findall("property"):
             if prop.get("type") == "bool":
                 boolean_properties[prop.get("name")] = (prop.get("value") == "true")
@@ -54,7 +54,7 @@ def read_boolean_properties(tile_element):
 def read_integer_properties(parent_element):
     integer_properties = {}
     properties_element = parent_element.find("properties")
-    if properties_element:
+    if properties_element is not None:
         for prop in properties_element.findall("property"):
             if prop.get("type") == "int":
                 integer_properties[prop.get("name")] = int(prop.get("value"))
@@ -63,7 +63,7 @@ def read_integer_properties(parent_element):
 def read_string_properties(parent_element):
     string_properties = {}
     properties_element = parent_element.find("properties")
-    if properties_element:
+    if properties_element is not None:
         for prop in properties_element.findall("property"):
             if prop.get("type") == None or prop.get("type") == "string":
                 string_properties[prop.get("name")] = prop.get("value")
