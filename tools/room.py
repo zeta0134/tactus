@@ -30,7 +30,7 @@ class TiledTileSet:
     tiles: Dict[int, TiledTile]
     string_properties: Dict[str, str]
 
-BLANK_TILE = TiledTile(tiled_index=0, ordinal_index=0, integer_properties={}, boolean_properties={}, string_properties={}, type="")
+BLANK_TILE = TiledTile(tiled_index=0, ordinal_index=0, integer_properties={}, boolean_properties={}, string_properties={}, type="blank")
 
 @dataclass
 class Room:
@@ -38,6 +38,7 @@ class Room:
     width: int
     height: int
     tiles: [TiledTile]
+    overlays: Dict[str, TiledTile]
     exit_id: int
     bg_palette: str
     obj_palette: str
@@ -108,11 +109,13 @@ def read_layer(layer_element, tilesets):
         return tiles
     exiterror("Non-csv encoding is not supported.")
 
+def safe_label(arbitrary_str):
+    return re.sub(r'[^A-Za-z0-9\_]', '_', arbitrary_str)
+
 def nice_label(full_path_and_filename):
-  (_, plain_filename) = os.path.split(full_path_and_filename)
-  (base_filename, _) = os.path.splitext(plain_filename)
-  safe_label = re.sub(r'[^A-Za-z0-9\-\_]', '_', base_filename)
-  return safe_label
+    (_, plain_filename) = os.path.split(full_path_and_filename)
+    (base_filename, _) = os.path.splitext(plain_filename)
+    return safe_label(base_filename)
 
 def combine_tile_properties(graphics_tile, supplementary_tiles):
     combined_tile = TiledTile(
@@ -130,7 +133,7 @@ def combine_tile_properties(graphics_tile, supplementary_tiles):
     return combined_tile
 
 # Given a list of layer elements, parses the layer contents, then
-# combines common attributes, using the "Graphics" layer as a base.
+# combines common attributes, using the "Base" layer as a base.
 def read_and_combine_layers(layer_elements, tilesets):
     layers = {}
     for layer_element in layer_elements:
@@ -170,6 +173,16 @@ def read_room(map_filename):
     layers = map_element.findall("layer")
     combined_tiles = read_and_combine_layers(layers, tilesets)
 
+    # now read any tile groups; these are named overlays, which we'll need to parse
+    # like additional collections of layers
+    overlays = {}
+    tile_groups = map_element.findall("group")
+    for tile_group in tile_groups:
+        overlay_name = tile_group.get("name")
+        overlay_layers = tile_group.findall("layer")
+        overlay_tiles = read_and_combine_layers(overlay_layers, tilesets)
+        overlays[overlay_name] = overlay_tiles
+
     # construct the exit ID from the four exit booleans, if present
     exit_id = 0
     flags = read_boolean_properties(map_element)
@@ -191,27 +204,29 @@ def read_room(map_filename):
     (base_filename, _) = os.path.splitext(plain_filename)
     safe_label = re.sub(r'[^A-Za-z0-9\-\_]', '_', base_filename)
 
-    return Room(name=safe_label, width=map_width, height=map_height, tiles=combined_tiles, exit_id=exit_id, 
-        bg_palette=room_bg_palette, obj_palette=room_obj_palette)
+    return Room(name=safe_label, width=map_width, height=map_height, tiles=combined_tiles, overlays=overlays,
+        exit_id=exit_id, bg_palette=room_bg_palette, obj_palette=room_obj_palette)
 
-def tile_id_bytes(tilemap):
+def tile_id_bytes(tiles):
   raw_bytes = []
-  for tile in tilemap.tiles:
+  for tile in tiles:
     if tile.type == "floor":
         raw_bytes.append(f"<BG_TILE_DISCO_FLOOR_TILES_{tile.tiled_index:04}")
     elif tile.type == "map":
         raw_bytes.append(f"<BG_TILE_MAP_TILES_{tile.tiled_index:04}")
     elif tile.type == "detail":
         raw_bytes.append(f"<{tile.string_properties.get('detail')}")
+    elif tile.type == "blank":
+        raw_bytes.append(f"ERROR_BLANK_TILE")
     else:
         print(f"Unrecognized tile type: {tile.type}, activating my panic and spin routines. PANIC AND SPIN!")
         sys.exit(-1)
   return raw_bytes
 
-def tile_attr_bytes(tilemap):
+def tile_attr_bytes(tiles):
   # TODO: color attributes, somehow?
   raw_bytes = []
-  for tile in tilemap.tiles:
+  for tile in tiles:
     palette_index = tile.integer_properties.get("palette_index",0) << 6
     if tile.type == "floor":
         raw_bytes.append(f">(BG_TILE_DISCO_FLOOR_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
@@ -219,16 +234,18 @@ def tile_attr_bytes(tilemap):
         raw_bytes.append(f">(BG_TILE_MAP_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
     elif tile.type == "detail":
         raw_bytes.append(f"${palette_index:02X}")
+    elif tile.type == "blank":
+        raw_bytes.append(f"ERROR_BLANK_TILE")
     else:
         print(f"Unrecognized tile type: {tile.type}, activating my panic and spin routines. PANIC AND SPIN!")
         sys.exit(-1)
   return raw_bytes
 
-def behavior_id_bytes(tilemap):
+def behavior_id_bytes(tiles):
   # TODO: tile properties should be able to override this. Individual tiles should be able
   # to override those... somehow. Punting complexity to my future self? Wheeee!
   raw_bytes = []
-  for tile in tilemap.tiles:
+  for tile in tiles:
     if "behavior" in tile.string_properties:
         raw_bytes.append(tile.string_properties["behavior"])
     else:
@@ -236,20 +253,60 @@ def behavior_id_bytes(tilemap):
             raw_bytes.append(f"TILE_REGULAR_FLOOR")
         elif tile.type == "map":
             raw_bytes.append(f"TILE_WALL_FACE")
+        elif tile.type == "blank":
+            raw_bytes.append(f"ERROR_BLANK_TILE")
         else:
             print(f"Unrecognized tile type: {tile.type}, activating my panic and spin routines. PANIC AND SPIN!")
             sys.exit(-1)
   return raw_bytes
 
-def behavior_flag_bytes(tilemap):
+def behavior_flag_bytes(tiles):
   # TODO: yeah all of this
   raw_bytes = []
-  for tile in tilemap.tiles:
+  for tile in tiles:
     if tile.type == "detail":
         raw_bytes.append(f"TILE_FLAG_DETAIL")
     else:
         raw_bytes.append("$00")
   return raw_bytes
+
+valid_overlays = [
+"Overlay: Interior - North",
+"Overlay: Interior - East",
+"Overlay: Interior - South",
+"Overlay: Interior - West",
+"Overlay: Exterior - North",
+"Overlay: Exterior - East",
+"Overlay: Exterior - South",
+"Overlay: Exterior - West",
+"Overlay: Challenge - North",
+"Overlay: Challenge - East",
+"Overlay: Challenge - South",
+"Overlay: Challenge - West",
+"Overlay: Shop - North",
+"Overlay: Shop - East",
+"Overlay: Shop - South",
+"Overlay: Shop - West",
+]
+
+def write_overlay(overlay_tiles, output_file):
+    overlay_tile_id_bytes = tile_id_bytes(overlay_tiles)
+    overlay_tile_attr_bytes = tile_attr_bytes(overlay_tiles)
+    overlay_behavior_id_bytes = behavior_id_bytes(overlay_tiles)
+    overlay_behavior_flag_bytes = behavior_flag_bytes(overlay_tiles)
+
+    for tile_id in range(0, len(overlay_tiles)):
+        candidate_tile = overlay_tiles[tile_id]
+        if candidate_tile.type == "blank":
+            # YOU SHALL NOT
+            pass
+        else:
+            output_file.write(f"  .byte {ca65_byte_literal(tile_id)}, ")
+            output_file.write(f"{overlay_tile_id_bytes[tile_id]}, ")
+            output_file.write(f"{overlay_tile_attr_bytes[tile_id]}, ")
+            output_file.write(f"{overlay_behavior_id_bytes[tile_id]}, ")
+            output_file.write(f"{overlay_behavior_flag_bytes[tile_id]}\n")
+    output_file.write("  .byte $FF ; end of overlay\n\n")
 
 def write_room(tilemap, output_file):
     output_file.write(ca65_label("room_"+tilemap.name) + "\n")
@@ -257,13 +314,24 @@ def write_room(tilemap, output_file):
     output_file.write("  .addr " + tilemap.bg_palette + " ; BG palette for this room\n")
     output_file.write("  .addr " + tilemap.obj_palette + " ; OBJ palette for this room\n")
     output_file.write("  ; Drawn Tile IDs, LOW\n")
-    pretty_print_table_str(tile_id_bytes(tilemap), output_file, tilemap.width)
+    pretty_print_table_str(tile_id_bytes(tilemap.tiles), output_file, tilemap.width)
     output_file.write("  ; Drawn Tile IDs, HIGH + Attributes\n")
-    pretty_print_table_str(tile_attr_bytes(tilemap), output_file, tilemap.width)
+    pretty_print_table_str(tile_attr_bytes(tilemap.tiles), output_file, tilemap.width)
     output_file.write("  ; Behavior IDs\n")
-    pretty_print_table_str(behavior_id_bytes(tilemap), output_file, tilemap.width)
+    pretty_print_table_str(behavior_id_bytes(tilemap.tiles), output_file, tilemap.width)
     output_file.write("  ; Special Flags\n")
-    pretty_print_table_str(behavior_flag_bytes(tilemap), output_file, tilemap.width)
+    pretty_print_table_str(behavior_flag_bytes(tilemap.tiles), output_file, tilemap.width)
+    output_file.write("  ; Overlays\n")
+    for overlay_name in valid_overlays:
+        if overlay_name in tilemap.overlays:
+            output_file.write(f"  .addr room_{tilemap.name}_{safe_label(overlay_name)} ; {overlay_name}\n")
+        else:
+            output_file.write(f"  .addr $0000 ; {overlay_name}\n")
+    output_file.write("\n")
+    for overlay_name in valid_overlays:
+        if overlay_name in tilemap.overlays:
+            output_file.write(f"room_{tilemap.name}_{safe_label(overlay_name)}:\n")
+            write_overlay(tilemap.overlays[overlay_name], output_file)
     
 if __name__ == '__main__':
     # DEBUG TEST THINGS
