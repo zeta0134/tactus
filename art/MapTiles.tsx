@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="MapTiles" tilewidth="16" tileheight="16" tilecount="32" columns="16">
- <image source="tilesets/map_tiles_tiled.png" width="256" height="32"/>
+<tileset version="1.10" tiledversion="1.10.2" name="MapTiles" tilewidth="16" tileheight="16" tilecount="64" columns="16">
+ <image source="tilesets/map_tiles_tiled.png" width="256" height="64"/>
  <tile id="0" type="map"/>
  <tile id="1" type="map"/>
  <tile id="2" type="map"/>
@@ -33,4 +33,20 @@
  <tile id="29" type="map"/>
  <tile id="30" type="map"/>
  <tile id="31" type="map"/>
+ <tile id="32" type="map"/>
+ <tile id="33" type="map"/>
+ <tile id="34" type="map"/>
+ <tile id="35" type="map"/>
+ <tile id="36" type="map"/>
+ <tile id="37" type="map"/>
+ <tile id="38" type="map"/>
+ <tile id="39" type="map"/>
+ <tile id="48" type="map"/>
+ <tile id="49" type="map"/>
+ <tile id="50" type="map"/>
+ <tile id="51" type="map"/>
+ <tile id="52" type="map"/>
+ <tile id="53" type="map"/>
+ <tile id="54" type="map"/>
+ <tile id="55" type="map"/>
 </tileset>

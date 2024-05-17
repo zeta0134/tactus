@@ -2,8 +2,8 @@
 <map version="1.10" tiledversion="1.10.2" orientation="orthogonal" renderorder="right-down" width="16" height="11" tilewidth="16" tileheight="16" infinite="0" nextlayerid="27" nextobjectid="1">
  <properties>
   <property name="exit_east" type="bool" value="true"/>
-  <property name="exit_north" type="bool" value="false"/>
-  <property name="exit_south" type="bool" value="false"/>
+  <property name="exit_north" type="bool" value="true"/>
+  <property name="exit_south" type="bool" value="true"/>
   <property name="exit_west" type="bool" value="true"/>
   <property name="room_palette" value="grassy_palette"/>
  </properties>
@@ -11,7 +11,7 @@
  <tileset firstgid="65" source="../DiscoFloorTiles.tsx"/>
  <tileset firstgid="129" source="../Attributes.tsx"/>
  <tileset firstgid="133" source="../TechnicalTiles.tsx"/>
- <layer id="1" name="Base" width="16" height="11">
+ <layer id="1" name="Base" width="16" height="11" visible="0">
   <data encoding="csv">
 151,151,151,151,151,151,151,151,151,151,151,151,151,151,151,151,
 151,151,150,150,150,150,150,150,150,150,150,150,150,150,151,151,
@@ -137,7 +137,7 @@
 </data>
   </layer>
  </group>
- <group id="7" name="Overlay: Exterior - North">
+ <group id="7" name="Overlay: Exterior - North" visible="0">
   <layer id="3" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,82,134,134,134,134,134,134,84,0,0,0,0,
@@ -169,7 +169,7 @@
 </data>
   </layer>
  </group>
- <group id="18" name="Overlay: Challenge - West">
+ <group id="18" name="Overlay: Challenge - West" visible="0">
   <layer id="25" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -265,12 +265,12 @@
 </data>
   </layer>
  </group>
- <group id="15" name="Overlay: Challenge - North" visible="0">
+ <group id="15" name="Overlay: Challenge - North">
   <layer id="19" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,82,65,65,65,65,65,65,84,0,0,0,0,
-0,0,0,0,82,1,1,1,1,1,1,84,0,0,0,0,
-0,0,0,0,82,1,1,33,34,1,1,84,0,0,0,0,
+0,0,0,0,82,65,65,65,65,65,65,84,0,0,0,0,
+0,0,0,0,82,65,65,33,34,65,65,84,0,0,0,0,
 0,0,0,0,86,65,65,49,50,65,65,85,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
