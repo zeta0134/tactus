@@ -313,6 +313,12 @@ def write_room(tilemap, output_file):
     output_file.write("  .byte " + ca65_byte_literal(tilemap.exit_id) + " ; exits\n")
     output_file.write("  .addr " + tilemap.bg_palette + " ; BG palette for this room\n")
     output_file.write("  .addr " + tilemap.obj_palette + " ; OBJ palette for this room\n")
+    output_file.write("  ; Overlays\n")
+    for overlay_name in valid_overlays:
+        if overlay_name in tilemap.overlays:
+            output_file.write(f"  .addr room_{tilemap.name}_{safe_label(overlay_name)} ; {overlay_name}\n")
+        else:
+            output_file.write(f"  .addr $0000 ; {overlay_name}\n")
     output_file.write("  ; Drawn Tile IDs, LOW\n")
     pretty_print_table_str(tile_id_bytes(tilemap.tiles), output_file, tilemap.width)
     output_file.write("  ; Drawn Tile IDs, HIGH + Attributes\n")
@@ -321,17 +327,12 @@ def write_room(tilemap, output_file):
     pretty_print_table_str(behavior_id_bytes(tilemap.tiles), output_file, tilemap.width)
     output_file.write("  ; Special Flags\n")
     pretty_print_table_str(behavior_flag_bytes(tilemap.tiles), output_file, tilemap.width)
-    output_file.write("  ; Overlays\n")
-    for overlay_name in valid_overlays:
-        if overlay_name in tilemap.overlays:
-            output_file.write(f"  .addr room_{tilemap.name}_{safe_label(overlay_name)} ; {overlay_name}\n")
-        else:
-            output_file.write(f"  .addr $0000 ; {overlay_name}\n")
     output_file.write("\n")
     for overlay_name in valid_overlays:
         if overlay_name in tilemap.overlays:
             output_file.write(f"room_{tilemap.name}_{safe_label(overlay_name)}:\n")
             write_overlay(tilemap.overlays[overlay_name], output_file)
+    output_file.write("\n")
     
 if __name__ == '__main__':
     # DEBUG TEST THINGS

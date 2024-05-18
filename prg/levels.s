@@ -110,13 +110,15 @@ obj_loop:
         rts
 .endproc
 
+; Note: relies on PlayerRoomIndex to load the room seed and other room properties
+; (this might become important if we later decide to initialize rooms in advance)
 .proc initialize_battlefield
 RoomPtr := R0
 TileIdPtr := R2
 TileAddrPtr := R4
 BehaviorIdPtr := R6
 FlagsPtr := R8
-CurrentRoomId := R10
+CurrentTileId := R10
         ; Detail needs to be regenerated the same for each room when we (re-)enter, so
         ; set that here
         jsr set_fixed_room_seed
@@ -131,10 +133,10 @@ CurrentRoomId := R10
         add16w FlagsPtr, #Room::FlagBytes
 
         ldy #0
-        sty CurrentRoomId
+        sty CurrentTileId
 loop:
         ; load static details for this tile
-        ldy CurrentRoomId
+        ldy CurrentTileId
         lda (TileIdPtr), y
         sta tile_patterns, y   ; current tile ID (low byte)
         sta tile_detail, y     ; original, mostly for disco tiles
@@ -152,12 +154,184 @@ loop:
         beq no_detail
         jsr roll_for_detail
 no_detail:
-        inc CurrentRoomId
-        lda CurrentRoomId
+        inc CurrentTileId
+        lda CurrentTileId
         cmp #::BATTLEFIELD_SIZE
         bne loop
 
+        jsr draw_battlefield_overlays
+
         far_call FAR_reset_inactive_queue
+        rts
+.endproc
+
+.proc draw_battlefield_overlays
+RoomPtr := R0
+OverlayPtr := R2
+
+check_north:
+        ldx PlayerRoomIndex
+        lda room_properties, x
+        and #EXIT_FLAG_NORTH
+        beq check_east
+
+        lda PlayerRoomIndex
+        sec
+        sbc #4
+        tax
+        lda room_flags, x
+        and #ROOM_FLAG_BOSS
+        bne boss_chamber_north
+        ; TODO: Shop, Interior
+exterior_chamber_north:
+        ldy #Room::ExteriorOverlayNorth        
+        jmp draw_overlay_north
+boss_chamber_north:
+        ldy #Room::ChallengeOverlayNorth
+        jmp draw_overlay_north
+draw_overlay_north:
+        lda (RoomPtr), y
+        sta OverlayPtr+0
+        iny
+        lda (RoomPtr), y
+        ; Sanity check: is this a valid pointer? If not, bail
+        beq check_east
+        sta OverlayPtr+1
+        jsr draw_single_battlefield_overlay
+
+check_east:
+        ldx PlayerRoomIndex
+        lda room_properties, x
+        and #EXIT_FLAG_EAST
+        beq check_south
+
+        lda PlayerRoomIndex
+        clc
+        adc #1
+        tax
+        lda room_flags, x
+        and #ROOM_FLAG_BOSS
+        bne boss_chamber_east
+        ; TODO: Shop, Interior
+exterior_chamber_east:
+        ldy #Room::ExteriorOverlayEast
+        jmp draw_overlay_east
+boss_chamber_east:
+        ldy #Room::ChallengeOverlayEast
+        jmp draw_overlay_east
+draw_overlay_east:
+        lda (RoomPtr), y
+        sta OverlayPtr+0
+        iny
+        lda (RoomPtr), y
+        ; Sanity check: is this a valid pointer? If not, bail
+        beq check_south
+        sta OverlayPtr+1
+        jsr draw_single_battlefield_overlay
+
+check_south:
+        ldx PlayerRoomIndex
+        lda room_properties, x
+        and #EXIT_FLAG_SOUTH
+        beq check_west
+
+        lda PlayerRoomIndex
+        clc
+        adc #4
+        tax
+        lda room_flags, x
+        and #ROOM_FLAG_BOSS
+        bne boss_chamber_south
+        ; TODO: Shop, Interior
+exterior_chamber_south:
+        ldy #Room::ExteriorOverlaySouth
+        jmp draw_overlay_south
+boss_chamber_south:
+        ldy #Room::ChallengeOverlaySouth
+        jmp draw_overlay_south
+draw_overlay_south:
+        lda (RoomPtr), y
+        sta OverlayPtr+0
+        iny
+        lda (RoomPtr), y
+        ; Sanity check: is this a valid pointer? If not, bail
+        beq check_west
+        sta OverlayPtr+1
+        jsr draw_single_battlefield_overlay
+
+check_west:
+        ldx PlayerRoomIndex
+        lda room_properties, x
+        and #EXIT_FLAG_WEST
+        beq done
+
+        lda PlayerRoomIndex
+        sec
+        sbc #1
+        tax
+        lda room_flags, x
+        and #ROOM_FLAG_BOSS
+        bne boss_chamber_west
+        ; TODO: Shop, Interior
+exterior_chamber_west:
+        ldy #Room::ExteriorOverlayWest
+        jmp draw_overlay_west
+boss_chamber_west:
+        ldy #Room::ChallengeOverlayWest
+        jmp draw_overlay_west
+draw_overlay_west:
+        lda (RoomPtr), y
+        sta OverlayPtr+0
+        iny
+        lda (RoomPtr), y
+        ; Sanity check: is this a valid pointer? If not, bail
+        beq done
+        sta OverlayPtr+1
+        jsr draw_single_battlefield_overlay
+
+done:
+        rts
+.endproc
+
+.proc draw_single_battlefield_overlay
+RoomPtr := R0
+OverlayPtr := R2
+CurrentTileId := R10
+; R12 - R15 are scratch for the detail function
+loop:
+        ldy #0
+        lda (OverlayPtr), y
+        cmp #$FF
+        beq done
+        sta CurrentTileId
+        inc16 OverlayPtr
+
+        ldx CurrentTileId
+
+        lda (OverlayPtr), y
+        sta tile_patterns, x
+        sta tile_detail, x
+        inc16 OverlayPtr
+
+        lda (OverlayPtr), y
+        sta tile_attributes, x
+        inc16 OverlayPtr
+
+        lda (OverlayPtr), y
+        sta battlefield, x
+        inc16 OverlayPtr
+
+        ; overlays can have detail too, so we need to roll for that here
+        ; as we draw the things
+        lda (OverlayPtr), y
+        and #TILE_FLAG_DETAIL
+        beq no_detail
+        jsr roll_for_detail
+no_detail:
+        inc16 OverlayPtr
+        jmp loop
+
+done:
         rts
 .endproc
 
@@ -296,14 +470,14 @@ TileIdPtr := R2
 TileAddrPtr := R4
 BehaviorIdPtr := R6
 FlagsPtr := R8
-CurrentRoomId := R10
+CurrentTileId := R10
 ; scratch for this routine
 DetailTablePtr := R12
 ScratchPal := R14
         
         ; the detail index should have been copied to the current room index, so
         ; get that loaded
-        ldy CurrentRoomId
+        ldy CurrentTileId
         lda tile_patterns, y
         ; use that to setup the detail pointer, from our fixed table
         tax
@@ -318,7 +492,7 @@ ScratchPal := R14
         and #$1F ; clamp to max of 31
         asl ; and multiply by 2, to index a table of words
         tay
-        ldx CurrentRoomId
+        ldx CurrentTileId
         ; the first byte is the low byte of the pattern, use this directly
         lda (DetailTablePtr), y
         sta tile_patterns, x
@@ -340,6 +514,7 @@ ScratchPal := R14
 
 ; Initialize a fixed floor, fully open, with boss and exit stairs
 ; in known, predictable locations. Useful for debugging
+; TODO: we'll need a new version of this if we use it at all
 .proc FAR_demo_init_floor
         access_data_bank #<.bank(floor_test_floor)
 
@@ -390,6 +565,7 @@ seed_loop:
 .endproc
 
 ; Generate a maze layout, and pick the player, boss, and exit locations
+; TODO: this is also going away!
 .proc FAR_init_floor
 FloorPtr := R0
 BossIndex := R2
@@ -500,6 +676,31 @@ exit_loop:
         rts
 .endproc
 
+EXIT_FLAG_NORTH = %00000001
+EXIT_FLAG_EAST  = %00000010
+EXIT_FLAG_SOUTH = %00000100
+EXIT_FLAG_WEST  = %00001000
+
+; Very temporary, going away soon
+exit_flag_equivalence_table:
+    .byte 0 ; nothing!
+    .byte EXIT_FLAG_EAST
+    .byte EXIT_FLAG_WEST
+    .byte EXIT_FLAG_EAST  | EXIT_FLAG_WEST
+    .byte EXIT_FLAG_SOUTH
+    .byte EXIT_FLAG_EAST  | EXIT_FLAG_SOUTH
+    .byte EXIT_FLAG_SOUTH | EXIT_FLAG_WEST
+    .byte EXIT_FLAG_EAST  | EXIT_FLAG_SOUTH | EXIT_FLAG_WEST
+    .byte EXIT_FLAG_NORTH
+    .byte EXIT_FLAG_NORTH | EXIT_FLAG_EAST
+    .byte EXIT_FLAG_NORTH | EXIT_FLAG_WEST
+    .byte EXIT_FLAG_NORTH | EXIT_FLAG_EAST  | EXIT_FLAG_WEST
+    .byte EXIT_FLAG_NORTH | EXIT_FLAG_SOUTH
+    .byte EXIT_FLAG_NORTH | EXIT_FLAG_EAST  | EXIT_FLAG_SOUTH
+    .byte EXIT_FLAG_NORTH | EXIT_FLAG_SOUTH | EXIT_FLAG_WEST
+    .byte EXIT_FLAG_NORTH | EXIT_FLAG_EAST  | EXIT_FLAG_SOUTH | EXIT_FLAG_WEST
+
+; TODO: remove this, it's getting replaced by the new layouts system
 .proc load_floor_properties
 LayoutPtr := R0
 RoomIndex := R2
@@ -511,16 +712,8 @@ loop:
         perform_zpcm_inc
         ldx RoomIndex
         lda room_layouts, x
-        asl
-        tax
-        lda layouts_table, x
-        sta LayoutPtr
-        lda layouts_table+1, x
-        sta LayoutPtr+1
-
-        ldx RoomIndex
-        ldy #Layout::RoomProperties
-        lda (LayoutPtr), y
+        tay
+        lda exit_flag_equivalence_table, y
         sta room_properties, x
         inc RoomIndex
         lda RoomIndex
@@ -918,24 +1111,7 @@ EntityAttribute := R3
 
         .segment "DATA_3"
 
-.include "../build/rooms/GrassyTest_Standard_E.incs"
-.include "../build/rooms/GrassyTest_Standard_W.incs"
-.include "../build/rooms/GrassyTest_Standard_EW.incs"
-.include "../build/rooms/GrassyTest_Standard_S.incs"
-.include "../build/rooms/GrassyTest_Standard_ES.incs"
-.include "../build/rooms/GrassyTest_Standard_SW.incs"
-.include "../build/rooms/GrassyTest_Standard_ESW.incs"
-.include "../build/rooms/GrassyTest_Standard_N.incs"
-.include "../build/rooms/GrassyTest_Standard_NE.incs"
-.include "../build/rooms/GrassyTest_Standard_NW.incs"
-.include "../build/rooms/GrassyTest_Standard_NEW.incs"
-
-        .segment "DATA_4"
-
-.include "../build/rooms/GrassyTest_Standard_NS.incs"
-.include "../build/rooms/GrassyTest_Standard_NES.incs"
-.include "../build/rooms/GrassyTest_Standard_NSW.incs"
-.include "../build/rooms/GrassyTest_Standard_NESW.incs"
+.include "../build/rooms/GrassyTest_Standard.incs"
 
 ; In the form of layouts table, which is soon to be rewritten
 ; entirely in a form that looks nothing like this
@@ -945,22 +1121,22 @@ EntityAttribute := R3
 .endmacro
 
 temporary_rooms_table:
-        temporary_room_entry room_GrassyTest_Standard_NESW ; 0, never used
-        temporary_room_entry room_GrassyTest_Standard_E
-        temporary_room_entry room_GrassyTest_Standard_W
-        temporary_room_entry room_GrassyTest_Standard_EW
-        temporary_room_entry room_GrassyTest_Standard_S
-        temporary_room_entry room_GrassyTest_Standard_ES
-        temporary_room_entry room_GrassyTest_Standard_SW
-        temporary_room_entry room_GrassyTest_Standard_ESW
-        temporary_room_entry room_GrassyTest_Standard_N
-        temporary_room_entry room_GrassyTest_Standard_NE
-        temporary_room_entry room_GrassyTest_Standard_NW
-        temporary_room_entry room_GrassyTest_Standard_NEW
-        temporary_room_entry room_GrassyTest_Standard_NS
-        temporary_room_entry room_GrassyTest_Standard_NES
-        temporary_room_entry room_GrassyTest_Standard_NSW
-        temporary_room_entry room_GrassyTest_Standard_NESW
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
+        temporary_room_entry room_GrassyTest_Standard
 
 
 ; =============================
