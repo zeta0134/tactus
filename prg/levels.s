@@ -22,10 +22,10 @@
 .segment "RAM"
 
 global_rng_seed: .res 1
-room_layouts: .res 16
-room_flags: .res 16 ; what did we spawn in here? what is the current status of those things?
-room_seeds: .res 16
-room_properties: .res 16 ; what are the BASE properties of this room? (exits, lighting, special render modes, etc)
+room_layouts: .res ::FLOOR_SIZE
+room_flags: .res ::FLOOR_SIZE ; what did we spawn in here? what is the current status of those things?
+room_seeds: .res ::FLOOR_SIZE
+room_properties: .res ::FLOOR_SIZE ; what are the BASE properties of this room? (exits, lighting, special render modes, etc)
 chest_spawned: .res 1
 enemies_active: .res 1
 
@@ -177,7 +177,7 @@ check_north:
 
         lda PlayerRoomIndex
         sec
-        sbc #4
+        sbc #::FLOOR_WIDTH
         tax
         lda room_flags, x
         and #ROOM_FLAG_BOSS
@@ -237,7 +237,7 @@ check_south:
 
         lda PlayerRoomIndex
         clc
-        adc #4
+        adc #::FLOOR_WIDTH
         tax
         lda room_flags, x
         and #ROOM_FLAG_BOSS
@@ -525,7 +525,7 @@ flag_loop:
         perform_zpcm_inc
         sta room_flags, x
         inx
-        cpx #16
+        cpx #::FLOOR_SIZE
         bne flag_loop
         ; load in the test floor's layout indices
         lda #0
@@ -534,7 +534,7 @@ room_loop:
         lda floor_test_floor, x
         sta room_layouts, x
         inx
-        cpx #16
+        cpx #::FLOOR_SIZE
         bne room_loop
 
         ; Load in the properties byte from each selected layout
@@ -547,7 +547,7 @@ seed_loop:
         lda #DEBUG_SEED
         sta room_seeds, x
         inx
-        cpx #16
+        cpx #::FLOOR_SIZE
         bne seed_loop
         
         ; TODO: pick the boss, exit, and player spawn locations here
@@ -578,7 +578,7 @@ flag_loop:
         perform_zpcm_inc
         sta room_flags, x
         inx
-        cpx #16
+        cpx #::FLOOR_SIZE
         bne flag_loop
 
         ; pick a random maze layout and load it in
@@ -602,7 +602,7 @@ room_loop:
         lda (FloorPtr), y
         sta room_layouts, y
         iny
-        cpy #16
+        cpy #::FLOOR_SIZE
         bne room_loop
 
         ; Load in the properties byte from each selected layout
@@ -615,12 +615,13 @@ seed_loop:
         jsr next_rand
         sta room_seeds, x
         inx
-        cpx #16
+        cpx #::FLOOR_SIZE
         bne seed_loop       
 
         ; Okay now, pick a random room for the player to spawn in
         jsr next_rand
-        and #$0F
+        and #(::FLOOR_SIZE-1)
+        ; TODO: check that this is a valid spawning location (at the very least, not out of bounds)
         sta PlayerRoomIndex
         ; Mark the player's room as cleared, so they don't load in surrounded by mobs
         tax
@@ -717,7 +718,7 @@ loop:
         sta room_properties, x
         inc RoomIndex
         lda RoomIndex
-        cmp #16
+        cmp #::FLOOR_SIZE
         bne loop
 
         restore_previous_bank

@@ -42,6 +42,10 @@
     FlagBytes .byte 176
 .endstruct
 
+FLOOR_WIDTH = 4
+FLOOR_HEIGHT = 4
+FLOOR_SIZE = (FLOOR_WIDTH*FLOOR_HEIGHT)
+
 ROOM_FLAG_VISITED            = %10000000 ; mostly for minimap purposes
 ROOM_FLAG_TREASURE_COLLECTED = %01000000 ; so the player can't infinitely farm
 ROOM_FLAG_EXIT_STAIRS        = %00100000 ; shows on the minimap, also tells the game engine when to spawn these

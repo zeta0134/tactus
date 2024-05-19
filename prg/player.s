@@ -1043,7 +1043,7 @@ exit_right:
 exit_top:
         lda PlayerRoomIndex
         sec
-        sbc #4
+        sbc #::FLOOR_WIDTH
         sta PlayerRoomIndex
         lda #(::BATTLEFIELD_HEIGHT - 2)
         sta PlayerRow
@@ -1051,7 +1051,7 @@ exit_top:
 exit_bottom:
         lda PlayerRoomIndex
         clc
-        adc #4
+        adc #::FLOOR_WIDTH
         sta PlayerRoomIndex
         lda #1
         sta PlayerRow
