@@ -42,32 +42,6 @@ grassy_palette:
         ;.incbin "../art/grassy_palette.pal"
         .incbin "../art/extra_grassy_palette.pal"
 
-; TODO: there is little reason for the various "wall" types to occupy
-; different behavioral IDs, collapse these at some point
-layout_behavior_ids:
-        .byte 128 ; plain floor
-        .byte 132 ; disco floor (unused?)
-        .byte 140 ; wall face
-        .byte 136 ; wall top
-        .byte 144 ; south pit edge (wall)
-        .byte 148 ; north pit edge (unused?)
-
-layout_patterns:
-        .byte <BG_TILE_FLOOR
-        .byte <BG_TILE_DISCO_FLOOR
-        .byte <BG_TILE_WALL_FACE
-        .byte <BG_TILE_WALL_TOP
-        .byte <BG_TILE_PIT_EDGE
-        .byte <BG_TILE_PIT_CENTER
-
-layout_attributes:
-        .byte >BG_TILE_FLOOR
-        .byte >BG_TILE_DISCO_FLOOR
-        .byte >BG_TILE_WALL_FACE
-        .byte >BG_TILE_WALL_TOP
-        .byte >BG_TILE_PIT_EDGE
-        .byte >BG_TILE_PIT_CENTER
-
 .proc load_room_palette
 RoomPtr := R0
 PalettePtr := R2
@@ -824,8 +798,6 @@ room_cleared:
 EntityId := R1
 EntityPattern := R2
 EntityAttribute := R3
-        access_data_bank #<.bank(layouts_table)
-
 check_room_clear:
         lda enemies_active
         bne all_done
@@ -871,7 +843,6 @@ all_done:
         lda #0
         sta enemies_active
 
-        restore_previous_bank
         rts
 .endproc
 
@@ -1145,119 +1116,20 @@ EntityAttribute := R3
 
 .include "../build/rooms/GrassyTest_Standard.incs"
 
-; In the form of layouts table, which is soon to be rewritten
-; entirely in a form that looks nothing like this
-.macro temporary_room_entry room_label
+.macro room_entry room_label
         .addr room_label
         .byte <.bank(room_label), >.bank(room_label)
 .endmacro
-
-temporary_rooms_table:
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-        temporary_room_entry room_GrassyTest_Standard
-
 
 ; =============================
 ; Floors - collections of rooms
 ; =============================
 
-; Room Layouts
-
-.include "../build/layouts/A0.incs"
-.include "../build/layouts/B0.incs"
-.include "../build/layouts/C0.incs"
-.include "../build/layouts/D0.incs"
-.include "../build/layouts/E0.incs"
-.include "../build/layouts/F0.incs"
-.include "../build/layouts/G0.incs"
-.include "../build/layouts/H0.incs"
-.include "../build/layouts/I0.incs"
-.include "../build/layouts/J0.incs"
-.include "../build/layouts/K0.incs"
-.include "../build/layouts/L0.incs"
-.include "../build/layouts/M0.incs"
-.include "../build/layouts/N0.incs"
-.include "../build/layouts/O0.incs"
-.include "../build/layouts/P0.incs"
-
-layouts_table:
-        .word layout_A0
-        .word layout_B0
-        .word layout_C0
-        .word layout_D0
-        .word layout_E0
-        .word layout_F0
-        .word layout_G0
-        .word layout_H0
-        .word layout_I0
-        .word layout_J0
-        .word layout_K0
-        .word layout_L0
-        .word layout_M0
-        .word layout_N0
-        .word layout_O0
-        .word layout_P0
-
-; for debug mode we can force the layout to an open floor plan
-.include "../build/floors/test_floor.incs"
-
-; for the actual game, we use one of a set of pregenerated mazes
-; (because I do not have time to write the maze generator in 6502)
-.include "../build/floors/maze_0.incs"
-.include "../build/floors/maze_1.incs"
-.include "../build/floors/maze_2.incs"
-.include "../build/floors/maze_3.incs"
-.include "../build/floors/maze_4.incs"
-.include "../build/floors/maze_5.incs"
-.include "../build/floors/maze_6.incs"
-.include "../build/floors/maze_7.incs"
-.include "../build/floors/maze_8.incs"
-.include "../build/floors/maze_9.incs"
-.include "../build/floors/maze_10.incs"
-.include "../build/floors/maze_11.incs"
-.include "../build/floors/maze_12.incs"
-.include "../build/floors/maze_13.incs"
-.include "../build/floors/maze_14.incs"
-.include "../build/floors/maze_15.incs"
-
-maze_list:
-        .word floor_maze_0
-        .word floor_maze_1
-        .word floor_maze_2
-        .word floor_maze_3
-        .word floor_maze_4
-        .word floor_maze_5
-        .word floor_maze_6
-        .word floor_maze_7
-        .word floor_maze_8
-        .word floor_maze_9
-        .word floor_maze_10
-        .word floor_maze_11
-        .word floor_maze_12
-        .word floor_maze_13
-        .word floor_maze_14
-        .word floor_maze_15
-
-
 ; these are what the big floors will reference for their room pools
 ; 16 entries each
 grassy_exterior:
         .repeat 16
-        temporary_room_entry room_GrassyTest_Standard
+        room_entry room_GrassyTest_Standard
         .endrepeat
 
 .include "../build/bigfloors/test_floor_wide_open.incs"
