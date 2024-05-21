@@ -42,9 +42,14 @@
     FlagBytes .byte 176
 .endstruct
 
-FLOOR_WIDTH = 4
+FLOOR_WIDTH = 8
 FLOOR_HEIGHT = 4
 FLOOR_SIZE = (FLOOR_WIDTH*FLOOR_HEIGHT)
+
+.struct BigFloor
+    SpawningPoolIDs .byte ::FLOOR_SIZE
+    RoomProperties .byte ::FLOOR_SIZE
+.endstruct
 
 ROOM_FLAG_VISITED            = %10000000 ; mostly for minimap purposes
 ROOM_FLAG_TREASURE_COLLECTED = %01000000 ; so the player can't infinitely farm
@@ -52,3 +57,8 @@ ROOM_FLAG_EXIT_STAIRS        = %00100000 ; shows on the minimap, also tells the 
 ROOM_FLAG_BOSS               = %00010000 ; boss rooms have their treasure forced to a key (and, y'know, also spawn tougher enemies)
 ROOM_FLAG_CLEARED            = %00001000 ; once cleared, a room will not respawn enemies when entered again
 ROOM_FLAG_REVEALED           = %00000100 ; more explicitly for minimap purposes
+
+EXIT_FLAG_NORTH = %00000001
+EXIT_FLAG_EAST  = %00000010
+EXIT_FLAG_SOUTH = %00000100
+EXIT_FLAG_WEST  = %00001000

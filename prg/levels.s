@@ -22,12 +22,16 @@
 .segment "RAM"
 
 global_rng_seed: .res 1
-room_layouts: .res ::FLOOR_SIZE
+room_ptr_low: .res ::FLOOR_SIZE
+room_ptr_high: .res ::FLOOR_SIZE
+room_bank: .res ::FLOOR_SIZE
 room_flags: .res ::FLOOR_SIZE ; what did we spawn in here? what is the current status of those things?
 room_seeds: .res ::FLOOR_SIZE
 room_properties: .res ::FLOOR_SIZE ; what are the BASE properties of this room? (exits, lighting, special render modes, etc)
 chest_spawned: .res 1
 enemies_active: .res 1
+
+room_population_order: .res ::FLOOR_SIZE
 
 .segment "CODE_1"
 
@@ -512,64 +516,122 @@ ScratchPal := R14
         rts
 .endproc
 
-; Initialize a fixed floor, fully open, with boss and exit stairs
-; in known, predictable locations. Useful for debugging
-; TODO: we'll need a new version of this if we use it at all
-.proc FAR_demo_init_floor
-        access_data_bank #<.bank(floor_test_floor)
+; Randomize the visitation order for populating rooms on each floor
+; This helps to ensure that things like player spawn locations and
+; challenge chambers aren't biased to one side of the map
+; TODO: replace this with either fisher-yates (ideal) or pseudo-yates,
+; per https://discord.com/channels/352252932953079811/352436568062951427/1242390363411320904
+.proc shuffle_room_order
+SourceIndex := R2
+DestIndex := R3
+Iterations := R4
+Temp := R5
+        ldx #0
+init_loop:
+        txa
+        sta room_population_order, x
+        inx
+        cpx #::FLOOR_SIZE
+        bne init_loop
 
-        ; clear out the room flags entirely
+        lda #64 ; somewhat arbitrary
+        sta Iterations
+shuffle_loop:
+        jsr next_fixed_rand
+        and #(::FLOOR_SIZE-1)
+        sta SourceIndex
+        jsr next_fixed_rand
+        and #(::FLOOR_SIZE-1)
+        sta DestIndex
+        ldx SourceIndex
+        ldy DestIndex
+        lda room_population_order, x
+        sta Temp
+        lda room_population_order, y
+        sta room_population_order, x
+        lda Temp
+        sta room_population_order, y
+        dec Iterations
+        bne shuffle_loop
+
+        rts
+.endproc
+
+GRASSY_EXTERIOR = 0
+
+room_pools_lut:
+        .word grassy_exterior
+room_pools_banks:
+        .byte <.bank(grassy_exterior)
+
+.proc choose_rooms_for_floor
+BigFloorPtr := R0
+RoomPoolPtr := R2
+RoomPoolBank := R4
+CurrentRoomIndex := R5
+CurrentRoomCounter := R6
+; TODO: pay attention to these
+; ChallengeCount := R?
+; ShopCount := R?
+; SpawnFoundCount := R?
+        jsr shuffle_room_order
+
+begin_floor_generation:
         lda #0
-        ldx #0
-flag_loop:
-        perform_zpcm_inc
-        sta room_flags, x
-        inx
-        cpx #::FLOOR_SIZE
-        bne flag_loop
-        ; load in the test floor's layout indices
-        lda #0
-        ldx #0
+        sta CurrentRoomCounter
 room_loop:
-        lda floor_test_floor, x
-        sta room_layouts, x
-        inx
-        cpx #::FLOOR_SIZE
+        ldx CurrentRoomCounter
+        lda room_population_order, x
+        sta CurrentRoomIndex
+setup_room_generation_state:
+        ldy CurrentRoomIndex
+        lda (BigFloorPtr), y
+        tax
+        lda room_pools_banks, x
+        sta RoomPoolBank
+        lda (BigFloorPtr), y
+        asl
+        tax
+        lda room_pools_lut+0, x
+        sta RoomPoolPtr+0
+        lda room_pools_lut+1, x
+        sta RoomPoolPtr+1
+        access_data_bank RoomPoolBank
+begin_room_selection:
+        jsr next_fixed_rand
+        and #$0F ; 0-15
+        asl
+        asl
+        tay
+        ldx CurrentRoomIndex
+        lda (RoomPoolPtr), y
+        sta room_ptr_low, x
+        iny
+        lda (RoomPoolPtr), y
+        sta room_ptr_high, x
+        iny
+        lda (RoomPoolPtr), y
+        sta room_bank, x
+        ; TODO: load up the room pointer and check properties and such to update
+        ; our counters. Right now we don't have those (or any rooms that would set them)
+        ; so we can skip that work and just use whatever we rolled. Should the counter
+        ; logic fail, we might need to roll the room again.
+
+        restore_previous_bank ; RoomPoolBank
+
+        inc CurrentRoomCounter
+        lda CurrentRoomCounter
+        cmp #::FLOOR_SIZE
         bne room_loop
 
-        ; Load in the properties byte from each selected layout
-        jsr load_floor_properties
-
-        ; set each room up with its own RNG low byte
-        ldx #0
-seed_loop:
-        ; jsr next_rand
-        lda #DEBUG_SEED
-        sta room_seeds, x
-        inx
-        cpx #::FLOOR_SIZE
-        bne seed_loop
-        
-        ; TODO: pick the boss, exit, and player spawn locations here
-        ; FOR TESTING, the boss room will be slot 1
-        ldx #1
-        lda #(ROOM_FLAG_BOSS | ROOM_FLAG_REVEALED)
-        sta room_flags, x
-        ; FOR TESTING, the exit room shall be slot 2
-        ldx #2
-        lda #ROOM_FLAG_EXIT_STAIRS
-        sta room_flags, x
-
-        restore_previous_bank
         rts
 .endproc
 
 ; Generate a maze layout, and pick the player, boss, and exit locations
-; TODO: this is also going away!
 .proc FAR_init_floor
-FloorPtr := R0
+BigFloorPtr := R0
 BossIndex := R2
-        access_data_bank #<.bank(layouts_table)
+        access_data_bank #<.bank(test_floor_layout_pool)
 
         ; clear out the room flags entirely
         lda #0
@@ -580,43 +642,48 @@ flag_loop:
         inx
         cpx #::FLOOR_SIZE
         bne flag_loop
+
+        ; set each room up with its own RNG low byte
+        ; TODO: should this be based on the floor's fixed seed?
+        ldx #0
+seed_loop:
+        perform_zpcm_inc
+        jsr next_rand
+        sta room_seeds, x
+        inx
+        cpx #::FLOOR_SIZE
+        bne seed_loop
 
         ; pick a random maze layout and load it in
         ; TODO: maybe this could use a global seed? it'd be nice to have a game-level seed
         ; ... though I guess also todo: write a 6502 maze generator
         jsr next_rand
-        ; There are only 16 mazes in the game right now
+
+        ; FOR NOW, pull from the only test pool we have
+        ; TODO: pick the pool to draw from based on the zone and level
         and #$0F
         asl
         tax
-        lda maze_list, x
-        sta FloorPtr
-        lda maze_list+1, x
-        sta FloorPtr+1
+        lda test_floor_layout_pool, x
+        sta BigFloorPtr
+        lda test_floor_layout_pool+1, x
+        sta BigFloorPtr+1
 
-        ; Load in that floor's layout bytes
+        ; Load in this floor's basic room properties
         lda #0
-        ldy #0
-room_loop:
-        perform_zpcm_inc
-        lda (FloorPtr), y
-        sta room_layouts, y
-        iny
-        cpy #::FLOOR_SIZE
-        bne room_loop
-
-        ; Load in the properties byte from each selected layout
-        jsr load_floor_properties
-
-        ; set each room up with its own RNG low byte
         ldx #0
-seed_loop:
+        ldy #BigFloor::RoomProperties
+room_properties_loop:
         perform_zpcm_inc
-        jsr next_rand
-        sta room_seeds, x
+        lda (BigFloorPtr), y
+        sta room_properties, x
         inx
-        cpx #::FLOOR_SIZE
-        bne seed_loop       
+        iny
+        cpy #(BigFloor::RoomProperties + ::FLOOR_SIZE)
+        bne room_properties_loop
+
+        ; Pick which individual rooms we are going to use here
+        jsr choose_rooms_for_floor
 
         ; Okay now, pick a random room for the player to spawn in
         jsr next_rand
@@ -645,10 +712,14 @@ done_with_player:
 
         ; Next choose the boss location; importantly this should NOT be the
         ; same room the player spawned in
+        ; TODO: check that this is a valid spawning location (at the very least, not out of bounds)
+        ; TODO: remove this and use an explicit challenge-room instead, with min/max as appropriate
+        ; (also TODO: not all challenge rooms spawn the big key, etc. we might need a treasure populating
+        ; loop in here)
 boss_loop:
         perform_zpcm_inc
         jsr next_rand
-        and #$0F
+        and #(::FLOOR_SIZE-1)
         cmp PlayerRoomIndex
         beq boss_loop
         tax
@@ -658,10 +729,11 @@ boss_loop:
 
         ; Choose the exit stairs location; this should again not be the same
         ; location as the player OR the boss
+        ; TODO: check that this is a valid spawning location (at the very least, not out of bounds)
 exit_loop:
         perform_zpcm_inc
         jsr next_rand
-        and #$0F
+        and #(::FLOOR_SIZE-1)
         cmp PlayerRoomIndex
         beq exit_loop
         cmp BossIndex
@@ -677,71 +749,21 @@ exit_loop:
         rts
 .endproc
 
-EXIT_FLAG_NORTH = %00000001
-EXIT_FLAG_EAST  = %00000010
-EXIT_FLAG_SOUTH = %00000100
-EXIT_FLAG_WEST  = %00001000
-
-; Very temporary, going away soon
-exit_flag_equivalence_table:
-    .byte 0 ; nothing!
-    .byte EXIT_FLAG_EAST
-    .byte EXIT_FLAG_WEST
-    .byte EXIT_FLAG_EAST  | EXIT_FLAG_WEST
-    .byte EXIT_FLAG_SOUTH
-    .byte EXIT_FLAG_EAST  | EXIT_FLAG_SOUTH
-    .byte EXIT_FLAG_SOUTH | EXIT_FLAG_WEST
-    .byte EXIT_FLAG_EAST  | EXIT_FLAG_SOUTH | EXIT_FLAG_WEST
-    .byte EXIT_FLAG_NORTH
-    .byte EXIT_FLAG_NORTH | EXIT_FLAG_EAST
-    .byte EXIT_FLAG_NORTH | EXIT_FLAG_WEST
-    .byte EXIT_FLAG_NORTH | EXIT_FLAG_EAST  | EXIT_FLAG_WEST
-    .byte EXIT_FLAG_NORTH | EXIT_FLAG_SOUTH
-    .byte EXIT_FLAG_NORTH | EXIT_FLAG_EAST  | EXIT_FLAG_SOUTH
-    .byte EXIT_FLAG_NORTH | EXIT_FLAG_SOUTH | EXIT_FLAG_WEST
-    .byte EXIT_FLAG_NORTH | EXIT_FLAG_EAST  | EXIT_FLAG_SOUTH | EXIT_FLAG_WEST
-
-; TODO: remove this, it's getting replaced by the new layouts system
-.proc load_floor_properties
-LayoutPtr := R0
-RoomIndex := R2
-        access_data_bank #<.bank(layouts_table)
-
-        lda #0
-        sta RoomIndex
-loop:
-        perform_zpcm_inc
-        ldx RoomIndex
-        lda room_layouts, x
-        tay
-        lda exit_flag_equivalence_table, y
-        sta room_properties, x
-        inc RoomIndex
-        lda RoomIndex
-        cmp #::FLOOR_SIZE
-        bne loop
-
-        restore_previous_bank
-
-        rts
-.endproc
-
 .proc FAR_init_current_room
 RoomPtr := R0
+RoomBank := R2
 EntityList := R4
-        access_data_bank #<.bank(layouts_table)
 
-        ; NEW: load a "room", still from a static maze floor
+        ; NEW: the room pointer and associated bank are just part of the
+        ; floor data now; load and use that
         ldx PlayerRoomIndex
-        lda room_layouts, x
-        asl
-        asl
-        tax
-        lda temporary_rooms_table+0, x
+        lda room_bank, x
+        sta RoomBank
+        lda room_ptr_low, x
         sta RoomPtr+0
-        lda temporary_rooms_table+1, x
+        lda room_ptr_high, x
         sta RoomPtr+1
-        access_data_bank {temporary_rooms_table+2, x}
+        access_data_bank RoomBank
         jsr initialize_battlefield
         jsr load_room_palette
         restore_previous_bank
@@ -777,7 +799,7 @@ converge_treasure:
         beq no_exit_stairs
         jsr spawn_exit_block
         ldx PlayerRoomIndex
-no_exit_stairs:
+no_exit_stairs:        
 
         ; Has the player already cleared this room?
         lda room_flags, x
@@ -795,7 +817,6 @@ spawn_boss_enemies:
         jmp room_cleared
 room_cleared:
 
-        restore_previous_bank
         rts
 .endproc
 
@@ -998,12 +1019,14 @@ EntityList := R4
         
 
         .if ::DEBUG_TEST_FLOOR
+        access_data_bank #<.bank(debug_zone_list)
         ; DEBUG: use a fake list for testing new enemy types
         lda debug_zone_list, x
         sta CollectionPtr
         lda debug_zone_list+1, x
         sta CollectionPtr+1
         .else
+        access_data_bank #<.bank(zone_list_basic)
         ; Use the real list
         lda zone_list_basic, x
         sta CollectionPtr
@@ -1036,6 +1059,9 @@ EntityList := R4
         ; Finally, now that we have the entity list, spawn random enemies from it
         jsr spawn_entity_list
 done:
+
+        restore_previous_bank
+
         rts
 .endproc
 
@@ -1054,6 +1080,7 @@ EntityList := R4
         tax
 
         .if ::DEBUG_TEST_FLOOR
+        access_data_bank #<.bank(debug_boss_zone_list)
         ; DEBUG: use a fake list for testing new enemy types
         lda debug_boss_zone_list, x
         sta CollectionPtr
@@ -1061,6 +1088,7 @@ EntityList := R4
         sta CollectionPtr+1
         .else
         ; Use the real list
+        access_data_bank #<.bank(zone_list_boss)
         lda zone_list_boss, x
         sta CollectionPtr
         lda zone_list_boss+1, x
@@ -1092,6 +1120,9 @@ EntityList := R4
         ; Finally, now that we have the entity list, spawn random enemies from it
         jsr spawn_entity_list
 done:
+        
+        restore_previous_bank
+
         rts
 .endproc
 
@@ -1221,6 +1252,35 @@ maze_list:
         .word floor_maze_14
         .word floor_maze_15
 
+
+; these are what the big floors will reference for their room pools
+; 16 entries each
+grassy_exterior:
+        .repeat 16
+        temporary_room_entry room_GrassyTest_Standard
+        .endrepeat
+
+.include "../build/bigfloors/test_floor_wide_open.incs"
+
+; eventually we'll want a whole big list of these
+; for now, 16 entries just like the floor mazes
+test_floor_layout_pool:
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
+        .word bigfloor_test_floor_wide_open
 
 
 ; =============================================

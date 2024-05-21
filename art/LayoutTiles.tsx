@@ -35,7 +35,7 @@
  </tile>
  <tile id="4">
   <properties>
-   <property name="room_pool" value="out_of_bounds"/>
+   <property name="room_pool" value="OUT_OF_BOUNDS"/>
   </properties>
  </tile>
  <tile id="16">
@@ -72,7 +72,7 @@
  </tile>
  <tile id="20">
   <properties>
-   <property name="room_pool" value="grassy_exterior"/>
+   <property name="room_pool" value="GRASSY_EXTERIOR"/>
   </properties>
  </tile>
  <tile id="32">
@@ -109,7 +109,7 @@
  </tile>
  <tile id="36">
   <properties>
-   <property name="room_pool" value="cave_interior"/>
+   <property name="room_pool" value="CAVE_INTERIOR"/>
   </properties>
  </tile>
  <tile id="48">
@@ -146,7 +146,7 @@
  </tile>
  <tile id="52">
   <properties>
-   <property name="room_pool" value="action53"/>
+   <property name="room_pool" value="DEBUG_ACTION_53"/>
   </properties>
  </tile>
 </tileset>

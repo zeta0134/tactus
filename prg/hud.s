@@ -536,7 +536,7 @@ loop:
         rts
 .endproc
 
-MINIMAP_BASE = (ROW_1+24)
+MINIMAP_BASE = (ROW_1+22)
 
 tile_offset BOSS_ROOM, 0, 1
 tile_offset DOOR_ROOM, 0, 2
@@ -558,13 +558,12 @@ AttributeAddr := R14
         ; TODO: adjust this for 8x4 mode when we implement that, currently
         ; it's tuned for 4x4
         lda RoomIndex
-        and #%00001100 ; isolate the row, which is currently x4
-        asl ; x8
+        and #%00011000 ; isolate the row, which is currently x8        
         asl ;x16
         asl ;x32
         sta DrawIndex
         lda RoomIndex
-        and #%00000011 ; isolate the column
+        and #%00000111 ; isolate the column
         ora DrawIndex
         sta DrawIndex
 
@@ -686,7 +685,7 @@ proceed_to_draw:
         jsr draw_minimap_tile
         inc CurrentMapIndex
         lda CurrentMapIndex
-        cmp #16
+        cmp #::FLOOR_SIZE
         bne done
         lda #0
         sta CurrentMapIndex
