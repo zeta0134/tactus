@@ -67,12 +67,6 @@ $(ROM_NAME): $(BUILDDIR)/output_chr.bin $(BUILDDIR)/torchlight/torchlight_0.incs
 $(BUILDDIR)/%.o: $(SOURCEDIR)/%.s $(BIN_FILES) $(FLOOR_INCS_FILES) $(ROOM_INCS_FILES)
 	ca65 -g -o $@ $<
 
-$(BUILDDIR)/animated_tiles/%.chr: $(ARTDIR)/animated_tiles/%.png
-	tools/animatedtile.py $< $@
-
-$(BUILDDIR)/static_tiles/%.chr: $(ARTDIR)/static_tiles/%.png
-	tools/statictile.py $< $@
-
 $(BUILDDIR)/rooms/%.incs: $(ARTDIR)/rooms/%.tmx
 	tools/room.py $< $@
 
