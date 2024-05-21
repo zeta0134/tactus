@@ -1125,34 +1125,34 @@ EntityAttribute := R3
 ; Floors - collections of rooms
 ; =============================
 
-; these are what the big floors will reference for their room pools
+; these are what the floors will reference for their room pools
 ; 16 entries each
 grassy_exterior:
         .repeat 16
         room_entry room_GrassyTest_Standard
         .endrepeat
 
-.include "../build/bigfloors/test_floor_wide_open.incs"
+.include "../build/floors/test_floor_wide_open.incs"
 
 ; eventually we'll want a whole big list of these
 ; for now, 16 entries just like the floor mazes
 test_floor_layout_pool:
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
-        .word bigfloor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
+        .word floor_test_floor_wide_open
 
 
 ; =============================================

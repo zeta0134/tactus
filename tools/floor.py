@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict
 
-from ca65 import pretty_print_table, ca65_label, ca65_byte_literal, ca65_word_literal
+from ca65 import pretty_print_table, pretty_print_table_str, ca65_label, ca65_byte_literal, ca65_word_literal
 from compress import compress_smallest
 
 # === Data Types ===
@@ -30,10 +30,10 @@ class TiledTileSet:
     tiles: Dict[int, TiledTile]
     string_properties: Dict[str, str]
 
-BLANK_TILE = TiledTile(tiled_index=0, ordinal_index=0, integer_properties={}, boolean_properties={}, string_properties={}, type="")
+BLANK_TILE = TiledTile(tiled_index=0, ordinal_index=0, integer_properties={}, boolean_properties={}, string_properties={}, type="blank")
 
 @dataclass
-class Layout:
+class Floor:
     name: str
     width: int
     height: int
@@ -42,7 +42,7 @@ class Layout:
 def read_boolean_properties(tile_element):
     boolean_properties = {}
     properties_element = tile_element.find("properties")
-    if properties_element:
+    if properties_element is not None:
         for prop in properties_element.findall("property"):
             if prop.get("type") == "bool":
                 boolean_properties[prop.get("name")] = (prop.get("value") == "true")
@@ -51,7 +51,7 @@ def read_boolean_properties(tile_element):
 def read_integer_properties(parent_element):
     integer_properties = {}
     properties_element = parent_element.find("properties")
-    if properties_element:
+    if properties_element is not None:
         for prop in properties_element.findall("property"):
             if prop.get("type") == "int":
                 integer_properties[prop.get("name")] = int(prop.get("value"))
@@ -60,7 +60,7 @@ def read_integer_properties(parent_element):
 def read_string_properties(parent_element):
     string_properties = {}
     properties_element = parent_element.find("properties")
-    if properties_element:
+    if properties_element is not None:
         for prop in properties_element.findall("property"):
             if prop.get("type") == None or prop.get("type") == "string":
                 string_properties[prop.get("name")] = prop.get("value")
@@ -105,11 +105,47 @@ def read_layer(layer_element, tilesets):
         return tiles
     exiterror("Non-csv encoding is not supported.")
 
+def safe_label(arbitrary_str):
+    return re.sub(r'[^A-Za-z0-9\_]', '_', arbitrary_str)
+
 def nice_label(full_path_and_filename):
-  (_, plain_filename) = os.path.split(full_path_and_filename)
-  (base_filename, _) = os.path.splitext(plain_filename)
-  safe_label = re.sub(r'[^A-Za-z0-9\-\_]', '_', base_filename)
-  return safe_label
+    (_, plain_filename) = os.path.split(full_path_and_filename)
+    (base_filename, _) = os.path.splitext(plain_filename)
+    return safe_label(base_filename)
+
+def combine_tile_properties(graphics_tile, supplementary_tiles):
+    combined_tile = TiledTile(
+        ordinal_index=graphics_tile.ordinal_index,
+        tiled_index=graphics_tile.tiled_index,
+        boolean_properties=dict(graphics_tile.boolean_properties),
+        integer_properties=dict(graphics_tile.integer_properties),
+        string_properties=dict(graphics_tile.string_properties),
+        type=graphics_tile.type
+    )
+    for supplementary_tile in supplementary_tiles:
+        combined_tile.integer_properties = combined_tile.integer_properties | supplementary_tile.integer_properties
+        combined_tile.boolean_properties = combined_tile.boolean_properties | supplementary_tile.boolean_properties
+        combined_tile.string_properties = combined_tile.string_properties | supplementary_tile.string_properties
+    return combined_tile
+
+# Given a list of layer elements, parses the layer contents, then
+# combines common attributes, using the "Base" layer as a base.
+def read_and_combine_layers(layer_elements, tilesets):
+    layers = {}
+    for layer_element in layer_elements:
+        layers[layer_element.get("name")] = read_layer(layer_element, tilesets)
+
+    # At this point we should have at least one layer named "Base", if we don't
+    # we can't continue and must bail
+    graphics_layer = layers.pop("Maze Shape")
+    supplementary_layers = layers
+
+    combined_tiles = []
+    for tile_index in range(0, len(graphics_layer)):
+        graphics_tile = graphics_layer[tile_index]
+        supplementary_tiles = [supplementary_layers[layer_name][tile_index] for layer_name in supplementary_layers]
+        combined_tiles.append(combine_tile_properties(graphics_tile, supplementary_tiles))
+    return combined_tiles
 
 def read_floor(map_filename):
     map_element = ElementTree.parse(map_filename).getroot()
@@ -130,29 +166,49 @@ def read_floor(map_filename):
     
     # then read in all map layers. Using the raw index data and the first gids, we can
     # translate the lists to the actual tiles they reference
+    layers = map_element.findall("layer")
+    combined_tiles = read_and_combine_layers(layers, tilesets)
 
-    # (hack: this converter only expects one layer, so ignore the name)
-    only_layer = None
-    layer_elements = map_element.findall("layer")
-    for layer_element in layer_elements:
-        only_layer = read_layer(layer_element, tilesets)  
+    # TODO: other global properties of the floor would go here
+    # (there aren't any yet)
 
     # finally let's make the name something useful
     (_, plain_filename) = os.path.split(map_filename)
     (base_filename, _) = os.path.splitext(plain_filename)
     safe_label = re.sub(r'[^A-Za-z0-9\-\_]', '_', base_filename)
 
-    return Layout(name=safe_label, width=map_width, height=map_height, tiles=only_layer)
+    return Floor(name=safe_label, width=map_width, height=map_height, tiles=combined_tiles)
 
-def floor_bytes(tilemap):
+def tile_exit_flag_bytes(tiles):
   raw_bytes = []
-  for tile in tilemap.tiles:
-    raw_bytes.append(tile.tiled_index)
+  for tile in tiles:
+    exit_flags = 0
+    flags = tile.boolean_properties
+    if tile.boolean_properties.get("exit_north", False):
+        exit_flags |= 0b0001 # Never
+    if tile.boolean_properties.get("exit_east", False):
+        exit_flags |= 0b0010 # Eat
+    if tile.boolean_properties.get("exit_south", False):
+        exit_flags |= 0b0100 # Soggy
+    if tile.boolean_properties.get("exit_west", False):
+        exit_flags |= 0b1000 # Waffles
+    # TODO: if there are other flags, check for those here
+    raw_bytes.append(ca65_byte_literal(exit_flags))
   return raw_bytes
 
-def write_layout(tilemap, output_file):
+def tile_room_pool_bytes(tiles):
+  raw_bytes = []
+  for tile in tiles:
+    raw_bytes.append(tile.string_properties.get("room_pool", "ERROR_NO_ROOM_POOL"))
+  return raw_bytes
+
+def write_floor(tilemap, output_file):
     output_file.write(ca65_label("floor_"+tilemap.name) + "\n")
-    pretty_print_table(floor_bytes(tilemap), output_file, tilemap.width)
+    output_file.write("  ; Room Pools\n")
+    pretty_print_table_str(tile_room_pool_bytes(tilemap.tiles), output_file, tilemap.width)
+    output_file.write("  ; Exits/Flags\n")
+    pretty_print_table_str(tile_exit_flag_bytes(tilemap.tiles), output_file, tilemap.width)
+    output_file.write("\n")
     
 if __name__ == '__main__':
     # DEBUG TEST THINGS
@@ -165,4 +221,4 @@ if __name__ == '__main__':
     tilemap = read_floor(input_filename)
 
     with open(output_filename, "w") as output_file:
-      write_layout(tilemap, output_file)
+      write_floor(tilemap, output_file)
