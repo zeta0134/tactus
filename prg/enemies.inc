@@ -7,7 +7,7 @@ PAL_RED    = %11000000
 
 ; TODO: not this!
 ; Every entity has an ID, and in this game it also doubles as their starting tile in CHR space.
-TILE_SMOKE_PUFF = $00 ; debug sprite
+TILE_SMOKE_PUFF = $00
 TILE_SLIME_BASE = $04
 TILE_BASIC_SLIME = (TILE_SLIME_BASE | %01)
 TILE_INTERMEDIATE_SLIME = (TILE_SLIME_BASE | %10)
@@ -45,11 +45,8 @@ TILE_WRENCH_PROJECTILE = $34
 
 ; Non-enemies also have IDs, eeeeeeverything has an update function
 TILE_REGULAR_FLOOR = $80
-TILE_DISCO_FLOOR =   $84
-TILE_WALL_TOP =      $88
-TILE_WALL_FACE =     $8C
-TILE_PIT_EDGE =      $90
-TILE_PIT      =      $94
+TILE_DISCO_FLOOR   = $84
+TILE_WALL          = $8C
 
 ; Treasure drops
 TILE_TREASURE_CHEST = ($98 | %10)

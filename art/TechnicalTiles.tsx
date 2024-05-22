@@ -39,13 +39,13 @@
  </tile>
  <tile id="17" type="detail">
   <properties>
-   <property name="behavior" value="TILE_WALL_FACE"/>
+   <property name="behavior" value="TILE_WALL"/>
    <property name="detail" value="DETAIL_GRASS_WALL_BORDER"/>
   </properties>
  </tile>
  <tile id="18" type="detail">
   <properties>
-   <property name="behavior" value="TILE_WALL_FACE"/>
+   <property name="behavior" value="TILE_WALL"/>
    <property name="detail" value="DETAIL_GRASS_WALL"/>
   </properties>
  </tile>

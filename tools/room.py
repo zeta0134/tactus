@@ -252,7 +252,7 @@ def behavior_id_bytes(tiles):
         if tile.type == "floor":
             raw_bytes.append(f"TILE_REGULAR_FLOOR")
         elif tile.type == "map":
-            raw_bytes.append(f"TILE_WALL_FACE")
+            raw_bytes.append(f"TILE_WALL")
         elif tile.type == "blank":
             raw_bytes.append(f"ERROR_BLANK_TILE")
         else:

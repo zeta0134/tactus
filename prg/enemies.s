@@ -93,10 +93,10 @@ static_behaviors:
         .endrepeat
         .word draw_disco_tile ; $80 - plain floor
         .word draw_disco_tile ; $84 - disco floor
-        .word no_behavior     ; $88 - wall top
-        .word no_behavior     ; $8C - wall face
-        .word no_behavior     ; $90 - pit edge
-        .word no_behavior     ; $94 - pit center
+        .word no_behavior     ; $88 - UNUSED
+        .word no_behavior     ; $8C - wall
+        .word no_behavior     ; $90 - UNUSED
+        .word no_behavior     ; $94 - UNUSED
         .word no_behavior     ; $98 - treasure chest
         .word no_behavior     ; $9C - big key
         .word no_behavior     ; $A0 - gold sack
@@ -128,10 +128,10 @@ direct_attack_behaviors:
         ; floors, statics, and technical tiles
         .word no_behavior ; $80 - plain floor
         .word no_behavior ; $84 - disco floor
-        .word no_behavior ; $88 - wall top
+        .word no_behavior ; $88 - UNUSEd
         .word no_behavior ; $8C - wall face
-        .word no_behavior ; $90 - pit edge
-        .word no_behavior ; $94 - pit center
+        .word no_behavior ; $90 - UNUSED
+        .word no_behavior ; $94 - UNUSED
         .word attack_treasure_chest ; $98 - treasure chest
         .word no_behavior ; $9C - big key
         .word no_behavior ; $A0 - gold sack
@@ -186,10 +186,10 @@ bonk_behaviors:
         .endrepeat
         .word no_behavior ; $80 - plain floor
         .word no_behavior ; $84 - disco floor
-        .word solid_tile_forbids_movement     ; $88 - wall top
+        .word no_behavior ; $88 - UNUSED
         .word solid_tile_forbids_movement     ; $8C - wall face
-        .word solid_tile_forbids_movement     ; $90 - pit edge
-        .word no_behavior ; $94 - pit center
+        .word no_behavior ; $90 - UNUSED
+        .word no_behavior ; $94 - UNUSED
         .word solid_tile_forbids_movement ; $98 - treasure chest
         .word collect_key ; $9C - big key
         .word collect_gold_sack ; $A0 - gold sack
