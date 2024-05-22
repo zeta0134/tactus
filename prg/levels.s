@@ -41,6 +41,8 @@ sprite_palette_overworld:
 grassy_palette:
         ;.incbin "../art/grassy_palette.pal"
         .incbin "../art/extra_grassy_palette.pal"
+dank_cave_palette:
+        .incbin "../art/dank_cave.pal"
 
 .proc load_room_palette
 RoomPtr := R0
@@ -530,13 +532,6 @@ shuffle_loop:
 
         rts
 .endproc
-
-GRASSY_EXTERIOR = 0
-
-room_pools_lut:
-        .word grassy_exterior
-room_pools_banks:
-        .byte <.bank(grassy_exterior)
 
 .proc choose_rooms_for_floor
 BigFloorPtr := R0
@@ -1114,7 +1109,18 @@ EntityAttribute := R3
 
         .segment "DATA_3"
 
+GRASSY_EXTERIOR = 0
+CAVE_INTERIOR = 1
+
+room_pools_lut:
+        .word grassy_exterior
+        .word cave_interior
+room_pools_banks:
+        .byte <.bank(grassy_exterior)
+        .byte <.bank(cave_interior)
+
 .include "../build/rooms/GrassyTest_Standard.incs"
+.include "../build/rooms/CaveTest_Standard.incs"
 
 .macro room_entry room_label
         .addr room_label
@@ -1130,6 +1136,13 @@ EntityAttribute := R3
 grassy_exterior:
         .repeat 16
         room_entry room_GrassyTest_Standard
+        .endrepeat
+
+; these are what the floors will reference for their room pools
+; 16 entries each
+cave_interior:
+        .repeat 16
+        room_entry room_CaveTest_Standard
         .endrepeat
 
 .include "../build/floors/test_floor_wide_open.incs"
