@@ -70,7 +70,7 @@ for radius_index in range(0, 32):
 
 # also give me a table of random noise!
 shuffled_rows = []
-ordered_rows = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19]
+ordered_rows = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21]
 for i in range(0, 13):
     shuffled_rows += random.sample(ordered_rows, k=len(ordered_rows))
 shuffled_rows = shuffled_rows[0:256]

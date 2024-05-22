@@ -11,11 +11,10 @@
 
 current_lighting_counter: .res 1
 current_lighting_row: .res 1
-current_radius: .res 1
+current_torchlight_radius: .res 1
 
-current_base_radius: .res 1
 target_counter: .res 1
-target_radius: .res 1
+target_torchlight_radius: .res 1
 
 torchlight_bank: .res 1
 
@@ -76,22 +75,22 @@ torchlight_bank: .res 1
     .segment "CODE_3"
 
 torchlight_update_table:
-  .byte $0d, $08, $0f, $04, $06, $0b, $13, $01, $0e, $11, $02, $12, $00, $03, $10, $07
-  .byte $0a, $09, $05, $0c, $08, $09, $10, $04, $11, $0d, $0f, $05, $0a, $0e, $07, $12
-  .byte $06, $0c, $0b, $02, $13, $03, $01, $00, $07, $05, $06, $0b, $10, $00, $0d, $13
-  .byte $0c, $01, $11, $04, $09, $12, $08, $02, $03, $0a, $0f, $0e, $02, $08, $00, $05
-  .byte $07, $06, $0c, $0f, $01, $0e, $11, $0b, $10, $09, $0d, $12, $13, $03, $0a, $04
-  .byte $12, $01, $06, $0c, $02, $0b, $10, $07, $13, $0a, $11, $05, $0d, $03, $0e, $00
-  .byte $09, $04, $0f, $08, $0c, $13, $02, $08, $03, $0d, $00, $0f, $0e, $01, $12, $0b
-  .byte $07, $10, $04, $0a, $05, $11, $06, $09, $08, $01, $05, $0b, $12, $0d, $0f, $04
-  .byte $13, $02, $09, $00, $07, $03, $11, $0e, $0c, $06, $0a, $10, $08, $13, $04, $0c
-  .byte $0f, $0d, $0e, $03, $02, $01, $11, $06, $09, $10, $0a, $07, $00, $0b, $12, $05
-  .byte $13, $00, $0e, $0a, $04, $06, $08, $10, $07, $03, $0d, $0f, $12, $01, $02, $05
-  .byte $09, $0b, $0c, $11, $07, $0c, $06, $05, $02, $0f, $13, $08, $0b, $0a, $0d, $00
-  .byte $03, $11, $12, $10, $04, $09, $0e, $01, $11, $04, $02, $10, $0d, $01, $0f, $06
-  .byte $0e, $08, $07, $0c, $0a, $03, $0b, $12, $05, $09, $13, $00, $13, $01, $10, $02
-  .byte $06, $08, $0b, $04, $03, $07, $0e, $0a, $00, $05, $11, $0f, $09, $0c, $0d, $12
-  .byte $11, $03, $10, $06, $02, $00, $05, $09, $0f, $0d, $01, $08, $07, $04, $0e, $0c
+  .byte $14, $0c, $0f, $01, $09, $0e, $04, $0a, $08, $15, $07, $12, $06, $10, $02, $05
+  .byte $0b, $13, $03, $00, $0d, $11, $15, $03, $00, $0a, $0b, $05, $02, $01, $0e, $14
+  .byte $06, $12, $09, $08, $10, $0c, $0d, $04, $0f, $07, $11, $13, $15, $08, $09, $06
+  .byte $0d, $10, $12, $11, $00, $05, $0e, $0f, $13, $04, $01, $0b, $07, $0c, $0a, $02
+  .byte $03, $14, $0b, $05, $0a, $0e, $12, $0f, $11, $0c, $15, $09, $07, $13, $06, $08
+  .byte $00, $14, $01, $10, $02, $04, $0d, $03, $11, $05, $0a, $0f, $01, $0e, $0b, $12
+  .byte $0d, $04, $07, $02, $13, $08, $15, $03, $10, $06, $00, $09, $0c, $14, $14, $0c
+  .byte $02, $00, $15, $0a, $09, $04, $01, $03, $12, $0e, $0d, $0f, $0b, $11, $05, $07
+  .byte $10, $13, $08, $06, $0b, $02, $09, $14, $05, $06, $01, $0f, $11, $12, $15, $0a
+  .byte $0d, $0e, $07, $0c, $13, $04, $00, $08, $10, $03, $0a, $14, $12, $0e, $00, $0c
+  .byte $01, $09, $13, $04, $0d, $0f, $07, $15, $11, $08, $02, $03, $06, $0b, $10, $05
+  .byte $09, $15, $08, $0b, $11, $0c, $13, $01, $07, $0d, $06, $12, $14, $00, $05, $0a
+  .byte $0f, $0e, $02, $03, $04, $10, $06, $0c, $08, $0b, $0a, $11, $13, $07, $01, $10
+  .byte $05, $15, $0e, $02, $03, $09, $0d, $12, $04, $00, $0f, $14, $0f, $0a, $00, $0b
+  .byte $05, $0e, $10, $14, $09, $13, $06, $03, $07, $01, $04, $02, $12, $0c, $11, $08
+  .byte $15, $0d, $13, $05, $02, $0a, $15, $14, $0d, $07, $0e, $00, $0b, $03, $12, $06
 
 torchlight_luts_low:
     .repeat 32, i
@@ -106,13 +105,6 @@ torchlight_luts_bank:
     .byte <.bank(.ident(.concat("torchlight_lut_", .string(i))))
     .endrepeat
 
-breathing_lut:
-    ;.byte 2, 3, 3, 4, 4, 4, 3, 3, 2, 1, 1, 0, 0, 0, 1, 1 ; strength 2
-    ;.byte 1, 1, 2, 2, 2, 2, 2, 1, 1, 1, 0, 0, 0, 0, 0, 1 ; strength 1
-    ;.byte 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1 ; strength 0.5, synced to music
-    .byte 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ; completely off (it's distracting?)
-
-
 .proc FAR_init_torchlight
     lda #0
     sta current_lighting_row
@@ -123,11 +115,8 @@ breathing_lut:
     sta target_counter
 
     lda #30
-    sta current_radius
-    sta current_base_radius
-
-    lda #30
-    sta target_radius
+    sta current_torchlight_radius
+    sta target_torchlight_radius
     rts
 .endproc
 
@@ -158,33 +147,19 @@ breathing_lut:
 .proc update_current_radius
     dec target_counter
     bne skip_update_target
-    lda #8
+    lda #4
     sta target_counter
-    lda target_radius
-    cmp current_base_radius
+    lda target_torchlight_radius
+    cmp current_torchlight_radius
     beq skip_update_target
     bcc decrease_current
 increase_current:
-    inc current_base_radius
+    inc current_torchlight_radius
     jmp skip_update_target
 decrease_current:
-    dec current_base_radius
+    dec current_torchlight_radius
 skip_update_target:
 
-    lda currently_playing_row
-    and #%00001111
-    tax
-
-    lda current_base_radius
-    clc
-    adc breathing_lut, x
-    cmp #31
-    bcs overflow
-    sta current_radius
-    rts
-overflow:
-    lda #31
-    sta current_radius
     rts
 .endproc
 
@@ -202,9 +177,7 @@ Scratch := R6
 
     lda #0
     sta Scratch
-    lda current_lighting_row
-    clc
-    adc #2 ; the battlefield starts on row 2 of the nametable, and spans its full width
+    lda current_lighting_row ; the battlefield starts on row 0 of the nametable, and spans its full width
     .repeat 5
     asl
     rol Scratch
@@ -224,7 +197,7 @@ Scratch := R6
     ; lighting row and the player's current position
     
     ;st16 TorchlightPtr, torchlight_10_lut
-    ldx current_radius
+    ldx current_torchlight_radius
     lda torchlight_luts_low, x
     sta TorchlightPtr+0
     lda torchlight_luts_high, x
@@ -258,8 +231,8 @@ Scratch := R6
     lda Scratch
     adc TorchlightPtr+1
     sta TorchlightPtr+1
-    ; X = 31 - PlayerCol * 2 - 2
-    lda #(31 - 2)
+    ; X = 31 - PlayerCol * 2 - 0
+    lda #(31 - 0)
     sec
     sbc PlayerCol
     sbc PlayerCol

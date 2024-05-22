@@ -21,6 +21,7 @@
 .global PlayerZone
 .global PlayerFloor
 .global PlayerNextDirection
+.global PlayerTorchlightRadius
 
 .global EnemyDiedThisFrame
 

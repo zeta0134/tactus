@@ -15,6 +15,7 @@
         .include "ppu.inc"
         .include "prng.inc"
         .include "rainbow.inc"
+        .include "torchlight.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
@@ -37,6 +38,8 @@ room_population_order: .res ::FLOOR_SIZE
 
 sprite_palette_overworld:
         .incbin "../art/sprite_palette_overworld.pal"
+sprite_palette_underworld:
+        .incbin "../art/sprite_palette.pal"
 
 grassy_palette:
         ;.incbin "../art/grassy_palette.pal"
@@ -152,7 +155,7 @@ OverlayPtr := R2
 check_north:
         ldx PlayerRoomIndex
         lda room_properties, x
-        and #EXIT_FLAG_NORTH
+        and #ROOM_EXIT_FLAG_NORTH
         beq check_east
 
         lda PlayerRoomIndex
@@ -182,7 +185,7 @@ draw_overlay_north:
 check_east:
         ldx PlayerRoomIndex
         lda room_properties, x
-        and #EXIT_FLAG_EAST
+        and #ROOM_EXIT_FLAG_EAST
         beq check_south
 
         lda PlayerRoomIndex
@@ -212,7 +215,7 @@ draw_overlay_east:
 check_south:
         ldx PlayerRoomIndex
         lda room_properties, x
-        and #EXIT_FLAG_SOUTH
+        and #ROOM_EXIT_FLAG_SOUTH
         beq check_west
 
         lda PlayerRoomIndex
@@ -242,7 +245,7 @@ draw_overlay_south:
 check_west:
         ldx PlayerRoomIndex
         lda room_properties, x
-        and #EXIT_FLAG_WEST
+        and #ROOM_EXIT_FLAG_WEST
         beq done
 
         lda PlayerRoomIndex
@@ -735,6 +738,28 @@ EntityList := R4
         access_data_bank RoomBank
         jsr initialize_battlefield
         jsr load_room_palette
+
+        ; If this room is darkened, apply torchlight
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #ROOM_PROPERTIES_DARK
+        bne apply_darkness
+apply_lightness:
+        lda #30
+        sta current_torchlight_radius
+        sta target_torchlight_radius
+        jmp done_with_torchlight
+apply_darkness:
+        lda target_torchlight_radius
+        cmp #30
+        bne no_instant_darkness
+        lda #0
+        sta current_torchlight_radius
+no_instant_darkness:
+        lda PlayerTorchlightRadius
+        sta target_torchlight_radius
+done_with_torchlight:
+
         restore_previous_bank
 
         ; Mark this room as visited

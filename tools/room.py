@@ -40,6 +40,8 @@ class Room:
     tiles: [TiledTile]
     overlays: Dict[str, TiledTile]
     exit_id: int
+    dark: bool
+    category: str
     bg_palette: str
     obj_palette: str
     
@@ -194,6 +196,9 @@ def read_room(map_filename):
         exit_id |= 0b0100 # Soggy
     if "exit_west" in flags and flags["exit_west"] == True:
         exit_id |= 0b1000 # Waffles
+    is_dark = flags.get("dark", False)
+    string_properties = read_string_properties(map_element)
+    category = string_properties.get("category", "exterior")
 
     string_properties = read_string_properties(map_element)
     room_bg_palette = string_properties.get("room_palette","grassy_palette")
@@ -205,7 +210,7 @@ def read_room(map_filename):
     safe_label = re.sub(r'[^A-Za-z0-9\-\_]', '_', base_filename)
 
     return Room(name=safe_label, width=map_width, height=map_height, tiles=combined_tiles, overlays=overlays,
-        exit_id=exit_id, bg_palette=room_bg_palette, obj_palette=room_obj_palette)
+        exit_id=exit_id, bg_palette=room_bg_palette, obj_palette=room_obj_palette, dark=is_dark, category=category)
 
 def tile_id_bytes(tiles):
   raw_bytes = []
@@ -308,9 +313,20 @@ def write_overlay(overlay_tiles, output_file):
             output_file.write(f"{overlay_behavior_flag_bytes[tile_id]}\n")
     output_file.write("  .byte $FF ; end of overlay\n\n")
 
+category_ids = {
+    "exterior": 0,
+    "interior": 1,
+    "challenge": 2,
+    "shop": 3,
+}
+
 def write_room(tilemap, output_file):
+    properties_byte = tilemap.exit_id
+    if tilemap.dark:
+        properties_byte |= 0x40
+    properties_byte |= (category_ids[tilemap.category] << 4)
     output_file.write(ca65_label("room_"+tilemap.name) + "\n")
-    output_file.write("  .byte " + ca65_byte_literal(tilemap.exit_id) + " ; exits\n")
+    output_file.write("  .byte " + ca65_byte_literal(properties_byte) + " ; property flags\n")
     output_file.write("  .addr " + tilemap.bg_palette + " ; BG palette for this room\n")
     output_file.write("  .addr " + tilemap.obj_palette + " ; OBJ palette for this room\n")
     output_file.write("  ; Overlays\n")

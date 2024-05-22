@@ -1,3 +1,6 @@
 .global FAR_init_torchlight
 .global FAR_update_torchlight
 .global FAR_draw_torchlight
+
+.global current_torchlight_radius
+.global target_torchlight_radius

@@ -46,6 +46,7 @@ PlayerJumpHeightPos: .res 2
 
 PlayerWeaponDmg: .res 1
 PlayerMovementBlocked: .res 1
+PlayerTorchlightRadius: .res 1
 
 PlayerMaxHealth: .res 1
 PlayerHealth: .res 1
@@ -110,6 +111,9 @@ MetaSpriteIndex := R0
         ; Initialize us to the *end* of the jump height table; this is its resting state
         lda #JUMP_HEIGHT_END
         sta PlayerJumpHeightPos
+
+        lda #10
+        sta PlayerTorchlightRadius
 
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes
