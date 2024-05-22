@@ -43,10 +43,11 @@ TILE_MOLE_THROWING = $2C
 TILE_MOLE_IDLE = $30
 TILE_WRENCH_PROJECTILE = $34
 
-; Non-enemies also have IDs, eeeeeeverything has an update function
-TILE_REGULAR_FLOOR = $80
-TILE_DISCO_FLOOR   = $84
-TILE_WALL          = $8C
+; Non-enemies, mostly level geometry
+TILE_REGULAR_FLOOR  = $80
+TILE_DISCO_FLOOR    = $84
+TILE_SEMISAFE_FLOOR = $88
+TILE_WALL           = $8C
 
 ; Treasure drops
 TILE_TREASURE_CHEST = ($98 | %10)

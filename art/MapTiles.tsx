@@ -33,20 +33,84 @@
  <tile id="29" type="map"/>
  <tile id="30" type="map"/>
  <tile id="31" type="map"/>
- <tile id="32" type="map"/>
- <tile id="33" type="map"/>
- <tile id="34" type="map"/>
- <tile id="35" type="map"/>
- <tile id="36" type="map"/>
- <tile id="37" type="map"/>
- <tile id="38" type="map"/>
- <tile id="39" type="map"/>
- <tile id="48" type="map"/>
- <tile id="49" type="map"/>
- <tile id="50" type="map"/>
- <tile id="51" type="map"/>
- <tile id="52" type="map"/>
- <tile id="53" type="map"/>
- <tile id="54" type="map"/>
- <tile id="55" type="map"/>
+ <tile id="32" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="33" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="34" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="35" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="36" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="37" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="38" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="39" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="48" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="49" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="50" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="51" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="52" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="53" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="54" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
+ <tile id="55" type="map">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
 </tileset>

@@ -265,7 +265,7 @@
 </data>
   </layer>
  </group>
- <group id="15" name="Overlay: Challenge - North">
+ <group id="15" name="Overlay: Challenge - North" visible="0">
   <layer id="19" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,82,65,65,65,65,65,65,84,0,0,0,0,

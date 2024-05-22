@@ -20,14 +20,14 @@ continue:
         ldx TargetTile
         lda tile_index_to_row_lut, x
         cmp #0
-        beq failure
+        beq valid_destination_failure
         cmp #(::BATTLEFIELD_HEIGHT-1)
-        beq failure
+        beq valid_destination_failure
         lda tile_index_to_col_lut, x
         cmp #0
-        beq failure
+        beq valid_destination_failure
         cmp #(::BATTLEFIELD_WIDTH-1)
-        beq failure
+        beq valid_destination_failure
 
         ldx TargetTile
         lda battlefield, x
@@ -39,10 +39,20 @@ continue:
         ; puffs of smoke are only okay if they moved *last* frame
         ; (this resolves some weirdness with tile update order)
         cmp #TILE_SMOKE_PUFF
-        bne failure
+        bne valid_destination_failure
         lda tile_flags, x
         bpl success_label
-failure:
+valid_destination_failure:
+.endmacro
+
+.macro if_semisafe_destination success_label,
+        ldx TargetTile
+        lda battlefield, x
+        ; currently there is only one semisolid tile, since
+        ; it never animates. later we might need to expand this list
+        cmp #TILE_SEMISAFE_FLOOR
+        beq success_label
+semisafe_failure:
 .endmacro
 
 ; Various battlefield drawing macros, mostly to cut down on repetition and copy/pasta errors

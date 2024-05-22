@@ -68,6 +68,7 @@ tile_index_to_col_lut:
 .include "enemies/exit_block.asm"
 .include "enemies/mole.asm"
 .include "enemies/slimes.asm"
+.include "enemies/semisafe_tile.asm"
 .include "enemies/small_heart.asm"
 .include "enemies/smoke_puff.asm"
 .include "enemies/treasure_chest.asm"
@@ -93,7 +94,7 @@ static_behaviors:
         .endrepeat
         .word draw_disco_tile ; $80 - plain floor
         .word draw_disco_tile ; $84 - disco floor
-        .word no_behavior     ; $88 - UNUSED
+        .word update_semisafe_tile ; $88 - semisafe floor
         .word no_behavior     ; $8C - wall
         .word no_behavior     ; $90 - UNUSED
         .word no_behavior     ; $94 - UNUSED
@@ -128,7 +129,7 @@ direct_attack_behaviors:
         ; floors, statics, and technical tiles
         .word no_behavior ; $80 - plain floor
         .word no_behavior ; $84 - disco floor
-        .word no_behavior ; $88 - UNUSEd
+        .word no_behavior ; $88 - semisafe floor
         .word no_behavior ; $8C - wall face
         .word no_behavior ; $90 - UNUSED
         .word no_behavior ; $94 - UNUSED
@@ -186,7 +187,7 @@ bonk_behaviors:
         .endrepeat
         .word no_behavior ; $80 - plain floor
         .word no_behavior ; $84 - disco floor
-        .word no_behavior ; $88 - UNUSED
+        .word semisolid_attacks_player ; $88 - semisafe floor
         .word solid_tile_forbids_movement     ; $8C - wall face
         .word no_behavior ; $90 - UNUSED
         .word no_behavior ; $94 - UNUSED
