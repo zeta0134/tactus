@@ -276,6 +276,21 @@ west:
         dec TargetTile
 attempt_to_spawn_wrench:
         if_valid_destination spawn_new_wrench
+move_wrench_failed:
+        if_semisafe_destination make_target_dangerous
+        jmp despawn_old_wrench
+make_target_dangerous:
+        ; write our own position into the target tile, as this will help
+        ; the damage sprite to spawn in the right location if the player
+        ; takes the hit
+        ldx TargetTile
+        lda CurrentTile
+        sta tile_data, x
+        ; additionally, for update order reasons, mark the target as "already moved",
+        ; this prevents it from clearing our damage state before the next beat
+        lda tile_flags, x
+        ora #%10000000
+        sta tile_flags, x
         jmp despawn_old_wrench
 spawn_new_wrench:
         ldx CurrentTile

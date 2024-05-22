@@ -35,8 +35,8 @@ loop:
 .endproc
 
 .proc reset
-        sei            ; Disable interrupts
         cld            ; make sure decimal mode is off (not that it does anything)
+        sei            ; Disable interrupts
         ldx #$ff       ; initialize stack
         txs
 

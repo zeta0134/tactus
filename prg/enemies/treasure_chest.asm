@@ -209,7 +209,7 @@ find_exit_loop:
         sta room_flags, x
 next_room:
         inx
-        cpx #16
+        cpx #::FLOOR_SIZE
         bne find_exit_loop
 
         lda #1

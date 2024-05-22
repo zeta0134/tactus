@@ -122,6 +122,22 @@ CurrentTile := R15
         inc TargetTile
         if_valid_destination proceed_with_jump
 jump_failed:
+        if_semisafe_destination make_target_dangerous
+        jmp return_to_idle_without_moving
+make_target_dangerous:
+        ; write our own position into the target tile, as this will help
+        ; the damage sprite to spawn in the right location if the player
+        ; takes the hit
+        ldx TargetTile
+        lda CurrentTile
+        sta tile_data, x
+        ; additionally, for update order reasons, mark the target as "already moved",
+        ; this prevents it from clearing our damage state before the next beat
+        lda tile_flags, x
+        ora #%10000000
+        sta tile_flags, x
+        ;jmp return_to_idle_without_moving ; (fall through)
+return_to_idle_without_moving:
 
         ; Turn ourselves back into an idle pose
         ldx CurrentTile
@@ -186,6 +202,22 @@ CurrentTile := R15
         dec TargetTile
         if_valid_destination proceed_with_jump
 jump_failed:
+        if_semisafe_destination make_target_dangerous
+        jmp return_to_idle_without_moving
+make_target_dangerous:
+        ; write our own position into the target tile, as this will help
+        ; the damage sprite to spawn in the right location if the player
+        ; takes the hit
+        ldx TargetTile
+        lda CurrentTile
+        sta tile_data, x
+        ; additionally, for update order reasons, mark the target as "already moved",
+        ; this prevents it from clearing our damage state before the next beat
+        lda tile_flags, x
+        ora #%10000000
+        sta tile_flags, x
+        ;jmp return_to_idle_without_moving ; (fall through)
+return_to_idle_without_moving:
 
         ; Turn ourselves back into an idle pose
         ldx CurrentTile
