@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="MapTiles" tilewidth="16" tileheight="16" tilecount="64" columns="16">
- <image source="tilesets/map_tiles_tiled.png" width="256" height="64"/>
+<tileset version="1.10" tiledversion="1.10.2" name="MapTiles" tilewidth="16" tileheight="16" tilecount="128" columns="16">
+ <image source="tilesets/map_tiles_tiled.png" width="256" height="128"/>
  <tile id="0" type="map"/>
  <tile id="1" type="map"/>
  <tile id="2" type="map"/>
@@ -177,4 +177,10 @@
    <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
   </properties>
  </tile>
+ <tile id="72" type="map"/>
+ <tile id="73" type="map"/>
+ <tile id="74" type="map"/>
+ <tile id="88" type="map"/>
+ <tile id="89" type="map"/>
+ <tile id="90" type="map"/>
 </tileset>
