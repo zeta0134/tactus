@@ -3,7 +3,7 @@
 .global FAR_init_current_room
 .global FAR_handle_room_spawns
 
-.global room_layouts, room_flags, room_seeds, room_properties, global_rng_seed, enemies_active
+.global room_layouts, room_flags, room_seeds, room_floorplan, room_properties, global_rng_seed, enemies_active
 
 ; layouts
 .global test_layout_with_four_exits
@@ -11,13 +11,9 @@
 .global far_too_many_slimes
 .global hit_box_testing
 
-.struct Layout
-    TileTypes .byte 140
-    RoomProperties .byte
-.endstruct
-
 .struct Room
     Properties .byte
+    Exits .byte
     BgPalette .word
     ObjPalette .word
     InteriorOverlayNorth .word
@@ -64,6 +60,7 @@ ROOM_CATEGORY_EXTERIOR  = %00000000
 ROOM_CATEGORY_INTERIOR  = %00010000
 ROOM_CATEGORY_CHALLENGE = %00100000
 ROOM_CATEGORY_SHOP      = %00110000
+ROOM_CATEGORY_MASK      = %00110000
 ROOM_EXIT_FLAG_NORTH    = %00000001 ; Never
 ROOM_EXIT_FLAG_EAST     = %00000010 ; Eat
 ROOM_EXIT_FLAG_SOUTH    = %00000100 ; Soggy

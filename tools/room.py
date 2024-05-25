@@ -321,12 +321,13 @@ category_ids = {
 }
 
 def write_room(tilemap, output_file):
-    properties_byte = tilemap.exit_id
+    properties_byte = 0
     if tilemap.dark:
         properties_byte |= 0x40
     properties_byte |= (category_ids[tilemap.category] << 4)
     output_file.write(ca65_label("room_"+tilemap.name) + "\n")
     output_file.write("  .byte " + ca65_byte_literal(properties_byte) + " ; property flags\n")
+    output_file.write("  .byte " + ca65_byte_literal(tilemap.exit_id) + " ; supported exits\n")
     output_file.write("  .addr " + tilemap.bg_palette + " ; BG palette for this room\n")
     output_file.write("  .addr " + tilemap.obj_palette + " ; OBJ palette for this room\n")
     output_file.write("  ; Overlays\n")

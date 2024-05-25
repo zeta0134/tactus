@@ -624,7 +624,7 @@ current_door_room:
 
 normal_room:
         ; Start with the room's "revealed" tile
-        lda room_properties, x
+        lda room_floorplan, x
         and #%00001111
         sta DrawTile
         ; If the player hasn't visited this room, we're done

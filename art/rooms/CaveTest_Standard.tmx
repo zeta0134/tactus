@@ -140,7 +140,7 @@
 </data>
   </layer>
  </group>
- <group id="11" name="Overlay: Interior - South" visible="0">
+ <group id="11" name="Overlay: Interior - South">
   <layer id="5" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -396,7 +396,7 @@
 </data>
   </layer>
  </group>
- <group id="15" name="Overlay: Challenge - North">
+ <group id="15" name="Overlay: Challenge - North" visible="0">
   <layer id="19" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,73,146,129,129,129,129,129,129,148,75,0,0,0,

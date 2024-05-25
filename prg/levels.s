@@ -28,7 +28,8 @@ room_ptr_high: .res ::FLOOR_SIZE
 room_bank: .res ::FLOOR_SIZE
 room_flags: .res ::FLOOR_SIZE ; what did we spawn in here? what is the current status of those things?
 room_seeds: .res ::FLOOR_SIZE
-room_properties: .res ::FLOOR_SIZE ; what are the BASE properties of this room? (exits, lighting, special render modes, etc)
+room_floorplan: .res ::FLOOR_SIZE ; properties of this cell in the floor's maze layout
+room_properties: .res ::FLOOR_SIZE ; properties of the selected room that populates this cell
 chest_spawned: .res 1
 enemies_active: .res 1
 
@@ -154,7 +155,7 @@ OverlayPtr := R2
 
 check_north:
         ldx PlayerRoomIndex
-        lda room_properties, x
+        lda room_floorplan, x
         and #ROOM_EXIT_FLAG_NORTH
         beq check_east
 
@@ -165,9 +166,16 @@ check_north:
         lda room_flags, x
         and #ROOM_FLAG_BOSS
         bne boss_chamber_north
-        ; TODO: Shop, Interior
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_INTERIOR
+        beq interior_chamber_north
+        ; TODO: Shop, Chamber as category
 exterior_chamber_north:
         ldy #Room::ExteriorOverlayNorth        
+        jmp draw_overlay_north
+interior_chamber_north:
+        ldy #Room::InteriorOverlayNorth
         jmp draw_overlay_north
 boss_chamber_north:
         ldy #Room::ChallengeOverlayNorth
@@ -184,7 +192,7 @@ draw_overlay_north:
 
 check_east:
         ldx PlayerRoomIndex
-        lda room_properties, x
+        lda room_floorplan, x
         and #ROOM_EXIT_FLAG_EAST
         beq check_south
 
@@ -195,9 +203,16 @@ check_east:
         lda room_flags, x
         and #ROOM_FLAG_BOSS
         bne boss_chamber_east
-        ; TODO: Shop, Interior
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_INTERIOR
+        beq interior_chamber_east
+        ; TODO: Shop, Chamber as category
 exterior_chamber_east:
         ldy #Room::ExteriorOverlayEast
+        jmp draw_overlay_east
+interior_chamber_east:
+        ldy #Room::InteriorOverlayEast
         jmp draw_overlay_east
 boss_chamber_east:
         ldy #Room::ChallengeOverlayEast
@@ -214,7 +229,7 @@ draw_overlay_east:
 
 check_south:
         ldx PlayerRoomIndex
-        lda room_properties, x
+        lda room_floorplan, x
         and #ROOM_EXIT_FLAG_SOUTH
         beq check_west
 
@@ -225,9 +240,16 @@ check_south:
         lda room_flags, x
         and #ROOM_FLAG_BOSS
         bne boss_chamber_south
-        ; TODO: Shop, Interior
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_INTERIOR
+        beq interior_chamber_south
+        ; TODO: Shop, Chamber as category
 exterior_chamber_south:
         ldy #Room::ExteriorOverlaySouth
+        jmp draw_overlay_south
+interior_chamber_south:
+        ldy #Room::InteriorOverlaySouth
         jmp draw_overlay_south
 boss_chamber_south:
         ldy #Room::ChallengeOverlaySouth
@@ -244,7 +266,7 @@ draw_overlay_south:
 
 check_west:
         ldx PlayerRoomIndex
-        lda room_properties, x
+        lda room_floorplan, x
         and #ROOM_EXIT_FLAG_WEST
         beq done
 
@@ -255,9 +277,16 @@ check_west:
         lda room_flags, x
         and #ROOM_FLAG_BOSS
         bne boss_chamber_west
-        ; TODO: Shop, Interior
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_INTERIOR
+        beq interior_chamber_west
+        ; TODO: Shop, Chamber as category
 exterior_chamber_west:
         ldy #Room::ExteriorOverlayWest
+        jmp draw_overlay_west
+interior_chamber_west:
+        ldy #Room::InteriorOverlayWest
         jmp draw_overlay_west
 boss_chamber_west:
         ldy #Room::ChallengeOverlayWest
@@ -542,6 +571,9 @@ RoomPoolPtr := R2
 RoomPoolBank := R4
 CurrentRoomIndex := R5
 CurrentRoomCounter := R6
+RoomPtr := R7
+RoomBank := R9
+ExitTemp := R10
 ; TODO: pay attention to these
 ; ChallengeCount := R?
 ; ShopCount := R?
@@ -578,23 +610,49 @@ begin_room_selection:
         ldx CurrentRoomIndex
         lda (RoomPoolPtr), y
         sta room_ptr_low, x
+        sta RoomPtr+0
         iny
         lda (RoomPoolPtr), y
         sta room_ptr_high, x
+        sta RoomPtr+1
         iny
         lda (RoomPoolPtr), y
         sta room_bank, x
+        sta RoomBank
+
         ; TODO: load up the room pointer and check properties and such to update
         ; our counters. Right now we don't have those (or any rooms that would set them)
         ; so we can skip that work and just use whatever we rolled. Should the counter
         ; logic fail, we might need to roll the room again.
-
+        access_data_bank RoomBank
+        ; firstly, does this room support the exits this floorplan location requires?
+        lda room_floorplan, x
+        and #$0F
+        sta ExitTemp
+        ldy #Room::Exits
+        lda (RoomPtr), y
+        and ExitTemp
+        cmp ExitTemp
+        bne reject_this_room
+        ; TODO: special feature counters
+        jmp accept_this_room
+reject_this_room:
+        restore_previous_bank ; RoomBank
+        jmp begin_room_selection
+accept_this_room:
+        ; Load in the chosen properties of this room, which we'll
+        ; use later during chamber generation
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        sta room_properties, x
+        ; Done reading room data for now
+        restore_previous_bank ; RoomBank
         restore_previous_bank ; RoomPoolBank
 
         inc CurrentRoomCounter
         lda CurrentRoomCounter
         cmp #::FLOOR_SIZE
-        bne room_loop
+        jne room_loop
 
         rts
 .endproc
@@ -645,14 +703,14 @@ seed_loop:
         lda #0
         ldx #0
         ldy #BigFloor::RoomProperties
-room_properties_loop:
+room_floorplan_loop:
         perform_zpcm_inc
         lda (BigFloorPtr), y
-        sta room_properties, x
+        sta room_floorplan, x
         inx
         iny
         cpy #(BigFloor::RoomProperties + ::FLOOR_SIZE)
-        bne room_properties_loop
+        bne room_floorplan_loop
 
         ; Pick which individual rooms we are going to use here
         jsr choose_rooms_for_floor
