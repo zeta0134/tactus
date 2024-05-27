@@ -42,8 +42,11 @@ sprite_palette_overworld:
 sprite_palette_underworld:
         .incbin "../art/sprite_palette.pal"
 
+oob_palette:
+        .incbin "../art/oob_palette.pal"
+test_palette:
+        .incbin "../art/test_palette.pal"
 grassy_palette:
-        ;.incbin "../art/grassy_palette.pal"
         .incbin "../art/extra_grassy_palette.pal"
 dank_cave_palette:
         .incbin "../art/dank_cave.pal"
@@ -1190,20 +1193,25 @@ EntityAttribute := R3
         rts
 .endproc
 
-        .segment "DATA_3"
-
-GRASSY_EXTERIOR = 0
-CAVE_INTERIOR = 1
+OUT_OF_BOUNDS = 0
+GRASSY_EXTERIOR = 1
+CAVE_INTERIOR = 2
 
 room_pools_lut:
-        .word grassy_exterior
-        .word cave_interior
+        .word room_pool_out_of_bounds
+        .word room_pool_grassy_exterior
+        .word room_pool_cave_interior
 room_pools_banks:
-        .byte <.bank(grassy_exterior)
-        .byte <.bank(cave_interior)
+        .byte <.bank(room_pool_out_of_bounds)
+        .byte <.bank(room_pool_grassy_exterior)
+        .byte <.bank(room_pool_cave_interior)
+
+        .segment "DATA_3"
 
 .include "../build/rooms/GrassyTest_Standard.incs"
 .include "../build/rooms/CaveTest_Standard.incs"
+.include "../build/rooms/OutOfBounds.incs"
+.include "../build/rooms/ChallengeArena_Standard.incs"
 
 .macro room_entry room_label
         .addr room_label
@@ -1216,40 +1224,38 @@ room_pools_banks:
 
 ; these are what the floors will reference for their room pools
 ; 16 entries each
-grassy_exterior:
+
+room_pool_out_of_bounds:
+        ; You **really** shouldn't be here
         .repeat 16
-        room_entry room_GrassyTest_Standard
+        room_entry room_OutOfBounds
         .endrepeat
 
-; these are what the floors will reference for their room pools
-; 16 entries each
-cave_interior:
-        .repeat 16
+room_pool_grassy_exterior:
+        .repeat 12
+        room_entry room_GrassyTest_Standard
+        .endrepeat
+        .repeat 4
+        room_entry room_ChallengeArena_Standard
+        .endrepeat
+
+room_pool_cave_interior:
+        .repeat 12
         room_entry room_CaveTest_Standard
+        .endrepeat
+        .repeat 4
+        room_entry room_ChallengeArena_Standard
         .endrepeat
 
 .include "../build/floors/test_floor_wide_open.incs"
+.include "../build/floors/test_floor_grass_with_caves.incs"
 
 ; eventually we'll want a whole big list of these
 ; for now, 16 entries just like the floor mazes
 test_floor_layout_pool:
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-        .word floor_test_floor_wide_open
-
+        .repeat 16
+        .word floor_test_floor_grass_with_caves
+        .endrepeat
 
 ; =============================================
 ; Enemies - Pools of spawns for rooms to select

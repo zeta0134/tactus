@@ -7,8 +7,9 @@
   <property name="exit_north" type="bool" value="true"/>
   <property name="exit_south" type="bool" value="true"/>
   <property name="exit_west" type="bool" value="true"/>
+  <property name="forbid_spawning" type="bool" value="true"/>
   <property name="room_obj_palette" value="sprite_palette_overworld"/>
-  <property name="room_palette" value="grassy_palette"/>
+  <property name="room_palette" value="test_palette"/>
  </properties>
  <tileset firstgid="1" source="../MapTiles.tsx"/>
  <tileset firstgid="129" source="../DiscoFloorTiles.tsx"/>
@@ -20,11 +21,11 @@
 6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
 6,6,5,5,5,5,5,5,5,5,5,5,5,5,6,6,
 6,6,130,131,131,131,131,131,131,131,131,131,131,132,6,6,
+6,6,146,138,129,129,129,129,129,129,129,129,138,148,6,6,
 6,6,146,129,129,129,129,129,129,129,129,129,129,148,6,6,
 6,6,146,129,129,129,129,129,129,129,129,129,129,148,6,6,
 6,6,146,129,129,129,129,129,129,129,129,129,129,148,6,6,
-6,6,146,129,129,129,129,129,129,129,129,129,129,148,6,6,
-6,6,146,129,129,129,129,129,129,129,129,129,129,148,6,6,
+6,6,146,138,129,129,129,129,129,129,129,129,138,148,6,6,
 6,6,162,163,163,163,163,163,163,163,163,163,163,164,6,6,
 6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6
 </data>
@@ -396,7 +397,7 @@
 </data>
   </layer>
  </group>
- <group id="15" name="Overlay: Challenge - North">
+ <group id="15" name="Overlay: Challenge - North" visible="0">
   <layer id="19" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,129,129,129,129,129,129,129,129,0,0,0,0,
