@@ -192,6 +192,8 @@ def tile_exit_flag_bytes(tiles):
         exit_flags |= 0b0100 # Soggy
     if tile.boolean_properties.get("exit_west", False):
         exit_flags |= 0b1000 # Waffles
+    if tile.boolean_properties.get("forbid_spawning", False):
+        exit_flags |= 0b1000_0000
     # TODO: if there are other flags, check for those here
     raw_bytes.append(ca65_byte_literal(exit_flags))
   return raw_bytes

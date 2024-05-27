@@ -55,6 +55,9 @@ ROOM_FLAG_CLEARED            = %00001000 ; once cleared, a room will not respawn
 ROOM_FLAG_REVEALED           = %00000100 ; more explicitly for minimap purposes
 ROOM_FLAG_DARK               = %00000010 ; activates torchlight radius effect. spookiness is optional
 
+FLOOR_PROPERTIES_NOSPAWN = %10000000 
+
+ROOM_PROPERTIES_NOSPAWN = %10000000
 ROOM_PROPERTIES_DARK    = %01000000
 ROOM_CATEGORY_EXTERIOR  = %00000000
 ROOM_CATEGORY_INTERIOR  = %00010000

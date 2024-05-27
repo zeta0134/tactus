@@ -548,10 +548,10 @@ init_loop:
         lda #64 ; somewhat arbitrary
         sta Iterations
 shuffle_loop:
-        jsr next_fixed_rand
+        jsr next_rand
         and #(::FLOOR_SIZE-1)
         sta SourceIndex
-        jsr next_fixed_rand
+        jsr next_rand
         and #(::FLOOR_SIZE-1)
         sta DestIndex
         ldx SourceIndex
@@ -580,10 +580,14 @@ ExitTemp := R10
 ; TODO: pay attention to these
 ; ChallengeCount := R?
 ; ShopCount := R?
-; SpawnFoundCount := R?
         jsr shuffle_room_order
 
 begin_floor_generation:
+        ; initialize the player room index to a nonsense value; later,
+        ; we'll check for this and redo the whole floor if it's still nonsense
+        lda #$FF
+        sta PlayerRoomIndex
+
         lda #0
         sta CurrentRoomCounter
 room_loop:
@@ -605,7 +609,7 @@ setup_room_generation_state:
         sta RoomPoolPtr+1
         access_data_bank RoomPoolBank
 begin_room_selection:
-        jsr next_fixed_rand
+        jsr next_rand
         and #$0F ; 0-15
         asl
         asl
@@ -637,7 +641,28 @@ begin_room_selection:
         and ExitTemp
         cmp ExitTemp
         bne reject_this_room
-        ; TODO: special feature counters
+        ; TODO: special feature counters        
+
+        ; handle player spawning: basically the first room we visit where the
+        ; player **could** spawn, we put them there
+        lda PlayerRoomIndex
+        cmp #$FF
+        bne done_with_player_spawning
+        ; can this room handle player spawns?
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #ROOM_PROPERTIES_NOSPAWN
+        bne done_with_player_spawning
+        ; can this floor tile handle player spawns?
+        lda room_floorplan, x
+        and #ROOM_PROPERTIES_NOSPAWN
+        bne done_with_player_spawning
+        ; we've found a room that the player **could** spawn in, and we haven't already
+        ; picked one. this one works. use this one!
+        stx PlayerRoomIndex
+
+done_with_player_spawning:
+
         jmp accept_this_room
 reject_this_room:
         restore_previous_bank ; RoomBank
@@ -656,6 +681,15 @@ accept_this_room:
         lda CurrentRoomCounter
         cmp #::FLOOR_SIZE
         jne room_loop
+
+        lda PlayerRoomIndex
+        cmp #$FF
+        jeq begin_floor_generation
+
+        ; TODO: sanity check generated counts, and reject the *entire* floor if any of the
+        ; conditions were not met
+
+
 
         rts
 .endproc
@@ -689,7 +723,6 @@ seed_loop:
 
         ; pick a random maze layout and load it in
         ; TODO: maybe this could use a global seed? it'd be nice to have a game-level seed
-        ; ... though I guess also todo: write a 6502 maze generator
         jsr next_rand
 
         ; FOR NOW, pull from the only test pool we have
@@ -718,13 +751,8 @@ room_floorplan_loop:
         ; Pick which individual rooms we are going to use here
         jsr choose_rooms_for_floor
 
-        ; Okay now, pick a random room for the player to spawn in
-        jsr next_rand
-        and #(::FLOOR_SIZE-1)
-        ; TODO: check that this is a valid spawning location (at the very least, not out of bounds)
-        sta PlayerRoomIndex
         ; Mark the player's room as cleared, so they don't load in surrounded by mobs
-        tax
+        ldx PlayerRoomIndex
         lda room_flags, x
         ora #ROOM_FLAG_CLEARED
         sta room_flags, x

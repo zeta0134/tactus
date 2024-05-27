@@ -38,6 +38,11 @@
    <property name="room_pool" value="OUT_OF_BOUNDS"/>
   </properties>
  </tile>
+ <tile id="15">
+  <properties>
+   <property name="forbid_spawning" type="bool" value="true"/>
+  </properties>
+ </tile>
  <tile id="16">
   <properties>
    <property name="exit_east" type="bool" value="true"/>
