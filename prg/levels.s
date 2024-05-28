@@ -30,10 +30,12 @@ room_flags: .res ::FLOOR_SIZE ; what did we spawn in here? what is the current s
 room_seeds: .res ::FLOOR_SIZE
 room_floorplan: .res ::FLOOR_SIZE ; properties of this cell in the floor's maze layout
 room_properties: .res ::FLOOR_SIZE ; properties of the selected room that populates this cell
+room_population_order: .res ::FLOOR_SIZE
 chest_spawned: .res 1
 enemies_active: .res 1
 
-room_population_order: .res ::FLOOR_SIZE
+rooms_rerolled: .res 2
+floors_rerolled: .res 2
 
 .segment "CODE_1"
 
@@ -577,16 +579,25 @@ CurrentRoomCounter := R6
 RoomPtr := R7
 RoomBank := R9
 ExitTemp := R10
+ChallengeCount := R11
+FloorExitCount := R12
 ; TODO: pay attention to these
 ; ChallengeCount := R?
 ; ShopCount := R?
         jsr shuffle_room_order
+
+        st16 floors_rerolled, 0
+        st16 rooms_rerolled, 0
 
 begin_floor_generation:
         ; initialize the player room index to a nonsense value; later,
         ; we'll check for this and redo the whole floor if it's still nonsense
         lda #$FF
         sta PlayerRoomIndex
+
+        lda #0
+        sta ChallengeCount
+        sta FloorExitCount
 
         lda #0
         sta CurrentRoomCounter
@@ -641,7 +652,27 @@ begin_room_selection:
         and ExitTemp
         cmp ExitTemp
         bne reject_this_room
-        ; TODO: special feature counters        
+        
+        ; If this is a challenge room...
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_CHALLENGE
+        bne done_considering_challenge_rooms
+        ; ... have we already satisfied the challenge maximum for this floor?
+        lda ChallengeCount
+        ldy #BigFloor::MaxChallengeRooms
+        cmp (BigFloorPtr), y
+        bcs reject_this_room
+        ; this is definitely a challenge chamber; increment the counter
+        inc ChallengeCount
+        ; TEMPORARY: also flag this as a "boss room" and, keeping with Action53 behavior,
+        ; automatically reveal this room
+        lda #(ROOM_FLAG_BOSS | ROOM_FLAG_REVEALED)
+        ora room_flags, x
+        sta room_flags, x
+done_considering_challenge_rooms:
+        ; TODO: this for shops
 
         ; handle player spawning: basically the first room we visit where the
         ; player **could** spawn, we put them there
@@ -660,12 +691,30 @@ begin_room_selection:
         ; we've found a room that the player **could** spawn in, and we haven't already
         ; picked one. this one works. use this one!
         stx PlayerRoomIndex
-
 done_with_player_spawning:
+
+        ; TEMPORARY: pick an exit location, which should basically be the first room
+        ; we generate that (a) isn't the player's starting location, (b) is not out of
+        ; bounds, and (c) is not a challenge room. Later we will be completely overhauling
+        ; exit generation in general
+        lda FloorExitCount
+        bne done_picking_exits ; only pick one exit
+        cpx PlayerRoomIndex
+        beq done_picking_exits ; (a) it isn't  the player's starting location
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #ROOM_PROPERTIES_NOSPAWN
+        bne done_picking_exits ; (b) it is otherwise "spawnable", which also (c) excludes challenge rooms
+        lda #ROOM_FLAG_EXIT_STAIRS
+        ora room_flags, x
+        sta room_flags, x
+        inc FloorExitCount
+done_picking_exits:
 
         jmp accept_this_room
 reject_this_room:
         restore_previous_bank ; RoomBank
+        inc16 rooms_rerolled
         jmp begin_room_selection
 accept_this_room:
         ; Load in the chosen properties of this room, which we'll
@@ -681,23 +730,35 @@ accept_this_room:
         lda CurrentRoomCounter
         cmp #::FLOOR_SIZE
         jne room_loop
-
+        
+        ; If we failed to find a suitable spawn point, reject this floor
         lda PlayerRoomIndex
         cmp #$FF
-        jeq begin_floor_generation
+        beq reject_floor
 
-        ; TODO: sanity check generated counts, and reject the *entire* floor if any of the
-        ; conditions were not met
+        ; If we failed to meet thresholds for the minimum number of special
+        ; rooms, also reject this floor
+        lda ChallengeCount
+        ldy #BigFloor::MinChallengeRooms
+        cmp (BigFloorPtr), y
+        bcc reject_floor
+        ; TODO: this for shops
 
+        ; Temporary: if we failed to pick an exit for some weird reason, reject
+        ; the whole floor
+        lda FloorExitCount
+        beq reject_floor
 
-
+accept_floor:
         rts
+reject_floor:
+        inc16 floors_rerolled
+        jmp begin_floor_generation
 .endproc
 
 ; Generate a maze layout, and pick the player, boss, and exit locations
 .proc FAR_init_floor
 BigFloorPtr := R0
-BossIndex := R2
         access_data_bank #<.bank(test_floor_layout_pool)
 
         ; clear out the room flags entirely
@@ -770,38 +831,6 @@ no_starting_treasure:
         ora #ROOM_FLAG_TREASURE_COLLECTED
         sta room_flags, x
 done_with_player:
-
-        ; Next choose the boss location; importantly this should NOT be the
-        ; same room the player spawned in
-        ; TODO: check that this is a valid spawning location (at the very least, not out of bounds)
-        ; TODO: remove this and use an explicit challenge-room instead, with min/max as appropriate
-        ; (also TODO: not all challenge rooms spawn the big key, etc. we might need a treasure populating
-        ; loop in here)
-boss_loop:
-        perform_zpcm_inc
-        jsr next_rand
-        and #(::FLOOR_SIZE-1)
-        cmp PlayerRoomIndex
-        beq boss_loop
-        tax
-        lda #(ROOM_FLAG_BOSS | ROOM_FLAG_REVEALED)
-        sta room_flags, x
-        stx BossIndex
-
-        ; Choose the exit stairs location; this should again not be the same
-        ; location as the player OR the boss
-        ; TODO: check that this is a valid spawning location (at the very least, not out of bounds)
-exit_loop:
-        perform_zpcm_inc
-        jsr next_rand
-        and #(::FLOOR_SIZE-1)
-        cmp PlayerRoomIndex
-        beq exit_loop
-        cmp BossIndex
-        beq exit_loop
-        tax
-        lda #ROOM_FLAG_EXIT_STAIRS
-        sta room_flags, x
 
         ; Aaaand.... that's it? I think that's it
         perform_zpcm_inc

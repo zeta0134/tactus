@@ -45,6 +45,10 @@ FLOOR_SIZE = (FLOOR_WIDTH*FLOOR_HEIGHT)
 .struct BigFloor
     SpawningPoolIDs .byte ::FLOOR_SIZE
     RoomProperties .byte ::FLOOR_SIZE
+    MinChallengeRooms .byte
+    MaxChallengeRooms .byte
+    MinShopRooms .byte
+    MaxShopRooms .byte
 .endstruct
 
 ROOM_FLAG_VISITED            = %10000000 ; mostly for minimap purposes

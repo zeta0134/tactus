@@ -38,6 +38,10 @@ class Floor:
     width: int
     height: int
     tiles: [TiledTile]
+    min_challenge_rooms: int
+    max_challenge_rooms: int
+    min_shop_rooms: int
+    max_shop_rooms: int
     
 def read_boolean_properties(tile_element):
     boolean_properties = {}
@@ -171,13 +175,20 @@ def read_floor(map_filename):
 
     # TODO: other global properties of the floor would go here
     # (there aren't any yet)
+    integer_properties = read_integer_properties(map_element)
+    min_challenge_rooms = integer_properties.get("min_challenge_rooms", 1)
+    max_challenge_rooms = integer_properties.get("max_challenge_rooms", 1)
+    min_shop_rooms = integer_properties.get("min_shop_rooms", 0)
+    max_shop_rooms = integer_properties.get("max_shop_rooms", 0)
 
     # finally let's make the name something useful
     (_, plain_filename) = os.path.split(map_filename)
     (base_filename, _) = os.path.splitext(plain_filename)
     safe_label = re.sub(r'[^A-Za-z0-9\-\_]', '_', base_filename)
 
-    return Floor(name=safe_label, width=map_width, height=map_height, tiles=combined_tiles)
+    return Floor(name=safe_label, width=map_width, height=map_height, tiles=combined_tiles,
+        min_challenge_rooms=min_challenge_rooms, max_challenge_rooms=max_challenge_rooms,
+        min_shop_rooms=min_shop_rooms, max_shop_rooms=max_shop_rooms)
 
 def tile_exit_flag_bytes(tiles):
   raw_bytes = []
@@ -210,6 +221,10 @@ def write_floor(tilemap, output_file):
     pretty_print_table_str(tile_room_pool_bytes(tilemap.tiles), output_file, tilemap.width)
     output_file.write("  ; Exits/Flags\n")
     pretty_print_table_str(tile_exit_flag_bytes(tilemap.tiles), output_file, tilemap.width)
+    output_file.write(f"  .byte {tilemap.min_challenge_rooms} ; Min Challenge Rooms\n")
+    output_file.write(f"  .byte {tilemap.max_challenge_rooms} ; Max Challenge Rooms\n")
+    output_file.write(f"  .byte {tilemap.min_shop_rooms} ; Min Shop Rooms\n")
+    output_file.write(f"  .byte {tilemap.max_shop_rooms} ; Max Shop Rooms\n")
     output_file.write("\n")
     
 if __name__ == '__main__':
