@@ -43,9 +43,11 @@ TILE_MOLE_THROWING = $2C
 TILE_MOLE_IDLE = $30
 TILE_WRENCH_PROJECTILE = $34
 
+TILE_CHALLENGE_SPIKES = $38
+
 ; Non-enemies, mostly level geometry
 TILE_REGULAR_FLOOR  = $80
-TILE_DISCO_FLOOR    = $84
+TILE_DISCO_FLOOR    = $84 ; why are these still different?
 TILE_SEMISAFE_FLOOR = $88
 TILE_WALL           = $8C
 

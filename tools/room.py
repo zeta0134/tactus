@@ -218,17 +218,20 @@ def read_room(map_filename):
 def tile_id_bytes(tiles):
   raw_bytes = []
   for tile in tiles:
-    if tile.type == "floor":
-        raw_bytes.append(f"<BG_TILE_DISCO_FLOOR_TILES_{tile.tiled_index:04}")
-    elif tile.type == "map":
-        raw_bytes.append(f"<BG_TILE_MAP_TILES_{tile.tiled_index:04}")
-    elif tile.type == "detail":
-        raw_bytes.append(f"<{tile.string_properties.get('detail')}")
-    elif tile.type == "blank":
-        raw_bytes.append(f"ERROR_BLANK_TILE")
+    if "tile_id" in tile.string_properties:
+        raw_bytes.append(f"<{tile.string_properties["tile_id"]}")
     else:
-        print(f"Unrecognized tile type: {tile.type}, activating my panic and spin routines. PANIC AND SPIN!")
-        sys.exit(-1)
+        if tile.type == "floor":
+            raw_bytes.append(f"<BG_TILE_DISCO_FLOOR_TILES_{tile.tiled_index:04}")
+        elif tile.type == "map":
+            raw_bytes.append(f"<BG_TILE_MAP_TILES_{tile.tiled_index:04}")
+        elif tile.type == "detail":
+            raw_bytes.append(f"<{tile.string_properties.get('detail')}")
+        elif tile.type == "blank":
+            raw_bytes.append(f"ERROR_BLANK_TILE")
+        else:
+            print(f"Unrecognized tile type: {tile.type}, activating my panic and spin routines. PANIC AND SPIN!")
+            sys.exit(-1)
   return raw_bytes
 
 def tile_attr_bytes(tiles):
@@ -236,17 +239,20 @@ def tile_attr_bytes(tiles):
   raw_bytes = []
   for tile in tiles:
     palette_index = tile.integer_properties.get("palette_index",0) << 6
-    if tile.type == "floor":
-        raw_bytes.append(f">(BG_TILE_DISCO_FLOOR_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
-    elif tile.type == "map":
-        raw_bytes.append(f">(BG_TILE_MAP_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
-    elif tile.type == "detail":
-        raw_bytes.append(f"${palette_index:02X}")
-    elif tile.type == "blank":
-        raw_bytes.append(f"ERROR_BLANK_TILE")
+    if "tile_id" in tile.string_properties:
+        raw_bytes.append(f">({tile.string_properties["tile_id"]} | ${palette_index:02X})")
     else:
-        print(f"Unrecognized tile type: {tile.type}, activating my panic and spin routines. PANIC AND SPIN!")
-        sys.exit(-1)
+        if tile.type == "floor":
+            raw_bytes.append(f">(BG_TILE_DISCO_FLOOR_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
+        elif tile.type == "map":
+            raw_bytes.append(f">(BG_TILE_MAP_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
+        elif tile.type == "detail":
+            raw_bytes.append(f"${palette_index:02X}")
+        elif tile.type == "blank":
+            raw_bytes.append(f"ERROR_BLANK_TILE")
+        else:
+            print(f"Unrecognized tile type: {tile.type}, activating my panic and spin routines. PANIC AND SPIN!")
+            sys.exit(-1)
   return raw_bytes
 
 def behavior_id_bytes(tiles):

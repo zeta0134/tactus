@@ -37,6 +37,12 @@
    <property name="detail" value="DETAIL_SAND"/>
   </properties>
  </tile>
+ <tile id="15">
+  <properties>
+   <property name="behavior" value="TILE_CHALLENGE_SPIKES"/>
+   <property name="tile_id" value="BG_TILE_SPIKES_LOWERED"/>
+  </properties>
+ </tile>
  <tile id="17" type="detail">
   <properties>
    <property name="behavior" value="TILE_WALL"/>

@@ -63,6 +63,7 @@ tile_index_to_col_lut:
 
 .include "enemies/birb.asm"
 .include "enemies/cardinal_chaser.asm"
+.include "enemies/challenge_spikes.asm"
 .include "enemies/diagonal_chaser.asm"
 .include "enemies/disco_tile.asm"
 .include "enemies/exit_block.asm"
@@ -75,33 +76,34 @@ tile_index_to_col_lut:
 .include "enemies/weapon_shadow.asm"
 
 static_behaviors:
-        .word update_smoke_puff      ; $00 - smoke puff
-        .word update_slime           ; $04 - slime (idle pose)
-        .word update_spider_base     ; $08 - spider (idle)
-        .word update_spider_anticipate ; $0C - spider (anticipate)
-        .word update_zombie_base     ; $10 - spider (idle)
-        .word update_zombie_anticipate ; $14 - spider (anticipate)
-        .word update_birb_left       ; $18
-        .word update_birb_right      ; $1C
+        .word update_smoke_puff         ; $00
+        .word update_slime              ; $04
+        .word update_spider_base        ; $08
+        .word update_spider_anticipate  ; $0C
+        .word update_zombie_base        ; $10
+        .word update_zombie_anticipate  ; $14
+        .word update_birb_left          ; $18
+        .word update_birb_right         ; $1C
         .word update_birb_flying_left   ; $20
         .word update_birb_flying_right  ; $24
         .word update_mole_hole          ; $28
         .word update_mole_throwing      ; $2C
         .word update_mole_idle          ; $30
         .word update_wrench_projectile  ; $34
-        .repeat 18
+        .word update_challenge_spike    ; $38
+        .repeat 17
         .word no_behavior ; unimplemented
         .endrepeat
-        .word draw_disco_tile ; $80 - plain floor
-        .word draw_disco_tile ; $84 - disco floor
-        .word update_semisafe_tile ; $88 - semisafe floor
-        .word no_behavior     ; $8C - wall
-        .word no_behavior     ; $90 - UNUSED
-        .word no_behavior     ; $94 - UNUSED
-        .word no_behavior     ; $98 - treasure chest
-        .word no_behavior     ; $9C - big key
-        .word no_behavior     ; $A0 - gold sack
-        .word update_weapon_shadow ; $A4 - weapon shadow
+        .word draw_disco_tile           ; $80 - plain floor
+        .word draw_disco_tile           ; $84 - disco floor
+        .word update_semisafe_tile      ; $88 - semisafe floor
+        .word no_behavior               ; $8C - wall
+        .word no_behavior               ; $90 - UNUSED
+        .word no_behavior               ; $94 - UNUSED
+        .word no_behavior               ; $98 - treasure chest
+        .word no_behavior               ; $9C - big key
+        .word no_behavior               ; $A0 - gold sack
+        .word update_weapon_shadow      ; $A4 - weapon shadow
         ; safety: fill out the rest of the table
         .repeat 22
         .word no_behavior
@@ -122,8 +124,9 @@ direct_attack_behaviors:
         .word direct_attack_mole_hole
         .word direct_attack_mole_throwing
         .word direct_attack_mole_idle
-        .word no_behavior ; wrench projectile, cannot be attacked
-        .repeat 18
+        .word no_behavior ; wrench projectile
+        .word no_behavior ; challenge spike
+        .repeat 17
         .word no_behavior
         .endrepeat
         ; floors, statics, and technical tiles
@@ -158,8 +161,9 @@ indirect_attack_behaviors:
         .word no_behavior ; moles - do not move, and therefore will never be indirectly attacked
         .word no_behavior
         .word no_behavior
-        .word no_behavior ; wrench projectile, cannot be attacked
-        .repeat 18
+        .word no_behavior ; wrench projectile
+        .word no_behavior ; challenge spike
+        .repeat 17
         .word no_behavior
         .endrepeat
         ; safety: fill out the rest of the table
@@ -182,7 +186,8 @@ bonk_behaviors:
         .word basic_enemy_attacks_player ; moles when bonked, mostly with the flail, *do* do damage
         .word basic_enemy_attacks_player
         .word projectile_attacks_player ; projectiles do damage, but also need to erase themselves
-        .repeat 18
+        .word challenge_spike_solid_test
+        .repeat 17
         .word no_behavior
         .endrepeat
         .word no_behavior ; $80 - plain floor
