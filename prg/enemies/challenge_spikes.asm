@@ -43,6 +43,8 @@ check_player_coordinates:
         lda #1
         sta tile_data, x
         draw_at_x_keeppal TILE_CHALLENGE_SPIKES, BG_TILE_SPIKES_RISING
+        ldx CurrentRow
+        jsr queue_row_x
         ; fall through to RTS; we're done here
 player_coordinates_invalid:
         rts
@@ -53,6 +55,8 @@ rising_state:
         lda #2
         sta tile_data, x
         draw_at_x_keeppal TILE_CHALLENGE_SPIKES, BG_TILE_SPIKES_RAISED
+        ldx CurrentRow
+        jsr queue_row_x
         rts
 risen_state:
         ; if the room is currently cleared, then it's time to lower
@@ -66,6 +70,8 @@ begin_lowering:
         lda #3
         sta tile_data, x
         draw_at_x_keeppal TILE_CHALLENGE_SPIKES, BG_TILE_SPIKES_LOWERING
+        ldx CurrentRow
+        jsr queue_row_x
         rts
 lowering_state:
         ; once we've started to lower, we will complete the motion. switch to the
@@ -75,6 +81,8 @@ lowering_state:
         lda #0
         sta tile_data, x
         draw_at_x_keeppal TILE_CHALLENGE_SPIKES, BG_TILE_SPIKES_LOWERED
+        ldx CurrentRow
+        jsr queue_row_x
         rts
 .endproc
 
