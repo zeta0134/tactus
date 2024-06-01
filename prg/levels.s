@@ -581,13 +581,19 @@ RoomBank := R9
 ExitTemp := R10
 ChallengeCount := R11
 FloorExitCount := R12
+MaxChallengeCount := R13
 ; TODO: pay attention to these
-; ChallengeCount := R?
 ; ShopCount := R?
         jsr shuffle_room_order
 
         st16 floors_rerolled, 0
         st16 rooms_rerolled, 0
+
+        ; we need to access some properties of the big floor while we have banked
+        ; in other data, so cache that to scratch here
+        ldy #BigFloor::MaxChallengeRooms
+        lda (BigFloorPtr), y
+        sta MaxChallengeCount
 
 begin_floor_generation:
         ; initialize the player room index to a nonsense value; later,
@@ -618,7 +624,7 @@ setup_room_generation_state:
         sta RoomPoolPtr+0
         lda room_pools_lut+1, x
         sta RoomPoolPtr+1
-        access_data_bank RoomPoolBank
+        access_data_bank RoomPoolBank ; this hides the big floor! do NOT read from BigFloorPtr until we restore!
 begin_room_selection:
         jsr next_rand
         and #$0F ; 0-15
@@ -661,8 +667,7 @@ begin_room_selection:
         bne done_considering_challenge_rooms
         ; ... have we already satisfied the challenge maximum for this floor?
         lda ChallengeCount
-        ldy #BigFloor::MaxChallengeRooms
-        cmp (BigFloorPtr), y
+        cmp MaxChallengeCount
         bcs reject_this_room
         ; this is definitely a challenge chamber; increment the counter
         inc ChallengeCount
@@ -724,7 +729,7 @@ accept_this_room:
         sta room_properties, x
         ; Done reading room data for now
         restore_previous_bank ; RoomBank
-        restore_previous_bank ; RoomPoolBank
+        restore_previous_bank ; RoomPoolBank ; Now we may read from BigFloorPtr again
 
         inc CurrentRoomCounter
         lda CurrentRoomCounter
@@ -1254,6 +1259,15 @@ OUT_OF_BOUNDS = 0
 GRASSY_EXTERIOR = 1
 CAVE_INTERIOR = 2
 
+.segment "DATA_4"
+
+        .include "../build/rooms/GrassyTest_Standard.incs"
+        .include "../build/rooms/CaveTest_Standard.incs"
+        .include "../build/rooms/OutOfBounds.incs"
+        .include "../build/rooms/ChallengeArena_Standard.incs"
+
+.segment "DATA_3"
+
 room_pools_lut:
         .word room_pool_out_of_bounds
         .word room_pool_grassy_exterior
@@ -1262,13 +1276,6 @@ room_pools_banks:
         .byte <.bank(room_pool_out_of_bounds)
         .byte <.bank(room_pool_grassy_exterior)
         .byte <.bank(room_pool_cave_interior)
-
-        .segment "DATA_3"
-
-.include "../build/rooms/GrassyTest_Standard.incs"
-.include "../build/rooms/CaveTest_Standard.incs"
-.include "../build/rooms/OutOfBounds.incs"
-.include "../build/rooms/ChallengeArena_Standard.incs"
 
 .macro room_entry room_label
         .addr room_label
@@ -1304,15 +1311,39 @@ room_pool_cave_interior:
         room_entry room_ChallengeArena_Standard
         .endrepeat
 
-.include "../build/floors/test_floor_wide_open.incs"
-.include "../build/floors/test_floor_grass_with_caves.incs"
+.include "../build/floors/grass_cave_mix_01.incs"
+.include "../build/floors/grass_cave_mix_02.incs"
+.include "../build/floors/grass_cave_mix_03.incs"
+.include "../build/floors/grass_cave_mix_04.incs"
+.include "../build/floors/grass_cave_mix_05.incs"
+.include "../build/floors/grass_cave_mix_06.incs"
+.include "../build/floors/grass_cave_mix_07.incs"
+.include "../build/floors/grass_cave_mix_08.incs"
+.include "../build/floors/grass_cave_mix_09.incs"
+.include "../build/floors/grass_cave_mix_10.incs"
 
 ; eventually we'll want a whole big list of these
 ; for now, 16 entries just like the floor mazes
-test_floor_layout_pool:
-        .repeat 16
-        .word floor_test_floor_grass_with_caves
-        .endrepeat
+test_floor_layout_pool:    
+        ;.repeat 16
+        ;.word floor_grass_cave_mix_02
+        ;.endrepeat    
+        .word floor_grass_cave_mix_01
+        .word floor_grass_cave_mix_01
+        .word floor_grass_cave_mix_02
+        .word floor_grass_cave_mix_03
+        .word floor_grass_cave_mix_04
+        .word floor_grass_cave_mix_04
+        .word floor_grass_cave_mix_05
+        .word floor_grass_cave_mix_05
+        .word floor_grass_cave_mix_06
+        .word floor_grass_cave_mix_06
+        .word floor_grass_cave_mix_07
+        .word floor_grass_cave_mix_08
+        .word floor_grass_cave_mix_08
+        .word floor_grass_cave_mix_09
+        .word floor_grass_cave_mix_10
+        .word floor_grass_cave_mix_10
 
 ; =============================================
 ; Enemies - Pools of spawns for rooms to select

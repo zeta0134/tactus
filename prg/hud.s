@@ -70,14 +70,14 @@ ident = ((tile_y * 16) + tile_x)
 
 tile_offset BLANK_TILE, 0, 0
 
-tile_offset MAP_BORDER_TL, 6,  8
-tile_offset MAP_BORDER_TM, 7,  8
-tile_offset MAP_BORDER_TR, 8,  8
-tile_offset MAP_BORDER_ML, 6,  9
-tile_offset MAP_BORDER_MR, 8,  9
-tile_offset MAP_BORDER_BL, 6, 10
-tile_offset MAP_BORDER_BM, 7, 10
-tile_offset MAP_BORDER_BR, 8, 10
+tile_offset MAP_BORDER_TL, 6, 7
+tile_offset MAP_BORDER_TM, 7, 7
+tile_offset MAP_BORDER_TR, 8, 7
+tile_offset MAP_BORDER_ML, 6, 8
+tile_offset MAP_BORDER_MR, 8, 8
+tile_offset MAP_BORDER_BL, 6, 9
+tile_offset MAP_BORDER_BM, 7, 9
+tile_offset MAP_BORDER_BR, 8, 9
 
 tile_offset COIN_ICON, 0, 7
 tile_offset COIN_X,    1, 7
@@ -548,6 +548,10 @@ tile_offset DOOR_ROOM_CURRENT, 15, 5
 tile_offset SHOP_ROOM_CURRENT, 14, 6
 tile_offset WARP_ROOM_CURRENT, 15, 6
 
+tile_offset HERE_ICON_IN_THE_VOID, 0, 15
+tile_offset EXTERIOR_SET, 0, 13
+tile_offset CLEAREED_ROOM_SET, 0, 10
+
 .proc draw_minimap_tile
 RoomIndex := R0
 DrawIndex := R1
@@ -574,8 +578,9 @@ AttributeAddr := R14
         ; can we see this room at all? any room that has been either
         ; visited OR revealed should be displayed
         and #(ROOM_FLAG_VISITED | ROOM_FLAG_REVEALED)
-        beq room_hidden
+        
         ; DEBUG: all rooms start at least 'revealed' for testing
+        ;jeq room_hidden
 
         ; check for special room types, which right now include boss
         ; rooms and exit doors
@@ -591,7 +596,7 @@ boss_room:
         ; If the boss has been cleared, draw this like a normal room instead
         lda room_flags, x
         and #ROOM_FLAG_CLEARED
-        bne normal_room
+        bne cleared_room
 
         ; load the appropriate boss tile, based on whether the player is
         ; currently in this room or not
@@ -622,22 +627,45 @@ current_door_room:
         sta DrawTile
         jmp draw_tile
 
-normal_room:
-        ; Start with the room's "revealed" tile
+cleared_room:
+        ; Start with an interior room's "revealed" tile
         lda room_floorplan, x
         and #%00001111
+        ; if there are 0 exits, treat this as a "hidden" tile instead (we may be out of bounds, or otherwise
+        ; in a special room that we forgot to handle)
+        beq room_hidden
         sta DrawTile
+        ; this is a cleared room, so use that offset and then merge with the below code
+        lda DrawTile
+        adc #CLEAREED_ROOM_SET
+        sta DrawTile
+        jmp done_with_interior_offset
+
+normal_room:
+        ; Start with an interior room's "revealed" tile
+        lda room_floorplan, x
+        and #%00001111
+        ; if there are 0 exits, treat this as a "hidden" tile instead (we may be out of bounds, or otherwise
+        ; in a special room that we forgot to handle)
+        beq room_hidden
+        sta DrawTile
+
+        ; if this is an exterior room, move to that map offset (keep the exit configuration)
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_EXTERIOR
+        bne done_with_interior_offset
+        clc
+        lda DrawTile
+        adc #EXTERIOR_SET
+        sta DrawTile
+done_with_interior_offset:
+
         ; If the player hasn't visited this room, we're done
         lda room_flags, x
         and #ROOM_FLAG_VISITED
         beq draw_tile
         ; If the player HAS visited the room, start by moving to the "visited" row
-        lda DrawTile
-        clc
-        adc #16
-        sta DrawTile
-        ; if this is a "lit" room, add another 16 to move to that row
-        ; (DEBUG: all rooms are lit for now)
         lda DrawTile
         clc
         adc #16
@@ -648,13 +676,21 @@ normal_room:
         bne draw_tile
         lda DrawTile
         clc
-        adc #32
+        adc #16
         sta DrawTile
 
         jmp draw_tile
 
 room_hidden:
         lda #BLANK_TILE
+        sta DrawTile
+        ; if the player is somehow inside an otherwise "hidden" room, pick a special tile to still
+        ; show their "here" location, floating in an empty void. (we might use this behavior for
+        ; warp zones, but until then, it's mostly useful for debugging out-of-bounds areas)
+        lda PlayerRoomIndex
+        cmp RoomIndex
+        bne draw_tile
+        lda #HERE_ICON_IN_THE_VOID
         sta DrawTile
         ; fall through
 draw_tile:
