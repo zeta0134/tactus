@@ -11,29 +11,29 @@
   <property name="room_palette" value="grassy_palette"/>
  </properties>
  <tileset firstgid="1" source="../MapTiles.tsx"/>
- <tileset firstgid="129" source="../DiscoFloorTiles.tsx"/>
- <tileset firstgid="385" source="../Attributes.tsx"/>
- <tileset firstgid="389" source="../TechnicalTiles.tsx"/>
+ <tileset firstgid="257" source="../DiscoFloorTiles.tsx"/>
+ <tileset firstgid="513" source="../Attributes.tsx"/>
+ <tileset firstgid="517" source="../TechnicalTiles.tsx"/>
  <layer id="1" name="Base" width="16" height="11">
   <data encoding="csv">
-407,407,407,407,407,407,407,407,407,407,407,407,407,407,407,407,
-407,407,406,406,406,406,406,406,406,406,406,406,406,406,407,407,
-407,407,17,17,17,17,17,17,17,17,17,17,17,17,407,407,
-407,407,130,131,131,131,131,131,131,131,131,131,131,132,407,407,
-407,407,146,390,390,390,390,390,390,390,390,390,390,148,407,407,
-407,407,146,390,390,390,390,390,390,390,390,390,390,148,407,407,
-407,407,146,390,390,390,390,390,390,390,390,390,390,148,407,407,
-407,407,146,390,390,390,390,390,390,390,390,390,390,148,407,407,
-407,407,146,390,390,390,390,390,390,390,390,390,390,148,407,407,
-407,407,162,163,163,163,163,163,163,163,163,163,163,164,407,407,
-407,407,407,407,407,407,407,407,407,407,407,407,407,407,407,407
+535,535,535,535,535,535,535,535,535,535,535,535,535,535,535,535,
+535,535,534,534,534,534,534,534,534,534,534,534,534,534,535,535,
+535,535,17,17,17,17,17,17,17,17,17,17,17,17,535,535,
+535,535,258,259,259,259,259,259,259,259,259,259,259,260,535,535,
+535,535,274,518,518,518,518,518,518,518,518,518,518,276,535,535,
+535,535,274,518,518,518,518,518,518,518,518,518,518,276,535,535,
+535,535,274,518,518,518,518,518,518,518,518,518,518,276,535,535,
+535,535,274,518,518,518,518,518,518,518,518,518,518,276,535,535,
+535,535,274,518,518,518,518,518,518,518,518,518,518,276,535,535,
+535,535,290,291,291,291,291,291,291,291,291,291,291,292,535,535,
+535,535,535,535,535,535,535,535,535,535,535,535,535,535,535,535
 </data>
  </layer>
  <layer id="2" name="Attributes" width="16" height="11" opacity="0.2">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,387,387,387,387,387,387,387,387,387,387,387,387,0,0,
+0,0,515,515,515,515,515,515,515,515,515,515,515,515,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -44,7 +44,14 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <group id="36" name="Overlay: Interior - West">
+ <group id="36" name="Overlay: Interior - West" class="overlay">
+  <properties>
+   <property name="adjacent_challenge" type="bool" value="false"/>
+   <property name="adjacent_exterior" type="bool" value="false"/>
+   <property name="adjacent_interior" type="bool" value="true"/>
+   <property name="adjacent_shop" type="bool" value="false"/>
+   <property name="direction" value="west"/>
+  </properties>
   <layer id="37" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -76,7 +83,14 @@
 </data>
   </layer>
  </group>
- <group id="13" name="Overlay: Exterior - West">
+ <group id="13" name="Overlay: Exterior - West" class="overlay">
+  <properties>
+   <property name="adjacent_challenge" type="bool" value="false"/>
+   <property name="adjacent_exterior" type="bool" value="true"/>
+   <property name="adjacent_interior" type="bool" value="false"/>
+   <property name="adjacent_shop" type="bool" value="false"/>
+   <property name="direction" value="west"/>
+  </properties>
   <layer id="6" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -108,7 +122,14 @@
 </data>
   </layer>
  </group>
- <group id="18" name="Overlay: Challenge - West">
+ <group id="18" name="Overlay: Challenge - West" class="overlay">
+  <properties>
+   <property name="adjacent_challenge" type="bool" value="true"/>
+   <property name="adjacent_exterior" type="bool" value="false"/>
+   <property name="adjacent_interior" type="bool" value="false"/>
+   <property name="adjacent_shop" type="bool" value="false"/>
+   <property name="direction" value="west"/>
+  </properties>
   <layer id="25" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -140,7 +161,14 @@
 </data>
   </layer>
  </group>
- <group id="33" name="Overlay: Interior - South">
+ <group id="33" name="Overlay: Interior - South" class="overlay">
+  <properties>
+   <property name="adjacent_challenge" type="bool" value="false"/>
+   <property name="adjacent_exterior" type="bool" value="false"/>
+   <property name="adjacent_interior" type="bool" value="true"/>
+   <property name="adjacent_shop" type="bool" value="false"/>
+   <property name="direction" value="south"/>
+  </properties>
   <layer id="34" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -172,7 +200,14 @@
 </data>
   </layer>
  </group>
- <group id="11" name="Overlay: Exterior - South">
+ <group id="11" name="Overlay: Exterior - South" class="overlay">
+  <properties>
+   <property name="adjacent_challenge" type="bool" value="false"/>
+   <property name="adjacent_exterior" type="bool" value="true"/>
+   <property name="adjacent_interior" type="bool" value="false"/>
+   <property name="adjacent_shop" type="bool" value="false"/>
+   <property name="direction" value="south"/>
+  </properties>
   <layer id="5" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -204,7 +239,14 @@
 </data>
   </layer>
  </group>
- <group id="17" name="Overlay: Challenge - South">
+ <group id="17" name="Overlay: Challenge - South" class="overlay">
+  <properties>
+   <property name="adjacent_challenge" type="bool" value="true"/>
+   <property name="adjacent_exterior" type="bool" value="false"/>
+   <property name="adjacent_interior" type="bool" value="false"/>
+   <property name="adjacent_shop" type="bool" value="false"/>
+   <property name="direction" value="south"/>
+  </properties>
   <layer id="23" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -236,7 +278,14 @@
 </data>
   </layer>
  </group>
- <group id="30" name="Overlay: Interior - East">
+ <group id="30" name="Overlay: Interior - East" class="overlay">
+  <properties>
+   <property name="adjacent_challenge" type="bool" value="false"/>
+   <property name="adjacent_exterior" type="bool" value="false"/>
+   <property name="adjacent_interior" type="bool" value="true"/>
+   <property name="adjacent_shop" type="bool" value="false"/>
+   <property name="direction" value="east"/>
+  </properties>
   <layer id="31" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -268,7 +317,14 @@
 </data>
   </layer>
  </group>
- <group id="9" name="Overlay: Exterior - East">
+ <group id="9" name="Overlay: Exterior - East" class="overlay">
+  <properties>
+   <property name="adjacent_challenge" type="bool" value="false"/>
+   <property name="adjacent_exterior" type="bool" value="true"/>
+   <property name="adjacent_interior" type="bool" value="false"/>
+   <property name="adjacent_shop" type="bool" value="false"/>
+   <property name="direction" value="east"/>
+  </properties>
   <layer id="4" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -300,7 +356,14 @@
 </data>
   </layer>
  </group>
- <group id="16" name="Overlay: Challenge - East">
+ <group id="16" name="Overlay: Challenge - East" class="overlay">
+  <properties>
+   <property name="adjacent_challenge" type="bool" value="true"/>
+   <property name="adjacent_exterior" type="bool" value="false"/>
+   <property name="adjacent_interior" type="bool" value="false"/>
+   <property name="adjacent_shop" type="bool" value="false"/>
+   <property name="direction" value="east"/>
+  </properties>
   <layer id="21" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -332,7 +395,14 @@
 </data>
   </layer>
  </group>
- <group id="27" name="Overlay: Interior - North">
+ <group id="27" name="Overlay: Interior - North" class="overlay">
+  <properties>
+   <property name="adjacent_challenge" type="bool" value="false"/>
+   <property name="adjacent_exterior" type="bool" value="false"/>
+   <property name="adjacent_interior" type="bool" value="true"/>
+   <property name="adjacent_shop" type="bool" value="false"/>
+   <property name="direction" value="north"/>
+  </properties>
   <layer id="28" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -364,7 +434,14 @@
 </data>
   </layer>
  </group>
- <group id="7" name="Overlay: Exterior - North">
+ <group id="7" name="Overlay: Exterior - North" class="overlay">
+  <properties>
+   <property name="adjacent_challenge" type="bool" value="false"/>
+   <property name="adjacent_exterior" type="bool" value="true"/>
+   <property name="adjacent_interior" type="bool" value="false"/>
+   <property name="adjacent_shop" type="bool" value="false"/>
+   <property name="direction" value="north"/>
+  </properties>
   <layer id="3" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -396,7 +473,14 @@
 </data>
   </layer>
  </group>
- <group id="15" name="Overlay: Challenge - North">
+ <group id="15" name="Overlay: Challenge - North" class="overlay">
+  <properties>
+   <property name="adjacent_challenge" type="bool" value="true"/>
+   <property name="adjacent_exterior" type="bool" value="false"/>
+   <property name="adjacent_interior" type="bool" value="false"/>
+   <property name="adjacent_shop" type="bool" value="false"/>
+   <property name="direction" value="north"/>
+  </properties>
   <layer id="19" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -417,7 +501,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,385,385,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,513,513,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

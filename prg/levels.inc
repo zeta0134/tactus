@@ -16,22 +16,7 @@
     Exits .byte
     BgPalette .word
     ObjPalette .word
-    InteriorOverlayNorth .word
-    InteriorOverlayEast .word
-    InteriorOverlaySouth .word
-    InteriorOverlayWest .word
-    ExteriorOverlayNorth .word
-    ExteriorOverlayEast .word
-    ExteriorOverlaySouth .word
-    ExteriorOverlayWest .word
-    ChallengeOverlayNorth .word
-    ChallengeOverlayEast .word
-    ChallengeOverlaySouth .word
-    ChallengeOverlayWest .word
-    ShopOverlayNorth .word
-    ShopOverlayEast .word
-    ShopOverlaySouth .word
-    ShopOverlayWest .word
+    OverlayList .word
     TileIDsLow .byte 176
     TileAttrsHigh .byte 176
     BehaviorIDs .byte 176

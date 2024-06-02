@@ -154,161 +154,369 @@ no_detail:
         rts
 .endproc
 
+overlay_conditional_lut_low:
+        .byte <invalid_conditional            ; %0000 = 0 exits
+        .byte <cardinal_conditional_north     ; %0001 = North
+        .byte <cardinal_conditional_east      ; %0010 = East
+        .byte <diagonal_conditional_northeast ; %0011 = Northeast
+        .byte <cardinal_conditional_south     ; %0100 = South
+        .byte <invalid_conditional            ; %0101 = Invalid (northsouth??)
+        .byte <diagonal_conditional_southeast ; %0110 = Southeast
+        .byte <invalid_conditional            ; %0111 = Invalid (3 exits?)
+        .byte <cardinal_conditional_west      ; %1000 = West
+        .byte <diagonal_conditional_northwest ; %1001 = Northwest
+        .byte <invalid_conditional            ; %1010 = Invalid (eastwest??)
+        .byte <invalid_conditional            ; %1011 = Invalid (3 exits?)
+        .byte <diagonal_conditional_southwest ; %1100 = Southwest
+        .byte <invalid_conditional            ; %1101 = Invalid (3 exits?)
+        .byte <invalid_conditional            ; %1110 = Invalid (3 exits?)
+        .byte <invalid_conditional            ; %1111 = Invalid (4 exits?)
+
+overlay_conditional_lut_high:
+        .byte >invalid_conditional            ; %0000 = 0 exits
+        .byte >cardinal_conditional_north     ; %0001 = North
+        .byte >cardinal_conditional_east      ; %0010 = East
+        .byte >diagonal_conditional_northeast ; %0011 = Northeast
+        .byte >cardinal_conditional_south     ; %0100 = South
+        .byte >invalid_conditional            ; %0101 = Invalid (northsouth??)
+        .byte >diagonal_conditional_southeast ; %0110 = Southeast
+        .byte >invalid_conditional            ; %0111 = Invalid (3 exits?)
+        .byte >cardinal_conditional_west      ; %1000 = West
+        .byte >diagonal_conditional_northwest ; %1001 = Northwest
+        .byte >invalid_conditional            ; %1010 = Invalid (eastwest??)
+        .byte >invalid_conditional            ; %1011 = Invalid (3 exits?)
+        .byte >diagonal_conditional_southwest ; %1100 = Southwest
+        .byte >invalid_conditional            ; %1101 = Invalid (3 exits?)
+        .byte >invalid_conditional            ; %1110 = Invalid (3 exits?)
+        .byte >invalid_conditional            ; %1111 = Invalid (4 exits?)
+
 .proc draw_battlefield_overlays
 RoomPtr := R0
 OverlayPtr := R2
+OverlayListPtr := R4
+ConditionalPtr := R6
+ConditionalByte := R8
+ScratchByte := R9
+; draw_single_battlefield_overlay will clobber these:
+; CurrentTileId := R10
+; R12 - R15 are scratch for the detail function
 
-check_north:
+        ; setup and ~~kart select~~ init
+        ldy #Room::OverlayList
+        lda (RoomPtr), y
+        sta OverlayListPtr+0
+        iny
+        lda (RoomPtr), y
+        sta OverlayListPtr+1
+loop:
+        ldy #0
+        lda (OverlayListPtr), y
+        cmp #$FF ; $FF is our end-of-list terminator
+        beq done
+        sta ConditionalByte ; stash this for later
+
+        ; first, check the exit mask for this overlay against the current floorplan. if this fails, then
+        ; the overlay does not apply to this room configuration and all the complicated checks can be
+        ; safely skipped
+        lda ConditionalByte ; mask off everything but the exit conditions
+        and #$0F
+        sta ScratchByte
+        ; the room needs to have at least the exits this overlay requires. it can have more, but not less
         ldx PlayerRoomIndex
         lda room_floorplan, x
-        and #ROOM_EXIT_FLAG_NORTH
-        beq check_east
+        and ScratchByte
+        cmp ScratchByte
+        bne reject_this_overlay
 
+        ; now, based on the exit type for this overlay, choose a conditional function
+        ldx ScratchByte
+        lda overlay_conditional_lut_low, x
+        sta ConditionalPtr+0
+        lda overlay_conditional_lut_high, x
+        sta ConditionalPtr+1
+        jmp (ConditionalPtr) ; will jump to either "draw" or "reject" below
+
+draw_this_overlay:
+        inc16 OverlayListPtr ; skip past the conditional byte
+        ; read the overlay pointer and prep for drawing
+        ldy #0
+        lda (OverlayListPtr), y
+        sta OverlayPtr+0
+        inc16 OverlayListPtr
+        lda (OverlayListPtr), y
+        sta OverlayPtr+1
+        inc16 OverlayListPtr
+        ; actually perform the draw
+        jsr draw_single_battlefield_overlay
+        ; at this point our pointer is already setup for the next entry, so get to it
+        jmp loop
+reject_this_overlay:
+        ; just skip past the pointer and keep going
+        inc16 OverlayListPtr
+        inc16 OverlayListPtr
+        inc16 OverlayListPtr
+        jmp loop
+done:
+        rts
+.endproc
+
+.proc invalid_conditional
+        ; we shouldn't ever get here. TODO: maybe call a crash handler? (we don't have one)
+        ; for now, just refuse to draw this overlay
+        jmp draw_battlefield_overlays::reject_this_overlay
+.endproc
+
+.proc cardinal_conditional_north
+ConditionalByte := R8
+ScratchByte := R9
         lda PlayerRoomIndex
         sec
         sbc #::FLOOR_WIDTH
         tax
-        lda room_flags, x
-        and #ROOM_FLAG_BOSS
-        bne boss_chamber_north
         lda room_properties, x
         and #ROOM_CATEGORY_MASK
-        cmp #ROOM_CATEGORY_INTERIOR
-        beq interior_chamber_north
-        ; TODO: Shop, Chamber as category
-exterior_chamber_north:
-        ldy #Room::ExteriorOverlayNorth        
-        jmp draw_overlay_north
-interior_chamber_north:
-        ldy #Room::InteriorOverlayNorth
-        jmp draw_overlay_north
-boss_chamber_north:
-        ldy #Room::ChallengeOverlayNorth
-        jmp draw_overlay_north
-draw_overlay_north:
-        lda (RoomPtr), y
-        sta OverlayPtr+0
-        iny
-        lda (RoomPtr), y
-        ; Sanity check: is this a valid pointer? If not, bail
-        beq check_east
-        sta OverlayPtr+1
-        jsr draw_single_battlefield_overlay
+        sta ScratchByte
+        lda ConditionalByte
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject
+        jmp draw_battlefield_overlays::draw_this_overlay
+reject:
+        jmp draw_battlefield_overlays::reject_this_overlay
+.endproc
 
-check_east:
-        ldx PlayerRoomIndex
-        lda room_floorplan, x
-        and #ROOM_EXIT_FLAG_EAST
-        beq check_south
-
+.proc cardinal_conditional_east
+ConditionalByte := R8
+ScratchByte := R9
         lda PlayerRoomIndex
         clc
         adc #1
         tax
-        lda room_flags, x
-        and #ROOM_FLAG_BOSS
-        bne boss_chamber_east
         lda room_properties, x
         and #ROOM_CATEGORY_MASK
-        cmp #ROOM_CATEGORY_INTERIOR
-        beq interior_chamber_east
-        ; TODO: Shop, Chamber as category
-exterior_chamber_east:
-        ldy #Room::ExteriorOverlayEast
-        jmp draw_overlay_east
-interior_chamber_east:
-        ldy #Room::InteriorOverlayEast
-        jmp draw_overlay_east
-boss_chamber_east:
-        ldy #Room::ChallengeOverlayEast
-        jmp draw_overlay_east
-draw_overlay_east:
-        lda (RoomPtr), y
-        sta OverlayPtr+0
-        iny
-        lda (RoomPtr), y
-        ; Sanity check: is this a valid pointer? If not, bail
-        beq check_south
-        sta OverlayPtr+1
-        jsr draw_single_battlefield_overlay
+        sta ScratchByte
+        lda ConditionalByte
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject
+        jmp draw_battlefield_overlays::draw_this_overlay
+reject:
+        jmp draw_battlefield_overlays::reject_this_overlay
+.endproc
 
-check_south:
-        ldx PlayerRoomIndex
-        lda room_floorplan, x
-        and #ROOM_EXIT_FLAG_SOUTH
-        beq check_west
-
+.proc cardinal_conditional_south
+ConditionalByte := R8
+ScratchByte := R9
         lda PlayerRoomIndex
         clc
         adc #::FLOOR_WIDTH
         tax
-        lda room_flags, x
-        and #ROOM_FLAG_BOSS
-        bne boss_chamber_south
         lda room_properties, x
         and #ROOM_CATEGORY_MASK
-        cmp #ROOM_CATEGORY_INTERIOR
-        beq interior_chamber_south
-        ; TODO: Shop, Chamber as category
-exterior_chamber_south:
-        ldy #Room::ExteriorOverlaySouth
-        jmp draw_overlay_south
-interior_chamber_south:
-        ldy #Room::InteriorOverlaySouth
-        jmp draw_overlay_south
-boss_chamber_south:
-        ldy #Room::ChallengeOverlaySouth
-        jmp draw_overlay_south
-draw_overlay_south:
-        lda (RoomPtr), y
-        sta OverlayPtr+0
-        iny
-        lda (RoomPtr), y
-        ; Sanity check: is this a valid pointer? If not, bail
-        beq check_west
-        sta OverlayPtr+1
-        jsr draw_single_battlefield_overlay
+        sta ScratchByte
+        lda ConditionalByte
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject
+        jmp draw_battlefield_overlays::draw_this_overlay
+reject:
+        jmp draw_battlefield_overlays::reject_this_overlay
+.endproc
 
-check_west:
-        ldx PlayerRoomIndex
-        lda room_floorplan, x
-        and #ROOM_EXIT_FLAG_WEST
-        beq done
-
+.proc cardinal_conditional_west
+ConditionalByte := R8
+ScratchByte := R9
         lda PlayerRoomIndex
         sec
         sbc #1
         tax
-        lda room_flags, x
-        and #ROOM_FLAG_BOSS
-        bne boss_chamber_west
         lda room_properties, x
         and #ROOM_CATEGORY_MASK
-        cmp #ROOM_CATEGORY_INTERIOR
-        beq interior_chamber_west
-        ; TODO: Shop, Chamber as category
-exterior_chamber_west:
-        ldy #Room::ExteriorOverlayWest
-        jmp draw_overlay_west
-interior_chamber_west:
-        ldy #Room::InteriorOverlayWest
-        jmp draw_overlay_west
-boss_chamber_west:
-        ldy #Room::ChallengeOverlayWest
-        jmp draw_overlay_west
-draw_overlay_west:
-        lda (RoomPtr), y
-        sta OverlayPtr+0
-        iny
-        lda (RoomPtr), y
-        ; Sanity check: is this a valid pointer? If not, bail
-        beq done
-        sta OverlayPtr+1
-        jsr draw_single_battlefield_overlay
-
-done:
-        rts
+        sta ScratchByte
+        lda ConditionalByte
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject
+        jmp draw_battlefield_overlays::draw_this_overlay
+reject:
+        jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
+
+.proc diagonal_conditional_northeast
+        ; UNIMPLEMENTED
+        jmp draw_battlefield_overlays::reject_this_overlay
+.endproc
+
+.proc diagonal_conditional_southeast
+        ; UNIMPLEMENTED
+        jmp draw_battlefield_overlays::reject_this_overlay
+.endproc
+
+.proc diagonal_conditional_southwest
+        ; UNIMPLEMENTED
+        jmp draw_battlefield_overlays::reject_this_overlay
+.endproc
+
+.proc diagonal_conditional_northwest
+        ; UNIMPLEMENTED
+        jmp draw_battlefield_overlays::reject_this_overlay
+.endproc
+
+;.proc draw_battlefield_overlays_old
+;RoomPtr := R0
+;OverlayPtr := R2
+;
+;check_north:
+;        ldx PlayerRoomIndex
+;        lda room_floorplan, x
+;        and #ROOM_EXIT_FLAG_NORTH
+;        beq check_east
+;
+;        lda PlayerRoomIndex
+;        sec
+;        sbc #::FLOOR_WIDTH
+;        tax
+;        lda room_flags, x
+;        and #ROOM_FLAG_BOSS
+;        bne boss_chamber_north
+;        lda room_properties, x
+;        and #ROOM_CATEGORY_MASK
+;        cmp #ROOM_CATEGORY_INTERIOR
+;        beq interior_chamber_north
+;        ; TODO: Shop, Chamber as category
+;exterior_chamber_north:
+;        ldy #Room::ExteriorOverlayNorth        
+;        jmp draw_overlay_north
+;interior_chamber_north:
+;        ldy #Room::InteriorOverlayNorth
+;        jmp draw_overlay_north
+;boss_chamber_north:
+;        ldy #Room::ChallengeOverlayNorth
+;        jmp draw_overlay_north
+;draw_overlay_north:
+;        lda (RoomPtr), y
+;        sta OverlayPtr+0
+;        iny
+;        lda (RoomPtr), y
+;        ; Sanity check: is this a valid pointer? If not, bail
+;        beq check_east
+;        sta OverlayPtr+1
+;        jsr draw_single_battlefield_overlay
+;
+;check_east:
+;        ldx PlayerRoomIndex
+;        lda room_floorplan, x
+;        and #ROOM_EXIT_FLAG_EAST
+;        beq check_south
+;
+;        lda PlayerRoomIndex
+;        clc
+;        adc #1
+;        tax
+;        lda room_flags, x
+;        and #ROOM_FLAG_BOSS
+;        bne boss_chamber_east
+;        lda room_properties, x
+;        and #ROOM_CATEGORY_MASK
+;        cmp #ROOM_CATEGORY_INTERIOR
+;        beq interior_chamber_east
+;        ; TODO: Shop, Chamber as category
+;exterior_chamber_east:
+;        ldy #Room::ExteriorOverlayEast
+;        jmp draw_overlay_east
+;interior_chamber_east:
+;        ldy #Room::InteriorOverlayEast
+;        jmp draw_overlay_east
+;boss_chamber_east:
+;        ldy #Room::ChallengeOverlayEast
+;        jmp draw_overlay_east
+;draw_overlay_east:
+;        lda (RoomPtr), y
+;        sta OverlayPtr+0
+;        iny
+;        lda (RoomPtr), y
+;        ; Sanity check: is this a valid pointer? If not, bail
+;        beq check_south
+;        sta OverlayPtr+1
+;        jsr draw_single_battlefield_overlay
+;
+;check_south:
+;        ldx PlayerRoomIndex
+;        lda room_floorplan, x
+;        and #ROOM_EXIT_FLAG_SOUTH
+;        beq check_west
+;
+;        lda PlayerRoomIndex
+;        clc
+;        adc #::FLOOR_WIDTH
+;        tax
+;        lda room_flags, x
+;        and #ROOM_FLAG_BOSS
+;        bne boss_chamber_south
+;        lda room_properties, x
+;        and #ROOM_CATEGORY_MASK
+;        cmp #ROOM_CATEGORY_INTERIOR
+;        beq interior_chamber_south
+;        ; TODO: Shop, Chamber as category
+;exterior_chamber_south:
+;        ldy #Room::ExteriorOverlaySouth
+;        jmp draw_overlay_south
+;interior_chamber_south:
+;        ldy #Room::InteriorOverlaySouth
+;        jmp draw_overlay_south
+;boss_chamber_south:
+;        ldy #Room::ChallengeOverlaySouth
+;        jmp draw_overlay_south
+;draw_overlay_south:
+;        lda (RoomPtr), y
+;        sta OverlayPtr+0
+;        iny
+;        lda (RoomPtr), y
+;        ; Sanity check: is this a valid pointer? If not, bail
+;        beq check_west
+;        sta OverlayPtr+1
+;        jsr draw_single_battlefield_overlay
+;
+;check_west:
+;        ldx PlayerRoomIndex
+;        lda room_floorplan, x
+;        and #ROOM_EXIT_FLAG_WEST
+;        beq done
+;
+;        lda PlayerRoomIndex
+;        sec
+;        sbc #1
+;        tax
+;        lda room_flags, x
+;        and #ROOM_FLAG_BOSS
+;        bne boss_chamber_west
+;        lda room_properties, x
+;        and #ROOM_CATEGORY_MASK
+;        cmp #ROOM_CATEGORY_INTERIOR
+;        beq interior_chamber_west
+;        ; TODO: Shop, Chamber as category
+;exterior_chamber_west:
+;        ldy #Room::ExteriorOverlayWest
+;        jmp draw_overlay_west
+;interior_chamber_west:
+;        ldy #Room::InteriorOverlayWest
+;        jmp draw_overlay_west
+;boss_chamber_west:
+;        ldy #Room::ChallengeOverlayWest
+;        jmp draw_overlay_west
+;draw_overlay_west:
+;        lda (RoomPtr), y
+;        sta OverlayPtr+0
+;        iny
+;        lda (RoomPtr), y
+;        ; Sanity check: is this a valid pointer? If not, bail
+;        beq done
+;        sta OverlayPtr+1
+;        jsr draw_single_battlefield_overlay
+;
+;done:
+;        rts
+;.endproc
 
 .proc draw_single_battlefield_overlay
 RoomPtr := R0

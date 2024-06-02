@@ -33,12 +33,20 @@ class TiledTileSet:
 BLANK_TILE = TiledTile(tiled_index=0, ordinal_index=0, integer_properties={}, boolean_properties={}, string_properties={}, type="blank")
 
 @dataclass
+class Overlay:
+    name: str
+    tiles: [TiledTile]
+    integer_properties: Dict[str, int]
+    boolean_properties: Dict[str, bool]
+    string_properties: Dict[str, str]
+
+@dataclass
 class Room:
     name: str
     width: int
     height: int
     tiles: [TiledTile]
-    overlays: Dict[str, TiledTile]
+    overlays: [Overlay]
     exit_id: int
     dark: bool
     forbid_spawning: bool
@@ -178,13 +186,18 @@ def read_room(map_filename):
 
     # now read any tile groups; these are named overlays, which we'll need to parse
     # like additional collections of layers
-    overlays = {}
+    overlays = []
     tile_groups = map_element.findall("group")
     for tile_group in tile_groups:
-        overlay_name = tile_group.get("name")
-        overlay_layers = tile_group.findall("layer")
-        overlay_tiles = read_and_combine_layers(overlay_layers, tilesets)
-        overlays[overlay_name] = overlay_tiles
+        if tile_group.get("class") == "overlay":
+            overlay_name = tile_group.get("name")
+            overlay_layers = tile_group.findall("layer")
+            overlay_tiles = read_and_combine_layers(overlay_layers, tilesets)
+            boolean_properties = read_boolean_properties(tile_group)
+            integer_properties = read_integer_properties(tile_group)
+            string_properties = read_string_properties(tile_group)
+            overlays.append(Overlay(name=overlay_name, tiles=overlay_tiles, boolean_properties=boolean_properties,
+                integer_properties=integer_properties, string_properties=string_properties))
 
     # construct the exit ID from the four exit booleans, if present
     exit_id = 0
@@ -329,6 +342,69 @@ category_ids = {
     "shop": 3,
 }
 
+direction_ids = {
+    "north":     0b0001,
+    "east":      0b0010,
+    "south":     0b0100,
+    "west":      0b1000,
+    "northeast": 0b0011,
+    "southeast": 0b0110,
+    "southwest": 0b1100,
+    "northwest": 0b1001,
+}
+
+adjacent_ids = {
+    "adjacent_exterior":  0b0000_0000,
+    "adjacent_interior":  0b0001_0000,
+    "adjacent_challenge": 0b0010_0000,
+    "adjacent_shop":      0b0011_0000,
+}
+
+ns_ids = {
+    "ns_exterior":  0b0000_0000,
+    "ns_interior":  0b0001_0000,
+    "ns_challenge": 0b0010_0000,
+    "ns_shop":      0b0011_0000,
+}
+
+ew_ids = {
+    "ew_exterior":  0b0000_0000,
+    "ew_interior":  0b0100_0000,
+    "ew_challenge": 0b1000_0000,
+    "ew_shop":      0b1100_0000,
+}
+
+def write_overlay_list(tilemap, output_file):
+    #output_file.write("  ; Overlays\n")
+    #for overlay_name in valid_overlays:
+    #    if overlay_name in tilemap.overlays:
+    #        output_file.write(f"  .addr room_{tilemap.name}_{safe_label(overlay_name)} ; {overlay_name}\n")
+    #    else:
+    #        output_file.write(f"  .addr $0000 ; {overlay_name}\n").
+    output_file.write(ca65_label("overlays_"+tilemap.name) + "\n")
+    for overlay in tilemap.overlays:        
+        direction = overlay.string_properties.get("direction")
+        direction_bits = direction_ids[direction]
+        if direction in ["north", "east", "south", "west"]:
+            for adjacent_type in ["adjacent_interior", "adjacent_exterior", "adjacent_challenge", "adjacent_shop"]:
+                if overlay.boolean_properties.get(adjacent_type, False) == True:
+                    adjacent_bits = adjacent_ids[adjacent_type]
+                    conditional_bits = adjacent_bits | direction_bits
+                    output_file.write(f"  .byte {ca65_byte_literal(conditional_bits)} ; cardinal conditional\n")
+                    output_file.write(f"  .addr room_{tilemap.name}_{safe_label(overlay.name)} ; {overlay.name}\n")
+        if direction in ["northeast", "southeast", "southwest", "northwest"]:
+            for ns_type in ["ns_interior", "ns_exterior", "ns_challenge", "ns_shop"]:
+                for ew_type in ["ew_interior", "ew_exterior", "ew_challenge", "ew_shop"]:
+                    if overlay.boolean_properties.get(ns_type, False) == True and overlay.boolean_properties.get(ew_type, False) == True:
+                        # would emit directional overlay here
+                        ns_bits = ns_ids[ns_type]
+                        ew_bits = ew_ids[ew_type]
+                        conditional_bits = ns_bits | ew_bits | direction_bits
+                        output_file.write(f"  .byte {ca65_byte_literal(conditional_bits)} ; cardinal conditional\n")
+                        output_file.write(f"  .addr room_{tilemap.name}_{safe_label(overlay.name)} ; {overlay.name}\n")
+    # always write a final terminator byte, this signifies the end of the overlay list
+    output_file.write("  .byte $FF\n")
+
 def write_room(tilemap, output_file):
     properties_byte = 0
     if tilemap.dark:
@@ -341,12 +417,7 @@ def write_room(tilemap, output_file):
     output_file.write("  .byte " + ca65_byte_literal(tilemap.exit_id) + " ; supported exits\n")
     output_file.write("  .addr " + tilemap.bg_palette + " ; BG palette for this room\n")
     output_file.write("  .addr " + tilemap.obj_palette + " ; OBJ palette for this room\n")
-    output_file.write("  ; Overlays\n")
-    for overlay_name in valid_overlays:
-        if overlay_name in tilemap.overlays:
-            output_file.write(f"  .addr room_{tilemap.name}_{safe_label(overlay_name)} ; {overlay_name}\n")
-        else:
-            output_file.write(f"  .addr $0000 ; {overlay_name}\n")
+    output_file.write("  .addr " + "overlays_"+tilemap.name + "; overlay list\n")
     output_file.write("  ; Drawn Tile IDs, LOW\n")
     pretty_print_table_str(tile_id_bytes(tilemap.tiles), output_file, tilemap.width)
     output_file.write("  ; Drawn Tile IDs, HIGH + Attributes\n")
@@ -356,10 +427,11 @@ def write_room(tilemap, output_file):
     output_file.write("  ; Special Flags\n")
     pretty_print_table_str(behavior_flag_bytes(tilemap.tiles), output_file, tilemap.width)
     output_file.write("\n")
-    for overlay_name in valid_overlays:
-        if overlay_name in tilemap.overlays:
-            output_file.write(f"room_{tilemap.name}_{safe_label(overlay_name)}:\n")
-            write_overlay(tilemap.overlays[overlay_name], output_file)
+    write_overlay_list(tilemap, output_file)
+    output_file.write("\n")
+    for overlay in tilemap.overlays:
+        output_file.write(f"room_{tilemap.name}_{safe_label(overlay.name)}:\n")
+        write_overlay(overlay.tiles, output_file)
     output_file.write("\n")
     
 if __name__ == '__main__':
