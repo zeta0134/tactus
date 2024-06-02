@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="MapTiles" tilewidth="16" tileheight="16" tilecount="128" columns="16">
- <image source="tilesets/map_tiles_tiled.png" width="256" height="128"/>
+<tileset version="1.10" tiledversion="1.10.2" name="MapTiles" tilewidth="16" tileheight="16" tilecount="256" columns="16">
+ <image source="tilesets/map_tiles_tiled.png" width="256" height="256"/>
  <tile id="0" type="map"/>
  <tile id="1" type="map"/>
  <tile id="2" type="map"/>
@@ -183,4 +183,28 @@
  <tile id="88" type="map"/>
  <tile id="89" type="map"/>
  <tile id="90" type="map"/>
+ <tile id="192" type="map"/>
+ <tile id="193" type="map"/>
+ <tile id="194" type="map"/>
+ <tile id="195" type="map"/>
+ <tile id="196" type="map"/>
+ <tile id="197" type="map"/>
+ <tile id="208" type="map"/>
+ <tile id="209" type="map"/>
+ <tile id="210" type="map"/>
+ <tile id="211" type="map"/>
+ <tile id="212" type="map"/>
+ <tile id="213" type="map"/>
+ <tile id="224" type="map"/>
+ <tile id="225" type="map"/>
+ <tile id="226" type="map"/>
+ <tile id="227" type="map"/>
+ <tile id="228" type="map"/>
+ <tile id="229" type="map"/>
+ <tile id="240" type="map"/>
+ <tile id="241" type="map"/>
+ <tile id="242" type="map"/>
+ <tile id="243" type="map"/>
+ <tile id="244" type="map"/>
+ <tile id="245" type="map"/>
 </tileset>
