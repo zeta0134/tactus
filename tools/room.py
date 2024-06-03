@@ -375,14 +375,8 @@ ew_ids = {
 }
 
 def write_overlay_list(tilemap, output_file):
-    #output_file.write("  ; Overlays\n")
-    #for overlay_name in valid_overlays:
-    #    if overlay_name in tilemap.overlays:
-    #        output_file.write(f"  .addr room_{tilemap.name}_{safe_label(overlay_name)} ; {overlay_name}\n")
-    #    else:
-    #        output_file.write(f"  .addr $0000 ; {overlay_name}\n").
     output_file.write(ca65_label("overlays_"+tilemap.name) + "\n")
-    for overlay in tilemap.overlays:        
+    for overlay in tilemap.overlays:
         direction = overlay.string_properties.get("direction")
         direction_bits = direction_ids[direction]
         if direction in ["north", "east", "south", "west"]:
@@ -400,7 +394,7 @@ def write_overlay_list(tilemap, output_file):
                         ns_bits = ns_ids[ns_type]
                         ew_bits = ew_ids[ew_type]
                         conditional_bits = ns_bits | ew_bits | direction_bits
-                        output_file.write(f"  .byte {ca65_byte_literal(conditional_bits)} ; cardinal conditional\n")
+                        output_file.write(f"  .byte {ca65_byte_literal(conditional_bits)} ; diagonal conditional\n")
                         output_file.write(f"  .addr room_{tilemap.name}_{safe_label(overlay.name)} ; {overlay.name}\n")
     # always write a final terminator byte, this signifies the end of the overlay list
     output_file.write("  .byte $FF\n")

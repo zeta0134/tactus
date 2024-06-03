@@ -189,22 +189,46 @@
  <tile id="195" type="map"/>
  <tile id="196" type="map"/>
  <tile id="197" type="map"/>
+ <tile id="198" type="map"/>
+ <tile id="199" type="map"/>
+ <tile id="200" type="map"/>
+ <tile id="201" type="map"/>
+ <tile id="202" type="map"/>
+ <tile id="203" type="map"/>
  <tile id="208" type="map"/>
  <tile id="209" type="map"/>
  <tile id="210" type="map"/>
  <tile id="211" type="map"/>
  <tile id="212" type="map"/>
  <tile id="213" type="map"/>
+ <tile id="214" type="map"/>
+ <tile id="215" type="map"/>
+ <tile id="216" type="map"/>
+ <tile id="217" type="map"/>
+ <tile id="218" type="map"/>
+ <tile id="219" type="map"/>
  <tile id="224" type="map"/>
  <tile id="225" type="map"/>
  <tile id="226" type="map"/>
  <tile id="227" type="map"/>
  <tile id="228" type="map"/>
  <tile id="229" type="map"/>
+ <tile id="230" type="map"/>
+ <tile id="231" type="map"/>
+ <tile id="232" type="map"/>
+ <tile id="233" type="map"/>
+ <tile id="234" type="map"/>
+ <tile id="235" type="map"/>
  <tile id="240" type="map"/>
  <tile id="241" type="map"/>
  <tile id="242" type="map"/>
  <tile id="243" type="map"/>
  <tile id="244" type="map"/>
  <tile id="245" type="map"/>
+ <tile id="246" type="map"/>
+ <tile id="247" type="map"/>
+ <tile id="248" type="map"/>
+ <tile id="249" type="map"/>
+ <tile id="250" type="map"/>
+ <tile id="251" type="map"/>
 </tileset>

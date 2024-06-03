@@ -25,8 +25,8 @@ from ca65 import ca65_byte_literal, ca65_word_literal
 # other tomfoolery. Not sure yet if they can be animated, I'm working that out.
 
 BACKGROUND_REGION_BASE = 0x00
-SPRITE_REGION_BASE     = 0x20
-RAW_CHR_REGION_BASE    = 0x30
+SPRITE_REGION_BASE     = 0x30
+RAW_CHR_REGION_BASE    = 0x38
 
 MAX_BACKGROUND_TILES = ((SPRITE_REGION_BASE - BACKGROUND_REGION_BASE) / 4) * 64
 MAX_SPRITE_TILES = (RAW_CHR_REGION_BASE - SPRITE_REGION_BASE) * 64

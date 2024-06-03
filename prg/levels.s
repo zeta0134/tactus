@@ -343,22 +343,150 @@ reject:
 .endproc
 
 .proc diagonal_conditional_northeast
-        ; UNIMPLEMENTED
+ConditionalByte := R8
+ScratchByte := R9
+        ; first, check the NORTH exit
+        lda PlayerRoomIndex
+        sec
+        sbc #::FLOOR_WIDTH
+        tax
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        sta ScratchByte
+        ; the NS exit (north in this case) uses the normal entry:
+        lda ConditionalByte
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject
+        ; do it all again but now check the EAST exit
+        lda PlayerRoomIndex
+        clc
+        adc #1
+        tax
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        sta ScratchByte
+        ; the EW exit (east in this case) uses the next 2 bits up, so
+        ; we need to shift those into place
+        lda ConditionalByte
+        lsr
+        lsr
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject
+        jmp draw_battlefield_overlays::draw_this_overlay
+reject:
         jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
 
 .proc diagonal_conditional_southeast
-        ; UNIMPLEMENTED
+ConditionalByte := R8
+ScratchByte := R9
+        ; first, check the SOUTH exit
+        lda PlayerRoomIndex
+        clc
+        adc #::FLOOR_WIDTH
+        tax
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        sta ScratchByte
+        ; the NS exit (south in this case) uses the normal entry:
+        lda ConditionalByte
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject
+        ; do it all again but now check the EAST exit
+        lda PlayerRoomIndex
+        clc
+        adc #1
+        tax
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        sta ScratchByte
+        ; the EW exit (east in this case) uses the next 2 bits up, so
+        ; we need to shift those into place
+        lda ConditionalByte
+        lsr
+        lsr
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject
+        jmp draw_battlefield_overlays::draw_this_overlay
+reject:
         jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
 
 .proc diagonal_conditional_southwest
-        ; UNIMPLEMENTED
+ConditionalByte := R8
+ScratchByte := R9
+        ; first, check the SOUTH exit
+        lda PlayerRoomIndex
+        clc
+        adc #::FLOOR_WIDTH
+        tax
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        sta ScratchByte
+        ; the NS exit (south in this case) uses the normal entry:
+        lda ConditionalByte
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject
+        ; do it all again but now check the WEST exit
+        lda PlayerRoomIndex
+        sec
+        sbc #1
+        tax
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        sta ScratchByte
+        ; the EW exit (west in this case) uses the next 2 bits up, so
+        ; we need to shift those into place
+        lda ConditionalByte
+        lsr
+        lsr
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject
+        jmp draw_battlefield_overlays::draw_this_overlay
+reject:
         jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
 
 .proc diagonal_conditional_northwest
-        ; UNIMPLEMENTED
+ConditionalByte := R8
+ScratchByte := R9
+        ; first, check the NORTH exit
+        lda PlayerRoomIndex
+        sec
+        sbc #::FLOOR_WIDTH
+        tax
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        sta ScratchByte
+        ; the NS exit (north in this case) uses the normal entry:
+        lda ConditionalByte
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject
+        ; do it all again but now check the WEST exit
+        lda PlayerRoomIndex
+        sec
+        sbc #1
+        tax
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        sta ScratchByte
+        ; the EW exit (west in this case) uses the next 2 bits up, so
+        ; we need to shift those into place
+        lda ConditionalByte
+        lsr
+        lsr
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject
+        jmp draw_battlefield_overlays::draw_this_overlay
+reject:
         jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
 
@@ -1530,28 +1658,35 @@ room_pool_cave_interior:
 .include "../build/floors/grass_cave_mix_09.incs"
 .include "../build/floors/grass_cave_mix_10.incs"
 
+.include "../build/floors/test_floor_corner_cases.incs"
+
 ; eventually we'll want a whole big list of these
 ; for now, 16 entries just like the floor mazes
-test_floor_layout_pool:    
-        ;.repeat 16
+test_floor_layout_pool:
+        ; draw a specific floor for testing
+        
+        .repeat 16
+        .word floor_test_floor_corner_cases
+        .endrepeat    
+
+        ; the real floor data
+        
+        ;.word floor_grass_cave_mix_01
+        ;.word floor_grass_cave_mix_01
         ;.word floor_grass_cave_mix_02
-        ;.endrepeat    
-        .word floor_grass_cave_mix_01
-        .word floor_grass_cave_mix_01
-        .word floor_grass_cave_mix_02
-        .word floor_grass_cave_mix_03
-        .word floor_grass_cave_mix_04
-        .word floor_grass_cave_mix_04
-        .word floor_grass_cave_mix_05
-        .word floor_grass_cave_mix_05
-        .word floor_grass_cave_mix_06
-        .word floor_grass_cave_mix_06
-        .word floor_grass_cave_mix_07
-        .word floor_grass_cave_mix_08
-        .word floor_grass_cave_mix_08
-        .word floor_grass_cave_mix_09
-        .word floor_grass_cave_mix_10
-        .word floor_grass_cave_mix_10
+        ;.word floor_grass_cave_mix_03
+        ;.word floor_grass_cave_mix_04
+        ;.word floor_grass_cave_mix_04
+        ;.word floor_grass_cave_mix_05
+        ;.word floor_grass_cave_mix_05
+        ;.word floor_grass_cave_mix_06
+        ;.word floor_grass_cave_mix_06
+        ;.word floor_grass_cave_mix_07
+        ;.word floor_grass_cave_mix_08
+        ;.word floor_grass_cave_mix_08
+        ;.word floor_grass_cave_mix_09
+        ;.word floor_grass_cave_mix_10
+        ;.word floor_grass_cave_mix_10
 
 ; =============================================
 ; Enemies - Pools of spawns for rooms to select
