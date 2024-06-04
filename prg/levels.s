@@ -667,8 +667,8 @@ detail_grass_wall:
         .word BG_TILE_MAP_TILES_0163 ; grass wall w/ light square flower
         .word BG_TILE_MAP_TILES_0163 ; grass wall w/ light square flower
         .word BG_TILE_MAP_TILES_0148 ; grass wall w/ cattails
-        .word BG_TILE_MAP_TILES_0163 ; grass wall w/ light spiral flower
-        .word BG_TILE_MAP_TILES_0163 ; grass wall w/ light spiral flower
+        .word BG_TILE_MAP_TILES_0165 ; grass wall w/ light spiral flower
+        .word BG_TILE_MAP_TILES_0165 ; grass wall w/ light spiral flower
 
 detail_grass_wall_upper_border:
         .repeat 20
@@ -1485,8 +1485,8 @@ CAVE_INTERIOR = 2
 
 .segment "DATA_4"
 
-        .include "../build/rooms/GrassyTest_Standard.incs"
-        .include "../build/rooms/CaveTest_Standard.incs"
+        .include "../build/rooms/Grasslands_Standard.incs"
+        .include "../build/rooms/Caves_Standard.incs"
         .include "../build/rooms/OutOfBounds.incs"
         .include "../build/rooms/ChallengeArena_Standard.incs"
 
@@ -1521,7 +1521,7 @@ room_pool_out_of_bounds:
 
 room_pool_grassy_exterior:
         .repeat 12
-        room_entry room_GrassyTest_Standard
+        room_entry room_Grasslands_Standard
         .endrepeat
         .repeat 4
         room_entry room_ChallengeArena_Standard
@@ -1529,7 +1529,7 @@ room_pool_grassy_exterior:
 
 room_pool_cave_interior:
         .repeat 12
-        room_entry room_CaveTest_Standard
+        room_entry room_Caves_Standard
         .endrepeat
         .repeat 4
         room_entry room_ChallengeArena_Standard
@@ -1553,28 +1553,28 @@ room_pool_cave_interior:
 test_floor_layout_pool:
         ; draw a specific floor for testing
         
-        .repeat 16
-        .word floor_test_floor_corner_cases
-        .endrepeat    
+        ;.repeat 16
+        ;.word floor_test_floor_corner_cases
+        ;.endrepeat    
 
         ; the real floor data
         
-        ;.word floor_grass_cave_mix_01
-        ;.word floor_grass_cave_mix_01
-        ;.word floor_grass_cave_mix_02
-        ;.word floor_grass_cave_mix_03
-        ;.word floor_grass_cave_mix_04
-        ;.word floor_grass_cave_mix_04
-        ;.word floor_grass_cave_mix_05
-        ;.word floor_grass_cave_mix_05
-        ;.word floor_grass_cave_mix_06
-        ;.word floor_grass_cave_mix_06
-        ;.word floor_grass_cave_mix_07
-        ;.word floor_grass_cave_mix_08
-        ;.word floor_grass_cave_mix_08
-        ;.word floor_grass_cave_mix_09
-        ;.word floor_grass_cave_mix_10
-        ;.word floor_grass_cave_mix_10
+        .word floor_grass_cave_mix_01
+        .word floor_grass_cave_mix_01
+        .word floor_grass_cave_mix_02
+        .word floor_grass_cave_mix_03
+        .word floor_grass_cave_mix_04
+        .word floor_grass_cave_mix_04
+        .word floor_grass_cave_mix_05
+        .word floor_grass_cave_mix_05
+        .word floor_grass_cave_mix_06
+        .word floor_grass_cave_mix_06
+        .word floor_grass_cave_mix_07
+        .word floor_grass_cave_mix_08
+        .word floor_grass_cave_mix_08
+        .word floor_grass_cave_mix_09
+        .word floor_grass_cave_mix_10
+        .word floor_grass_cave_mix_10
 
 ; =============================================
 ; Enemies - Pools of spawns for rooms to select

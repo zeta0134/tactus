@@ -183,6 +183,30 @@
  <tile id="88" type="map"/>
  <tile id="89" type="map"/>
  <tile id="90" type="map"/>
+ <tile id="128" type="map"/>
+ <tile id="129" type="map"/>
+ <tile id="130" type="map"/>
+ <tile id="131" type="map"/>
+ <tile id="132" type="map"/>
+ <tile id="133" type="map"/>
+ <tile id="144" type="map"/>
+ <tile id="145" type="map"/>
+ <tile id="146" type="map"/>
+ <tile id="147" type="map"/>
+ <tile id="148" type="map"/>
+ <tile id="149" type="map"/>
+ <tile id="160" type="map"/>
+ <tile id="161" type="map"/>
+ <tile id="162" type="map"/>
+ <tile id="163" type="map"/>
+ <tile id="164" type="map"/>
+ <tile id="165" type="map"/>
+ <tile id="176" type="map"/>
+ <tile id="177" type="map"/>
+ <tile id="178" type="map"/>
+ <tile id="179" type="map"/>
+ <tile id="180" type="map"/>
+ <tile id="181" type="map"/>
  <tile id="192" type="map"/>
  <tile id="193" type="map"/>
  <tile id="194" type="map"/>
