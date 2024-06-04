@@ -52,6 +52,10 @@ grassy_palette:
         .incbin "../art/extra_grassy_palette.pal"
 dank_cave_palette:
         .incbin "../art/dank_cave.pal"
+challenge_pit_darkblue:
+        .incbin "../art/challenge_pit_darkblue.pal"
+challenge_pit_darkred:
+        .incbin "../art/challenge_pit_darkred.pal"
 
 .proc load_room_palette
 RoomPtr := R0
@@ -490,162 +494,6 @@ reject:
         jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
 
-;.proc draw_battlefield_overlays_old
-;RoomPtr := R0
-;OverlayPtr := R2
-;
-;check_north:
-;        ldx PlayerRoomIndex
-;        lda room_floorplan, x
-;        and #ROOM_EXIT_FLAG_NORTH
-;        beq check_east
-;
-;        lda PlayerRoomIndex
-;        sec
-;        sbc #::FLOOR_WIDTH
-;        tax
-;        lda room_flags, x
-;        and #ROOM_FLAG_BOSS
-;        bne boss_chamber_north
-;        lda room_properties, x
-;        and #ROOM_CATEGORY_MASK
-;        cmp #ROOM_CATEGORY_INTERIOR
-;        beq interior_chamber_north
-;        ; TODO: Shop, Chamber as category
-;exterior_chamber_north:
-;        ldy #Room::ExteriorOverlayNorth        
-;        jmp draw_overlay_north
-;interior_chamber_north:
-;        ldy #Room::InteriorOverlayNorth
-;        jmp draw_overlay_north
-;boss_chamber_north:
-;        ldy #Room::ChallengeOverlayNorth
-;        jmp draw_overlay_north
-;draw_overlay_north:
-;        lda (RoomPtr), y
-;        sta OverlayPtr+0
-;        iny
-;        lda (RoomPtr), y
-;        ; Sanity check: is this a valid pointer? If not, bail
-;        beq check_east
-;        sta OverlayPtr+1
-;        jsr draw_single_battlefield_overlay
-;
-;check_east:
-;        ldx PlayerRoomIndex
-;        lda room_floorplan, x
-;        and #ROOM_EXIT_FLAG_EAST
-;        beq check_south
-;
-;        lda PlayerRoomIndex
-;        clc
-;        adc #1
-;        tax
-;        lda room_flags, x
-;        and #ROOM_FLAG_BOSS
-;        bne boss_chamber_east
-;        lda room_properties, x
-;        and #ROOM_CATEGORY_MASK
-;        cmp #ROOM_CATEGORY_INTERIOR
-;        beq interior_chamber_east
-;        ; TODO: Shop, Chamber as category
-;exterior_chamber_east:
-;        ldy #Room::ExteriorOverlayEast
-;        jmp draw_overlay_east
-;interior_chamber_east:
-;        ldy #Room::InteriorOverlayEast
-;        jmp draw_overlay_east
-;boss_chamber_east:
-;        ldy #Room::ChallengeOverlayEast
-;        jmp draw_overlay_east
-;draw_overlay_east:
-;        lda (RoomPtr), y
-;        sta OverlayPtr+0
-;        iny
-;        lda (RoomPtr), y
-;        ; Sanity check: is this a valid pointer? If not, bail
-;        beq check_south
-;        sta OverlayPtr+1
-;        jsr draw_single_battlefield_overlay
-;
-;check_south:
-;        ldx PlayerRoomIndex
-;        lda room_floorplan, x
-;        and #ROOM_EXIT_FLAG_SOUTH
-;        beq check_west
-;
-;        lda PlayerRoomIndex
-;        clc
-;        adc #::FLOOR_WIDTH
-;        tax
-;        lda room_flags, x
-;        and #ROOM_FLAG_BOSS
-;        bne boss_chamber_south
-;        lda room_properties, x
-;        and #ROOM_CATEGORY_MASK
-;        cmp #ROOM_CATEGORY_INTERIOR
-;        beq interior_chamber_south
-;        ; TODO: Shop, Chamber as category
-;exterior_chamber_south:
-;        ldy #Room::ExteriorOverlaySouth
-;        jmp draw_overlay_south
-;interior_chamber_south:
-;        ldy #Room::InteriorOverlaySouth
-;        jmp draw_overlay_south
-;boss_chamber_south:
-;        ldy #Room::ChallengeOverlaySouth
-;        jmp draw_overlay_south
-;draw_overlay_south:
-;        lda (RoomPtr), y
-;        sta OverlayPtr+0
-;        iny
-;        lda (RoomPtr), y
-;        ; Sanity check: is this a valid pointer? If not, bail
-;        beq check_west
-;        sta OverlayPtr+1
-;        jsr draw_single_battlefield_overlay
-;
-;check_west:
-;        ldx PlayerRoomIndex
-;        lda room_floorplan, x
-;        and #ROOM_EXIT_FLAG_WEST
-;        beq done
-;
-;        lda PlayerRoomIndex
-;        sec
-;        sbc #1
-;        tax
-;        lda room_flags, x
-;        and #ROOM_FLAG_BOSS
-;        bne boss_chamber_west
-;        lda room_properties, x
-;        and #ROOM_CATEGORY_MASK
-;        cmp #ROOM_CATEGORY_INTERIOR
-;        beq interior_chamber_west
-;        ; TODO: Shop, Chamber as category
-;exterior_chamber_west:
-;        ldy #Room::ExteriorOverlayWest
-;        jmp draw_overlay_west
-;interior_chamber_west:
-;        ldy #Room::InteriorOverlayWest
-;        jmp draw_overlay_west
-;boss_chamber_west:
-;        ldy #Room::ChallengeOverlayWest
-;        jmp draw_overlay_west
-;draw_overlay_west:
-;        lda (RoomPtr), y
-;        sta OverlayPtr+0
-;        iny
-;        lda (RoomPtr), y
-;        ; Sanity check: is this a valid pointer? If not, bail
-;        beq done
-;        sta OverlayPtr+1
-;        jsr draw_single_battlefield_overlay
-;
-;done:
-;        rts
-;.endproc
-
 .proc draw_single_battlefield_overlay
 RoomPtr := R0
 OverlayPtr := R2
@@ -690,14 +538,16 @@ done:
 
 TILE_FLAG_DETAIL = %10000000
 
-DETAIL_SPARSE_GRASS         = 0
-DETAIL_SPARSE_SHROOMS       = 2
-DETAIL_SPARSE_GRASS_SHROOMS = 4
-DETAIL_CAVE                 = 6
-DETAIL_CAVE_SHROOMS         = 8
-DETAIL_SAND                 = 10
-DETAIL_GRASS_WALL_BORDER    = 12
-DETAIL_GRASS_WALL           = 14
+DETAIL_SPARSE_GRASS            = 0
+DETAIL_SPARSE_SHROOMS          = 2
+DETAIL_SPARSE_GRASS_SHROOMS    = 4
+DETAIL_CAVE                    = 6
+DETAIL_CAVE_SHROOMS            = 8
+DETAIL_SAND                    = 10
+DETAIL_GRASS_WALL_LOWER_BORDER = 12
+DETAIL_GRASS_WALL              = 14
+DETAIL_GRASS_WALL_UPPER_BORDER = 16
+DETAIL_GRASS_WALL_HORIZ_STRIP  = 18
 
 ; indexed by the direct values above
 detail_variants_table:
@@ -707,8 +557,10 @@ detail_variants_table:
         .addr detail_cave
         .addr detail_cave_shrooms
         .addr detail_sand
-        .addr detail_grass_wall_border
+        .addr detail_grass_wall_lower_border
         .addr detail_grass_wall
+        .addr detail_grass_wall_upper_border
+        .addr detail_grass_wall_horiz_strip
 
 ; FOR NOW, every detail table has exactly 32 entries in it, which controls 
 ; overall detail density with a reasonable degree of fine-tuning
@@ -780,41 +632,77 @@ detail_sand:
         .word BG_TILE_DISCO_FLOOR_TILES_0018 ; sand with seashell
         .endrepeat
 
-detail_grass_wall_border:
-        .repeat 19
-        .word BG_TILE_MAP_TILES_0018 ; plain grass wall border
+detail_grass_wall_lower_border:
+        .repeat 20
+        .word BG_TILE_MAP_TILES_0161 ; plain grass wall lower border
         .endrepeat
-        .word BG_TILE_MAP_TILES_0019 ; grass wall border w/ cattails
-        .word BG_TILE_MAP_TILES_0019 ; grass wall border w/ cattails
-        .word BG_TILE_MAP_TILES_0023 ; grass wall border w/ dancing flower
-        .word BG_TILE_MAP_TILES_0023 ; grass wall border w/ dancing flower
-        .word BG_TILE_MAP_TILES_0020 ; grass wall border w/ short grass, low
-        .word BG_TILE_MAP_TILES_0020 ; grass wall border w/ short grass, low
-        .word BG_TILE_MAP_TILES_0020 ; grass wall border w/ short grass, low
-        .word BG_TILE_MAP_TILES_0021 ; grass wall border w/ tall grass
-        .word BG_TILE_MAP_TILES_0021 ; grass wall border w/ tall grass
-        .word BG_TILE_MAP_TILES_0021 ; grass wall border w/ tall grass
-        .word BG_TILE_MAP_TILES_0022 ; grass wall border w/ short grass, high
-        .word BG_TILE_MAP_TILES_0022 ; grass wall border w/ short grass, high
-        .word BG_TILE_MAP_TILES_0022 ; grass wall border w/ short grass, high
+        .word BG_TILE_MAP_TILES_0160 ; grass wall lower border w/ cattails
+        .word BG_TILE_MAP_TILES_0160 ; grass wall lower border w/ cattails
+        .word BG_TILE_MAP_TILES_0160 ; grass wall lower border w/ cattails
+        .word BG_TILE_MAP_TILES_0160 ; grass wall lower border w/ cattails
+        .word BG_TILE_MAP_TILES_0162 ; grass wall lower border w/ light flower
+        .word BG_TILE_MAP_TILES_0162 ; grass wall lower border w/ light flower
+        .word BG_TILE_MAP_TILES_0162 ; grass wall lower border w/ light flower
+        .word BG_TILE_MAP_TILES_0162 ; grass wall lower border w/ light flower
+        .word BG_TILE_MAP_TILES_0181 ; grass wall lower border w/ tall grass
+        .word BG_TILE_MAP_TILES_0181 ; grass wall lower border w/ tall grass
+        .word BG_TILE_MAP_TILES_0181 ; grass wall lower border w/ tall grass
+        .word BG_TILE_MAP_TILES_0181 ; grass wall lower border w/ tall grass
 
 detail_grass_wall:
-        .repeat 19
-        .word BG_TILE_MAP_TILES_0002 ; plain light grey solid
+        .repeat 16
+        .word BG_TILE_MAP_TILES_0145 ; grass wall plain
         .endrepeat
-        .word BG_TILE_MAP_TILES_0024 ; light grey w/ cattails
-        .word BG_TILE_MAP_TILES_0024 ; light grey w/ cattails
-        .word BG_TILE_MAP_TILES_0028 ; light grey w/ dancing flower
-        .word BG_TILE_MAP_TILES_0028 ; light grey w/ dancing flower
-        .word BG_TILE_MAP_TILES_0025 ; light grey w/ short grass, low
-        .word BG_TILE_MAP_TILES_0025 ; light grey w/ short grass, low
-        .word BG_TILE_MAP_TILES_0025 ; light grey w/ short grass, low
-        .word BG_TILE_MAP_TILES_0026 ; light grey w/ tall grass
-        .word BG_TILE_MAP_TILES_0026 ; light grey w/ tall grass
-        .word BG_TILE_MAP_TILES_0026 ; light grey w/ tall grass
-        .word BG_TILE_MAP_TILES_0027 ; light grey w/ short grass, high
-        .word BG_TILE_MAP_TILES_0027 ; light grey w/ short grass, high
-        .word BG_TILE_MAP_TILES_0027 ; light grey w/ short grass, high
+        .word BG_TILE_MAP_TILES_0144 ; grass wall w/ short grass high
+        .word BG_TILE_MAP_TILES_0144 ; grass wall w/ short grass high
+        .word BG_TILE_MAP_TILES_0144 ; grass wall w/ short grass high
+        .word BG_TILE_MAP_TILES_0164 ; grass wall w/ short grass low
+        .word BG_TILE_MAP_TILES_0164 ; grass wall w/ short grass low
+        .word BG_TILE_MAP_TILES_0164 ; grass wall w/ short grass low
+        .word BG_TILE_MAP_TILES_0146 ; grass wall w/ tall grass
+        .word BG_TILE_MAP_TILES_0146 ; grass wall w/ tall grass
+        .word BG_TILE_MAP_TILES_0146 ; grass wall w/ tall grass
+        .word BG_TILE_MAP_TILES_0147 ; grass wall w/ dark flower
+        .word BG_TILE_MAP_TILES_0147 ; grass wall w/ dark flower
+        .word BG_TILE_MAP_TILES_0163 ; grass wall w/ light square flower
+        .word BG_TILE_MAP_TILES_0163 ; grass wall w/ light square flower
+        .word BG_TILE_MAP_TILES_0148 ; grass wall w/ cattails
+        .word BG_TILE_MAP_TILES_0163 ; grass wall w/ light spiral flower
+        .word BG_TILE_MAP_TILES_0163 ; grass wall w/ light spiral flower
+
+detail_grass_wall_upper_border:
+        .repeat 20
+        .word BG_TILE_MAP_TILES_0129 ; grass wall upper border plain
+        .endrepeat
+        .word BG_TILE_MAP_TILES_0128 ; grass wall upper border w/ light square flower
+        .word BG_TILE_MAP_TILES_0128 ; grass wall upper border w/ light square flower
+        .word BG_TILE_MAP_TILES_0128 ; grass wall upper border w/ light square flower
+        .word BG_TILE_MAP_TILES_0128 ; grass wall upper border w/ light square flower
+        .word BG_TILE_MAP_TILES_0130 ; grass wall upper border w/ cattails
+        .word BG_TILE_MAP_TILES_0130 ; grass wall upper border w/ cattails
+        .word BG_TILE_MAP_TILES_0130 ; grass wall upper border w/ cattails
+        .word BG_TILE_MAP_TILES_0130 ; grass wall upper border w/ cattails
+        .word BG_TILE_MAP_TILES_0149 ; grass wall upper border w/ tall grass
+        .word BG_TILE_MAP_TILES_0149 ; grass wall upper border w/ tall grass
+        .word BG_TILE_MAP_TILES_0149 ; grass wall upper border w/ tall grass
+        .word BG_TILE_MAP_TILES_0149 ; grass wall upper border w/ tall grass
+
+detail_grass_wall_horiz_strip:
+        .repeat 20
+        .word BG_TILE_MAP_TILES_0132 ; grass wall horiz strip
+        .endrepeat
+        .word BG_TILE_MAP_TILES_0131 ; grass wall horiz strip w/ short grass
+        .word BG_TILE_MAP_TILES_0131 ; grass wall horiz strip w/ short grass
+        .word BG_TILE_MAP_TILES_0131 ; grass wall horiz strip w/ short grass
+        .word BG_TILE_MAP_TILES_0131 ; grass wall horiz strip w/ short grass
+        .word BG_TILE_MAP_TILES_0133 ; grass wall horiz strip w/ cattails
+        .word BG_TILE_MAP_TILES_0133 ; grass wall horiz strip w/ cattails
+        .word BG_TILE_MAP_TILES_0133 ; grass wall horiz strip w/ cattails
+        .word BG_TILE_MAP_TILES_0133 ; grass wall horiz strip w/ cattails
+        .word BG_TILE_MAP_TILES_0180 ; grass wall horiz strip w/ light square flower
+        .word BG_TILE_MAP_TILES_0180 ; grass wall horiz strip w/ light square flower
+        .word BG_TILE_MAP_TILES_0180 ; grass wall horiz strip w/ light square flower
+        .word BG_TILE_MAP_TILES_0180 ; grass wall horiz strip w/ light square flower
 
 .proc roll_for_detail
 ; in-use by the battlefield routine, don't clobber these

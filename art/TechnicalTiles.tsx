@@ -46,13 +46,25 @@
  <tile id="17" type="detail">
   <properties>
    <property name="behavior" value="TILE_WALL"/>
-   <property name="detail" value="DETAIL_GRASS_WALL_BORDER"/>
+   <property name="detail" value="DETAIL_GRASS_WALL_LOWER_BORDER"/>
   </properties>
  </tile>
  <tile id="18" type="detail">
   <properties>
    <property name="behavior" value="TILE_WALL"/>
    <property name="detail" value="DETAIL_GRASS_WALL"/>
+  </properties>
+ </tile>
+ <tile id="19" type="detail">
+  <properties>
+   <property name="behavior" value="TILE_WALL"/>
+   <property name="detail" value="DETAIL_GRASS_WALL_UPPER_BORDER"/>
+  </properties>
+ </tile>
+ <tile id="20">
+  <properties>
+   <property name="behavior" value="TILE_WALL"/>
+   <property name="detail" value="DETAIL_GRASS_WALL_HORIZ_STRIP"/>
   </properties>
  </tile>
 </tileset>
