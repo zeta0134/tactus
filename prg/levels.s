@@ -1493,6 +1493,7 @@ CAVE_INTERIOR = 2
 .segment "DATA_6"
 
         .include "../build/rooms/Grasslands_Round.incs"
+        .include "../build/rooms/Grasslands_Ring.incs"
 
 .segment "DATA_3"
 
@@ -1524,11 +1525,14 @@ room_pool_out_of_bounds:
         .endrepeat
 
 room_pool_grassy_exterior:
-        .repeat 6
+        .repeat 4
         room_entry room_Grasslands_Standard
         .endrepeat
-        .repeat 6
+        .repeat 4
         room_entry room_Grasslands_Round
+        .endrepeat
+        .repeat 4
+        room_entry room_Grasslands_Ring
         .endrepeat
         .repeat 4
         room_entry room_ChallengeArena_Standard
