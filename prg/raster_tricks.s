@@ -17,6 +17,10 @@ delay_routine_addr: .res 2
 ; this bit might get more complicated later XD
 raster_tricks_enabled: .res 1
 
+        .segment "PRGRAM"
+HudBgActual: .res 1
+HudObjActual: .res 1
+
         .segment "PRGFIXED_E000"
 
 .proc init_irq_subsystem
@@ -40,7 +44,12 @@ raster_tricks_enabled: .res 1
         lda #0
         sta MAP_PPU_IRQ_OFFSET
         lda #$FF ; "any value"
-        sta MAP_PPU_IRQ_ENABLE  
+        sta MAP_PPU_IRQ_ENABLE
+
+        lda HudBgHighBank
+        sta HudBgActual
+        lda HudObjHighBank
+        sta HudObjActual
 
 disabled:
         rts
@@ -230,9 +239,9 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         ;sta MAP_BG_EXT_BANK       ; 4
 
         ; new cost: 26
-        lda HudBgHighBank       ; 4
+        lda HudBgActual         ; 4
         sta MAP_BG_EXT_BANK     ; 4
-        lda HudObjHighBank      ; 4 - %......HL
+        lda HudObjActual        ; 4 - %......HL
         ror                     ; 2 - %.......H C:L
         ror                     ; 2 - %L....... C:H
         ror                     ; 2 - %HL......
