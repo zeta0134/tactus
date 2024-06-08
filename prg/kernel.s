@@ -482,7 +482,7 @@ not_victory:
         sta LastBeat
 
         ; reset animation tracking to the start of the musical row
-        near_call FAR_reset_gameplay_position
+        MACRO_reset_gameplay_position
 
         ; - Swap the active and inactive buffers
         far_call FAR_swap_battlefield_buffers
@@ -819,8 +819,6 @@ continue_waiting:
 ; Utility Functions
 
 .proc update_beat_counters_title
-        near_call FAR_update_beat_tracker
-
         ldx TrackedMusicPos
         lda tracked_animation_frame, x
         sta PlayfieldBgHighBank
@@ -835,8 +833,6 @@ continue_waiting:
 .endproc
 
 .proc update_beat_counters
-        near_call FAR_update_beat_tracker
-
         ; for the HUD, we'll always sync directly to the music, no funny business
         ldx TrackedMusicPos
         lda tracked_animation_frame, x

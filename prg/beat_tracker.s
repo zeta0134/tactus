@@ -4,8 +4,6 @@
 
 .segment "PRGRAM"
 
-
-
 tracked_row_buffer: .res 64
 tracked_animation_frame: .res 64
 
@@ -13,20 +11,12 @@ TrackedMusicPos: .res 1
 TrackedGameplayPos: .res 1
 CurrentBeat: .res 1
 
+CurrentRow: .res 1
 LastTrackedRow: .res 1
 
-.segment "CODE_1"
 
-; This is the animation frame we'll display on each tracked
-; musical row. currently, we favor 8 tracker rows per beat,
-; and we shorten the earlier frames to help the movements
-; feel snappy. the final held frame is "anticipation" and its 
-; duration will vary based on player input timing
-beat_frame_pacing:
-        .byte 0, 1, 1, 2, 2, 3, 3, 3
-; note that for art purposes, our "key pose" for any given
-; animation is nearly always frame 3, as it will be displayed
-; the longest by far
+
+.segment "CODE_1"
 
 .proc FAR_beat_tracker_init
     ldy #63
@@ -46,15 +36,20 @@ loop:
     rts
 .endproc
 
-; oh, this probably shouldn't be a function, but w/e
-.proc FAR_reset_gameplay_position
-    lda #0
-    sta TrackedGameplayPos
-    rts
-.endproc
+.segment "PRGFIXED_E000"
 
-.proc FAR_update_beat_tracker
-CurrentRow := R0
+; This is the animation frame we'll display on each tracked
+; musical row. currently, we favor 8 tracker rows per beat,
+; and we shorten the earlier frames to help the movements
+; feel snappy. the final held frame is "anticipation" and its 
+; duration will vary based on player input timing
+beat_frame_pacing:
+        .byte 0, 1, 1, 2, 2, 3, 3, 3
+; note that for art purposes, our "key pose" for any given
+; animation is nearly always frame 3, as it will be displayed
+; the longest by far
+
+.proc update_beat_tracker
     lda currently_playing_row ; from bhop
     and #%00000111
     sta CurrentRow

@@ -3,6 +3,7 @@
 .include "../build/tile_defs.inc"
 
 .include "battlefield.inc"
+.include "beat_tracker.inc"
 .include "bhop/bhop.inc"
 .include "chr.inc"
 .include "debug.inc"
@@ -155,6 +156,8 @@ nmi_soft_disable:
         pha
 
         far_call_nmi FAR_update_audio
+        perform_zpcm_inc
+        jsr update_beat_tracker
         perform_zpcm_inc
 
         pla
