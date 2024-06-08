@@ -716,27 +716,51 @@ StartingTile := R15
 
         ;- 1 frame: Update rows 8-9 of dynamic enemies, queue rows 8-9 to inactive buffer
         jsr every_gameloop
-        st16 GameMode, wait_for_the_next_beat
+        st16 GameMode, decide_how_to_wait_for_the_next_beat
         rts
 .endproc
 
-.proc wait_for_the_next_beat
-        ;- Variable Frames: wait for the next "beat" to begin
-
-        ; Special case: if the current room is marked as cleared, we do not need to wait
-        ; for the next beat. Check for that here
+.proc decide_how_to_wait_for_the_next_beat
         ldx PlayerRoomIndex
         lda room_flags, x
         and #ROOM_FLAG_CLEARED
         beq normal_gameplay_beat_checking
 room_cleared:
+        st16 GameMode, wait_for_the_next_cleared_room_beat
+        rts
+normal_gameplay_beat_checking:
+        st16 GameMode, wait_for_the_next_standard_gameplay_beat
+        rts
+.endproc
+
+.proc wait_for_the_next_cleared_room_beat
         ; If the player's input has arrived...
         lda PlayerNextDirection
-        ; ... then go ahead and process this beat early
+        ; ... then go ahead and process this beat!
         bne process_next_beat_now
-        ; otherwise treat things normally, so the visual beat is unchanged(ish)
-        
-normal_gameplay_beat_checking:
+
+        ; TODO: deal with cooldowns, process the next beat eventually, etc
+
+continue_waiting:
+        ; We have LOTS of time on this particular frame, so update the torchlight a whole
+        ; heck of a bunch to catch it up with the player's current location
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
+        far_call FAR_draw_torchlight
+        debug_color LIGHTGRAY
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
+        far_call FAR_draw_torchlight
+        debug_color LIGHTGRAY
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
+        far_call FAR_draw_torchlight
+        debug_color LIGHTGRAY
+        jsr every_gameloop
+        rts
+process_next_beat_now:
+        st16 GameMode, beat_frame_1
+        rts ; right now!
+.endproc
+
+.proc wait_for_the_next_standard_gameplay_beat
         ; If it's not time for the next beat yet, then continue waiting no matter what
         lda CurrentBeat
         cmp LastBeat
