@@ -191,9 +191,13 @@ NT_BANK_IDX           = %00111111
 ;################################################################################
 ; Tactus-specific macros and utility functions
 
-.macro rainbow_set_upper_chr bank_value, sprite_page
+.macro rainbow_set_upper_bg_chr bank_value
 	lda bank_value
 	sta MAP_BG_EXT_BANK
+.endmacro
+
+.macro rainbow_set_upper_obj_chr bank_value, sprite_page
+	lda bank_value
 	.repeat 6
 	asl
 	.endrepeat

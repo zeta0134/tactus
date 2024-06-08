@@ -122,8 +122,8 @@ write_ppuctrl:
         lda PpuScrollY
         sta PPUSCROLL
 
-
-        rainbow_set_upper_chr CurrentChrBank, #SPRITE_REGION_BASE
+        rainbow_set_upper_bg_chr PlayfieldBgHighBank
+        rainbow_set_upper_obj_chr PlayfieldObjHighBank, #SPRITE_REGION_BASE
 
         ; re-enable rendering (the IRQ may have disabled it, if it ran)
         lda #$1E

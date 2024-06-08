@@ -1,5 +1,6 @@
         .setcpu "6502"
 
+        .include "beat_tracker.inc"
         .include "far_call.inc"
         .include "hud.inc"
         .include "kernel.inc"
@@ -131,9 +132,11 @@ rising_sprite_y:
         sec
         sbc ScratchByte
         pha
-        lda DisplayedRowCounter
-        and #%00000111        
+
+        ldy TrackedGameplayPos
+        lda tracked_row_buffer, y
         sta ScratchByte
+
         pla
         sec
         sbc ScratchByte

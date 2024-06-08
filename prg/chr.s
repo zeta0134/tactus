@@ -9,9 +9,6 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
-.segment "RAM"
-CurrentChrBank: .res 1
-
 .segment "CHR_ROM"
         .incbin "../build/output_chr.bin"
 
@@ -19,11 +16,6 @@ CurrentChrBank: .res 1
 
 title_nametable:
         .incbin "../art/raw_nametables/title_screen.nam"
-
-.segment "PRGFIXED_E000"
-
-chr_frame_pacing:
-        .byte 0, 1, 1, 2, 2, 3, 3, 3
 
 .segment "CODE_0"
 
@@ -100,14 +92,5 @@ DataAddr := R0
         jsr write_nametable
 
         restore_previous_bank
-        rts
-.endproc
-
-.proc FAR_sync_chr_bank_to_music
-        lda DisplayedRowCounter
-        and #%00000111
-        tax
-        lda chr_frame_pacing, x
-        sta CurrentChrBank
         rts
 .endproc

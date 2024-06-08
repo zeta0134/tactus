@@ -1,13 +1,12 @@
 .include "nes.inc"
 
-.include "bhop/bhop.inc"
-.include "chr.inc"
+.include "../build/tile_defs.inc"
+
 .include "debug.inc"
-.include "far_call.inc"
+.include "kernel.inc"
 .include "palette.inc"
 .include "rainbow.inc"
 .include "raster_tricks.inc"
-.include "sound.inc"
 .include "zeropage.inc"
 .include "zpcm.inc"
 
@@ -221,21 +220,36 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
 
         ; since we have time to kill, we might as well compute the musical beat and set
         ; the new animation frame right here
-        lda currently_playing_row         ; 4
-        and #%00000111          ; 2
-        tax                     ; 2
-        lda chr_frame_pacing, x ; 4
-        sta MAP_BG_EXT_BANK     ; 4
 
-        ; ppu dot here: 87
+
+        ; old cost: 16
+        ;lda currently_playing_row ; 4
+        ;and #%00000111            ; 2
+        ;tax                       ; 2
+        ;lda chr_frame_pacing, x   ; 4
+        ;sta MAP_BG_EXT_BANK       ; 4
+
+        ; new cost: 26
+        lda HudBgHighBank       ; 4
+        sta MAP_BG_EXT_BANK     ; 4
+        lda HudObjHighBank      ; 4 - %......HL
+        ror                     ; 2 - %.......H C:L
+        ror                     ; 2 - %L....... C:H
+        ror                     ; 2 - %HL......
+        and #%11000000          ; 2 (safety)
+        ora #SPRITE_REGION_BASE ; 2 (later: replace with HUD sprite base!)
+        sta MAP_CHR_0_LO        ; 4
+
+        ; ppu dot here: 117
 
         ; now we simply wait for hblank (256), then re-enable backgrounds:
         lda #BG_ON ; 2
-        jsr delay_20
-        jsr delay_20
         jsr delay_12
-        nop ; 2
-        nop ; 2
+        jsr delay_12
+        jsr delay_12
+        .repeat 5 ; 10
+        nop
+        .endrepeat
 
         ; ppu dot here: 261
         sta PPUMASK ; 4

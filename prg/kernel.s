@@ -4,6 +4,7 @@
 
         .include "bhop/bhop.inc"
         .include "battlefield.inc"
+        .include "beat_tracker.inc"
         .include "chr.inc"
         .include "debug.inc"
         .include "enemies.inc"
@@ -41,10 +42,13 @@ PpuScrollNametable: .res 1
 
 .segment "RAM"
 CurrentBeatCounter: .res 1
-CurrentBeat: .res 1
 LastBeat: .res 1
-DisplayedRowCounter: .res 1
 AccumulatedGameBeats: .res 2
+
+PlayfieldBgHighBank: .res 1
+PlayfieldObjHighBank: .res 1
+HudBgHighBank: .res 1
+HudObjHighBank: .res 1
 
 .segment "CODE_1"
 
@@ -97,7 +101,6 @@ continue_waiting:
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
         jsr update_beat_counters
-        far_call FAR_sync_chr_bank_to_music
 
         jsr wait_for_next_vblank
         rts
@@ -122,6 +125,7 @@ MetaSpriteIndex := R0
         ; Play lovely silence while we're loading
         lda #0
         jsr play_track
+        near_call FAR_beat_tracker_init
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
         sta PPUMASK
@@ -189,10 +193,12 @@ MetaSpriteIndex := R0
         ; Play the title track on the title screen (duh)
         lda #3
         jsr play_track
+        near_call FAR_beat_tracker_init
 
         ; (actually play other tracks for debugging)
         ;lda #4
         ;jsr play_track
+        ;near_call FAR_beat_tracker_init
 
         rts
 .endproc
@@ -202,7 +208,6 @@ MetaSpriteIndex := R0
         sta queued_bytes_counter
 
         jsr update_beat_counters_title
-        far_call FAR_sync_chr_bank_to_music
         far_call FAR_draw_sprites
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
@@ -220,6 +225,7 @@ MetaSpriteIndex := R0
         ; Play lovely silence while we're loading
         lda #0
         jsr play_track
+        near_call FAR_beat_tracker_init
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
         sta PPUMASK
@@ -274,7 +280,6 @@ MetaSpriteIndex := R0
         sta queued_bytes_counter
 
         jsr update_beat_counters_title
-        far_call FAR_sync_chr_bank_to_music
         far_call FAR_draw_sprites
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
@@ -293,6 +298,7 @@ MetaSpriteIndex := R0
         ; (this also ensures the music / beat counter are in a deterministic spot when we fade back in)
         lda #0
         jsr play_track
+        near_call FAR_beat_tracker_init
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
         sta PPUMASK
@@ -357,14 +363,17 @@ MetaSpriteIndex := R0
         ;lda #4 ; in another world
 
         jsr play_track
+        near_call FAR_beat_tracker_init
 
         lda #0
-        sta DisplayedRowCounter
-        sta CurrentBeat
         sta LastBeat
         sta CurrentBeatCounter
         sta AccumulatedGameBeats
         sta AccumulatedGameBeats+1
+        sta PlayfieldBgHighBank
+        sta PlayfieldObjHighBank
+        sta HudBgHighBank
+        sta HudObjHighBank
 
         .if ::DEBUG_TEST_FLOOR
         lda #%00000001
@@ -471,8 +480,10 @@ not_victory:
         inc CurrentBeatCounter
         lda CurrentBeat
         sta LastBeat
-        lda #0
-        sta DisplayedRowCounter
+
+        ; reset animation tracking to the start of the musical row
+        near_call FAR_reset_gameplay_position
+
         ; - Swap the active and inactive buffers
         far_call FAR_swap_battlefield_buffers
 
@@ -739,7 +750,7 @@ input_received:
         jmp process_next_beat_now
 no_input_received:        
         ; The player's input might arrive late, so give them some time. If we get to
-        ; an actual row of 3 or more, THEN process the beat without waiting any longer:
+        ; an actual row of 2 or more, THEN process the beat without waiting any longer:
         lda currently_playing_row
         and #%00000111
         cmp #2
@@ -769,7 +780,6 @@ continue_waiting:
 .proc every_gameloop
         perform_zpcm_inc
         jsr update_beat_counters
-        far_call FAR_sync_chr_bank_to_music
         perform_zpcm_inc
 
         lda #0
@@ -809,39 +819,55 @@ continue_waiting:
 ; Utility Functions
 
 .proc update_beat_counters_title
-        lda currently_playing_row
-        and #%00000111
-        sta DisplayedRowCounter
+        near_call FAR_update_beat_tracker
+
+        ldx TrackedMusicPos
+        lda tracked_animation_frame, x
+        sta PlayfieldBgHighBank
+        sta PlayfieldObjHighBank
+        ; the title screen doesn't actually use these, but we
+        ; still might as well update them. maybe it will gain a palette
+        ; swap later?
+        sta HudBgHighBank
+        sta HudObjHighBank
+
         rts
 .endproc
 
 .proc update_beat_counters
-        ; Don't update the displayed row counter if it's already >= 7
-        lda DisplayedRowCounter
-        cmp #7
-        bcs done_with_displayed_row_counter
-        ; If the displayed row counter does not equal the actual row counter
-        lda currently_playing_row
-        and #%00000111
-        cmp DisplayedRowCounter
-        beq done_with_displayed_row_counter
-        ; ... then increment it by one stage
-        inc DisplayedRowCounter
-done_with_displayed_row_counter:
-        ; If the current row_counter is 0...
-        lda currently_playing_row
-        and #%00000111
-        bne done_with_current_beat
-        ; ... and current and last beat ARE the same
-        lda CurrentBeat
-        cmp LastBeat
-        bne done_with_current_beat
-        ; and... to prevent hyper-beat speed, the displayed row counter is not STILL 0...
-        lda DisplayedRowCounter
-        beq done_with_current_beat
-        ; ... then increment CurrentBeat
-        inc CurrentBeat
-done_with_current_beat:
+        near_call FAR_update_beat_tracker
+
+        ; for the HUD, we'll always sync directly to the music, no funny business
+        ldx TrackedMusicPos
+        lda tracked_animation_frame, x
+        sta HudBgHighBank
+        sta HudObjHighBank
+
+        ; how we determine the beat sync for the playfield depends on the current game mode,
+        ; so check that here
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_CLEARED
+        beq normal_gameplay
+cleared_gameplay:
+        ; when the room is clear, the background always tracks the music regardless of what the player is doing.
+        ; this helps prevent the player's off-tempo movements from causing animation glitchiness in otherwise
+        ; static elements (like flickering torchlight, dancing flowers, etc)
+        ldx TrackedMusicPos
+        lda tracked_animation_frame, x
+        sta PlayfieldBgHighBank
+        ; the sprite layer meanwhile continues to follow the player
+        ldx TrackedGameplayPos
+        lda tracked_animation_frame, x
+        sta PlayfieldObjHighBank
+        rts
+normal_gameplay:
+        ; when the room is not clear, everything tracks the gameplay timing so the player and enemies
+        ; remain in perfect sync, even if the player's inputs are a little late
+        ldx TrackedGameplayPos
+        lda tracked_animation_frame, x
+        sta PlayfieldBgHighBank
+        sta PlayfieldObjHighBank
         rts
 .endproc
 

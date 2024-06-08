@@ -4,6 +4,11 @@
 .global DisplayedRowCounter
 .global AccumulatedGameBeats
 
+.global PlayfieldBgHighBank
+.global PlayfieldObjHighBank
+.global HudBgHighBank
+.global HudObjHighBank
+
 ; subroutines
 .global FAR_kernel_game_loop
 
