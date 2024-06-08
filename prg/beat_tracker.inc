@@ -6,6 +6,7 @@
 
 .global TrackedMusicPos
 .global TrackedGameplayPos
+.global TrackedBeatLength
 .global CurrentBeat
 
 .macro MACRO_reset_gameplay_position

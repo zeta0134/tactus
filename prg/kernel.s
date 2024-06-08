@@ -1,5 +1,7 @@
         .setcpu "6502"
 
+        .macpack longbranch
+
         .include "../build/tile_defs.inc"
 
         .include "bhop/bhop.inc"
@@ -49,6 +51,8 @@ PlayfieldBgHighBank: .res 1
 PlayfieldObjHighBank: .res 1
 HudBgHighBank: .res 1
 HudObjHighBank: .res 1
+
+ClearedRoomCooldown: .res 1
 
 .segment "CODE_1"
 
@@ -374,6 +378,9 @@ MetaSpriteIndex := R0
         sta PlayfieldObjHighBank
         sta HudBgHighBank
         sta HudObjHighBank
+
+        lda #$FF
+        sta ClearedRoomCooldown
 
         .if ::DEBUG_TEST_FLOOR
         lda #%00000001
@@ -737,11 +744,36 @@ normal_gameplay_beat_checking:
         ; If the player's input has arrived...
         lda PlayerNextDirection
         ; ... then go ahead and process this beat!
-        bne process_next_beat_now
+        jne player_input_forces_a_beat
 
-        ; TODO: deal with cooldowns, process the next beat eventually, etc
+        ; Firstly, if the next beat haven't arrived yet, do nothing
+        lda CurrentBeat
+        cmp LastBeat
+        beq continue_waiting
+
+        ; Second, to work around a beat alignment problem that can eat player inputs,
+        ; if the player has forced an update less than a quarter of one beat (+8 frames) ago,
+        ; refuse to advance
+
+        lda TrackedBeatLength
+        lsr ; divide by 2
+        lsr ; divide by 4 !?
+        cmp ClearedRoomCooldown
+        bcs cooldown_forces_us_to_wait
+
+        ; otherwise, on this beat boundary, advance!
+        jmp process_next_beat_now
+
+cooldown_forces_us_to_wait:
+        lda CurrentBeat
+        sta LastBeat
 
 continue_waiting:
+        inc ClearedRoomCooldown
+        bne cooldown_is_fine
+        lda #$FF
+        sta ClearedRoomCooldown
+cooldown_is_fine:
         ; We have LOTS of time on this particular frame, so update the torchlight a whole
         ; heck of a bunch to catch it up with the player's current location
         debug_color (TINT_R | TINT_G | LIGHTGRAY)
@@ -755,12 +787,21 @@ continue_waiting:
         debug_color LIGHTGRAY
         jsr every_gameloop
         rts
+player_input_forces_a_beat:
+        lda #0
+        sta ClearedRoomCooldown
 process_next_beat_now:
         st16 GameMode, beat_frame_1
         rts ; right now!
 .endproc
 
 .proc wait_for_the_next_standard_gameplay_beat
+        ; when we transition from standard -> cleared, do take the first on-beat
+        ; transition right away. this eliminates a delay cycle with disco tiles still
+        ; visible
+        lda #$FF
+        sta ClearedRoomCooldown
+
         ; If it's not time for the next beat yet, then continue waiting no matter what
         lda CurrentBeat
         cmp LastBeat

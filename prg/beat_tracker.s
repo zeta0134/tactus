@@ -10,6 +10,7 @@ tracked_animation_frame: .res 64
 TrackedMusicPos: .res 1
 TrackedGameplayPos: .res 1
 CurrentBeat: .res 1
+TrackedBeatLength: .res 1
 
 CurrentRow: .res 1
 LastTrackedRow: .res 1
@@ -32,6 +33,9 @@ loop:
     sta TrackedMusicPos
     sta TrackedGameplayPos
     sta CurrentBeat
+
+    lda #20 ; 180 BPM, sure, why not (this only affects cleared-room cooldowns)
+    sta TrackedBeatLength
 
     rts
 .endproc
@@ -58,6 +62,8 @@ beat_frame_pacing:
     lda LastTrackedRow
     beq increment_music_head
     ; then reset the music position (unconditionally)
+    lda TrackedMusicPos
+    sta TrackedBeatLength ; track the current beat length in ~frames
     lda #0
     sta TrackedMusicPos
     inc CurrentBeat
