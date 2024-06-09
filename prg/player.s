@@ -57,6 +57,8 @@ PlayerZone: .res 1
 PlayerFloor: .res 1
 PlayerRoomIndex: .res 1
 
+PlayerIdleBeats: .res 1
+
 ; "Scratch" registers, because 16 was just not enough for some situations
 EnemyDiedThisFrame: .res 1
 SafetyCol: .res 1
@@ -155,6 +157,9 @@ MetaSpriteIndex := R0
         sta PlayerZone
         lda #1
         sta PlayerFloor
+
+        lda #0
+        sta PlayerIdleBeats
 
         rts
 
@@ -400,14 +405,41 @@ arrived_at_target:
 .proc FAR_update_player
 TargetRow := R14
 TargetCol := R15
+        ; First up, default the player's animation cel to either standing or, if it's been a really long
+        ; time since we got a player input AND the room is clear, the idle pose for flavor
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_CLEARED
+        beq pick_standard_pose
+check_for_idle_pose:
+        lda PlayerIdleBeats
+        cmp #16
+        bcc pick_standard_pose
+        lda #16
+        sta PlayerIdleBeats
+        ldx PlayerSpriteIndex
+        lda #<SPRITE_TILE_PLAYER_IDLE
+        sta sprite_table + MetaSpriteState::TileIndex, x
+        jmp done_with_initial_pose
+pick_standard_pose:
+        ldx PlayerSpriteIndex
+        lda #<SPRITE_TILE_PLAYER
+        sta sprite_table + MetaSpriteState::TileIndex, x
+done_with_initial_pose:
+
         lda PlayerRow
         sta TargetRow
         lda PlayerCol
         sta TargetCol
 
+        inc PlayerIdleBeats
+
 ; TODO: If no move or attack was attempted, reset the combo counter (assuming we implement one)
         lda PlayerNextDirection
         beq resolve_enemy_collision
+
+        lda #0
+        sta PlayerIdleBeats
 
         lda #0
         sta PlayerMovementBlocked
@@ -425,6 +457,21 @@ move_player:
 
 resolve_enemy_collision:
         near_call FAR_player_resolve_collision
+
+        ; If the player's position changed, have the jumping pose kick in
+        ; (this overrides attacking, which feels like it should be appropriate?)
+        lda TargetRow
+        cmp PlayerRow
+        bne apply_jumping_pose
+        lda TargetCol
+        cmp PlayerCol
+        bne apply_jumping_pose
+        jmp skip_jumping_pose
+apply_jumping_pose:
+        ldx PlayerSpriteIndex
+        lda #<SPRITE_TILE_PLAYER_JUMP
+        sta sprite_table + MetaSpriteState::TileIndex, x
+skip_jumping_pose:
 
         ; Now we may finalize the player's position and draw
         lda TargetRow
@@ -665,14 +712,22 @@ no_early_exit:
 
 done_with_swing:
         perform_zpcm_inc
-        ; if an attack landed at all, play a weapon slash effect
+        ; if an attack landed at all ...
         lda AttackLanded
         beq done
-        lda EnemyDiedThisFrame
-        bne done
         
+        ; ... play a weapon slash effect
+        lda EnemyDiedThisFrame
+        bne skip_weapon_sfx
         st16 R0, sfx_weapon_slash
         jsr play_sfx_noise
+skip_weapon_sfx:
+        ; ... and set our sprite state to attacking
+        ; TODO: if we have multiple or weapon-specific attack animations, here is where to apply them
+        ldx PlayerSpriteIndex
+        lda #<SPRITE_TILE_PLAYER_ATTACK
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
 done:
 
         ; If there is any cleanup to do, do that here. Otherwise we're finished I think?

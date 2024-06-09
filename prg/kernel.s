@@ -174,7 +174,7 @@ MetaSpriteIndex := R0
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #71
         sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_PLAYER
+        lda #<SPRITE_TILE_PLAYER_IDLE
         sta sprite_table + MetaSpriteState::TileIndex, x
 
         ; The title screen does not (currently) use IRQs
