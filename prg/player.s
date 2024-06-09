@@ -82,7 +82,6 @@ player_tile_index_table:
 
 JUMP_HEIGHT_END = 5
 jump_height_table:
-        ;.byte 6, 8, 7, 4, 1, 0
         .byte 10, 14, 11, 7, 2, 0
 
 .proc FAR_init_player

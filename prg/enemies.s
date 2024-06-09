@@ -26,20 +26,133 @@ DamageSpriteCoordX: .res 2
 DamageSpriteCoordY: .res 2
 HealthDroughtCounter: .res 1
 
+; TODO: can we relocate this to shared zeropage scratch later?
+ActiveDrawingScratch: .res 6
+
 .segment "RAM"
+
 
 .segment "PRGFIXED_E000"
 
+PALETTE_MASK  := %11000000
+LIGHTING_MASK := %00000011
+CORNER_MASK   := %11111100
+
+TOP_LEFT_BITS     := %00 ; not actually used
+TOP_RIGHT_BITS    := %10
+BOTTOM_LEFT_BITS  := %01
+BOTTOM_RIGHT_BITS := %11
+
+; Note: this is kinda slow! expect it to cause lag if we try to change a BUNCH of
+; tiles in one go, but it should be reasonably okay for half a dozen or so
 .proc draw_active_tile
 TargetIndex := R0
+
+NametableAddr := ActiveDrawingScratch+0
+AttributeAddr := ActiveDrawingScratch+2
+HighRowScratch := ActiveDrawingScratch+4
+LowRowScratch := ActiveDrawingScratch+5
+
         ; TODO: dissolve the concept of a row queue, and actually
         ; *draw* the tile, right now. We can do that, the nametable
         ; is accessible to the CPU on this mapper!
+        ;ldx TargetIndex
+        ;lda tile_index_to_row_lut, x
+        ;tax
+        ;lda #1
+        ;sta active_tile_queue, x
+        ;rts
+
+        ; init some scratch space
+        lda #0
+        sta HighRowScratch
+
+        ; work out the high bits of the row, these are the top 4 bits of TargetIndex x64, so they
+        ; are split across both nametable address bytes
+        lda TargetIndex
+        asl
+        rol HighRowScratch
+        asl
+        rol HighRowScratch
+        and #%11000000
+        sta LowRowScratch
+        ; now deal with the column, which here is x2 (we'll do a +32 later to skip over the row)
+        lda TargetIndex
+        asl
+        and #%00011110
+        ora LowRowScratch
+        sta NametableAddr+0
+        sta AttributeAddr+0
+
+        lda active_battlefield
+        bne second_nametable
+        lda #$50
+        ldy #$58
+        jmp set_high_bytes
+second_nametable:
+        lda #$54
+        ldy #$5C
+set_high_bytes:
+        ora HighRowScratch
+        sta NametableAddr+1
+        tya
+        ora HighRowScratch
+        sta AttributeAddr+1
+        
+        ; now actually draw the tile, here using logic mostly lifted from battlefield's "_draw_tiles_common"
+
         ldx TargetIndex
-        lda tile_index_to_row_lut, x
-        tax
-        lda #1
-        sta active_tile_queue, x
+        ldy #0
+
+        ; top left tile
+        lda tile_patterns, x
+        and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
+        ; ora #TOP_LEFT_BITS   ; this would be a nop
+        sta (NametableAddr), y  ; store that to our regular nametable
+        ; top-left attribute
+        lda (AttributeAddr), y
+        and #LIGHTING_MASK      ; keep only lighting bits        
+        ora tile_attributes, x  ; NEW apply palette and high tile bits
+        sta (AttributeAddr), y  ;
+        iny ; Y = Y + 1
+
+        ; top right tile
+        lda tile_patterns, x
+        and #CORNER_MASK
+        ora #TOP_RIGHT_BITS
+        sta (NametableAddr), y
+        ; top-right attribute
+        lda (AttributeAddr), y
+        and #LIGHTING_MASK      ; keep only lighting bits
+        ora tile_attributes, x  ; NEW apply palette and high tile bits
+        sta (AttributeAddr), y  ;
+        
+        ldy #32 ; skip to the start of the next row for this tile
+
+        ; bottom left tile
+        lda tile_patterns, x
+        and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
+        ora #BOTTOM_LEFT_BITS
+        sta (NametableAddr), y  ; store that to our regular nametable
+        ; bottom-left attribute
+        lda (AttributeAddr), y
+        and #LIGHTING_MASK      ; keep only lighting bits        
+        ora tile_attributes, x  ; NEW apply palette and high tile bits
+        sta (AttributeAddr), y  ;
+        iny
+
+        ; bottom right tile
+        lda tile_patterns, x
+        and #CORNER_MASK
+        ora #BOTTOM_RIGHT_BITS
+        sta (NametableAddr), y
+        ; top-right attribute
+        lda (AttributeAddr), y
+        and #LIGHTING_MASK      ; keep only lighting bits
+        ora tile_attributes, x  ; NEW apply palette and high tile bits
+        sta (AttributeAddr), y  ;
+
+        ; and with all that... we're done?
         rts
 .endproc
 
