@@ -497,7 +497,7 @@ not_victory:
         perform_zpcm_inc
 
         ; Set the next kernel mode early; the player might override this
-        st16 GameMode, wait_for_player_draw_1
+        st16 GameMode, update_enemies_1
 
         ; - Resolve the player's action
         debug_color (TINT_B | LIGHTGRAY)
@@ -521,36 +521,6 @@ not_victory:
         far_call FAR_refresh_hud
         perform_zpcm_inc
         jsr every_gameloop
-        rts
-.endproc
-
-.proc wait_for_player_draw_1
-StartingRow := R14
-StartingTile := R15
-        ; Do nothing! The player probably updated several rows, and
-        ; we should give them a frame or two to draw before we do enemies again.
-        ; If we draw enemies too quickly, we can get things slightly out of sync
-        
-        ; TODO: once we draw player tiles to FPGA RAM, this wait state should
-        ; no longer be needed
-
-        jsr every_gameloop
-        st16 GameMode, wait_for_player_draw_2
-        rts
-.endproc
-
-.proc wait_for_player_draw_2
-StartingRow := R14
-StartingTile := R15
-        ; Do nothing! The player probably updated several rows, and
-        ; we should give them a frame or two to draw before we do enemies again.
-        ; If we draw enemies too quickly, we can get things slightly out of sync
-
-        ; TODO: once we draw player tiles to FPGA RAM, this wait state should
-        ; no longer be needed
-
-        jsr every_gameloop
-        st16 GameMode, update_enemies_1
         rts
 .endproc
 

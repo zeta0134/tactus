@@ -107,14 +107,12 @@ end
 
 beat_frame_names = {
   [1]="BEAT!   ",
-  [2]="WAIT 1  ",
-  [3]="WAIT 2  ",
-  [4]="ENEM 1  ",
-  [5]="ENEM 2  ",
-  [6]="ENEM 3  ",
-  [7]="ENEM 4  ",
-  [8]="WAIT 3  ",
-  [9]="WAIT 4  ",
+  [2]="ENEM 1  ",
+  [3]="ENEM 2  ",
+  [4]="ENEM 3  ",
+  [5]="ENEM 4  ",
+  [6]="WAIT 3  ",
+  [7]="WAIT 4  ",
 }
 
 function identify_frame()
