@@ -7,6 +7,8 @@
 ; this is way too many honestly, but it's a reasonable upper bounds
 ; if we ACTUALLY queue up this many flashing tiles, we will probably lag
 MAX_TILES_TO_CYCLE = 16
+FRAMES_TO_CYCLE = 16
+
 tiles_to_cycle: .res ::MAX_TILES_TO_CYCLE
 num_tiles_to_cycle: .res 1
 frames_remaining: .res 1
@@ -72,7 +74,7 @@ done:
 .proc FAR_reset_palette_cycler
         lda #0
         sta num_tiles_to_cycle
-        lda #8
+        lda #FRAMES_TO_CYCLE
         sta frames_remaining
         rts
 .endproc
@@ -107,7 +109,7 @@ loop:
         ; are split across both nametable address bytes
         lda #0
         sta HighRowScratch
-        
+
         lda TargetIndex
         asl
         rol HighRowScratch
