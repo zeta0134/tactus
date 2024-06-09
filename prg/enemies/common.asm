@@ -294,7 +294,7 @@ TargetIndex := R0
 TileId := R1
 
 AttackLanded := R7
-EffectiveAttackSquare := R10 
+EffectiveAttackSquare := R10
 EnemyHealth := R11
         ; Register the attack as a hit
         lda #1
@@ -313,6 +313,11 @@ EnemyHealth := R11
         ; TODO: if we implement health bars, we should draw one right now
         ; TODO: can we build a system that palette cycles enemies once they take damage? just a quick
         ; rotation through the four palettes, at frame speed rather than beat speed
+
+        ; this enemy took a hit and did not die! let's cycle their palette for flashy effect
+        lda EffectiveAttackSquare
+        jsr queue_palette_cycle
+
         rts
 
 die:
@@ -403,6 +408,11 @@ TargetSquare := R13
         sta tile_patterns, y
         lda tile_attributes, x
         sta tile_attributes, y
+
+        ; if our old square was flashing, move the flashing effect to our new location
+        lda TargetSquare
+        ldy PuffSquare
+        jsr move_palette_cycle
 
         lda PuffSquare
         sta TargetIndex

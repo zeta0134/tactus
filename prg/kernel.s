@@ -17,6 +17,7 @@
         .include "levels.inc"
         .include "nes.inc"
         .include "palette.inc"
+        .include "palette_cycler.inc"
         .include "player.inc"
         .include "prng.inc"
         .include "ppu.inc"
@@ -500,6 +501,9 @@ not_victory:
         ; - Swap the active and inactive buffers
         far_call FAR_swap_battlefield_buffers
 
+        ; Reset special effects that depend on the current beat
+        near_call FAR_reset_palette_cycler
+
         perform_zpcm_inc
 
         ; Set the next kernel mode early; the player might override this
@@ -830,6 +834,8 @@ continue_waiting:
         perform_zpcm_inc
         jsr update_beat_counters
         perform_zpcm_inc
+
+        near_call FAR_update_palette_cycler
 
         perform_zpcm_inc
         far_call FAR_queue_hud

@@ -1,0 +1,4 @@
+.global queue_palette_cycle
+.global move_palette_cycle
+.global FAR_reset_palette_cycler
+.global FAR_update_palette_cycler

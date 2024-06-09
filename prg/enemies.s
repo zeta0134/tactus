@@ -12,6 +12,7 @@
         .include "levels.inc"
         .include "nes.inc"
         .include "palette.inc"
+        .include "palette_cycler.inc"
         .include "player.inc"
         .include "prng.inc"
         .include "settings.inc"
