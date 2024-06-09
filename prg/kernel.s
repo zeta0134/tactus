@@ -693,19 +693,6 @@ StartingTile := R15
         debug_color LIGHTGRAY
 
         jsr every_gameloop
-        st16 GameMode, draw_battlefield_D
-        rts
-.endproc
-
-.proc draw_battlefield_D
-StartingRow := R14
-StartingTile := R15
-
-        debug_color (TINT_G | LIGHTGRAY)
-        far_call FAR_draw_battlefield_block_D
-        debug_color LIGHTGRAY
-
-        jsr every_gameloop
         st16 GameMode, decide_how_to_wait_for_the_next_beat
         rts
 .endproc

@@ -1,8 +1,6 @@
 .global FAR_draw_battlefield_block_A
 .global FAR_draw_battlefield_block_B
 .global FAR_draw_battlefield_block_C
-.global FAR_draw_battlefield_block_D
-.global FAR_draw_battlefield_block_E
 .global FAR_swap_battlefield_buffers
 
 .global battlefield, tile_data, tile_flags, tile_patterns, tile_attributes, tile_detail

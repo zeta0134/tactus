@@ -82,31 +82,6 @@ draw_rows:
         sta CurrentTile
         jsr _draw_tiles_common
 
-        rts
-.endproc
-
-.proc FAR_draw_battlefield_block_B
-; used by _draw_tiles_common
-NametableAddr := R2
-CurrentTile := R4
-AttributeAddr := R6
-        ; pick the high nametable/attr address bytes for row 0
-        lda active_battlefield
-        beq second_nametable
-        lda #$50
-        sta NametableAddr+1
-        lda #$58
-        sta AttributeAddr+1
-        jmp draw_rows
-second_nametable:
-        lda #$54
-        sta NametableAddr+1
-        lda #$5C
-        sta AttributeAddr+1
-draw_rows:
-        ; the drawing function doesn't alter the addresses, so all we need to do
-        ; is set the current tile and low byte of the address as we go, and occasionally
-        ; increment the high byte
         lda #192
         sta NametableAddr+0
         sta AttributeAddr+0
@@ -114,26 +89,10 @@ draw_rows:
         sta CurrentTile
         jsr _draw_tiles_common
 
-        lda #0
-        sta NametableAddr+0
-        sta AttributeAddr+0
-        inc NametableAddr+1
-        inc AttributeAddr+1
-        lda #64
-        sta CurrentTile
-        jsr _draw_tiles_common
-
-        lda #64
-        sta NametableAddr+0
-        sta AttributeAddr+0
-        lda #80
-        sta CurrentTile
-        jsr _draw_tiles_common
-
         rts
 .endproc
 
-.proc FAR_draw_battlefield_block_C
+.proc FAR_draw_battlefield_block_B
 ; used by _draw_tiles_common
 NametableAddr := R2
 CurrentTile := R4
@@ -155,6 +114,20 @@ draw_rows:
         ; the drawing function doesn't alter the addresses, so all we need to do
         ; is set the current tile and low byte of the address as we go, and occasionally
         ; increment the high byte
+        lda #0
+        sta NametableAddr+0
+        sta AttributeAddr+0
+        lda #64
+        sta CurrentTile
+        jsr _draw_tiles_common
+
+        lda #64
+        sta NametableAddr+0
+        sta AttributeAddr+0
+        lda #80
+        sta CurrentTile
+        jsr _draw_tiles_common
+
         lda #128
         sta NametableAddr+0
         sta AttributeAddr+0
@@ -169,19 +142,10 @@ draw_rows:
         sta CurrentTile
         jsr _draw_tiles_common
 
-        lda #0
-        sta NametableAddr+0
-        sta AttributeAddr+0
-        inc NametableAddr+1
-        inc AttributeAddr+1
-        lda #128
-        sta CurrentTile
-        jsr _draw_tiles_common
-
         rts
 .endproc
 
-.proc FAR_draw_battlefield_block_D
+.proc FAR_draw_battlefield_block_C
 ; used by _draw_tiles_common
 NametableAddr := R2
 CurrentTile := R4
@@ -203,10 +167,6 @@ draw_rows:
         ; the drawing function doesn't alter the addresses, so all we need to do
         ; is set the current tile and low byte of the address as we go, and occasionally
         ; increment the high byte
-
-        ; TODO! TODO! TODO!
-        ; NOTE: redundant for profiling, remove this later!!
-        ; DEBUG! DEBUG! DEBUG!
         lda #0
         sta NametableAddr+0
         sta AttributeAddr+0
@@ -226,6 +186,16 @@ draw_rows:
         sta AttributeAddr+0
         inc NametableAddr+1
         inc AttributeAddr+1
+        lda #160
+        sta CurrentTile
+        jsr _draw_tiles_common
+
+        ; TODO! TODO! TODO!
+        ; NOTE: redundant for profiling, remove this later!!
+        ; DEBUG! DEBUG! DEBUG!
+        lda #128
+        sta NametableAddr+0
+        sta AttributeAddr+0
         lda #160
         sta CurrentTile
         jsr _draw_tiles_common

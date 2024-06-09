@@ -113,7 +113,6 @@ beat_frame_names = {
   [5]="DRAW A  ",
   [6]="DRAW B  ",
   [7]="DRAW C  ",
-  [8]="DRAW D  ",
 }
 
 function identify_frame()
