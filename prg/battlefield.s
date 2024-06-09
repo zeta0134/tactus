@@ -58,22 +58,18 @@ active_battlefield: .res 1
         sta inactive_tile_queue+0
         sta inactive_tile_queue+1
         sta inactive_tile_queue+2
-
         lda #0
         sta inactive_tile_queue+3
         sta inactive_tile_queue+4
         sta inactive_tile_queue+5
-        
-        lda #0
         sta inactive_tile_queue+6
         sta inactive_tile_queue+7
         sta inactive_tile_queue+8
-
-        lda #0
         sta inactive_tile_queue+9
         sta inactive_tile_queue+10
 
         jsr draw_inactive_tiles
+        rts
 .endproc
 
 .proc FAR_draw_battlefield_block_B
@@ -81,22 +77,19 @@ active_battlefield: .res 1
         sta inactive_tile_queue+0
         sta inactive_tile_queue+1
         sta inactive_tile_queue+2
-
         lda #1
         sta inactive_tile_queue+3
         sta inactive_tile_queue+4
         sta inactive_tile_queue+5
-        
         lda #0
         sta inactive_tile_queue+6
         sta inactive_tile_queue+7
         sta inactive_tile_queue+8
-
-        lda #0
         sta inactive_tile_queue+9
         sta inactive_tile_queue+10
 
         jsr draw_inactive_tiles
+        rts
 .endproc
 
 .proc FAR_draw_battlefield_block_C
@@ -104,22 +97,19 @@ active_battlefield: .res 1
         sta inactive_tile_queue+0
         sta inactive_tile_queue+1
         sta inactive_tile_queue+2
-
-        lda #0
         sta inactive_tile_queue+3
         sta inactive_tile_queue+4
         sta inactive_tile_queue+5
-        
         lda #1
         sta inactive_tile_queue+6
         sta inactive_tile_queue+7
         sta inactive_tile_queue+8
-
         lda #0
         sta inactive_tile_queue+9
         sta inactive_tile_queue+10
 
         jsr draw_inactive_tiles
+        rts
 .endproc
 
 .proc FAR_draw_battlefield_block_D
@@ -127,22 +117,19 @@ active_battlefield: .res 1
         sta inactive_tile_queue+0
         sta inactive_tile_queue+1
         sta inactive_tile_queue+2
-
-        lda #0
         sta inactive_tile_queue+3
         sta inactive_tile_queue+4
         sta inactive_tile_queue+5
-        
-        lda #0
         sta inactive_tile_queue+6
         sta inactive_tile_queue+7
         sta inactive_tile_queue+8
-
         lda #1
         sta inactive_tile_queue+9
         sta inactive_tile_queue+10
+        lda #0
 
         jsr draw_inactive_tiles
+        rts
 .endproc
 
 .proc draw_inactive_tiles
