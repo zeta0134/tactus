@@ -42,7 +42,6 @@ active_battlefield: .res 1
 .proc FAR_draw_battlefield_block_A
 ; used by _draw_tiles_common
 NametableAddr := R2
-CurrentTile := R4
 AttributeAddr := R6
         ; pick the high nametable/attr address bytes for row 0
         lda active_battlefield
@@ -64,29 +63,25 @@ draw_rows:
         lda #0
         sta NametableAddr+0
         sta AttributeAddr+0
-        lda #0
-        sta CurrentTile
+        ldx #0
         jsr _draw_tiles_common
 
         lda #64
         sta NametableAddr+0
         sta AttributeAddr+0
-        lda #16
-        sta CurrentTile
+        ldx #16
         jsr _draw_tiles_common
 
         lda #128
         sta NametableAddr+0
         sta AttributeAddr+0
-        lda #32
-        sta CurrentTile
+        ldx #32
         jsr _draw_tiles_common
 
         lda #192
         sta NametableAddr+0
         sta AttributeAddr+0
-        lda #48
-        sta CurrentTile
+        ldx #48
         jsr _draw_tiles_common
 
         rts
@@ -95,7 +90,6 @@ draw_rows:
 .proc FAR_draw_battlefield_block_B
 ; used by _draw_tiles_common
 NametableAddr := R2
-CurrentTile := R4
 AttributeAddr := R6
         ; pick the high nametable/attr address bytes for row 0
         lda active_battlefield
@@ -117,29 +111,25 @@ draw_rows:
         lda #0
         sta NametableAddr+0
         sta AttributeAddr+0
-        lda #64
-        sta CurrentTile
+        ldx #64
         jsr _draw_tiles_common
 
         lda #64
         sta NametableAddr+0
         sta AttributeAddr+0
-        lda #80
-        sta CurrentTile
+        ldx #80
         jsr _draw_tiles_common
 
         lda #128
         sta NametableAddr+0
         sta AttributeAddr+0
-        lda #96
-        sta CurrentTile
+        ldx #96
         jsr _draw_tiles_common
 
         lda #192
         sta NametableAddr+0
         sta AttributeAddr+0
-        lda #112
-        sta CurrentTile
+        ldx #112
         jsr _draw_tiles_common
 
         rts
@@ -148,7 +138,6 @@ draw_rows:
 .proc FAR_draw_battlefield_block_C
 ; used by _draw_tiles_common
 NametableAddr := R2
-CurrentTile := R4
 AttributeAddr := R6
         ; pick the high nametable/attr address bytes for row 0
         lda active_battlefield
@@ -170,15 +159,13 @@ draw_rows:
         lda #0
         sta NametableAddr+0
         sta AttributeAddr+0
-        lda #128
-        sta CurrentTile
+        ldx #128
         jsr _draw_tiles_common
 
         lda #64
         sta NametableAddr+0
         sta AttributeAddr+0
-        lda #144
-        sta CurrentTile
+        ldx #144
         jsr _draw_tiles_common
 
         lda #128
@@ -186,8 +173,7 @@ draw_rows:
         sta AttributeAddr+0
         inc NametableAddr+1
         inc AttributeAddr+1
-        lda #160
-        sta CurrentTile
+        ldx #160
         jsr _draw_tiles_common
 
         ; TODO! TODO! TODO!
@@ -196,8 +182,7 @@ draw_rows:
         lda #128
         sta NametableAddr+0
         sta AttributeAddr+0
-        lda #160
-        sta CurrentTile
+        ldx #160
         jsr _draw_tiles_common
 
         rts
@@ -217,82 +202,74 @@ BOTTOM_RIGHT_BITS := %11
 CurrentRow := R0
 
 ; destination nametable addr for this row, set by calling code
+; args: X - starting battlefield tile
+; (all regs clobbered)
 NametableAddr := R2
-; current tile, set by outer calling code, indexes
-; into battlefield state. use this to read drawing
-; details, clobber at will
-CurrentTile := R4
 ; new: destination exattr for this row, set by calling code
 AttributeAddr := R6
 ; used to hold the (shared) upper attribute byte, for palettes
 ; and (later) the extended CHR page. Does not hold lighting bits!
 ScratchAttrByte := R8
 
-        ldx CurrentTile
         ldy #0
 
 .repeat ::BATTLEFIELD_WIDTH, i
         perform_zpcm_inc
 
         ; top left tile
-        lda tile_patterns, x
+        lda tile_patterns+i, x
         and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
         ; ora #TOP_LEFT_BITS   ; this would be a nop
         sta (NametableAddr), y  ; store that to our regular nametable
         ; top-left attribute
         lda (AttributeAddr), y
         and #LIGHTING_MASK      ; keep only lighting bits        
-        ora tile_attributes, x  ; NEW apply palette and high tile bits
+        ora tile_attributes+i, x  ; NEW apply palette and high tile bits
         sta (AttributeAddr), y  ;
         iny
 
         ; top right tile
-        lda tile_patterns, x
+        lda tile_patterns+i, x
         and #CORNER_MASK
         ora #TOP_RIGHT_BITS
         sta (NametableAddr), y
         ; top-right attribute
         lda (AttributeAddr), y
         and #LIGHTING_MASK      ; keep only lighting bits
-        ora tile_attributes, x  ; NEW apply palette and high tile bits
+        ora tile_attributes+i, x  ; NEW apply palette and high tile bits
         sta (AttributeAddr), y  ;
         iny 
-
-        inx
 .endrepeat
 
-
-        ldx CurrentTile
+        
         ldy #32
 
 .repeat ::BATTLEFIELD_WIDTH, i
         perform_zpcm_inc
 
         ; bottom left tile
-        lda tile_patterns, x
+        lda tile_patterns+i, x
         and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
         ora #BOTTOM_LEFT_BITS
         sta (NametableAddr), y  ; store that to our regular nametable
         ; bottom-left attribute
         lda (AttributeAddr), y
         and #LIGHTING_MASK      ; keep only lighting bits        
-        ora tile_attributes, x  ; NEW apply palette and high tile bits
+        ora tile_attributes+i, x  ; NEW apply palette and high tile bits
         sta (AttributeAddr), y  ;
         iny
 
         ; bottom right tile
-        lda tile_patterns, x
+        lda tile_patterns+i, x
         and #CORNER_MASK
         ora #BOTTOM_RIGHT_BITS
         sta (NametableAddr), y
         ; top-right attribute
         lda (AttributeAddr), y
         and #LIGHTING_MASK      ; keep only lighting bits
-        ora tile_attributes, x  ; NEW apply palette and high tile bits
+        ora tile_attributes+i, x  ; NEW apply palette and high tile bits
         sta (AttributeAddr), y  ;
         iny
-
-        inx
 .endrepeat
 
         rts
