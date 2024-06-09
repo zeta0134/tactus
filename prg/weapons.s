@@ -71,27 +71,27 @@ broadsword:
 
 broadsword_north:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1, -1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  0, -1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  1, -1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1, -1, SPRITE_TILE_BROADSWORD_NORTH_1, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -1, SPRITE_TILE_BROADSWORD_NORTH_2, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1, -1, SPRITE_TILE_BROADSWORD_NORTH_3, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 broadsword_east:
         ;         X,  Y, TileId, Behavior
-        .lobytes  1, -1, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  1,  0, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  1,  1, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1, -1, SPRITE_TILE_BROADSWORD_EAST_1, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  0, SPRITE_TILE_BROADSWORD_EAST_2, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  1, SPRITE_TILE_BROADSWORD_EAST_3, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 broadsword_south:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1,  1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  0,  1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  1,  1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  1, SPRITE_TILE_BROADSWORD_SOUTH_1, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  1, SPRITE_TILE_BROADSWORD_SOUTH_2, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  1, SPRITE_TILE_BROADSWORD_SOUTH_3, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 broadsword_west:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1,  1, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes -1,  0, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes -1, -1, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  1, SPRITE_TILE_BROADSWORD_WEST_1, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  0, SPRITE_TILE_BROADSWORD_WEST_2, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1, -1, SPRITE_TILE_BROADSWORD_WEST_3, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 
 ; Longswords are like daggers that hit an extra square in front of the player
