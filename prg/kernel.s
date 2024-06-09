@@ -416,6 +416,20 @@ MetaSpriteIndex := R0
         perform_zpcm_inc
         far_call FAR_despawn_unimportant_sprites
         perform_zpcm_inc
+
+        ; As a hack, draw the entire floor right now (we don't have
+        ; the usual active_queue to draw for us)
+        debug_color (TINT_G | LIGHTGRAY)
+        far_call FAR_draw_battlefield_block_A
+        debug_color LIGHTGRAY
+        debug_color (TINT_G | LIGHTGRAY)
+        far_call FAR_draw_battlefield_block_B
+        debug_color LIGHTGRAY
+        debug_color (TINT_G | LIGHTGRAY)
+        far_call FAR_draw_battlefield_block_C
+        debug_color LIGHTGRAY
+
+
         st16 GameMode, beat_frame_1
         rts
 .endproc

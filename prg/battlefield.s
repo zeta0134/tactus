@@ -171,17 +171,6 @@ draw_rows:
         lda #128
         sta NametableAddr+0
         sta AttributeAddr+0
-        inc NametableAddr+1
-        inc AttributeAddr+1
-        ldx #160
-        jsr _draw_tiles_common
-
-        ; TODO! TODO! TODO!
-        ; NOTE: redundant for profiling, remove this later!!
-        ; DEBUG! DEBUG! DEBUG!
-        lda #128
-        sta NametableAddr+0
-        sta AttributeAddr+0
         ldx #160
         jsr _draw_tiles_common
 
