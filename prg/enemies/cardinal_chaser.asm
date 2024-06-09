@@ -173,9 +173,6 @@ done:
         ; switch to our anticipation pose
         draw_at_x_keeppal TILE_ZOMBIE_ANTICIPATE, BG_TILE_ZOMBIE_ANTICIPATE
 
-        ldx CurrentRow
-        jsr queue_row_x
-
 no_change:
         perform_zpcm_inc
         rts
@@ -233,9 +230,6 @@ return_to_idle_without_moving:
         lda #0
         sta tile_data, x
 
-        ldx CurrentRow
-        jsr queue_row_x
-
         rts
 
 proceed_with_jump:        
@@ -262,12 +256,6 @@ proceed_with_jump:
         ; And finally clear the data flags for the puff of smoke, just to keep things tidy
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
-
-        ; Queue up both rows
-        ldx CurrentRow
-        jsr queue_row_x
-        ldx TargetRow
-        jsr queue_row_x
 
         rts
 .endproc

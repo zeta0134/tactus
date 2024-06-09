@@ -91,9 +91,6 @@ switch_to_attack_pose:
         ldx CurrentTile
         draw_at_x_keeppal TILE_MOLE_THROWING, BG_TILE_MOLE_THROWING
 
-        ldx CurrentRow
-        jsr queue_row_x
-
         ; And we're done, the tile_data is set up for the next frame, and we don't
         ; need to bother with the flags byte this round
 
@@ -164,9 +161,6 @@ spawn_wrench:
         ; this prevents us from going an extra square in the east/south directions
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, y
-        
-        ldx TargetRow
-        jsr queue_row_x
 
 switch_to_idle_pose:
         ldx CurrentTile
@@ -175,9 +169,6 @@ switch_to_idle_pose:
         ; reset tile_data to 0, it will be our counter for idle -> hole
         lda #0
         sta tile_data, x
-
-        ldx CurrentRow
-        jsr queue_row_x
 
         rts
 .endproc
@@ -308,9 +299,6 @@ spawn_new_wrench:
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, y
         
-        ldx TargetRow
-        jsr queue_row_x
-        
 despawn_old_wrench:
         ; mark ourselves as floor; we're done
         ; (no puff stool this time, projectiles can't be attacked)
@@ -321,9 +309,6 @@ despawn_old_wrench:
         lda #0
         sta tile_data, x
         sta tile_flags, x
-
-        ldx CurrentRow
-        jsr queue_row_x
 
         rts
 .endproc

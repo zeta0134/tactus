@@ -96,9 +96,6 @@ proceed_with_jump:
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
 
-        ldx CurrentRow
-        jsr queue_row_x
-
         rts
 .endproc
 
@@ -195,11 +192,6 @@ proceed_with_jump:
         ; And finally clear the data flags for the puff of smoke, just to keep things tidy
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
-
-        ldx CurrentRow
-        jsr queue_row_x
-        ldx TargetRow
-        jsr queue_row_x
 
         rts
 .endproc

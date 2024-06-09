@@ -154,7 +154,6 @@ no_detail:
 
         jsr draw_battlefield_overlays
 
-        far_call FAR_reset_inactive_queue
         rts
 .endproc
 

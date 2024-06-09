@@ -73,8 +73,6 @@ converge:
         lda TileAttrHigh
         sta tile_attributes, x
 
-        ldx CurrentRow
-        jsr queue_row_x
         rts
 .endproc
 

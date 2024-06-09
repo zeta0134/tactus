@@ -23,9 +23,6 @@ chaaaaaaaaarge:
         ldx CurrentTile
         draw_at_x_keeppal TILE_BIRB_LEFT_FLYING, BG_TILE_BIRB_FLYING_LEFT
 
-        ldx CurrentRow
-        jsr queue_row_x
-
         ; And all done
         rts
 do_not_charge:
@@ -42,9 +39,6 @@ face_to_the_right:
         ; Turn to face the player. That's cute, and certainly not creepy at all!
         ldx CurrentTile
         draw_at_x_keeppal TILE_BIRB_RIGHT_BASE, BG_TILE_BIRB_IDLE_RIGHT
-
-        ldx CurrentRow
-        jsr queue_row_x
 
         ; And all done
 all_done:
@@ -72,10 +66,6 @@ chaaaaaaaaarge:
         ldx CurrentTile
         draw_at_x_keeppal TILE_BIRB_RIGHT_FLYING, BG_TILE_BIRB_FLYING_RIGHT
 
-
-        ldx CurrentRow
-        jsr queue_row_x
-
         ; And all done
         rts
 do_not_charge:
@@ -92,9 +82,6 @@ face_to_the_left:
         ; Turn to face the player. That's cute, and certainly not creepy at all!
         ldx CurrentTile
         draw_at_x_keeppal TILE_BIRB_LEFT_BASE, BG_TILE_BIRB_IDLE_LEFT
-
-        ldx CurrentRow
-        jsr queue_row_x
 
         ; And all done
 all_done:
@@ -143,9 +130,6 @@ return_to_idle_without_moving:
         ldx CurrentTile
         draw_at_x_keeppal TILE_BIRB_RIGHT_BASE, BG_TILE_BIRB_IDLE_RIGHT
 
-        ldx CurrentRow
-        jsr queue_row_x
-
         ; And all done
         rts
 
@@ -170,13 +154,6 @@ proceed_with_jump:
         ; And finally clear the data flags for the puff of smoke, just to keep things tidy
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
-
-        ; Queue up both rows
-        ldx CurrentRow
-        jsr queue_row_x
-
-        ldx TargetRow
-        jsr queue_row_x
 
         rts
 .endproc
@@ -223,9 +200,6 @@ return_to_idle_without_moving:
         ldx CurrentTile
         draw_at_x_keeppal TILE_BIRB_LEFT_BASE, BG_TILE_BIRB_IDLE_LEFT
 
-        ldx CurrentRow
-        jsr queue_row_x
-
         ; And all done
         rts
 
@@ -249,13 +223,6 @@ proceed_with_jump:
         ; And finally clear the data flags for the puff of smoke, just to keep things tidy
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
-
-        ; Queue up both rows
-        ldx CurrentRow
-        jsr queue_row_x
-        
-        ldx TargetRow
-        jsr queue_row_x
 
         rts
 .endproc

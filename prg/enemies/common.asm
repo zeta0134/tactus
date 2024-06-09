@@ -97,13 +97,6 @@ semisafe_failure:
         sta tile_attributes, y
 .endmacro
 
-; TODO: for heck's sake, inline this
-.proc queue_row_x
-        lda #1
-        sta inactive_tile_queue, x
-        rts
-.endproc
-
 .proc spawn_death_sprite_here
 MetaSpriteIndex := R0
 AttackSquare := R3

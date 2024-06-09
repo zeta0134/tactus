@@ -21,29 +21,15 @@ tile_patterns: .res ::BATTLEFIELD_SIZE
 tile_attributes: .res ::BATTLEFIELD_SIZE
 tile_detail: .res ::BATTLEFIELD_SIZE
 
-inactive_tile_queue: .res ::BATTLEFIELD_HEIGHT
 active_battlefield: .res 1
 
 .segment "CODE_0"
-
-.proc FAR_reset_inactive_queue
-        perform_zpcm_inc
-        lda #1
-        .repeat ::BATTLEFIELD_HEIGHT, i
-        sta inactive_tile_queue+i
-        .endrepeat
-        perform_zpcm_inc
-        rts
-.endproc
 
 .proc FAR_swap_battlefield_buffers
         ; first, copy the inactive queue to the active queue
         ; rationalle: anything we didn't get around to updating still needs to be drawn, we'll
         ; just be drawing it late with a visible glitch. It's fine
         perform_zpcm_inc
-
-        ; now reset the inactive queue, setting it up for a full draw
-        near_call FAR_reset_inactive_queue
 
         lda active_battlefield
         eor #%00000001
@@ -244,49 +230,6 @@ draw_rows:
         sta CurrentTile
         jsr _draw_tiles_common
 
-        rts
-.endproc
-
-.proc draw_inactive_tiles
-CurrentRow := R0
-NametableAddr := R2
-CurrentTile := R4
-AttributeAddr := R6
-        lda #0
-        sta CurrentRow
-        sta CurrentTile
-        lda active_battlefield
-        beq second_nametable
-        st16 NametableAddr, $5000
-        st16 AttributeAddr, $5800
-        jmp row_loop
-second_nametable:
-        st16 NametableAddr, $5400
-        st16 AttributeAddr, $5C00
-row_loop:
-        perform_zpcm_inc
-        ldx CurrentRow
-        lda inactive_tile_queue, x
-        jeq skip
-        lda #0
-        sta inactive_tile_queue, x
-
-        jsr _draw_tiles_common
-skip:
-        add16b NametableAddr, #64
-        add16b AttributeAddr, #64
-converge:
-        clc
-        lda CurrentTile
-        adc #::BATTLEFIELD_WIDTH
-        sta CurrentTile
-        inc CurrentRow
-        lda CurrentRow
-        cmp #::BATTLEFIELD_HEIGHT
-        beq done
-        jmp row_loop
-
-done:
         rts
 .endproc
 
