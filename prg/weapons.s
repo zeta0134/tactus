@@ -41,19 +41,19 @@ dagger:
 
 dagger_north:
         ;         X,  Y, TileId,        Behavior
-        .lobytes  0, -1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -1, SPRITE_TILE_DAGGER_NORTH, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 dagger_east:
         ;         X,  Y, TileId, Behavior
-        .lobytes  1,  0, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  0, SPRITE_TILE_DAGGER_EAST, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 dagger_south:
         ;         X,  Y, TileId, Behavior
-        .lobytes  0,  1, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  1, SPRITE_TILE_DAGGER_SOUTH, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 dagger_west:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1,  0, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  0, SPRITE_TILE_DAGGER_WEST, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 ; Broadswords hit a wide field of 3 tiles in front of the player. Great
 ; for crowd control, but poor for escaping, as they are likely to cancel
