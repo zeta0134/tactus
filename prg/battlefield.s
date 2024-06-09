@@ -22,7 +22,6 @@ tile_attributes: .res ::BATTLEFIELD_SIZE
 tile_detail: .res ::BATTLEFIELD_SIZE
 
 inactive_tile_queue: .res ::BATTLEFIELD_HEIGHT
-queued_bytes_counter: .res 1
 active_battlefield: .res 1
 
 .segment "CODE_0"
@@ -53,72 +52,98 @@ active_battlefield: .res 1
         rts
 .endproc
 
-.proc FAR_queue_battlefield_updates
-        perform_zpcm_inc
+; crude, but effective-ish
+.proc FAR_draw_battlefield_block_A
+        lda #1
+        sta inactive_tile_queue+0
+        sta inactive_tile_queue+1
+        sta inactive_tile_queue+2
+
         lda #0
-        sta queued_bytes_counter
+        sta inactive_tile_queue+3
+        sta inactive_tile_queue+4
+        sta inactive_tile_queue+5
+        
+        lda #0
+        sta inactive_tile_queue+6
+        sta inactive_tile_queue+7
+        sta inactive_tile_queue+8
 
-        perform_zpcm_inc
+        lda #0
+        sta inactive_tile_queue+9
+        sta inactive_tile_queue+10
+
         jsr draw_inactive_tiles
-        perform_zpcm_inc
-
-        rts
 .endproc
 
-; TODO: will we be using this long term? We might replace it
-; with a "draw specific active tile" routine to perform less
-; work after vertical strikes. If we do that, maybe we can
-; remove this function.
-;.proc draw_active_tiles
-;CurrentRow := R0
-;NametableAddr := R2
-;CurrentTile := R4
-;RowCounter := R5
-;AttributeAddr := R6
-;        lda #0
-;        sta CurrentRow
-;        sta CurrentTile
-;        lda active_battlefield
-;        bne second_nametable
-;        st16 NametableAddr, $5000
-;        st16 AttributeAddr, $5800
-;        jmp row_loop
-;second_nametable:
-;        st16 NametableAddr, $5400
-;        st16 AttributeAddr, $5C00
-;row_loop:
-;        perform_zpcm_inc
-;        lda queued_bytes_counter
-;        cmp #(MAXIMUM_QUEUE_SIZE - 28 - 28)
-;        bcc continue
-;        rts ; the queue is full; bail immediately
-;continue:
-;        ldx CurrentRow
-;        lda active_tile_queue, x
-;        jeq skip
-;        lda #0
-;        sta active_tile_queue, x
-;
-;        jsr _draw_tiles_common
-;        jmp converge
-;
-;skip:
-;        add16b NametableAddr, #64
-;        add16b AttributeAddr, #64
-;converge:
-;        clc
-;        lda CurrentTile
-;        adc #::BATTLEFIELD_WIDTH
-;        sta CurrentTile
-;        inc CurrentRow
-;        lda CurrentRow
-;        cmp #::BATTLEFIELD_HEIGHT
-;        beq done
-;        jmp row_loop
-;
-;done:
-;        rts
-;.endproc
+.proc FAR_draw_battlefield_block_B
+        lda #0
+        sta inactive_tile_queue+0
+        sta inactive_tile_queue+1
+        sta inactive_tile_queue+2
+
+        lda #1
+        sta inactive_tile_queue+3
+        sta inactive_tile_queue+4
+        sta inactive_tile_queue+5
+        
+        lda #0
+        sta inactive_tile_queue+6
+        sta inactive_tile_queue+7
+        sta inactive_tile_queue+8
+
+        lda #0
+        sta inactive_tile_queue+9
+        sta inactive_tile_queue+10
+
+        jsr draw_inactive_tiles
+.endproc
+
+.proc FAR_draw_battlefield_block_C
+        lda #0
+        sta inactive_tile_queue+0
+        sta inactive_tile_queue+1
+        sta inactive_tile_queue+2
+
+        lda #0
+        sta inactive_tile_queue+3
+        sta inactive_tile_queue+4
+        sta inactive_tile_queue+5
+        
+        lda #1
+        sta inactive_tile_queue+6
+        sta inactive_tile_queue+7
+        sta inactive_tile_queue+8
+
+        lda #0
+        sta inactive_tile_queue+9
+        sta inactive_tile_queue+10
+
+        jsr draw_inactive_tiles
+.endproc
+
+.proc FAR_draw_battlefield_block_D
+        lda #0
+        sta inactive_tile_queue+0
+        sta inactive_tile_queue+1
+        sta inactive_tile_queue+2
+
+        lda #0
+        sta inactive_tile_queue+3
+        sta inactive_tile_queue+4
+        sta inactive_tile_queue+5
+        
+        lda #0
+        sta inactive_tile_queue+6
+        sta inactive_tile_queue+7
+        sta inactive_tile_queue+8
+
+        lda #1
+        sta inactive_tile_queue+9
+        sta inactive_tile_queue+10
+
+        jsr draw_inactive_tiles
+.endproc
 
 .proc draw_inactive_tiles
 CurrentRow := R0
@@ -139,11 +164,6 @@ second_nametable:
         st16 AttributeAddr, $5C00
 row_loop:
         perform_zpcm_inc
-        lda queued_bytes_counter
-        cmp #(MAXIMUM_QUEUE_SIZE - 28 - 28)
-        bcc continue
-        rts ; the queue is full; bail immediately
-continue:
         ldx CurrentRow
         lda inactive_tile_queue, x
         jeq skip
@@ -272,11 +292,6 @@ ScratchAttrByte := R8
         
         add16b NametableAddr, #32
         add16b AttributeAddr, #32
-
-        clc
-        lda queued_bytes_counter
-        adc #(28 + 28)
-        sta queued_bytes_counter
 
         rts
 .endproc

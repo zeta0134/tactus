@@ -145,11 +145,6 @@ DestPalIndex := R3
         ora ObjPaletteDirty
         jeq done
 
-        lda queued_bytes_counter
-        cmp #(MAXIMUM_QUEUE_SIZE - 32)
-        bcc continue
-        rts ; the queue is full; bail immediately
-continue:
         perform_zpcm_inc
 
         lda Brightness
@@ -232,11 +227,6 @@ done:
         lda #0
         sta BgPaletteDirty
         sta ObjPaletteDirty
-
-        lda queued_bytes_counter
-        clc
-        adc #32
-        sta queued_bytes_counter
 
         rts
 .endproc

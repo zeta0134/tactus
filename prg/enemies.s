@@ -4,11 +4,13 @@
 
         .include "battlefield.inc"
         .include "branch_util.inc"
+        .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
         .include "kernel.inc"
         .include "hud.inc"
         .include "levels.inc"
+        .include "nes.inc"
         .include "palette.inc"
         .include "player.inc"
         .include "prng.inc"
@@ -53,15 +55,7 @@ AttributeAddr := ActiveDrawingScratch+2
 HighRowScratch := ActiveDrawingScratch+4
 LowRowScratch := ActiveDrawingScratch+5
 
-        ; TODO: dissolve the concept of a row queue, and actually
-        ; *draw* the tile, right now. We can do that, the nametable
-        ; is accessible to the CPU on this mapper!
-        ;ldx TargetIndex
-        ;lda tile_index_to_row_lut, x
-        ;tax
-        ;lda #1
-        ;sta active_tile_queue, x
-        ;rts
+        debug_color (TINT_G | LIGHTGRAY)
 
         ; init some scratch space
         lda #0
@@ -153,6 +147,7 @@ set_high_bytes:
         sta (AttributeAddr), y  ;
 
         ; and with all that... we're done?
+        debug_color LIGHTGRAY
         rts
 .endproc
 

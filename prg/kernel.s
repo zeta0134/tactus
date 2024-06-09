@@ -100,8 +100,6 @@ main_loop:
         sta GameMode+1
 
 continue_waiting:
-        lda #0
-        sta queued_bytes_counter
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
         jsr update_beat_counters
@@ -208,9 +206,6 @@ MetaSpriteIndex := R0
 .endproc
 
 .proc run_title_screen
-        lda #0
-        sta queued_bytes_counter
-
         jsr update_beat_counters_title
         far_call FAR_draw_sprites
         far_call FAR_update_brightness
@@ -280,9 +275,6 @@ MetaSpriteIndex := R0
 .endproc
 
 .proc run_game_end_screen
-        lda #0
-        sta queued_bytes_counter
-
         jsr update_beat_counters_title
         far_call FAR_draw_sprites
         far_call FAR_update_brightness
@@ -599,15 +591,6 @@ StartingTile := R15
 
         debug_color LIGHTGRAY
 
-        jsr every_gameloop
-        st16 GameMode, update_enemies_3
-        rts
-.endproc
-
-.proc update_enemies_3
-StartingRow := R14
-StartingTile := R15
-
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
 
         ;- 1 frame: Update rows 6-7 of static enemies, 2-3 of dynamic enemies, queue rows 2-3 to inactive buffer
@@ -619,6 +602,15 @@ StartingTile := R15
 
         debug_color LIGHTGRAY
 
+        jsr every_gameloop
+        st16 GameMode, update_enemies_3
+        rts
+.endproc
+
+.proc update_enemies_3
+StartingRow := R14
+StartingTile := R15
+
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
 
         lda #7
@@ -628,15 +620,6 @@ StartingTile := R15
         far_call FAR_update_static_enemy_row
 
         debug_color LIGHTGRAY
-
-        jsr every_gameloop
-        st16 GameMode, update_enemies_4
-        rts
-.endproc
-
-.proc update_enemies_4
-StartingRow := R14
-StartingTile := R15
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
 
@@ -659,15 +642,6 @@ StartingTile := R15
 
         debug_color LIGHTGRAY
 
-        jsr every_gameloop
-        st16 GameMode, update_enemies_5
-        rts
-.endproc
-
-.proc update_enemies_5
-StartingRow := R14
-StartingTile := R15
-
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
 
         lda #10
@@ -678,20 +652,59 @@ StartingTile := R15
 
         debug_color LIGHTGRAY
 
-        ;- 1 frame: Update rows 6-7 of dynamic enemies, queue rows 6-7 to inactive buffer
         jsr every_gameloop
-        st16 GameMode, update_enemies_6
+        st16 GameMode, draw_battlefield_A
         rts
 .endproc
 
-.proc update_enemies_6
+.proc draw_battlefield_A
 StartingRow := R14
 StartingTile := R15
 
-        ; TODO: the concept of static/dynamic updates never really got implemented. Do
-        ; we need it? If not, this wait state is unnecessary
+        debug_color (TINT_G | LIGHTGRAY)
+        far_call FAR_draw_battlefield_block_A
+        debug_color LIGHTGRAY
 
-        ;- 1 frame: Update rows 8-9 of dynamic enemies, queue rows 8-9 to inactive buffer
+        jsr every_gameloop
+        st16 GameMode, draw_battlefield_B
+        rts
+.endproc
+
+.proc draw_battlefield_B
+StartingRow := R14
+StartingTile := R15
+
+        debug_color (TINT_G | LIGHTGRAY)
+        far_call FAR_draw_battlefield_block_B
+        debug_color LIGHTGRAY
+
+        jsr every_gameloop
+        st16 GameMode, draw_battlefield_C
+        rts
+.endproc
+
+
+.proc draw_battlefield_C
+StartingRow := R14
+StartingTile := R15
+
+        debug_color (TINT_G | LIGHTGRAY)
+        far_call FAR_draw_battlefield_block_C
+        debug_color LIGHTGRAY
+
+        jsr every_gameloop
+        st16 GameMode, draw_battlefield_D
+        rts
+.endproc
+
+.proc draw_battlefield_D
+StartingRow := R14
+StartingTile := R15
+
+        debug_color (TINT_G | LIGHTGRAY)
+        far_call FAR_draw_battlefield_block_D
+        debug_color LIGHTGRAY
+
         jsr every_gameloop
         st16 GameMode, decide_how_to_wait_for_the_next_beat
         rts
@@ -816,12 +829,6 @@ continue_waiting:
         perform_zpcm_inc
         jsr update_beat_counters
         perform_zpcm_inc
-
-        lda #0
-        sta queued_bytes_counter
-        debug_color (TINT_G | LIGHTGRAY)
-        far_call FAR_queue_battlefield_updates
-        debug_color LIGHTGRAY
 
         perform_zpcm_inc
         far_call FAR_queue_hud
