@@ -108,23 +108,23 @@ longsword:
 
 longsword_north:
         ;         X,  Y, TileId, Behavior
-        .lobytes  0, -1, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  0, -2, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -1, SPRITE_TILE_LONGSWORD_NORTH_2, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -2, SPRITE_TILE_LONGSWORD_NORTH_1, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_east:
         ;         X,  Y, TileId, Behavior
-        .lobytes  1,  0, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  2,  0, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  0, SPRITE_TILE_LONGSWORD_EAST_2, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  2,  0, SPRITE_TILE_LONGSWORD_EAST_1, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_south:
         ;         X,  Y, TileId, Behavior
-        .lobytes  0,  1, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  0,  2, FX_VT, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  1, SPRITE_TILE_LONGSWORD_SOUTH_2, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  2, SPRITE_TILE_LONGSWORD_SOUTH_1, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_west:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1,  0, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes -2,  0, FX_HZ, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  0, SPRITE_TILE_LONGSWORD_WEST_2, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -2,  0, SPRITE_TILE_LONGSWORD_WEST_1, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 ; Spears are almost identical to longswords, except they can only target one enemy
 ; at a time, prioritizing the enemy closest to the player
