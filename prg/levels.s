@@ -1094,6 +1094,7 @@ apply_lightness:
         lda #30
         sta current_torchlight_radius
         sta target_torchlight_radius
+        far_call FAR_lighten_entire_inactive_torchlight
         jmp done_with_torchlight
 apply_darkness:
         lda target_torchlight_radius
@@ -1101,6 +1102,7 @@ apply_darkness:
         bne no_instant_darkness
         lda #0
         sta current_torchlight_radius
+        far_call FAR_darken_entire_inactive_torchlight
 no_instant_darkness:
         lda PlayerTorchlightRadius
         sta target_torchlight_radius

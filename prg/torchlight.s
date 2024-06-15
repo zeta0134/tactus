@@ -1,4 +1,7 @@
+    .macpack longbranch
+
     .include "bhop/bhop.inc"
+    .include "battlefield.inc"
     .include "far_call.inc"
     .include "player.inc"
     .include "rainbow.inc"
@@ -141,6 +144,60 @@ torchlight_luts_bank:
     lda torchlight_update_table, x
     sta current_lighting_row
     perform_zpcm_inc
+    rts
+.endproc
+
+; Meant for level transitions, this (slowly!) sets the entire inactive
+; buffer to its darkest (%11) shade, all in one go. Will almost certainly
+; cause lag, so use sparingly
+.proc FAR_darken_entire_inactive_torchlight
+TorchlightValue := R0
+    lda #%11
+    sta TorchlightValue
+    jmp set_static_torchlight_common
+    ; tail call
+.endproc
+
+; Same deal as above, but for lightening (%00) rooms on entry
+.proc FAR_lighten_entire_inactive_torchlight
+TorchlightValue := R0
+    lda #%00
+    sta TorchlightValue
+    jmp set_static_torchlight_common
+    ; tail call
+.endproc
+
+.proc set_static_torchlight_common
+TorchlightValue := R0
+NametablePtr := R2
+TilesRemaining := R4
+    lda #0
+    sta NametablePtr+0
+    lda active_battlefield
+    beq second_nametable
+first_nametable:
+    lda #$58
+    jmp done_picking_nametable
+second_nametable:
+    lda #$5C
+done_picking_nametable:
+    sta NametablePtr+1
+
+    lda #(BATTLEFIELD_HEIGHT*2)
+    sta TilesRemaining
+big_giant_loop:
+    ldy #0
+    .repeat 32
+    lda (NametablePtr), y       ; 5
+    ; keep everything except old light level
+    and #%11111100              ; 2
+    ora TorchlightValue         ; 3
+    sta (NametablePtr), y       ; 6
+    iny                         ; 2
+    .endrepeat
+    add16b NametablePtr, #32
+    dec TilesRemaining
+    jne big_giant_loop
     rts
 .endproc
 

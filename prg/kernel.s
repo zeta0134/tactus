@@ -312,6 +312,7 @@ MetaSpriteIndex := R0
 .endproc
 
 .proc game_init
+        ; TODO: have the track be part of the level data... somehow
         lda #2 ; shower groove
         ;lda #4 ; in another world
 
