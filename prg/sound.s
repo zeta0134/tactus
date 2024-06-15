@@ -1,6 +1,7 @@
         .setcpu "6502"
-        .include "debug.inc"
         .include "bhop/bhop.inc"
+        .include "debug.inc"
+        .include "beat_tracker.inc"
         .include "far_call.inc"
         .include "rainbow.inc"
         .include "slowam.inc"
@@ -206,6 +207,8 @@ done:
         lda #0
         sta global_attenuation
         restore_previous_bank
+
+        far_call FAR_beat_tracker_init
 no_change:
         rts
 .endproc

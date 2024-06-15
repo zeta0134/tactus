@@ -1,6 +1,9 @@
         .macpack longbranch
 
+        .include "../build/tile_defs.inc"
+
         .include "charmap.inc"
+        .include "debug.inc"
         .include "far_call.inc"
         .include "chr.inc"
         .include "input.inc"
@@ -8,6 +11,8 @@
         .include "nes.inc"
         .include "player.inc"
         .include "ppu.inc"
+        .include "raster_tricks.inc"
+        .include "rainbow.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "static_screens.inc"
@@ -15,16 +20,65 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
+.segment "RAM"
+
+TitleCursorIndex: .res 1
+
 .segment "CODE_1"
 
 BLANK_TILE = 250
+
+.proc FAR_init_title
+        ; The title screen does not (currently) use IRQs
+        lda #0
+        sta raster_tricks_enabled
+
+        ; the title screen for now doesn't use extended attributes, so
+        ; turn those off
+        lda #(NT_FPGA_RAM | NT_NO_EXT)
+        sta MAP_NT_A_CONTROL
+        sta MAP_NT_B_CONTROL
+        sta MAP_NT_C_CONTROL
+        sta MAP_NT_D_CONTROL
+        lda #CHR_BANK_TITLE
+        sta MAP_CHR_1_LO
+
+        jsr initialize_title_palettes
+
+        ; Setup the title nametable
+        far_call FAR_copy_title_nametable
+        .if ::DEBUG_NAMETABLES
+        far_call FAR_debug_nametable_header
+        .endif
+
+        ; Set up a player sprite, which will act as our cursor
+        far_call FAR_initialize_sprites
+        far_call FAR_find_unused_sprite
+        stx TitleCursorIndex
+        ; this runs on an empty set, so it ought to succeed
+        lda #(SPRITE_ACTIVE)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+        lda #72
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda #71
+        sta sprite_table + MetaSpriteState::PositionY, x
+        lda #<SPRITE_TILE_PLAYER
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+        ; Play the title track on the title screen (duh)
+        lda #3
+        jsr play_track
+
+        rts
+.endproc
 
 .proc FAR_update_title
         lda #KEY_START
         and ButtonsDown
         beq stay_here
 
-        ; TODO: fade out to game prep?
         st16 FadeToGameMode, game_prep
         st16 GameMode, fade_to_game_mode
 

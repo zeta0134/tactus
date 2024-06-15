@@ -128,57 +128,25 @@ MetaSpriteIndex := R0
         ; Play lovely silence while we're loading
         lda #0
         jsr play_track
-        near_call FAR_beat_tracker_init
+
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
         sta PPUMASK
-
         lda #1
         sta NmiSoftDisable
 
-        jsr initialize_title_palettes
-
+        ; Setup a fade to black into the target mode
         lda #0
         jsr set_brightness
         lda #4
         sta TargetBrightness
 
-        ; the title screen for now doesn't use extended attributes, so
-        ; turn those off
-        lda #(NT_FPGA_RAM | NT_NO_EXT)
-        sta MAP_NT_A_CONTROL
-        sta MAP_NT_B_CONTROL
-        sta MAP_NT_C_CONTROL
-        sta MAP_NT_D_CONTROL
-        lda #CHR_BANK_TITLE
-        sta MAP_CHR_1_LO
-
-        ; copy the initial batch of graphics into CHR RAM
+        ; clear FPGA RAM
         jsr clear_fpga_ram
-        far_call FAR_copy_title_nametable
 
-        .if ::DEBUG_NAMETABLES
-        far_call FAR_debug_nametable_header
-        .endif
+        ; Call the mode-specific init, in this case for the Title screen
+        near_call FAR_init_title
 
-        ; Set up a player sprite, which will act as our cursor
-        far_call FAR_initialize_sprites
-        far_call FAR_find_unused_sprite
-        ; this runs on an empty set, so it ought to succeed
-        lda #(SPRITE_ACTIVE)
-        sta sprite_table + MetaSpriteState::BehaviorFlags, x
-        lda #$FF
-        sta sprite_table + MetaSpriteState::LifetimeBeats, x
-        lda #72
-        sta sprite_table + MetaSpriteState::PositionX, x
-        lda #71
-        sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_PLAYER_IDLE
-        sta sprite_table + MetaSpriteState::TileIndex, x
-
-        ; The title screen does not (currently) use IRQs
-        lda #0
-        sta raster_tricks_enabled
 
         ; Enable NMI first (but not rendering)
         lda #0
@@ -192,16 +160,6 @@ MetaSpriteIndex := R0
         sta PPUMASK
         lda #(VBLANK_NMI | BG_1000 | OBJ_0000)
         sta PPUCTRL
-
-        ; Play the title track on the title screen (duh)
-        lda #3
-        jsr play_track
-        near_call FAR_beat_tracker_init
-
-        ; (actually play other tracks for debugging)
-        ;lda #4
-        ;jsr play_track
-        ;near_call FAR_beat_tracker_init
 
         rts
 .endproc
@@ -225,7 +183,6 @@ MetaSpriteIndex := R0
         ; Play lovely silence while we're loading
         lda #0
         jsr play_track
-        near_call FAR_beat_tracker_init
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
         sta PPUMASK
@@ -295,7 +252,6 @@ MetaSpriteIndex := R0
         ; (this also ensures the music / beat counter are in a deterministic spot when we fade back in)
         lda #0
         jsr play_track
-        near_call FAR_beat_tracker_init
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
         sta PPUMASK
@@ -359,8 +315,7 @@ MetaSpriteIndex := R0
         lda #2 ; shower groove
         ;lda #4 ; in another world
 
-        jsr play_track
-        near_call FAR_beat_tracker_init
+        jsr play_track        
 
         lda #0
         sta LastBeat
