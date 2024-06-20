@@ -3,5 +3,3 @@
 .global FAR_refresh_hud
 
 .global HudMapDirty
-
-.global FAR_debug_nametable_header

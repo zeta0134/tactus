@@ -28,6 +28,7 @@
         .include "sprites.inc"
         .include "static_screens.inc"
         .include "torchlight.inc"
+        .include "ui.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
@@ -115,7 +116,13 @@ continue_waiting:
         ; TODO: pretty much everyting in this little section is debug demo stuff
         ; Later, organize this so that it loads the title screen, initial levels, etc
 
-        st16 GameMode, title_prep
+        ; NORMAL: start on the title screen
+        ; TODO: add the boxgirl productions logo, and any other "first run" screens here
+        ;st16 GameMode, title_prep
+
+        ; DEBUG! start on the options screen
+        st16 GameMode, options_prep
+
         jsr wait_for_next_vblank
         rts
 .endproc
@@ -176,6 +183,77 @@ MetaSpriteIndex := R0
         rts
 .endproc
 
+.proc options_prep
+LayoutPtr := R0
+        ; setup the UI subsystem with the options screen layout
+        ; DEBUG: a test layout for now
+        st16 LayoutPtr, test_ui_layout
+        far_call FAR_initialize_widgets
+
+        ; the rest of UI subsystem prep is shared, so do that now
+        st16 GameMode, initialize_ui_subsystem
+
+        rts
+.endproc
+
+.proc initialize_ui_subsystem
+        ; disable rendering, and soft-disable NMI (so music keeps playing)
+        lda #$00
+        sta PPUMASK
+        lda #1
+        sta NmiSoftDisable
+
+        ; Setup a fade to black into the target mode
+        lda #0
+        jsr set_brightness
+        lda #4
+        sta TargetBrightness
+
+        ; clear FPGA RAM
+        jsr clear_fpga_ram
+
+        ; set up our usual extended attributes, which is necessary to properly
+        ; display fonts
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta MAP_NT_A_CONTROL
+        sta MAP_NT_C_CONTROL
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG_AT)
+        sta MAP_NT_B_CONTROL
+        sta MAP_NT_D_CONTROL
+
+        ; the UI subsystem may override this, but this'll be a sane starting set for testing
+        jsr initialize_title_palettes
+
+        ; Enable NMI first (but not rendering)
+        lda #0
+        sta NmiSoftDisable
+
+        st16 GameMode, run_ui_subsystem
+        jsr wait_for_next_vblank
+
+        ; NOW it is safe to re-enable rendering
+        lda #$1E
+        sta PPUMASK
+        lda #(VBLANK_NMI | BG_1000 | OBJ_0000)
+        sta PPUCTRL
+
+        rts
+.endproc
+
+; shared runner for all UI screens using the widget system
+; (the widget logic contains all customizations, that's the point)
+.proc run_ui_subsystem
+        jsr update_beat_counters_title
+        far_call FAR_draw_sprites
+        far_call FAR_update_brightness
+        far_call FAR_refresh_palettes_gameloop
+
+        far_call FAR_update_widgets
+
+        jsr wait_for_next_vblank
+        rts
+.endproc
+
 .proc game_end_screen_prep
         lda #0
         sta tempo_adjustment
@@ -207,10 +285,6 @@ MetaSpriteIndex := R0
         jsr clear_fpga_ram
         far_call FAR_initialize_sprites
         near_call FAR_init_game_end_screen
-
-        .if ::DEBUG_NAMETABLES
-        far_call FAR_debug_nametable_header
-        .endif
 
         ; The end screens do not (currently) use IRQs
         lda #0
@@ -281,10 +355,6 @@ MetaSpriteIndex := R0
         ; copy the initial batch of graphics into CHR RAM
         jsr clear_fpga_ram
         far_call FAR_init_nametables
-
-        .if ::DEBUG_NAMETABLES
-        far_call FAR_debug_nametable_header
-        .endif
 
         ; Gameplay does use IRQs
         lda #1

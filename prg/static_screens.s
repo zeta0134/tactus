@@ -24,6 +24,7 @@
 
 TitleCursorIndex: .res 1
 
+
 .segment "CODE_1"
 
 BLANK_TILE = 250
@@ -47,9 +48,6 @@ BLANK_TILE = 250
 
         ; Setup the title nametable
         far_call FAR_copy_title_nametable
-        .if ::DEBUG_NAMETABLES
-        far_call FAR_debug_nametable_header
-        .endif
 
         ; Set up a player sprite, which will act as our cursor
         far_call FAR_initialize_sprites
