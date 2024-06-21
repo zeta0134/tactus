@@ -2,6 +2,8 @@
 
         .include "charmap.inc"
         .include "far_call.inc"
+        .include "nes.inc"
+        .include "input.inc"
         .include "sprites.inc"
         .include "text_util.inc"
         .include "ui.inc"
@@ -18,12 +20,8 @@ MAX_WIDGETS = 16 ; just how many do we need!?
 
 widgets_onupdate_low: .res ::MAX_WIDGETS
 widgets_onupdate_high: .res ::MAX_WIDGETS
-widgets_onselect_low: .res ::MAX_WIDGETS
-widgets_onselect_high: .res ::MAX_WIDGETS
-widgets_top_pixel: .res ::MAX_WIDGETS
-widgets_bottom_pixel: .res ::MAX_WIDGETS
-widgets_left_pixel: .res ::MAX_WIDGETS
-widgets_right_pixel: .res ::MAX_WIDGETS
+widgets_cursor_pos_x: .res ::MAX_WIDGETS
+widgets_cursor_pos_y: .res ::MAX_WIDGETS
 widgets_state_flags: .res ::MAX_WIDGETS
 ; miscellaneous storage per widget
 widgets_data0: .res ::MAX_WIDGETS
@@ -35,6 +33,12 @@ widgets_data5: .res ::MAX_WIDGETS
 widgets_data6: .res ::MAX_WIDGETS
 widgets_data7: .res ::MAX_WIDGETS
 
+test_value_1: .res 1
+test_value_2: .res 1
+test_value_3: .res 1
+test_value_4: .res 1
+test_value_5: .res 1
+
         .segment "CODE_4"
 
 ; ======================================================================
@@ -43,11 +47,35 @@ widgets_data7: .res ::MAX_WIDGETS
 ; ======================================================================
 
 test_ui_layout:
-        widget_corner_cursor
-        widget_text_label hello_world_str, 10, 10
+        widget_cursor
+        widget_text_label hello_world_str, 8, 4
+        widget_text_options test_label_1_str, fruit_types, test_value_1, 4, 8
+        widget_text_options test_label_2_str, considerations, test_value_2, 4, 10
         .addr $0000 ; end of list
 
-hello_world_str: .asciiz "HELLO WORLD!"
+hello_world_str: .asciiz "ALL WE NEED"
+test_label_1_str: .asciiz "FRUIT: "
+test_label_2_str: .asciiz "STATUS: "
+
+fruit_types:
+        .byte 4 ; length of option set
+        .addr test_option_a
+        .addr test_option_b
+        .addr test_option_c
+        .addr test_option_d
+
+test_option_a: .asciiz "APPLE"
+test_option_b: .asciiz "BANANA"
+test_option_c: .asciiz "COCONUT"
+test_option_d: .asciiz "DURIAN"
+
+considerations:
+        .byte 2
+        .addr option_not_considered
+        .addr option_considered
+
+option_not_considered: .asciiz "NOT CONSIDERED"
+option_considered: .asciiz "CONSIDERED"
 
 ; ======================================================================
 ;                         Kernel Functions
@@ -68,12 +96,8 @@ PtrStash := R2
 memclr_loop:
         sta widgets_onupdate_low, y
         sta widgets_onupdate_high, y
-        sta widgets_onselect_low, y
-        sta widgets_onselect_high, y
-        sta widgets_top_pixel, y
-        sta widgets_bottom_pixel, y
-        sta widgets_left_pixel, y
-        sta widgets_right_pixel, y
+        sta widgets_cursor_pos_x, y
+        sta widgets_cursor_pos_y, y
         sta widgets_state_flags, y
         sta widgets_data0, y
         sta widgets_data1, y
@@ -141,6 +165,13 @@ widget_loop:
         jmp widget_loop
 
 done:
+
+        ; DEBUG
+        lda #2
+        sta test_value_1
+        lda #0
+        sta test_value_2
+
         rts
 .endproc
 
@@ -187,86 +218,234 @@ done:
         rts
 .endproc
 
-.proc widget_corner_cursor_init
+.proc widget_cursor_init
 MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
-        ; allocate all four corner sprites, which will track the onscreen position
-        ; of the cursor
+        
+widget_sprite_index := widgets_data0
+widget_cursor_nav_index := widgets_data1
 
-        ; (don't bother with failure; during UI drawing the sprite allocations are reasonably fixed)
-        far_call FAR_find_unused_sprite
-        lda MetaSpriteIndex
+        ; firstly, set our tracked index to be invalid, which
+        ; gives consistent behavior. we want our first update to perform
+        ; a scan of the list, but we also want to give all the widgets
+        ; a chance to initialize themselves first, so we wait one frame
+        ; before triggering that scan for the first time
         ldy CurrentWidgetIndex
-        sta widgets_data0, y
-        far_call FAR_find_unused_sprite
-        lda MetaSpriteIndex
-        ldy CurrentWidgetIndex
-        sta widgets_data1, y
-        far_call FAR_find_unused_sprite
-        lda MetaSpriteIndex
-        ldy CurrentWidgetIndex
-        sta widgets_data2, y
-        far_call FAR_find_unused_sprite
-        lda MetaSpriteIndex
-        ldy CurrentWidgetIndex
-        sta widgets_data3, y
+        lda #$FF
+        sta widget_cursor_nav_index, y
 
-        ; initialize all four sprites
-        ldx widgets_data0, y
+        far_call FAR_find_unused_sprite
+        lda MetaSpriteIndex
+        ldy CurrentWidgetIndex
+        sta widget_sprite_index, y
+
+        ldx widget_sprite_index, y
         lda #(SPRITE_ACTIVE | SPRITE_PAL_1)
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
         lda #$FF
         sta sprite_table + MetaSpriteState::LifetimeBeats, x
         lda #0
         sta sprite_table + MetaSpriteState::PositionX, x
-        lda #$F0 ; offscreen for now
+        lda #$F0 ; offscreen for now 
         sta sprite_table + MetaSpriteState::PositionY, x
         lda #<SPRITE_TILE_MENU_CURSOR
         sta sprite_table + MetaSpriteState::TileIndex, x
 
-        ldx widgets_data1, y
-        lda #(SPRITE_ACTIVE | SPRITE_HORIZ_FLIP | SPRITE_PAL_1)
-        sta sprite_table + MetaSpriteState::BehaviorFlags, x
-        lda #$FF
-        sta sprite_table + MetaSpriteState::LifetimeBeats, x
-        lda #0
-        sta sprite_table + MetaSpriteState::PositionX, x
-        lda #$F0 ; offscreen for now
-        sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_MENU_CURSOR
-        sta sprite_table + MetaSpriteState::TileIndex, x
-
-        ldx widgets_data2, y
-        lda #(SPRITE_ACTIVE | SPRITE_VERT_FLIP | SPRITE_PAL_1)
-        sta sprite_table + MetaSpriteState::BehaviorFlags, x
-        lda #$FF
-        sta sprite_table + MetaSpriteState::LifetimeBeats, x
-        lda #0
-        sta sprite_table + MetaSpriteState::PositionX, x
-        lda #$F0 ; offscreen for now
-        sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_MENU_CURSOR
-        sta sprite_table + MetaSpriteState::TileIndex, x
-
-        ldx widgets_data3, y
-        lda #(SPRITE_ACTIVE | SPRITE_HORIZ_FLIP | SPRITE_VERT_FLIP | SPRITE_PAL_1)
-        sta sprite_table + MetaSpriteState::BehaviorFlags, x
-        lda #$FF
-        sta sprite_table + MetaSpriteState::LifetimeBeats, x
-        lda #0
-        sta sprite_table + MetaSpriteState::PositionX, x
-        lda #$F0 ; offscreen for now
-        sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_MENU_CURSOR
-        sta sprite_table + MetaSpriteState::TileIndex, x
-
-        set_widget_state_y widget_corner_cursor_update
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_cursor_update
 
         rts
 .endproc
 
-.proc widget_corner_cursor_update
-        ; nothing! nothing at all!
+.proc widget_cursor_update
+TargetWidgetIndex := R0
+CurrentWidgetIndex := R20
+
+widget_sprite_index := widgets_data0
+widget_cursor_nav_index := widgets_data1
+        jsr clear_hover_states
+
+        ldy CurrentWidgetIndex
+        lda widget_cursor_nav_index, y
+        sta TargetWidgetIndex
+
+        ; if we are not currently pointing to a navigable element, try to find oue
+        ; (this is our startup state; we'll usually be pointing at ourselves, and
+        ; the cursor is not considered 'active') 
+
+        ldx TargetWidgetIndex
+        cmp #$FF
+        beq find_new_widget
+continue_considering:
+        lda widgets_state_flags, x
+        and #WIDGET_STATE_NAVIGABLE
+        bne target_valid
+find_new_widget:
+        jsr find_first_active_widget
+        ldy CurrentWidgetIndex
+        lda TargetWidgetIndex
+        sta widget_cursor_nav_index, y
+        cmp #$FF
+        bne new_target_acquired
+target_invalid:
+        ; hide ourselves immediately and do nothing
+        ldx widget_sprite_index, y
+        lda #$F0 ; offscreen for now 
+        sta sprite_table + MetaSpriteState::PositionY, x
+        rts
+new_target_acquired:
+        ; initialize our position to the target's position
+        ; with no lerping
+        jsr snap_to_widget_position
+        jmp update_at_active_position
+target_valid:
+        ; if the user has pressed the UP or DOWN buttons,
+        ; try to find a new target (which should remain valid)
+        lda #KEY_DOWN
+        bit ButtonsDown
+        bne handle_move_down
+        lda #KEY_UP
+        bit ButtonsDown
+        bne handle_move_up
+        jmp update_at_active_position
+handle_move_down:
+        jsr move_to_next_active_widget
+        ldy CurrentWidgetIndex
+        lda TargetWidgetIndex
+        sta widget_cursor_nav_index, y
+        jmp update_at_active_position
+handle_move_up:
+        jsr move_to_previous_active_widget
+        ldy CurrentWidgetIndex
+        lda TargetWidgetIndex
+        sta widget_cursor_nav_index, y
+        ; fall through
+update_at_active_position:
+        ; smoothly lerp the cursor to its current position
+        jsr lerp_to_widget_position
+        ; tell the widget we're pointing at that it should become
+        ; "hovered", whatever that widget thinks that means
+        jsr set_hover_state
+        rts
+.endproc
+
+; result placed in R0
+; returns #$FF on failure
+.proc find_first_active_widget
+TargetWidgetIndex := R0
+        ldy #0
+loop:
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_NAVIGABLE
+        bne found_one
+        iny
+        cmp #::MAX_WIDGETS
+        bne loop
+did_not_find_one:
+        lda #$FF
+        sta TargetWidgetIndex
+        rts
+found_one:
+        tya
+        sta TargetWidgetIndex
+        rts
+.endproc
+
+; for right now, widgets are in a simple linked list, and
+; we traverse the items in that list in order. we might expand
+; on this later, but we're thinking this will serve our needs
+; for a good long while
+.proc move_to_next_active_widget
+TargetWidgetIndex := R0
+        ; starting at our position +1, scan forward for an active widget
+        ldy TargetWidgetIndex
+        iny
+        cpy #::MAX_WIDGETS   ; safety: if we run off the end of the list, bail
+        beq did_not_find_one
+loop:
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_NAVIGABLE
+        bne found_one
+        iny
+        cpy #::MAX_WIDGETS
+        bne loop
+did_not_find_one:
+        ; leave the target unchanged!
+        rts
+found_one:
+        ; TODO: play a "cursor moved" sfx here
+        tya
+        sta TargetWidgetIndex
+        rts
+.endproc
+
+.proc move_to_previous_active_widget
+TargetWidgetIndex := R0
+        ; starting at our position -1, scan forward for an active widget
+        ldy TargetWidgetIndex
+        beq did_not_find_one
+        dey
+loop:
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_NAVIGABLE
+        bne found_one
+        cpy #0
+        beq did_not_find_one
+        dey
+        bne loop
+did_not_find_one:
+        ; leave the target unchanged!
+        rts
+found_one:
+        ; TODO: play a "cursor moved" sfx here
+        tya
+        sta TargetWidgetIndex
+        rts
+.endproc
+
+.proc snap_to_widget_position
+TargetWidgetIndex := R0
+CurrentWidgetIndex := R20
+
+widget_sprite_index := widgets_data0
+
+        ldy CurrentWidgetIndex
+        lda widget_sprite_index, y
+        tax
+        ldy TargetWidgetIndex
+        lda widgets_cursor_pos_x, y
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda widgets_cursor_pos_y, y
+        sta sprite_table + MetaSpriteState::PositionY, x
+
+        rts
+.endproc
+
+.proc lerp_to_widget_position
+        ; FOR NOW, just snap. no lerping during debug
+        jsr snap_to_widget_position
+
+        rts
+.endproc
+
+.proc clear_hover_states
+        ldy #0
+loop:
+        lda widgets_state_flags, y
+        and #($FF - WIDGET_STATE_HOVER)
+        sta widgets_state_flags, y
+        iny
+        cpy #::MAX_WIDGETS
+        bne loop
+        rts
+.endproc
+
+.proc set_hover_state
+TargetWidgetIndex := R0
+        ldx TargetWidgetIndex
+        lda widgets_state_flags, x
+        ora #WIDGET_STATE_HOVER
+        sta widgets_state_flags, x
         rts
 .endproc
 
@@ -287,8 +466,82 @@ TileY := T5
 StringPtr := T4
 TileBase := T6
 PaletteIndex := T7
+        jsr _draw_widget_label
 
-        ; all we actually need to do is draw the silly thing, so get that set up
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_no_behavior
+
+        rts
+.endproc
+
+.proc widget_text_options_init
+CurrentWidgetIndex := R20
+
+; rename the data labels to something more readable
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_label_string_low := widgets_data2
+widget_label_string_high := widgets_data3
+widget_options_table_low := widgets_data4
+widget_options_table_high := widgets_data5
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
+
+        ; set our cursor position based on the leftmost tile position
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        asl ; x2
+        asl ; x4
+        asl ; x8
+        sec
+        sbc #17
+        sta widgets_cursor_pos_x, y
+        lda widget_tile_y, y
+        asl ; x2
+        asl ; x4
+        asl ; x8
+        sec
+        sbc #4
+        sta widgets_cursor_pos_y, y
+
+        ; flag this widget as active for cursor navigation purposes
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+
+        ; draw the initial label and options for this widget
+        jsr _draw_widget_label
+        jsr _draw_option
+
+        ; now switch to the update function
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_text_options_update
+        rts
+.endproc
+
+.proc widget_text_options_update
+        ; for now, do nothing!
+        rts
+.endproc
+
+.proc _draw_widget_label
+CurrentWidgetIndex := R20
+
+; rename the data labels to something more readable
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_text_string_low := widgets_data2
+widget_text_string_high := widgets_data3
+
+; arguments to string drawing functions
+NametableAddr := T0
+AttributeAddr := T2
+TileX := T4
+TileY := T5
+StringPtr := T4
+TileBase := T6
+PaletteIndex := T7
+
         ldy CurrentWidgetIndex
         lda widget_tile_x, y
         sta TileX
@@ -304,13 +557,101 @@ PaletteIndex := T7
         sta StringPtr+1
         lda #CHR_BANK_OLD_CHRRAM
         sta TileBase
-        lda #0 ; sure
+        lda #0 ; sure, why not
         sta PaletteIndex
         jsr FIXED_draw_string
-
-        ldy CurrentWidgetIndex
-        set_widget_state_y widget_no_behavior
 
         rts
 .endproc
 
+range_error_str: .asciiz "RANGE ERROR!"
+
+.proc _draw_option
+OptionsTablePtr := R0
+DataValuePtr := R2
+CurrentWidgetIndex := R20
+
+; arguments to string drawing functions
+NametableAddr := T0
+AttributeAddr := T2
+TileX := T4
+TileY := T5
+StringPtr := T4
+TileBase := T6
+PaletteIndex := T7
+
+StringLenPtr := T0
+StringLength := T2
+
+; rename the data labels to something more readable
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_label_string_low := widgets_data2
+widget_label_string_high := widgets_data3
+widget_options_table_low := widgets_data4
+widget_options_table_high := widgets_data5
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
+
+        ; first, we need to skip over the label portion, so work that out
+        ldy CurrentWidgetIndex
+        lda widget_label_string_low, y
+        sta StringLenPtr+0
+        lda widget_label_string_high, y
+        sta StringLenPtr+1
+        jsr FIXED_strlen
+        ; however long the label is, add that much to the starting X position
+        ; in tiles for string drawing
+        ldy CurrentWidgetIndex
+        lda StringLength
+        clc
+        adc widget_tile_x, y
+        sta TileX
+        lda widget_tile_y, y
+        sta TileY
+        st16 NametableAddr, $5000
+        st16 AttributeAddr, $5800
+        far_call FAR_nametable_from_coordinates
+        ; Now pick out the appropriate entry from the options table
+        ldy CurrentWidgetIndex
+        lda widget_options_table_low, y
+        sta OptionsTablePtr+0
+        lda widget_options_table_high, y
+        sta OptionsTablePtr+1
+        lda widget_data_target_low, y
+        sta DataValuePtr+0
+        lda widget_data_target_high, y
+        sta DataValuePtr+1
+
+        ldy #0
+        lda (DataValuePtr), y
+        ; sanity check: have we somehow exceeded the bounds of the table?
+        cmp (OptionsTablePtr), y
+        bcs option_out_of_range
+option_in_range:
+        ; use the current value to index into the list of option strings
+        asl
+        clc
+        adc #1
+        tay
+        lda (OptionsTablePtr), y
+        sta StringPtr+0
+        iny
+        lda (OptionsTablePtr), y
+        sta StringPtr+1
+        jmp converge
+option_out_of_range:
+        lda #<range_error_str
+        sta StringPtr+0
+        lda #>range_error_str
+        sta StringPtr+1
+converge:
+        ; finally, draw the stupid thing
+        lda #CHR_BANK_OLD_CHRRAM
+        sta TileBase
+        lda #%01000000 ; sure, why not
+        sta PaletteIndex
+        jsr FIXED_draw_string
+
+        rts
+.endproc

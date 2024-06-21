@@ -19,8 +19,8 @@
 ; convenient macros to build the layout list, largely
 ; to make specifying widget parameters more sane
 
-.macro widget_corner_cursor ; no parameters needed
-    .addr widget_corner_cursor_init
+.macro widget_cursor ; no parameters needed
+    .addr widget_cursor_init
     .byte 0, 0, 0, 0, 0, 0, 0, 0
 .endmacro
 
@@ -31,16 +31,15 @@
     .byte 0, 0, 0, 0
 .endmacro
 
-.macro widget_text_options text_string, option_list, tile_x, tile_y
+.macro widget_text_options label_string, option_list, data_target, tile_x, tile_y
     .addr widget_text_options_init
     .byte tile_x, tile_y
-    .addr text_string
+    .addr label_string
     .addr option_list
-    .byte 0, 0
+    .addr data_target
 .endmacro
 
 ; mostly for the cursor
 WIDGET_STATE_NAVIGABLE  = %10000000
-WIDGET_STATE_SELECTABLE = %01000000
 ; to tell the widget what the cursor is doing
 WIDGET_STATE_HOVER      = %00000001

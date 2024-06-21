@@ -45,6 +45,24 @@ end_of_string:
         rts
 .endproc
 
+; oh boy, this certainly won't cause memory corruption, no sir
+; caveats: will infini-loop if it doesn't find a zero byte within a page
+; maybe don't point it at bad data, etc. max length 255 bytes, etc etc
+.proc FIXED_strlen
+StringPtr := T0
+Length := T2
+        ldy #0
+loop:
+        perform_zpcm_inc
+        lda (StringPtr), y
+        beq end_of_string
+        iny
+        jmp loop
+end_of_string:
+        sty Length
+        rts       
+.endproc
+
         ; TODO: should we move smaller utilities into fixed?
         .segment "CODE_0"
 

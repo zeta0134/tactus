@@ -37,6 +37,11 @@ clean:
 	-@rm -f $(ROM_NAME)
 	-@rm -f $(DBG_NAME)
 
+cleancode:
+	-@rm -rf build/*.o
+	-@rm -f $(ROM_NAME)
+	-@rm -f $(DBG_NAME)
+
 run: dir $(ROM_NAME)
 	rustico-sdl $(ROM_NAME)
 

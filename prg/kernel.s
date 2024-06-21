@@ -223,6 +223,7 @@ LayoutPtr := R0
 
         ; the UI subsystem may override this, but this'll be a sane starting set for testing
         jsr initialize_title_palettes
+        far_call FAR_initialize_sprites
 
         ; Enable NMI first (but not rendering)
         lda #0
