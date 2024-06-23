@@ -53,7 +53,7 @@ options_ui_layout:
         widget_cursor
         widget_text_label options_str, 4, 3
         widget_text_options disco_floor_str, disco_types, setting_disco_floor, 8, 5
-        widget_text_label back_to_title_str, 8, 20
+        widget_text_button back_to_title_str, return_to_title, 8, 20
         .addr $0000 ; end of list
 
 options_str:       .asciiz "- OPTIONS -"
@@ -98,11 +98,14 @@ CurrentWidgetIndex := R20
         lda #KEY_B
         and ButtonsDown
         beq stay_here
+        jsr return_to_title
+stay_here:
+        rts
+.endproc
 
-        ; TODO: fade out to game prep?
+.proc return_to_title
         st16 FadeToGameMode, title_prep
         st16 GameMode, fade_to_game_mode
-stay_here:
         rts
 .endproc
 
@@ -791,5 +794,82 @@ converge:
 .proc _erase_option
         jsr _draw_option_common
         jsr FIXED_erase_string
+        rts
+.endproc
+
+.proc widget_text_button_init
+CurrentWidgetIndex := R20
+
+; rename the data labels to something more readable
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_label_string_low := widgets_data2
+widget_label_string_high := widgets_data3
+
+        ; set our cursor position based on the leftmost tile position
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        asl ; x2
+        asl ; x4
+        asl ; x8
+        sec
+        sbc #17
+        sta widgets_cursor_pos_x, y
+        lda widget_tile_y, y
+        asl ; x2
+        asl ; x4
+        asl ; x8
+        sec
+        sbc #4
+        sta widgets_cursor_pos_y, y
+
+        ; flag this widget as active for cursor navigation purposes
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+
+        ; draw the initial label and options for this widget
+        jsr _draw_widget_label
+
+        ; now switch to the update function
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_text_button_update
+        rts
+.endproc
+
+.proc __action_trampoline
+ActionFuncPtr := R0
+        jmp (ActionFuncPtr)
+        ; rts (implied)
+.endproc
+
+.proc widget_text_button_update
+ActionFuncPtr := R0
+CurrentWidgetIndex := R20
+
+; rename the data labels to something more readable
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_action_func_low := widgets_data4
+widget_action_func_high := widgets_data5
+        ; if we aren't even hovered, do nothing
+        ldy CurrentWidgetIndex
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_HOVER
+        bne check_for_action_input
+        rts
+check_for_action_input:
+        lda #KEY_A
+        and ButtonsDown
+        beq do_nothing
+
+        ; load up our pointer and call into it
+        lda widget_action_func_low, y
+        sta ActionFuncPtr+0
+        lda widget_action_func_high, y
+        sta ActionFuncPtr+1
+        jsr __action_trampoline
+
+do_nothing:
         rts
 .endproc

@@ -45,7 +45,7 @@
 .endmacro
 
 .macro widget_text_button text_string, action_func_ptr, tile_x, tile_y
-    .addr widget_text_label_init
+    .addr widget_text_button_init
     .byte tile_x, tile_y
     .addr text_string
     .addr action_func_ptr
