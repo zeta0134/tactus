@@ -113,6 +113,8 @@ continue_waiting:
 ; === Game Mode Functions Follow ===
 
 .proc init_engine
+        near_call FAR_init_settings
+
         ; TODO: pretty much everyting in this little section is debug demo stuff
         ; Later, organize this so that it loads the title screen, initial levels, etc
 
@@ -186,8 +188,7 @@ MetaSpriteIndex := R0
 .proc options_prep
 LayoutPtr := R0
         ; setup the UI subsystem with the options screen layout
-        ; DEBUG: a test layout for now
-        st16 LayoutPtr, test_ui_layout
+        st16 LayoutPtr, options_ui_layout
         far_call FAR_initialize_widgets
 
         ; the rest of UI subsystem prep is shared, so do that now
@@ -333,8 +334,6 @@ LayoutPtr := R0
 
         lda #1
         sta NmiSoftDisable
-
-        near_call FAR_init_settings
 
         far_call FAR_init_torchlight
 

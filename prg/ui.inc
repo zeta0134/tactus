@@ -5,8 +5,8 @@
 ; common widgets
 .global widget_corner_cursor_init
 
-; test layouts (real layouts will almost certainly be elsewhere)
-.global test_ui_layout
+; layouts (we might move these elsewhere eventually)
+.global options_ui_layout
 
 ; convenient macros to tweak widget state
 .macro set_widget_state_y func_ptr
@@ -18,6 +18,11 @@
 
 ; convenient macros to build the layout list, largely
 ; to make specifying widget parameters more sane
+
+.macro widget_controller init_function_ptr ; no parameters needed
+    .addr init_function_ptr
+    .byte 0, 0, 0, 0, 0, 0, 0, 0
+.endmacro
 
 .macro widget_cursor ; no parameters needed
     .addr widget_cursor_init
@@ -37,6 +42,14 @@
     .addr label_string
     .addr option_list
     .addr data_target
+.endmacro
+
+.macro widget_text_button text_string, action_func_ptr, tile_x, tile_y
+    .addr widget_text_label_init
+    .byte tile_x, tile_y
+    .addr text_string
+    .addr action_func_ptr
+    .byte 0, 0
 .endmacro
 
 ; mostly for the cursor

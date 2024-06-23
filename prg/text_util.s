@@ -45,6 +45,30 @@ end_of_string:
         rts
 .endproc
 
+; for when you need to erase a string and don't feel like futzing about
+; with loads of extra padding
+.proc FIXED_erase_string
+NametableAddr := T0
+AttributeAddr := T2
+StringPtr := T4
+TileBase := T6
+PaletteIndex := T7
+        ldy #0
+loop:
+        perform_zpcm_inc
+        lda (StringPtr), y
+        beq end_of_string
+        lda #0
+        sta (NametableAddr), y
+        lda TileBase
+        ora PaletteIndex
+        sta (AttributeAddr), y
+        iny
+        jmp loop
+end_of_string:
+        rts
+.endproc
+
 ; oh boy, this certainly won't cause memory corruption, no sir
 ; caveats: will infini-loop if it doesn't find a zero byte within a page
 ; maybe don't point it at bad data, etc. max length 255 bytes, etc etc

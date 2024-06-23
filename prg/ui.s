@@ -2,8 +2,10 @@
 
         .include "charmap.inc"
         .include "far_call.inc"
+        .include "kernel.inc"
         .include "nes.inc"
         .include "input.inc"
+        .include "settings.inc"
         .include "sprites.inc"
         .include "text_util.inc"
         .include "ui.inc"
@@ -46,28 +48,29 @@ test_value_5: .res 1
 ;       (regular layouts should be split into separate files?)
 ; ======================================================================
 
-test_ui_layout:
+options_ui_layout:
+        widget_controller options_controller_init
         widget_cursor
-        widget_text_label hello_world_str, 8, 4
-        widget_text_options test_label_1_str, fruit_types, test_value_1, 4, 8
-        widget_text_options test_label_2_str, considerations, test_value_2, 4, 10
+        widget_text_label options_str, 4, 3
+        widget_text_options disco_floor_str, disco_types, setting_disco_floor, 8, 5
+        widget_text_label back_to_title_str, 8, 20
         .addr $0000 ; end of list
 
-hello_world_str: .asciiz "ALL WE NEED"
-test_label_1_str: .asciiz "FRUIT: "
-test_label_2_str: .asciiz "STATUS: "
+options_str:       .asciiz "- OPTIONS -"
+disco_floor_str:   .asciiz "FLOOR: "
+back_to_title_str: .asciiz "RETURN TO TITLE "
 
-fruit_types:
+disco_types:
         .byte 4 ; length of option set
-        .addr test_option_a
-        .addr test_option_b
-        .addr test_option_c
-        .addr test_option_d
+        .addr disco_option_0_str
+        .addr disco_option_1_str
+        .addr disco_option_2_str
+        .addr disco_option_3_str
 
-test_option_a: .asciiz "APPLE"
-test_option_b: .asciiz "BANANA"
-test_option_c: .asciiz "COCONUT"
-test_option_d: .asciiz "DURIAN"
+disco_option_0_str: .asciiz "DISCO SQUARES"
+disco_option_1_str: .asciiz "DISCO OUTLINES"
+disco_option_2_str: .asciiz "JUST GROOVEMENT"
+disco_option_3_str: .asciiz "NO MOTION"
 
 considerations:
         .byte 2
@@ -75,7 +78,33 @@ considerations:
         .addr option_considered
 
 option_not_considered: .asciiz "NOT CONSIDERED"
-option_considered: .asciiz "CONSIDERED"
+option_considered:     .asciiz "CONSIDERED    "
+
+; ======================================================================
+;                      Layout Specific Functions
+;       (mostly the "base" controller widget that manages state)
+; ======================================================================
+
+.proc options_controller_init
+CurrentWidgetIndex := R20
+        ; setup stuff, whatever, do it later
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y options_controller_update
+        rts
+.endproc
+
+.proc options_controller_update
+        lda #KEY_B
+        and ButtonsDown
+        beq stay_here
+
+        ; TODO: fade out to game prep?
+        st16 FadeToGameMode, title_prep
+        st16 GameMode, fade_to_game_mode
+stay_here:
+        rts
+.endproc
 
 ; ======================================================================
 ;                         Kernel Functions
@@ -167,7 +196,7 @@ widget_loop:
 done:
 
         ; DEBUG
-        lda #2
+        lda #0
         sta test_value_1
         lda #0
         sta test_value_2
@@ -520,7 +549,104 @@ widget_data_target_high := widgets_data7
 .endproc
 
 .proc widget_text_options_update
-        ; for now, do nothing!
+CurrentWidgetIndex := R20
+        ; if we aren't even hovered, no change
+        ldy CurrentWidgetIndex
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_HOVER
+        bne check_for_forward_input
+        rts
+check_for_forward_input:
+        lda #(KEY_RIGHT | KEY_A)
+        bit ButtonsDown
+        beq check_for_reverse_input
+        jsr cycle_to_next_option
+        jmp redraw_self
+check_for_reverse_input:
+        lda #(KEY_LEFT)
+        bit ButtonsDown
+        beq nothing_to_do
+        jsr cycle_to_previous_option
+        jmp redraw_self
+nothing_to_do:
+        rts
+redraw_self:
+        jsr _draw_widget_label
+        jsr _draw_option
+        rts
+.endproc
+
+.proc cycle_to_next_option
+OptionsTablePtr := R0
+DataValuePtr := R2
+CurrentWidgetIndex := R20
+
+widget_options_table_low := widgets_data4
+widget_options_table_high := widgets_data5
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
+        jsr _erase_option
+
+        ldy CurrentWidgetIndex
+        lda widget_options_table_low, y
+        sta OptionsTablePtr+0
+        lda widget_options_table_high, y
+        sta OptionsTablePtr+1
+        lda widget_data_target_low, y
+        sta DataValuePtr+0
+        lda widget_data_target_high, y
+        sta DataValuePtr+1
+
+        ldy #0
+        ;inc (DataValuePtr), y
+        lda (DataValuePtr), y
+        clc
+        adc #1
+        ; did we run past the end of the table?
+        cmp (OptionsTablePtr), y ; first byte contains the length
+        bcs wraparound
+        sta (DataValuePtr), y
+        rts
+wraparound:
+        lda #0
+        sta (DataValuePtr), y
+        rts
+.endproc
+
+.proc cycle_to_previous_option
+OptionsTablePtr := R0
+DataValuePtr := R2
+CurrentWidgetIndex := R20
+
+widget_options_table_low := widgets_data4
+widget_options_table_high := widgets_data5
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
+        jsr _erase_option
+
+        ldy CurrentWidgetIndex
+        lda widget_options_table_low, y
+        sta OptionsTablePtr+0
+        lda widget_options_table_high, y
+        sta OptionsTablePtr+1
+        lda widget_data_target_low, y
+        sta DataValuePtr+0
+        lda widget_data_target_high, y
+        sta DataValuePtr+1
+
+        ldy #0
+
+        lda (DataValuePtr), y
+        beq wraparound
+        sec
+        sbc #1
+        sta (DataValuePtr), y
+        rts
+wraparound:
+        lda (OptionsTablePtr), y
+        sec
+        sbc #1
+        sta (DataValuePtr), y
         rts
 .endproc
 
@@ -566,7 +692,7 @@ PaletteIndex := T7
 
 range_error_str: .asciiz "RANGE ERROR!"
 
-.proc _draw_option
+.proc _draw_option_common
 OptionsTablePtr := R0
 DataValuePtr := R2
 CurrentWidgetIndex := R20
@@ -650,8 +776,20 @@ converge:
         lda #CHR_BANK_OLD_CHRRAM
         sta TileBase
         lda #%01000000 ; sure, why not
-        sta PaletteIndex
-        jsr FIXED_draw_string
+        sta PaletteIndex        
+        ; setup complete, the calling function will decide what to do
+        ; with this string information. common, out!
+        rts
+.endproc
 
+.proc _draw_option
+        jsr _draw_option_common
+        jsr FIXED_draw_string
+        rts
+.endproc
+
+.proc _erase_option
+        jsr _draw_option_common
+        jsr FIXED_erase_string
         rts
 .endproc
