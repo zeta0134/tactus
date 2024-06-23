@@ -136,7 +136,7 @@ stay_here:
         lda #KEY_START
         and ButtonsDown
         beq stay_here
-        
+
         jsr go_to_gameplay
 stay_here:
         rts
@@ -325,7 +325,7 @@ widget_cursor_nav_index := widgets_data1
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #$F0 ; offscreen for now 
         sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_MENU_CURSOR
+        lda #<SPRITE_TILE_MENU_CURSOR_SPIN
         sta sprite_table + MetaSpriteState::TileIndex, x
 
         ldy CurrentWidgetIndex
