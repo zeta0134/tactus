@@ -554,7 +554,7 @@ done:
 .endproc
 
 
-.segment "DATA_4"
+.segment "DATA_1"
 
 sfx_data:
         .include "sfx.incs"

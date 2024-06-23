@@ -377,3 +377,19 @@ sfx_cash_flow:
         pulse_init  PITCH_D6,   $2,      $8,          0
         pulse_init  PITCH_G6,   $1,      $6,          0
         pulse_init  PITCH_D7,   $0,      $4,          0
+
+sfx_move_cursor:
+        ; Length in rows
+        .byte 2
+        ;           pitch,    duty,  volume,     length
+        pulse_init  PITCH_G4,   $2,      $5,          0
+        pulse_cont_duty         $2,      $1,          0
+
+sfx_select_cursor:
+        ; Length in rows
+        .byte 4
+        ;           pitch,    duty,  volume,     length
+        pulse_init  PITCH_C4,   $1,      $6,          0
+        pulse_cont_duty         $1,      $1,          0
+        pulse_init  PITCH_G4,   $1,      $7,          0
+        pulse_cont_duty         $1,      $1,          0

@@ -118,6 +118,9 @@ stay_here:
 .endproc
 
 .proc return_to_title
+        st16 R0, sfx_teleport
+        jsr play_sfx_pulse2
+
         st16 FadeToGameMode, title_prep
         st16 GameMode, fade_to_game_mode
         rts
@@ -152,12 +155,18 @@ stay_here:
 .endproc
 
 .proc go_to_options
+        st16 R0, sfx_teleport
+        jsr play_sfx_pulse2
+
         st16 FadeToGameMode, options_prep
         st16 GameMode, fade_to_game_mode
         rts
 .endproc
 
 .proc go_to_gameplay
+        st16 R0, sfx_teleport
+        jsr play_sfx_pulse2
+
         st16 FadeToGameMode, game_prep
         st16 GameMode, fade_to_game_mode
         rts
@@ -624,7 +633,15 @@ found_one:
         lda #0
         sta widget_beats_at_this_location, y
         sta widget_frames_at_this_location, y
-        ; TODO: play a "cursor moved" sfx here
+
+        ; preserve?
+        lda R0
+        pha
+        st16 R0, sfx_move_cursor
+        jsr play_sfx_pulse2
+        pla
+        sta R0
+
         rts
 .endproc
 
@@ -657,7 +674,15 @@ found_one:
         lda #0
         sta widget_beats_at_this_location, y
         sta widget_frames_at_this_location, y
-        ; TODO: play a "cursor moved" sfx here
+
+        ; preserve
+        lda R0
+        pha
+        st16 R0, sfx_move_cursor
+        jsr play_sfx_pulse2
+        pla
+        sta R0
+
         rts
 .endproc
 
@@ -886,6 +911,9 @@ widget_options_table_low := widgets_data4
 widget_options_table_high := widgets_data5
 widget_data_target_low := widgets_data6
 widget_data_target_high := widgets_data7
+        st16 R0, sfx_select_cursor
+        jsr play_sfx_pulse2
+
         jsr _erase_option
 
         ldy CurrentWidgetIndex
@@ -923,6 +951,9 @@ widget_options_table_low := widgets_data4
 widget_options_table_high := widgets_data5
 widget_data_target_low := widgets_data6
 widget_data_target_high := widgets_data7
+        st16 R0, sfx_select_cursor
+        jsr play_sfx_pulse2
+
         jsr _erase_option
 
         ldy CurrentWidgetIndex
