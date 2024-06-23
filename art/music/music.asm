@@ -34,6 +34,7 @@ ft_instrument_list:
 	.word ft_inst_18
 	.word ft_inst_19
 	.word ft_inst_20
+	.word ft_inst_21
 
 ; Instruments
 ft_inst_0:
@@ -163,6 +164,13 @@ ft_inst_20:
 	.word ft_seq_vrc6_5
 	.word ft_seq_vrc6_4
 
+ft_inst_21:
+	.byte 0
+	.byte $13
+	.word ft_seq_2a03_125
+	.word ft_seq_2a03_46
+	.word ft_seq_2a03_24
+
 ; Sequences
 ft_seq_2a03_0:
 	.byte $10, $FF, $00, $00, $0F, $0E, $0D, $0C, $0B, $0A, $09, $08, $07, $06, $05, $04, $03, $02, $01, $00
@@ -238,6 +246,8 @@ ft_seq_2a03_115:
 ft_seq_2a03_120:
 	.byte $1C, $FF, $14, $00, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0E, $0D, $0C, $0C, $0B, $0A, $09, $08
 	.byte $07, $07, $06, $05, $03, $02, $02, $01, $01, $01, $00, $00
+ft_seq_2a03_125:
+	.byte $0E, $FF, $00, $00, $0F, $0F, $0E, $0B, $08, $04, $01, $00, $00, $00, $00, $00, $00, $00
 ft_seq_vrc6_0:
 	.byte $18, $FF, $0E, $00, $0F, $0F, $0F, $0E, $0D, $0C, $0B, $0A, $09, $08, $07, $06, $05, $04, $03, $03
 	.byte $03, $02, $02, $02, $01, $01, $01, $00
@@ -260,6 +270,7 @@ ft_samples:
 ft_groove_list:
 	.byte $00
 ; Grooves (size, terms)
+	.byte $04, $03, $03, $02, $00, $01
 
 ; Song pointer list
 ft_song_list:
@@ -267,6 +278,7 @@ ft_song_list:
 	.word ft_song_1
 	.word ft_song_2
 	.word ft_song_3
+	.word ft_song_4
 
 ; Song info
 ft_song_0:
@@ -303,6 +315,15 @@ ft_song_3:
 	.byte 3	; speed
 	.byte 120	; tempo
 	.byte 0	; groove position
+	.byte 0	; initial bank
+
+ft_song_4:
+	.word ft_s4_frames
+	.byte 2	; frame count
+	.byte 64	; pattern length
+	.byte 0	; speed
+	.byte 120	; tempo
+	.byte 1	; groove position
 	.byte 0	; initial bank
 
 
@@ -860,6 +881,64 @@ ft_s3p1c3:
 ; Bank 0
 ft_s3p2c0:
 	.byte $00, $03, $80, $24, $F6, $28, $03, $34, $01, $28, $19, $F7, $10, $03, $1C, $01, $10, $03, $10, $11
+
+; Bank 0
+ft_s4_frames:
+	.word ft_s4f0
+	.word ft_s4f1
+ft_s4f0:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s4p0c2, ft_s4p0c3, ft_s0p0c0, ft_s4p0c6, ft_s4p0c7, ft_s0p0c0
+ft_s4f1:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s4p1c2, ft_s4p1c3, ft_s0p0c0, ft_s4p1c6, ft_s4p1c7, ft_s0p0c0
+; Bank 0
+ft_s4p0c2:
+	.byte $EB, $0D, $07, $EC, $0D, $0B, $EB, $0D, $03, $EC, $0D, $07, $EB, $0D, $07, $EC, $0D, $0B, $EB, $0D
+	.byte $03, $EC, $0D, $05, $0D, $01
+
+; Bank 0
+ft_s4p0c3:
+	.byte $E4, $F8, $11, $01, $E7, $F6, $11, $01, $E8, $F8, $11, $03, $80, $2A, $FC, $11, $03, $82, $01, $E7
+	.byte $F7, $11, $F5, $11, $F7, $11, $F7, $11, $83, $E8, $F8, $11, $03, $80, $2A, $FC, $11, $03, $82, $01
+	.byte $E7, $F7, $11, $F5, $11, $E4, $F8, $11, $E7, $F6, $11, $83, $E8, $F8, $11, $03, $82, $01, $80, $2A
+	.byte $FC, $11, $E7, $F2, $11, $F7, $11, $F5, $11, $F7, $11, $F7, $11, $83, $E8, $F8, $11, $03, $80, $2A
+	.byte $FC, $11, $03, $E7, $F5, $11, $01, $80, $2A, $FA, $11, $01
+
+; Bank 0
+ft_s4p0c6:
+	.byte $80, $28, $91, $88, $0A, $03, $7F, $01, $0A, $01, $7F, $03, $0A, $01, $7F, $03, $0A, $00, $7F, $00
+	.byte $0F, $02, $7F, $00, $82, $01, $10, $7F, $11, $7F, $83, $0A, $03, $7F, $01, $0A, $01, $7F, $03, $0A
+	.byte $01, $7F, $03, $16, $00, $7F, $00, $82, $01, $0A, $7F, $0F, $7F, $11, $83, $7F, $01
+
+; Bank 0
+ft_s4p0c7:
+	.byte $E3, $0A, $03, $7F, $01, $0A, $01, $7F, $03, $0A, $01, $7F, $03, $0A, $00, $7F, $00, $0F, $02, $7F
+	.byte $00, $82, $01, $10, $7F, $11, $7F, $83, $0A, $03, $7F, $01, $0A, $01, $7F, $03, $0A, $01, $7F, $03
+	.byte $16, $00, $7F, $00, $82, $01, $0A, $7F, $0F, $7F, $11, $83, $7F, $01
+
+; Bank 0
+ft_s4p1c2:
+	.byte $EB, $0D, $07, $EC, $0D, $0B, $EB, $0D, $03, $EC, $0D, $07, $EB, $0D, $07, $EC, $0D, $05, $EB, $0D
+	.byte $03, $EC, $0D, $01, $EB, $0D, $03, $EC, $0D, $07
+
+; Bank 0
+ft_s4p1c3:
+	.byte $E4, $F8, $11, $01, $E7, $F6, $11, $01, $E8, $F8, $11, $03, $80, $2A, $FC, $11, $03, $82, $01, $E7
+	.byte $F7, $11, $F5, $11, $F7, $11, $F7, $11, $83, $E8, $F8, $11, $03, $80, $2A, $FC, $11, $03, $82, $01
+	.byte $E7, $F7, $11, $F5, $11, $E4, $F8, $11, $E7, $F6, $11, $83, $E8, $F8, $11, $03, $80, $2A, $FC, $11
+	.byte $03, $82, $01, $E7, $F7, $11, $E4, $F8, $11, $E7, $F7, $11, $80, $2A, $FA, $11, $E7, $F7, $11, $F5
+	.byte $11, $80, $2A, $FC, $11, $E7, $F6, $11, $83, $E8, $F8, $11, $03
+
+; Bank 0
+ft_s4p1c6:
+	.byte $80, $28, $05, $03, $7F, $01, $05, $01, $7F, $03, $05, $01, $7F, $03, $05, $00, $7F, $00, $09, $02
+	.byte $7F, $00, $82, $01, $0A, $7F, $0B, $7F, $0C, $05, $7F, $83, $05, $03, $7F, $01, $05, $01, $7F, $03
+	.byte $82, $01, $05, $11, $7F, $05, $7F, $09, $83, $7F, $01
+
+; Bank 0
+ft_s4p1c7:
+	.byte $E3, $05, $03, $7F, $01, $05, $01, $7F, $03, $05, $01, $7F, $03, $05, $00, $7F, $00, $09, $02, $7F
+	.byte $00, $82, $01, $0A, $7F, $0B, $7F, $0C, $05, $7F, $83, $05, $03, $7F, $01, $05, $01, $7F, $03, $82
+	.byte $01, $05, $11, $7F, $05, $7F, $09, $83, $7F, $01
 
 
 ; DPCM samples (located at DPCM segment)

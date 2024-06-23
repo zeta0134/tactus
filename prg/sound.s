@@ -52,19 +52,19 @@ FADE_SPEED = 8
 ; todo: figure out if we can move this elsewhere? it might grow
 
 track_table_module_low:
-        .repeat 4
+        .repeat 5
         .lobytes zeta_tactus_ost
         .endrepeat
         .lobytes persune_tactus_ost
 
 track_table_module_high:
-        .repeat 4
+        .repeat 5
         .hibytes zeta_tactus_ost
         .endrepeat
         .hibytes persune_tactus_ost
 
 track_table_bank:
-        .repeat 4
+        .repeat 5
         .lobytes .bank(zeta_tactus_ost)
         .endrepeat
         .lobytes .bank(persune_tactus_ost)
@@ -74,6 +74,7 @@ track_table_song:
         .byte 1 ; click track (meant for debugging)
         .byte 2 ; level music
         .byte 3 ; title music
+        .byte 4 ; options music
         .byte 0 ; in another world (warp zone)
 
 track_table_num_variants:
@@ -81,6 +82,7 @@ track_table_num_variants:
         .byte 1 ; click_track
         .byte 1 ; level music
         .byte 1 ; title music
+        .byte 1 ; options music
         .byte 1 ; in another world (warp zone)
 
 track_table_variant_length:
@@ -88,6 +90,7 @@ track_table_variant_length:
         .byte 0 ; click_track
         .byte 0 ; level music
         .byte 0 ; title music
+        .byte 0 ; options music
         .byte 0 ; in another world (warp zone)
 
 ; bhop calls these functions for bank swapping and ZPCM tomfoolery

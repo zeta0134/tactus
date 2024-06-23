@@ -6,6 +6,7 @@
         .include "nes.inc"
         .include "input.inc"
         .include "settings.inc"
+        .include "sound.inc"
         .include "sprites.inc"
         .include "text_util.inc"
         .include "ui.inc"
@@ -80,6 +81,15 @@ considerations:
 option_not_considered: .asciiz "NOT CONSIDERED"
 option_considered:     .asciiz "CONSIDERED    "
 
+empty_string: .asciiz ""
+
+title_ui_layout:
+        widget_controller title_controller_init
+        widget_cursor
+        widget_text_button empty_string, go_to_gameplay, 12, 10
+        widget_text_button empty_string, go_to_options, 12, 13
+        .addr $0000 ; end of list
+
 ; ======================================================================
 ;                      Layout Specific Functions
 ;       (mostly the "base" controller widget that manages state)
@@ -88,6 +98,10 @@ option_considered:     .asciiz "CONSIDERED    "
 .proc options_controller_init
 CurrentWidgetIndex := R20
         ; setup stuff, whatever, do it later
+
+        ; Play the options track on the options screen
+        lda #4
+        jsr play_track
 
         ldy CurrentWidgetIndex
         set_widget_state_y options_controller_update
@@ -105,6 +119,37 @@ stay_here:
 
 .proc return_to_title
         st16 FadeToGameMode, title_prep
+        st16 GameMode, fade_to_game_mode
+        rts
+.endproc
+
+.proc title_controller_init
+        CurrentWidgetIndex := R20
+        ; setup stuff, whatever, do it later
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y title_controller_update
+        rts
+.endproc
+
+.proc title_controller_update
+        lda #KEY_START
+        and ButtonsDown
+        beq stay_here
+        
+        jsr go_to_gameplay
+stay_here:
+        rts
+.endproc
+
+.proc go_to_options
+        st16 FadeToGameMode, options_prep
+        st16 GameMode, fade_to_game_mode
+        rts
+.endproc
+
+.proc go_to_gameplay
+        st16 FadeToGameMode, game_prep
         st16 GameMode, fade_to_game_mode
         rts
 .endproc

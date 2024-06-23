@@ -19,6 +19,7 @@
 .global fade_to_game_mode
 .global game_prep
 .global title_prep
+.global options_prep
 .global game_end_screen_prep
 
 .globalzp PpuScrollX
