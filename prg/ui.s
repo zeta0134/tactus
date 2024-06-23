@@ -151,6 +151,7 @@ stay_here:
 .endproc
 
 .proc title_controller_update
+CurrentWidgetIndex := R20
         rts
 .endproc
 
@@ -1188,7 +1189,7 @@ widget_action_func_high := widgets_data5
         bne check_for_action_input
         rts
 check_for_action_input:
-        lda #KEY_A
+        lda #(KEY_A | KEY_START)
         and ButtonsDown
         beq do_nothing
 
