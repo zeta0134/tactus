@@ -1,10 +1,12 @@
         .include "../build/tile_defs.inc"
 
+        .include "chr.inc"
         .include "charmap.inc"
         .include "far_call.inc"
         .include "kernel.inc"
         .include "nes.inc"
         .include "input.inc"
+        .include "rainbow.inc"
         .include "settings.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -97,8 +99,6 @@ title_ui_layout:
 
 .proc options_controller_init
 CurrentWidgetIndex := R20
-        ; setup stuff, whatever, do it later
-
         ; Play the options track on the options screen
         lda #4
         jsr play_track
@@ -125,7 +125,22 @@ stay_here:
 
 .proc title_controller_init
         CurrentWidgetIndex := R20
-        ; setup stuff, whatever, do it later
+        ; the title screen for now doesn't use extended attributes, so
+        ; turn those off
+        lda #(NT_FPGA_RAM | NT_NO_EXT)
+        sta MAP_NT_A_CONTROL
+        sta MAP_NT_B_CONTROL
+        sta MAP_NT_C_CONTROL
+        sta MAP_NT_D_CONTROL
+        lda #CHR_BANK_TITLE
+        sta MAP_CHR_1_LO
+
+        ; Setup the title nametable
+        far_call FAR_copy_title_nametable
+
+        ; Play the title track on the title screen
+        lda #3
+        jsr play_track
 
         ldy CurrentWidgetIndex
         set_widget_state_y title_controller_update
@@ -133,12 +148,6 @@ stay_here:
 .endproc
 
 .proc title_controller_update
-        lda #KEY_START
-        and ButtonsDown
-        beq stay_here
-
-        jsr go_to_gameplay
-stay_here:
         rts
 .endproc
 

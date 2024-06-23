@@ -117,71 +117,25 @@ continue_waiting:
 
         ; TODO: pretty much everyting in this little section is debug demo stuff
         ; Later, organize this so that it loads the title screen, initial levels, etc
+        far_call FAR_disable_all_oam_entries
 
         ; NORMAL: start on the title screen
         ; TODO: add the boxgirl productions logo, and any other "first run" screens here
-        ;st16 GameMode, title_prep
-
-        ; DEBUG! start on the options screen
-        st16 GameMode, options_prep
+        st16 GameMode, title_prep
 
         jsr wait_for_next_vblank
         rts
 .endproc
 
 .proc title_prep
-MetaSpriteIndex := R0
-        lda #0
-        sta tempo_adjustment
+LayoutPtr := R0
+        ; setup the UI subsystem with the options screen layout
+        st16 LayoutPtr, title_ui_layout
+        far_call FAR_initialize_widgets
 
-        ; Play lovely silence while we're loading
-        lda #0
-        jsr play_track
+        ; the rest of UI subsystem prep is shared, so do that now
+        st16 GameMode, initialize_ui_subsystem
 
-        ; disable rendering, and soft-disable NMI (so music keeps playing)
-        lda #$00
-        sta PPUMASK
-        lda #1
-        sta NmiSoftDisable
-
-        ; Setup a fade to black into the target mode
-        lda #0
-        jsr set_brightness
-        lda #4
-        sta TargetBrightness
-
-        ; clear FPGA RAM
-        jsr clear_fpga_ram
-
-        ; Call the mode-specific init, in this case for the Title screen
-        near_call FAR_init_title
-
-
-        ; Enable NMI first (but not rendering)
-        lda #0
-        sta NmiSoftDisable
-
-        st16 GameMode, run_title_screen
-        jsr wait_for_next_vblank
-
-        ; NOW it is safe to re-enable rendering
-        lda #$1E
-        sta PPUMASK
-        lda #(VBLANK_NMI | BG_1000 | OBJ_0000)
-        sta PPUCTRL
-
-        rts
-.endproc
-
-.proc run_title_screen
-        jsr update_beat_counters_title
-        far_call FAR_draw_sprites
-        far_call FAR_update_brightness
-        far_call FAR_refresh_palettes_gameloop
-
-        near_call FAR_update_title
-
-        jsr wait_for_next_vblank
         rts
 .endproc
 

@@ -7,6 +7,7 @@
 
 ; layouts (we might move these elsewhere eventually)
 .global options_ui_layout
+.global title_ui_layout
 
 ; convenient macros to tweak widget state
 .macro set_widget_state_y func_ptr

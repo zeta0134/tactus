@@ -54,17 +54,19 @@ loop:
 .endproc
 
 .proc write_nametable
-DataAddr := R0
-Length := R2
+SourceAddr := R0
+DestAddr := R2
+Length := R4
         st16 Length, $0400
         
         ldy #0
 loop:
         perform_zpcm_inc
-        lda (DataAddr), y ; static tile 0
-        sta PPUDATA
+        lda (SourceAddr), y
+        sta (DestAddr), y
         dec16 Length
-        inc16 DataAddr
+        inc16 SourceAddr
+        inc16 DestAddr
         lda Length
         ora Length+1
         bne loop
@@ -73,7 +75,8 @@ loop:
 .endproc
 
 .proc FAR_copy_title_nametable
-DataAddr := R0
+SourceAddr := R0
+DestAddr := R2
         access_data_bank #<.bank(title_nametable)
 
         lda #(VBLANK_NMI | BG_0000 | OBJ_1000)
@@ -83,12 +86,12 @@ DataAddr := R0
         ; NMI is not getting touched; copy this to both nametables
         ; redundantly and let whichever one is active be displayed.
         ; It's fine.
-        set_ppuaddr #$2000
-        st16 DataAddr, title_nametable
+        st16 DestAddr, $5000
+        st16 SourceAddr, title_nametable
         jsr write_nametable
 
-        set_ppuaddr #$2400
-        st16 DataAddr, title_nametable
+        st16 DestAddr, $5400
+        st16 SourceAddr, title_nametable
         jsr write_nametable
 
         restore_previous_bank
