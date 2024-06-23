@@ -30,6 +30,11 @@
     .byte 0, 0, 0, 0, 0, 0, 0, 0
 .endmacro
 
+.macro widget_player_cursor ; the player is the cursor. purely visual
+    .addr widget_player_cursor_init
+    .byte 0, 0, 0, 0, 0, 0, 0, 0
+.endmacro
+
 .macro widget_text_label text_string, tile_x, tile_y
     .addr widget_text_label_init
     .byte tile_x, tile_y
