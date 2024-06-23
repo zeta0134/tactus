@@ -382,14 +382,18 @@ sfx_move_cursor:
         ; Length in rows
         .byte 2
         ;           pitch,    duty,  volume,     length
-        pulse_init  PITCH_G4,   $2,      $5,          0
-        pulse_cont_duty         $2,      $1,          0
+        pulse_init_sweep  PITCH_C5,   $2,      $6, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      0
+        pulse_cont_duty               $2,      $2,          0
 
 sfx_select_cursor:
         ; Length in rows
         .byte 4
         ;           pitch,    duty,  volume,     length
-        pulse_init  PITCH_C4,   $1,      $6,          0
-        pulse_cont_duty         $1,      $1,          0
-        pulse_init  PITCH_G4,   $1,      $7,          0
-        pulse_cont_duty         $1,      $1,          0
+        ;pulse_init  PITCH_C4,   $1,      $6,          0
+        ;pulse_cont_duty         $1,      $1,          0
+        ;pulse_init  PITCH_G4,   $1,      $7,          0
+        ;pulse_cont_duty         $1,      $1,          0
+        pulse_init_sweep  PITCH_G3,   $2,      $8, (S_PERIOD_0 | S_SHIFT_2 | S_NEG),      0
+        pulse_cont_duty               $2,      $2,                                        0
+        pulse_init_sweep  PITCH_E4,   $2,      $6, (S_PERIOD_0 | S_SHIFT_2 | S_NEG),      0
+        pulse_cont_duty               $2,      $1,                                        0
