@@ -1,6 +1,7 @@
         .include "battlefield.inc"
         .include "palette_cycler.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
         .segment "PRGRAM"
 
@@ -35,6 +36,7 @@ full:
 .proc unqueue_palette_cycle
         ldx #0
 scan_loop:
+        perform_zpcm_inc
         cmp tiles_to_cycle, x
         beq fix_it_loop
         inx
@@ -42,6 +44,7 @@ scan_loop:
         beq not_found
         jmp scan_loop
 fix_it_loop:
+        perform_zpcm_inc
         lda tiles_to_cycle+1, x
         sta tiles_to_cycle, x
         inx
@@ -95,6 +98,7 @@ perform_update:
         lda #0
         sta CurrentTile
 loop:
+        perform_zpcm_inc
         ldx CurrentTile
         cpx num_tiles_to_cycle
         beq done
@@ -165,5 +169,6 @@ set_high_byte:
 
 done:
         dec frames_remaining
+        perform_zpcm_inc
         rts
 .endproc

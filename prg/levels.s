@@ -69,6 +69,7 @@ PalettePtr := R2
 
         ldy #0
 bg_loop:
+        perform_zpcm_inc
         lda (PalettePtr), y
         sta BgPaletteBuffer, y
         iny
@@ -84,6 +85,7 @@ bg_loop:
 
         ldy #0
 obj_loop:
+        perform_zpcm_inc
         lda (PalettePtr), y
         sta ObjPaletteBuffer, y
         iny
@@ -100,6 +102,7 @@ obj_loop:
         sta BgPaletteBuffer+8
         sta BgPaletteBuffer+12
 
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -128,6 +131,7 @@ CurrentTileId := R10
         ldy #0
         sty CurrentTileId
 loop:
+        perform_zpcm_inc
         ; load static details for this tile
         ldy CurrentTileId
         lda (TileIdPtr), y
@@ -152,7 +156,9 @@ no_detail:
         cmp #::BATTLEFIELD_SIZE
         bne loop
 
+        perform_zpcm_inc
         jsr draw_battlefield_overlays
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -212,6 +218,7 @@ ScratchByte := R9
         lda (RoomPtr), y
         sta OverlayListPtr+1
 loop:
+        perform_zpcm_inc
         ldy #0
         lda (OverlayListPtr), y
         cmp #$FF ; $FF is our end-of-list terminator
@@ -499,6 +506,7 @@ OverlayPtr := R2
 CurrentTileId := R10
 ; R12 - R15 are scratch for the detail function
 loop:
+        perform_zpcm_inc
         ldy #0
         lda (OverlayPtr), y
         cmp #$FF
@@ -764,6 +772,7 @@ Iterations := R4
 Temp := R5
         ldx #0
 init_loop:
+        perform_zpcm_inc
         txa
         sta room_population_order, x
         inx
@@ -773,10 +782,13 @@ init_loop:
         lda #64 ; somewhat arbitrary
         sta Iterations
 shuffle_loop:
+        perform_zpcm_inc
         jsr next_rand
+        perform_zpcm_inc
         and #(::FLOOR_SIZE-1)
         sta SourceIndex
         jsr next_rand
+        perform_zpcm_inc
         and #(::FLOOR_SIZE-1)
         sta DestIndex
         ldx SourceIndex
@@ -790,6 +802,7 @@ shuffle_loop:
         dec Iterations
         bne shuffle_loop
 
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -831,6 +844,7 @@ begin_floor_generation:
         lda #0
         sta CurrentRoomCounter
 room_loop:
+        perform_zpcm_inc
         ldx CurrentRoomCounter
         lda room_population_order, x
         sta CurrentRoomIndex
@@ -850,6 +864,7 @@ setup_room_generation_state:
         access_data_bank RoomPoolBank ; this hides the big floor! do NOT read from BigFloorPtr until we restore!
 begin_room_selection:
         jsr next_rand
+        perform_zpcm_inc
         and #$0F ; 0-15
         asl
         asl

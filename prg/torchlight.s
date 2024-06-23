@@ -132,8 +132,8 @@ torchlight_luts_bank:
 .proc FAR_draw_torchlight
     perform_zpcm_inc
     jsr setup_torchlight_pointers
-
     access_data_bank torchlight_bank
+    perform_zpcm_inc
     jsr draw_one_torchlight_row
     perform_zpcm_inc
     restore_previous_bank
@@ -188,6 +188,7 @@ done_picking_nametable:
 big_giant_loop:
     ldy #0
     .repeat 32
+    perform_zpcm_inc
     lda (NametablePtr), y       ; 5
     ; keep everything except old light level
     and #%11111100              ; 2

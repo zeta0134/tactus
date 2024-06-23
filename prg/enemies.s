@@ -56,6 +56,8 @@ AttributeAddr := ActiveDrawingScratch+2
 HighRowScratch := ActiveDrawingScratch+4
 LowRowScratch := ActiveDrawingScratch+5
 
+        perform_zpcm_inc
+
         debug_color (TINT_G | LIGHTGRAY)
 
         ; init some scratch space
@@ -149,6 +151,7 @@ set_high_bytes:
 
         ; and with all that... we're done?
         debug_color LIGHTGRAY
+        perform_zpcm_inc
         rts
 .endproc
 

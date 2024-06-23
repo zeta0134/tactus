@@ -1043,7 +1043,7 @@ TargetCol := R15
         sta TargetSquare
 
         far_call FAR_player_collides_with_tile
-
+        perform_zpcm_inc
         rts
 .endproc
 
