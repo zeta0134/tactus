@@ -1,6 +1,7 @@
     .include "bhop/bhop.inc"
     .include "beat_tracker.inc"
     .include "zeropage.inc"
+    .include "zpcm.inc"
 
 .segment "PRGRAM"
 
@@ -22,6 +23,7 @@ LastTrackedRow: .res 1
 .proc FAR_beat_tracker_init
     ldy #63
 loop:
+    perform_zpcm_inc
     lda #7
     sta tracked_row_buffer, y
     lda #3

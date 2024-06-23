@@ -185,11 +185,13 @@ CurrentWidgetIndex := R20
 .proc FAR_initialize_widgets
 WidgetListPtr := R0
 PtrStash := R2
+        perform_zpcm_inc
         ; firstly, for sanity, completely zero out all of widget memory
         ; absolutely no holding onto previous state from other runs
         lda #0
         ldy #0
 memclr_loop:
+        perform_zpcm_inc
         sta widgets_onupdate_low, y
         sta widgets_onupdate_high, y
         sta widgets_cursor_pos_x, y
@@ -212,6 +214,7 @@ memclr_loop:
         ldx #0 ; current widget index
         ldy #0 ; list index
 widget_loop:
+        perform_zpcm_inc
         lda (WidgetListPtr), y
         sta PtrStash+0
         iny
@@ -260,7 +263,7 @@ widget_loop:
         beq done
         jmp widget_loop
 done:
-
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -278,6 +281,7 @@ CurrentWidgetIndex := R20
         lda #0
         sta CurrentWidgetIndex
 loop:
+        perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda widgets_onupdate_high, y
         beq widget_inactive ; if the high byte is 0, this widget doesn't exist
@@ -386,6 +390,7 @@ continue_considering:
         and #WIDGET_STATE_NAVIGABLE
         bne target_valid
 find_new_widget:
+        perform_zpcm_inc
         jsr find_first_active_widget
         ldy CurrentWidgetIndex
         lda TargetWidgetIndex
@@ -399,6 +404,7 @@ target_invalid:
         sta sprite_table + MetaSpriteState::PositionY, x
         rts
 new_target_acquired:
+        perform_zpcm_inc
         ; initialize our position to the target's position
         ; with no lerping
         jsr snap_to_widget_position
@@ -415,17 +421,20 @@ target_valid:
         jmp update_at_active_position
 handle_move_down:
         jsr move_to_next_active_widget
+        perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda TargetWidgetIndex
         sta widget_cursor_nav_index, y
         jmp update_at_active_position
 handle_move_up:
         jsr move_to_previous_active_widget
+        perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda TargetWidgetIndex
         sta widget_cursor_nav_index, y
         ; fall through
 update_at_active_position:
+        perform_zpcm_inc
         ; smoothly lerp the cursor to its current position
         jsr lerp_to_widget_position
         jsr apply_cursor_position_to_sprite
@@ -514,6 +523,7 @@ widget_beats_at_this_location := widgets_data6
 widget_frames_at_this_location := widgets_data7
         ; first off, do everything the original cursor update does, more or less
         jsr widget_cursor_update
+        perform_zpcm_inc
         ; now adjust the player's position based on how long we've been here
         ldy CurrentWidgetIndex
         lda widget_frames_at_this_location, y
@@ -527,6 +537,7 @@ widget_frames_at_this_location := widgets_data7
         adc #1
         sta widget_frames_at_this_location, y
 no_adjustment:
+        perform_zpcm_inc
         ; apply the player offset to the metasprite position
         lda widget_sprite_index, y
         tax
@@ -539,6 +550,8 @@ no_adjustment:
         sbc #4 ; constant, to line our feet up with the ground
         sbc HeightOffsetScratch ; variable, based on jump timing
         sta sprite_table + MetaSpriteState::PositionY, x
+
+        perform_zpcm_inc
 
         jsr count_beats ; preserves X
         ; if we've been at this position for long enough, switch to the idle fidget
@@ -616,6 +629,7 @@ widget_frames_at_this_location := widgets_data7
         cpy #::MAX_WIDGETS   ; safety: if we run off the end of the list, bail
         beq did_not_find_one
 loop:
+        perform_zpcm_inc
         lda widgets_state_flags, y
         and #WIDGET_STATE_NAVIGABLE
         bne found_one
@@ -643,6 +657,8 @@ found_one:
         pla
         sta R0
 
+        perform_zpcm_inc
+
         rts
 .endproc
 
@@ -656,6 +672,7 @@ widget_frames_at_this_location := widgets_data7
         beq did_not_find_one
         dey
 loop:
+        perform_zpcm_inc
         lda widgets_state_flags, y
         and #WIDGET_STATE_NAVIGABLE
         bne found_one
@@ -683,6 +700,8 @@ found_one:
         jsr play_sfx_pulse2
         pla
         sta R0
+
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -1000,7 +1019,7 @@ TileY := T5
 StringPtr := T4
 TileBase := T6
 PaletteIndex := T7
-
+        perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda widget_tile_x, y
         sta TileX
@@ -1009,6 +1028,7 @@ PaletteIndex := T7
         st16 NametableAddr, $5000
         st16 AttributeAddr, $5800
         far_call FAR_nametable_from_coordinates
+        perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda widget_text_string_low, y
         sta StringPtr+0
@@ -1051,6 +1071,7 @@ widget_options_table_low := widgets_data4
 widget_options_table_high := widgets_data5
 widget_data_target_low := widgets_data6
 widget_data_target_high := widgets_data7
+        perform_zpcm_inc
 
         ; first, we need to skip over the label portion, so work that out
         ldy CurrentWidgetIndex
@@ -1071,6 +1092,7 @@ widget_data_target_high := widgets_data7
         st16 NametableAddr, $5000
         st16 AttributeAddr, $5800
         far_call FAR_nametable_from_coordinates
+        perform_zpcm_inc
         ; Now pick out the appropriate entry from the options table
         ldy CurrentWidgetIndex
         lda widget_options_table_low, y
@@ -1105,6 +1127,7 @@ option_out_of_range:
         lda #>range_error_str
         sta StringPtr+1
 converge:
+        perform_zpcm_inc
         ; finally, draw the stupid thing
         lda #CHR_BANK_OLD_CHRRAM
         sta TileBase
