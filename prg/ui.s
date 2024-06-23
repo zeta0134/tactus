@@ -14,6 +14,7 @@
         .include "ui.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
         .segment "RAM"
 
@@ -311,6 +312,10 @@ CurrentWidgetIndex := R20
 widget_sprite_index := widgets_data0
 widget_cursor_nav_index := widgets_data1
 
+; low bytes, to help with lerping smoothness
+widget_sprite_position_low_x := widgets_data2
+widget_sprite_position_low_y := widgets_data3
+
         ; firstly, set our tracked index to be invalid, which
         ; gives consistent behavior. we want our first update to perform
         ; a scan of the list, but we also want to give all the widgets
@@ -319,6 +324,10 @@ widget_cursor_nav_index := widgets_data1
         ldy CurrentWidgetIndex
         lda #$FF
         sta widget_cursor_nav_index, y
+
+        lda #0
+        sta widget_sprite_position_low_x, y
+        sta widget_sprite_position_low_y, y
 
         far_call FAR_find_unused_sprite
         lda MetaSpriteIndex
@@ -349,6 +358,7 @@ CurrentWidgetIndex := R20
 
 widget_sprite_index := widgets_data0
 widget_cursor_nav_index := widgets_data1
+
         jsr clear_hover_states
 
         ldy CurrentWidgetIndex
@@ -494,6 +504,8 @@ TargetWidgetIndex := R0
 CurrentWidgetIndex := R20
 
 widget_sprite_index := widgets_data0
+widget_sprite_position_low_x := widgets_data2
+widget_sprite_position_low_y := widgets_data3
 
         ldy CurrentWidgetIndex
         lda widget_sprite_index, y
@@ -504,12 +516,65 @@ widget_sprite_index := widgets_data0
         lda widgets_cursor_pos_y, y
         sta sprite_table + MetaSpriteState::PositionY, x
 
+        ldy CurrentWidgetIndex
+        sta widget_sprite_position_low_x, y
+        sta widget_sprite_position_low_y, y
+
         rts
 .endproc
 
 .proc lerp_to_widget_position
+TargetWidgetIndex := R0
+CurrentWidgetIndex := R20
+
+LerpCurrentPos := R2
+LerpTargetPos := R4
+; lerping clobbers R6,R7
+
+widget_sprite_index := widgets_data0
+widget_sprite_position_low_x := widgets_data2
+widget_sprite_position_low_y := widgets_data3
         ; FOR NOW, just snap. no lerping during debug
-        jsr snap_to_widget_position
+        ;jsr snap_to_widget_position
+
+        ; setup!
+        ldy CurrentWidgetIndex
+        lda widget_sprite_index, y
+        tax
+
+        ; X position!
+        lda widget_sprite_position_low_x, y
+        sta LerpCurrentPos
+        lda sprite_table + MetaSpriteState::PositionX, x
+        sta LerpCurrentPos+1
+        lda #0
+        sta LerpTargetPos
+        ldy TargetWidgetIndex
+        lda widgets_cursor_pos_x, y
+        sta LerpTargetPos+1
+        jsr lerp_coordinate ; clobbers A, preserves X and Y
+        ldy CurrentWidgetIndex
+        lda LerpCurrentPos
+        sta widget_sprite_position_low_x, y
+        lda LerpCurrentPos+1
+        sta sprite_table + MetaSpriteState::PositionX, x
+
+        ; Y position!
+        lda widget_sprite_position_low_y, y
+        sta LerpCurrentPos
+        lda sprite_table + MetaSpriteState::PositionY, x
+        sta LerpCurrentPos+1
+        lda #0
+        sta LerpTargetPos
+        ldy TargetWidgetIndex
+        lda widgets_cursor_pos_y, y
+        sta LerpTargetPos+1
+        jsr lerp_coordinate ; clobbers A, preserves X and Y
+        ldy CurrentWidgetIndex
+        lda LerpCurrentPos
+        sta widget_sprite_position_low_y, y
+        lda LerpCurrentPos+1
+        sta sprite_table + MetaSpriteState::PositionY, x
 
         rts
 .endproc
@@ -925,5 +990,75 @@ check_for_action_input:
         jsr __action_trampoline
 
 do_nothing:
+        rts
+.endproc
+
+; lifted straight from dungeon game, with little to no modification
+.proc lerp_coordinate
+CurrentPos := R2
+TargetPos := R4
+Distance := R6
+        sec
+        lda TargetPos
+        sbc CurrentPos
+        sta Distance
+        lda TargetPos+1
+        sbc CurrentPos+1
+        sta Distance+1
+        ; for sign checks, we need a third distance byte; we'll use
+        ; #0 for both incoming values
+        lda #0
+        sbc #0
+        sta Distance+2
+
+        ; sanity check: are we already very close to the target?
+        ; If our distance byte is either $00 or $FF, then there is
+        ; less than 1px remaining
+        lda Distance+1
+        cmp #$00
+        beq arrived_at_target
+        cmp #$FF
+        beq arrived_at_target
+
+        perform_zpcm_inc
+
+        ; this is a signed comparison, and it's much easier to simply split the code here
+        lda Distance+2
+        bmi negative_distance
+
+positive_distance:
+        ; divide the distance by 2
+.repeat 1
+        lsr Distance+1
+        ror Distance
+.endrepeat
+        jmp store_result
+
+negative_distance:
+        ; divide the distance by 2
+.repeat 1
+        sec
+        ror Distance+1
+        ror Distance
+.endrepeat
+
+store_result:
+        ; apply the computed distance/4 to the current position
+        clc
+        lda CurrentPos
+        adc Distance
+        sta CurrentPos
+        lda CurrentPos+1
+        adc Distance+1
+        sta CurrentPos+1
+        ; and we're done!
+        rts
+
+arrived_at_target:
+        ; go ahead and apply the target position completely, to skip the tail end of the lerp
+        lda TargetPos + 1
+        sta CurrentPos + 1
+        lda #0
+        sta CurrentPos
         rts
 .endproc
