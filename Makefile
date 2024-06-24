@@ -46,7 +46,7 @@ run: dir $(ROM_NAME)
 	rustico-sdl $(ROM_NAME)
 
 mesen: dir $(ROM_NAME)
-	vendor/Mesen.AppImage $(ROM_NAME)
+	vendor/Mesen $(ROM_NAME)
 
 beta: dir $(ROM_NAME)
 	/home/zeta0134/Downloads/MesenBeta/Mesen $(ROM_NAME)
@@ -55,10 +55,10 @@ osx: dir $(ROM_NAME)
 	/Users/zeta0134/Github/Mesen2/bin/osx-arm64/Release/osx-arm64/publish/Mesen $(ROM_NAME)
 
 debugzpcm: dir $(ROM_NAME)
-	vendor/Mesen.AppImage $(ROM_NAME) debug_zpcm_timing.lua
+	vendor/Mesen $(ROM_NAME) debug_zpcm_timing.lua
 
 profile: dir $(ROM_NAME)
-	vendor/Mesen.AppImage $(ROM_NAME) debug_profile.lua
+	vendor/Mesen $(ROM_NAME) debug_profile.lua
 
 everdrive: dir $(ROM_NAME)
 	mono vendor/edlink-n8.exe $(ROM_NAME)
