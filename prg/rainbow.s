@@ -4,7 +4,11 @@
 
 .zeropage
 code_bank_shadow: .res 1
-data_bank_shadow: .res 1
+; for the data bank we preserve the high byte, which also includes
+; the chip selector. this allows the data bank to pull from expanded
+; PRG RAM without issue
+data_bank_low_shadow: .res 1
+data_bank_high_shadow: .res 1
 
 .segment "PRGFIXED_E000"
 
@@ -49,8 +53,8 @@ data_bank_shadow: .res 1
 	sta MAP_CHR_1_HI
 	; for backgrounds, 
 
-	; for PRG RAM, just map in all 8k in one big chunk
-	; this stuff is battery backed, so we'll put save files here
+	; for PRG RAM, put bank $00 in the $6000-$7FFF region. We treat
+	; this as "fixed" work RAM for the most part.
 	lda #$80 ; select PRG RAM
 	sta MAP_PRG_6_HI
 	lda #0

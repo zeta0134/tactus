@@ -152,6 +152,9 @@ PRG_RAM_MODE_1        = %10000000 ; 4K + 4K
 PRG_RAM_MODE_MASK     = %10000000
 PRG_RAM_MODE_CLEAR    = PRG_RAM_MODE_MASK^$ff
 
+PRG_CHIPSEL_ROM       = %00000000
+PRG_CHIPSEL_RAM       = %10000000
+
 CHR_CHIP_ROM          = %00000000 ; CHR-ROM
 CHR_CHIP_RAM          = %01000000 ; CHR-RAM
 CHR_CHIP_FPGA_RAM     = %10000000 ; FPGA-RAM
@@ -216,9 +219,13 @@ NT_BANK_IDX           = %00111111
 	sta MAP_PRG_8_LO
 .endmacro
 
-.macro rainbow_set_data_bank bank_value
-	lda bank_value
-	sta data_bank_shadow
+.macro rainbow_set_data_bank bank_value_low, bank_value_high
+	lda bank_value_high
+	sta data_bank_high_shadow
+	sta MAP_PRG_A_HI
+
+	lda bank_value_low
+	sta data_bank_low_shadow
 	sta MAP_PRG_A_LO
 .endmacro
 
@@ -229,4 +236,5 @@ NT_BANK_IDX           = %00111111
 
 .global rainbow_init, clear_fpga_ram
 .globalzp code_bank_shadow
-.globalzp data_bank_shadow
+.globalzp data_bank_low_shadow
+.globalzp data_bank_high_shadow

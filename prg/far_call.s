@@ -6,7 +6,8 @@
         .zeropage
 TargetBank: .byte $00
 CurrentBank: .byte $00
-CurrentDataBank: .byte $00
+CurrentDataBankLow: .byte $00
+CurrentDataBankHigh: .byte $00
 JumpTarget: .word $0000
 FarCallScratchA: .byte $00
 

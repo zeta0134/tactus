@@ -1,4 +1,7 @@
         .setcpu "6502"
+
+        .macpack longbranch
+        
         .include "bhop/bhop.inc"
         .include "debug.inc"
         .include "beat_tracker.inc"
@@ -186,7 +189,7 @@ done:
         lda #1
         .endif
         cmp MusicCurrentTrack
-        beq no_change
+        jeq no_change
         sta MusicCurrentTrack
         sta MusicTargetTrack
         tax

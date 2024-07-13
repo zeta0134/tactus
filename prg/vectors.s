@@ -152,7 +152,9 @@ nmi_soft_disable:
         lda code_bank_shadow
         sta NmiCurrentBank ; might as well initialize the NMI call stack with the current bank
         pha
-        lda data_bank_shadow
+        lda data_bank_low_shadow
+        pha
+        lda data_bank_high_shadow
         pha
 
         far_call_nmi FAR_update_audio
@@ -161,7 +163,10 @@ nmi_soft_disable:
         perform_zpcm_inc
 
         pla
-        sta data_bank_shadow
+        sta data_bank_high_shadow
+        sta MAP_PRG_A_HI
+        pla
+        sta data_bank_low_shadow
         sta MAP_PRG_A_LO
         pla
         sta code_bank_shadow
