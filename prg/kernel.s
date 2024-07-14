@@ -387,13 +387,19 @@ LayoutPtr := R0
         near_call FAR_init_floor
         .endif
 
+        ; TODO: This is where we should generate, and then preserve, ALL rooms
+
         st16 GameMode, room_init
         rts
 .endproc
 
 .proc room_init
         perform_zpcm_inc
+        
+        ; TODO: don't generate the room here; instead, load the pregenerated room data
+        ; that we saved during zone init
         near_call FAR_init_current_room
+
         perform_zpcm_inc
         far_call FAR_despawn_unimportant_sprites
         perform_zpcm_inc

@@ -1,0 +1,2 @@
+.global FAR_preserve_room
+.global FAR_restore_preserved_room
