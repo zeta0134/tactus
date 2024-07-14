@@ -313,12 +313,6 @@ proceed_to_collect:
         ora #(SHADOW_STATE_COLLECTED)
         sta tile_flags, x
 
-        ; We have *collected a treasure*! Mark this as such in the current room data
-        ldx PlayerRoomIndex
-        lda room_flags, x
-        ora #ROOM_FLAG_TREASURE_COLLECTED
-        sta room_flags, x
-
         ; Play a joyous SFX
         st16 R0, sfx_equip_ability_pulse1
         jsr play_sfx_pulse1

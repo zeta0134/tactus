@@ -32,7 +32,6 @@ room_seeds: .res ::FLOOR_SIZE
 room_floorplan: .res ::FLOOR_SIZE ; properties of this cell in the floor's maze layout
 room_properties: .res ::FLOOR_SIZE ; properties of the selected room that populates this cell
 room_population_order: .res ::FLOOR_SIZE
-chest_spawned: .res 1
 enemies_active: .res 1
 
 rooms_rerolled: .res 2
@@ -1076,7 +1075,7 @@ room_floorplan_loop:
         jmp done_with_player
 no_starting_treasure:
         lda room_flags, x
-        ora #ROOM_FLAG_TREASURE_COLLECTED
+        ora #ROOM_FLAG_TREASURE_SPAWNED
         sta room_flags, x
 done_with_player:
 
@@ -1226,21 +1225,6 @@ done_with_torchlight:
         lda #1
         sta HudMapDirty
 
-        ; If the player has already collected this room's treausre, then don't allow
-        ; another one to spawn
-        ; (todo: this entire system may be going away)
-        ldx PlayerRoomIndex
-        lda room_flags, x
-        and #ROOM_FLAG_TREASURE_COLLECTED
-        bne treasure_already_collected
-        lda #0
-        sta chest_spawned
-        jmp converge_treasure
-treasure_already_collected:
-        lda #1
-        sta chest_spawned
-converge_treasure:
-
         ; set the initial enemies active counter to nonzero,
         ; so we process at least one full beat before considering the room to be "empty"
         lda #1
@@ -1276,7 +1260,8 @@ check_room_clear:
         jmp all_done
 
 check_chest_spawn:
-        lda chest_spawned
+        lda room_flags, x
+        and #ROOM_FLAG_TREASURE_SPAWNED
         bne all_done
 
         perform_zpcm_inc
@@ -1291,8 +1276,11 @@ check_chest_spawn:
         lda #(>BG_TILE_TREASURE_CHEST | PAL_YELLOW)
         sta EntityAttribute
         jsr spawn_entity
-        lda #1
-        sta chest_spawned
+
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        ora #ROOM_FLAG_TREASURE_SPAWNED
+        sta room_flags, x
         
 all_done:
         perform_zpcm_inc

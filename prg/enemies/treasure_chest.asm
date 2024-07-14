@@ -155,13 +155,6 @@ TargetSquare := R13
         sta tile_flags, x
 
         jsr draw_active_tile
-        
-
-        ; We have *collected a treasure*! Mark this as such in the current room data
-        ldx PlayerRoomIndex
-        lda room_flags, x
-        ora #ROOM_FLAG_TREASURE_COLLECTED
-        sta room_flags, x
 
         rts
 .endproc
@@ -189,12 +182,6 @@ TargetSquare := R13
         sta tile_flags, x
 
         jsr draw_active_tile
-
-        ; We have *collected a treasure*! Mark this as such in the current room data
-        ldx PlayerRoomIndex
-        lda room_flags, x
-        ora #ROOM_FLAG_TREASURE_COLLECTED
-        sta room_flags, x
 
         ; This is the big key! Now that we have it, reveal the location of the exit
         ; stairs (this stops the player from needing to do a brute-force search)
@@ -259,12 +246,6 @@ done_awarding_gold:
         sta tile_flags, x
 
         jsr draw_active_tile
-
-        ; We have *collected a treasure*! Mark this as such in the current room data
-        ldx PlayerRoomIndex
-        lda room_flags, x
-        ora #ROOM_FLAG_TREASURE_COLLECTED
-        sta room_flags, x
 
         rts
 .endproc
