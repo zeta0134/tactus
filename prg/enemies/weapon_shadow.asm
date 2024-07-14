@@ -328,6 +328,15 @@ proceed_to_collect:
 
 .proc suspend_weapon_shadow
 CurrentSquare := R15
-        ; TODO!
+        ; all we actually need to do is throw this weapon into the somewhat poorly named
+        ; "collected" state, which triggers it to respawn its held metasprite on the next
+        ; update
+
+        ldx CurrentSquare
+        lda tile_flags, x
+        and #($FF-SHADOW_STATE_MASK)
+        ora #SHADOW_STATE_COLLECTED
+        sta tile_flags, x
+
         rts
 .endproc
