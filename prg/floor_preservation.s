@@ -308,12 +308,12 @@ preserved_room_tile_detail_high:
 ; arguments: intended room index in X
 ; (clobbers A)
 .proc setup_preservation_pointers
-PreservedBattlefieldPtr := R1
-PreservedTileDataPtr := R3
-PreservedTileFlagsPtr := R5
-PreservedTilePatternsPtr := R7
-PreservedTileAttributesPtr := R9
-PreservedTileDetailPtr := R11
+PreservedBattlefieldPtr := R2
+PreservedTileDataPtr := R4
+PreservedTileFlagsPtr := R6
+PreservedTilePatternsPtr := R8
+PreservedTileAttributesPtr := R10
+PreservedTileDetailPtr := R12
     lda preserved_room_battlefield_low, x
     sta PreservedBattlefieldPtr+0
     lda preserved_room_battlefield_high, x

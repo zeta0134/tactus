@@ -366,7 +366,7 @@ LayoutPtr := R0
 
         far_call FAR_initialize_sprites
         far_call FAR_init_hud
-        near_call FAR_init_player
+        far_call FAR_init_player
 
         st16 GameMode, zone_init
         rts
@@ -388,6 +388,7 @@ LayoutPtr := R0
         .endif
 
         ; TODO: This is where we should generate, and then preserve, ALL rooms
+        near_call FAR_generate_rooms_for_floor
 
         st16 GameMode, room_init
         rts
@@ -398,7 +399,8 @@ LayoutPtr := R0
         
         ; TODO: don't generate the room here; instead, load the pregenerated room data
         ; that we saved during zone init
-        near_call FAR_init_current_room
+        ;near_call FAR_init_current_room
+        near_call FAR_load_current_room
 
         perform_zpcm_inc
         far_call FAR_despawn_unimportant_sprites
@@ -497,7 +499,7 @@ not_victory:
 
         ; - Resolve the player's action
         debug_color (TINT_B | LIGHTGRAY)
-        near_call FAR_update_player
+        far_call FAR_update_player
         near_call FAR_handle_room_spawns
         debug_color LIGHTGRAY
 
@@ -826,8 +828,8 @@ continue_waiting:
         perform_zpcm_inc
         far_call FAR_queue_hud
         perform_zpcm_inc
-        near_call FAR_determine_player_intent
-        near_call FAR_draw_player
+        far_call FAR_determine_player_intent
+        far_call FAR_draw_player
         perform_zpcm_inc
 
         debug_color (TINT_G | TINT_B | LIGHTGRAY)

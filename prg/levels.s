@@ -7,6 +7,7 @@
         .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
+        .include "floor_preservation.inc"
         .include "hud.inc"
         .include "levels.inc"
         .include "nes.inc"
@@ -36,6 +37,9 @@ enemies_active: .res 1
 
 rooms_rerolled: .res 2
 floors_rerolled: .res 2
+
+RoomIndexToGenerate: .res 1
+LoadedRoomIndex: .res 1
 
 .segment "CODE_1"
 
@@ -232,7 +236,7 @@ loop:
         and #$0F
         sta ScratchByte
         ; the room needs to have at least the exits this overlay requires. it can have more, but not less
-        ldx PlayerRoomIndex
+        ldx RoomIndexToGenerate
         lda room_floorplan, x
         and ScratchByte
         cmp ScratchByte
@@ -279,7 +283,7 @@ done:
 .proc cardinal_conditional_north
 ConditionalByte := R8
 ScratchByte := R9
-        lda PlayerRoomIndex
+        lda RoomIndexToGenerate
         sec
         sbc #::FLOOR_WIDTH
         tax
@@ -298,7 +302,7 @@ reject:
 .proc cardinal_conditional_east
 ConditionalByte := R8
 ScratchByte := R9
-        lda PlayerRoomIndex
+        lda RoomIndexToGenerate
         clc
         adc #1
         tax
@@ -317,7 +321,7 @@ reject:
 .proc cardinal_conditional_south
 ConditionalByte := R8
 ScratchByte := R9
-        lda PlayerRoomIndex
+        lda RoomIndexToGenerate
         clc
         adc #::FLOOR_WIDTH
         tax
@@ -336,7 +340,7 @@ reject:
 .proc cardinal_conditional_west
 ConditionalByte := R8
 ScratchByte := R9
-        lda PlayerRoomIndex
+        lda RoomIndexToGenerate
         sec
         sbc #1
         tax
@@ -356,7 +360,7 @@ reject:
 ConditionalByte := R8
 ScratchByte := R9
         ; first, check the NORTH exit
-        lda PlayerRoomIndex
+        lda RoomIndexToGenerate
         sec
         sbc #::FLOOR_WIDTH
         tax
@@ -369,7 +373,7 @@ ScratchByte := R9
         cmp ScratchByte
         bne reject
         ; do it all again but now check the EAST exit
-        lda PlayerRoomIndex
+        lda RoomIndexToGenerate
         clc
         adc #1
         tax
@@ -393,7 +397,7 @@ reject:
 ConditionalByte := R8
 ScratchByte := R9
         ; first, check the SOUTH exit
-        lda PlayerRoomIndex
+        lda RoomIndexToGenerate
         clc
         adc #::FLOOR_WIDTH
         tax
@@ -406,7 +410,7 @@ ScratchByte := R9
         cmp ScratchByte
         bne reject
         ; do it all again but now check the EAST exit
-        lda PlayerRoomIndex
+        lda RoomIndexToGenerate
         clc
         adc #1
         tax
@@ -430,7 +434,7 @@ reject:
 ConditionalByte := R8
 ScratchByte := R9
         ; first, check the SOUTH exit
-        lda PlayerRoomIndex
+        lda RoomIndexToGenerate
         clc
         adc #::FLOOR_WIDTH
         tax
@@ -443,7 +447,7 @@ ScratchByte := R9
         cmp ScratchByte
         bne reject
         ; do it all again but now check the WEST exit
-        lda PlayerRoomIndex
+        lda RoomIndexToGenerate
         sec
         sbc #1
         tax
@@ -467,7 +471,7 @@ reject:
 ConditionalByte := R8
 ScratchByte := R9
         ; first, check the NORTH exit
-        lda PlayerRoomIndex
+        lda RoomIndexToGenerate
         sec
         sbc #::FLOOR_WIDTH
         tax
@@ -480,7 +484,7 @@ ScratchByte := R9
         cmp ScratchByte
         bne reject
         ; do it all again but now check the WEST exit
-        lda PlayerRoomIndex
+        lda RoomIndexToGenerate
         sec
         sbc #1
         tax
@@ -1056,6 +1060,7 @@ room_floorplan_loop:
         jsr choose_rooms_for_floor
 
         ; Mark the player's room as cleared, so they don't load in surrounded by mobs
+        ; TODO: the whole concept of "cleared" as a room-level flag might go away
         ldx PlayerRoomIndex
         lda room_flags, x
         ora #ROOM_FLAG_CLEARED
@@ -1082,14 +1087,35 @@ done_with_player:
         rts
 .endproc
 
-.proc FAR_init_current_room
+.proc FAR_generate_rooms_for_floor
+RoomIndexToPreserve := R0
+        lda #0
+        sta RoomIndexToGenerate
+loop:
+        jsr generate_room
+        lda RoomIndexToGenerate
+        sta RoomIndexToPreserve
+        far_call FAR_preserve_room
+        inc RoomIndexToGenerate
+        lda RoomIndexToGenerate
+        cmp #FLOOR_SIZE
+        bne loop
+
+        ; just in case state restoration gets called in a weird order, store the
+        ; index of the last room we generated
+        lda #(FLOOR_SIZE-1)
+        sta LoadedRoomIndex
+
+        rts
+.endproc
+
+.proc generate_room
 RoomPtr := R0
 RoomBank := R2
 EntityList := R4
-
         ; NEW: the room pointer and associated bank are just part of the
         ; floor data now; load and use that
-        ldx PlayerRoomIndex
+        ldx RoomIndexToGenerate
         lda room_bank, x
         sta RoomBank
         lda room_ptr_low, x
@@ -1098,6 +1124,70 @@ EntityList := R4
         sta RoomPtr+1
         access_data_bank RoomBank
         jsr initialize_battlefield
+        restore_previous_bank
+
+        ; Does this room have exit stairs? If so, spawn those first
+        ldx RoomIndexToGenerate
+        lda room_flags, x
+        and #ROOM_FLAG_EXIT_STAIRS
+        beq no_exit_stairs
+        jsr spawn_exit_block
+        ldx RoomIndexToGenerate
+no_exit_stairs:        
+
+        ; Has the player already cleared this room?
+        ; TODO: this check is redundant now?
+        ldx RoomIndexToGenerate
+        lda room_flags, x
+        and #ROOM_FLAG_CLEARED
+        bne room_cleared
+
+        ; If this is a boss room, we need to use the boss pool
+        lda room_flags, x
+        and #ROOM_FLAG_BOSS
+        bne spawn_boss_enemies
+spawn_basic_enemies:
+        jsr spawn_basic_enemies_from_pool
+        jmp room_cleared
+spawn_boss_enemies:
+        jsr spawn_boss_enemies_from_pool
+        jmp room_cleared
+room_cleared:
+
+        rts
+.endproc
+
+.proc FAR_load_current_room
+RoomIndexToPreserve := R0
+
+RoomPtr := R0
+RoomBank := R2
+EntityList := R4
+
+        ; Store the previous room first, so we don't lose
+        ; its state
+        lda LoadedRoomIndex
+        sta RoomIndexToPreserve
+        far_call FAR_preserve_room
+
+        ; Now we can overwrite the working set with the target room
+        lda PlayerRoomIndex
+        sta RoomIndexToPreserve
+        far_call FAR_restore_preserved_room
+        lda PlayerRoomIndex
+        sta LoadedRoomIndex
+
+        ; Some details are part of the original room pointer, so get that set up
+        ldx PlayerRoomIndex
+        lda room_bank, x
+        sta RoomBank
+        lda room_ptr_low, x
+        sta RoomPtr+0
+        lda room_ptr_high, x
+        sta RoomPtr+1
+        access_data_bank RoomBank
+
+        ; load this room's palette data
         jsr load_room_palette
 
         ; If this room is darkened, apply torchlight
@@ -1135,6 +1225,8 @@ done_with_torchlight:
 
         ; If the player has already collected this room's treausre, then don't allow
         ; another one to spawn
+        ; (todo: this entire system may be going away)
+        ldx PlayerRoomIndex
         lda room_flags, x
         and #ROOM_FLAG_TREASURE_COLLECTED
         bne treasure_already_collected
@@ -1146,37 +1238,16 @@ treasure_already_collected:
         sta chest_spawned
 converge_treasure:
 
-        ; set the initial enemies active counter to nonzero, so we process at least one full beat before considering the room to be "empty"
+        ; set the initial enemies active counter to nonzero,
+        ; so we process at least one full beat before considering the room to be "empty"
         lda #1
         sta enemies_active
-
-        ; Does this room have exit stairs? If so, spawn those first
-        lda room_flags, x
-        and #ROOM_FLAG_EXIT_STAIRS
-        beq no_exit_stairs
-        jsr spawn_exit_block
-        ldx PlayerRoomIndex
-no_exit_stairs:        
-
-        ; Has the player already cleared this room?
-        lda room_flags, x
-        and #ROOM_FLAG_CLEARED
-        bne room_cleared
-        ; If this is a boss room, we need to use the boss pool
-        lda room_flags, x
-        and #ROOM_FLAG_BOSS
-        bne spawn_boss_enemies
-spawn_basic_enemies:
-        jsr spawn_basic_enemies_from_pool
-        jmp room_cleared
-spawn_boss_enemies:
-        jsr spawn_boss_enemies_from_pool
-        jmp room_cleared
-room_cleared:
 
         rts
 .endproc
 
+; Called during gameplay, not during generation. Handles ongoing room flag
+; state, and checks for any entities that need to spawn post-generation
 .proc FAR_handle_room_spawns
 EntityId := R1
 EntityPattern := R2

@@ -78,7 +78,7 @@ player_tile_index_table:
         .byte (::BATTLEFIELD_WIDTH * i)
         .endrepeat
 
-.segment "CODE_1"
+.segment "CODE_4"
 
 JUMP_HEIGHT_END = 5
 jump_height_table:
