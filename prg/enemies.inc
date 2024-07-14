@@ -72,6 +72,7 @@ TILE_EXIT_STAIRS = ($AC | %00)
 .global FAR_clear_active_move_flags
 .global FAR_attack_enemy_tile
 .global FAR_player_collides_with_tile
+.global FAR_suspend_entire_room
 
 ; Below this distance, mobs will prefer to move directly towards the player
 SPIDER_TARGET_RADIUS = 5

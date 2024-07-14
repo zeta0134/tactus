@@ -327,6 +327,42 @@ bonk_behaviors:
         .word no_behavior
         .endrepeat
 
+; called just before suspending the map, typically because the player
+; is moving to an adjacent room. handles all sorts of fun jank
+suspend_behaviors:
+        .word draw_cleared_disco_tile  ; smoke puff
+        .word move_away_from_map_edge  ; slime
+        .word move_away_from_map_edge  ; spider
+        .word move_away_from_map_edge  ; spider (anticipating)
+        .word move_away_from_map_edge  ; zombie
+        .word move_away_from_map_edge  ; zombie (anticipating)
+        .word move_away_from_map_edge  ; birb (left)
+        .word move_away_from_map_edge  ; birb (right)
+        .word move_away_from_map_edge  ; birb (flying, left)
+        .word move_away_from_map_edge  ; birb (flying, right)
+        .word no_behavior              ; mole hole
+        .word no_behavior              ; mole throwing
+        .word no_behavior              ; mole idle
+        .word draw_cleared_disco_tile  ; wrench
+        .word no_behavior              ; challenge spike
+        .repeat 17
+        .word no_behavior ; unimplemented
+        .endrepeat
+        .word draw_cleared_disco_tile   ; $80 - plain floor
+        .word draw_cleared_disco_tile   ; $84 - disco floor
+        .word no_behavior               ; $88 - semisafe floor
+        .word no_behavior               ; $8C - wall
+        .word no_behavior               ; $90 - UNUSED
+        .word no_behavior               ; $94 - UNUSED
+        .word no_behavior               ; $98 - treasure chest
+        .word no_behavior               ; $9C - big key
+        .word no_behavior               ; $A0 - gold sack
+        .word suspend_weapon_shadow     ; $A4 - weapon shadow
+        ; safety: fill out the rest of the table
+        .repeat 22
+        .word no_behavior
+        .endrepeat
+
 .proc __trampoline
         perform_zpcm_inc
         jmp (DestPtr)
@@ -427,5 +463,31 @@ TargetCol := R15
         perform_zpcm_inc
         jsr __trampoline
 
+        rts
+.endproc
+
+; Note: parameters are intentionally backloaded, to allow the behavior functions to use R0+
+; without conflict
+.proc FAR_suspend_entire_room
+CurrentSquare := R15
+        lda #0
+        sta CurrentSquare
+loop:
+        ldx CurrentSquare
+        lda battlefield, x
+        ; the top 6 bits index into the behavior table, which is a list of **words**
+        ; so we want it to end up like this: %0bbbbbb0
+        lsr
+        and #%01111110
+        tax
+        lda suspend_behaviors, x
+        sta DestPtr
+        lda suspend_behaviors+1, x
+        sta DestPtr+1
+        jsr __trampoline
+        inc CurrentSquare
+        lda CurrentSquare
+        cmp #BATTLEFIELD_SIZE
+        bne loop
         rts
 .endproc

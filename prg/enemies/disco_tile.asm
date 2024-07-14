@@ -76,3 +76,24 @@ converge:
         rts
 .endproc
 
+; ============================================================================================================================
+; ===                                             Suspend Behaviors                                                        ===
+; ============================================================================================================================
+
+
+; used anytime we need to guarantee that this disco tile is in its base state, usually
+; when suspending a room (otherwise it looks weird on re-entry)
+.proc draw_cleared_disco_tile
+CurrentTile := R15
+        ; draw_with_pal, adjusted for our temporary stash
+        ldx CurrentTile
+        lda #TILE_REGULAR_FLOOR
+        sta battlefield, x
+        ; use the detail pattern directly
+        lda tile_detail, x
+        sta tile_patterns, x
+        ; always use the cleared variant
+        lda #$00
+        sta tile_attributes, x
+        rts
+.endproc

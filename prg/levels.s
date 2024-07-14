@@ -1163,9 +1163,12 @@ RoomIndexToPreserve := R0
 RoomPtr := R0
 RoomBank := R2
 EntityList := R4
-
         ; Store the previous room first, so we don't lose
-        ; its state
+        ; its state. First, prepare the room for suspension; some tiles
+        ; need to perform cleanup
+        far_call FAR_suspend_entire_room
+
+        ; Now write the suspended room state into RAM so we don't lose it
         lda LoadedRoomIndex
         sta RoomIndexToPreserve
         far_call FAR_preserve_room
