@@ -140,6 +140,10 @@ TargetSquare := R13
         clc
         adc #4
         sta PlayerMaxHealth
+
+        lda PlayerHealth
+        clc
+        adc #4
         sta PlayerHealth
 
         st16 R0, sfx_heart_container
