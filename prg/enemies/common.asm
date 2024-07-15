@@ -289,6 +289,8 @@ ignore_attack:
 .endproc
 
 .proc attack_with_hp_common
+OriginalAttackSquare := R3
+
 ; For drawing tiles
 TargetIndex := R0
 TileId := R1
@@ -325,34 +327,42 @@ die:
         ldx EffectiveAttackSquare
         stx TargetIndex
 
-        ; If the player is at less than max health, we can try to spawn a small heart
-        lda PlayerMaxHealth
-        cmp PlayerHealth
-        beq drop_nothing
-        ; Common enemies have a 1/32 chance to spawn a health tile when defeated
-        jsr next_rand
-        and #%00011111
-        beq drop_health
-drop_nothing:
         lda #TILE_REGULAR_FLOOR
         sta battlefield, x
         lda #<BG_TILE_FLOOR
         sta tile_patterns, x
         lda #(>BG_TILE_FLOOR | PAL_WORLD)
         sta tile_attributes, x
+        jsr draw_active_tile
+
+        ; If the player is at less than max health, we can try to spawn a small heart
+        lda PlayerMaxHealth
+        cmp PlayerHealth
+        beq drop_nothing
+        ; Common enemies have a 1/16 chance to spawn a health tile when defeated
+        jsr next_rand
+        
+        and #%00001111
+
+        beq drop_health
+drop_nothing:
+        
         inc HealthDroughtCounter
         jmp done_with_drops
 drop_health:
+        ldx OriginalAttackSquare
+        stx TargetIndex
         lda #TILE_SMALL_HEART
         sta battlefield, x
         lda #<BG_TILE_SMALL_HEART
         sta tile_patterns, x
         lda #(>BG_TILE_SMALL_HEART | PAL_RED)
         sta tile_attributes, x
+        jsr draw_active_tile
         lda #0
         sta HealthDroughtCounter
+
 done_with_drops:
-        jsr draw_active_tile
         ldx EffectiveAttackSquare
         lda #0
         sta tile_data, x

@@ -7,10 +7,10 @@ TargetIndex := R0
 TileId := R1
 TargetSquare := R13
 
-        ; Add 2 to the player's health pool
+        ; Add 1 to the player's health pool
         lda PlayerHealth
         clc
-        adc #2
+        adc #1
         sta PlayerHealth
         ; Now if we've just overhealed them...
         lda PlayerHealth

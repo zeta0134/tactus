@@ -226,6 +226,8 @@ ignore_attack:
 TargetIndex := R0
 TileId := R1
 
+OriginalAttackSquare := R3
+
 AttackLanded := R7
 EffectiveAttackSquare := R10 
         ; Register the attack as a hit
@@ -237,6 +239,8 @@ EffectiveAttackSquare := R10
 
         ldx EffectiveAttackSquare
         stx TargetIndex
+        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
+        jsr draw_active_tile
 
         ; If the player is at less than max health, we can try to spawn a small heart
         lda PlayerMaxHealth
@@ -244,23 +248,23 @@ EffectiveAttackSquare := R10
         beq drop_nothing
         ; If we are in the middle of a health drought, force a health drop and clear the counter
         lda HealthDroughtCounter
-        cmp #16
+        cmp #10
         bcs drop_health
-        ; Slimes have a 1/16 chance to spawn a health tile (more than other enemies)
+        ; Slimes have a 1/8 chance to spawn a health tile (more than other enemies)
         jsr next_rand
-        and #%00001111
+        and #%00000111
         beq drop_health
 drop_nothing:
-        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
         inc HealthDroughtCounter
         jmp done_with_drops
 drop_health:
+        ldx OriginalAttackSquare
+        stx TargetIndex
         draw_at_x_withpal TILE_SMALL_HEART, BG_TILE_SMALL_HEART, PAL_RED
+        jsr draw_active_tile
         lda #0
         sta HealthDroughtCounter
 done_with_drops:
-        ; update this tile right now!
-        jsr draw_active_tile
         ldx EffectiveAttackSquare
         lda #0
         sta tile_data, x
