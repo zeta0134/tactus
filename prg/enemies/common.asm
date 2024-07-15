@@ -485,9 +485,102 @@ proceed_to_forbid:
 ; ===                                             Suspend Behaviors                                                        ===
 ; ============================================================================================================================
 
+; These are used to take a 5bit random number and pick something "in bounds" coordinate wise,
+; with reasonable speed and fairness
+random_row_table:
+        .repeat 32, i
+        .byte (3 + (i .MOD (::BATTLEFIELD_HEIGHT - 6)))
+        .endrepeat
+
+random_col_table:
+        .repeat 32, i
+        .byte (3 + (i .MOD (::BATTLEFIELD_WIDTH - 6)))
+        .endrepeat
+
+; result in R0
+.proc find_safe_coordinate
+TempCol := R0
+TempRow := R1
+; TODO: track attempts, to guard against failure?
+TempIndex := R3
+
+FinalIndex := R0
+        jsr next_rand
+        and #%00011111
+        tax
+        lda random_row_table, x
+        sta TempRow
+        jsr next_rand
+        and #%00011111
+        tax
+        lda random_col_table, x
+        sta TempCol
+check_floor:
+        ldx TempRow
+        lda row_number_to_tile_index_lut, x
+        clc
+        adc TempCol
+        sta TempIndex
+        ldx TempIndex
+        lda battlefield, x
+        and #%11111100 ; we only care about the index, not the color
+        cmp #TILE_REGULAR_FLOOR
+        beq is_valid_space
+        cmp #TILE_DISCO_FLOOR
+        beq is_valid_space
+        ; no good; this is not a floor tile. We cannot spawn anything here,
+        ; try again
+        jmp find_safe_coordinate
+is_valid_space:
+        lda TempIndex
+        sta FinalIndex
+        rts
+.endproc
+
 .proc move_away_from_map_edge
+NewSquare := R0
 CurrentSquare := R15
-        ; TODO!
+        ; This is a generic implementation that simply teleports the enemy to a valid tile somewhere
+        ; near the center of the room, just like when they were initially spawned. For many enemies,
+        ; we can write a custom fix that is less arbitrary, but this works as a default
+
+        ; Firstly, does this enemy need treatment? If they aren't on an extreme map edge then they do not:
+        ldx CurrentSquare
+        lda tile_index_to_row_lut, x
+        ; (enemies can't move onto the extreme map edges at all, so we're just checking
+        ; the spots where the player can spawn in)
+        cmp #1
+        beq adjustment_needed
+        cmp #(BATTLEFIELD_HEIGHT-2)
+        beq adjustment_needed
+        lda tile_index_to_col_lut, x
+        cmp #1
+        beq adjustment_needed
+        cmp #(BATTLEFIELD_WIDTH-2)
+        beq adjustment_needed
+        ; This enemy is in a safe spot; we're done
+        rts
+adjustment_needed:
+        jsr find_safe_coordinate
+        ; move ourselves to the new coordinate
+        ldx CurrentSquare
+        ldy NewSquare
+
+        lda battlefield, x
+        sta battlefield, y
+        lda tile_data, x
+        sta tile_data, y
+        lda tile_flags, x
+        sta tile_flags, y
+        lda tile_patterns, x
+        sta tile_patterns, y
+        lda tile_attributes, x
+        sta tile_attributes, y
+        ; do not move detail. detail always stays behind
+
+        ; okay, now draw a cleared disco tile at our current location
+        jsr draw_cleared_disco_tile
+
         rts
 .endproc
 

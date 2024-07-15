@@ -447,6 +447,9 @@ not_victory:
         near_call FAR_init_floor
         .endif
 
+        ; TODO: This is where we should generate, and then preserve, ALL rooms
+        near_call FAR_generate_rooms_for_floor
+
         ; reset the player's position to the center of the room
         lda #6
         sta PlayerRow
