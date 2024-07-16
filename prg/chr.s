@@ -1,3 +1,4 @@
+        .include "../build/tile_defs.inc"
         .include "chr.inc"
         .include "compression.inc"
         .include "far_call.inc"
@@ -95,5 +96,55 @@ DestAddr := R2
         jsr write_nametable
 
         restore_previous_bank
+        rts
+.endproc
+
+.proc FAR_set_title_exbg
+DestAddrLeft := R0
+DestAddrRight := R2
+Length := R4
+
+st16 DestAddrLeft, $5800
+st16 DestAddrRight, $5C00
+st16 Length, $0400
+        
+        ldy #0
+loop:
+        perform_zpcm_inc
+        lda #CHR_BANK_TITLE
+        sta (DestAddrLeft), y
+        sta (DestAddrRight), y
+        dec16 Length
+        inc16 DestAddrLeft
+        inc16 DestAddrRight
+        lda Length
+        ora Length+1
+        bne loop
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc FAR_set_old_chr_exbg
+DestAddrLeft := R0
+DestAddrRight := R2
+Length := R4
+
+st16 DestAddrLeft, $5800
+st16 DestAddrRight, $5C00
+st16 Length, $0400
+        
+        ldy #0
+loop:
+        perform_zpcm_inc
+        lda #CHR_BANK_OLD_CHRRAM
+        sta (DestAddrLeft), y
+        sta (DestAddrRight), y
+        dec16 Length
+        inc16 DestAddrLeft
+        inc16 DestAddrRight
+        lda Length
+        ora Length+1
+        bne loop
+        perform_zpcm_inc
         rts
 .endproc

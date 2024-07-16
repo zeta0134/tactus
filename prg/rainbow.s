@@ -47,7 +47,7 @@ data_bank_high_shadow: .res 1
 	lda #0
 	sta MAP_CHR_0_HI
 
-	lda #$FF
+	lda #(SPRITE_REGION_BASE+1)
 	sta MAP_CHR_1_LO
 	lda #0
 	sta MAP_CHR_1_HI

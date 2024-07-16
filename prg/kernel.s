@@ -230,17 +230,18 @@ LayoutPtr := R0
         sta TargetBrightness
 
         ; the end screens use typical 16x16 attributes for now, so set those up again
-        lda #(NT_FPGA_RAM | NT_NO_EXT)
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG)
         sta MAP_NT_A_CONTROL
-        sta MAP_NT_B_CONTROL
         sta MAP_NT_C_CONTROL
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG)
+        sta MAP_NT_B_CONTROL
         sta MAP_NT_D_CONTROL
-        lda #CHR_BANK_OLD_CHRRAM
-        sta MAP_CHR_1_LO
 
         jsr clear_fpga_ram
         far_call FAR_initialize_sprites
         near_call FAR_init_game_end_screen
+        far_call FAR_set_old_chr_exbg
+        jsr initialize_title_palettes
 
         ; The end screens do not (currently) use IRQs
         lda #0

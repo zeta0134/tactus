@@ -130,16 +130,16 @@ stay_here:
         CurrentWidgetIndex := R20
         ; the title screen for now doesn't use extended attributes, so
         ; turn those off
-        lda #(NT_FPGA_RAM | NT_NO_EXT)
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG)
         sta MAP_NT_A_CONTROL
-        sta MAP_NT_B_CONTROL
         sta MAP_NT_C_CONTROL
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG)
+        sta MAP_NT_B_CONTROL
         sta MAP_NT_D_CONTROL
-        lda #CHR_BANK_TITLE
-        sta MAP_CHR_1_LO
 
         ; Setup the title nametable
         far_call FAR_copy_title_nametable
+        far_call FAR_set_title_exbg
 
         ; Play the title track on the title screen
         lda #3

@@ -206,6 +206,8 @@ NT_BANK_IDX           = %00111111
 	.endrepeat
 	ora sprite_page
 	sta MAP_CHR_0_LO
+	ora #%00000001
+	sta MAP_CHR_1_LO
 .endmacro
 
 .import __BANK_MASK__

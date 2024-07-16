@@ -285,10 +285,19 @@ with open('build/tile_defs.inc', 'w') as definitions:
   print("", file=definitions)
   print("; sprite tiles", file=definitions)
   for i in range(0, len(sprite_filenames)):
+    # sprites will, for now, fit in 2 CHR pages, so we have 256 8x16 sprites total. Right now
+    # I don't think we'll exceed this limit, we can revisit the whole sprite strategy if it looks like
+    # it'll be a problem
+    
+    #metatile_id = (i % 64) * 4
+    #bank_id = math.floor(i / 64) + SPRITE_REGION_BASE
+    #tiledef = (bank_id << 8) + metatile_id
+
     metatile_id = (i % 64) * 4
-    bank_id = math.floor(i / 64) + SPRITE_REGION_BASE
-    tiledef = (bank_id << 8) + metatile_id
-    print("SPRITE_TILE_%s = %s" % (constant_name(sprite_filenames[i]), ca65_word_literal(tiledef)), file=definitions)
+    bank_id = math.floor(i / 64)
+    tiledef = (bank_id & 0x01) + (metatile_id & 0xFE)
+
+    print("SPRITE_TILE_%s = %s" % (constant_name(sprite_filenames[i]), ca65_byte_literal(tiledef)), file=definitions)
   print("", file=definitions)
   print("; raw_chr banks", file=definitions)
   combined_chr_filenames = raw_chr_filenames + png_chr_filenames
