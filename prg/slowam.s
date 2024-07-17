@@ -8,7 +8,7 @@
 ; Cursed Slow OAM "DMA", in 1632 cycles
 ; Drink responsibly
 
-.segment "CODE_0"
+.segment "PRGFIXED_E000"
 
 ; to access an individual sprite quickly
 sprite_ptr_lut_low:
@@ -24,6 +24,8 @@ sprite_ptr_lut_high:
     .byte >((20 * i) + (83 * j) + SPRITE_TRANSFER_BASE)
 .endrepeat
 .endrepeat
+
+.segment "CODE_0"
 
 one_sprite_byte:
     lda #0 ; 2 bytes

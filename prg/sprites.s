@@ -23,7 +23,7 @@ starting_oam_index: .res 1
 
 SHUFFLE_NEXT_SPRITE = (11 * 2)
 SHUFFLE_NEXT_FRAME = (19 * 2)
-SHUFFLE_MASK = %00111111
+SHUFFLE_MASK = %00011111
 
 .segment "CODE_0"
 

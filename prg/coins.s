@@ -1,6 +1,7 @@
     .include "battlefield.inc"
     .include "coins.inc"
     .include "../build/tile_defs.inc"
+    .include "slowam.inc"
     .include "zeropage.inc"
 
 
@@ -32,6 +33,8 @@ queued_coin_pos: .res ::MAX_ACTIVE_COINS
 coin_queue_next: .res 1
 coin_queue_last: .res 1
 next_active_coin: .res 1
+
+coin_sprite_starting_index: .res 1
 
         .segment "PRGFIXED_E000"
 
@@ -190,6 +193,7 @@ COIN_STATE_COLLECT = 6
     sta coin_queue_next
     sta coin_queue_last
     sta next_active_coin
+    sta coin_sprite_starting_index
 
     lda #COIN_STATE_INACTIVE
     ldx #0
@@ -205,6 +209,12 @@ loop:
 .proc FAR_update_coins
     ; try to spawn a new coin every frame
     jsr spawn_one_new_coin
+    ; draw all active coins
+    jsr draw_coins
+
+    ; TODO: actually move coins here
+    ; (but I am LE TIRED)
+
     rts  
 .endproc
 
@@ -288,3 +298,75 @@ proceed_to_spawn:
     ; ... and we're done?
     rts
 .endproc
+
+SHUFFLE_NEXT_SPRITE = 5
+SHUFFLE_NEXT_FRAME = 7
+FIRST_COIN_SPRITE = 32
+
+.proc draw_coins
+CoinIndex := R0
+SpriteIndex := R1
+SpritePtr := R2
+    lda #0
+    sta CoinIndex
+    lda coin_sprite_starting_index
+    sta SpriteIndex
+
+loop:
+    ldx CoinIndex
+    lda coin_state, x
+    beq coin_inactive
+
+    lda SpriteIndex
+    clc
+    adc #FIRST_COIN_SPRITE
+    tay
+    lda sprite_ptr_lut_low, y
+    sta SpritePtr+0
+    lda sprite_ptr_lut_high, y
+    sta SpritePtr+1
+
+    lda coin_pos_x_pixels, x
+    ldy #SelfModifiedSprite::PosX
+    sta (SpritePtr), y
+    lda coin_pos_y_pixels, x
+    ldy #SelfModifiedSprite::PosY
+    sta (SpritePtr), y
+    lda coin_tile_id, x
+    ldy #SelfModifiedSprite::TileId
+    sta (SpritePtr), y
+    lda coin_attributes, x
+    ldy #SelfModifiedSprite::Attributes
+    sta (SpritePtr), y
+
+coin_inactive:
+    lda SpriteIndex
+    clc
+    adc #SHUFFLE_NEXT_SPRITE
+    cmp #MAX_ACTIVE_COINS
+    bcc sprite_index_okay
+    sec
+    sbc #MAX_ACTIVE_COINS
+sprite_index_okay:
+    sta SpriteIndex
+    inc CoinIndex
+    lda CoinIndex
+    cmp #MAX_ACTIVE_COINS
+    bne loop
+
+    ; update the sprite pointer for proper rotation
+    lda coin_sprite_starting_index
+    clc
+    adc #SHUFFLE_NEXT_FRAME
+    cmp #MAX_ACTIVE_COINS
+    bcc sprite_start_okay
+    sec
+    sbc #MAX_ACTIVE_COINS
+sprite_start_okay:
+    sta coin_sprite_starting_index
+
+
+    rts    
+.endproc
+
+
