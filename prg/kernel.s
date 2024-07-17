@@ -7,6 +7,7 @@
         .include "bhop/bhop.inc"
         .include "battlefield.inc"
         .include "beat_tracker.inc"
+        .include "coins.inc"
         .include "chr.inc"
         .include "debug.inc"
         .include "enemies.inc"
@@ -291,6 +292,7 @@ LayoutPtr := R0
         sta NmiSoftDisable
 
         far_call FAR_init_torchlight
+        far_call FAR_init_coins
 
         ; the game screen uses ExAttr for palette access, so set that up here
         lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
@@ -844,6 +846,8 @@ continue_waiting:
         far_call FAR_update_torchlight
         far_call FAR_draw_torchlight
         debug_color LIGHTGRAY
+
+        far_call FAR_update_coins
 
         perform_zpcm_inc
         far_call FAR_update_brightness

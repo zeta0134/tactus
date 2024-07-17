@@ -4,6 +4,7 @@
 
         .include "battlefield.inc"
         .include "branch_util.inc"
+        .include "coins.inc"
         .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
