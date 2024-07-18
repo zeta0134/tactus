@@ -1,5 +1,6 @@
     .include "coins.inc"
     .include "loot.inc"
+    .include "player.inc"
     .include "prng.inc"
     .include "word_util.inc"
 
@@ -355,12 +356,34 @@ rare_loot_table:
     ; TODO!
 
 
+chain_offset_lut:
+    .byte 0, 10, 20, 30, 40, 50, 60, 70, 80
+combo_offset_lut:
+    .byte 0, 2, 4, 6, 8
+
+MAX_CHAIN = 8
+MAX_COMBO = 4 ; actually 5, but we need to decrement
+
 ; Note: defaults to tiny_loot_table, and resets to this after each call. Set
 ; LootTable to the desired table for all non-basic enemies.
 .proc FAR_roll_loot
     ; TODO: combo and chain! (compute Y based on this)
     ; FOR NOW, just grab the base entry in the list
-    ldy #0
+    ldx PlayerChain
+    cpx #MAX_CHAIN
+    bcc chain_in_range
+    ldx #MAX_CHAIN
+chain_in_range:
+    ldy PlayerCombo
+    dey
+    cpy #MAX_COMBO
+    bcc combo_in_range
+    ldy #MAX_COMBO
+combo_in_range:
+    lda chain_offset_lut, x
+    clc
+    adc combo_offset_lut, y
+    tay
 
     ; Load up the relevant drop table
     lda (LootTable), y
