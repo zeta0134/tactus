@@ -23,6 +23,9 @@
 .global PlayerNextDirection
 .global PlayerTorchlightRadius
 
+.global PlayerCurrentX
+.global PlayerCurrentY
+
 .global EnemyDiedThisFrame
 .global PlayerCombo
 .global PlayerChain

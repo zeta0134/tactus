@@ -1,0 +1,1 @@
+.global FAR_update_indicators

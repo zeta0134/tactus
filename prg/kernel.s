@@ -13,6 +13,7 @@
         .include "enemies.inc"
         .include "far_call.inc"
         .include "hud.inc"
+        .include "indicators.inc"
         .include "input.inc"
         .include "kernel.inc"
         .include "levels.inc"
@@ -848,6 +849,7 @@ continue_waiting:
         debug_color LIGHTGRAY
 
         far_call FAR_update_coins
+        far_call FAR_update_indicators
 
         perform_zpcm_inc
         far_call FAR_update_brightness
