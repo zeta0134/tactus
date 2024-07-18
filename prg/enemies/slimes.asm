@@ -274,6 +274,9 @@ done_with_drops:
         ; #RIP
         jsr spawn_death_sprite_here
 
+        ; A slime died! Increment the player's ongoing combo
+        inc PlayerCombo
+
         ; spawn LOOT upon defeat
         set_loot_table tiny_loot_table
         roll_loot_at OriginalAttackSquare

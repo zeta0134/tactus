@@ -372,6 +372,9 @@ done_with_drops:
         ; #RIP
         jsr spawn_death_sprite_here
 
+        ; A standard enemy died! Increment the player's ongoing combo
+        inc PlayerCombo
+
         ; Roll for loot here!
         ; TODO: move the loot table selection into individual enemies instead
         set_loot_table standard_loot_table

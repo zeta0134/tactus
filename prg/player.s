@@ -64,6 +64,11 @@ EnemyDiedThisFrame: .res 1
 SafetyCol: .res 1
 SafetyRow: .res 1
 
+; Score Multipliers
+PlayerCombo: .res 1
+PlayerChain: .res 1
+PlayerChainGrace: .res 1
+
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
 DIRECTION_SOUTH = 3
@@ -160,6 +165,11 @@ MetaSpriteIndex := R0
 
         lda #0
         sta PlayerIdleBeats
+
+        lda #0
+        sta PlayerCombo
+        sta PlayerChain
+        sta PlayerChainGrace
 
         rts
 
@@ -434,6 +444,9 @@ done_with_initial_pose:
 
         inc PlayerIdleBeats
 
+        lda #0
+        sta PlayerCombo
+
 ; TODO: If no move or attack was attempted, reset the combo counter (assuming we implement one)
         lda PlayerNextDirection
         beq resolve_enemy_collision
@@ -472,6 +485,9 @@ apply_jumping_pose:
         lda #<SPRITE_TILE_PLAYER_JUMP
         sta sprite_table + MetaSpriteState::TileIndex, x
 skip_jumping_pose:
+
+        ; Update the player's combo counter
+        jsr update_chain_and_combo
 
         ; Now we may finalize the player's position and draw
         lda TargetRow
@@ -549,6 +565,9 @@ TargetCol := R15
         perform_zpcm_inc
         lda #0
         sta EnemyDiedThisFrame
+
+        lda #0
+        sta PlayerCombo
 
         ldx PlayerRow
         lda player_tile_index_table, x ; Row * Width
@@ -729,8 +748,36 @@ skip_weapon_sfx:
         sta sprite_table + MetaSpriteState::TileIndex, x
 
 done:
-
         ; If there is any cleanup to do, do that here. Otherwise we're finished I think?
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc update_chain_and_combo
+        perform_zpcm_inc
+        ; Based on the player's accumulated combo, manipulate their chain here
+        lda PlayerCombo
+        beq check_chain_over
+        ; Continue the player's current chain
+        inc PlayerChain
+        lda #0
+        sta PlayerChainGrace
+        jmp cleanup
+check_chain_over:
+        ; If the player is below the grace threshold, continue the chain
+        lda PlayerChainGrace
+        cmp #1
+        bcs chain_over
+        ; continue the grace period
+        inc PlayerChainGrace
+        jmp cleanup
+chain_over:
+        ; Reset the chain and grace back to 0
+        lda #0
+        sta PlayerChain
+        sta PlayerChainGrace
+
+cleanup:
         perform_zpcm_inc
         rts
 .endproc
