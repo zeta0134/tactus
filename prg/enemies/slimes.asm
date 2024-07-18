@@ -274,11 +274,9 @@ done_with_drops:
         ; #RIP
         jsr spawn_death_sprite_here
 
-        ; spawn a COIN here (new!)
-        ; TODO: actual coin loot tables, per enemy type probably
-        lda #0 ; first coin type
-        ldx OriginalAttackSquare
-        jsr FIXED_spawn_coin
+        ; spawn LOOT upon defeat
+        set_loot_table tiny_loot_table
+        roll_loot_at OriginalAttackSquare
 
         ; Play an appropriately crunchy death sound
         st16 R0, sfx_defeat_enemy_pulse

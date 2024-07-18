@@ -121,7 +121,7 @@ MetaSpriteIndex := R0
         ; The player should start with whatever Zeta likes
         lda #1
         sta PlayerWeaponDmg
-        lda #WEAPON_SPEAR
+        lda #WEAPON_BROADSWORD
         sta PlayerWeapon
 .else
         ; The player should start with a standard L1-DAGGER

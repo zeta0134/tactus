@@ -11,6 +11,7 @@
         .include "kernel.inc"
         .include "hud.inc"
         .include "levels.inc"
+        .include "loot.inc"
         .include "nes.inc"
         .include "palette.inc"
         .include "palette_cycler.inc"
