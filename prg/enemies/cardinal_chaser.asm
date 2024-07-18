@@ -26,9 +26,13 @@ north:
         sec
         sbc #::BATTLEFIELD_WIDTH
         sta TargetTile
+        lda #DUST_DIRECTION_S
+        sta SmokePuffDirection
         rts
 east:
         inc TargetTile
+        lda #DUST_DIRECTION_W
+        sta SmokePuffDirection
         rts
 south:
         inc TargetRow
@@ -36,9 +40,13 @@ south:
         clc
         adc #::BATTLEFIELD_WIDTH
         sta TargetTile
+        lda #DUST_DIRECTION_N
+        sta SmokePuffDirection
         rts
 west:
         dec TargetTile
+        lda #DUST_DIRECTION_E
+        sta SmokePuffDirection
         rts
 .endproc
 
@@ -104,9 +112,13 @@ move_horizontally:
         bmi move_left
 move_right: 
         inc TargetTile
+        lda #DUST_DIRECTION_W
+        sta SmokePuffDirection
         rts
 move_left:
         dec TargetTile
+        lda #DUST_DIRECTION_E
+        sta SmokePuffDirection
         rts
 
 move_vertically:
@@ -121,6 +133,8 @@ move_down:
         clc
         adc #::BATTLEFIELD_WIDTH
         sta TargetTile
+        lda #DUST_DIRECTION_N
+        sta SmokePuffDirection
         rts
 move_up:
         dec TargetRow
@@ -128,6 +142,8 @@ move_up:
         sec
         sbc #::BATTLEFIELD_WIDTH
         sta TargetTile
+        lda #DUST_DIRECTION_S
+        sta SmokePuffDirection
         rts
 .endproc
 
@@ -241,10 +257,6 @@ proceed_with_jump:
         lda #0
         sta tile_data, y
 
-        ; Now, draw a puff of smoke at our current location
-        ; this should use the same palette that we use
-        draw_at_x_keeppal TILE_SMOKE_PUFF, BG_TILE_SMOKE_PUFF
-
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
         sta tile_data, x
@@ -256,6 +268,14 @@ proceed_with_jump:
         ; And finally clear the data flags for the puff of smoke, just to keep things tidy
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
+
+        ; Finally, draw the puff of smoke at our current location
+        ; (this clobbers X and Y, so we prefer to do it last)
+        lda CurrentTile
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        jsr draw_smoke_puff
 
         rts
 .endproc
