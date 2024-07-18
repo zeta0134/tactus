@@ -2,10 +2,18 @@
 
     .include "../build/tile_defs.inc"
     .include "indicators.inc"
+    .include "kernel.inc"
     .include "player.inc"
     .include "slowam.inc"
     .include "sprites.inc"
     .include "zeropage.inc"
+
+    .segment "RAM"
+
+LastDisplayedComboBeat: .res 1
+LastDisplayedChain: .res 1
+ComboBounceHeightPos: .res 1
+ChainBounceHeightPos: .res 1
 
     .segment "CODE_3"
 
@@ -73,7 +81,9 @@ chain_right_lut:
     .byte SPRITE_TILE_TACTUSINDICATORS11 + 0
     .byte SPRITE_TILE_TACTUSINDICATORS18 + 2
 
-
+bounce_height_table:
+    .byte 2, 3, 3, 2, 1, 0, 0, 0, 0
+BOUNCE_END = 6
 
 .proc FAR_update_indicators
 IndicatorX := R0
@@ -88,11 +98,16 @@ IndicatorY := R1
     cmp #2
     bcs display_indicators
     ; nothing to display! sprites are already disabled, bail now.
-    rts
+    jmp cleanup
 display_indicators:
     jsr compute_initial_indicator_position
     jsr draw_chain_indicator
     jsr draw_combo_indicator
+cleanup:
+    lda PlayerChain
+    sta LastDisplayedChain
+    lda CurrentBeatCounter
+    sta LastDisplayedComboBeat
     rts
 .endproc
 
@@ -105,7 +120,7 @@ IndicatorY := R1
     sta IndicatorX
 
     lda PlayerRow
-    cmp #5
+    cmp #4
     bcs upper_indicator
 lower_indicator:
     lda PlayerCurrentY+1
@@ -124,7 +139,7 @@ upper_indicator:
 .proc compute_next_indicator_position
 IndicatorY := R1
     lda PlayerRow
-    cmp #5
+    cmp #4
     bcs upper_indicator
 lower_indicator:
     lda IndicatorY
@@ -137,7 +152,6 @@ upper_indicator:
     sec
     sbc #16
     sta IndicatorY
-    rts
     rts
 .endproc
 
@@ -152,6 +166,13 @@ ChainIndex := R4
     lda PlayerChain
     cmp #2
     jcc done_with_chain
+
+    lda PlayerChain
+    cmp LastDisplayedChain
+    beq keep_current_bounce_position
+    lda #0
+    sta ChainBounceHeightPos
+keep_current_bounce_position:
 
     ldx PlayerChain
     cpx #MAX_CHAIN
@@ -169,6 +190,9 @@ chain_in_range:
     ldy #SelfModifiedSprite::PosX
     sta (SpritePtr), y
     lda IndicatorY
+    ldx ChainBounceHeightPos
+    sec 
+    sbc bounce_height_table, x
     ldy #SelfModifiedSprite::PosY
     sta (SpritePtr), y
     ldx ChainIndex
@@ -190,6 +214,9 @@ chain_in_range:
     ldy #SelfModifiedSprite::PosX
     sta (SpritePtr), y
     lda IndicatorY
+    ldx ChainBounceHeightPos
+    sec 
+    sbc bounce_height_table, x
     ldy #SelfModifiedSprite::PosY
     sta (SpritePtr), y
     ldx ChainIndex
@@ -211,6 +238,9 @@ chain_in_range:
     ldy #SelfModifiedSprite::PosX
     sta (SpritePtr), y
     lda IndicatorY
+    ldx ChainBounceHeightPos
+    sec 
+    sbc bounce_height_table, x
     ldy #SelfModifiedSprite::PosY
     sta (SpritePtr), y
     ldx ChainIndex
@@ -222,6 +252,11 @@ chain_in_range:
     sta (SpritePtr), y
 
     jsr compute_next_indicator_position
+
+    lda ChainBounceHeightPos
+    cmp #BOUNCE_END
+    beq done_with_chain
+    inc ChainBounceHeightPos
 done_with_chain:
     rts
 .endproc
@@ -234,6 +269,13 @@ ComboIndex := R4
     lda PlayerCombo
     cmp #2
     jcc done_with_combo
+
+    lda CurrentBeatCounter
+    cmp LastDisplayedComboBeat
+    beq keep_current_bounce_position
+    lda #0
+    sta ComboBounceHeightPos
+keep_current_bounce_position:
 
     ldx PlayerCombo
     cpx #MAX_COMBO
@@ -251,6 +293,9 @@ combo_in_range:
     ldy #SelfModifiedSprite::PosX
     sta (SpritePtr), y
     lda IndicatorY
+    ldx ComboBounceHeightPos
+    sec 
+    sbc bounce_height_table, x
     ldy #SelfModifiedSprite::PosY
     sta (SpritePtr), y
     ldx ComboIndex
@@ -272,6 +317,9 @@ combo_in_range:
     ldy #SelfModifiedSprite::PosX
     sta (SpritePtr), y
     lda IndicatorY
+    ldx ComboBounceHeightPos
+    sec 
+    sbc bounce_height_table, x
     ldy #SelfModifiedSprite::PosY
     sta (SpritePtr), y
     ldx ComboIndex
@@ -293,6 +341,9 @@ combo_in_range:
     ldy #SelfModifiedSprite::PosX
     sta (SpritePtr), y
     lda IndicatorY
+    ldx ComboBounceHeightPos
+    sec 
+    sbc bounce_height_table, x
     ldy #SelfModifiedSprite::PosY
     sta (SpritePtr), y
     ldx ComboIndex
@@ -304,6 +355,11 @@ combo_in_range:
     sta (SpritePtr), y
 
     jsr compute_next_indicator_position
+
+    lda ComboBounceHeightPos
+    cmp #BOUNCE_END
+    beq done_with_combo
+    inc ComboBounceHeightPos
 done_with_combo:
     rts
 .endproc
