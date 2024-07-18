@@ -83,6 +83,11 @@ no_change:
         rts
 .endproc
 
+; This really needs to be... just... ENTIRELY redone. Most notably, spiders
+; are REAL bad about getting stuck in a corner with a 25% chance to escape. They
+; do a bit better when tracking the player, but still make stupid decisions. We
+; want them to try to always move if they're not completely blocked, and we want
+; the whole "randomly pick a direction" logic to be much less stupid.
 .proc update_spider_anticipate
 TargetRow := R0
 TargetTile := R1
@@ -116,6 +121,8 @@ move_up:
         sbc #::BATTLEFIELD_WIDTH
         sta TargetTile
         dec TargetRow
+        lda #DUST_DIRECTION_N ; temp
+        sta SmokePuffDirection
         jmp row_target_converge
 move_down:
         lda TargetTile
@@ -123,6 +130,8 @@ move_down:
         adc #::BATTLEFIELD_WIDTH
         sta TargetTile
         inc TargetRow
+        lda #DUST_DIRECTION_S ; temp
+        sta SmokePuffDirection
         jmp row_target_converge
 randomly_target_row:
         jsr next_rand
@@ -143,9 +152,29 @@ row_target_converge:
         bpl move_right
 move_left:
         dec TargetTile
+        lda SmokePuffDirection
+        cmp #DUST_DIRECTION_N
+        bne dust_sw
+dust_nw:
+        lda #DUST_DIRECTION_SE
+        sta SmokePuffDirection
+        jmp col_target_converge
+dust_sw:
+        lda #DUST_DIRECTION_NE
+        sta SmokePuffDirection
         jmp col_target_converge
 move_right:
         inc TargetTile
+        lda SmokePuffDirection
+        cmp #DUST_DIRECTION_N
+        bne dust_se
+dust_ne:
+        lda #DUST_DIRECTION_SW
+        sta SmokePuffDirection
+        jmp col_target_converge
+dust_se:
+        lda #DUST_DIRECTION_NW
+        sta SmokePuffDirection
         jmp col_target_converge
 randomly_target_col:
         jsr next_rand
@@ -195,9 +224,6 @@ proceed_with_jump:
         lda #0
         sta tile_data, y
 
-        ; Now, draw a puff of smoke at our current location
-        ; this should use the same palette that we use
-        draw_at_x_keeppal TILE_SMOKE_PUFF, BG_TILE_SMOKE_PUFF
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
         sta tile_data, x
@@ -206,9 +232,17 @@ proceed_with_jump:
         lda #FLAG_MOVED_THIS_FRAME
         ora tile_flags, x
         sta tile_flags, y
-        ; And finally clear the data flags for the puff of smoke, just to keep things tidy
+        ; Finally clear the data flags for the puff of smoke, just to keep things tidy
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
+
+        ; Finally, draw the puff of smoke at our current location
+        ; (this clobbers X and Y, so we prefer to do it last)
+        lda CurrentTile
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        jsr draw_smoke_puff
 
         rts
 .endproc
