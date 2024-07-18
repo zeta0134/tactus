@@ -51,11 +51,15 @@ jump_left:
         lda CurrentTile
         sta TargetTile
         dec TargetTile
+        lda #DUST_DIRECTION_E
+        sta SmokePuffDirection
         jmp converge
 jump_right:
         lda CurrentTile
         sta TargetTile
         inc TargetTile
+        lda #DUST_DIRECTION_W
+        sta SmokePuffDirection
 converge:
         ; Sanity check: is the target tile free?
         if_valid_destination proceed_with_jump
@@ -79,22 +83,26 @@ proceed_with_jump:
         eor #%00000100 ; invert the direction: if there was a wall to one side, try the other side next time        
         sta tile_data, y
 
-        ; Now, draw a puff of smoke at our current location
-        ; this should use the same palette that we use
-        draw_at_x_keeppal TILE_SMOKE_PUFF, BG_TILE_SMOKE_PUFF
-
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
         sta tile_data, x
 
-        ; Finally, flag ourselves as having just moved; this signals to the player that our old
+        ; Flag ourselves as having just moved; this signals to the player that our old
         ; position is a valid target, and it also signals to the engine that we shouldn't be ticked
         ; a second time, if our target square comes up while we're scanning
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, y
-        ; And finally clear the data flags for the puff of smoke, just to keep things tidy
+        ; Clear the data flags for the puff of smoke, just to keep things tidy
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
+
+        ; Finally, draw the puff of smoke at our current location
+        ; (this clobbers X and Y, so we prefer to do it last)
+        lda CurrentTile
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        jsr draw_smoke_puff
 
         rts
 .endproc
@@ -124,6 +132,8 @@ CurrentTile := R15
         cmp #2
         beq west
 north:
+        lda #DUST_DIRECTION_S
+        sta SmokePuffDirection
         lda CurrentTile
         sec
         sbc #(BATTLEFIELD_WIDTH)
@@ -131,12 +141,16 @@ north:
         dec TargetRow
         jmp converge
 east:
+        lda #DUST_DIRECTION_W
+        sta SmokePuffDirection
         lda CurrentTile
         clc
         adc #1
         sta TargetTile
         jmp converge
 south:
+        lda #DUST_DIRECTION_N
+        sta SmokePuffDirection
         lda CurrentTile
         clc
         adc #(BATTLEFIELD_WIDTH)
@@ -144,6 +158,8 @@ south:
         inc TargetRow
         jmp converge
 west:
+        lda #DUST_DIRECTION_E
+        sta SmokePuffDirection
         lda CurrentTile
         sec
         sbc #1
@@ -177,21 +193,26 @@ proceed_with_jump:
         and #%00000011
         sta tile_data, y
 
-        ; Now, draw a puff of smoke at our current location
-        ; this should use the same palette that we use
-        draw_at_x_keeppal TILE_SMOKE_PUFF, BG_TILE_SMOKE_PUFF
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
         sta tile_data, x
 
-        ; Finally, flag ourselves as having just moved; this signals to the player that our old
+        ; Flag ourselves as having just moved; this signals to the player that our old
         ; position is a valid target, and it also signals to the engine that we shouldn't be ticked
         ; a second time, if our target square comes up while we're scanning
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, y
-        ; And finally clear the data flags for the puff of smoke, just to keep things tidy
+        ; Clear the data flags for the puff of smoke, just to keep things tidy
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
+
+        ; Finally, draw the puff of smoke at our current location
+        ; (this clobbers X and Y, so we prefer to do it last)
+        lda CurrentTile
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        jsr draw_smoke_puff
 
         rts
 .endproc

@@ -36,6 +36,9 @@ ActiveDrawingScratch: .res 6
 
 .segment "RAM"
 
+SmokePuffTile: .res 1
+SmokePuffRow: .res 1
+SmokePuffDirection: .res 1
 
 .segment "PRGFIXED_E000"
 
@@ -47,6 +50,15 @@ TOP_LEFT_BITS     := %00 ; not actually used
 TOP_RIGHT_BITS    := %10
 BOTTOM_LEFT_BITS  := %01
 BOTTOM_RIGHT_BITS := %11
+
+DUST_DIRECTION_N  := 0
+DUST_DIRECTION_NE := 2
+DUST_DIRECTION_E  := 4
+DUST_DIRECTION_SE := 6
+DUST_DIRECTION_S  := 8
+DUST_DIRECTION_SW := 10
+DUST_DIRECTION_W  := 12
+DUST_DIRECTION_NW := 14
 
 ; Note: this is kinda slow! expect it to cause lag if we try to change a BUNCH of
 ; tiles in one go, but it should be reasonably okay for half a dozen or so
