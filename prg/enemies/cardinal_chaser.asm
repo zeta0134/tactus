@@ -295,14 +295,17 @@ EnemyHealth := R11
         cmp #%11
         beq advanced_hp
 basic_hp:
+        set_loot_table basic_loot_table
         lda #2
         sta EnemyHealth
         jmp done
 intermediate_hp:
+        set_loot_table intermediate_loot_table
         lda #4
         sta EnemyHealth
         jmp done
 advanced_hp:
+        set_loot_table advanced_loot_table
         lda #6
         sta EnemyHealth
 done:
@@ -321,14 +324,17 @@ EnemyHealth := R11
         cmp #%11
         beq advanced_hp
 basic_hp:
+        set_loot_table basic_loot_table
         lda #2
         sta EnemyHealth
         jmp done
 intermediate_hp:
+        set_loot_table intermediate_loot_table
         lda #4
         sta EnemyHealth
         jmp done
 advanced_hp:
+        set_loot_table advanced_loot_table
         lda #6
         sta EnemyHealth
 done:

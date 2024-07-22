@@ -278,7 +278,7 @@ chain_offset_lut:
 combo_offset_lut:
     .byte 0, 2, 4, 6, 8
 
-MAX_CHAIN = 9
+MAX_CHAIN = 8
 MAX_COMBO = 4 ; actually 5, but we need to decrement
 
 ; Note: defaults to tiny_loot_table, and resets to this after each call. Set

@@ -298,7 +298,9 @@ done_with_drops:
         ; A slime died! Increment the player's ongoing combo
         inc PlayerCombo
 
-        ; spawn LOOT upon defeat
+        ; spawn LOOT upon defeat. Slimes always use the tiny loot table,
+        ; regardless of their "difficulty" (which really just affects their
+        ; movement pattern)
         set_loot_table tiny_loot_table
         roll_loot_at OriginalAttackSquare
 
