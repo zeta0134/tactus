@@ -1113,6 +1113,13 @@ TargetCol := R15
         st16 R0, sfx_weak_hit_noise
         jsr play_sfx_noise
 
+        ; Taking damage resets any ongoing chain. We want to
+        ; reward SKILLED play, not merely one's ability to
+        ; kite a crowd of zombies and tank hits
+        lda #0
+        sta PlayerChain
+        sta PlayerChainGrace
+
 already_dead:
         rts
 .endproc
