@@ -20,7 +20,10 @@
 .global FAR_roll_loot
 
 .global tiny_loot_table
-.global standard_loot_table
+.global basic_loot_table
+.global intermediate_loot_table
+.global advanced_loot_table
+
 
 .macro set_loot_table loot_table
     st16 LootTable, loot_table

@@ -60,97 +60,43 @@ coin_sprite_starting_index: .res 1
 
     .segment "CODE_3"
 
-COIN_PAL_WHITE = $01
-COIN_PAL_ORANGE = $02
-COIN_PAL_PURPLE = $03
+COIN_PAL_WHI  = $01
+COIN_PAL_RED    = $02
+COIN_PAL_PPL = $03
 
 ; indexed by entries in the coin queue. IDs into this table are what
 ; game logic will ultimately specify when spawning coins, usually on
 ; enemy defeat
 coin_type_tile_id_lut:
-    .byte SPRITE_TILE_COIN_STACK_01 + 0 ; blank (should be unused)
-    .byte SPRITE_TILE_COIN_STACK_01 + 2 ; note: the left side here is a blank tile
-    .byte SPRITE_TILE_COIN_STACK_23 + 0
-    .byte SPRITE_TILE_COIN_STACK_23 + 2
-    .byte SPRITE_TILE_COIN_SINGLE_01 + 0
-    .byte SPRITE_TILE_COIN_SINGLE_01 + 2
-    .byte SPRITE_TILE_COIN_SINGLE_23 + 0
-    .byte SPRITE_TILE_COIN_SINGLE_23 + 2
-    .byte SPRITE_TILE_COIN_NUGGETS_01 + 0
-    .byte SPRITE_TILE_COIN_NUGGETS_01 + 2
-    .byte SPRITE_TILE_COIN_NUGGETS_23 + 0
-    .byte SPRITE_TILE_COIN_NUGGETS_23 + 2
-    .byte SPRITE_TILE_COIN_GEMS_01 + 0
-    .byte SPRITE_TILE_COIN_GEMS_01 + 0
-    .byte SPRITE_TILE_COIN_GEMS_01 + 2
-    .byte SPRITE_TILE_COIN_GEMS_23 + 0
-    .byte SPRITE_TILE_COIN_GEMS_23 + 0
-    .byte SPRITE_TILE_COIN_GEMS_23 + 2
-    .byte SPRITE_TILE_COIN_GEMS_23 + 2
-    .byte SPRITE_TILE_COIN_GEMS_45 + 0
-    .byte SPRITE_TILE_COIN_GEMS_45 + 2
-    .byte SPRITE_TILE_COIN_GEMS_45 + 2
-    .byte SPRITE_TILE_COIN_GEMS_45 + 2
-    .byte SPRITE_TILE_COIN_GEMS_67 + 0
-    .byte SPRITE_TILE_COIN_GEMS_67 + 0
-    .byte SPRITE_TILE_COIN_GEMS_67 + 0
-    .byte SPRITE_TILE_COIN_GEMS_67 + 2
+    .byte SPRITE_TILE_LOOT_01 + 0 ; 0-value diamond (should be unused)
+    .byte SPRITE_TILE_LOOT_01 + 2 ; 1-coin (white)
+    .byte SPRITE_TILE_LOOT_23 + 0 ; 2-gem (red)
+    .byte SPRITE_TILE_LOOT_23 + 2 ; 3-gem (purple)
+    .byte SPRITE_TILE_LOOT_45 + 0 ; 5-jewel (red)
+    .byte SPRITE_TILE_LOOT_45 + 2 ; 5-jewel (purple)
+    .byte SPRITE_TILE_LOOT_67 + 0 ; 10-pearl (white)
+    .byte SPRITE_TILE_LOOT_67 + 2 ; 10-obelisk (purple)
+    .byte SPRITE_TILE_LOOT_01 + 0 ; 25-diamond (white)
 coin_type_attribute_lut:
-    .byte COIN_PAL_WHITE ; blank
-    .byte COIN_PAL_WHITE ; stack 1
-    .byte COIN_PAL_WHITE ; stack 2
-    .byte COIN_PAL_WHITE ; stack 3
-    .byte COIN_PAL_WHITE ; single 0 
-    .byte COIN_PAL_ORANGE ; single 1
-    .byte COIN_PAL_ORANGE ; single 2
-    .byte COIN_PAL_ORANGE ; single 3
-    .byte COIN_PAL_ORANGE ; nugget 0
-    .byte COIN_PAL_ORANGE ; nugget 1
-    .byte COIN_PAL_ORANGE ; nugget 2
-    .byte COIN_PAL_ORANGE ; nugget 3
-    .byte COIN_PAL_PURPLE ; gems 0 (small jewel) (purple)
-    .byte COIN_PAL_ORANGE ; gems 0 (small jewel) (orange)
-    .byte COIN_PAL_WHITE ; gems 1 (diamond)
-    .byte COIN_PAL_PURPLE ; gems 2 (large jewel) (purple)
-    .byte COIN_PAL_ORANGE ; gems 2 (large jewel) (orange)
-    .byte COIN_PAL_PURPLE ; gems 3 (square jewel) (purple)
-    .byte COIN_PAL_ORANGE ; gems 3 (square jewel) (orange)
-    .byte COIN_PAL_ORANGE ; gems 4 (meowth coin)
-    .byte COIN_PAL_PURPLE ; gems 5 (pointed crystal) (purple)
-    .byte COIN_PAL_WHITE  ; gems 5 (pointed crystal) (white)
-    .byte COIN_PAL_ORANGE ; gems 5 (pointed crystal) (orange)
-    .byte COIN_PAL_PURPLE ; gems 6 (large crystal) (purple)
-    .byte COIN_PAL_WHITE  ; gems 6 (large crystal) (white)
-    .byte COIN_PAL_ORANGE ; gems 6 (large crystal) (orange)
-    .byte COIN_PAL_WHITE ; gems 7 (pearl)
+    .byte COIN_PAL_WHI ; 0-value diamond (should be unused)
+    .byte COIN_PAL_WHI ; 1-coin
+    .byte COIN_PAL_RED ; 2-gem (red)
+    .byte COIN_PAL_PPL ; 3-gem (purple)
+    .byte COIN_PAL_RED ; 5-jewel (red)
+    .byte COIN_PAL_PPL ; 5-jewel (purple)
+    .byte COIN_PAL_WHI ; 10-pearl (white)
+    .byte COIN_PAL_PPL ; 10-obelisk (purple)
+    .byte COIN_PAL_WHI ; 25-diamond
 coin_type_value_lut:
-    .byte 0 ; blank
-    .byte 1 ; stack 1
-    .byte 2 ; stack 2
-    .byte 3 ; stack 3
-    .byte 1 ; single 0 
-    .byte 1 ; single 1
-    .byte 2 ; single 2
-    .byte 2 ; single 3
-    .byte 1 ; nugget 0
-    .byte 2 ; nugget 1
-    .byte 2 ; nugget 2
-    .byte 3 ; nugget 3
-    .byte 3 ; gems 0 (small jewel)
-    .byte 3 ; gems 0 (small jewel)
-    .byte 25 ; gems 1 (diamond)
-    .byte 5 ; gems 2 (large jewel)
-    .byte 5 ; gems 2 (large jewel)
-    .byte 5 ; gems 3 (square jewel)
-    .byte 5 ; gems 3 (square jewel)
-    .byte 5 ; gems 4 (meowth coin)
-    .byte 10 ; gems 5 (pointed crystal)
-    .byte 10 ; gems 5 (pointed crystal)
-    .byte 10 ; gems 5 (pointed crystal)
-    .byte 10 ; gems 6 (large crystal)
-    .byte 10 ; gems 6 (large crystal)
-    .byte 10 ; gems 6 (large crystal)
-    .byte 10 ; gems 7 (pearl)
+    .byte 0  ; 0-value diamond (should be unused)
+    .byte 1  ; 1-coin
+    .byte 2  ; 2-gem (red)
+    .byte 3  ; 3-gem (purple)
+    .byte 5  ; 5-jewel (red)
+    .byte 5  ; 5-jewel (purple)
+    .byte 10 ; 10-pearl (white)
+    .byte 10 ; 10-obelisk (purple)
+    .byte 25 ; 25-diamond
 
 coin_height_lut:
     ;32100123

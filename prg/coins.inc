@@ -2,32 +2,15 @@
 .global FAR_init_coins
 .global FAR_update_coins
 
-; (sorted by point value, not by table order)
+; (sorted by point value)
 COIN_00_NON = 0
 COIN_01_STK = 1
-COIN_01_SNW = 4
-COIN_01_SNO = 5
-COIN_01_NUG = 8
-COIN_02_STK = 2
-COIN_02_SNG = 6
-COIN_02_NGA = 9
-COIN_02_NGB = 10
-COIN_03_STK = 3
-COIN_03_SNG = 7
-COIN_03_NUG = 11
-COIN_03_GMP = 12
-COIN_03_GMO = 13
-COIN_05_GPA = 15
-COIN_05_GOA = 16
-COIN_05_GPB = 17
-COIN_05_GOB = 18
-COIN_05_MTH = 19
-COIN_10_CPA = 20
-COIN_10_CWA = 21
-COIN_10_COA = 22
-COIN_10_CPB = 23
-COIN_10_CWB = 24
-COIN_10_COB = 25
-COIN_10_PRL = 26
-COIN_25_DMD = 14
+COIN_02_GMR = 2
+COIN_03_GMP = 3
+COIN_05_JWR = 4
+COIN_05_JWP = 5
+COIN_10_PRL = 6
+COIN_10_OBL = 7
+COIN_25_DMD = 8
+
 

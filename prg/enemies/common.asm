@@ -377,7 +377,7 @@ done_with_drops:
 
         ; Roll for loot here!
         ; TODO: move the loot table selection into individual enemies instead
-        set_loot_table standard_loot_table
+        set_loot_table basic_loot_table
         roll_loot_at OriginalAttackSquare
 
         ; Play an appropriately crunchy death sound

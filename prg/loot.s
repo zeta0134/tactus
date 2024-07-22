@@ -24,9 +24,10 @@ LootPosition: .res 1
 ; four separate coin denominations can be selected. Use
 ; NON for a chance at nothing.
 
-; Generic treasure, divided merely by denomination and
-; reward chance. This first group has inbetween variants
-; which reward half-coins on average
+; For now, all entries also drop a consistent amount of loot.
+; While the system could in theory support randomization, right now
+; it is too tricky to balance, and we need to get standard play
+; feeling good before we introduce spice.
 
 ; It's absolutely nothing
 loot_00_000:
@@ -39,140 +40,56 @@ loot_00_000:
     .byte COIN_00_NON
     .byte COIN_00_NON
 
-
-; 50% chance to drop nothing (useful for weaker enemies)
-loot_00_500:
-    .byte COIN_00_NON
-    .byte COIN_00_NON
-    .byte COIN_00_NON
-    .byte COIN_00_NON
-    .byte COIN_01_STK
-    .byte COIN_01_SNW
-    .byte COIN_01_SNO
-    .byte COIN_01_NUG
-
 ; Biased towards "normal" looking coins
 loot_01_000:
     .byte COIN_01_STK
     .byte COIN_01_STK
     .byte COIN_01_STK
-    .byte COIN_01_SNW
-    .byte COIN_01_SNW
-    .byte COIN_01_SNW
-    .byte COIN_01_SNO
-    .byte COIN_01_NUG
-
-; 50% chance to drop a higher value coin
-loot_01_500:
     .byte COIN_01_STK
-    .byte COIN_01_SNW
-    .byte COIN_01_SNO
-    .byte COIN_01_NUG
-    .byte COIN_02_STK
-    .byte COIN_02_SNG
-    .byte COIN_02_NGA
-    .byte COIN_02_NGB
+    .byte COIN_01_STK
+    .byte COIN_01_STK
+    .byte COIN_01_STK
+    .byte COIN_01_STK
 
 ; Always drops a higher value coin (no particular bias)
 loot_02_000:
-    .byte COIN_02_STK
-    .byte COIN_02_STK
-    .byte COIN_02_SNG
-    .byte COIN_02_SNG
-    .byte COIN_02_NGA
-    .byte COIN_02_NGA
-    .byte COIN_02_NGB
-    .byte COIN_02_NGB
-
-; 50% chance to drop a higher value coin (no stacks though)
-loot_02_500:
-    .byte COIN_02_STK
-    .byte COIN_02_SNG
-    .byte COIN_02_NGA
-    .byte COIN_02_NGB
-    .byte COIN_03_SNG
-    .byte COIN_03_NUG
-    .byte COIN_03_GMP
-    .byte COIN_03_GMO
+    .byte COIN_02_GMR
+    .byte COIN_02_GMR
+    .byte COIN_02_GMR
+    .byte COIN_02_GMR
+    .byte COIN_02_GMR
+    .byte COIN_02_GMR
+    .byte COIN_02_GMR
+    .byte COIN_02_GMR
 
 ; 100% chance to drop a higher value coin (biased against nugs/stacks)
 loot_03_000:
-    .byte COIN_03_STK
-    .byte COIN_03_NUG
-    .byte COIN_03_SNG
-    .byte COIN_03_SNG
     .byte COIN_03_GMP
     .byte COIN_03_GMP
-    .byte COIN_03_GMO
-    .byte COIN_03_GMO
-
-; That's enough small-value shenanigans, so the following
-; groups will be more utilitarian. First, we have a crowd
-; favorite, "rare chance of treasure"
-; (the number here is always the average expected payout)
-
-rare_03_625:
-    .byte COIN_02_STK
-    .byte COIN_02_SNG
-    .byte COIN_02_NGA
-    .byte COIN_02_NGB
     .byte COIN_03_GMP
-    .byte COIN_03_GMO
-    .byte COIN_05_MTH
-    .byte COIN_10_PRL
-
-rare_07_125:
-    .byte COIN_03_SNG
-    .byte COIN_03_NUG
     .byte COIN_03_GMP
-    .byte COIN_03_GMO
-    .byte COIN_05_GOA
-    .byte COIN_05_GPB
-    .byte COIN_10_CWA
-    .byte COIN_25_DMD
-
-rare_09_375:
-    .byte COIN_05_GPA
-    .byte COIN_05_GOA
-    .byte COIN_05_GPB
-    .byte COIN_05_GOB
-    .byte COIN_10_CPA
-    .byte COIN_10_CWB
-    .byte COIN_10_PRL
-    .byte COIN_25_DMD
-
-; (much less spready; biased heavily towards 10)
-rare_11_875:
-    .byte COIN_10_CPA
-    .byte COIN_10_CWA
-    .byte COIN_10_COA
-    .byte COIN_10_CPB
-    .byte COIN_10_CWB
-    .byte COIN_10_COB
-    .byte COIN_10_PRL
-    .byte COIN_25_DMD
-
-; Rounding out the generic treasure category, for those
-; times when you'd like to consistently force one particular
-; denomination:
+    .byte COIN_03_GMP
+    .byte COIN_03_GMP
+    .byte COIN_03_GMP
+    .byte COIN_03_GMP
 
 loot_05_000:
-    .byte COIN_05_GPA
-    .byte COIN_05_GPA
-    .byte COIN_05_GOA
-    .byte COIN_05_GPB
-    .byte COIN_05_GPB
-    .byte COIN_05_GOB
-    .byte COIN_05_GOB
-    .byte COIN_05_MTH
+    .byte COIN_05_JWR
+    .byte COIN_05_JWR
+    .byte COIN_05_JWR
+    .byte COIN_05_JWR
+    .byte COIN_05_JWP
+    .byte COIN_05_JWP
+    .byte COIN_05_JWP
+    .byte COIN_05_JWP
 
 loot_10_000:
-    .byte COIN_10_CPA
-    .byte COIN_10_CWA
-    .byte COIN_10_COA
-    .byte COIN_10_CPB
-    .byte COIN_10_CWB
-    .byte COIN_10_COB
+    .byte COIN_10_OBL
+    .byte COIN_10_OBL
+    .byte COIN_10_OBL
+    .byte COIN_10_OBL
+    .byte COIN_10_PRL
+    .byte COIN_10_PRL
     .byte COIN_10_PRL
     .byte COIN_10_PRL
 
@@ -203,96 +120,60 @@ loot_25_000:
 
 ; Guaranteed basic drops, biased to generate the largest number
 ; of unique coins for each payout stage
-b00_p00_000: .word loot_00_000, loot_00_000, loot_00_000
-b01_p00_000: .word loot_01_000, loot_00_000, loot_00_000
-b02_p00_000: .word loot_01_000, loot_01_000, loot_00_000
-b03_p00_000: .word loot_01_000, loot_01_000, loot_01_000
-b04_p00_000: .word loot_02_000, loot_01_000, loot_01_000
-b05_p00_000: .word loot_02_000, loot_02_000, loot_01_000
-b06_p00_000: .word loot_02_000, loot_02_000, loot_02_000
-b07_p00_000: .word loot_03_000, loot_02_000, loot_02_000
-b08_p00_000: .word loot_03_000, loot_03_000, loot_02_000
-b09_p00_000: .word loot_03_000, loot_03_000, loot_03_000
-b10_p00_000: .word loot_05_000, loot_03_000, loot_02_000
-b11_p00_000: .word loot_05_000, loot_03_000, loot_03_000
-b12_p00_000: .word loot_05_000, loot_05_000, loot_02_000
-b13_p00_000: .word loot_05_000, loot_05_000, loot_03_000
-b14_p00_000: .word loot_10_000, loot_02_000, loot_02_000
-b15_p00_000: .word loot_05_000, loot_05_000, loot_05_000
-b16_p00_000: .word loot_10_000, loot_05_000, loot_01_000
-b17_p00_000: .word loot_10_000, loot_05_000, loot_02_000
-b18_p00_000: .word loot_10_000, loot_05_000, loot_03_000
+base00: .word loot_00_000, loot_00_000, loot_00_000
+base01: .word loot_01_000, loot_00_000, loot_00_000
+base02: .word loot_01_000, loot_01_000, loot_00_000
+base03: .word loot_01_000, loot_01_000, loot_01_000
+base04: .word loot_02_000, loot_01_000, loot_01_000
+base05: .word loot_02_000, loot_02_000, loot_01_000
+base06: .word loot_02_000, loot_02_000, loot_02_000
+base07: .word loot_03_000, loot_02_000, loot_02_000
+base08: .word loot_03_000, loot_03_000, loot_02_000
+base09: .word loot_03_000, loot_03_000, loot_03_000
+base10: .word loot_05_000, loot_03_000, loot_02_000
+base11: .word loot_05_000, loot_03_000, loot_03_000
+base12: .word loot_05_000, loot_05_000, loot_02_000
+base13: .word loot_05_000, loot_05_000, loot_03_000
+base14: .word loot_10_000, loot_02_000, loot_02_000
+base15: .word loot_05_000, loot_05_000, loot_05_000
+base16: .word loot_10_000, loot_05_000, loot_01_000
+base17: .word loot_10_000, loot_05_000, loot_02_000
+base18: .word loot_10_000, loot_05_000, loot_03_000
 ; b19 can't be guaranteed
-b20_p00_000: .word loot_10_000, loot_05_000, loot_05_000
-b21_p00_000: .word loot_10_000, loot_10_000, loot_01_000
-b22_p00_000: .word loot_10_000, loot_10_000, loot_02_000
-b23_p00_000: .word loot_10_000, loot_10_000, loot_03_000
+base20: .word loot_10_000, loot_05_000, loot_05_000
+base21: .word loot_10_000, loot_10_000, loot_01_000
+base22: .word loot_10_000, loot_10_000, loot_02_000
+base23: .word loot_10_000, loot_10_000, loot_03_000
 ; b24 can't be guaranteed
-b25_p00_000: .word loot_10_000, loot_10_000, loot_05_000
-b26_p00_000: .word loot_25_000, loot_01_000, loot_00_000
-b27_p00_000: .word loot_25_000, loot_01_000, loot_01_000
-b28_p00_000: .word loot_25_000, loot_02_000, loot_01_000
-b29_p00_000: .word loot_25_000, loot_02_000, loot_02_000
-b30_p00_000: .word loot_25_000, loot_03_000, loot_02_000
-b31_p00_000: .word loot_25_000, loot_03_000, loot_03_000
-b32_p00_000: .word loot_25_000, loot_05_000, loot_02_000
-b33_p00_000: .word loot_25_000, loot_05_000, loot_03_000
+base25: .word loot_10_000, loot_10_000, loot_05_000
+base26: .word loot_25_000, loot_01_000, loot_00_000
+base27: .word loot_25_000, loot_01_000, loot_01_000
+base28: .word loot_25_000, loot_02_000, loot_01_000
+base29: .word loot_25_000, loot_02_000, loot_02_000
+base30: .word loot_25_000, loot_03_000, loot_02_000
+base31: .word loot_25_000, loot_03_000, loot_03_000
+base32: .word loot_25_000, loot_05_000, loot_02_000
+base33: .word loot_25_000, loot_05_000, loot_03_000
 ; b34 can't be guaranteed
-b35_p00_000: .word loot_25_000, loot_05_000, loot_05_000
-b36_p00_000: .word loot_25_000, loot_10_000, loot_01_000
-b37_p00_000: .word loot_25_000, loot_10_000, loot_02_000
-b38_p00_000: .word loot_25_000, loot_10_000, loot_03_000
+base35: .word loot_25_000, loot_05_000, loot_05_000
+base36: .word loot_25_000, loot_10_000, loot_01_000
+base37: .word loot_25_000, loot_10_000, loot_02_000
+base38: .word loot_25_000, loot_10_000, loot_03_000
 ; b39 can't be guaranteed
-b40_p00_000: .word loot_25_000, loot_10_000, loot_05_000
+base40: .word loot_25_000, loot_10_000, loot_05_000
 ; b41-b44 can't be guaranteed
-b45_p00_000: .word loot_25_000, loot_10_000, loot_10_000
+base45: .word loot_25_000, loot_10_000, loot_10_000
 ; b46-b49 can't be guaranteed
-b50_p00_000: .word loot_25_000, loot_25_000, loot_00_000
-b51_p00_000: .word loot_25_000, loot_25_000, loot_01_000
-b52_p00_000: .word loot_25_000, loot_25_000, loot_02_000
-b53_p00_000: .word loot_25_000, loot_25_000, loot_03_000
+base50: .word loot_25_000, loot_25_000, loot_00_000
+base51: .word loot_25_000, loot_25_000, loot_01_000
+base52: .word loot_25_000, loot_25_000, loot_02_000
+base53: .word loot_25_000, loot_25_000, loot_03_000
 ; b54 can't be guaranteed
-b55_p00_000: .word loot_25_000, loot_25_000, loot_05_000
+base55: .word loot_25_000, loot_25_000, loot_05_000
 ; b56-b59 can't be guaranteed
-b60_p00_000: .word loot_25_000, loot_25_000, loot_10_000
+base60: .word loot_25_000, loot_25_000, loot_10_000
 ; b61-b74 can't be guaranteed
-b75_p00_000: .word loot_25_000, loot_25_000, loot_25_000 ; Note: maximum possible loot
-
-; pure spread, mostly meant for weaker enemies
-b00_p00_500: .word loot_00_500, loot_00_000, loot_00_000
-b00_p01_000: .word loot_00_500, loot_00_500, loot_00_000
-b00_p01_500: .word loot_00_500, loot_00_500, loot_00_500
-
-; guaranteed baseline with a chance of bonus
-; notably, these coin entries have the following base+spread amounts:
-; loot_01_500 ; b01_p00_500
-; loot_02_500 ; b02_p00_500
-; rare_03_625 ; b02_p01_625
-; rare_07_125 ; b03_p04_125
-; rare_09_375 ; b05_p04_375
-; rare_11_875 ; b10_p01_875
-
-; pure spread + baseline for a few baseline levels, meant for use in combos
-b01_p00_500: .word loot_01_000, loot_00_500, loot_00_000
-b01_p01_000: .word loot_01_000, loot_00_500, loot_00_500
-b01_p01_500: .word loot_01_000, loot_00_500, loot_00_500
-b02_p00_500: .word loot_02_000, loot_00_500, loot_00_000
-b02_p01_000: .word loot_02_000, loot_00_500, loot_00_500
-b03_p00_500: .word loot_03_000, loot_00_500, loot_00_000
-b03_p01_000: .word loot_03_000, loot_00_500, loot_00_500
-b05_p00_500: .word loot_05_000, loot_00_500, loot_00_000
-b05_p01_000: .word loot_05_000, loot_00_500, loot_00_500
-b10_p00_500: .word loot_10_000, loot_00_500, loot_00_000
-b10_p01_000: .word loot_10_000, loot_00_500, loot_00_500
-
-; rare drops; these use all the wacky loot tables and have significant spread. Mostly
-; use these for uncommon, difficult enemies
-b04_p02_625: .word rare_03_625, loot_01_500, loot_01_500
-b05_p03_750: .word rare_03_625, rare_03_625, loot_01_500
-b06_p04_875: .word rare_03_625, rare_03_625, rare_03_625
-b09_p12_375: .word rare_07_125, rare_07_125, rare_07_125
-b15_p13_125: .word rare_09_375, rare_09_375, rare_09_375
-b30_p05_625: .word rare_11_875, rare_11_875, rare_11_875 ; extremely rare chance for maximum payout
+base75: .word loot_25_000, loot_25_000, loot_25_000 ; Note: maximum possible loot
 
 ; ========================================================
 ;                       LOOT TABLES
@@ -317,47 +198,83 @@ b30_p05_625: .word rare_11_875, rare_11_875, rare_11_875 ; extremely rare chance
 ; - Above CHAIN 3, just use basic payouts; the random factor isn't
 ;   very fun at that point.
 
-; For the weakest of the weak. Very low maximum payout, often
-; drops nothing for basic hits, etc. (This is primarily meant for slimes)
-; Not very spready at higher levels; slimes are a weak but reliable source
-; of income for players that can work them into extended chains.
+; For when an enemy needs to use the shared damage routine, but should
+; never drop anything ever. Mostly meant for spawners and enemies that
+; clone (bits of) themselves.
+no_loot_table:
+    ; COMBO x1 (+0), x2 (+1), x3 (+2), x4 (+3), x5 (+5)
+    .word    base00,  base00,  base00,  base00,  base00 ; CHAIN 1
+    .word    base00,  base00,  base00,  base00,  base00 ; CHAIN 2
+    .word    base00,  base00,  base00,  base00,  base00 ; CHAIN 3
+    .word    base00,  base00,  base00,  base00,  base00 ; CHAIN 4
+    .word    base00,  base00,  base00,  base00,  base00 ; CHAIN 5
+    .word    base00,  base00,  base00,  base00,  base00 ; CHAIN 6
+    .word    base00,  base00,  base00,  base00,  base00 ; CHAIN 7
+    .word    base00,  base00,  base00,  base00,  base00 ; CHAIN 8
+    .word    base00,  base00,  base00,  base00,  base00 ; CHAIN WOW
+
+; For the weakest of the weak. Drops nothing at the base level. Meant primarily
+; for slimes and other weak enemies that tend to die in one hit. Slow chain and
+; combo growth on purpose, though high chains will still award reasonably decent
+; payouts.
 tiny_loot_table:
-    ; COMBO   x1 (+0),     x2 (+1),     x3 (+2),     x4 (+3),     x5 (+5)
-    .word b00_p00_500, b01_p00_500, b02_p00_500, b03_p00_500, b05_p00_500 ; CHAIN 1
-    .word b00_p01_000, b01_p01_000, b02_p01_000, b03_p01_000, b05_p01_000 ; CHAIN 2
-    .word b01_p00_500, b02_p00_500, b03_p00_500, b04_p00_000, b06_p00_000 ; CHAIN 3
-    .word b02_p01_000, b03_p00_000, b04_p00_000, b05_p00_000, b07_p00_000 ; CHAIN 4
-    .word b03_p01_000, b04_p00_000, b05_p00_000, b06_p00_000, b08_p00_000 ; CHAIN 5
-    .word b04_p00_000, b05_p00_000, b06_p00_000, b07_p00_000, b09_p00_000 ; CHAIN 6
-    .word b06_p00_000, b07_p00_000, b08_p00_000, b09_p00_000, b11_p00_000 ; CHAIN 7
-    .word b08_p00_000, b09_p00_000, b10_p00_000, b11_p00_000, b13_p00_000 ; CHAIN 8
-    .word b10_p00_000, b11_p00_000, b12_p00_000, b13_p00_000, b15_p00_000 ; CHAIN WOW
+    ; COMBO x1 (+0), x2 (+1), x3 (+2), x4 (+3), x5 (+5)
+    .word    base00,  base01,  base02,  base03,  base05 ; CHAIN 1
+    .word    base01,  base02,  base03,  base04,  base06 ; CHAIN 2
+    .word    base03,  base04,  base05,  base06,  base08 ; CHAIN 3
+    .word    base05,  base06,  base07,  base08,  base10 ; CHAIN 4
+    .word    base07,  base08,  base09,  base10,  base12 ; CHAIN 5
+    .word    base10,  base11,  base12,  base13,  base15 ; CHAIN 6
+    .word    base15,  base20,  base25,  base30,  base35 ; CHAIN 7
+    .word    base20,  base25,  base30,  base35,  base40 ; CHAIN 8
+    .word    base25,  base30,  base35,  base40,  base45 ; CHAIN WOW
 
-; For standard enemies at their least threatening
-; (for all non-slimes at the moment)
-standard_loot_table:
-    ; COMBO   x1 (+0),     x2 (+1),     x3 (+3),     x4 (+5),     x5 (+7)
-    .word b00_p01_000, b01_p01_000, b04_p00_000, b05_p00_000, b08_p00_000 ; CHAIN 1
-    .word b01_p01_000, b02_p01_000, b05_p00_000, b07_p00_000, b09_p00_000 ; CHAIN 2
-    .word b02_p01_000, b04_p00_000, b06_p00_000, b08_p00_000, b10_p00_000 ; CHAIN 3
-    .word b04_p00_000, b05_p00_000, b07_p00_000, b09_p00_000, b11_p00_000 ; CHAIN 4
-    .word b05_p00_000, b06_p00_000, b08_p00_000, b10_p00_000, b12_p00_000 ; CHAIN 5
-    .word b07_p00_000, b08_p00_000, b09_p00_000, b11_p00_000, b13_p00_000 ; CHAIN 6
-    .word b10_p00_000, b11_p00_000, b13_p00_000, b15_p00_000, b17_p00_000 ; CHAIN 7
-    .word b12_p00_000, b13_p00_000, b15_p00_000, b17_p00_000, b20_p00_000 ; CHAIN 8
-    .word b15_p00_000, b16_p00_000, b18_p00_000, b20_p00_000, b22_p00_000 ; CHAIN WOW
+; The following are the "standard" loot tables used by most regular
+; enemies. They provide a consistent growth boost, and the base payout
+; is increased based on enemy difficulty. Once base10 is reached, the
+; payout grows *quite* quickly with respect to combo/chain.
 
-; For medium strength enemies. Heavily random on purpose
-uncommon_loot_table:
-    ; TODO!
+; For basic enemies at their least threatening stage.
+basic_loot_table:
+    ; COMBO x1 (+0), x2 (+1), x3 (+2), x4 (+3), x5 (+5)
+    .word    base02,  base03,  base04,  base05,  base07 ; CHAIN 1
+    .word    base03,  base04,  base05,  base06,  base08 ; CHAIN 2
+    .word    base05,  base06,  base07,  base08,  base10 ; CHAIN 3
+    .word    base07,  base08,  base09,  base10,  base15 ; CHAIN 4
+    .word    base10,  base15,  base20,  base25,  base30 ; CHAIN 5
+    .word    base15,  base20,  base25,  base30,  base35 ; CHAIN 6
+    .word    base20,  base25,  base30,  base35,  base40 ; CHAIN 7
+    .word    base25,  base30,  base35,  base40,  base45 ; CHAIN 8
+    .word    base30,  base35,  base40,  base45,  base50 ; CHAIN WOW
+
+; For basic medium strength enemies.
+intermediate_loot_table:
+    ; COMBO x1 (+0), x2 (+1), x3 (+2), x4 (+3), x5 (+5)
+    .word    base03,  base04,  base05,  base06,  base08 ; CHAIN 1
+    .word    base05,  base06,  base07,  base08,  base10 ; CHAIN 2
+    .word    base07,  base08,  base09,  base10,  base15 ; CHAIN 3
+    .word    base10,  base15,  base20,  base25,  base30 ; CHAIN 4
+    .word    base15,  base20,  base25,  base30,  base35 ; CHAIN 5
+    .word    base20,  base25,  base30,  base35,  base40 ; CHAIN 6
+    .word    base25,  base30,  base35,  base40,  base45 ; CHAIN 7
+    .word    base30,  base35,  base40,  base45,  base50 ; CHAIN 8
+    .word    base35,  base40,  base45,  base50,  base55 ; CHAIN WOW
 
 ; For strong enemies. Large payouts, especially at high chain levels
-rare_loot_table:
-    ; TODO!
-
+advanced_loot_table:
+    ; COMBO x1 (+0), x2 (+1), x3 (+2), x4 (+3), x5 (+5)
+    .word    base05,  base06,  base07,  base08,  base10 ; CHAIN 1
+    .word    base07,  base08,  base09,  base10,  base15 ; CHAIN 2
+    .word    base10,  base15,  base20,  base25,  base30 ; CHAIN 3
+    .word    base15,  base20,  base25,  base30,  base35 ; CHAIN 4
+    .word    base20,  base25,  base30,  base35,  base40 ; CHAIN 5
+    .word    base25,  base30,  base35,  base40,  base45 ; CHAIN 6
+    .word    base30,  base35,  base40,  base45,  base50 ; CHAIN 7
+    .word    base35,  base40,  base45,  base50,  base55 ; CHAIN 8
+    .word    base40,  base45,  base50,  base60,  base75 ; CHAIN WOW
 
 chain_offset_lut:
-    .byte 0, 0, 10, 20, 30, 40, 50, 60, 70, 80
+    .byte 0, 10, 20, 30, 40, 50, 60, 70, 80
 combo_offset_lut:
     .byte 0, 2, 4, 6, 8
 
