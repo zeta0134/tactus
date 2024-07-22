@@ -37,6 +37,8 @@ coin_queue_next: .res 1
 coin_queue_last: .res 1
 next_active_coin: .res 1
 
+coin_spawn_cooldown: .res 1
+
 coin_sprite_starting_index: .res 1
 
         .segment "PRGFIXED_E000"
@@ -171,6 +173,7 @@ COIN_STATE_VACUUM = 8
     sta coin_queue_last
     sta next_active_coin
     sta coin_sprite_starting_index
+    sta coin_spawn_cooldown
 
     lda #COIN_STATE_INACTIVE
     ldx #0
@@ -229,6 +232,11 @@ CoinStatePtr := R0
 ; if there is a waiting coin in the queue, attempts to spawn it
 ; in. fails if either the queue is empty or the active coin list is full
 .proc spawn_one_new_coin
+    lda coin_spawn_cooldown
+    beq check_for_spawn
+    dec coin_spawn_cooldown
+    rts
+check_for_spawn:
     lda coin_queue_next
     cmp coin_queue_last
     bne attempt_spawn
@@ -312,6 +320,9 @@ done_advancing_active_coins:
     lda coin_queue_next
     and #$1F
     sta coin_queue_next
+
+    lda #2
+    sta coin_spawn_cooldown
 
     ; ... and we're done?
     rts
