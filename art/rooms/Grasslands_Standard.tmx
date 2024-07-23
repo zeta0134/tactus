@@ -122,7 +122,7 @@
 </data>
   </layer>
  </group>
- <group id="18" name="Special - West" class="overlay">
+ <group id="18" name="Special - West" class="overlay" visible="0">
   <properties>
    <property name="adjacent_challenge" type="bool" value="true"/>
    <property name="adjacent_exterior" type="bool" value="false"/>
@@ -200,7 +200,7 @@
 </data>
   </layer>
  </group>
- <group id="133" name="Shop - West" class="overlay">
+ <group id="133" name="Shop - West" class="overlay" visible="0">
   <properties>
    <property name="adjacent_challenge" type="bool" value="false"/>
    <property name="adjacent_exterior" type="bool" value="false"/>
@@ -239,7 +239,7 @@
 </data>
   </layer>
  </group>
- <group id="33" name="Cave - South" class="overlay">
+ <group id="33" name="Cave - South" class="overlay" visible="0">
   <properties>
    <property name="adjacent_challenge" type="bool" value="false"/>
    <property name="adjacent_exterior" type="bool" value="false"/>
@@ -629,7 +629,7 @@
 </data>
   </layer>
  </group>
- <group id="27" name="Cave - North" class="overlay">
+ <group id="27" name="Cave - North" class="overlay" visible="0">
   <properties>
    <property name="adjacent_challenge" type="bool" value="false"/>
    <property name="adjacent_exterior" type="bool" value="false"/>
@@ -1039,7 +1039,7 @@
 </data>
   </layer>
  </group>
- <group id="145" name="Corner: NE Cave+Shop" class="overlay">
+ <group id="145" name="Corner: NE Cave+Shop" class="overlay" visible="0">
   <properties>
    <property name="direction" value="northeast"/>
    <property name="ew_challenge" type="bool" value="false"/>
@@ -1125,7 +1125,7 @@
 </data>
   </layer>
  </group>
- <group id="142" name="Corner: SE Cave+Shop" class="overlay">
+ <group id="142" name="Corner: SE Cave+Shop" class="overlay" visible="0">
   <properties>
    <property name="direction" value="southeast"/>
    <property name="ew_challenge" type="bool" value="false"/>
@@ -1211,7 +1211,7 @@
 </data>
   </layer>
  </group>
- <group id="139" name="Corner: SW Cave+Shop" class="overlay">
+ <group id="139" name="Corner: SW Cave+Shop" class="overlay" visible="0">
   <properties>
    <property name="direction" value="southwest"/>
    <property name="ew_challenge" type="bool" value="false"/>
@@ -1297,7 +1297,7 @@
 </data>
   </layer>
  </group>
- <group id="136" name="Corner: NW Cave+Shop" class="overlay">
+ <group id="136" name="Corner: NW Cave+Shop" class="overlay" visible="0">
   <properties>
    <property name="direction" value="northwest"/>
    <property name="ew_challenge" type="bool" value="false"/>
