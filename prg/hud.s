@@ -591,6 +591,10 @@ AttributeAddr := R14
         lda room_flags, x
         and #ROOM_FLAG_EXIT_STAIRS
         bne door_room
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_SHOP
+        beq shop_room
         jmp normal_room
 
 boss_room:
@@ -625,6 +629,21 @@ regular_door_room:
         jmp draw_tile
 current_door_room:
         lda #DOOR_ROOM_CURRENT
+        sta DrawTile
+        jmp draw_tile
+
+shop_room:
+        ; load the appropriate shop tile, based on whether the player is
+        ; currently in this room or not
+        lda PlayerRoomIndex
+        cmp RoomIndex
+        beq current_shop_room
+regular_shop_room:
+        lda #SHOP_ROOM
+        sta DrawTile
+        jmp draw_tile
+current_shop_room:
+        lda #SHOP_ROOM_CURRENT
         sta DrawTile
         jmp draw_tile
 

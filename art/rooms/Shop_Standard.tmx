@@ -15,7 +15,7 @@
  <tileset firstgid="4097" source="../DiscoFloorTiles.tsx"/>
  <tileset firstgid="4353" source="../Attributes.tsx"/>
  <tileset firstgid="4357" source="../TechnicalTiles.tsx"/>
- <layer id="1" name="Base" width="16" height="11" opacity="0.64">
+ <layer id="1" name="Base" width="16" height="11" opacity="0.75">
   <data encoding="csv">
 6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
 6,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,

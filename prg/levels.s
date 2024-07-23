@@ -821,8 +821,8 @@ ExitTemp := R10
 ChallengeCount := R11
 FloorExitCount := R12
 MaxChallengeCount := R13
-; TODO: pay attention to these
-; ShopCount := R?
+ShopCount := R14
+MaxShopCount := R15
         jsr shuffle_room_order
 
         st16 floors_rerolled, 0
@@ -833,6 +833,9 @@ MaxChallengeCount := R13
         ldy #BigFloor::MaxChallengeRooms
         lda (BigFloorPtr), y
         sta MaxChallengeCount
+        ldy #BigFloor::MaxShopRooms
+        lda (BigFloorPtr), y
+        sta MaxShopCount
 
 begin_floor_generation:
         ; initialize the player room index to a nonsense value; later,
@@ -918,7 +921,26 @@ begin_room_selection:
         ora room_flags, x
         sta room_flags, x
 done_considering_challenge_rooms:
-        ; TODO: this for shops
+
+        ; If this is a shop room...
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_SHOP
+        bne done_considering_shop_rooms
+        ; ... have we already satisfied the shop maximum for this floor?
+        lda ShopCount
+        cmp MaxShopCount
+        bcs reject_this_room
+        ; this is definitely a shop chamber; increment the counter
+        inc ShopCount
+        ; Shop rooms begin "cleared" as they should never spawn actual monsters
+        ; or enter disco mode. They also never spawn a treasure (TODO: which is an
+        ; old mechanic that should go away) 
+        lda #(ROOM_FLAG_CLEARED | ROOM_FLAG_TREASURE_SPAWNED)
+        ora room_flags, x
+        sta room_flags, x
+done_considering_shop_rooms:
 
         ; handle player spawning: basically the first room we visit where the
         ; player **could** spawn, we put them there
@@ -988,7 +1010,11 @@ accept_this_room:
         ldy #BigFloor::MinChallengeRooms
         cmp (BigFloorPtr), y
         bcc reject_floor
-        ; TODO: this for shops
+
+        lda ShopCount
+        ldy #BigFloor::MinShopRooms
+        cmp (BigFloorPtr), y
+        bcc reject_floor        
 
         ; Temporary: if we failed to pick an exit for some weird reason, reject
         ; the whole floor
@@ -1571,6 +1597,7 @@ CAVE_INTERIOR = 2
 .segment "DATA_6"
 
         .include "../build/rooms/Grasslands_Round.incs"
+        .include "../build/rooms/Shop_Standard.incs"
 
 .segment "DATA_3"
 
@@ -1602,19 +1629,25 @@ room_pool_out_of_bounds:
         .endrepeat
 
 room_pool_grassy_exterior:
-        .repeat 6
+        .repeat 4
         room_entry room_Grasslands_Standard
         .endrepeat
-        .repeat 6
+        .repeat 4
         room_entry room_Grasslands_Round
+        .endrepeat
+        .repeat 4
+        room_entry room_Shop_Standard
         .endrepeat
         .repeat 4
         room_entry room_ChallengeArena_Standard
         .endrepeat
 
 room_pool_cave_interior:
-        .repeat 12
+        .repeat 8
         room_entry room_Caves_Standard
+        .endrepeat
+        .repeat 4
+        room_entry room_Shop_Standard
         .endrepeat
         .repeat 4
         room_entry room_ChallengeArena_Standard

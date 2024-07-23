@@ -178,8 +178,8 @@ def read_floor(map_filename):
     integer_properties = read_integer_properties(map_element)
     min_challenge_rooms = integer_properties.get("min_challenge_rooms", 1)
     max_challenge_rooms = integer_properties.get("max_challenge_rooms", 1)
-    min_shop_rooms = integer_properties.get("min_shop_rooms", 0)
-    max_shop_rooms = integer_properties.get("max_shop_rooms", 0)
+    min_shop_rooms = integer_properties.get("min_shop_rooms", 1)
+    max_shop_rooms = integer_properties.get("max_shop_rooms", 1)
 
     # finally let's make the name something useful
     (_, plain_filename) = os.path.split(map_filename)
