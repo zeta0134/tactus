@@ -3,23 +3,6 @@
         .include "player.inc"
         .include "levels.inc"
         .include "zpcm.inc"
-;
-; 6502 LFSR PRNG - 16-bit
-; Brad Smith, 2019
-; http://rainwarrior.ca
-;
-
-; A 16-bit Galois LFSR
-
-; Possible feedback values that generate a full 65535 step sequence:
-; $2D = %00101101
-; $39 = %00111001
-; $3F = %00111111
-; $53 = %01010011
-; $BD = %10111101
-; $D7 = %11010111
-
-; $39 is chosen for its compact bit pattern
 
 .zeropage
 gameplay_seed: .res 2 ; seed can be 2-4 bytes
@@ -38,7 +21,7 @@ room_seed: .res 4
 	ora run_seed+1
 	ora run_seed+2
 	ora run_seed+3
-	beq run_seed_valid
+	bne run_seed_valid
 	lda #$FF
 	sta run_seed+0
 run_seed_valid:
@@ -46,6 +29,24 @@ run_seed_valid:
 	sta gameplay_seed+0
 	rts
 .endproc
+
+;
+; 6502 LFSR PRNG - 16-bit
+; Brad Smith, 2019
+; http://rainwarrior.ca
+;
+
+; A 16-bit Galois LFSR
+
+; Possible feedback values that generate a full 65535 step sequence:
+; $2D = %00101101
+; $39 = %00111001
+; $3F = %00111111
+; $53 = %01010011
+; $BD = %10111101
+; $D7 = %11010111
+
+; $39 is chosen for its compact bit pattern
 
 ; overlapped 16bit version, computes all 8 iterations in an overlapping fashion
 ; 69 cycles
@@ -80,6 +81,21 @@ run_seed_valid:
 	perform_zpcm_inc
 	rts
 .endproc
+
+;
+; 6502 LFSR PRNG - 32-bit
+; Brad Smith, 2019
+; http://rainwarrior.ca
+;
+
+; A 32-bit Galois LFSR
+
+; Possible feedback values that generate a full 4294967295 step sequence:
+; $AF = %10101111
+; $C5 = %11000101
+; $F5 = %11110101
+
+; $C5 is chosen
 
 .proc next_run_rand
 	; rotate the middle bytes left
