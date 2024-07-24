@@ -117,8 +117,6 @@ continue_waiting:
 .proc init_engine
         near_call FAR_init_settings
 
-        ; TODO: pretty much everyting in this little section is debug demo stuff
-        ; Later, organize this so that it loads the title screen, initial levels, etc
         far_call FAR_disable_all_oam_entries
 
         ; NORMAL: start on the title screen
@@ -359,14 +357,7 @@ LayoutPtr := R0
         lda #$FF
         sta ClearedRoomCooldown
 
-        .if ::DEBUG_TEST_FLOOR
-        lda #%00000001
-        sta global_rng_seed
-        .else
-        jsr next_rand
-        ora #%00000001
-        sta global_rng_seed
-        .endif
+        ; TODO: if we are in fixed seed mode, set that here.
 
         far_call FAR_initialize_sprites
         far_call FAR_init_hud
@@ -925,7 +916,7 @@ RandTemp := R1
         sta DepthTemp
 
         ; X can use the rand value almost directly
-        jsr next_rand
+        jsr next_gameplay_rand
         perform_zpcm_inc
         sta RandTemp
         ldx DepthTemp
@@ -949,7 +940,7 @@ done_with_x:
         sta PpuScrollX
 
         ; Y should remain in the range 0-240, so the minus case is handled diffrently
-        jsr next_rand
+        jsr next_gameplay_rand
         perform_zpcm_inc
         sta RandTemp
         ldx DepthTemp

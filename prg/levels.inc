@@ -5,7 +5,7 @@
 .global FAR_load_current_room
 .global FAR_handle_room_spawns
 
-.global room_layouts, room_flags, room_seeds, room_floorplan, room_properties, global_rng_seed, enemies_active
+.global room_layouts, room_flags, room_floorplan, room_properties, enemies_active
 
 ; layouts
 .global test_layout_with_four_exits

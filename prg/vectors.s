@@ -134,8 +134,8 @@ write_ppuctrl:
         ; TODO: move this to the game loop
         ;debug_color (TINT_B | LIGHTGRAY)
         jsr poll_input
-        ; Advance the global pRNG once every frame
-        jsr next_rand
+        ; Advance the gameplay pRNG once every frame
+        jsr next_gameplay_rand
 
         debug_color (TINT_R | LIGHTGRAY)
 

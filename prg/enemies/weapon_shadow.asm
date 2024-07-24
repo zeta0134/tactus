@@ -1,3 +1,5 @@
+; TODO: This entire thing is GOING AWAY.
+
                         ; ssccccdd
 SHADOW_STATE_MASK      = %11000000
 SHADOW_WEAPON_MASK     = %00111100
@@ -37,11 +39,9 @@ weapon_damage_lut:
 
 .proc roll_weapon
 WeaponClassTemp := R1
-        jsr set_fixed_room_seed
-
 perform_roll:
         ; First we need to roll a weapon class
-        jsr next_fixed_rand
+        jsr next_gameplay_rand
         and #(SHADOW_WEAPON_MASK | SHADOW_DMG_MASK) ; low 2 bits = weapon strength, middle 4 bits = weapon type from table
         sta WeaponClassTemp
         ; weapon strength should be clamped based on the current floor (and later, zone?)

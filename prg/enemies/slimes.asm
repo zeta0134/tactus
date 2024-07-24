@@ -272,7 +272,8 @@ EffectiveAttackSquare := R10
         cmp #10
         bcs drop_health
         ; Slimes have a 1/8 chance to spawn a health tile (more than other enemies)
-        jsr next_rand
+        ; TODO: should slimes continue to drop health? it seems to make the game too easy?
+        jsr next_gameplay_rand
         and #%00000111
         beq drop_health
 drop_nothing:

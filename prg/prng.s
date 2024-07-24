@@ -22,83 +22,194 @@
 ; $39 is chosen for its compact bit pattern
 
 .zeropage
-seed: .res 2 ; seed can be 2-4 bytes
-fixed_seed: .res 2
+gameplay_seed: .res 2 ; seed can be 2-4 bytes
+
+run_seed: .res 4
+floor_seed: .res 4
+room_seed: .res 4
 
         .segment "PRGFIXED_E000"
 
-; overlapped version, computes all 8 iterations in an overlapping fashion
+; this just performs some quick sanity checks at game start
+; call this at startup, and again each time the run seed or gameplay
+; seed are modified (by, say, loading them from the save file)
+.proc initialize_prng
+	lda run_seed+0
+	ora run_seed+1
+	ora run_seed+2
+	ora run_seed+3
+	beq run_seed_valid
+	lda #$FF
+	sta run_seed+0
+run_seed_valid:
+	lda #$FF
+	sta gameplay_seed+0
+	rts
+.endproc
+
+; overlapped 16bit version, computes all 8 iterations in an overlapping fashion
 ; 69 cycles
 ; 35 bytes
 
-next_rand:
-	lda seed+1
+.proc next_gameplay_rand
+	lda gameplay_seed+1
 	tay ; store copy of high byte
 	; compute seed+1 ($39>>1 = %11100)
 	lsr ; shift to consume zeroes on left...
 	lsr
 	lsr
-	sta seed+1 ; now recreate the remaining bits in reverse order... %111
+	sta gameplay_seed+1 ; now recreate the remaining bits in reverse order... %111
 	lsr
-	eor seed+1
+	eor gameplay_seed+1
 	lsr
-	eor seed+1
-	eor seed+0 ; recombine with original low byte
-	sta seed+1
+	eor gameplay_seed+1
+	eor gameplay_seed+0 ; recombine with original low byte
+	sta gameplay_seed+1
 	; compute seed+0 ($39 = %111001)
 	tya ; original high byte
-	sta seed+0
+	sta gameplay_seed+0
 	asl
-	eor seed+0
+	eor gameplay_seed+0
 	asl
-	eor seed+0
+	eor gameplay_seed+0
 	asl
 	asl
 	asl
-	eor seed+0
-	sta seed+0
+	eor gameplay_seed+0
+	sta gameplay_seed+0
 	perform_zpcm_inc
 	rts
+.endproc
 
-next_fixed_rand:
-	lda fixed_seed+1
-	tay ; store copy of high byte
-	; compute fixed_seed+1 ($39>>1 = %11100)
-	lsr ; shift to consume zeroes on left...
+.proc next_run_rand
+	; rotate the middle bytes left
+	ldy run_seed+2 ; will move to run_seed+3 at the end
+	lda run_seed+1
+	sta run_seed+2
+	; compute run_seed+1 ($C5>>1 = %1100010)
+	lda run_seed+3 ; original high byte
+	lsr
+	sta run_seed+1 ; reverse: 100011
 	lsr
 	lsr
-	sta fixed_seed+1 ; now recreate the remaining bits in reverse order... %111
 	lsr
-	eor fixed_seed+1
 	lsr
-	eor fixed_seed+1
-	eor fixed_seed+0 ; recombine with original low byte
-	sta fixed_seed+1
-	; compute fixed_seed+0 ($39 = %111001)
-	tya ; original high byte
-	sta fixed_seed+0
+	eor run_seed+1
+	lsr
+	eor run_seed+1
+	eor run_seed+0 ; combine with original low byte
+	sta run_seed+1
+	; compute run_seed+0 ($C5 = %11000101)
+	lda run_seed+3 ; original high byte
 	asl
-	eor fixed_seed+0
-	asl
-	eor fixed_seed+0
-	asl
+	eor run_seed+3
 	asl
 	asl
-	eor fixed_seed+0
-	sta fixed_seed+0
-	perform_zpcm_inc
+	asl
+	asl
+	eor run_seed+3
+	asl
+	asl
+	eor run_seed+3
+	sty run_seed+3 ; finish rotating byte 2 into 3
+	sta run_seed+0
 	rts
+.endproc
 
-.proc set_fixed_room_seed
-	perform_zpcm_inc
-        lda global_rng_seed
-        sta fixed_seed
-        ldx PlayerRoomIndex
-        lda room_seeds, x
-        sta fixed_seed+1
-        ; I've noticed that the first number pulled can be a *mite* predictable, so to
-        ; resolve this run the routine twice before returning
-        jsr next_fixed_rand
-        jsr next_fixed_rand
-        rts
+.proc generate_floor_seed
+	jsr next_run_rand
+	sta floor_seed+0
+	jsr next_run_rand
+	sta floor_seed+1
+	jsr next_run_rand
+	sta floor_seed+2
+	jsr next_run_rand
+	; ensure seed is not 0, which will lock up the LFSR
+	ora #$80
+	sta floor_seed+3
+	rts
+.endproc
+
+.proc next_floor_rand
+	; rotate the middle bytes left
+	ldy floor_seed+2 ; will move to floor_seed+3 at the end
+	lda floor_seed+1
+	sta floor_seed+2
+	; compute floor_seed+1 ($C5>>1 = %1100010)
+	lda floor_seed+3 ; original high byte
+	lsr
+	sta floor_seed+1 ; reverse: 100011
+	lsr
+	lsr
+	lsr
+	lsr
+	eor floor_seed+1
+	lsr
+	eor floor_seed+1
+	eor floor_seed+0 ; combine with original low byte
+	sta floor_seed+1
+	; compute floor_seed+0 ($C5 = %11000101)
+	lda floor_seed+3 ; original high byte
+	asl
+	eor floor_seed+3
+	asl
+	asl
+	asl
+	asl
+	eor floor_seed+3
+	asl
+	asl
+	eor floor_seed+3
+	sty floor_seed+3 ; finish rotating byte 2 into 3
+	sta floor_seed+0
+	rts
+.endproc
+
+.proc generate_room_seed
+	jsr next_floor_rand
+	sta room_seed+0
+	jsr next_floor_rand
+	sta room_seed+1
+	jsr next_floor_rand
+	sta room_seed+2
+	jsr next_floor_rand
+	; ensure seed is not 0, which will lock up the LFSR
+	ora #$80
+	sta room_seed+3
+	rts
+.endproc
+
+.proc next_room_rand
+	; rotate the middle bytes left
+	ldy room_seed+2 ; will move to room_seed+3 at the end
+	lda room_seed+1
+	sta room_seed+2
+	; compute room_seed+1 ($C5>>1 = %1100010)
+	lda room_seed+3 ; original high byte
+	lsr
+	sta room_seed+1 ; reverse: 100011
+	lsr
+	lsr
+	lsr
+	lsr
+	eor room_seed+1
+	lsr
+	eor room_seed+1
+	eor room_seed+0 ; combine with original low byte
+	sta room_seed+1
+	; compute room_seed+0 ($C5 = %11000101)
+	lda room_seed+3 ; original high byte
+	asl
+	eor room_seed+3
+	asl
+	asl
+	asl
+	asl
+	eor room_seed+3
+	asl
+	asl
+	eor room_seed+3
+	sty room_seed+3 ; finish rotating byte 2 into 3
+	sta room_seed+0
+	rts
 .endproc

@@ -13,7 +13,7 @@ CurrentTile := R15
         lda CurrentTile
         sta TargetTile
 
-        jsr next_rand
+        jsr next_gameplay_rand
         and #%00000011
         beq east
         cmp #1
@@ -99,7 +99,7 @@ save_col_distance:
         bmi move_horizontally
         jmp move_vertically
 choose_randomly:
-        jsr next_rand
+        jsr next_gameplay_rand
         bmi move_horizontally
         jmp move_vertically
 

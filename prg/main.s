@@ -49,10 +49,7 @@ start:
         lda #0
         sta $4010 ; DMC DMA
 
-        ; initialize the prng seed to a nonzero value
-        lda #1
-        sta seed
-        sta fixed_seed
+        jsr initialize_prng
 
         far_call FAR_init_nametables
         far_call FAR_init_palettes

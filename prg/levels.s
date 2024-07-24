@@ -23,12 +23,10 @@
 
 .segment "RAM"
 
-global_rng_seed: .res 1
 room_ptr_low: .res ::FLOOR_SIZE
 room_ptr_high: .res ::FLOOR_SIZE
 room_bank: .res ::FLOOR_SIZE
 room_flags: .res ::FLOOR_SIZE ; what did we spawn in here? what is the current status of those things?
-room_seeds: .res ::FLOOR_SIZE
 room_floorplan: .res ::FLOOR_SIZE ; properties of this cell in the floor's maze layout
 room_properties: .res ::FLOOR_SIZE ; properties of the selected room that populates this cell
 room_population_order: .res ::FLOOR_SIZE
@@ -118,10 +116,6 @@ TileAddrPtr := R4
 BehaviorIdPtr := R6
 FlagsPtr := R8
 CurrentTileId := R10
-        ; Detail needs to be regenerated the same for each room when we (re-)enter, so
-        ; set that here
-        jsr set_fixed_room_seed
-
         mov16 TileIdPtr, RoomPtr
         add16w TileIdPtr, #Room::TileIDsLow
         mov16 TileAddrPtr, RoomPtr
@@ -739,7 +733,7 @@ ScratchPal := R14
 
         ; now we roll for detail out of the selected table, always in
         ; a range from 0-31
-        jsr next_fixed_rand ; result in A, clobbers Y
+        jsr next_room_rand ; result in A, clobbers Y
         and #$1F ; clamp to max of 31
         asl ; and multiply by 2, to index a table of words
         tay
@@ -786,11 +780,11 @@ init_loop:
         sta Iterations
 shuffle_loop:
         perform_zpcm_inc
-        jsr next_rand
+        jsr next_floor_rand
         perform_zpcm_inc
         and #(::FLOOR_SIZE-1)
         sta SourceIndex
-        jsr next_rand
+        jsr next_floor_rand
         perform_zpcm_inc
         and #(::FLOOR_SIZE-1)
         sta DestIndex
@@ -869,7 +863,7 @@ setup_room_generation_state:
         sta RoomPoolPtr+1
         access_data_bank RoomPoolBank ; this hides the big floor! do NOT read from BigFloorPtr until we restore!
 begin_room_selection:
-        jsr next_rand
+        jsr next_floor_rand
         perform_zpcm_inc
         and #$0F ; 0-15
         asl
@@ -1031,6 +1025,10 @@ reject_floor:
 ; Generate a maze layout, and pick the player, boss, and exit locations
 .proc FAR_init_floor
 BigFloorPtr := R0
+        ; We are about to kick off floor generation, so grab a fresh floor PRNG
+        ; seed based on the current run seed
+        jsr generate_floor_seed
+
         access_data_bank #<.bank(test_floor_layout_pool)
 
         ; clear out the room flags entirely
@@ -1043,20 +1041,9 @@ flag_loop:
         cpx #::FLOOR_SIZE
         bne flag_loop
 
-        ; set each room up with its own RNG low byte
-        ; TODO: should this be based on the floor's fixed seed?
-        ldx #0
-seed_loop:
-        perform_zpcm_inc
-        jsr next_rand
-        sta room_seeds, x
-        inx
-        cpx #::FLOOR_SIZE
-        bne seed_loop
-
         ; pick a random maze layout and load it in
         ; TODO: maybe this could use a global seed? it'd be nice to have a game-level seed
-        jsr next_rand
+        jsr next_floor_rand
 
         ; FOR NOW, pull from the only test pool we have
         ; TODO: pick the pool to draw from based on the zone and level
@@ -1117,6 +1104,7 @@ RoomIndexToPreserve := R0
         lda #0
         sta RoomIndexToGenerate
 loop:
+        jsr generate_room_seed
         jsr generate_room
         lda RoomIndexToGenerate
         sta RoomIndexToPreserve
@@ -1292,8 +1280,6 @@ check_chest_spawn:
 
         perform_zpcm_inc
 
-        ; load the fixed seed for the players current room
-        jsr set_fixed_room_seed
         ; spawn in a chest
         lda #TILE_TREASURE_CHEST
         sta EntityId
@@ -1345,12 +1331,12 @@ TempRow := R9
 TempCol := R10
 
 find_safe_coordinate:
-        jsr next_fixed_rand
+        jsr next_room_rand
         and #%00011111
         tax
         lda random_row_table, x
         sta TempRow
-        jsr next_fixed_rand
+        jsr next_room_rand
         and #%00011111
         tax
         lda random_col_table, x
@@ -1448,9 +1434,6 @@ done:
 CollectionPtr := R0
 PoolPtr := R2
 EntityList := R4
-        ; Everything we are about to do depends on the room seed, so fix that in place before we start
-        jsr set_fixed_room_seed
-
         ; First find the pool collection for this zone
         lda PlayerZone
         sec
@@ -1489,7 +1472,7 @@ EntityList := R4
         sta PoolPtr+1
         ; Here we need to pick a random number from 0-15, and use that to index the pool to select
         ; one of the enemy lists
-        jsr next_fixed_rand ; clobbers Y
+        jsr next_room_rand ; clobbers Y
         and #%00001111
         asl ; still indexing words
         tay
@@ -1511,9 +1494,6 @@ done:
 CollectionPtr := R0
 PoolPtr := R2
 EntityList := R4
-        ; Everything we are about to do depends on the room seed, so fix that in place before we start
-        jsr set_fixed_room_seed
-
         ; First find the pool collection for this zone
         lda PlayerZone
         sec
@@ -1550,7 +1530,7 @@ EntityList := R4
         sta PoolPtr+1
         ; Here we need to pick a random number from 0-3, and use that to index the pool to select
         ; one of the enemy lists
-        jsr next_fixed_rand ; clobbers Y
+        jsr next_room_rand ; clobbers Y
         and #%00000011
         asl ; still indexing words
         tay
@@ -1572,7 +1552,6 @@ done:
 EntityId := R1
 EntityPattern := R2
 EntityAttribute := R3
-        jsr set_fixed_room_seed
         lda #TILE_EXIT_BLOCK
         sta EntityId
         lda #<BG_TILE_EXIT_BLOCK

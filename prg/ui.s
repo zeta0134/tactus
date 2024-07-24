@@ -8,6 +8,7 @@
         .include "nes.inc"
         .include "input.inc"
         .include "rainbow.inc"
+        .include "prng.inc"
         .include "settings.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -152,6 +153,12 @@ stay_here:
 
 .proc title_controller_update
 CurrentWidgetIndex := R20
+        ; while on the title screen, continuously clock the rng seeds. this helps
+        ; with entropy when starting a brand new game, even in emulators with an
+        ; otherwise deterministic boot state
+        jsr next_run_rand
+        jsr next_gameplay_rand
+
         rts
 .endproc
 

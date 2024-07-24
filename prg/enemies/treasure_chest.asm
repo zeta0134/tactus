@@ -1,3 +1,5 @@
+; TODO: This is GOING AWAY / BEING REDONE, etc.
+
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
@@ -33,9 +35,6 @@ WeaponPtr := R11
         lda #1
         sta AttackLanded
 
-        ; load the room seed before spawning the treasure
-        jsr set_fixed_room_seed
-
         ; if this is a boss room, we need to always spawn the key!
         ldx PlayerRoomIndex
         lda room_flags, x
@@ -45,7 +44,7 @@ WeaponPtr := R11
         rts
 spawn_treasure:
         ; determine which weapon category to spawn
-        jsr next_fixed_rand
+        jsr next_gameplay_rand
         and #%00001111
         tax
         lda treasure_category_table, x

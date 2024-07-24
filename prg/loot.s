@@ -342,7 +342,7 @@ combo_in_range:
 .endproc
 
 .proc roll_coin
-    jsr next_rand
+    jsr next_gameplay_rand
     and #%00000111
     tay
     lda (CoinTablePtr), y

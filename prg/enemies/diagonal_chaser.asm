@@ -134,7 +134,7 @@ move_down:
         sta SmokePuffDirection
         jmp row_target_converge
 randomly_target_row:
-        jsr next_rand
+        jsr next_gameplay_rand
         bmi move_up
         jmp move_down
 row_target_converge:
@@ -177,7 +177,7 @@ dust_se:
         sta SmokePuffDirection
         jmp col_target_converge
 randomly_target_col:
-        jsr next_rand
+        jsr next_gameplay_rand
         bmi move_left
         jmp move_right
 col_target_converge:

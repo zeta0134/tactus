@@ -340,7 +340,8 @@ die:
         cmp PlayerHealth
         beq drop_nothing
         ; Common enemies have a 1/16 chance to spawn a health tile when defeated
-        jsr next_rand
+        ; TODO: rework this for balance! small health drops might be going away entirely
+        jsr next_gameplay_rand
         
         and #%00001111
 
@@ -521,12 +522,12 @@ TempRow := R1
 TempIndex := R3
 
 FinalIndex := R0
-        jsr next_rand
+        jsr next_gameplay_rand
         and #%00011111
         tax
         lda random_row_table, x
         sta TempRow
-        jsr next_rand
+        jsr next_gameplay_rand
         and #%00011111
         tax
         lda random_col_table, x
