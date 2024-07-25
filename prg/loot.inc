@@ -15,7 +15,7 @@
 .global rare_11_875
 .global loot_25_000
 
-.global LootTable
+.globalzp LootTable
 .global LootPosition
 .global FAR_roll_loot
 

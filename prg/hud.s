@@ -43,10 +43,10 @@ TorchDisplayTarget: .res 1
 TorchDisplayCurrent: .res 1
 ArmorDisplayTarget: .res 1
 ArmorDisplayCurrent: .res 1
-AccessoryDisplayTarget: .res 1
-AccessoryDisplayCurrent: .res 1
 BootsDisplayTarget: .res 1
 BootsDisplayCurrent: .res 1
+AccessoryDisplayTarget: .res 1
+AccessoryDisplayCurrent: .res 1
 SpellDisplayTarget: .res 1
 SpellDisplayCurrent: .res 1
 ItemDisplayTarget: .res 1
@@ -65,74 +65,31 @@ ROW_3 = (32*3)
 ROW_4 = (32*4)
 ROW_5 = (32*5)
 
-.macro tile_offset ident, tile_x, tile_y
-ident = ((tile_y * 16) + tile_x)
-.endmacro
+chr_tile_offset MAP_BORDER_TL, 6, 7
+chr_tile_offset MAP_BORDER_TM, 7, 7
+chr_tile_offset MAP_BORDER_TR, 8, 7
+chr_tile_offset MAP_BORDER_ML, 6, 8
+chr_tile_offset MAP_BORDER_MR, 8, 8
+chr_tile_offset MAP_BORDER_BL, 6, 9
+chr_tile_offset MAP_BORDER_BM, 7, 9
+chr_tile_offset MAP_BORDER_BR, 8, 9
+chr_tile_offset COIN_ICON, 0, 7
+chr_tile_offset COIN_X,    1, 7
+chr_tile_offset FULL_HEART_BASE,          0, 5
+chr_tile_offset FULL_HEART_BEATING,       2, 5
+chr_tile_offset ARMORED_HEART_BASE,       4, 5
+chr_tile_offset ARMORED_HEART_BEATING,    6, 5
+chr_tile_offset ARMORED_HEART_DEPLETED,   8, 5
+chr_tile_offset FRAGILE_HEART_BASE,      10, 5
+chr_tile_offset FRAGILE_HEART_BEATING,   12, 5
+chr_tile_offset HEART_CONTAINER_BASE,    12, 7
+chr_tile_offset HEART_CONTAINER_BEATING, 14, 7
+chr_tile_offset SPELL_A_DISABLED,   0, 14
+chr_tile_offset SPELL_B_DISABLED,   0, 15
+chr_tile_offset SPELL_A_ENABLED,    2, 14
+chr_tile_offset SPELL_B_ENABLED,    2, 15
+chr_tile_offset SPELL_DISABLED_BL_CORNER, 1, 14
 
-tile_offset BLANK_TILE, 0, 0
-
-tile_offset MAP_BORDER_TL, 6, 7
-tile_offset MAP_BORDER_TM, 7, 7
-tile_offset MAP_BORDER_TR, 8, 7
-tile_offset MAP_BORDER_ML, 6, 8
-tile_offset MAP_BORDER_MR, 8, 8
-tile_offset MAP_BORDER_BL, 6, 9
-tile_offset MAP_BORDER_BM, 7, 9
-tile_offset MAP_BORDER_BR, 8, 9
-
-tile_offset COIN_ICON, 0, 7
-tile_offset COIN_X,    1, 7
-
-tile_offset FULL_HEART_BASE,          0, 5
-tile_offset FULL_HEART_BEATING,       2, 5
-tile_offset ARMORED_HEART_BASE,       4, 5
-tile_offset ARMORED_HEART_BEATING,    6, 5
-tile_offset ARMORED_HEART_DEPLETED,   8, 5
-tile_offset FRAGILE_HEART_BASE,      10, 5
-tile_offset FRAGILE_HEART_BEATING,   12, 5
-tile_offset HEART_CONTAINER_BASE,    12, 7
-tile_offset HEART_CONTAINER_BEATING, 14, 7
-
-tile_offset SPELL_A_DISABLED,   0, 14
-tile_offset SPELL_B_DISABLED,   0, 15
-tile_offset SPELL_A_ENABLED,    2, 14
-tile_offset SPELL_B_ENABLED,    2, 15
-
-tile_offset SPELL_DISABLED_BL_CORNER, 1, 14
-
-tile_offset EQUIPMENT_NONE,    0, 0
-tile_offset EQUIPMENT_TORCH_1, 2, 0
-tile_offset EQUIPMENT_TORCH_2, 4, 0
-tile_offset EQUIPMENT_TORCH_3, 6, 0
-
-tile_offset EQUIPMENT_WEAPON_DAGGER,     0, 2
-tile_offset EQUIPMENT_WEAPON_BROADSWORD, 2, 2
-tile_offset EQUIPMENT_WEAPON_LONGSWORD,  4, 2
-tile_offset EQUIPMENT_WEAPON_SPEAR,      6, 2
-tile_offset EQUIPMENT_WEAPON_FLAIL,      8, 2
-
-tile_offset EQUIPMENT_ARMOR_1, 0, 4
-tile_offset EQUIPMENT_ARMOR_2, 2, 4
-tile_offset EQUIPMENT_ARMOR_3, 4, 4
-tile_offset EQUIPMENT_ARMOR_4, 6, 4
-
-tile_offset EQUIPMENT_ACCESSORY_1, 0, 6
-tile_offset EQUIPMENT_ACCESSORY_2, 2, 6
-tile_offset EQUIPMENT_ACCESSORY_3, 4, 6
-tile_offset EQUIPMENT_ACCESSORY_4, 6, 6
-
-tile_offset EQUIPMENT_BOOTS_1, 0, 8
-tile_offset EQUIPMENT_BOOTS_2, 2, 8
-tile_offset EQUIPMENT_BOOTS_3, 4, 8
-tile_offset EQUIPMENT_BOOTS_4, 6, 8
-
-tile_offset EQUIPMENT_SPELL_1, 0, 12
-tile_offset EQUIPMENT_SPELL_2, 2, 12
-tile_offset EQUIPMENT_SPELL_3, 4, 12
-
-tile_offset EQUIPMENT_ITEM_1, 4, 14
-tile_offset EQUIPMENT_ITEM_2, 6, 14
-tile_offset EQUIPMENT_ITEM_3, 8, 14
 
 ; the only one of the above that's implemented at the moment is weapon, so
 ; deal with that here
@@ -193,12 +150,6 @@ TILE_ROW_OFFSET = 16
         lda attr
         sta HUD_TILE_BASE + HUD_ATTR_OFFSET + row, x
 .endmacro
-
-WORLD_PAL  = %00000000
-TEXT_PAL   = %01000000 ; text and blue are the same, the blue palette will
-BLUE_PAL   = %01000000 ; always contain white in slot 3 for simple UI elements
-YELLOW_PAL = %10000000
-RED_PAL    = %11000000
 
 weapon_palette_table:
         .byte %00, %01, %10, %11
@@ -388,11 +339,11 @@ done_with_this_heart:
 ; upon completion, Y is left alone, and X is incremented twice
 .proc draw_empty_heart
         perform_zpcm_inc
-        draw_tile_at_x ROW_3, #BLANK_TILE, #(RED_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_4, #BLANK_TILE, #(RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, #BLANK_TILE, #(HUD_RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #BLANK_TILE, #(HUD_RED_PAL | CHR_BANK_HUD)
         inx
-        draw_tile_at_x ROW_3, #BLANK_TILE, #(RED_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_4, #BLANK_TILE, #(RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, #BLANK_TILE, #(HUD_RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #BLANK_TILE, #(HUD_RED_PAL | CHR_BANK_HUD)
         inx
         rts
 .endproc
@@ -433,7 +384,7 @@ top_left_empty:
         lda HeartEmptyBase
 draw_top_left:
         sta TileId
-        draw_tile_at_x ROW_3, TileId, #(RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, TileId, #(HUD_RED_PAL | CHR_BANK_HUD)
 
         perform_zpcm_inc
 
@@ -451,7 +402,7 @@ draw_bottom_left:
         clc
         adc #TILE_ROW_OFFSET
         sta TileId
-        draw_tile_at_x ROW_4, TileId, #(RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, TileId, #(HUD_RED_PAL | CHR_BANK_HUD)
 
         perform_zpcm_inc
         inx
@@ -470,7 +421,7 @@ draw_top_right:
         clc
         adc #TILE_COL_OFFSET
         sta TileId
-        draw_tile_at_x ROW_3, TileId, #(RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, TileId, #(HUD_RED_PAL | CHR_BANK_HUD)
 
         perform_zpcm_inc
 
@@ -488,7 +439,7 @@ draw_bottom_right:
         clc
         adc #TILE_COL_OFFSET + TILE_ROW_OFFSET
         sta TileId
-        draw_tile_at_x ROW_4, TileId, #(RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, TileId, #(HUD_RED_PAL | CHR_BANK_HUD)
 
         perform_zpcm_inc
         inx
@@ -501,36 +452,36 @@ draw_bottom_right:
         ; first, draw the border around the minimap
         ldx #19
         ; left side
-        draw_tile_at_x ROW_0, #MAP_BORDER_TL, #(BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_1, #MAP_BORDER_ML, #(BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_2, #MAP_BORDER_ML, #(BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_3, #MAP_BORDER_ML, #(BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_4, #MAP_BORDER_ML, #(BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_5, #MAP_BORDER_BL, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_0, #MAP_BORDER_TL, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_1, #MAP_BORDER_ML, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_2, #MAP_BORDER_ML, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, #MAP_BORDER_ML, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #MAP_BORDER_ML, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_5, #MAP_BORDER_BL, #(HUD_BLUE_PAL | CHR_BANK_HUD)
         inx
         ; center loop
 loop:
         perform_zpcm_inc
-        draw_tile_at_x ROW_0, #MAP_BORDER_TM, #(BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_5, #MAP_BORDER_BM, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_0, #MAP_BORDER_TM, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_5, #MAP_BORDER_BM, #(HUD_BLUE_PAL | CHR_BANK_HUD)
         inx
         cpx #30
         bne loop
 
         perform_zpcm_inc
         ; right side
-        draw_tile_at_x ROW_0, #MAP_BORDER_TR, #(BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_1, #MAP_BORDER_MR, #(BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_2, #MAP_BORDER_MR, #(BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_3, #MAP_BORDER_MR, #(BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_4, #MAP_BORDER_MR, #(BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_5, #MAP_BORDER_BR, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_0, #MAP_BORDER_TR, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_1, #MAP_BORDER_MR, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_2, #MAP_BORDER_MR, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, #MAP_BORDER_MR, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #MAP_BORDER_MR, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_5, #MAP_BORDER_BR, #(HUD_BLUE_PAL | CHR_BANK_HUD)
 
         ; coin counter, static tiles
         ldx #14
-        draw_tile_at_x ROW_4, #COIN_ICON, #(YELLOW_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #COIN_ICON, #(HUD_YELLOW_PAL | CHR_BANK_HUD)
         ldx #15
-        draw_tile_at_x ROW_4, #COIN_X, #(BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #COIN_X, #(HUD_BLUE_PAL | CHR_BANK_HUD)
 
         perform_zpcm_inc
 
@@ -539,19 +490,19 @@ loop:
 
 MINIMAP_BASE = (ROW_1+22)
 
-tile_offset BOSS_ROOM, 0, 1
-tile_offset DOOR_ROOM, 0, 2
-tile_offset SHOP_ROOM, 0, 3
-tile_offset WARP_ROOM, 0, 4
+chr_tile_offset BOSS_ROOM, 0, 1
+chr_tile_offset DOOR_ROOM, 0, 2
+chr_tile_offset SHOP_ROOM, 0, 3
+chr_tile_offset WARP_ROOM, 0, 4
 
-tile_offset BOSS_ROOM_CURRENT, 14, 5
-tile_offset DOOR_ROOM_CURRENT, 15, 5
-tile_offset SHOP_ROOM_CURRENT, 14, 6
-tile_offset WARP_ROOM_CURRENT, 15, 6
+chr_tile_offset BOSS_ROOM_CURRENT, 14, 5
+chr_tile_offset DOOR_ROOM_CURRENT, 15, 5
+chr_tile_offset SHOP_ROOM_CURRENT, 14, 6
+chr_tile_offset WARP_ROOM_CURRENT, 15, 6
 
-tile_offset HERE_ICON_IN_THE_VOID, 0, 15
-tile_offset EXTERIOR_SET, 0, 13
-tile_offset CLEAREED_ROOM_SET, 0, 10
+chr_tile_offset HERE_ICON_IN_THE_VOID, 0, 15
+chr_tile_offset EXTERIOR_SET, 0, 13
+chr_tile_offset CLEAREED_ROOM_SET, 0, 10
 
 .proc draw_minimap_tile
 RoomIndex := R0
@@ -715,7 +666,7 @@ room_hidden:
         ; fall through
 draw_tile:
         ldx DrawIndex
-        draw_tile_at_x MINIMAP_BASE, DrawTile, #(TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x MINIMAP_BASE, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         rts
 .endproc
@@ -794,10 +745,10 @@ proceed_to_draw:
         sta DrawTile
 
         ldx #20
-        draw_tile_at_x ROW_1, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
         inc DrawTile
         inx
-        draw_tile_at_x ROW_1, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
 
         perform_zpcm_inc
 
@@ -808,10 +759,10 @@ proceed_to_draw:
         sta DrawTile
 
         ldx #20
-        draw_tile_at_x ROW_2, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
         inc DrawTile
         inx
-        draw_tile_at_x ROW_2, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
 
         clc
         lda DrawTile
@@ -819,10 +770,10 @@ proceed_to_draw:
         sta DrawTile
 
         ldx #20
-        draw_tile_at_x ROW_3, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_3, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
         inc DrawTile
         inx
-        draw_tile_at_x ROW_3, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_3, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
 
         perform_zpcm_inc
 
@@ -832,10 +783,10 @@ proceed_to_draw:
         sta DrawTile
 
         ldx #20
-        draw_tile_at_x ROW_4, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_4, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
         inc DrawTile
         inx
-        draw_tile_at_x ROW_4, DrawTile, #(WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_4, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
 
         ; and that should be it!
         perform_zpcm_inc
@@ -900,11 +851,11 @@ TenThousandsDigit := T6
         mov16 NumberWord, DisplayedGold
         near_call FAR_base_10
         ldx #16
-        draw_tile_at_x ROW_4, HundredsDigit, #(TEXT_PAL | CHR_BANK_OLD_CHRRAM)
+        draw_tile_at_x ROW_4, HundredsDigit, #(HUD_TEXT_PAL | CHR_BANK_OLD_CHRRAM)
         ldx #17
-        draw_tile_at_x ROW_4, TensDigit, #(TEXT_PAL | CHR_BANK_OLD_CHRRAM)
+        draw_tile_at_x ROW_4, TensDigit, #(HUD_TEXT_PAL | CHR_BANK_OLD_CHRRAM)
         ldx #18
-        draw_tile_at_x ROW_4, OnesDigit, #(TEXT_PAL | CHR_BANK_OLD_CHRRAM)
+        draw_tile_at_x ROW_4, OnesDigit, #(HUD_TEXT_PAL | CHR_BANK_OLD_CHRRAM)
         rts
 .endproc
 
@@ -943,19 +894,19 @@ check_weapon:
         lda weapon_tile_table, x
         sta DrawTile
         ldx #2
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         inc DrawTile
         ldx #3
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         clc
         lda DrawTile
         adc #15
         sta DrawTile
         ldx #2
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         inc DrawTile
         ldx #3
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         perform_zpcm_inc
 
 check_torch:
@@ -968,19 +919,19 @@ check_torch:
         lda torch_tile_table, x
         sta DrawTile
         ldx #4
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         inc DrawTile
         ldx #5
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         clc
         lda DrawTile
         adc #15
         sta DrawTile
         ldx #4
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         inc DrawTile
         ldx #5
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         perform_zpcm_inc
 
 check_armor:
@@ -993,19 +944,19 @@ check_armor:
         lda armor_tile_table, x
         sta DrawTile
         ldx #6
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         inc DrawTile
         ldx #7
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         clc
         lda DrawTile
         adc #15
         sta DrawTile
         ldx #6
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         inc DrawTile
         ldx #7
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         perform_zpcm_inc
 
 check_boots:
@@ -1018,19 +969,19 @@ check_boots:
         lda boots_tile_table, x
         sta DrawTile
         ldx #8
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         inc DrawTile
         ldx #9
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         clc
         lda DrawTile
         adc #15
         sta DrawTile
         ldx #8
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         inc DrawTile
         ldx #9
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         perform_zpcm_inc
 
 check_accessory:
@@ -1043,19 +994,19 @@ check_accessory:
         lda accessory_tile_table, x
         sta DrawTile
         ldx #10
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         inc DrawTile
         ldx #11
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         clc
         lda DrawTile
         adc #15
         sta DrawTile
         ldx #10
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         inc DrawTile
         ldx #11
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         perform_zpcm_inc
 
 check_item:
@@ -1070,9 +1021,9 @@ check_item:
         bne item_equipped
 no_item_equipped:
         ldx #13
-        draw_tile_at_x ROW_2, #SPELL_B_DISABLED, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, #SPELL_B_DISABLED, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         ldx #14
-        draw_tile_at_x ROW_2, #SPELL_DISABLED_BL_CORNER, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, #SPELL_DISABLED_BL_CORNER, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         ldx ItemDisplayCurrent
         lda item_tile_table, x
         clc
@@ -1081,27 +1032,27 @@ no_item_equipped:
         jmp draw_untabbed_item_tiles
 item_equipped:
         ldx #13
-        draw_tile_at_x ROW_2, #SPELL_B_ENABLED, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, #SPELL_B_ENABLED, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         ldx ItemDisplayCurrent
         lda item_tile_table, x
         clc
         adc #16
         sta DrawTile
         ldx #14
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
 draw_untabbed_item_tiles:
         inc DrawTile
         ldx #15
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         sec
         lda DrawTile
         sbc #17
         sta DrawTile
         ldx #14
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         inc DrawTile
         ldx #15
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         perform_zpcm_inc
 
 check_spell:
@@ -1116,9 +1067,9 @@ check_spell:
         bne spell_equipped
 no_spell_equipped:
         ldx #16
-        draw_tile_at_x ROW_2, #SPELL_A_DISABLED, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, #SPELL_A_DISABLED, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         ldx #17
-        draw_tile_at_x ROW_2, #SPELL_DISABLED_BL_CORNER, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, #SPELL_DISABLED_BL_CORNER, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         ldx SpellDisplayCurrent
         lda spell_tile_table, x
         clc
@@ -1127,27 +1078,27 @@ no_spell_equipped:
         jmp draw_untabbed_spell_tiles
 spell_equipped:
         ldx #16
-        draw_tile_at_x ROW_2, #SPELL_A_ENABLED, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, #SPELL_A_ENABLED, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         ldx SpellDisplayCurrent
         lda spell_tile_table, x
         clc
         adc #16
         sta DrawTile
         ldx #17
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
 draw_untabbed_spell_tiles:
         inc DrawTile
         ldx #18
-        draw_tile_at_x ROW_2, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         sec
         lda DrawTile
         sbc #17
         sta DrawTile
         ldx #17
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         inc DrawTile
         ldx #18
-        draw_tile_at_x ROW_1, DrawTile, #(TEXT_PAL | CHR_BANK_ITEMS)
+        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         perform_zpcm_inc
 
 done:
