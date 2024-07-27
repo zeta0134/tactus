@@ -52,6 +52,7 @@ TILE_SEMISAFE_FLOOR = $88
 TILE_WALL           = $8C
 
 ; Treasure drops
+TILE_ITEM_SHADOW = ($90 | %00)
 TILE_TREASURE_CHEST = ($98 | %10)
 TILE_BIG_KEY = ($9C | %01)
 TILE_GOLD_SACK = ($A0 | %10)

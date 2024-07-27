@@ -10,6 +10,7 @@
         .include "far_call.inc"
         .include "kernel.inc"
         .include "hud.inc"
+        .include "items.inc"
         .include "levels.inc"
         .include "loot.inc"
         .include "nes.inc"
@@ -193,6 +194,7 @@ tile_index_to_col_lut:
 .include "enemies/diagonal_chaser.asm"
 .include "enemies/disco_tile.asm"
 .include "enemies/exit_block.asm"
+.include "enemies/item_shadow.asm"
 .include "enemies/mole.asm"
 .include "enemies/slimes.asm"
 .include "enemies/semisafe_tile.asm"
@@ -224,7 +226,7 @@ static_behaviors:
         .word draw_disco_tile           ; $84 - disco floor
         .word update_semisafe_tile      ; $88 - semisafe floor
         .word no_behavior               ; $8C - wall
-        .word no_behavior               ; $90 - UNUSED
+        .word update_item_shadow        ; $90 - item shadow
         .word no_behavior               ; $94 - UNUSED
         .word no_behavior               ; $98 - treasure chest
         .word no_behavior               ; $9C - big key
@@ -260,7 +262,7 @@ direct_attack_behaviors:
         .word no_behavior ; $84 - disco floor
         .word no_behavior ; $88 - semisafe floor
         .word no_behavior ; $8C - wall face
-        .word no_behavior ; $90 - UNUSED
+        .word no_behavior ; $90 - item shadow
         .word no_behavior ; $94 - UNUSED
         .word attack_treasure_chest ; $98 - treasure chest
         .word no_behavior ; $9C - big key
@@ -320,8 +322,8 @@ bonk_behaviors:
         .word no_behavior ; $84 - disco floor
         .word semisolid_attacks_player ; $88 - semisafe floor
         .word solid_tile_forbids_movement     ; $8C - wall face
-        .word no_behavior ; $90 - UNUSED
-        .word no_behavior ; $94 - UNUSED
+        .word collect_item ; $90 - item shadow
+        .word no_behavior  ; $94 - UNUSED
         .word solid_tile_forbids_movement ; $98 - treasure chest
         .word collect_key ; $9C - big key
         .word collect_gold_sack ; $A0 - gold sack
@@ -366,7 +368,7 @@ suspend_behaviors:
         .word draw_cleared_disco_tile   ; $84 - disco floor
         .word no_behavior               ; $88 - semisafe floor
         .word no_behavior               ; $8C - wall
-        .word no_behavior               ; $90 - UNUSED
+        .word suspend_item_shadow       ; $90 - item shadow
         .word no_behavior               ; $94 - UNUSED
         .word no_behavior               ; $98 - treasure chest
         .word no_behavior               ; $9C - big key

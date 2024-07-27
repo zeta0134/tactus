@@ -21,6 +21,11 @@ tile_patterns: .res ::BATTLEFIELD_SIZE
 tile_attributes: .res ::BATTLEFIELD_SIZE
 tile_detail: .res ::BATTLEFIELD_SIZE
 
+; for those tiles that need to track a metasprite over time
+; transient; this is not stored with the room because all
+; metasprites are despawned. be sure to suspend properly!
+tile_metasprite: .res ::BATTLEFIELD_SIZE
+
 active_battlefield: .res 1
 
 .segment "CODE_0"

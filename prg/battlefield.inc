@@ -3,7 +3,14 @@
 .global FAR_draw_battlefield_block_C
 .global FAR_swap_battlefield_buffers
 
-.global battlefield, tile_data, tile_flags, tile_patterns, tile_attributes, tile_detail
+.global battlefield
+.global tile_data
+.global tile_flags
+.global tile_patterns
+.global tile_attributes
+.global tile_detail
+.global tile_metasprite
+
 .global active_battlefield, queued_bytes_counter
 
 BATTLEFIELD_WIDTH = 16

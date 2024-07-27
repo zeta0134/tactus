@@ -1,4 +1,4 @@
-.struct Item
+.struct ItemDef
     SlotId .byte
     WorldSpriteTile .byte
     WorldSpriteAttr .byte
@@ -6,6 +6,7 @@
     HudBgAttr .byte
     HudSpriteTile .byte
     HudSpriteAttr .byte
+    ShopCost .byte
     WeaponShape .byte
     DamageFunc .addr
     TorchlightFunc .addr
@@ -21,3 +22,15 @@ SLOT_ITEM      = 5
 SLOT_SPELL     = 6
 
 .global item_table
+
+ITEM_NONE          = 0
+ITEM_DAGGER_L1     = 1
+ITEM_BROADSWORD_L1 = 2
+ITEM_BROADSWORD_L2 = 3
+ITEM_BROADSWORD_L3 = 4
+ITEM_LONGSWORD_L1  = 5
+ITEM_LONGSWORD_L2  = 6
+ITEM_LONGSWORD_L3  = 7
+
+.global FAR_apply_item_world_metasprite
+.global FAR_apply_item_hud_metasprite
