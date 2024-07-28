@@ -7,6 +7,8 @@
 
 .global row_number_to_tile_index_lut
 
+.global player_equipment_by_index
+
 .global PlayerEquipmentWeapon
 .global PlayerEquipmentTorch
 .global PlayerEquipmentArmor

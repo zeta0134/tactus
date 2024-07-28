@@ -6,7 +6,7 @@
     HudBgAttr .byte
     HudSpriteTile .byte
     HudSpriteAttr .byte
-    ShopCost .byte
+    ShopCost .word
     WeaponShape .byte
     DamageFunc .addr
     TorchlightFunc .addr

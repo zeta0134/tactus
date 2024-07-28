@@ -16,12 +16,12 @@ CurrentTile := R15
         sta MetaSpriteIndex
         
         ; Load the real item
-        ;lda tile_data, x
-        ;sta ItemIndex
+        lda tile_data, x
+        sta ItemIndex
 
         ; For testing, load a lvl 1 dagger
-        lda #ITEM_DAGGER_L1
-        sta ItemIndex
+        ;lda #ITEM_DAGGER_L1
+        ;sta ItemIndex
         
         far_call FAR_apply_item_world_metasprite
 
@@ -119,10 +119,122 @@ sprite_failed:
 ; ============================================================================================================================
 
 .proc collect_item
+ItemPtr := R0
+ItemCost := R2
+ItemSlot := R4
+OldItem := R5
 
-        ; stub: nope!
+
+; for use by draw_active_tile later
+TargetIndex := R0
+TargetSquare := R13
+        ; sanity: if we haven't spawned in yet, we cannot be collected. this prevents the player
+        ; from rapidly picking up items while they stand on the square
+        ldx TargetSquare
+        lda tile_flags, x
+        and #ITEM_SPRITE_SPAWNED
+        bne try_item_collection
+        rts
+
+try_item_collection:
+        access_data_bank #<.bank(item_table)
+
+        ; look up the item properties and stash them for later
+        ldx TargetSquare
+        lda tile_data, x
+        asl
+        tay
+        lda item_table+0, y
+        sta ItemPtr+0
+        lda item_table+1, y
+        sta ItemPtr+1
+        ldy #ItemDef::ShopCost
+        lda (ItemPtr), y
+        sta ItemCost+0
+        iny
+        lda (ItemPtr), y
+        sta ItemCost+1
+        ldy #ItemDef::SlotId
+        lda (ItemPtr), y
+        sta ItemSlot
+
+        restore_previous_bank
+
+        ; if this is not an item for purchase, then perform the collection right away
+        ldx TargetSquare
+        lda tile_flags, x
+        and #ITEM_FOR_PURCHASE
+        beq perform_collection        
+
+        cmp16 PlayerGold, ItemCost
+        jcc deny_collection ; Can't afford it. Sorry!
+
+        ; "We take Visa."
+        sec
+        lda PlayerGold+0
+        sbc ItemCost+0
+        sta PlayerGold+0
+        lda PlayerGold+1
+        sbc ItemCost+1
+        sta PlayerGold+1
+
+perform_collection:
+        ldy ItemSlot
+        ; switcheroo!
+        lda player_equipment_by_index, y
+        sta OldItem
+        ldx TargetSquare
+        lda tile_data, x
+        sta player_equipment_by_index, y
+
+        ; we need to despawn our metasprite (the player's going to occupy this square, it should vanish)
+        lda tile_metasprite, x
+        tay
+        lda #0
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
+
+        ; before we write the old item back, sanity check: is it nothing?
+        ; if so, we should revert to a disco tile
+        lda OldItem
+        beq revert_to_disco_tile
+        sta tile_data, x
+
+        ; otherwise we have some cleanup to do. first off, the item was just purchased, so
+        ; this tile is no longer a purchase square (the player can pick up their old item and
+        ; swap back for free). while we're here, we also need to clear the "item spawned" flag so
+        ; that the logic knows to spawn in the new one once the player moves away
+        lda tile_flags, x
+        and #($FF - ITEM_FOR_PURCHASE - ITEM_SPRITE_SPAWNED)
+        sta tile_flags, x
+
+        ; And we're done!
+        restore_previous_bank
+        rts
+
+revert_to_disco_tile:
+        ; Now, draw a basic floor tile here, which will be underneath the player
+        ldx TargetSquare
+        stx TargetIndex
+        lda #TILE_REGULAR_FLOOR
+        sta battlefield, x
+        lda #<BG_TILE_FLOOR
+        sta tile_patterns, x
+        lda #(>BG_TILE_FLOOR | PAL_WORLD)
+        sta tile_attributes, x
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+        jsr draw_active_tile
+        restore_previous_bank
+        rts
+
+deny_collection:
+        ; If the player can't afford this item, or can't pick it up for some other reason, then
+        ; block their movement just like any wall
         jsr solid_tile_forbids_movement
 
+        ; TODO: play a sad buzzer sound?
+        restore_previous_bank
         rts
 .endproc
 

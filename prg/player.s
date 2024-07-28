@@ -30,13 +30,14 @@ PlayerWeaponPtr: .res 2
 
 .segment "RAM"
 
-PlayerEquipmentWeapon: .res 1
-PlayerEquipmentTorch: .res 1
-PlayerEquipmentArmor: .res 1
-PlayerEquipmentBoots: .res 1
-PlayerEquipmentAccessory: .res 1
-PlayerEquipmentBombs: .res 1
-PlayerEquipmentSpell: .res 1
+player_equipment_by_index: ; for indexing into this like a list
+        PlayerEquipmentWeapon: .res 1
+        PlayerEquipmentTorch: .res 1
+        PlayerEquipmentArmor: .res 1
+        PlayerEquipmentBoots: .res 1
+        PlayerEquipmentAccessory: .res 1
+        PlayerEquipmentBombs: .res 1
+        PlayerEquipmentSpell: .res 1
 
 PlayerBombCount: .res 1
 

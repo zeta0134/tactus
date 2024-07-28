@@ -18,6 +18,7 @@
         .include "palette_cycler.inc"
         .include "player.inc"
         .include "prng.inc"
+        .include "rainbow.inc"
         .include "settings.inc"
         .include "sound.inc"
         .include "sprites.inc"
