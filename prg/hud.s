@@ -1088,7 +1088,7 @@ check_item:
         jeq check_spell
         sta ItemDisplayCurrent
         sta ItemId
-        st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 13)
+        st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 14)
         jsr draw_tabbed_b_icon
         perform_zpcm_inc
 
@@ -1098,7 +1098,7 @@ check_spell:
         jeq done
         sta SpellDisplayCurrent
         sta ItemId
-        st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 16)
+        st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 17)
         jsr draw_tabbed_a_icon
         perform_zpcm_inc
        
