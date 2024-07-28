@@ -132,7 +132,7 @@ MetaSpriteIndex := R0
 
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
-        lda #ITEM_BROADSWORD_L1
+        lda #ITEM_BROADSWORD_L3
         sta PlayerEquipmentWeapon
         lda #ITEM_NONE
         sta PlayerEquipmentTorch

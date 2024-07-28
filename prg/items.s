@@ -3,10 +3,18 @@
     .include "../build/tile_defs.inc"
     .include "far_call.inc"
     .include "hud.inc"
+    .include "player.inc"
     .include "rainbow.inc"
     .include "sprites.inc"
     .include "weapons.inc"
     .include "zeropage.inc"
+
+    .zeropage
+
+; for use during general purpose routines, since I don't want to delicately
+; dance around scratch byte allocation
+ItemPtr: .res 2
+ItemFuncPtr: .res 2
 
     .segment "DATA_0"
 
@@ -245,12 +253,56 @@ ItemPtr := R2
     rts
 .endproc
 
-    .segment "PRGFIXED_E000"
+.proc __item_logic_trampoline
+    jmp (ItemFuncPtr)
+.endproc
+
+; item index in A
+.proc item_damage_common
+DmgTotal := R0
+    asl
+    tax
+    lda item_table+0, x
+    sta ItemPtr+0
+    lda item_table+1, x
+    sta ItemPtr+1
+    ldy #ItemDef::DamageFunc
+    lda (ItemPtr), y
+    sta ItemFuncPtr+0
+    iny
+    lda (ItemPtr), y
+    sta ItemFuncPtr+1
+    jsr __item_logic_trampoline
+    clc
+    adc DmgTotal
+    sta DmgTotal
+    rts
+.endproc
 
 ; Returns weapon dmg amount in A, based on the currently loaded item
 ; Clobbers: TODO, probably at least X,Y
-.proc FIXED_weapon_dmg
-    ; stub: do no harm!
+.proc FAR_weapon_dmg
+DmgTotal := R0
+    access_data_bank #<.bank(item_table)
+
+    ; Loop through all 5 equipment slots and keep a running sum of their damage
+    ; contributions
     lda #0
+    sta DmgTotal
+
+    lda PlayerEquipmentWeapon
+    jsr item_damage_common
+    lda PlayerEquipmentTorch
+    jsr item_damage_common
+    lda PlayerEquipmentArmor
+    jsr item_damage_common
+    lda PlayerEquipmentBoots
+    jsr item_damage_common
+    lda PlayerEquipmentAccessory
+    jsr item_damage_common
+
+    restore_previous_bank
+    lda DmgTotal
     rts
 .endproc
+

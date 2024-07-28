@@ -295,6 +295,9 @@ OriginalAttackSquare := R3
 TargetIndex := R0
 TileId := R1
 
+; Damage done by the weapon swing
+WeaponDmg := R0
+
 AttackLanded := R7
 EffectiveAttackSquare := R10
 EnemyHealth := R11
@@ -303,7 +306,8 @@ EnemyHealth := R11
         sta AttackLanded
 
         ; Add the player's currently equipped damage to our flags byte
-        jsr FIXED_weapon_dmg ; clobbers X,Y, result in A
+        far_call FAR_weapon_dmg ; clobbers X,Y, result in R0
+        lda WeaponDmg
         ldx EffectiveAttackSquare
         clc
         adc tile_flags, x
