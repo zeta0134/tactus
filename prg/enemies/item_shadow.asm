@@ -176,6 +176,13 @@ try_item_collection:
         sta PlayerGold+1
 
 perform_collection:
+        ; Play a joyous SFX
+        ; TODO: should this be a different sound depending on the type of item? (yes, but how?)
+        st16 R0, sfx_equip_ability_pulse1
+        jsr play_sfx_pulse1
+        st16 R0, sfx_equip_ability_pulse2
+        jsr play_sfx_pulse2
+
         ldy ItemSlot
         ; switcheroo!
         lda player_equipment_by_index, y
@@ -205,7 +212,6 @@ perform_collection:
         sta tile_flags, x
 
         ; And we're done!
-        restore_previous_bank
         rts
 
 revert_to_disco_tile:
@@ -222,7 +228,6 @@ revert_to_disco_tile:
         sta tile_data, x
         sta tile_flags, x
         jsr draw_active_tile
-        restore_previous_bank
         rts
 
 deny_collection:
@@ -230,8 +235,11 @@ deny_collection:
         ; block their movement just like any wall
         jsr solid_tile_forbids_movement
 
-        ; TODO: play a sad buzzer sound?
-        restore_previous_bank
+        st16 R0, sfx_too_poor_pulse1
+        jsr play_sfx_pulse1
+        st16 R0, sfx_too_poor_pulse2
+        jsr play_sfx_pulse2
+
         rts
 .endproc
 

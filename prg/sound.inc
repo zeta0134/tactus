@@ -35,6 +35,8 @@
 
 .global sfx_move_cursor
 .global sfx_select_cursor
+.global sfx_too_poor_pulse1
+.global sfx_too_poor_pulse2
 
 .macro play_dpcm sample_addr, length
 .scope

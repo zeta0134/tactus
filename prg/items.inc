@@ -22,7 +22,6 @@ SLOT_ITEM      = 5
 SLOT_SPELL     = 6
 
 .global item_table
-.global test_loot_table
 
 ITEM_NONE          = 0
 ITEM_DAGGER_L1     = 1

@@ -24,6 +24,7 @@
 .global intermediate_loot_table
 .global advanced_loot_table
 
+.global test_treasure_table
 
 .macro set_loot_table loot_table
     st16 LootTable, loot_table

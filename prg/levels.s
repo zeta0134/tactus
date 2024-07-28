@@ -11,6 +11,7 @@
         .include "hud.inc"
         .include "items.inc"
         .include "levels.inc"
+        .include "loot.inc"
         .include "nes.inc"
         .include "palette.inc"
         .include "player.inc"
@@ -1191,7 +1192,7 @@ ItemId := R2
 CurrentTile := R4 
         ; TODO: pick the loot table based on the zone? maybe based on some
         ; data from the room too. undecided!
-        st16 LootTablePtr, test_loot_table
+        st16 LootTablePtr, test_treasure_table
 
         ; Loop through the entire room, scanning for any item shadow tiles that aren't populated
         lda #0

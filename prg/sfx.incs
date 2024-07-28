@@ -393,3 +393,19 @@ sfx_select_cursor:
         pulse_cont_duty               $2,      $2,                                        0
         pulse_init_sweep  PITCH_E4,   $2,      $6, (S_PERIOD_0 | S_SHIFT_2 | S_NEG),      0
         pulse_cont_duty               $2,      $1,                                        0
+
+sfx_too_poor_pulse1:
+        ; Length in rows
+        .byte 3
+        ;                pitch,    duty,  volume,     length
+        pulse_init       PITCH_DS2,   $1,      $F,          3
+        pulse_init       PITCH_DS2,   $1,      $0,          2
+        pulse_init       PITCH_DS2,   $1,      $F,          5
+        
+sfx_too_poor_pulse2:
+        ; Length in rows
+        .byte 3
+        ;                pitch,    duty,  volume,     length
+        pulse_init       PITCH_CS2,   $2,      $F,          3
+        pulse_init       PITCH_CS2,   $2,      $0,          2
+        pulse_init       PITCH_CS2,   $2,      $F,          5
