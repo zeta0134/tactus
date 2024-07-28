@@ -22,6 +22,7 @@ SLOT_ITEM      = 5
 SLOT_SPELL     = 6
 
 .global item_table
+.global test_loot_table
 
 ITEM_NONE          = 0
 ITEM_DAGGER_L1     = 1
@@ -36,3 +37,6 @@ ITEM_LONGSWORD_L3  = 7
 .global FAR_apply_item_hud_metasprite
 
 .global FAR_weapon_dmg
+.global FAR_reset_shop_tracker
+.global FAR_roll_shop_loot
+.global FAR_roll_gameplay_loot

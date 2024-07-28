@@ -9,6 +9,7 @@
         .include "far_call.inc"
         .include "floor_preservation.inc"
         .include "hud.inc"
+        .include "items.inc"
         .include "levels.inc"
         .include "nes.inc"
         .include "palette.inc"
@@ -839,6 +840,7 @@ begin_floor_generation:
 
         lda #0
         sta ChallengeCount
+        sta ShopCount
         sta FloorExitCount
 
         lda #0
@@ -1028,6 +1030,7 @@ BigFloorPtr := R0
         ; We are about to kick off floor generation, so grab a fresh floor PRNG
         ; seed based on the current run seed
         jsr generate_floor_seed
+        far_call FAR_reset_shop_tracker
 
         access_data_bank #<.bank(test_floor_layout_pool)
 
@@ -1166,6 +1169,56 @@ spawn_boss_enemies:
         jsr spawn_boss_enemies_from_pool
         jmp room_cleared
 room_cleared:
+
+        ; If this is a shop room, roll shop loot
+        ldx RoomIndexToGenerate
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_SHOP
+        bne done_with_shop_rolls
+        jsr roll_shop_loot
+done_with_shop_rolls:
+
+        rts
+.endproc
+
+.proc roll_shop_loot
+LootTablePtr := R0
+ItemId := R2
+; R3 is clobbered by the loot rolling function
+CurrentTile := R4 
+        ; TODO: pick the loot table based on the zone? maybe based on some
+        ; data from the room too. undecided!
+        st16 LootTablePtr, test_loot_table
+
+        ; Loop through the entire room, scanning for any item shadow tiles that aren't populated
+        lda #0
+        sta CurrentTile
+loop:
+        ldx CurrentTile
+        lda battlefield, x
+        cmp #TILE_ITEM_SHADOW
+        bne done_with_tile
+        lda tile_data, x   ; only roll an item if this slot actually has no item in it.
+                           ; not sure if we'll use this, but it allows us to have the map data
+                           ; specify a forced roll and control the purchase flag?
+        bne done_with_tile
+
+        far_call FAR_roll_shop_loot
+        ldx CurrentTile
+        lda ItemId
+        sta tile_data, x
+        lda tile_flags, x
+        ora #ITEM_FOR_PURCHASE
+        sta tile_flags, x
+
+done_with_tile:
+        inc CurrentTile
+        lda CurrentTile
+        cmp #BATTLEFIELD_SIZE
+        bne loop
+
+        ; et voila! items for sale!
 
         rts
 .endproc

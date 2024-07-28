@@ -3,6 +3,7 @@
     .include "../build/tile_defs.inc"
     .include "far_call.inc"
     .include "hud.inc"
+    .include "prng.inc"
     .include "player.inc"
     .include "rainbow.inc"
     .include "sprites.inc"
@@ -16,7 +17,24 @@
 ItemPtr: .res 2
 ItemFuncPtr: .res 2
 
+    .segment "RAM"
+
+ShopRollsCount: .res 1
+shop_rolls_tracker: .res 16
+
     .segment "DATA_0"
+
+; simply includes all the items. balance? what's that?
+test_loot_table:
+    .byte 8 ; length must be a power of 2!
+    .byte ITEM_DAGGER_L1
+    .byte ITEM_DAGGER_L1
+    .byte ITEM_BROADSWORD_L1
+    .byte ITEM_BROADSWORD_L2
+    .byte ITEM_BROADSWORD_L3
+    .byte ITEM_LONGSWORD_L1
+    .byte ITEM_LONGSWORD_L2
+    .byte ITEM_LONGSWORD_L3
 
 item_table:
     .word no_item
@@ -40,7 +58,7 @@ no_item:
     .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr
     .byte 0                               ; HudSpriteTile
     .byte 0                               ; HudSpriteAttr
-    .word 173                             ; ShopCost
+    .word 50                              ; ShopCost
     .byte WEAPON_DAGGER                   ; WeaponShape (unused)
     .addr no_effect                       ; DamageFunc
     .addr no_effect                       ; TorchlightFunc
@@ -54,7 +72,7 @@ dagger_lvl_1:
     .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS); HudBgAttr
     .byte 0 ; HudSpriteTile
     .byte 0 ; HudSpriteAttr
-    .word 173                             ; ShopCost
+    .word 50                             ; ShopCost
     .byte WEAPON_DAGGER ; WeaponShape
     .addr flat_1     ; DamageFunc
     .addr no_effect  ; TorchlightFunc
@@ -68,7 +86,7 @@ broadsword_lvl_1:
     .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS); HudBgAttr
     .byte 0 ; HudSpriteTile
     .byte 0 ; HudSpriteAttr
-    .word 173                             ; ShopCost
+    .word 50                             ; ShopCost
     .byte WEAPON_BROADSWORD ; WeaponShape
     .addr flat_1     ; DamageFunc
     .addr no_effect  ; TorchlightFunc
@@ -82,7 +100,7 @@ broadsword_lvl_2:
     .byte (HUD_RED_PAL | CHR_BANK_ITEMS); HudBgAttr
     .byte 0 ; HudSpriteTile
     .byte 0 ; HudSpriteAttr
-    .word 173                             ; ShopCost
+    .word 200                             ; ShopCost
     .byte WEAPON_BROADSWORD ; WeaponShape
     .addr flat_2     ; DamageFunc
     .addr no_effect  ; TorchlightFunc
@@ -96,7 +114,7 @@ broadsword_lvl_3:
     .byte (HUD_WORLD_PAL | CHR_BANK_ITEMS); HudBgAttr
     .byte 0 ; HudSpriteTile
     .byte 0 ; HudSpriteAttr
-    .word 173                             ; ShopCost
+    .word 500                             ; ShopCost
     .byte WEAPON_BROADSWORD ; WeaponShape
     .addr flat_3     ; DamageFunc
     .addr no_effect  ; TorchlightFunc
@@ -110,7 +128,7 @@ longsword_lvl_1:
     .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS); HudBgAttr
     .byte 0 ; HudSpriteTile
     .byte 0 ; HudSpriteAttr
-    .word 173                             ; ShopCost
+    .word 50                             ; ShopCost
     .byte WEAPON_LONGSWORD ; WeaponShape
     .addr flat_1     ; DamageFunc
     .addr no_effect  ; TorchlightFunc
@@ -124,7 +142,7 @@ longsword_lvl_2:
     .byte (HUD_RED_PAL | CHR_BANK_ITEMS); HudBgAttr
     .byte 0 ; HudSpriteTile
     .byte 0 ; HudSpriteAttr
-    .word 173                             ; ShopCost
+    .word 200                             ; ShopCost
     .byte WEAPON_LONGSWORD ; WeaponShape
     .addr flat_2     ; DamageFunc
     .addr no_effect  ; TorchlightFunc
@@ -138,7 +156,7 @@ longsword_lvl_3:
     .byte (HUD_WORLD_PAL | CHR_BANK_ITEMS) ; HudBgAttr
     .byte 0                                ; HudSpriteTile
     .byte 0                                ; HudSpriteAttr
-    .word 173                              ; ShopCost
+    .word 500                              ; ShopCost
     .byte WEAPON_LONGSWORD                 ; WeaponShape
     .addr flat_3                           ; DamageFunc
     .addr no_effect                        ; TorchlightFunc
@@ -306,3 +324,105 @@ DmgTotal := R0
     rts
 .endproc
 
+; place the loot table of your choice in R0, result in R2
+.proc FAR_roll_shop_loot
+LootTablePtr := R0
+ItemId := R2
+TableLength := R3
+    access_data_bank #<.bank(item_table)
+
+    ldy #0
+    lda (LootTablePtr), y
+    sta TableLength
+roll_acceptable_item_loop:
+    jsr next_room_rand
+fix_index_loop:
+    cmp TableLength
+    bcc item_index_in_range
+    sec
+    sbc TableLength
+    jmp fix_index_loop
+item_index_in_range:
+    tay
+    iny ; move past length byte
+    lda (LootTablePtr), y
+    sta ItemId
+    ; sanity checks here
+    jsr check_for_duplicate_shop_roll
+    bne roll_acceptable_item_loop
+    ; we'll keep this item then; add it to the set that we've rolled so far
+    jsr add_to_shop_rolls
+    ; and... done?
+
+    restore_previous_bank
+    rts
+.endproc
+
+; same deal but it uses the gameplay LFSR, for when we need to
+; spawn treasure on the fly
+.proc FAR_roll_gameplay_loot
+LootTablePtr := R0
+ItemId := R2
+TableLength := R3
+    access_data_bank #<.bank(item_table)
+
+    ldy #0
+    lda (LootTablePtr), y
+    sta TableLength
+roll_acceptable_item_loop:
+    jsr next_gameplay_rand
+fix_index_loop:
+    cmp TableLength
+    bcc item_index_in_range
+    sec
+    sbc TableLength
+    jmp fix_index_loop
+item_index_in_range:
+    tay
+    iny ; move past length byte
+    lda (LootTablePtr), y
+    sta ItemId
+    ; for gameplay treasures, we don't perform sanity checks or bother
+    ; with duplicates. you get what you get. (depending on mechanics, a player
+    ; might spawn a lot of these, and we don't ever want to run out of unique items
+    ; to roll and lock up)
+
+    restore_previous_bank
+    rts
+.endproc
+
+; returns 0 on success, nonzero on failure
+.proc check_for_duplicate_shop_roll
+LootTablePtr := R0
+ItemId := R2
+    ldx #0
+loop:
+    cpx ShopRollsCount
+    beq accept ; if we reach the end of the list (which may be empty) we're done!
+    lda shop_rolls_tracker, x
+    cmp ItemId ; only reject on exact ItemId match
+    beq reject
+    inx
+    jmp loop
+accept:
+    lda #0
+    rts
+reject:
+    lda #$FF
+    rts
+.endproc
+
+.proc add_to_shop_rolls
+ItemId := R2
+    ldx ShopRollsCount
+    lda ItemId
+    sta shop_rolls_tracker, x
+    inc ShopRollsCount
+    rts
+.endproc
+
+.proc FAR_reset_shop_tracker
+    lda #0
+    sta ShopRollsCount
+    rts
+.endproc

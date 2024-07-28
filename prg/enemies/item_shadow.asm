@@ -1,6 +1,3 @@
-ITEM_SPRITE_SPAWNED = %00000001
-ITEM_FOR_PURCHASE   = %00000010
-
 .proc draw_item_sprite
 ; as used by FAR_apply_item_world_metasprite 
 MetaSpriteIndex := R0
