@@ -67,7 +67,7 @@
    <property name="detail" value="DETAIL_GRASS_WALL_UPPER_BORDER"/>
   </properties>
  </tile>
- <tile id="20">
+ <tile id="20" type="detail">
   <properties>
    <property name="behavior" value="TILE_WALL"/>
    <property name="detail" value="DETAIL_GRASS_WALL_HORIZ_STRIP"/>

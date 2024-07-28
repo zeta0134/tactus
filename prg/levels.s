@@ -58,6 +58,8 @@ challenge_pit_darkblue:
         .incbin "../art/challenge_pit_darkblue.pal"
 challenge_pit_darkred:
         .incbin "../art/challenge_pit_darkred.pal"
+shop_palette:
+        .incbin "../art/shop_palette.pal"
 
 .proc load_room_palette
 RoomPtr := R0

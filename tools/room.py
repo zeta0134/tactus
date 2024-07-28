@@ -253,7 +253,7 @@ def tile_attr_bytes(tiles):
   for tile in tiles:
     palette_index = tile.integer_properties.get("palette_index",0) << 6
     if "tile_id" in tile.string_properties:
-        raw_bytes.append(f">({tile.string_properties["tile_id"]} | ${palette_index:02X})")
+        raw_bytes.append(f">({tile.string_properties["tile_id"]}) | ${palette_index:02X}")
     else:
         if tile.type == "floor":
             raw_bytes.append(f">(BG_TILE_DISCO_FLOOR_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
