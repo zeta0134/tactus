@@ -34,3 +34,5 @@ ITEM_LONGSWORD_L3  = 7
 
 .global FAR_apply_item_world_metasprite
 .global FAR_apply_item_hud_metasprite
+
+.global FIXED_weapon_dmg

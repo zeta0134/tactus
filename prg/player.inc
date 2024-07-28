@@ -7,13 +7,19 @@
 
 .global row_number_to_tile_index_lut
 
+.global PlayerEquipmentWeapon
+.global PlayerEquipmentTorch
+.global PlayerEquipmentArmor
+.global PlayerEquipmentBoots
+.global PlayerEquipmentAccessory
+.global PlayerEquipmentBombs
+.global PlayerEquipmentSpell
+.global PlayerBombCount
+
 .global PlayerRow
 .global PlayerCol
 .global PlayerMaxHealth
 .global PlayerHealth
-.globalzp PlayerWeapon
-.global PlayerWeaponDmg
-.globalzp PlayerWeaponPtr
 .global PlayerRoomIndex
 .global PlayerKeys
 .global PlayerGold

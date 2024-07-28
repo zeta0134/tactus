@@ -8,10 +8,12 @@
         .include "far_call.inc"
         .include "chr.inc"
         .include "hud.inc"
+        .include "items.inc"
         .include "levels.inc"
         .include "nes.inc"
         .include "player.inc"
         .include "ppu.inc"
+        .include "rainbow.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "text_util.inc"
@@ -37,19 +39,12 @@ FloorCurrent: .res 1
 DisplayedGold: .res 2
 GoldSfxCooldown: .res 1
 
-WeaponDisplayTarget: .res 1
 WeaponDisplayCurrent: .res 1
-TorchDisplayTarget: .res 1
 TorchDisplayCurrent: .res 1
-ArmorDisplayTarget: .res 1
 ArmorDisplayCurrent: .res 1
-BootsDisplayTarget: .res 1
 BootsDisplayCurrent: .res 1
-AccessoryDisplayTarget: .res 1
 AccessoryDisplayCurrent: .res 1
-SpellDisplayTarget: .res 1
 SpellDisplayCurrent: .res 1
-ItemDisplayTarget: .res 1
 ItemDisplayCurrent: .res 1
 
 .segment "CODE_0"
@@ -860,248 +855,255 @@ TenThousandsDigit := T6
 .endproc
 
 .proc update_equipment
-        lda PlayerWeapon
+        ; TODO: if we're going to animate equipment icons, this is where we do that
+        rts
+.endproc
+
+.proc draw_icon_common
+ItemId := R0
+TileAddr  := R2
+AttributeAddr := R4
+DrawTile := R6
+DrawAttr := R7
+ItemPtr := R8
+
         clc
-        adc #1
-        sta WeaponDisplayTarget
+        lda TileAddr+0
+        adc #<HUD_ATTR_OFFSET
+        sta AttributeAddr+0
+        lda TileAddr+1
+        adc #>HUD_ATTR_OFFSET
+        sta AttributeAddr+1
 
-        ; hardcode a torch for now
-        lda #1
-        sta TorchDisplayTarget
+        ; lookup the item ID to obtain its attributes
+        lda ItemId
+        asl
+        tay
+        lda item_table+0, y
+        sta ItemPtr+0
+        lda item_table+1, y
+        sta ItemPtr +1
+        ldy #ItemDef::HudBgTile
+        lda (ItemPtr), y
+        sta DrawTile
+        ldy #ItemDef::HudBgAttr
+        lda (ItemPtr), y
+        sta DrawAttr
 
-        ; nothing else exists, so zero it out
-        lda #0
-        sta ArmorDisplayTarget
-        sta BootsDisplayTarget
-        sta AccessoryDisplayTarget
-        sta SpellDisplayTarget
-        sta ItemDisplayTarget
+        ; Perform the draw
 
+        ldy #0
+
+        lda DrawTile
+        sta (TileAddr), y
+        lda DrawAttr
+        sta (AttributeAddr), y
+        
+        inc DrawTile
+        iny
+
+        lda DrawTile
+        sta (TileAddr), y
+        lda DrawAttr
+        sta (AttributeAddr), y
+
+        clc
+        lda DrawTile
+        adc #15
+        sta DrawTile
+
+        tya
+        clc
+        adc #31
+        tay
+
+        lda DrawTile
+        sta (TileAddr), y
+        lda DrawAttr
+        sta (AttributeAddr), y
+
+        inc DrawTile
+        iny
+
+        lda DrawTile
+        sta (TileAddr), y
+        lda DrawAttr
+        sta (AttributeAddr), y
+        
+        rts
+.endproc
+
+.proc draw_equipment_icon
+ItemId := R0
+TileAddr  := R2
+AttributeAddr := R4
+DrawTile := R6
+DrawAttr := R7
+ItemPtr := R8
+        ; The 5 standard equipment icons need no special logic
+        jsr draw_icon_common
+        rts
+.endproc
+
+; same interface as above, but handles the little tab tiles on the bottom left
+.proc draw_tabbed_b_icon
+ItemId := R0
+TileAddr  := R2
+AttributeAddr := R4
+DrawTile := R6
+DrawAttr := R7
+ItemPtr := R8
+        jsr draw_icon_common
+        ; at this point, Y points to the bottom-right tile
+        ; backpedal unconditionally here
+        dey
+        ; now handle the little tab
+        lda ItemId
+        beq no_b_item_equipped
+b_item_equipped:
+        ; skip past the bottom-left corner
+        dey
+        ; draw the little B tab, enabled
+        lda #SPELL_B_ENABLED
+        sta (TileAddr), y
+        lda #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        sta (AttributeAddr), y
+        rts
+no_b_item_equipped:
+        ; draw the tabbed bottom left corner, disabled
+        lda #SPELL_DISABLED_BL_CORNER
+        sta (TileAddr), y
+        lda #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        sta (AttributeAddr), y
+        ; now skip past the bottom-left corner
+        dey
+        ; and finally draw the B tab, disabled
+        lda #SPELL_B_DISABLED
+        sta (TileAddr), y
+        lda #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        sta (AttributeAddr), y
+        rts
+.endproc
+
+; same deal but for the A button
+.proc draw_tabbed_a_icon
+ItemId := R0
+TileAddr  := R2
+AttributeAddr := R4
+DrawTile := R6
+DrawAttr := R7
+ItemPtr := R8
+        jsr draw_icon_common
+        ; at this point, Y points to the bottom-right tile
+        ; backpedal unconditionally here
+        dey
+        ; now handle the little tab
+        lda ItemId
+        beq no_a_item_equipped
+a_item_equipped:
+        ; skip past the bottom-left corner
+        dey
+        ; draw the little B tab, enabled
+        lda #SPELL_A_ENABLED
+        sta (TileAddr), y
+        lda #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        sta (AttributeAddr), y
+        rts
+no_a_item_equipped:
+        ; draw the tabbed bottom left corner, disabled
+        lda #SPELL_DISABLED_BL_CORNER
+        sta (TileAddr), y
+        lda #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        sta (AttributeAddr), y
+        ; now skip past the bottom-left corner
+        dey
+        ; and finally draw the B tab, disabled
+        lda #SPELL_A_DISABLED
+        sta (TileAddr), y
+        lda #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        sta (AttributeAddr), y
         rts
 .endproc
 
 .proc draw_equipment
-DrawTile := R0
+ItemId := R0
+TileAddr  := R2
         perform_zpcm_inc
 
+        access_data_bank #<.bank(item_table)
+
 check_weapon:
-        lda WeaponDisplayTarget
+        lda PlayerEquipmentWeapon
         cmp WeaponDisplayCurrent
         beq check_torch
         sta WeaponDisplayCurrent
-
-        ldx WeaponDisplayCurrent
-        lda weapon_tile_table, x
-        sta DrawTile
-        ldx #2
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        inc DrawTile
-        ldx #3
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        clc
-        lda DrawTile
-        adc #15
-        sta DrawTile
-        ldx #2
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        inc DrawTile
-        ldx #3
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        sta ItemId
+        st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 2)
+        jsr draw_equipment_icon
         perform_zpcm_inc
 
 check_torch:
-        lda TorchDisplayTarget
+        lda PlayerEquipmentTorch
         cmp TorchDisplayCurrent
         beq check_armor
         sta TorchDisplayCurrent
-
-        ldx TorchDisplayCurrent
-        lda torch_tile_table, x
-        sta DrawTile
-        ldx #4
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        inc DrawTile
-        ldx #5
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        clc
-        lda DrawTile
-        adc #15
-        sta DrawTile
-        ldx #4
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        inc DrawTile
-        ldx #5
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        sta ItemId
+        st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 4)
+        jsr draw_equipment_icon
         perform_zpcm_inc
 
 check_armor:
-        lda ArmorDisplayTarget
+        lda PlayerEquipmentArmor
         cmp ArmorDisplayCurrent
         beq check_boots
         sta ArmorDisplayCurrent
-
-        ldx ArmorDisplayCurrent
-        lda armor_tile_table, x
-        sta DrawTile
-        ldx #6
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        inc DrawTile
-        ldx #7
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        clc
-        lda DrawTile
-        adc #15
-        sta DrawTile
-        ldx #6
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        inc DrawTile
-        ldx #7
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        sta ItemId
+        st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 6)
+        jsr draw_equipment_icon
         perform_zpcm_inc
 
 check_boots:
-        lda BootsDisplayTarget
+        lda PlayerEquipmentBoots
         cmp BootsDisplayCurrent
         beq check_accessory
-        sta BootsDisplayCurrent
-
-        ldx BootsDisplayCurrent
-        lda boots_tile_table, x
-        sta DrawTile
-        ldx #8
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        inc DrawTile
-        ldx #9
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        clc
-        lda DrawTile
-        adc #15
-        sta DrawTile
-        ldx #8
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        inc DrawTile
-        ldx #9
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        sta BootsDisplayCurrent        
+        sta ItemId
+        st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 8)
+        jsr draw_equipment_icon
         perform_zpcm_inc
 
 check_accessory:
-        lda AccessoryDisplayTarget
+        lda PlayerEquipmentAccessory
         cmp AccessoryDisplayCurrent
         beq check_item
         sta AccessoryDisplayCurrent
-
-        ldx AccessoryDisplayCurrent
-        lda accessory_tile_table, x
-        sta DrawTile
-        ldx #10
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        inc DrawTile
-        ldx #11
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        clc
-        lda DrawTile
-        adc #15
-        sta DrawTile
-        ldx #10
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        inc DrawTile
-        ldx #11
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        sta ItemId
+        st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 10)
+        jsr draw_equipment_icon
         perform_zpcm_inc
 
 check_item:
-        lda ItemDisplayTarget
+        lda PlayerEquipmentBombs
         cmp ItemDisplayCurrent
         jeq check_spell
         sta ItemDisplayCurrent
-
-        ; here we need to handle the little tab as a special case
-        ldx ItemDisplayCurrent
-        cpx #0
-        bne item_equipped
-no_item_equipped:
-        ldx #13
-        draw_tile_at_x ROW_2, #SPELL_B_DISABLED, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        ldx #14
-        draw_tile_at_x ROW_2, #SPELL_DISABLED_BL_CORNER, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        ldx ItemDisplayCurrent
-        lda item_tile_table, x
-        clc
-        adc #16
-        sta DrawTile
-        jmp draw_untabbed_item_tiles
-item_equipped:
-        ldx #13
-        draw_tile_at_x ROW_2, #SPELL_B_ENABLED, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        ldx ItemDisplayCurrent
-        lda item_tile_table, x
-        clc
-        adc #16
-        sta DrawTile
-        ldx #14
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-draw_untabbed_item_tiles:
-        inc DrawTile
-        ldx #15
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        sec
-        lda DrawTile
-        sbc #17
-        sta DrawTile
-        ldx #14
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        inc DrawTile
-        ldx #15
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        sta ItemId
+        st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 13)
+        jsr draw_tabbed_b_icon
         perform_zpcm_inc
 
 check_spell:
-        lda SpellDisplayTarget
+        lda PlayerEquipmentSpell
         cmp SpellDisplayCurrent
         jeq done
         sta SpellDisplayCurrent
-
-        ; here we need to handle the little tab as a special case
-        ldx SpellDisplayCurrent
-        cpx #0
-        bne spell_equipped
-no_spell_equipped:
-        ldx #16
-        draw_tile_at_x ROW_2, #SPELL_A_DISABLED, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        ldx #17
-        draw_tile_at_x ROW_2, #SPELL_DISABLED_BL_CORNER, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        ldx SpellDisplayCurrent
-        lda spell_tile_table, x
-        clc
-        adc #16
-        sta DrawTile
-        jmp draw_untabbed_spell_tiles
-spell_equipped:
-        ldx #16
-        draw_tile_at_x ROW_2, #SPELL_A_ENABLED, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        ldx SpellDisplayCurrent
-        lda spell_tile_table, x
-        clc
-        adc #16
-        sta DrawTile
-        ldx #17
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-draw_untabbed_spell_tiles:
-        inc DrawTile
-        ldx #18
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        sec
-        lda DrawTile
-        sbc #17
-        sta DrawTile
-        ldx #17
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
-        inc DrawTile
-        ldx #18
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        sta ItemId
+        st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 16)
+        jsr draw_tabbed_a_icon
         perform_zpcm_inc
-
+       
 done:
+        restore_previous_bank
         perform_zpcm_inc
         rts
 .endproc

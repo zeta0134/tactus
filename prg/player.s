@@ -7,11 +7,13 @@
         .include "enemies.inc"
         .include "far_call.inc"
         .include "input.inc"
+        .include "items.inc"
         .include "kernel.inc"
         .include "bhop/longbranch.inc"
         .include "levels.inc"
         .include "nes.inc"
         .include "player.inc"
+        .include "rainbow.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "weapons.inc"
@@ -21,14 +23,22 @@
 
 .zeropage
 
-PlayerWeapon: .res 2
-PlayerWeaponPtr: .res 2
-
 FxTileId: .res 1
 SfxTileId: .res 1
 SingleHitAttackSquare: .res 1
+PlayerWeaponPtr: .res 2
 
 .segment "RAM"
+
+PlayerEquipmentWeapon: .res 1
+PlayerEquipmentTorch: .res 1
+PlayerEquipmentArmor: .res 1
+PlayerEquipmentBoots: .res 1
+PlayerEquipmentAccessory: .res 1
+PlayerEquipmentBombs: .res 1
+PlayerEquipmentSpell: .res 1
+
+PlayerBombCount: .res 1
 
 PlayerSpriteIndex: .res 1
 PlayerRow: .res 1
@@ -43,8 +53,6 @@ PlayerTargetX: .res 2
 PlayerTargetY: .res 2
 
 PlayerJumpHeightPos: .res 2
-
-PlayerWeaponDmg: .res 1
 PlayerMovementBlocked: .res 1
 PlayerTorchlightRadius: .res 1
 
@@ -95,7 +103,7 @@ MetaSpriteIndex := R0
         far_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
         cpx #$FF
-        beq sprite_failed
+        jeq sprite_failed
         stx PlayerSpriteIndex
         lda #(SPRITE_ACTIVE)
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
@@ -123,25 +131,28 @@ MetaSpriteIndex := R0
         sta PlayerTorchlightRadius
 
 .if ::DEBUG_GOD_MODE
-        ; The player should start with whatever Zeta likes
-        lda #1
-        sta PlayerWeaponDmg
-        lda #WEAPON_BROADSWORD
-        sta PlayerWeapon
+        ; The player should start with whatever Zeta likes        
+        lda #ITEM_BROADSWORD_L1
+        sta PlayerEquipmentWeapon
+        lda #ITEM_NONE
+        sta PlayerEquipmentTorch
+        sta PlayerEquipmentArmor
+        sta PlayerEquipmentBoots
+        sta PlayerEquipmentAccessory
+        sta PlayerEquipmentBombs
+        sta PlayerEquipmentSpell
 .else
         ; The player should start with a standard L1-DAGGER
-        lda #1
-        sta PlayerWeaponDmg
-        lda #WEAPON_DAGGER
-        sta PlayerWeapon
-.endif
-        asl
-        tax
-        lda weapon_class_table, x
-        sta PlayerWeaponPtr
-        lda weapon_class_table+1, x
-        sta PlayerWeaponPtr+1
-        
+        lda #ITEM_DAGGER_L1
+        sta PlayerEquipmentWeapon
+        lda #ITEM_NONE
+        sta PlayerEquipmentTorch
+        sta PlayerEquipmentArmor
+        sta PlayerEquipmentBoots
+        sta PlayerEquipmentAccessory
+        sta PlayerEquipmentBombs
+        sta PlayerEquipmentSpell
+.endif  
 
 .if ::DEBUG_GOD_MODE
         lda #20
@@ -548,6 +559,28 @@ done_choosing_target:
         rts
 .endproc
 
+.proc load_weapon_ptr
+ItemPtr := R0
+        access_data_bank #<.bank(item_table)
+        lda PlayerEquipmentWeapon
+        asl
+        tay
+        lda item_table+0, y
+        sta ItemPtr+0
+        lda item_table+1, y
+        sta ItemPtr+1
+        ldy #ItemDef::WeaponShape
+        lda (ItemPtr), y
+        asl
+        tay
+        lda weapon_class_table+0, y
+        sta PlayerWeaponPtr+0
+        lda weapon_class_table+1, y
+        sta PlayerWeaponPtr+1
+        restore_previous_bank
+        rts
+.endproc
+
 .proc player_swing_weapon
 ; R0 and R1 are reserved for the enemy behaviors to use
 ; Current target square to consider for attacking
@@ -563,6 +596,11 @@ EffectiveAttackSquare := R10
 TargetRow := R14
 TargetCol := R15
         perform_zpcm_inc
+
+        jsr load_weapon_ptr ; clobbers R0,R1,y
+
+        perform_zpcm_inc
+
         lda #0
         sta EnemyDiedThisFrame
 

@@ -17,7 +17,7 @@ treasure_category_table:
         .byte TREASURE_GOLD
         .endrepeat
         .repeat 10
-        .byte TREASURE_WEAPON
+        .byte TREASURE_GOLD
         .endrepeat
         .repeat 2
         .byte TREASURE_HEART
@@ -48,11 +48,6 @@ spawn_treasure:
         and #%00001111
         tax
         lda treasure_category_table, x
-check_weapon:
-        cmp #TREASURE_WEAPON
-        bne check_gold
-        jsr spawn_weapon
-        rts
 check_gold:
         cmp #TREASURE_GOLD
         bne spawn_heart

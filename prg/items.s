@@ -247,6 +247,8 @@ ItemPtr := R2
 
     .segment "PRGFIXED_E000"
 
+; Returns weapon dmg amount in A, based on the currently loaded item
+; Clobbers: TODO, probably at least X,Y
 .proc FIXED_weapon_dmg
     ; stub: do no harm!
     lda #0

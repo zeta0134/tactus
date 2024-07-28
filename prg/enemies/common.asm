@@ -303,8 +303,8 @@ EnemyHealth := R11
         sta AttackLanded
 
         ; Add the player's currently equipped damage to our flags byte
+        jsr FIXED_weapon_dmg ; clobbers X,Y, result in A
         ldx EffectiveAttackSquare
-        lda PlayerWeaponDmg
         clc
         adc tile_flags, x
         sta tile_flags, x

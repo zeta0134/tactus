@@ -201,7 +201,6 @@ tile_index_to_col_lut:
 .include "enemies/small_heart.asm"
 .include "enemies/smoke_puff.asm"
 .include "enemies/treasure_chest.asm"
-.include "enemies/weapon_shadow.asm"
 
 static_behaviors:
         .word update_smoke_puff         ; $00
@@ -231,7 +230,7 @@ static_behaviors:
         .word no_behavior               ; $98 - treasure chest
         .word no_behavior               ; $9C - big key
         .word no_behavior               ; $A0 - gold sack
-        .word update_weapon_shadow      ; $A4 - weapon shadow
+        .word no_behavior               ; $A4 - UNUSED
         ; safety: fill out the rest of the table
         .repeat 22
         .word no_behavior
@@ -267,7 +266,7 @@ direct_attack_behaviors:
         .word attack_treasure_chest ; $98 - treasure chest
         .word no_behavior ; $9C - big key
         .word no_behavior ; $A0 - gold sack
-        .word no_behavior ; $A4 - weapon shadow
+        .word no_behavior ; $A4 - UNUSED
         .word attack_exit_block ; $A8 - exit block
         .word no_behavior ; $AC - exit stairs
         ; safety: fill out the rest of the table
@@ -327,7 +326,7 @@ bonk_behaviors:
         .word solid_tile_forbids_movement ; $98 - treasure chest
         .word collect_key ; $9C - big key
         .word collect_gold_sack ; $A0 - gold sack
-        .word collect_weapon ; $A4 - weapon shadow
+        .word no_behavior       ; $A4 - UNUSED
         .word solid_tile_forbids_movement ; $A8 - exit block
         .word descend_stairs ; $AC - exit stairs
         .word collect_small_heart ; $B0
@@ -373,7 +372,7 @@ suspend_behaviors:
         .word no_behavior               ; $98 - treasure chest
         .word no_behavior               ; $9C - big key
         .word no_behavior               ; $A0 - gold sack
-        .word suspend_weapon_shadow     ; $A4 - weapon shadow
+        .word no_behavior               ; $A4 - UNUSED
         ; safety: fill out the rest of the table
         .repeat 22
         .word no_behavior
