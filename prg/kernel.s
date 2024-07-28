@@ -17,6 +17,7 @@
         .include "input.inc"
         .include "kernel.inc"
         .include "levels.inc"
+        .include "loot.inc"
         .include "nes.inc"
         .include "palette.inc"
         .include "palette_cycler.inc"
@@ -413,6 +414,7 @@ LayoutPtr := R0
         far_call FAR_draw_battlefield_block_C
         debug_color LIGHTGRAY
 
+        far_call FAR_reset_price_tracker
 
         st16 GameMode, beat_frame_1
         rts
@@ -525,6 +527,8 @@ StartingRow := R14
 StartingTile := R15
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
+
+        far_call FAR_reset_price_tracker
 
         ;- 1 frame: Update rows 0-3 of static enemies
         lda #0
@@ -695,6 +699,8 @@ StartingTile := R15
         debug_color (TINT_G | LIGHTGRAY)
         far_call FAR_draw_battlefield_block_C
         debug_color LIGHTGRAY
+
+        far_call FAR_draw_prices
 
         jsr every_gameloop
         st16 GameMode, decide_how_to_wait_for_the_next_beat

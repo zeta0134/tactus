@@ -1,4 +1,5 @@
 ; various text-based conversion utilities
+.global FAR_base_10_old_chrram
 .global FAR_base_10
 
 ; drawing utilities

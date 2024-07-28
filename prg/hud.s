@@ -845,12 +845,23 @@ ThousandsDigit := T5
 TenThousandsDigit := T6
         mov16 NumberWord, DisplayedGold
         near_call FAR_base_10
+
+        lda ThousandsDigit
+        beq draw_little_x
+draw_thousands_digit:
+        ldx #15
+        draw_tile_at_x ROW_4, ThousandsDigit, #(HUD_TEXT_PAL | CHR_BANK_SHIFTED_NUMERALS)
+        jmp converge
+draw_little_x:
+        ldx #15
+        draw_tile_at_x ROW_4, #COIN_X, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+converge:
         ldx #16
-        draw_tile_at_x ROW_4, HundredsDigit, #(HUD_TEXT_PAL | CHR_BANK_OLD_CHRRAM)
+        draw_tile_at_x ROW_4, HundredsDigit, #(HUD_TEXT_PAL | CHR_BANK_SHIFTED_NUMERALS)
         ldx #17
-        draw_tile_at_x ROW_4, TensDigit, #(HUD_TEXT_PAL | CHR_BANK_OLD_CHRRAM)
+        draw_tile_at_x ROW_4, TensDigit, #(HUD_TEXT_PAL | CHR_BANK_SHIFTED_NUMERALS)
         ldx #18
-        draw_tile_at_x ROW_4, OnesDigit, #(HUD_TEXT_PAL | CHR_BANK_OLD_CHRRAM)
+        draw_tile_at_x ROW_4, OnesDigit, #(HUD_TEXT_PAL | CHR_BANK_SHIFTED_NUMERALS)
         rts
 .endproc
 

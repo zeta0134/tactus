@@ -93,7 +93,7 @@ end_of_string:
 ; given a 16bit number, computes the individual digit tiles (in base 10)
 ; does not actually draw the number, meant to be consumed by other routines
 ; that perform this task
-.proc FAR_base_10
+.proc FAR_base_10_old_chrram
 NumberWord := T0
 OnesDigit := T2
 TensDigit := T3
@@ -147,6 +147,66 @@ compute_ones:
         lda NumberWord+0
         clc
         adc #NUMBERS_BASE
+        sta OnesDigit
+
+        rts
+.endproc
+
+; given a 16bit number, computes the individual digit tiles (in base 10)
+; does not actually draw the number, meant to be consumed by other routines
+; that perform this task
+.proc FAR_base_10
+NumberWord := T0
+OnesDigit := T2
+TensDigit := T3
+HundredsDigit := T4
+ThousandsDigit := T5
+TenThousandsDigit := T6
+        perform_zpcm_inc
+
+        lda #0
+        sta TenThousandsDigit
+ten_thousands_loop:
+        cmp16 NumberWord, #10000
+        bcc compute_thousands
+        inc TenThousandsDigit
+        sub16w NumberWord, 10000
+        jmp ten_thousands_loop
+
+compute_thousands:
+        lda #0
+        sta ThousandsDigit
+thousands_loop:
+        cmp16 NumberWord, #1000
+        bcc compute_hundreds
+        inc ThousandsDigit
+        sub16w NumberWord, 1000
+        jmp thousands_loop
+
+compute_hundreds:
+        lda #0
+        sta HundredsDigit
+hundreds_loop:
+        cmp16 NumberWord, #100
+        bcc compute_tens
+        inc HundredsDigit
+        sub16w NumberWord, 100
+        jmp hundreds_loop
+
+compute_tens:
+        lda #0
+        sta TensDigit
+tens_loop:
+        cmp16 NumberWord, #10
+        bcc compute_ones
+        inc TensDigit
+        sub16w NumberWord, 10
+        jmp tens_loop
+
+compute_ones:
+        ; at this stage, NumberWord's lowest byte is already
+        ; between 0 and 9, so just use it directly
+        lda NumberWord+0
         sta OnesDigit
 
         rts

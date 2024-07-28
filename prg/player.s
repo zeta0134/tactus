@@ -142,6 +142,11 @@ MetaSpriteIndex := R0
         sta PlayerEquipmentAccessory
         sta PlayerEquipmentBombs
         sta PlayerEquipmentSpell
+
+        lda #20
+        sta PlayerHealth
+        sta PlayerMaxHealth
+        st16 PlayerGold, 999
 .else
         ; The player should start with a standard L1-DAGGER
         lda #ITEM_DAGGER_L1
@@ -153,22 +158,16 @@ MetaSpriteIndex := R0
         sta PlayerEquipmentAccessory
         sta PlayerEquipmentBombs
         sta PlayerEquipmentSpell
-.endif  
 
-.if ::DEBUG_GOD_MODE
-        lda #20
-        sta PlayerHealth
-        sta PlayerMaxHealth
-.else
         lda #8
         sta PlayerHealth
         sta PlayerMaxHealth
-.endif
+        st16 PlayerGold, 0
+.endif  
 
         lda #0
         sta PlayerKeys
         sta PlayerRoomIndex
-        st16 PlayerGold, 0
 
         lda #1
         sta PlayerZone

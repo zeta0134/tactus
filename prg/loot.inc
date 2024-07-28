@@ -18,6 +18,9 @@
 .globalzp LootTable
 .global LootPosition
 .global FAR_roll_loot
+.global FAR_queue_price_tile_here
+.global FAR_draw_prices
+.global FAR_reset_price_tracker
 
 .global tiny_loot_table
 .global basic_loot_table

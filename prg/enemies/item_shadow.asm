@@ -53,10 +53,57 @@ CurrentTile := R15
 ; ============================================================================================================================
 
 .proc update_item_shadow
+ItemPtr         := R0
+ItemCost        := R2
+PriceColor      := R4
+
 MetaSpriteIndex := R0
+
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
+        ; If this is an item for purchase, we need to look up its cost
+        ; and display it
+        ldx CurrentTile
+        lda tile_flags, x
+        and #ITEM_FOR_PURCHASE
+        beq skip_cost_drawing
+
+        ; Lookup the item properties from the table and nab the purchase price
+        access_data_bank #<.bank(item_table)
+
+        ; look up the item properties and stash them for later
+        ldx CurrentTile
+        lda tile_data, x
+        asl
+        tay
+        lda item_table+0, y
+        sta ItemPtr+0
+        lda item_table+1, y
+        sta ItemPtr+1
+        ldy #ItemDef::ShopCost
+        lda (ItemPtr), y
+        sta ItemCost+0
+        iny
+        lda (ItemPtr), y
+        sta ItemCost+1
+
+        restore_previous_bank
+
+        ; if the player can afford this item, draw it in white. otherwise, draw it in red
+
+        cmp16 PlayerGold, ItemCost
+        jcc thats_too_expensive ; Can't afford it. Sorry!
+
+sell_it_to_meeeeeee:
+        lda #(PAL_BLUE | CHR_BANK_OLD_CHRRAM)
+        jmp queue_cost
+thats_too_expensive:
+        lda #(PAL_RED | CHR_BANK_OLD_CHRRAM)
+queue_cost:
+        sta PriceColor
+        far_call FAR_queue_price_tile_here
+skip_cost_drawing:
 
 check_spawned_state:
         ; If we already have the item spawned, then there is not much

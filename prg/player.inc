@@ -39,4 +39,4 @@
 .global PlayerChain
 
 MAX_HEARTS = 5
-MAX_GOLD = 999
+MAX_GOLD = 9999

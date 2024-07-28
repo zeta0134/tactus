@@ -22,6 +22,12 @@ LootPosition: .res 1
 ShopRollsCount: .res 1
 shop_rolls_tracker: .res 16
 
+price_buffer_low: .res 8
+price_buffer_high: .res 8
+price_buffer_pos: .res 8
+price_buffer_attr: .res 8 ; sets the CHR bank and the color
+PriceBufferPos: .res 1
+
     .segment "CODE_3"
 
 ; ========================================================
@@ -488,3 +494,59 @@ ItemId := R2
     rts
 .endproc
 
+.proc FAR_reset_price_tracker
+    lda #0
+    sta PriceBufferPos
+    rts
+.endproc
+
+; I don't really have a better place to put this: we need to track which
+; tiles want to display a number underneath themselves, and draw those numbers.
+; This pair of functions keeps a running tally of that
+.proc FAR_draw_prices
+NumberWord := T0
+CurrentPos := R0
+    ; bail early if there's nothing to do
+    lda PriceBufferPos
+    bne proceed_to_draw
+    rts
+
+proceed_to_draw:
+    lda #0
+    sta CurrentPos
+loop:
+    ldx CurrentPos
+    lda price_buffer_low, x
+    sta NumberWord+0
+    lda price_buffer_high, x
+    sta NumberWord+1
+    far_call FAR_base_10
+    ldx CurrentPos
+
+
+
+
+    
+    rts
+.endproc
+
+.proc FAR_queue_price_tile_here
+ItemCost        := R2
+PriceColor      := R4
+CurrentTile := R15
+    ldx PriceBufferPos
+    lda ItemCost+0
+    sta price_buffer_low, x
+    lda ItemCost+0
+    sta price_buffer_high, x
+    lda PriceColor
+    sta price_buffer_attr, x
+    lda CurrentTile
+    sta price_buffer_pos, x
+    inc PriceBufferPos
+    ;safety
+    lda PriceBufferPos
+    and #%111
+    sta PriceBufferPos
+    rts
+.endproc
