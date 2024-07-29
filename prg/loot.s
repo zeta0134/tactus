@@ -1,4 +1,8 @@
+    .macpack longbranch
+
+    .include "battlefield.inc"
     .include "coins.inc"
+    .include "enemies.inc"
     .include "far_call.inc"
     .include "items.inc"
     .include "loot.inc"
@@ -505,7 +509,19 @@ ItemId := R2
 ; This pair of functions keeps a running tally of that
 .proc FAR_draw_prices
 NumberWord := T0
+OnesDigit := T2
+TensDigit := T3
+HundredsDigit := T4
+ThousandsDigit := T5 ; we're not supporting shop prices higher than 9999
+
 CurrentPos := R0
+CurrentAttr := R1
+
+NametableAddr := ActiveDrawingScratch+0
+AttributeAddr := ActiveDrawingScratch+2
+HighRowScratch := ActiveDrawingScratch+4
+LowRowScratch := ActiveDrawingScratch+5
+
     ; bail early if there's nothing to do
     lda PriceBufferPos
     bne proceed_to_draw
@@ -515,18 +531,221 @@ proceed_to_draw:
     lda #0
     sta CurrentPos
 loop:
+    ; workout the base 10 numerals for this price
     ldx CurrentPos
+    lda price_buffer_attr, x
+    sta CurrentAttr ; stash for later so we free up X during drawing
     lda price_buffer_low, x
     sta NumberWord+0
     lda price_buffer_high, x
     sta NumberWord+1
     far_call FAR_base_10
+
+
+    ; figure out the starting tile for price drawing
+    lda #0
+    sta HighRowScratch
+
     ldx CurrentPos
+    lda price_buffer_pos, x
 
+    ; work out the high bits of the row, these are the top 4 bits of TargetIndex x64, so they
+    ; are split across both nametable address bytes
+    asl
+    rol HighRowScratch
+    asl
+    rol HighRowScratch
+    and #%11000000
+    sta LowRowScratch
+    ; now deal with the column, which here is x2
+    lda price_buffer_pos, x
+    asl
+    and #%00011110
+    ora LowRowScratch
+    sta NametableAddr+0
+    sta AttributeAddr+0
 
+    lda active_battlefield
+    beq second_nametable ; use the INACTIVE buffer here
+    lda #$50
+    ldy #$58
+    jmp set_high_bytes
+second_nametable:
+    lda #$54
+    ldy #$5C
+set_high_bytes:
+    ora HighRowScratch
+    sta NametableAddr+1
+    tya
+    ora HighRowScratch
+    sta AttributeAddr+1
 
+    ; now we have the position of the top-left corner of the shop tile. we need to move
+    ; down by 3 rows, and left by 1 column. we don't worry too much about wraparound here
+    add16b NametableAddr, #(32*3)
+    dec16 NametableAddr
+    add16b AttributeAddr, #(32*3)
+    dec16 AttributeAddr
 
+    ; now, depending on how large the number is, call one of the drawing routines
+check_thousands:
+    lda ThousandsDigit
+    beq check_hundreds
+    jsr draw_thousands_centered
+    jmp converge
+check_hundreds:
+    lda HundredsDigit
+    beq check_tens
+    jsr draw_hundreds_centered
+    jmp converge
+check_tens:
+    lda TensDigit
+    beq draw_ones
+    jsr draw_tens_centered
+    jmp converge
+draw_ones:
+    jsr draw_ones_centered
+converge:
+    inc CurrentPos
+    lda CurrentPos
+    cmp PriceBufferPos
+    jne loop
+
+    ; and done!
     
+    rts
+.endproc
+
+LEFT_HALF_DIGIT_BASE = $10
+RIGHT_HALF_DIGIT_BASE = $20
+
+tens_place_tile_lut:
+    .byte $30, $40, $50, $60, $70, $80, $90, $A0, $B0, $C0
+
+.proc draw_thousands_centered
+OnesDigit := T2
+TensDigit := T3
+HundredsDigit := T4
+ThousandsDigit := T5
+
+CurrentAttr := R1
+NametableAddr := ActiveDrawingScratch+0
+AttributeAddr := ActiveDrawingScratch+2
+
+    ldy #0
+    lda ThousandsDigit
+    sta (NametableAddr), y
+    lda CurrentAttr
+    sta (AttributeAddr), y
+
+    ldy #1
+    lda HundredsDigit
+    sta (NametableAddr), y
+    lda CurrentAttr
+    sta (AttributeAddr), y
+
+    ldy #2
+    lda TensDigit
+    sta (NametableAddr), y
+    lda CurrentAttr
+    sta (AttributeAddr), y
+
+    ldy #3
+    lda OnesDigit
+    sta (NametableAddr), y
+    lda CurrentAttr
+    sta (AttributeAddr), y
+
+    rts
+.endproc
+
+.proc draw_hundreds_centered
+OnesDigit := T2
+TensDigit := T3
+HundredsDigit := T4
+ThousandsDigit := T5
+
+CurrentAttr := R1
+NametableAddr := ActiveDrawingScratch+0
+AttributeAddr := ActiveDrawingScratch+2
+
+    ldy #0
+    lda HundredsDigit
+    ora #LEFT_HALF_DIGIT_BASE
+    sta (NametableAddr), y
+    lda CurrentAttr
+    sta (AttributeAddr), y
+
+    ldy #1
+    ldx HundredsDigit
+    lda tens_place_tile_lut, x
+    ora TensDigit
+    sta (NametableAddr), y
+    lda CurrentAttr
+    sta (AttributeAddr), y
+
+    ldy #2
+    ldx TensDigit
+    lda tens_place_tile_lut, x
+    ora OnesDigit
+    sta (NametableAddr), y
+    lda CurrentAttr
+    sta (AttributeAddr), y
+
+    ldy #3
+    lda OnesDigit
+    ora #RIGHT_HALF_DIGIT_BASE
+    sta (NametableAddr), y
+    lda CurrentAttr
+    sta (AttributeAddr), y
+
+    rts
+.endproc
+
+.proc draw_tens_centered
+OnesDigit := T2
+TensDigit := T3
+
+CurrentAttr := R1
+NametableAddr := ActiveDrawingScratch+0
+AttributeAddr := ActiveDrawingScratch+2
+
+    ldy #1
+    lda TensDigit
+    sta (NametableAddr), y
+    lda CurrentAttr
+    sta (AttributeAddr), y
+
+    ldy #2
+    lda OnesDigit
+    sta (NametableAddr), y
+    lda CurrentAttr
+    sta (AttributeAddr), y
+
+    rts
+.endproc
+
+.proc draw_ones_centered
+OnesDigit := T2
+
+CurrentAttr := R1
+NametableAddr := ActiveDrawingScratch+0
+AttributeAddr := ActiveDrawingScratch+2
+
+    ldy #1
+    lda OnesDigit
+    ora #LEFT_HALF_DIGIT_BASE
+    sta (NametableAddr), y
+    lda CurrentAttr
+    sta (AttributeAddr), y
+
+    ldy #2
+    lda OnesDigit
+    ora #RIGHT_HALF_DIGIT_BASE
+    sta (NametableAddr), y
+    lda CurrentAttr
+    sta (AttributeAddr), y
+
     rts
 .endproc
 
@@ -537,7 +756,7 @@ CurrentTile := R15
     ldx PriceBufferPos
     lda ItemCost+0
     sta price_buffer_low, x
-    lda ItemCost+0
+    lda ItemCost+1
     sta price_buffer_high, x
     lda PriceColor
     sta price_buffer_attr, x

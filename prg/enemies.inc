@@ -67,6 +67,8 @@ TILE_EXIT_STAIRS = ($AC | %00)
 .global draw_active_tile
 .global tile_index_to_row_lut, tile_index_to_col_lut
 
+.globalzp ActiveDrawingScratch
+
 ; NOT in the fixed page
 .global FAR_update_static_enemy_row
 .global FAR_clear_active_move_flags

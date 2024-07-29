@@ -96,10 +96,10 @@ CurrentTile := R15
         jcc thats_too_expensive ; Can't afford it. Sorry!
 
 sell_it_to_meeeeeee:
-        lda #(PAL_BLUE | CHR_BANK_OLD_CHRRAM)
+        lda #(PAL_BLUE | CHR_BANK_000_SHIFTED_NUMERALS)
         jmp queue_cost
 thats_too_expensive:
-        lda #(PAL_RED | CHR_BANK_OLD_CHRRAM)
+        lda #(PAL_RED | CHR_BANK_000_SHIFTED_NUMERALS)
 queue_cost:
         sta PriceColor
         far_call FAR_queue_price_tile_here
