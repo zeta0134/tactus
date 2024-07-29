@@ -87,57 +87,6 @@ chr_tile_offset SPELL_A_ENABLED,    2, 14
 chr_tile_offset SPELL_B_ENABLED,    2, 15
 chr_tile_offset SPELL_DISABLED_BL_CORNER, 1, 14
 
-
-; the only one of the above that's implemented at the moment is weapon, so
-; deal with that here
-
-weapon_tile_table:
-        .byte EQUIPMENT_NONE
-        .byte EQUIPMENT_WEAPON_DAGGER
-        .byte EQUIPMENT_WEAPON_BROADSWORD
-        .byte EQUIPMENT_WEAPON_LONGSWORD
-        .byte EQUIPMENT_WEAPON_SPEAR
-        .byte EQUIPMENT_WEAPON_FLAIL
-
-torch_tile_table:
-        .byte EQUIPMENT_NONE
-        .byte EQUIPMENT_TORCH_1
-        .byte EQUIPMENT_TORCH_2
-        .byte EQUIPMENT_TORCH_3
-
-armor_tile_table:
-        .byte EQUIPMENT_NONE
-        .byte EQUIPMENT_ARMOR_1
-        .byte EQUIPMENT_ARMOR_2
-        .byte EQUIPMENT_ARMOR_3
-        .byte EQUIPMENT_ARMOR_4
-
-accessory_tile_table:
-        .byte EQUIPMENT_NONE
-        .byte EQUIPMENT_ACCESSORY_1
-        .byte EQUIPMENT_ACCESSORY_2
-        .byte EQUIPMENT_ACCESSORY_3
-        .byte EQUIPMENT_ACCESSORY_4
-
-boots_tile_table:
-        .byte EQUIPMENT_NONE
-        .byte EQUIPMENT_BOOTS_1
-        .byte EQUIPMENT_BOOTS_2
-        .byte EQUIPMENT_BOOTS_3
-        .byte EQUIPMENT_BOOTS_4
-
-spell_tile_table:
-        .byte EQUIPMENT_NONE    ; note: needs a special case to deal with the BL corner
-        .byte EQUIPMENT_SPELL_1
-        .byte EQUIPMENT_SPELL_2
-        .byte EQUIPMENT_SPELL_3
-
-item_tile_table:
-        .byte EQUIPMENT_NONE    ; note: needs a special case to deal with the BL corner
-        .byte EQUIPMENT_ITEM_1
-        .byte EQUIPMENT_ITEM_2
-        .byte EQUIPMENT_ITEM_3
-
 TILE_COL_OFFSET = 1
 TILE_ROW_OFFSET = 16
 

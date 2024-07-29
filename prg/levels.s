@@ -1152,7 +1152,6 @@ EntityList := R4
         sta RoomPtr+1
         access_data_bank RoomBank
         jsr initialize_battlefield
-        restore_previous_bank
 
         ; Is this room dark? If so, set the darkness flag
         ; (it may later change at runtime)
@@ -1165,6 +1164,7 @@ EntityList := R4
         ora #ROOM_FLAG_DARK
         sta room_flags, x
 not_dark:
+        restore_previous_bank
 
         ; Does this room have exit stairs? If so, spawn those first
         ldx RoomIndexToGenerate

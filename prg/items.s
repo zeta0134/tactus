@@ -35,6 +35,8 @@ item_table:
     .word flail_lvl_1
     .word flail_lvl_2
     .word flail_lvl_3
+    .word basic_torch
+    .word large_torch
     ; safety
     .repeat 128
     .word no_item
@@ -236,6 +238,34 @@ flail_lvl_3:
     .addr no_effect                        ; TorchlightFunc
     .addr do_nothing                       ; UseFunc
 
+basic_torch:
+    .byte SLOT_TORCH                        ; SlotId
+    .byte SPRITE_TILE_BASIC_TORCH           ; WorldSpriteTile
+    .byte SPRITE_PAL_GREY                   ; WorldSpriteAttr
+    .byte EQUIPMENT_BASIC_TORCH             ; HudBgTile
+    .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+    .byte 0                                 ; HudSpriteTile
+    .byte 0                                 ; HudSpriteAttr
+    .word 50                                ; ShopCost
+    .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+    .addr no_effect                         ; DamageFunc
+    .addr flat_8                            ; TorchlightFunc
+    .addr do_nothing                        ; UseFunc
+
+large_torch:
+    .byte SLOT_TORCH                        ; SlotId
+    .byte SPRITE_TILE_LARGE_TORCH           ; WorldSpriteTile
+    .byte SPRITE_PAL_RED                    ; WorldSpriteAttr
+    .byte EQUIPMENT_BASIC_TORCH             ; HudBgTile
+    .byte (HUD_RED_PAL | CHR_BANK_ITEMS)    ; HudBgAttr
+    .byte 0                                 ; HudSpriteTile
+    .byte 0                                 ; HudSpriteAttr
+    .word 150                               ; ShopCost
+    .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+    .addr no_effect                         ; DamageFunc
+    .addr flat_15                           ; TorchlightFunc
+    .addr do_nothing                        ; UseFunc
+
     .segment "CODE_0"
 
 ; Flat value functions. If these seem remarkably inefficient, that's because they are
@@ -260,8 +290,33 @@ flail_lvl_3:
     rts
 .endproc
 
+.proc flat_4
+    lda #4
+    rts
+.endproc
+
+.proc flat_5
+    lda #5
+    rts
+.endproc
+
 .proc flat_6
     lda #6
+    rts
+.endproc
+
+.proc flat_7
+    lda #7
+    rts
+.endproc
+
+.proc flat_8
+    lda #8
+    rts
+.endproc
+
+.proc flat_9
+    lda #9
     rts
 .endproc
 
@@ -270,13 +325,28 @@ flail_lvl_3:
     rts
 .endproc
 
+.proc flat_11
+    lda #11
+    rts
+.endproc
+
 .proc flat_12
     lda #12
     rts
 .endproc
 
+.proc flat_13
+    lda #13
+    rts
+.endproc
+
 .proc flat_14
     lda #14
+    rts
+.endproc
+
+.proc flat_15
+    lda #15
     rts
 .endproc
 

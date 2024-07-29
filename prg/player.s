@@ -515,13 +515,8 @@ skip_jumping_pose:
         lda #0
         sta PlayerNextDirection
 
-        ; Detect exits and, if necessary, transition to the next room
-        jsr detect_exit
-
-        ; Detect being dead and, if necessary, transition to the end screen
-        jsr detect_critical_existence_failure
-
         ; Detect equipment changes and update static player stats as necessary
+        ; (this needs to happen BEFORE our exit changes, to facilitate room transition logic)
         far_call FAR_equipment_torchlight
         lda TorchlightTotal
         sta PlayerTorchlightRadius
@@ -533,6 +528,12 @@ skip_jumping_pose:
         lda PlayerTorchlightRadius
         sta target_torchlight_radius
 no_darkness:
+
+        ; Detect exits and, if necessary, transition to the next room
+        jsr detect_exit
+
+        ; Detect being dead and, if necessary, transition to the end screen
+        jsr detect_critical_existence_failure
 
         rts
 .endproc

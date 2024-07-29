@@ -37,6 +37,8 @@ ITEM_SPEAR_L3      = 10
 ITEM_FLAIL_L1      = 11
 ITEM_FLAIL_L2      = 12
 ITEM_FLAIL_L3      = 13
+ITEM_BASIC_TORCH   = 14
+ITEM_LARGE_TORCH   = 15
 
 ; utilities for drawing items
 .global FAR_apply_item_world_metasprite
