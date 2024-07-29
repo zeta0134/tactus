@@ -302,15 +302,19 @@ combo_offset_lut:
 
 ; simply includes all the items. balance? what's that?
 test_treasure_table:
-    .byte 8 ; length must be a power of 2!
-    .byte ITEM_DAGGER_L1
-    .byte ITEM_DAGGER_L1
+    .byte 12
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L2
     .byte ITEM_BROADSWORD_L3
     .byte ITEM_LONGSWORD_L1
     .byte ITEM_LONGSWORD_L2
     .byte ITEM_LONGSWORD_L3
+    .byte ITEM_SPEAR_L1
+    .byte ITEM_SPEAR_L2
+    .byte ITEM_SPEAR_L3
+    .byte ITEM_FLAIL_L1
+    .byte ITEM_FLAIL_L2
+    .byte ITEM_FLAIL_L3
 
 MAX_CHAIN = 8
 MAX_COMBO = 4 ; actually 5, but we need to decrement

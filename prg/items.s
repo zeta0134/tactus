@@ -28,6 +28,12 @@ item_table:
     .word longsword_lvl_1
     .word longsword_lvl_2
     .word longsword_lvl_3
+    .word spear_lvl_1
+    .word spear_lvl_2
+    .word spear_lvl_3
+    .word flail_lvl_1
+    .word flail_lvl_2
+    .word flail_lvl_3
     ; safety
     .repeat 128
     .word no_item
@@ -55,7 +61,7 @@ dagger_lvl_1:
     .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS); HudBgAttr
     .byte 0 ; HudSpriteTile
     .byte 0 ; HudSpriteAttr
-    .word 5                              ; ShopCost
+    .word 25                              ; ShopCost
     .byte WEAPON_DAGGER ; WeaponShape
     .addr flat_1     ; DamageFunc
     .addr no_effect  ; TorchlightFunc
@@ -69,7 +75,7 @@ broadsword_lvl_1:
     .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS); HudBgAttr
     .byte 0 ; HudSpriteTile
     .byte 0 ; HudSpriteAttr
-    .word 50                             ; ShopCost
+    .word 75                             ; ShopCost
     .byte WEAPON_BROADSWORD ; WeaponShape
     .addr flat_1     ; DamageFunc
     .addr no_effect  ; TorchlightFunc
@@ -83,7 +89,7 @@ broadsword_lvl_2:
     .byte (HUD_RED_PAL | CHR_BANK_ITEMS); HudBgAttr
     .byte 0 ; HudSpriteTile
     .byte 0 ; HudSpriteAttr
-    .word 200                             ; ShopCost
+    .word 250                             ; ShopCost
     .byte WEAPON_BROADSWORD ; WeaponShape
     .addr flat_2     ; DamageFunc
     .addr no_effect  ; TorchlightFunc
@@ -111,7 +117,7 @@ longsword_lvl_1:
     .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS); HudBgAttr
     .byte 0 ; HudSpriteTile
     .byte 0 ; HudSpriteAttr
-    .word 50                             ; ShopCost
+    .word 75                             ; ShopCost
     .byte WEAPON_LONGSWORD ; WeaponShape
     .addr flat_1     ; DamageFunc
     .addr no_effect  ; TorchlightFunc
@@ -125,7 +131,7 @@ longsword_lvl_2:
     .byte (HUD_RED_PAL | CHR_BANK_ITEMS); HudBgAttr
     .byte 0 ; HudSpriteTile
     .byte 0 ; HudSpriteAttr
-    .word 200                             ; ShopCost
+    .word 250                             ; ShopCost
     .byte WEAPON_LONGSWORD ; WeaponShape
     .addr flat_2     ; DamageFunc
     .addr no_effect  ; TorchlightFunc
@@ -141,6 +147,90 @@ longsword_lvl_3:
     .byte 0                                ; HudSpriteAttr
     .word 1000                              ; ShopCost
     .byte WEAPON_LONGSWORD                 ; WeaponShape
+    .addr flat_3                           ; DamageFunc
+    .addr no_effect                        ; TorchlightFunc
+    .addr do_nothing                       ; UseFunc
+
+spear_lvl_1:
+    .byte SLOT_WEAPON ; SlotId
+    .byte SPRITE_TILE_SPEAR; WorldSpriteTile
+    .byte SPRITE_PAL_GREY; WorldSpriteAttr
+    .byte EQUIPMENT_WEAPON_SPEAR ; HudBgTile
+    .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS); HudBgAttr
+    .byte 0 ; HudSpriteTile
+    .byte 0 ; HudSpriteAttr
+    .word 50                             ; ShopCost
+    .byte WEAPON_SPEAR ; WeaponShape
+    .addr flat_1     ; DamageFunc
+    .addr no_effect  ; TorchlightFunc
+    .addr do_nothing ; UseFunc
+
+spear_lvl_2:
+    .byte SLOT_WEAPON ; SlotId
+    .byte SPRITE_TILE_SPEAR ; WorldSpriteTile
+    .byte SPRITE_PAL_RED ; WorldSpriteAttr
+    .byte EQUIPMENT_WEAPON_SPEAR ; HudBgTile
+    .byte (HUD_RED_PAL | CHR_BANK_ITEMS); HudBgAttr
+    .byte 0 ; HudSpriteTile
+    .byte 0 ; HudSpriteAttr
+    .word 200                             ; ShopCost
+    .byte WEAPON_SPEAR ; WeaponShape
+    .addr flat_2     ; DamageFunc
+    .addr no_effect  ; TorchlightFunc
+    .addr do_nothing ; UseFunc
+
+spear_lvl_3:
+    .byte SLOT_WEAPON ; SlotId
+    .byte SPRITE_TILE_SPEAR; WorldSpriteTile
+    .byte SPRITE_PAL_PURPLE ; WorldSpriteAttr
+    .byte EQUIPMENT_WEAPON_SPEAR ; HudBgTile
+    .byte (HUD_WORLD_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+    .byte 0                                ; HudSpriteTile
+    .byte 0                                ; HudSpriteAttr
+    .word 750                              ; ShopCost
+    .byte WEAPON_SPEAR                 ; WeaponShape
+    .addr flat_3                           ; DamageFunc
+    .addr no_effect                        ; TorchlightFunc
+    .addr do_nothing                       ; UseFunc
+
+flail_lvl_1:
+    .byte SLOT_WEAPON ; SlotId
+    .byte SPRITE_TILE_FLAIL; WorldSpriteTile
+    .byte SPRITE_PAL_GREY; WorldSpriteAttr
+    .byte EQUIPMENT_WEAPON_FLAIL ; HudBgTile
+    .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS); HudBgAttr
+    .byte 0 ; HudSpriteTile
+    .byte 0 ; HudSpriteAttr
+    .word 100                             ; ShopCost
+    .byte WEAPON_FLAIL ; WeaponShape
+    .addr flat_1     ; DamageFunc
+    .addr no_effect  ; TorchlightFunc
+    .addr do_nothing ; UseFunc
+
+flail_lvl_2:
+    .byte SLOT_WEAPON ; SlotId
+    .byte SPRITE_TILE_FLAIL ; WorldSpriteTile
+    .byte SPRITE_PAL_RED ; WorldSpriteAttr
+    .byte EQUIPMENT_WEAPON_FLAIL ; HudBgTile
+    .byte (HUD_RED_PAL | CHR_BANK_ITEMS); HudBgAttr
+    .byte 0 ; HudSpriteTile
+    .byte 0 ; HudSpriteAttr
+    .word 350                             ; ShopCost
+    .byte WEAPON_FLAIL ; WeaponShape
+    .addr flat_2     ; DamageFunc
+    .addr no_effect  ; TorchlightFunc
+    .addr do_nothing ; UseFunc
+
+flail_lvl_3:
+    .byte SLOT_WEAPON ; SlotId
+    .byte SPRITE_TILE_FLAIL; WorldSpriteTile
+    .byte SPRITE_PAL_PURPLE ; WorldSpriteAttr
+    .byte EQUIPMENT_WEAPON_FLAIL ; HudBgTile
+    .byte (HUD_WORLD_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+    .byte 0                                ; HudSpriteTile
+    .byte 0                                ; HudSpriteAttr
+    .word 1250                              ; ShopCost
+    .byte WEAPON_FLAIL                 ; WeaponShape
     .addr flat_3                           ; DamageFunc
     .addr no_effect                        ; TorchlightFunc
     .addr do_nothing                       ; UseFunc

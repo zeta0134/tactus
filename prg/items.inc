@@ -31,6 +31,12 @@ ITEM_BROADSWORD_L3 = 4
 ITEM_LONGSWORD_L1  = 5
 ITEM_LONGSWORD_L2  = 6
 ITEM_LONGSWORD_L3  = 7
+ITEM_SPEAR_L1      = 8
+ITEM_SPEAR_L2      = 9
+ITEM_SPEAR_L3      = 10
+ITEM_FLAIL_L1      = 11
+ITEM_FLAIL_L2      = 12
+ITEM_FLAIL_L3      = 13
 
 .global FAR_apply_item_world_metasprite
 .global FAR_apply_item_hud_metasprite
