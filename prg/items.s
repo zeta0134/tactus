@@ -7,6 +7,7 @@
     .include "player.inc"
     .include "rainbow.inc"
     .include "sprites.inc"
+    .include "torchlight.inc"
     .include "weapons.inc"
     .include "zeropage.inc"
 
@@ -394,5 +395,70 @@ DmgTotal := R0
 
     restore_previous_bank
     lda DmgTotal
+    rts
+.endproc
+
+; item index in A
+.proc item_torchlight_common
+TorchlightTotal := R0
+    asl
+    tax
+    lda item_table+0, x
+    sta ItemPtr+0
+    lda item_table+1, x
+    sta ItemPtr+1
+    ldy #ItemDef::TorchlightFunc
+    lda (ItemPtr), y
+    sta ItemFuncPtr+0
+    iny
+    lda (ItemPtr), y
+    sta ItemFuncPtr+1
+    jsr __item_logic_trampoline
+    clc
+    adc TorchlightTotal
+    sta TorchlightTotal
+    rts
+.endproc
+
+; Returns weapon dmg amount in A, based on the currently loaded item
+; Clobbers: TODO, probably at least X,Y
+.proc FAR_equipment_torchlight
+TorchlightTotal := R0
+    access_data_bank #<.bank(item_table)
+
+    ; Loop through all 5 equipment slots and keep a running sum of their 
+    ; torchlight contributions
+    lda #0
+    sta TorchlightTotal
+
+    lda PlayerEquipmentWeapon
+    jsr item_torchlight_common
+    lda PlayerEquipmentTorch
+    jsr item_torchlight_common
+    lda PlayerEquipmentArmor
+    jsr item_torchlight_common
+    lda PlayerEquipmentBoots
+    jsr item_torchlight_common
+    lda PlayerEquipmentAccessory
+    jsr item_torchlight_common
+
+    ; safety: make sure the torchlight is at least the guaranteed minimum
+    lda TorchlightTotal
+    cmp #PLAYER_BASE_TORCHLIGHT
+    bcs torchlight_mininum_satisfied
+    lda #PLAYER_BASE_TORCHLIGHT
+    sta TorchlightTotal
+torchlight_mininum_satisfied:
+    
+    ; safety: make sure we aren't *above* the maximum torchlight we can render
+    lda TorchlightTotal
+    cmp #MAXIMUM_TORCHLIGHT_RADIUS
+    bcc torchlight_maximum_satisfied
+    lda #MAXIMUM_TORCHLIGHT_RADIUS
+    sta TorchlightTotal
+torchlight_maximum_satisfied:
+
+    restore_previous_bank
+    lda TorchlightTotal
     rts
 .endproc

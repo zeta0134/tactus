@@ -16,6 +16,7 @@
         .include "rainbow.inc"
         .include "sound.inc"
         .include "sprites.inc"
+        .include "torchlight.inc"
         .include "weapons.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
@@ -424,6 +425,8 @@ arrived_at_target:
 
 ; Called once at the beginning of every beat
 .proc FAR_update_player
+TorchlightTotal := R0
+
 TargetRow := R14
 TargetCol := R15
         ; First up, default the player's animation cel to either standing or, if it's been a really long
@@ -517,6 +520,19 @@ skip_jumping_pose:
 
         ; Detect being dead and, if necessary, transition to the end screen
         jsr detect_critical_existence_failure
+
+        ; Detect equipment changes and update static player stats as necessary
+        far_call FAR_equipment_torchlight
+        lda TorchlightTotal
+        sta PlayerTorchlightRadius
+        ; If this room is darkened, apply torchlight
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_DARK
+        beq no_darkness
+        lda PlayerTorchlightRadius
+        sta target_torchlight_radius
+no_darkness:
 
         rts
 .endproc

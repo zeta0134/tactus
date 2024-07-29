@@ -1154,6 +1154,18 @@ EntityList := R4
         jsr initialize_battlefield
         restore_previous_bank
 
+        ; Is this room dark? If so, set the darkness flag
+        ; (it may later change at runtime)
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #ROOM_PROPERTIES_DARK
+        beq not_dark
+        ldx RoomIndexToGenerate
+        lda room_flags, x
+        ora #ROOM_FLAG_DARK
+        sta room_flags, x
+not_dark:
+
         ; Does this room have exit stairs? If so, spawn those first
         ldx RoomIndexToGenerate
         lda room_flags, x
@@ -1272,9 +1284,9 @@ EntityList := R4
         jsr load_room_palette
 
         ; If this room is darkened, apply torchlight
-        ldy #Room::Properties
-        lda (RoomPtr), y
-        and #ROOM_PROPERTIES_DARK
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_DARK
         bne apply_darkness
 apply_lightness:
         lda #30

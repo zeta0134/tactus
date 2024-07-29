@@ -38,10 +38,21 @@ ITEM_FLAIL_L1      = 11
 ITEM_FLAIL_L2      = 12
 ITEM_FLAIL_L3      = 13
 
+; utilities for drawing items
 .global FAR_apply_item_world_metasprite
 .global FAR_apply_item_hud_metasprite
 
+; utilities for working out the (generic) effects of most items
+; (some unique item effects are not covered here)
 .global FAR_weapon_dmg
+.global FAR_equipment_torchlight
+
+; various utilities for generating loot. be mindful of the RNG seed!
 .global FAR_reset_shop_tracker
 .global FAR_roll_shop_loot
 .global FAR_roll_gameplay_loot
+
+; torchlight provided by the player alone, so they aren't
+; completely blind if they haven't found a light emitting
+; item in the early game
+PLAYER_BASE_TORCHLIGHT = 5

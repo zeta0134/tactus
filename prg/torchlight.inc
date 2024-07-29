@@ -6,3 +6,7 @@
 
 .global current_torchlight_radius
 .global target_torchlight_radius
+
+; this is also the "fully bright" size. we don't have anymore
+; lookup tables for a larger radius.
+MAXIMUM_TORCHLIGHT_RADIUS = 31
