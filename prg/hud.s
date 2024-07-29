@@ -5,14 +5,16 @@
         .include "bhop/bhop.inc"
         .include "battlefield.inc"
         .include "charmap.inc"
-        .include "far_call.inc"
         .include "chr.inc"
+        .include "debug.inc"
+        .include "far_call.inc"
         .include "hud.inc"
         .include "items.inc"
         .include "levels.inc"
         .include "nes.inc"
         .include "player.inc"
         .include "ppu.inc"
+        .include "prng.inc"
         .include "rainbow.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -205,6 +207,9 @@ weapon_palette_table:
         jsr draw_current_zone
         jsr draw_equipment
         jsr update_coin_counter
+        .if ::DEBUG_MODE
+        jsr draw_run_seed
+        .endif
         rts
 .endproc
 
@@ -1119,3 +1124,70 @@ done:
         rts
 .endproc
 
+.if ::DEBUG_MODE
+.proc draw_run_seed
+Numeral := R0        
+
+        lda initial_run_seed+0
+        lsr
+        lsr
+        lsr
+        lsr
+        ora #$F0
+        sta Numeral
+        ldx #2
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        lda initial_run_seed+0
+        ora #$F0
+        sta Numeral
+        ldx #3
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+
+        lda initial_run_seed+1
+        lsr
+        lsr
+        lsr
+        lsr
+        ora #$F0
+        sta Numeral
+        ldx #4
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        lda initial_run_seed+1
+        ora #$F0
+        sta Numeral
+        ldx #5
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+
+        lda initial_run_seed+2
+        lsr
+        lsr
+        lsr
+        lsr
+        ora #$F0
+        sta Numeral
+        ldx #6
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        lda initial_run_seed+2
+        ora #$F0
+        sta Numeral
+        ldx #7
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+
+        lda initial_run_seed+3
+        lsr
+        lsr
+        lsr
+        lsr
+        ora #$F0
+        sta Numeral
+        ldx #8
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        lda initial_run_seed+3
+        ora #$F0
+        sta Numeral
+        ldx #9
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+
+        rts
+.endproc
+.endif

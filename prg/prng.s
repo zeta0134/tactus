@@ -4,12 +4,19 @@
         .include "levels.inc"
         .include "zpcm.inc"
 
-.zeropage
+	.zeropage
 gameplay_seed: .res 2 ; seed can be 2-4 bytes
 
 run_seed: .res 4
 floor_seed: .res 4
 room_seed: .res 4
+
+	.segment "RAM"
+
+; For preserving this to display at various points. Once the run gets going,
+; the real run seed is of course advanced repeatedly. For debugging purposes,
+; it can be handy to know this seed to reproduce glitch setups.
+initial_run_seed: .res 4
 
         .segment "PRGFIXED_E000"
 

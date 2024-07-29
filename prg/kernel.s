@@ -277,6 +277,14 @@ LayoutPtr := R0
 .endproc
 
 .proc game_prep
+        ; copy the run seed before we use it to generate the game state
+        ; (we'll display this in the debug HUD / game end screens, etc)
+        ; TODO: if we're going to do fixed seed things, do that here?
+        .repeat 4, i
+        lda run_seed+i
+        sta initial_run_seed+i
+        .endrepeat
+
         lda #0
         sta tempo_adjustment
 

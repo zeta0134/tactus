@@ -836,6 +836,15 @@ MaxShopCount := R15
         sta MaxShopCount
 
 begin_floor_generation:
+        ; initialize room flags and other state to a sensible starting value
+        ldx #0
+room_setup_loop:
+        lda #0
+        sta room_flags, x
+        inx
+        cpx #::FLOOR_SIZE
+        bne room_setup_loop
+
         ; initialize the player room index to a nonsense value; later,
         ; we'll check for this and redo the whole floor if it's still nonsense
         lda #$FF
