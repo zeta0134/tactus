@@ -134,7 +134,7 @@ MetaSpriteIndex := R0
 
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
-        lda #ITEM_BROADSWORD_L3
+        lda #ITEM_BROADSWORD_L1
         sta PlayerEquipmentWeapon
         lda #ITEM_NONE
         sta PlayerEquipmentTorch
@@ -144,10 +144,10 @@ MetaSpriteIndex := R0
         sta PlayerEquipmentBombs
         sta PlayerEquipmentSpell
 
-        lda #20
+        lda #8
         sta PlayerHealth
         sta PlayerMaxHealth
-        st16 PlayerGold, 999
+        st16 PlayerGold, 150
 .else
         ; The player should start with a standard L1-DAGGER
         lda #ITEM_DAGGER_L1

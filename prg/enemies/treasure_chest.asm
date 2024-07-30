@@ -4,7 +4,7 @@
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
 
-TREASURE_WEAPON = 0
+TREASURE_ITEM = 0
 TREASURE_HEART = 1
 TREASURE_GOLD = 2
 
@@ -17,7 +17,7 @@ treasure_category_table:
         .byte TREASURE_GOLD
         .endrepeat
         .repeat 10
-        .byte TREASURE_GOLD
+        .byte TREASURE_ITEM
         .endrepeat
         .repeat 2
         .byte TREASURE_HEART
@@ -48,6 +48,11 @@ spawn_treasure:
         and #%00001111
         tax
         lda treasure_category_table, x
+check_item:
+        cmp #TREASURE_ITEM
+        bne check_gold
+        jsr spawn_item
+        rts
 check_gold:
         cmp #TREASURE_GOLD
         bne spawn_heart
@@ -118,6 +123,38 @@ AttackSquare := R3
         sta tile_flags, x
 
         jsr draw_active_tile
+
+        rts
+.endproc
+
+.proc spawn_item
+; for draw_active_tile
+TargetIndex := R0
+
+TileId := R1
+AttackSquare := R3 ; do not clobber! (don't clobber R2 or R4-R15 either!)
+
+; for rolling treasure loot
+LootTablePtr := R16
+ItemId := R18
+
+        ; Mostly easy: replace the chest with an item shadow
+        ldx AttackSquare
+        stx TargetIndex        
+        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_WORLD
+
+        lda #0
+        sta tile_flags, x
+        jsr draw_active_tile
+
+        ; Now roll for the loot this item shadow will contain. This is a gameplay
+        ; roll, so use that RNG and the appropriate table
+
+        st16 LootTablePtr, test_chest_treasure_table
+        far_call FAR_roll_gameplay_loot
+        ldx AttackSquare
+        lda ItemId
+        sta tile_data, x
 
         rts
 .endproc

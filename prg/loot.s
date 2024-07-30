@@ -318,6 +318,15 @@ test_treasure_table:
     .byte ITEM_BASIC_TORCH
     .byte ITEM_LARGE_TORCH
 
+test_chest_treasure_table:
+    .byte 5
+    .byte ITEM_BROADSWORD_L1
+    .byte ITEM_LONGSWORD_L1
+    .byte ITEM_SPEAR_L1
+    .byte ITEM_FLAIL_L1
+    .byte ITEM_BASIC_TORCH
+
+
 MAX_CHAIN = 8
 MAX_COMBO = 4 ; actually 5, but we need to decrement
 
@@ -404,14 +413,14 @@ done:
 ; place the loot table of your choice in R0, result in R2
 .proc FAR_roll_shop_loot
 LootTablePtr := R0
+TableLength := R2
 ItemId := R2
-TableLength := R3
     access_data_bank #<.bank(item_table)
 
+roll_acceptable_item_loop:
     ldy #0
     lda (LootTablePtr), y
     sta TableLength
-roll_acceptable_item_loop:
     jsr next_room_rand
 fix_index_loop:
     cmp TableLength
@@ -438,15 +447,15 @@ item_index_in_range:
 ; same deal but it uses the gameplay LFSR, for when we need to
 ; spawn treasure on the fly
 .proc FAR_roll_gameplay_loot
-LootTablePtr := R0
-ItemId := R2
-TableLength := R3
+LootTablePtr := R16
+ItemId       := R18
+TableLength  := R19
     access_data_bank #<.bank(item_table)
 
+roll_acceptable_item_loop:
     ldy #0
     lda (LootTablePtr), y
     sta TableLength
-roll_acceptable_item_loop:
     jsr next_gameplay_rand
 fix_index_loop:
     cmp TableLength
