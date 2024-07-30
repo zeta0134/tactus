@@ -140,15 +140,16 @@ MetaSpriteIndex := R0
         ; The player should start with whatever Zeta likes        
         lda #ITEM_BROADSWORD_L1
         sta PlayerEquipmentWeapon
-        lda #ITEM_NONE
+        lda #ITEM_LARGE_TORCH
         sta PlayerEquipmentTorch
+        lda #ITEM_NONE
         sta PlayerEquipmentArmor
         sta PlayerEquipmentBoots
         sta PlayerEquipmentAccessory
         sta PlayerEquipmentBombs
         sta PlayerEquipmentSpell
 
-        lda #8
+        lda #20
         sta PlayerHealth
         sta PlayerMaxHealth
         st16 PlayerGold, 150

@@ -27,6 +27,7 @@ tile_detail: .res ::BATTLEFIELD_SIZE
 tile_metasprite: .res ::BATTLEFIELD_SIZE
 
 active_battlefield: .res 1
+displayed_battlefield: .res 1
 
 .segment "CODE_0"
 

@@ -1321,10 +1321,10 @@ apply_darkness:
         bne no_instant_darkness
         lda #0
         sta current_torchlight_radius
-        far_call FAR_darken_entire_inactive_torchlight
 no_instant_darkness:
         lda PlayerTorchlightRadius
         sta target_torchlight_radius
+        far_call FAR_darken_entire_inactive_torchlight
 done_with_torchlight:
 
         restore_previous_bank

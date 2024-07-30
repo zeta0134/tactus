@@ -11,7 +11,7 @@
 .global tile_detail
 .global tile_metasprite
 
-.global active_battlefield, queued_bytes_counter
+.global active_battlefield, displayed_battlefield, queued_bytes_counter
 
 BATTLEFIELD_WIDTH = 16
 BATTLEFIELD_HEIGHT = 11

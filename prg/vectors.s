@@ -107,7 +107,7 @@ all_frames:
         ;     will glitch pretty badly
         ; ===========================================================
 
-        lda active_battlefield
+        lda displayed_battlefield
         eor PpuScrollNametable
         bne right_nametable
 left_nametable:

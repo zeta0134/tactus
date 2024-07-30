@@ -871,6 +871,11 @@ continue_waiting:
         jsr update_screen_shake
         perform_zpcm_inc
 
+        ; this stops the incompletely-drawn active battlefield from being displayed
+        ; if we lag on the first frame of a new beat, which can mostly occur during
+        ; room transitions
+        lda active_battlefield
+        sta displayed_battlefield
         jsr wait_for_next_vblank
         rts
 .endproc
