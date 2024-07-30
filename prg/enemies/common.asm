@@ -339,35 +339,6 @@ die:
         sta tile_attributes, x
         jsr draw_active_tile
 
-        ; If the player is at less than max health, we can try to spawn a small heart
-        lda PlayerMaxHealth
-        cmp PlayerHealth
-        beq drop_nothing
-        ; Common enemies have a 1/16 chance to spawn a health tile when defeated
-        ; TODO: rework this for balance! small health drops might be going away entirely
-        jsr next_gameplay_rand
-        
-        and #%00001111
-
-        beq drop_health
-drop_nothing:
-        
-        inc HealthDroughtCounter
-        jmp done_with_drops
-drop_health:
-        ldx OriginalAttackSquare
-        stx TargetIndex
-        lda #TILE_SMALL_HEART
-        sta battlefield, x
-        lda #<BG_TILE_SMALL_HEART
-        sta tile_patterns, x
-        lda #(>BG_TILE_SMALL_HEART | PAL_RED)
-        sta tile_attributes, x
-        jsr draw_active_tile
-        lda #0
-        sta HealthDroughtCounter
-
-done_with_drops:
         ldx EffectiveAttackSquare
         lda #0
         sta tile_data, x

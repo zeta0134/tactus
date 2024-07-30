@@ -1218,7 +1218,17 @@ ItemId := R2
 CurrentTile := R4 
         ; TODO: pick the loot table based on the zone? maybe based on some
         ; data from the room too. undecided!
-        st16 LootTablePtr, test_treasure_table
+        ;st16 LootTablePtr, test_treasure_table
+
+        lda PlayerFloor
+        cmp #1
+        bcs pick_rare_loot
+pick_common_loot:
+        st16 LootTablePtr, common_treasure_table
+        jmp done_picking_loot
+pick_rare_loot:
+        st16 LootTablePtr, rare_treasure_table
+done_picking_loot:
 
         ; Loop through the entire room, scanning for any item shadow tiles that aren't populated
         lda #0

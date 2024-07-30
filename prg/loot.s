@@ -327,7 +327,7 @@ test_treasure_table:
 
 ; heavily weighted towards L1 weapons, but occasionally has some L2 and other interesting stuff
 common_treasure_table:
-    .byte 19
+    .byte 21
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L1
@@ -347,13 +347,48 @@ common_treasure_table:
     .byte ITEM_BROADSWORD_L2
     .byte ITEM_SPEAR_L2
     .byte ITEM_SPEAR_L2
+    .byte ITEM_GO_GO_BOOTS
+    .byte ITEM_GO_GO_BOOTS
 
-test_chest_treasure_table:
-    .byte 8
+; heavily weighted towards L2 items, some L3 items too
+rare_treasure_table:
+    .byte 21
+    .byte ITEM_BROADSWORD_L2
+    .byte ITEM_BROADSWORD_L2
+    .byte ITEM_BROADSWORD_L2
+    .byte ITEM_LONGSWORD_L2
+    .byte ITEM_LONGSWORD_L2
+    .byte ITEM_LONGSWORD_L2
+    .byte ITEM_SPEAR_L2
+    .byte ITEM_SPEAR_L2
+    .byte ITEM_SPEAR_L2
+    .byte ITEM_FLAIL_L2
+    .byte ITEM_FLAIL_L2
+    .byte ITEM_FLAIL_L2
+    .byte ITEM_LARGE_TORCH
+    .byte ITEM_LARGE_TORCH
+    .byte ITEM_LARGE_TORCH
+    .byte ITEM_BROADSWORD_L3
+    .byte ITEM_LONGSWORD_L3
+    .byte ITEM_SPEAR_L3
+    .byte ITEM_FLAIL_L3
+    .byte ITEM_GO_GO_BOOTS
+    .byte ITEM_GO_GO_BOOTS
+
+common_chest_treasure_table:
+    .byte 16
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_LONGSWORD_L1
     .byte ITEM_SPEAR_L1
     .byte ITEM_FLAIL_L1
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
     .byte ITEM_BASIC_TORCH
     .byte ITEM_SMALL_FRIES
     .byte ITEM_SMALL_FRIES

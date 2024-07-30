@@ -263,30 +263,6 @@ EffectiveAttackSquare := R10
         draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
         jsr draw_active_tile
 
-        ; If the player is at less than max health, we can try to spawn a small heart
-        lda PlayerMaxHealth
-        cmp PlayerHealth
-        beq drop_nothing
-        ; If we are in the middle of a health drought, force a health drop and clear the counter
-        lda HealthDroughtCounter
-        cmp #10
-        bcs drop_health
-        ; Slimes have a 1/8 chance to spawn a health tile (more than other enemies)
-        ; TODO: should slimes continue to drop health? it seems to make the game too easy?
-        jsr next_gameplay_rand
-        and #%00000111
-        beq drop_health
-drop_nothing:
-        inc HealthDroughtCounter
-        jmp done_with_drops
-drop_health:
-        ldx OriginalAttackSquare
-        stx TargetIndex
-        draw_at_x_withpal TILE_SMALL_HEART, BG_TILE_SMALL_HEART, PAL_RED
-        jsr draw_active_tile
-        lda #0
-        sta HealthDroughtCounter
-done_with_drops:
         ldx EffectiveAttackSquare
         lda #0
         sta tile_data, x

@@ -14,23 +14,23 @@ TREASURE_NAV = 3
 ; has to work pretty hard to get a chest to spawn. Hearts are useful,
 ; gold not so much, it feels like a nothing drop
 treasure_category_table:
-        ;.repeat 4
-        ;.byte TREASURE_GOLD
-        ;.endrepeat
-        ;.repeat 4
-        ;.byte TREASURE_ITEM
-        ;.endrepeat
-        ;.repeat 2
-        ;.byte TREASURE_HEART
-        ;.endrepeat
-        ;.repeat 6
-        ;.byte TREASURE_NAV
-        ;.endrepeat
-        
-        ; force a specific drop
-        .repeat 16
+        .repeat 4
+        .byte TREASURE_GOLD
+        .endrepeat
+        .repeat 3
         .byte TREASURE_ITEM
         .endrepeat
+        .repeat 1
+        .byte TREASURE_HEART
+        .endrepeat
+        .repeat 8
+        .byte TREASURE_NAV
+        .endrepeat
+        
+        ; force a specific drop
+        ;.repeat 16
+        ;.byte TREASURE_ITEM
+        ;.endrepeat
 
 .proc attack_treasure_chest
 MetaSpriteIndex := R0
@@ -165,9 +165,9 @@ ItemId := R18
         ; roll, so use that RNG and the appropriate table
 
         ; the real loot table
-        ;st16 LootTablePtr, test_chest_treasure_table
+        st16 LootTablePtr, common_chest_treasure_table
         ; zeta needs to obtain a specific item for testing
-        st16 LootTablePtr, test_specific_item_table
+        ;st16 LootTablePtr, test_specific_item_table
 
         far_call FAR_roll_gameplay_loot
         ldx AttackSquare
@@ -308,19 +308,19 @@ TargetSquare := R13
         cmp #4
         jeq floor4
 floor_1:
-        add16w PlayerGold, #10
+        add16w PlayerGold, #25
         clamp16 PlayerGold, #MAX_GOLD
         jmp done_awarding_gold
 floor2:
-        add16w PlayerGold, #20
+        add16w PlayerGold, #50
         clamp16 PlayerGold, #MAX_GOLD
         jmp done_awarding_gold
 floor3:
-        add16w PlayerGold, #30
+        add16w PlayerGold, #100
         clamp16 PlayerGold, #MAX_GOLD
         jmp done_awarding_gold
 floor4:
-        add16w PlayerGold, #50
+        add16w PlayerGold, #250
         clamp16 PlayerGold, #MAX_GOLD
 done_awarding_gold:
         ; TODO: a nice SFX

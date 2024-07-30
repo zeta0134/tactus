@@ -586,8 +586,8 @@ previous_move_succeeded:
         ; don't trigger if we are moving towards a map border and we have
         ; already arrived there!
         lda PlayerNextDirection
-        ldx TargetRow
-        ldy TargetCol
+        ldx TargetCol
+        ldy TargetRow
 check_north:
         cmp #DIRECTION_NORTH
         bne check_east
@@ -1244,10 +1244,14 @@ TargetCol := R15
         rts
 .endproc
 
+; TODO: *completely* rework this for the new heart containers system
 .proc FAR_damage_player
+
+        .repeat 2
         lda PlayerHealth
         beq already_dead
         dec PlayerHealth
+        .endrepeat
 
         lda #1
         sta ScreenShakeDepth
