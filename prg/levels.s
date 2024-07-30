@@ -925,7 +925,7 @@ begin_room_selection:
         inc ChallengeCount
         ; TEMPORARY: also flag this as a "boss room" and, keeping with Action53 behavior,
         ; automatically reveal this room
-        lda #(ROOM_FLAG_BOSS | ROOM_FLAG_REVEALED)
+        lda #(ROOM_FLAG_BOSS)
         ora room_flags, x
         sta room_flags, x
 done_considering_challenge_rooms:
@@ -1039,6 +1039,11 @@ reject_floor:
 ; Generate a maze layout, and pick the player, boss, and exit locations
 .proc FAR_init_floor
 BigFloorPtr := R0
+        ; The player won't initially have navigated the floor at all, so reset
+        ; the nav items set
+        lda #0
+        sta PlayerNavState
+
         ; We are about to kick off floor generation, so grab a fresh floor PRNG
         ; seed based on the current run seed
         jsr generate_floor_seed

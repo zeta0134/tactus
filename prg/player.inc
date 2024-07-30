@@ -38,5 +38,7 @@
 .global PlayerCombo
 .global PlayerChain
 
+.global PlayerNavState
+
 MAX_HEARTS = 5
 MAX_GOLD = 9999

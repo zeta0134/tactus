@@ -319,13 +319,15 @@ test_treasure_table:
     .byte ITEM_LARGE_TORCH
 
 test_chest_treasure_table:
-    .byte 5
+    .byte 8
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_LONGSWORD_L1
     .byte ITEM_SPEAR_L1
     .byte ITEM_FLAIL_L1
     .byte ITEM_BASIC_TORCH
-
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
 
 MAX_CHAIN = 8
 MAX_COMBO = 4 ; actually 5, but we need to decrement
@@ -403,12 +405,6 @@ combo_in_range:
 done:
     rts
 .endproc
-
-
-
-
-
-
 
 ; place the loot table of your choice in R0, result in R2
 .proc FAR_roll_shop_loot

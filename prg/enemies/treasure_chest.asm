@@ -7,20 +7,29 @@
 TREASURE_ITEM = 0
 TREASURE_HEART = 1
 TREASURE_GOLD = 2
+TREASURE_NAV = 3
 
 ; control frequency of gold, weapon, and heart container drops
 ; right now it feels like we should favor weapons, as the player
 ; has to work pretty hard to get a chest to spawn. Hearts are useful,
 ; gold not so much, it feels like a nothing drop
 treasure_category_table:
-        .repeat 4
-        .byte TREASURE_GOLD
-        .endrepeat
-        .repeat 10
-        .byte TREASURE_ITEM
-        .endrepeat
-        .repeat 2
-        .byte TREASURE_HEART
+        ;.repeat 4
+        ;.byte TREASURE_GOLD
+        ;.endrepeat
+        ;.repeat 4
+        ;.byte TREASURE_ITEM
+        ;.endrepeat
+        ;.repeat 2
+        ;.byte TREASURE_HEART
+        ;.endrepeat
+        ;.repeat 6
+        ;.byte TREASURE_NAV
+        ;.endrepeat
+        
+        ; force a specific drop
+        .repeat 16
+        .byte TREASURE_NAV
         .endrepeat
 
 .proc attack_treasure_chest
@@ -48,6 +57,11 @@ spawn_treasure:
         and #%00001111
         tax
         lda treasure_category_table, x
+check_nav:
+        cmp #TREASURE_NAV
+        bne check_gold
+        jsr spawn_nav_item
+        rts
 check_item:
         cmp #TREASURE_ITEM
         bne check_gold
@@ -155,6 +169,44 @@ ItemId := R18
         ldx AttackSquare
         lda ItemId
         sta tile_data, x
+
+        rts
+.endproc
+
+.proc spawn_nav_item
+; for draw_active_tile
+TargetIndex := R0
+TileId := R1
+AttackSquare := R3 ; do not clobber! (don't clobber R2 or R4-R15 either!)
+
+        ; depending on the player's nav index, we spawn nav helpers in a fixed order
+        lda PlayerNavState
+        beq spawn_compass
+        cmp #1
+        beq spawn_map
+        ; the player has mapped this area; revert to generating a regular item instead
+        jmp spawn_item
+spawn_compass:
+        inc PlayerNavState
+        ldx AttackSquare
+        lda #ITEM_COMPASS
+        sta tile_data, x
+        jmp converge
+spawn_map:
+        inc PlayerNavState
+        ldx AttackSquare
+        lda #ITEM_MAP
+        sta tile_data, x
+converge:
+
+        ; Mostly easy: replace the chest with an item shadow
+        ldx AttackSquare
+        stx TargetIndex        
+        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_WORLD
+
+        lda #0
+        sta tile_flags, x
+        jsr draw_active_tile
 
         rts
 .endproc

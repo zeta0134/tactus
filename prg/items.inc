@@ -13,13 +13,14 @@
     UseFunc .addr
 .endstruct
 
-SLOT_WEAPON    = 0
-SLOT_TORCH     = 1
-SLOT_ARMOR     = 2
-SLOT_BOOTS     = 3
-SLOT_ACCESSORY = 4
-SLOT_ITEM      = 5
-SLOT_SPELL     = 6
+SLOT_WEAPON     = 0
+SLOT_TORCH      = 1
+SLOT_ARMOR      = 2
+SLOT_BOOTS      = 3
+SLOT_ACCESSORY  = 4
+SLOT_ITEM       = 5
+SLOT_SPELL      = 6
+SLOT_CONSUMABLE = 7
 
 .global item_table
 
@@ -39,6 +40,11 @@ ITEM_FLAIL_L2      = 12
 ITEM_FLAIL_L3      = 13
 ITEM_BASIC_TORCH   = 14
 ITEM_LARGE_TORCH   = 15
+ITEM_COMPASS       = 16
+ITEM_MAP           = 17
+ITEM_SMALL_FRIES   = 18
+ITEM_MEDIUM_FRIES  = 19
+ITEM_LARGE_FRIES   = 20
 
 ; utilities for drawing items
 .global FAR_apply_item_world_metasprite
@@ -46,6 +52,7 @@ ITEM_LARGE_TORCH   = 15
 
 ; utilities for working out the (generic) effects of most items
 ; (some unique item effects are not covered here)
+.global FAR_pickup_item
 .global FAR_weapon_dmg
 .global FAR_equipment_torchlight
 

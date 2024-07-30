@@ -79,6 +79,8 @@ PlayerCombo: .res 1
 PlayerChain: .res 1
 PlayerChainGrace: .res 1
 
+PlayerNavState: .res 1
+
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
 DIRECTION_SOUTH = 3

@@ -481,7 +481,7 @@ AttributeAddr := R14
         and #(ROOM_FLAG_VISITED | ROOM_FLAG_REVEALED)
         
         ; DEBUG: all rooms start at least 'revealed' for testing
-        ;jeq room_hidden
+        jeq room_hidden
 
         ; check for special room types, which right now include boss
         ; rooms and exit doors
