@@ -5,6 +5,7 @@ ItemIndex := R1
 
 CurrentRow := R14
 CurrentTile := R15
+        perform_zpcm_inc
 
         ; we can use the utility function to set the TileId and BehaviorFlags for
         ; this sprite:
@@ -21,6 +22,7 @@ CurrentTile := R15
         ;sta ItemIndex
         
         far_call FAR_apply_item_world_metasprite
+        perform_zpcm_inc
 
         ; the X and Y position will be based on our current location, very similar to
         ; how we spawn death sprites
@@ -44,6 +46,7 @@ CurrentTile := R15
         sta sprite_table + MetaSpriteState::PositionY, x
 
         ; that should be it?
+        perform_zpcm_inc
         
         rts
 .endproc
@@ -105,6 +108,8 @@ queue_cost:
         far_call FAR_queue_price_tile_here
 skip_cost_drawing:
 
+        perform_zpcm_inc
+
 check_spawned_state:
         ; If we already have the item spawned, then there is not much
         ; else to do while we update.
@@ -137,6 +142,8 @@ proceed_to_spawn_sprite:
         cpx #$FF
         beq sprite_failed
 
+        perform_zpcm_inc
+
         ; We need to despawn this later, so store the index
         ldy CurrentTile
         txa
@@ -155,6 +162,7 @@ proceed_to_spawn_sprite:
 sprite_failed:
         ; no big deal, try again next beat. we shouldn't be starved indefinitely,
         ; but might have to wait if a bomb went off or something.
+        perform_zpcm_inc
         rts
 .endproc
 

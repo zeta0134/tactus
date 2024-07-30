@@ -52,6 +52,7 @@ WeaponPtr := R11
         jsr spawn_big_key
         rts
 spawn_treasure:
+        perform_zpcm_inc
         ; determine which weapon category to spawn
         jsr next_gameplay_rand
         and #%00001111

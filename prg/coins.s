@@ -6,6 +6,7 @@
     .include "slowam.inc"
     .include "word_util.inc"
     .include "zeropage.inc"
+    .include "zpcm.inc"
 
 
     .segment "PRGRAM"
@@ -168,6 +169,7 @@ COIN_STATE_VACUUM = 8
 ; Call this once when initializing the game as a whole. Do not call
 ; between rooms or zones, the coins will maintain their own state.
 .proc FAR_init_coins
+    perform_zpcm_inc
     lda #0
     sta coin_queue_next
     sta coin_queue_last
@@ -178,18 +180,19 @@ COIN_STATE_VACUUM = 8
     lda #COIN_STATE_INACTIVE
     ldx #0
 loop:
+    perform_zpcm_inc
     sta coin_state, x
     inx
     cpx #::MAX_ACTIVE_COINS
     bne loop
 
+    perform_zpcm_inc
     rts
 .endproc
 
 .proc FAR_update_coins
 CoinStatePtr := R0
 CoinIndex := R15
-
     ; try to spawn a new coin every frame
     jsr spawn_one_new_coin
     ; draw all active coins
@@ -198,6 +201,7 @@ CoinIndex := R15
     lda #0
     sta CoinIndex
 loop:
+    perform_zpcm_inc
     ldx CoinIndex
     lda coin_state, x
     beq coin_inactive
@@ -213,6 +217,7 @@ coin_inactive:
     cmp #MAX_ACTIVE_COINS
     bne loop
 
+    perform_zpcm_inc
     rts  
 .endproc
 
@@ -232,6 +237,7 @@ CoinStatePtr := R0
 ; if there is a waiting coin in the queue, attempts to spawn it
 ; in. fails if either the queue is empty or the active coin list is full
 .proc spawn_one_new_coin
+    perform_zpcm_inc
     lda coin_spawn_cooldown
     beq check_for_spawn
     dec coin_spawn_cooldown
@@ -249,6 +255,7 @@ attempt_spawn:
         ; (coins live for an equal number of frames and fill these slots sequentially,
         ; so we don't need to scan the whole list, just the next item in the sequence)
 proceed_to_spawn:
+    perform_zpcm_inc
     ; common initialization for all coins
     lda #COIN_STATE_FAST_BOUNCE ; init
     sta coin_state, x
@@ -274,6 +281,7 @@ proceed_to_spawn:
     sta coin_speed_y_fast_low, x
     lda coin_speed_fast_y_high_lut, y
     sta coin_speed_y_fast_high, x
+    perform_zpcm_inc
     ; copy the value and tile ID from the coin type table
     ldy coin_queue_next
     lda queued_coin_id, y
@@ -295,6 +303,7 @@ proceed_to_spawn:
     clc
     adc #4
     sta coin_pos_x_pixels, x
+    perform_zpcm_inc
 
     ldy coin_queue_next
     lda queued_coin_pos, y
@@ -306,6 +315,7 @@ proceed_to_spawn:
     sec
     sbc #4
     sta coin_pos_y_pixels, x
+    perform_zpcm_inc
     
     ; advance!
     inc next_active_coin
@@ -325,6 +335,7 @@ done_advancing_active_coins:
     sta coin_spawn_cooldown
 
     ; ... and we're done?
+    perform_zpcm_inc
     rts
 .endproc
 
@@ -342,6 +353,7 @@ SpritePtr := R2
     sta SpriteIndex
 
 loop:
+    perform_zpcm_inc
     ldx CoinIndex
     lda coin_state, x
     beq coin_inactive
@@ -394,6 +406,7 @@ sprite_index_okay:
 sprite_start_okay:
     sta coin_sprite_starting_index
 
+    perform_zpcm_inc
     rts    
 .endproc
 

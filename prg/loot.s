@@ -12,6 +12,7 @@
     .include "text_util.inc"
     .include "word_util.inc"
     .include "zeropage.inc"
+    .include "zpcm.inc"
 
     .zeropage
 
@@ -400,6 +401,7 @@ MAX_COMBO = 4 ; actually 5, but we need to decrement
 ; Note: defaults to tiny_loot_table, and resets to this after each call. Set
 ; LootTable to the desired table for all non-basic enemies.
 .proc FAR_roll_loot
+    perform_zpcm_inc
     ; TODO: combo and chain! (compute Y based on this)
     ; FOR NOW, just grab the base entry in the list
     ldx PlayerChain
@@ -424,6 +426,8 @@ combo_in_range:
     iny
     lda (LootTable), y
     sta DropTablePtr+1
+
+    perform_zpcm_inc
 
     ; Each drop table has three coin entries, so get those going
     ldy #0
@@ -454,6 +458,8 @@ combo_in_range:
     ; (if an enemy forgets to set it, this becomes our default)
     st16 LootTable, tiny_loot_table
 
+    perform_zpcm_inc
+
     rts
 .endproc
 
@@ -479,11 +485,13 @@ ItemId := R2
     access_data_bank #<.bank(item_table)
 
 roll_acceptable_item_loop:
+    perform_zpcm_inc
     ldy #0
     lda (LootTablePtr), y
     sta TableLength
     jsr next_room_rand
 fix_index_loop:
+    perform_zpcm_inc
     cmp TableLength
     bcc item_index_in_range
     sec
@@ -502,6 +510,7 @@ item_index_in_range:
     ; and... done?
 
     restore_previous_bank
+    perform_zpcm_inc
     rts
 .endproc
 
@@ -607,6 +616,7 @@ proceed_to_draw:
     lda #0
     sta CurrentPos
 loop:
+    perform_zpcm_inc
     ; workout the base 10 numerals for this price
     ldx CurrentPos
     lda price_buffer_attr, x
@@ -640,6 +650,8 @@ loop:
     ora LowRowScratch
     sta NametableAddr+0
     sta AttributeAddr+0
+
+    perform_zpcm_inc
 
     lda active_battlefield
     beq second_nametable ; use the INACTIVE buffer here
@@ -688,7 +700,7 @@ converge:
     jne loop
 
     ; and done!
-    
+    perform_zpcm_inc
     rts
 .endproc
 

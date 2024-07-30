@@ -136,6 +136,7 @@ run_seed_valid:
 	eor run_seed+3
 	sty run_seed+3 ; finish rotating byte 2 into 3
 	sta run_seed+0
+	perform_zpcm_inc
 	rts
 .endproc
 
@@ -185,6 +186,7 @@ run_seed_valid:
 	eor floor_seed+3
 	sty floor_seed+3 ; finish rotating byte 2 into 3
 	sta floor_seed+0
+	perform_zpcm_inc
 	rts
 .endproc
 
@@ -234,5 +236,6 @@ run_seed_valid:
 	eor room_seed+3
 	sty room_seed+3 ; finish rotating byte 2 into 3
 	sta room_seed+0
+	perform_zpcm_inc
 	rts
 .endproc

@@ -180,6 +180,7 @@ nmi_soft_disable:
         tax
         pla
         ; all done
+        perform_zpcm_inc
         rti
 .endproc
 

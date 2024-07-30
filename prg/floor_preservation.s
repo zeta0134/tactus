@@ -3,6 +3,7 @@
     .include "floor_preservation.inc"
     .include "rainbow.inc"
     .include "zeropage.inc"
+    .include "zpcm.inc"
 
     .segment "LEVEL_RAM_0"
 
@@ -358,6 +359,7 @@ PreservedTileFlagsPtr := R6
 PreservedTilePatternsPtr := R8
 PreservedTileAttributesPtr := R10
 PreservedTileDetailPtr := R12
+    perform_zpcm_inc
     ldx RoomIndex
     jsr setup_preservation_pointers
     ldx RoomIndex
@@ -367,6 +369,7 @@ PreservedTileDetailPtr := R12
 
     ldy #0
 loop:
+    perform_zpcm_inc
     lda battlefield, y
     sta (PreservedBattlefieldPtr), y
     lda tile_data, y
@@ -384,6 +387,7 @@ loop:
     bne loop
 
     restore_previous_bank
+    perform_zpcm_inc
     rts
 .endproc
 
@@ -398,6 +402,7 @@ PreservedTileFlagsPtr := R6
 PreservedTilePatternsPtr := R8
 PreservedTileAttributesPtr := R10
 PreservedTileDetailPtr := R12
+    perform_zpcm_inc
     ldx RoomIndex
     jsr setup_preservation_pointers
     ldx RoomIndex
@@ -407,6 +412,7 @@ PreservedTileDetailPtr := R12
 
     ldy #0
 loop:
+    perform_zpcm_inc
     lda (PreservedBattlefieldPtr), y
     sta battlefield, y
     lda (PreservedTileDataPtr), y
@@ -424,5 +430,6 @@ loop:
     bne loop
 
     restore_previous_bank
+    perform_zpcm_inc
     rts
 .endproc

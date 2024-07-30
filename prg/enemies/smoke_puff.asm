@@ -115,6 +115,7 @@ smoke_puff_outline_lut:
 regular_tile:
         ; "regular" and "cleared" tiles are the same for smoke poffs
 cleared_tile:
+        perform_zpcm_inc
         ldx SmokePuffTile
         ldy SmokePuffDirection
         lda smoke_puff_plain_lut+0, y
@@ -123,11 +124,13 @@ cleared_tile:
         sta tile_attributes, x
         jmp converge
 disco_tile:
+        perform_zpcm_inc
         ; disco tiles have two accessibility modes: regular and outline, so handle that here
         lda setting_disco_floor
         cmp #DISCO_FLOOR_OUTLINE
         beq outlined_disco_tile
 full_disco_tile:
+        perform_zpcm_inc
         ldx SmokePuffTile
         ldy SmokePuffDirection
         lda smoke_puff_solid_lut+0, y
@@ -136,6 +139,7 @@ full_disco_tile:
         sta tile_attributes, x
         jmp converge
 outlined_disco_tile:
+        perform_zpcm_inc
         ldx SmokePuffTile
         ldy SmokePuffDirection
         lda smoke_puff_outline_lut+0, y

@@ -105,8 +105,11 @@ main_loop:
         sta GameMode+1
 
 continue_waiting:
+        perform_zpcm_inc
         far_call FAR_update_brightness
+        perform_zpcm_inc
         far_call FAR_refresh_palettes_gameloop
+        perform_zpcm_inc
         jsr update_beat_counters
 
         jsr wait_for_next_vblank
@@ -201,8 +204,11 @@ LayoutPtr := R0
 ; (the widget logic contains all customizations, that's the point)
 .proc run_ui_subsystem
         jsr update_beat_counters_title
+        perform_zpcm_inc
         far_call FAR_draw_sprites
+        perform_zpcm_inc
         far_call FAR_update_brightness
+        perform_zpcm_inc
         far_call FAR_refresh_palettes_gameloop
 
         far_call FAR_update_widgets
@@ -537,6 +543,7 @@ StartingTile := R15
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
 
         far_call FAR_reset_price_tracker
+        perform_zpcm_inc
 
         ;- 1 frame: Update rows 0-3 of static enemies
         lda #0

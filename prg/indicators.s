@@ -7,6 +7,7 @@
     .include "slowam.inc"
     .include "sprites.inc"
     .include "zeropage.inc"
+    .include "zpcm.inc"
 
     .segment "RAM"
 
@@ -163,6 +164,7 @@ IndicatorX := R0
 IndicatorY := R1
 SpritePtr := R2
 ChainIndex := R4
+    perform_zpcm_inc
     lda PlayerChain
     cmp #2
     jcc done_with_chain
@@ -203,6 +205,8 @@ chain_in_range:
     ldy #SelfModifiedSprite::Attributes
     sta (SpritePtr), y
 
+    perform_zpcm_inc
+
     ldy #FIRST_INDICATOR_OAM_INDEX+1
     lda sprite_ptr_lut_low, y
     sta SpritePtr+0
@@ -226,6 +230,8 @@ chain_in_range:
     lda #2 ; reddish palette
     ldy #SelfModifiedSprite::Attributes
     sta (SpritePtr), y
+
+    perform_zpcm_inc
 
     ldy #FIRST_INDICATOR_OAM_INDEX+2
     lda sprite_ptr_lut_low, y
@@ -251,6 +257,8 @@ chain_in_range:
     ldy #SelfModifiedSprite::Attributes
     sta (SpritePtr), y
 
+    perform_zpcm_inc
+
     jsr compute_next_indicator_position
 
     lda ChainBounceHeightPos
@@ -258,6 +266,7 @@ chain_in_range:
     beq done_with_chain
     inc ChainBounceHeightPos
 done_with_chain:
+    perform_zpcm_inc
     rts
 .endproc
 
@@ -284,6 +293,8 @@ keep_current_bounce_position:
 combo_in_range:
     stx ComboIndex
 
+    perform_zpcm_inc
+
     ldy #SECOND_INDICATOR_OAM_INDEX
     lda sprite_ptr_lut_low, y
     sta SpritePtr+0
@@ -305,6 +316,8 @@ combo_in_range:
     lda #3 ; purpleish palette
     ldy #SelfModifiedSprite::Attributes
     sta (SpritePtr), y
+
+    perform_zpcm_inc
 
     ldy #SECOND_INDICATOR_OAM_INDEX+1
     lda sprite_ptr_lut_low, y
@@ -330,6 +343,8 @@ combo_in_range:
     ldy #SelfModifiedSprite::Attributes
     sta (SpritePtr), y
 
+    perform_zpcm_inc
+
     ldy #SECOND_INDICATOR_OAM_INDEX+2
     lda sprite_ptr_lut_low, y
     sta SpritePtr+0
@@ -354,6 +369,8 @@ combo_in_range:
     ldy #SelfModifiedSprite::Attributes
     sta (SpritePtr), y
 
+    perform_zpcm_inc
+
     jsr compute_next_indicator_position
 
     lda ComboBounceHeightPos
@@ -361,5 +378,6 @@ combo_in_range:
     beq done_with_combo
     inc ComboBounceHeightPos
 done_with_combo:
+    perform_zpcm_inc
     rts
 .endproc

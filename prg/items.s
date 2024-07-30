@@ -13,6 +13,7 @@
     .include "weapons.inc"
     .include "word_util.inc"
     .include "zeropage.inc"
+    .include "zpcm.inc"
 
     .zeropage
 
@@ -453,6 +454,7 @@ go_go_boots:
 .proc reveal_special_rooms
     ldx #0
 loop:
+    perform_zpcm_inc
     ; if this room has an exit, reveal it!
     lda room_flags, x
     and #ROOM_FLAG_EXIT_STAIRS
@@ -492,6 +494,7 @@ done_with_this_room:
 .proc reveal_all_rooms
     ldx #0
 loop:
+    perform_zpcm_inc
     lda room_flags, x
     ora #ROOM_FLAG_REVEALED
     sta room_flags, x
@@ -643,7 +646,7 @@ NewItem := R0
 OldItem := R0
 
 ItemPtr := R16
-    
+    perform_zpcm_inc
     access_data_bank #<.bank(item_table)
 
     lda NewItem
@@ -681,7 +684,7 @@ pickup_equipped_item:
     stx OldItem
 
     restore_previous_bank
-
+    perform_zpcm_inc
     rts
 
 pickup_consumable_item:
@@ -726,6 +729,7 @@ DmgTotal := R0
 ; Clobbers: TODO, probably at least X,Y
 .proc FAR_weapon_dmg
 DmgTotal := R0
+    perform_zpcm_inc
     access_data_bank #<.bank(item_table)
 
     ; Loop through all 5 equipment slots and keep a running sum of their damage
@@ -735,14 +739,19 @@ DmgTotal := R0
 
     lda PlayerEquipmentWeapon
     jsr item_damage_common
+    perform_zpcm_inc
     lda PlayerEquipmentTorch
     jsr item_damage_common
+    perform_zpcm_inc
     lda PlayerEquipmentArmor
     jsr item_damage_common
+    perform_zpcm_inc
     lda PlayerEquipmentBoots
     jsr item_damage_common
+    perform_zpcm_inc
     lda PlayerEquipmentAccessory
     jsr item_damage_common
+    perform_zpcm_inc
 
     restore_previous_bank
     lda DmgTotal
@@ -775,6 +784,7 @@ TorchlightTotal := R0
 ; Clobbers: TODO, probably at least X,Y
 .proc FAR_equipment_torchlight
 TorchlightTotal := R0
+    perform_zpcm_inc
     access_data_bank #<.bank(item_table)
 
     ; Loop through all 5 equipment slots and keep a running sum of their 
@@ -784,14 +794,19 @@ TorchlightTotal := R0
 
     lda PlayerEquipmentWeapon
     jsr item_torchlight_common
+    perform_zpcm_inc
     lda PlayerEquipmentTorch
     jsr item_torchlight_common
+    perform_zpcm_inc
     lda PlayerEquipmentArmor
     jsr item_torchlight_common
+    perform_zpcm_inc
     lda PlayerEquipmentBoots
     jsr item_torchlight_common
+    perform_zpcm_inc
     lda PlayerEquipmentAccessory
     jsr item_torchlight_common
+    perform_zpcm_inc
 
     ; safety: make sure the torchlight is at least the guaranteed minimum
     lda TorchlightTotal
@@ -810,6 +825,7 @@ torchlight_mininum_satisfied:
 torchlight_maximum_satisfied:
 
     restore_previous_bank
+    perform_zpcm_inc
     lda TorchlightTotal
     rts
 .endproc

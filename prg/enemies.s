@@ -489,6 +489,7 @@ CurrentSquare := R15
         lda #0
         sta CurrentSquare
 loop:
+        perform_zpcm_inc
         ldx CurrentSquare
         lda battlefield, x
         ; the top 6 bits index into the behavior table, which is a list of **words**

@@ -151,14 +151,21 @@ weapon_palette_table:
 
 .proc hud_state_update
         jsr update_heart_state
+        perform_zpcm_inc
         jsr draw_hearts
+        perform_zpcm_inc
         jsr draw_map_tiles
+        perform_zpcm_inc
         jsr draw_current_zone
+        perform_zpcm_inc
         jsr draw_equipment
+        perform_zpcm_inc
         jsr update_coin_counter
+        perform_zpcm_inc
         .if ::DEBUG_MODE
         jsr draw_run_seed
         .endif
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -767,6 +774,8 @@ decrease_needed:
 converge:
         jsr draw_coin_counter 
 
+        perform_zpcm_inc
+
         ; only play the cash SFX if we haven't started it within some number of frames, just
         ; to make sure it isn't trampling all over itself
         lda GoldSfxCooldown
@@ -786,6 +795,7 @@ done:
         ; playing right away
         lda #0
         sta GoldSfxCooldown
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -797,6 +807,7 @@ TensDigit := T3
 HundredsDigit := T4
 ThousandsDigit := T5
 TenThousandsDigit := T6
+        perform_zpcm_inc
         mov16 NumberWord, DisplayedGold
         near_call FAR_base_10
 
@@ -810,12 +821,14 @@ draw_little_x:
         ldx #15
         draw_tile_at_x ROW_4, #COIN_X, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 converge:
+        perform_zpcm_inc
         ldx #16
         draw_tile_at_x ROW_4, HundredsDigit, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
         ldx #17
         draw_tile_at_x ROW_4, TensDigit, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
         ldx #18
         draw_tile_at_x ROW_4, OnesDigit, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -1075,7 +1088,8 @@ done:
 
 .if ::DEBUG_MODE
 .proc draw_run_seed
-Numeral := R0        
+Numeral := R0     
+        perform_zpcm_inc   
 
         lda initial_run_seed+0
         lsr
@@ -1137,6 +1151,7 @@ Numeral := R0
         ldx #9
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
 
+        perform_zpcm_inc
         rts
 .endproc
 .endif

@@ -839,6 +839,7 @@ begin_floor_generation:
         ; initialize room flags and other state to a sensible starting value
         ldx #0
 room_setup_loop:
+        perform_zpcm_inc
         lda #0
         sta room_flags, x
         inx
@@ -1124,6 +1125,7 @@ RoomIndexToPreserve := R0
         lda #0
         sta RoomIndexToGenerate
 loop:
+        perform_zpcm_inc
         jsr generate_room_seed
         jsr generate_room
         lda RoomIndexToGenerate
@@ -1216,12 +1218,14 @@ LootTablePtr := R0
 ItemId := R2
 ; R3 is clobbered by the loot rolling function
 CurrentTile := R4 
+        perform_zpcm_inc
+
         ; TODO: pick the loot table based on the zone? maybe based on some
         ; data from the room too. undecided!
         ;st16 LootTablePtr, test_treasure_table
 
         lda PlayerFloor
-        cmp #1
+        cmp #3
         bcs pick_rare_loot
 pick_common_loot:
         st16 LootTablePtr, common_treasure_table
@@ -1234,6 +1238,7 @@ done_picking_loot:
         lda #0
         sta CurrentTile
 loop:
+        perform_zpcm_inc
         ldx CurrentTile
         lda battlefield, x
         cmp #TILE_ITEM_SHADOW
@@ -1258,6 +1263,7 @@ done_with_tile:
         bne loop
 
         ; et voila! items for sale!
+        perform_zpcm_inc
 
         rts
 .endproc
