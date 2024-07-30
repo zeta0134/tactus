@@ -29,7 +29,7 @@ treasure_category_table:
         
         ; force a specific drop
         .repeat 16
-        .byte TREASURE_NAV
+        .byte TREASURE_ITEM
         .endrepeat
 
 .proc attack_treasure_chest
@@ -59,7 +59,7 @@ spawn_treasure:
         lda treasure_category_table, x
 check_nav:
         cmp #TREASURE_NAV
-        bne check_gold
+        bne check_item
         jsr spawn_nav_item
         rts
 check_item:
@@ -164,7 +164,11 @@ ItemId := R18
         ; Now roll for the loot this item shadow will contain. This is a gameplay
         ; roll, so use that RNG and the appropriate table
 
-        st16 LootTablePtr, test_chest_treasure_table
+        ; the real loot table
+        ;st16 LootTablePtr, test_chest_treasure_table
+        ; zeta needs to obtain a specific item for testing
+        st16 LootTablePtr, test_specific_item_table
+
         far_call FAR_roll_gameplay_loot
         ldx AttackSquare
         lda ItemId

@@ -45,6 +45,7 @@ ITEM_MAP           = 17
 ITEM_SMALL_FRIES   = 18
 ITEM_MEDIUM_FRIES  = 19
 ITEM_LARGE_FRIES   = 20
+ITEM_GO_GO_BOOTS   = 21
 
 ; utilities for drawing items
 .global FAR_apply_item_world_metasprite

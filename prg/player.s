@@ -81,6 +81,8 @@ PlayerChainGrace: .res 1
 
 PlayerNavState: .res 1
 
+PlayerPreviousSuccessfulDirection: .res 1
+
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
 DIRECTION_SOUTH = 3
@@ -463,7 +465,6 @@ done_with_initial_pose:
         lda #0
         sta PlayerCombo
 
-; TODO: If no move or attack was attempted, reset the combo counter (assuming we implement one)
         lda PlayerNextDirection
         beq resolve_enemy_collision
 
@@ -482,24 +483,35 @@ swing_weapon:
         bne resolve_enemy_collision
 
 move_player:
-        jsr player_move
+        jsr player_move        
 
 resolve_enemy_collision:
         near_call FAR_player_resolve_collision
 
+        jsr handle_go_go_boots_movement
+
         ; If the player's position changed, have the jumping pose kick in
         ; (this overrides attacking, which feels like it should be appropriate?)
+        ; TODO: if something else can move the player (pushing enemies?) we might
+        ; need a custom "being pushed" animation. at the very least, the player probably
+        ; shouldn't visibly jump.
         lda TargetRow
         cmp PlayerRow
         bne apply_jumping_pose
         lda TargetCol
         cmp PlayerCol
         bne apply_jumping_pose
+        ; the player's previous move did not succeed, so clear that flag
+        lda #0
+        sta PlayerPreviousSuccessfulDirection
         jmp skip_jumping_pose
 apply_jumping_pose:
         ldx PlayerSpriteIndex
         lda #<SPRITE_TILE_PLAYER_JUMP
         sta sprite_table + MetaSpriteState::TileIndex, x
+        ; The player's movement succeeded, so store that in a flag
+        lda PlayerNextDirection
+        sta PlayerPreviousSuccessfulDirection
 skip_jumping_pose:
 
         ; Update the player's combo counter
@@ -537,6 +549,87 @@ no_darkness:
         ; Detect being dead and, if necessary, transition to the end screen
         jsr detect_critical_existence_failure
 
+        rts
+.endproc
+
+.proc handle_go_go_boots_movement
+TargetRow := R14
+TargetCol := R15
+        ; ITEM: if the player has the gogo boots equipped, 
+        ; AND the previous move succeeded,
+        ; AND this is their second successful move,
+        ; then attempt a move again!
+        lda PlayerEquipmentBoots
+        cmp #ITEM_GO_GO_BOOTS
+        bne done_with_go_go_boots
+
+        ; don't trigger if we aren't actually attempting a move
+        lda PlayerNextDirection
+        beq done_with_go_go_boots
+
+        ; don't trigger if we are changing directions OR if this is our
+        ; first movement in this chain
+        lda PlayerPreviousSuccessfulDirection
+        cmp PlayerNextDirection
+        bne done_with_go_go_boots
+
+        ; don't trigger if the previous movement failed!
+        lda TargetRow
+        cmp PlayerRow
+        bne previous_move_succeeded
+        lda TargetCol
+        cmp PlayerCol
+        bne previous_move_succeeded
+        jmp done_with_go_go_boots
+previous_move_succeeded:
+
+        ; don't trigger if we are moving towards a map border and we have
+        ; already arrived there!
+        lda PlayerNextDirection
+        ldx TargetRow
+        ldy TargetCol
+check_north:
+        cmp #DIRECTION_NORTH
+        bne check_east
+        cpy #0
+        beq done_with_go_go_boots
+check_east:
+        cmp #DIRECTION_EAST
+        bne check_south
+        cpx #(BATTLEFIELD_WIDTH-1)
+        beq done_with_go_go_boots
+check_south:
+        cmp #DIRECTION_SOUTH
+        bne check_west
+        cpy #(BATTLEFIELD_HEIGHT-1)
+        beq done_with_go_go_boots
+check_west:
+        cmp #DIRECTION_WEST
+        bne done_with_map_edge_checks
+        cpx #0
+        beq done_with_go_go_boots
+done_with_map_edge_checks:
+
+        ; finally, all the sanity checks having passed, do the thing
+        ; firstly, commit the previous move (it succeeded)
+        lda TargetCol
+        sta PlayerCol
+        lda TargetRow
+        sta PlayerRow
+
+        ; the previous move actually happened, so apply the jumping pose
+        ; (even if the next one fails!)
+        ldx PlayerSpriteIndex
+        lda #<SPRITE_TILE_PLAYER_JUMP
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+move_player:
+        jsr player_move        
+
+resolve_enemy_collision:
+        near_call FAR_player_resolve_collision
+
+done_with_go_go_boots:
         rts
 .endproc
 

@@ -31,7 +31,7 @@ chr_tile_offset EQUIPMENT_ACCESSORY_2, 2, 6
 chr_tile_offset EQUIPMENT_ACCESSORY_3, 4, 6
 chr_tile_offset EQUIPMENT_ACCESSORY_4, 6, 6
 
-chr_tile_offset EQUIPMENT_BOOTS_1, 0, 8
+chr_tile_offset EQUIPMENT_GO_GO_BOOTS, 0, 8
 chr_tile_offset EQUIPMENT_BOOTS_2, 2, 8
 chr_tile_offset EQUIPMENT_BOOTS_3, 4, 8
 chr_tile_offset EQUIPMENT_BOOTS_4, 6, 8

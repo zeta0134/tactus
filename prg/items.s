@@ -45,6 +45,7 @@ item_table:
     .word small_fries
     .word medium_fries
     .word large_fries
+    .word go_go_boots
     ; safety
     .repeat 128
     .word no_item
@@ -343,6 +344,22 @@ large_fries:
     .addr no_effect                       ; DamageFunc     (unused)
     .addr no_effect                       ; TorchlightFunc (unused)
     .addr heal_12_hp                      ; UseFunc
+
+; Note: as an item with a custom effect, these are just special-case checked
+; in the player movement code
+go_go_boots:
+    .byte SLOT_BOOTS                      ; SlotId (irrelevant)
+    .byte SPRITE_TILE_GO_GO_BOOTS         ; WorldSpriteTile (obviously broken)
+    .byte SPRITE_PAL_GREY                 ; WorldSpriteAttr
+    .byte EQUIPMENT_GO_GO_BOOTS           ; HudBgTile
+    .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+    .byte 0                               ; HudSpriteTile
+    .byte 0                               ; HudSpriteAttr
+    .word 150                             ; ShopCost
+    .byte WEAPON_DAGGER                   ; WeaponShape (unused)
+    .addr no_effect                       ; DamageFunc
+    .addr no_effect                       ; TorchlightFunc
+    .addr do_nothing                      ; UseFunc
 
     .segment "CODE_0"
 

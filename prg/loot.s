@@ -300,9 +300,15 @@ combo_offset_lut:
 ;                    TREASURE TABLES
 ; ========================================================
 
+test_specific_item_table:
+    .byte 10
+    .repeat 10
+    .byte ITEM_GO_GO_BOOTS
+    .endrepeat
+
 ; simply includes all the items. balance? what's that?
 test_treasure_table:
-    .byte 14
+    .byte 15
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L2
     .byte ITEM_BROADSWORD_L3
@@ -317,6 +323,30 @@ test_treasure_table:
     .byte ITEM_FLAIL_L3
     .byte ITEM_BASIC_TORCH
     .byte ITEM_LARGE_TORCH
+    .byte ITEM_GO_GO_BOOTS
+
+; heavily weighted towards L1 weapons, but occasionally has some L2 and other interesting stuff
+common_treasure_table:
+    .byte 19
+    .byte ITEM_BROADSWORD_L1
+    .byte ITEM_BROADSWORD_L1
+    .byte ITEM_BROADSWORD_L1
+    .byte ITEM_LONGSWORD_L1
+    .byte ITEM_LONGSWORD_L1
+    .byte ITEM_LONGSWORD_L1
+    .byte ITEM_SPEAR_L1
+    .byte ITEM_SPEAR_L1
+    .byte ITEM_SPEAR_L1
+    .byte ITEM_FLAIL_L1
+    .byte ITEM_FLAIL_L1
+    .byte ITEM_FLAIL_L1
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_BROADSWORD_L2
+    .byte ITEM_BROADSWORD_L2
+    .byte ITEM_SPEAR_L2
+    .byte ITEM_SPEAR_L2
 
 test_chest_treasure_table:
     .byte 8
