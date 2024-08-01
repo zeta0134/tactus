@@ -1817,27 +1817,37 @@ el_basic_mix:
         .byte TILE_BASIC_SLIME,        <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_BLUE),   1
         .byte TILE_INTERMEDIATE_SLIME, <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_YELLOW), 2
 
+el_test_mushroom_mushroom:
+        .byte 4
+        .byte TILE_MUSHROOM_BASIC,        <BG_TILE_MUSHROOM_IDLE,      (>BG_TILE_MUSHROOM_IDLE      | PAL_RED),    1
+        .byte TILE_MUSHROOM_INTERMEDIATE, <BG_TILE_MUSHROOM_IDLE,      (>BG_TILE_MUSHROOM_IDLE      | PAL_BLUE),   1
+        .byte TILE_MUSHROOM_ADVANCED,     <BG_TILE_MUSHROOM_IDLE,      (>BG_TILE_MUSHROOM_IDLE      | PAL_YELLOW), 1
+        .byte TILE_MUSHROOM_WEIRD,        <BG_TILE_MUSHROOM_IDLE,      (>BG_TILE_MUSHROOM_IDLE      | PAL_WORLD),  1
+
 basic_pool_zone_1_floor_1:
         ; Make sure all sections add up to 16
-        .repeat 3
-        .word el_intermediate_slimes
+        ;.repeat 3
+        ;.word el_intermediate_slimes
+        ;.endrepeat
+        ;.repeat 4
+        ;.word el_zombies_and_slimes
+        ;.endrepeat
+        ;.repeat 3
+        ;.word el_spiders_and_slimes
+        ;.endrepeat
+        ;.repeat 3
+        ;.word el_zombies_and_spiders
+        ;.endrepeat
+        ;.repeat 3
+        ;.word el_basic_mix
+        ;.endrepeat
+
+        ; For testing a specific set of enemies
+        .repeat 16
+        .word el_test_mushroom_mushroom
         .endrepeat
 
-        .repeat 4
-        .word el_zombies_and_slimes
-        .endrepeat
 
-        .repeat 3
-        .word el_spiders_and_slimes
-        .endrepeat
-
-        .repeat 3
-        .word el_zombies_and_spiders
-        .endrepeat
-
-        .repeat 3
-        .word el_basic_mix
-        .endrepeat
 
 ; =============================================
 ;                Zone 1 - Boss

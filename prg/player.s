@@ -456,6 +456,14 @@ pick_standard_pose:
         sta sprite_table + MetaSpriteState::TileIndex, x
 done_with_initial_pose:
 
+        ; Always reset the player's palette back to 0 at the start of the beat
+        ; (in case some other state changed it for an effect)
+        ldx PlayerSpriteIndex
+        lda sprite_table + MetaSpriteState::BehaviorFlags, x
+        and #($FF - SPRITE_PAL_MASK)
+        ora #SPRITE_PAL_0
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+
         lda PlayerRow
         sta TargetRow
         lda PlayerCol
@@ -490,6 +498,8 @@ resolve_enemy_collision:
         near_call FAR_player_resolve_collision
 
         jsr handle_go_go_boots_movement
+
+        ; if the player took damage
 
         ; If the player's position changed, have the jumping pose kick in
         ; (this overrides attacking, which feels like it should be appropriate?)
@@ -1274,6 +1284,24 @@ TargetCol := R15
         lda #0
         sta PlayerChain
         sta PlayerChainGrace
+
+        ; If we are in our idle pose, switch to damage. (Let any other
+        ; animation override the damage state though, as it's more important)
+        ldx PlayerSpriteIndex
+        lda sprite_table + MetaSpriteState::TileIndex, x
+        cmp #<SPRITE_TILE_PLAYER
+        beq apply_damage_animation
+        cmp #<SPRITE_TILE_PLAYER_IDLE
+        beq apply_damage_animation
+        jmp action_overrides_damage_animation
+apply_damage_animation:
+        lda #<SPRITE_TILE_PLAYER_HIT
+        sta sprite_table + MetaSpriteState::TileIndex, x
+        lda sprite_table + MetaSpriteState::BehaviorFlags, x
+        and #($FF - SPRITE_PAL_MASK)
+        ora #SPRITE_PAL_2
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+action_overrides_damage_animation:
 
 already_dead:
         rts

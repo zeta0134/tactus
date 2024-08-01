@@ -197,6 +197,7 @@ tile_index_to_col_lut:
 .include "enemies/exit_block.asm"
 .include "enemies/item_shadow.asm"
 .include "enemies/mole.asm"
+.include "enemies/mushroom.asm"
 .include "enemies/slimes.asm"
 .include "enemies/semisafe_tile.asm"
 .include "enemies/small_heart.asm"
@@ -219,7 +220,9 @@ static_behaviors:
         .word update_mole_idle          ; $30
         .word update_wrench_projectile  ; $34
         .word update_challenge_spike    ; $38
-        .repeat 17
+        .word update_mushroom           ; $3C
+        .word update_one_beat_hazard    ; $40
+        .repeat 15
         .word no_behavior ; unimplemented
         .endrepeat
         .word draw_disco_tile           ; $80 - plain floor
@@ -254,7 +257,9 @@ direct_attack_behaviors:
         .word direct_attack_mole_idle
         .word no_behavior ; wrench projectile
         .word no_behavior ; challenge spike
-        .repeat 17
+        .word direct_attack_mushroom
+        .word no_behavior ; one beat hazard
+        .repeat 15
         .word no_behavior
         .endrepeat
         ; floors, statics, and technical tiles
@@ -291,7 +296,9 @@ indirect_attack_behaviors:
         .word no_behavior
         .word no_behavior ; wrench projectile
         .word no_behavior ; challenge spike
-        .repeat 17
+        .word indirect_attack_mushroom
+        .word no_behavior ; one beat hazard
+        .repeat 15
         .word no_behavior
         .endrepeat
         ; safety: fill out the rest of the table
@@ -311,11 +318,13 @@ bonk_behaviors:
         .word basic_enemy_attacks_player
         .word basic_enemy_attacks_player
         .word no_behavior ; mole holes, when unoccupied, do no damage
-        .word basic_enemy_attacks_player ; moles when bonked, mostly with the flail, *do* do damage
+        .word basic_enemy_attacks_player ; moles when bonked, mostly with the flail/boots, *do* do damage
         .word basic_enemy_attacks_player
-        .word projectile_attacks_player ; projectiles do damage, but also need to erase themselves
+        .word projectile_attacks_player  ; projectiles do damage, but also need to erase themselves
         .word challenge_spike_solid_test
-        .repeat 17
+        .word basic_enemy_attacks_player ; $3C - mushroom
+        .word hazard_damages_player      ; $40 one beat hazards just do damage
+        .repeat 15
         .word no_behavior
         .endrepeat
         .word no_behavior ; $80 - plain floor
@@ -361,7 +370,9 @@ suspend_behaviors:
         .word no_behavior              ; mole idle
         .word draw_cleared_disco_tile  ; wrench
         .word no_behavior              ; challenge spike
-        .repeat 17
+        .word no_behavior              ; mushroom
+        .word no_behavior              ; one beat hazard
+        .repeat 15
         .word no_behavior ; unimplemented
         .endrepeat
         .word draw_cleared_disco_tile   ; $80 - plain floor
