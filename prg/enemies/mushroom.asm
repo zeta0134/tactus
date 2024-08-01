@@ -155,8 +155,31 @@ skip_spawning_diagonal_spores:
 
 .proc spawn_spore_tile
         ; First off, is this even a valid location for a spore to spawn? Basically
-        ; this follows the same rules as any other enemy movement
-        if_valid_dust_destination proceed_to_spawn
+        ; this follows the same rules as any other enemy movement, but also allows
+        ; overwriting nearby spore tiles
+        ldx SmokePuffTile
+        lda battlefield, x
+        ; floors are unconditionally okay
+        cmp #TILE_REGULAR_FLOOR
+        beq proceed_to_spawn
+        cmp #TILE_DISCO_FLOOR
+        beq proceed_to_spawn
+check_smoke_puffs:
+        ; puffs of smoke are only okay if they moved *last* frame
+        ; (this resolves some weirdness with tile update order)
+        cmp #TILE_SMOKE_PUFF
+        bne check_one_beat_hazards
+        lda tile_flags, x
+        bpl proceed_to_spawn
+        jmp valid_destination_failure
+check_one_beat_hazards:
+        ; same deal with hazard tiles (which would be turning into floor when they update)
+        cmp #TILE_ONE_BEAT_HAZARD
+        bne valid_destination_failure
+        lda tile_flags, x
+        bpl proceed_to_spawn
+        jmp valid_destination_failure
+valid_destination_failure:
         rts
 proceed_to_spawn:
         jsr draw_spore_here
