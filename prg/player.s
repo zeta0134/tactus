@@ -499,8 +499,6 @@ resolve_enemy_collision:
 
         jsr handle_go_go_boots_movement
 
-        ; if the player took damage
-
         ; If the player's position changed, have the jumping pose kick in
         ; (this overrides attacking, which feels like it should be appropriate?)
         ; TODO: if something else can move the player (pushing enemies?) we might
@@ -1285,9 +1283,15 @@ TargetCol := R15
         sta PlayerChain
         sta PlayerChainGrace
 
+        ; apply the damage coloration no matter what pose we're in
+        ldx PlayerSpriteIndex
+        lda sprite_table + MetaSpriteState::BehaviorFlags, x
+        and #($FF - SPRITE_PAL_MASK)
+        ora #SPRITE_PAL_2
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+
         ; If we are in our idle pose, switch to damage. (Let any other
         ; animation override the damage state though, as it's more important)
-        ldx PlayerSpriteIndex
         lda sprite_table + MetaSpriteState::TileIndex, x
         cmp #<SPRITE_TILE_PLAYER
         beq apply_damage_animation
@@ -1297,10 +1301,6 @@ TargetCol := R15
 apply_damage_animation:
         lda #<SPRITE_TILE_PLAYER_HIT
         sta sprite_table + MetaSpriteState::TileIndex, x
-        lda sprite_table + MetaSpriteState::BehaviorFlags, x
-        and #($FF - SPRITE_PAL_MASK)
-        ora #SPRITE_PAL_2
-        sta sprite_table + MetaSpriteState::BehaviorFlags, x
 action_overrides_damage_animation:
 
 already_dead:
