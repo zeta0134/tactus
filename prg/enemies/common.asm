@@ -45,6 +45,36 @@ continue:
 valid_destination_failure:
 .endmacro
 
+.macro if_valid_dust_destination success_label,
+        ; Screen edges are never okay
+        ldx SmokePuffTile
+        lda tile_index_to_row_lut, x
+        cmp #0
+        beq valid_destination_failure
+        cmp #(::BATTLEFIELD_HEIGHT-1)
+        beq valid_destination_failure
+        lda tile_index_to_col_lut, x
+        cmp #0
+        beq valid_destination_failure
+        cmp #(::BATTLEFIELD_WIDTH-1)
+        beq valid_destination_failure
+
+        ldx SmokePuffTile
+        lda battlefield, x
+        ; floors are unconditionally okay
+        cmp #TILE_REGULAR_FLOOR
+        beq success_label
+        cmp #TILE_DISCO_FLOOR
+        beq success_label
+        ; puffs of smoke are only okay if they moved *last* frame
+        ; (this resolves some weirdness with tile update order)
+        cmp #TILE_SMOKE_PUFF
+        bne valid_destination_failure
+        lda tile_flags, x
+        bpl success_label
+valid_destination_failure:
+.endmacro
+
 .macro if_semisafe_destination success_label,
         ldx TargetTile
         lda battlefield, x

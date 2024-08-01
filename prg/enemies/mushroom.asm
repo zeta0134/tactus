@@ -20,11 +20,11 @@ basic:
         sta IdleDelay
         jmp done_picking_idle_duration
 intermediate:
-        lda #2
+        lda #3
         sta IdleDelay
         jmp done_picking_idle_duration
 advanced:
-        lda #1
+        lda #2
         sta IdleDelay
         jmp done_picking_idle_duration
 weird:
@@ -53,10 +53,114 @@ perform_attack:
         lda #0
         sta tile_data, x
 
-        ; TODO: spawn spore tiles around ourselves!
+        ; all mushrooms will spawn spores in cardinal directions, so do that first
+        ; note: mushrooms are immobile and cannot spawn on a map border, so there is
+        ; no need to perform bounds checks on these calculations
+        lda #DUST_DIRECTION_N
+        sta SmokePuffDirection
+        lda CurrentTile
+        sec
+        sbc #BATTLEFIELD_WIDTH
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        dec SmokePuffRow
+        jsr spawn_spore_tile
 
+        lda #DUST_DIRECTION_S
+        sta SmokePuffDirection
+        lda CurrentTile
+        clc
+        adc #BATTLEFIELD_WIDTH
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        inc SmokePuffRow
+        jsr spawn_spore_tile
 
+        lda #DUST_DIRECTION_W
+        sta SmokePuffDirection
+        lda CurrentTile
+        sec
+        sbc #1
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        jsr spawn_spore_tile
+
+        lda #DUST_DIRECTION_E
+        sta SmokePuffDirection
+        lda CurrentTile
+        clc
+        adc #1
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        jsr spawn_spore_tile
+
+        ; everything except the basic variety also spawns diagonals, so check for that here
+        ldx CurrentTile
+        lda battlefield, x
+        and #%00000011
+        cmp #%11
+        beq skip_spawning_diagonal_spores
+
+        lda #DUST_DIRECTION_NW
+        sta SmokePuffDirection
+        lda CurrentTile
+        sec
+        sbc #(BATTLEFIELD_WIDTH+1)
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        dec SmokePuffRow
+        jsr spawn_spore_tile
+
+        lda #DUST_DIRECTION_NE
+        sta SmokePuffDirection
+        lda CurrentTile
+        sec
+        sbc #(BATTLEFIELD_WIDTH-1)
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        dec SmokePuffRow
+        jsr spawn_spore_tile
+
+        lda #DUST_DIRECTION_SW
+        sta SmokePuffDirection
+        lda CurrentTile
+        clc
+        adc #(BATTLEFIELD_WIDTH-1)
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        inc SmokePuffRow
+        jsr spawn_spore_tile
+
+        lda #DUST_DIRECTION_SE
+        sta SmokePuffDirection
+        lda CurrentTile
+        clc
+        adc #(BATTLEFIELD_WIDTH+1)
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        inc SmokePuffRow
+        jsr spawn_spore_tile
+
+skip_spawning_diagonal_spores:
         rts
+.endproc
+
+.proc spawn_spore_tile
+        ; First off, is this even a valid location for a spore to spawn? Basically
+        ; this follows the same rules as any other enemy movement
+        if_valid_dust_destination proceed_to_spawn
+        rts
+proceed_to_spawn:
+        jsr draw_spore_here
+        rts        
 .endproc
 
 .proc direct_attack_mushroom
@@ -133,6 +237,9 @@ done:
 
 .proc update_one_beat_hazard
 CurrentTile := R15
+        ldx CurrentTile
+        bail_if_already_moved
+
         ; it's been one beat! stop being a one beat hazard, thx.
         ldx CurrentTile
         draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
