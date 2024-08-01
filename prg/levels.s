@@ -1818,11 +1818,12 @@ el_basic_mix:
         .byte TILE_INTERMEDIATE_SLIME, <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_YELLOW), 2
 
 el_test_mushroom_mushroom:
-        .byte 4
+        .byte 5
         .byte TILE_MUSHROOM_BASIC,        <BG_TILE_MUSHROOM_IDLE,      (>BG_TILE_MUSHROOM_IDLE      | PAL_RED),    1
         .byte TILE_MUSHROOM_INTERMEDIATE, <BG_TILE_MUSHROOM_IDLE,      (>BG_TILE_MUSHROOM_IDLE      | PAL_BLUE),   1
         .byte TILE_MUSHROOM_ADVANCED,     <BG_TILE_MUSHROOM_IDLE,      (>BG_TILE_MUSHROOM_IDLE      | PAL_YELLOW), 1
         .byte TILE_MUSHROOM_WEIRD,        <BG_TILE_MUSHROOM_IDLE,      (>BG_TILE_MUSHROOM_IDLE      | PAL_WORLD),  1
+        .byte TILE_ZOMBIE_BASIC,       <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_WORLD),  4
 
 basic_pool_zone_1_floor_1:
         ; Make sure all sections add up to 16

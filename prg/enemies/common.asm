@@ -36,6 +36,9 @@ continue:
         beq success_label
         cmp #TILE_DISCO_FLOOR
         beq success_label
+        ; Right now, one-beat hazards are also okay (they're mushroom spores)
+        cmp #TILE_ONE_BEAT_HAZARD
+        beq success_label
         ; puffs of smoke are only okay if they moved *last* frame
         ; (this resolves some weirdness with tile update order)
         cmp #TILE_SMOKE_PUFF
