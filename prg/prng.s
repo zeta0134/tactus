@@ -1,7 +1,6 @@
         .setcpu "6502"
         .include "prng.inc"
         .include "player.inc"
-        .include "levels.inc"
         .include "zpcm.inc"
 
 	.zeropage

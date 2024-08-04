@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="LayoutTiles" tilewidth="16" tileheight="16" tilecount="64" columns="16">
+<tileset version="1.10" tiledversion="1.11.0" name="LayoutTiles" tilewidth="16" tileheight="16" tilecount="64" columns="16">
  <image source="tilesets/layout_tiles.png" width="256" height="64"/>
  <tile id="0">
   <properties>
@@ -36,6 +36,16 @@
  <tile id="4">
   <properties>
    <property name="room_pool" value="OUT_OF_BOUNDS"/>
+  </properties>
+ </tile>
+ <tile id="5">
+  <properties>
+   <property name="room_pool" value="BLOCKING_EXTERIOR"/>
+  </properties>
+ </tile>
+ <tile id="6">
+  <properties>
+   <property name="room_pool" value="BLOCKING_INTERIOR"/>
   </properties>
  </tile>
  <tile id="15">

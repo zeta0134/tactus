@@ -4,7 +4,6 @@
         .include "enemies.inc"
         .include "far_call.inc"
         .include "chr.inc"
-        .include "levels.inc"
         .include "nes.inc"
         .include "ppu.inc"
         .include "word_util.inc"
