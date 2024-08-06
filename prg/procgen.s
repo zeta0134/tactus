@@ -1202,7 +1202,6 @@ no_exit_stairs:
         and #ROOM_FLAG_BOSS
         bne spawn_boss_enemies
 spawn_basic_enemies:
-        ;jsr spawn_basic_enemies_from_pool
 
         st16 SpawnPoolPtr, spawn_pool_generic
         ; for now, fudge the settings based on floor?
@@ -1553,66 +1552,6 @@ done:
         rts
 .endproc
 
-.proc spawn_basic_enemies_from_pool
-CollectionPtr := R0
-PoolPtr := R2
-EntityList := R4
-        ; First find the pool collection for this zone
-        lda PlayerZone
-        sec
-        sbc #1 ; the lists are 0-based, but zones are 1-based
-        asl ; the lists contain words
-        tax
-
-        
-
-        .if ::DEBUG_TEST_FLOOR
-        access_data_bank #<.bank(debug_zone_list)
-        ; DEBUG: use a fake list for testing new enemy types
-        lda debug_zone_list, x
-        sta CollectionPtr
-        lda debug_zone_list+1, x
-        sta CollectionPtr+1
-        .else
-        access_data_bank #<.bank(zone_list_basic)
-        ; Use the real list
-        lda zone_list_basic, x
-        sta CollectionPtr
-        lda zone_list_basic+1, x
-        sta CollectionPtr+1
-        .endif
-
-        ; Now load the appropriate pool list for this floor from the collection
-        lda PlayerFloor
-        sec
-        sbc #1 ; the lists are 0-based, but zones are 1-based
-        asl ; the lists contain words
-        tay
-        lda (CollectionPtr), y
-        sta PoolPtr
-        iny
-        lda (CollectionPtr), y
-        sta PoolPtr+1
-        ; Here we need to pick a random number from 0-15, and use that to index the pool to select
-        ; one of the enemy lists
-        jsr next_room_rand ; clobbers Y
-        and #%00001111
-        asl ; still indexing words
-        tay
-        lda (PoolPtr), y
-        sta EntityList
-        iny
-        lda (PoolPtr), y
-        sta EntityList+1
-        ; Finally, now that we have the entity list, spawn random enemies from it
-        jsr spawn_entity_list
-done:
-
-        restore_previous_bank
-
-        rts
-.endproc
-
 .proc spawn_boss_enemies_from_pool
 CollectionPtr := R0
 PoolPtr := R2
@@ -1810,70 +1749,6 @@ test_floor_layout_pool:
 ; If including fewer unique enemy lists, be sure
 ; to duplicate the list so that it is the full size
 
-; =============================================
-;                Zone 1 - Basic
-; =============================================
-el_intermediate_slimes:
-        .byte 2 ; length
-        .byte TILE_BASIC_SLIME,        <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_BLUE),   3
-        .byte TILE_INTERMEDIATE_SLIME, <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_YELLOW), 4
-
-el_zombies_and_slimes:
-        .byte 3 ; length
-        .byte TILE_ZOMBIE_BASIC,       <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_WORLD),  3
-        .byte TILE_BASIC_SLIME,        <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_BLUE),   3
-        .byte TILE_INTERMEDIATE_SLIME, <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_YELLOW), 1
-
-el_spiders_and_slimes:
-        .byte 3 ; length
-        .byte TILE_SPIDER_BASIC,       <BG_TILE_SPIDER,     (>BG_TILE_SPIDER     | PAL_BLUE),   3
-        .byte TILE_BASIC_SLIME,        <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_BLUE),   2
-        .byte TILE_INTERMEDIATE_SLIME, <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_YELLOW), 2
-
-el_zombies_and_spiders:
-        .byte 2 ; length
-        .byte TILE_SPIDER_BASIC, <BG_TILE_SPIDER,      (>BG_TILE_SPIDER      | PAL_BLUE),  2
-        .byte TILE_ZOMBIE_BASIC, <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_WORLD), 3
-
-el_basic_mix:
-        .byte 4 ; length
-        .byte TILE_SPIDER_BASIC,       <BG_TILE_SPIDER,      (>BG_TILE_SPIDER      | PAL_BLUE),   2
-        .byte TILE_ZOMBIE_BASIC,       <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_WORLD),  2
-        .byte TILE_BASIC_SLIME,        <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_BLUE),   1
-        .byte TILE_INTERMEDIATE_SLIME, <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_YELLOW), 2
-
-el_test_mushroom_mushroom:
-        .byte 5
-        .byte TILE_MUSHROOM_BASIC,        <BG_TILE_MUSHROOM_IDLE,      (>BG_TILE_MUSHROOM_IDLE      | PAL_RED),    1
-        .byte TILE_MUSHROOM_INTERMEDIATE, <BG_TILE_MUSHROOM_IDLE,      (>BG_TILE_MUSHROOM_IDLE      | PAL_BLUE),   1
-        .byte TILE_MUSHROOM_ADVANCED,     <BG_TILE_MUSHROOM_IDLE,      (>BG_TILE_MUSHROOM_IDLE      | PAL_YELLOW), 1
-        .byte TILE_MUSHROOM_WEIRD,        <BG_TILE_MUSHROOM_IDLE,      (>BG_TILE_MUSHROOM_IDLE      | PAL_WORLD),  1
-        .byte TILE_ZOMBIE_BASIC,       <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_WORLD),  4
-
-basic_pool_zone_1_floor_1:
-        ; Make sure all sections add up to 16
-        ;.repeat 3
-        ;.word el_intermediate_slimes
-        ;.endrepeat
-        ;.repeat 4
-        ;.word el_zombies_and_slimes
-        ;.endrepeat
-        ;.repeat 3
-        ;.word el_spiders_and_slimes
-        ;.endrepeat
-        ;.repeat 3
-        ;.word el_zombies_and_spiders
-        ;.endrepeat
-        ;.repeat 3
-        ;.word el_basic_mix
-        ;.endrepeat
-
-        ; For testing a specific set of enemies
-        .repeat 16
-        .word el_test_mushroom_mushroom
-        .endrepeat
-
-
 
 ; =============================================
 ;                Zone 1 - Boss
@@ -1890,66 +1765,6 @@ boss_pool_zone_1_floor_1:
         ; Make sure sections add up to 4
         .repeat 4
         .word el_slime_pit
-        .endrepeat
-
-; =============================================
-;                Zone 2 - Basic
-; =============================================
-
-el_zombies_and_spiders2:
-        .byte 4 ; length
-        .byte TILE_BASIC_SLIME,        <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_BLUE),   1
-        .byte TILE_INTERMEDIATE_SLIME, <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_YELLOW), 1
-        .byte TILE_SPIDER_BASIC,       <BG_TILE_SPIDER,      (>BG_TILE_SPIDER      | PAL_BLUE),   3
-        .byte TILE_ZOMBIE_BASIC,       <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_WORLD),  5
-
-el_birds_and_spiders:
-        .byte 3
-        .byte TILE_BIRB_LEFT_BASIC,  <BG_TILE_BIRB_IDLE_LEFT,  (>BG_TILE_BIRB_IDLE_LEFT  | PAL_YELLOW), 2
-        .byte TILE_BIRB_RIGHT_BASIC, <BG_TILE_BIRB_IDLE_RIGHT, (>BG_TILE_BIRB_IDLE_RIGHT | PAL_YELLOW), 2
-        .byte TILE_SPIDER_BASIC,     <BG_TILE_SPIDER,          (>BG_TILE_SPIDER          | PAL_BLUE),   3
-
-el_hello_mr_mole:
-        .byte 4
-        .byte TILE_MOLE_HOLE_BASIC,    <BG_TILE_MOLE_HOLE,   (>BG_TILE_MOLE_HOLE   | PAL_RED),    2
-        .byte TILE_BASIC_SLIME,        <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_BLUE),   1
-        .byte TILE_INTERMEDIATE_SLIME, <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_YELLOW), 2
-        .byte TILE_ZOMBIE_BASIC,       <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_WORLD),  3
-
-el_full_mix:
-        .byte 6
-        .byte TILE_MOLE_HOLE_BASIC,    <BG_TILE_MOLE_HOLE,      (>BG_TILE_MOLE_HOLE      | PAL_RED),    1
-        .byte TILE_BASIC_SLIME,        <BG_TILE_SLIME_IDLE,     (>BG_TILE_SLIME_IDLE     | PAL_BLUE),   2
-        .byte TILE_INTERMEDIATE_SLIME, <BG_TILE_SLIME_IDLE,     (>BG_TILE_SLIME_IDLE     | PAL_YELLOW), 1
-        .byte TILE_ZOMBIE_BASIC,       <BG_TILE_ZOMBIE_IDLE,    (>BG_TILE_ZOMBIE_IDLE    | PAL_WORLD),  2
-        .byte TILE_SPIDER_BASIC,       <BG_TILE_SPIDER,         (>BG_TILE_SPIDER         | PAL_BLUE),   1
-        .byte TILE_BIRB_LEFT_BASIC,    <BG_TILE_BIRB_IDLE_LEFT, (>BG_TILE_BIRB_IDLE_LEFT | PAL_YELLOW), 1
-
-el_zombie_hoard:
-        .byte 2
-        .byte TILE_INTERMEDIATE_SLIME, <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_YELLOW), 2
-        .byte TILE_ZOMBIE_BASIC,       <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_WORLD),  7
-
-basic_pool_zone_1_floor_2:
-        ; Make sure all sections add up to 16
-        .repeat 3
-        .word el_zombies_and_spiders2
-        .endrepeat
-
-        .repeat 3
-        .word el_birds_and_spiders
-        .endrepeat
-
-        .repeat 4
-        .word el_hello_mr_mole
-        .endrepeat
-
-        .repeat 3
-        .word el_full_mix
-        .endrepeat
-
-        .repeat 3
-        .word el_zombie_hoard
         .endrepeat
 
 ; =============================================
@@ -1981,59 +1796,6 @@ boss_pool_zone_1_floor_2:
         .word el_rockin_flock
         .endrepeat
 
-
-; =============================================
-;                Zone 3 - Basic
-; =============================================
-
-el_slimes_and_imm_zombies:
-        .byte 5
-        .byte TILE_BASIC_SLIME,         <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_BLUE),   1
-        .byte TILE_INTERMEDIATE_SLIME,  <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_YELLOW), 1
-        .byte TILE_ADVANCED_SLIME,      <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_RED),    1
-        .byte TILE_ZOMBIE_BASIC,        <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_WORLD),  1
-        .byte TILE_ZOMBIE_INTERMEDIATE, <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_YELLOW), 3
-
-el_mole_and_friends:
-        .byte 4
-        .byte TILE_MOLE_HOLE_BASIC,         <BG_TILE_MOLE_HOLE,       (>BG_TILE_MOLE_HOLE       | PAL_RED),   4
-        .byte TILE_BIRB_LEFT_INTERMEDIATE,  <BG_TILE_BIRB_IDLE_LEFT,  (>BG_TILE_BIRB_IDLE_LEFT  | PAL_BLUE),  1
-        .byte TILE_BIRB_RIGHT_INTERMEDIATE, <BG_TILE_BIRB_IDLE_RIGHT, (>BG_TILE_BIRB_IDLE_RIGHT | PAL_BLUE),  1
-        .byte TILE_ZOMBIE_BASIC,            <BG_TILE_ZOMBIE_IDLE,     (>BG_TILE_ZOMBIE_IDLE     | PAL_WORLD), 3
-
-el_mix3:
-        .byte 6
-        .byte TILE_MOLE_HOLE_BASIC,        <BG_TILE_MOLE_HOLE,      (>BG_TILE_MOLE_HOLE      | PAL_RED),    2
-        .byte TILE_BIRB_LEFT_INTERMEDIATE, <BG_TILE_BIRB_IDLE_LEFT, (>BG_TILE_BIRB_IDLE_LEFT | PAL_BLUE),   1
-        .byte TILE_ZOMBIE_BASIC,           <BG_TILE_ZOMBIE_IDLE,    (>BG_TILE_ZOMBIE_IDLE    | PAL_WORLD),  1
-        .byte TILE_ZOMBIE_INTERMEDIATE,    <BG_TILE_ZOMBIE_IDLE,    (>BG_TILE_ZOMBIE_IDLE    | PAL_YELLOW), 2
-        .byte TILE_SPIDER_BASIC,           <BG_TILE_SPIDER,         (>BG_TILE_SPIDER         | PAL_BLUE),   1
-        .byte TILE_SPIDER_INTERMEDIATE,    <BG_TILE_SPIDER,         (>BG_TILE_SPIDER         | PAL_YELLOW), 2
-
-el_adv_slimes_and_spiders:
-        .byte 3
-        .byte TILE_ADVANCED_SLIME,  <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_RED),  3
-        .byte TILE_SPIDER_BASIC,    <BG_TILE_SPIDER,     (>BG_TILE_SPIDER     | PAL_BLUE), 3
-        .byte TILE_MOLE_HOLE_BASIC, <BG_TILE_MOLE_HOLE,  (>BG_TILE_MOLE_HOLE  | PAL_RED),  2
-
-basic_pool_zone_1_floor_3:
-        ; Make sure all sections add up to 16
-        .repeat 4
-        .word el_slimes_and_imm_zombies
-        .endrepeat
-
-        .repeat 4
-        .word el_mole_and_friends
-        .endrepeat
-
-        .repeat 4
-        .word el_mix3
-        .endrepeat
-
-        .repeat 4
-        .word el_adv_slimes_and_spiders
-        .endrepeat
-
 ; =============================================
 ;                Zone 3 - Boss
 ; =============================================
@@ -2059,71 +1821,6 @@ boss_pool_zone_1_floor_3:
         .endrepeat
         .repeat 2
         .word el_mr_whiskers
-        .endrepeat
-
-; =============================================
-;                Zone 4 - Basic
-; =============================================
-
-el_advanced_slimes_and_zombies:
-        .byte 4
-        .byte TILE_ZOMBIE_INTERMEDIATE, <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_YELLOW), 4
-        .byte TILE_ZOMBIE_ADVANCED,     <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_RED), 2
-        .byte TILE_ADVANCED_SLIME,      <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_RED), 2
-        .byte TILE_INTERMEDIATE_SLIME,  <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_YELLOW), 2
-
-el_oops_all_chasers:
-        .byte 6
-        .byte TILE_ZOMBIE_INTERMEDIATE,    <BG_TILE_ZOMBIE_IDLE,     (>BG_TILE_ZOMBIE_IDLE     | PAL_YELLOW), 2
-        .byte TILE_ZOMBIE_ADVANCED,        <BG_TILE_ZOMBIE_IDLE,     (>BG_TILE_ZOMBIE_IDLE     | PAL_RED),    2
-        .byte TILE_SPIDER_INTERMEDIATE,    <BG_TILE_SPIDER,          (>BG_TILE_SPIDER          | PAL_YELLOW), 2
-        .byte TILE_SPIDER_ADVANCED,        <BG_TILE_SPIDER,          (>BG_TILE_SPIDER          | PAL_RED),    3
-        .byte TILE_BIRB_LEFT_INTERMEDIATE, <BG_TILE_BIRB_IDLE_LEFT,  (>BG_TILE_BIRB_IDLE_LEFT  | PAL_BLUE),   1
-        .byte TILE_BIRB_RIGHT_ADVANCED,    <BG_TILE_BIRB_IDLE_RIGHT, (>BG_TILE_BIRB_IDLE_RIGHT | PAL_RED),    1
-
-el_advanced_moles_and_friends:
-        .byte 5
-        .byte TILE_MOLE_HOLE_ADVANCED,  <BG_TILE_MOLE_HOLE,  (>BG_TILE_MOLE_HOLE  | PAL_BLUE),   4
-        .byte TILE_SPIDER_ADVANCED,     <BG_TILE_SPIDER,     (>BG_TILE_SPIDER     | PAL_RED),    2
-        .byte TILE_SPIDER_INTERMEDIATE, <BG_TILE_SPIDER,     (>BG_TILE_SPIDER     | PAL_YELLOW), 1
-        .byte TILE_INTERMEDIATE_SLIME,  <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_YELLOW), 1
-        .byte TILE_ADVANCED_SLIME,      <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_RED),    2
-
-el_zombie_hoard_round_2:
-        .byte 3
-        .byte TILE_INTERMEDIATE_SLIME,  <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_YELLOW), 3
-        .byte TILE_ZOMBIE_INTERMEDIATE, <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_YELLOW), 5
-        .byte TILE_ZOMBIE_ADVANCED,     <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_RED),    6
-
-el_extra_healthy_mix4:
-        .byte 6
-        .byte TILE_ZOMBIE_ADVANCED,     <BG_TILE_ZOMBIE_IDLE,     (>BG_TILE_ZOMBIE_IDLE     | PAL_RED),    3
-        .byte TILE_ADVANCED_SLIME,      <BG_TILE_SLIME_IDLE,      (>BG_TILE_SLIME_IDLE      | PAL_RED),    1
-        .byte TILE_SPIDER_ADVANCED,     <BG_TILE_SPIDER,          (>BG_TILE_SPIDER          | PAL_RED),    1
-        .byte TILE_SPIDER_INTERMEDIATE, <BG_TILE_SPIDER,          (>BG_TILE_SPIDER          | PAL_YELLOW), 2
-        .byte TILE_BIRB_RIGHT_ADVANCED, <BG_TILE_BIRB_IDLE_RIGHT, (>BG_TILE_BIRB_IDLE_RIGHT | PAL_RED),    2
-        .byte TILE_MOLE_HOLE_ADVANCED,  <BG_TILE_MOLE_HOLE,       (>BG_TILE_MOLE_HOLE       | PAL_BLUE),   2
-
-basic_pool_zone_1_floor_4:
-        ; Make sure all sections add up to 16
-        .repeat 4
-        .word el_advanced_slimes_and_zombies
-        .endrepeat
-
-        .repeat 3
-        .word el_oops_all_chasers
-        .endrepeat
-
-        .repeat 3
-        .word el_advanced_moles_and_friends
-        .endrepeat
-
-        .repeat 3
-        .word el_zombie_hoard_round_2
-        .endrepeat
-
-        .repeat 3
-        .word el_extra_healthy_mix4
         .endrepeat
 
 ; =============================================
@@ -2166,28 +1863,11 @@ boss_pool_zone_1_floor_4:
         .word el_family_reunion
         .endrepeat
 
-; Each zone is a collection of pools, one pool for each floor
-
-zone_1_basic_pools:
-        .word basic_pool_zone_1_floor_1 ; floor 1
-        .word basic_pool_zone_1_floor_2 ; floor 2
-        .word basic_pool_zone_1_floor_3 ; floor 3
-        .word basic_pool_zone_1_floor_4 ; floor 4
-
 zone_1_boss_pools:
         .word boss_pool_zone_1_floor_1 ; floor 1
         .word boss_pool_zone_1_floor_2 ; floor 2
         .word boss_pool_zone_1_floor_3 ; floor 3
         .word boss_pool_zone_1_floor_4 ; floor 4
-
-; And finally, here is the list of zone collections
-; (Note: for demo purposes, only zone 1 actually exists; this
-; list is mostly useless as a result.)
-zone_list_basic:
-        .word zone_1_basic_pools ; zone 1
-        .word zone_1_basic_pools ; zone 2
-        .word zone_1_basic_pools ; zone 3
-        .word zone_1_basic_pools ; zone 4
 
 zone_list_boss:
         .word zone_1_boss_pools ; zone 1

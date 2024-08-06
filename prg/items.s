@@ -266,7 +266,7 @@ large_torch:
     .byte SLOT_TORCH                        ; SlotId
     .byte SPRITE_TILE_LARGE_TORCH           ; WorldSpriteTile
     .byte SPRITE_PAL_RED                    ; WorldSpriteAttr
-    .byte EQUIPMENT_BASIC_TORCH             ; HudBgTile
+    .byte EQUIPMENT_LARGE_TORCH             ; HudBgTile
     .byte (HUD_RED_PAL | CHR_BANK_ITEMS)    ; HudBgAttr
     .byte 0                                 ; HudSpriteTile
     .byte 0                                 ; HudSpriteAttr
