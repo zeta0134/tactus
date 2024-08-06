@@ -26,7 +26,7 @@ not_overhealed:
         ; Now, draw a basic floor tile here, which will be underneath the player
         ldx TargetSquare
         stx TargetIndex
-        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
+        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_WORLD
         
         lda #0
         sta tile_data, x

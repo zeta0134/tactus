@@ -54,7 +54,6 @@ TILE_MUSHROOM_WEIRD = (TILE_MUSHROOM_BASE | %00)
 TILE_ONE_BEAT_HAZARD = $40
 
 ; Non-enemies, mostly level geometry
-TILE_REGULAR_FLOOR  = $80
 TILE_DISCO_FLOOR    = $84 ; why are these still different?
 TILE_SEMISAFE_FLOOR = $88
 TILE_WALL           = $8C

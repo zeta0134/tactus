@@ -160,8 +160,6 @@ skip_spawning_diagonal_spores:
         ldx SmokePuffTile
         lda battlefield, x
         ; floors are unconditionally okay
-        cmp #TILE_REGULAR_FLOOR
-        beq proceed_to_spawn
         cmp #TILE_DISCO_FLOOR
         beq proceed_to_spawn
 check_smoke_puffs:
@@ -265,7 +263,7 @@ CurrentTile := R15
 
         ; it's been one beat! stop being a one beat hazard, thx.
         ldx CurrentTile
-        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
+        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_WORLD
         jsr draw_disco_tile
         rts
 .endproc

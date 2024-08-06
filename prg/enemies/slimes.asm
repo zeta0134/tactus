@@ -260,7 +260,7 @@ EffectiveAttackSquare := R10
 
         ldx EffectiveAttackSquare
         stx TargetIndex
-        draw_at_x_withpal TILE_REGULAR_FLOOR, BG_TILE_FLOOR, PAL_WORLD
+        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_WORLD
         jsr draw_active_tile
 
         ldx EffectiveAttackSquare

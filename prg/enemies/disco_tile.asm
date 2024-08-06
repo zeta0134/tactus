@@ -66,7 +66,7 @@ converge:
 
         ldx CurrentTile
         ; draw_with_pal, adjusted for our temporary stash
-        lda #TILE_REGULAR_FLOOR
+        lda #TILE_DISCO_FLOOR
         sta battlefield, x
         lda TileIdLow
         sta tile_patterns, x
@@ -87,7 +87,7 @@ converge:
 CurrentTile := R15
         ; draw_with_pal, adjusted for our temporary stash
         ldx CurrentTile
-        lda #TILE_REGULAR_FLOOR
+        lda #TILE_DISCO_FLOOR
         sta battlefield, x
         ; use the detail pattern directly
         lda tile_detail, x

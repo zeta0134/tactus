@@ -10,6 +10,7 @@
         .include "floor_preservation.inc"
         .include "hud.inc"
         .include "items.inc"
+        .include "levels.inc"
         .include "loot.inc"
         .include "nes.inc"
         .include "palette.inc"
@@ -1144,6 +1145,13 @@ loop:
         rts
 .endproc
 
+spawn_pool_floor_min_lut:
+        .byte 0, 0, 16, 48
+spawn_pool_floor_max_lut:
+        .byte 32, 64, 96, 128
+spawn_pool_population_lut:
+        .byte 8, 10, 12, 16
+
 .proc generate_room
 RoomPtr := R0
 RoomBank := R2
@@ -1194,7 +1202,26 @@ no_exit_stairs:
         and #ROOM_FLAG_BOSS
         bne spawn_boss_enemies
 spawn_basic_enemies:
-        jsr spawn_basic_enemies_from_pool
+        ;jsr spawn_basic_enemies_from_pool
+
+        st16 SpawnPoolPtr, spawn_pool_generic
+        ; for now, fudge the settings based on floor?
+        lda #0
+        sta SpawnPoolMin
+        lda PlayerFloor
+        tax
+        dex ; make it 0-based
+        lda spawn_pool_floor_min_lut, x
+        sta SpawnPoolMin
+        lda spawn_pool_floor_max_lut, x
+        sta SpawnPoolMax
+        lda spawn_pool_population_lut, x
+        sta PopulationLimit
+        ; fingers crossed!
+        jsr spawn_entities_from_pool
+
+
+
         jmp room_cleared
 spawn_boss_enemies:
         jsr spawn_boss_enemies_from_pool
@@ -1460,8 +1487,6 @@ check_floor:
         ldx TempIndex
         lda battlefield, x
         and #%11111100 ; we only care about the index, not the color
-        cmp #TILE_REGULAR_FLOOR
-        beq is_valid_space
         cmp #TILE_DISCO_FLOOR
         beq is_valid_space
         ; no good; this is not a floor tile. We cannot spawn anything here,

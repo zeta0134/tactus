@@ -267,7 +267,7 @@ revert_to_disco_tile:
         ; Now, draw a basic floor tile here, which will be underneath the player
         ldx TargetSquare
         stx TargetIndex
-        lda #TILE_REGULAR_FLOOR
+        lda #TILE_DISCO_FLOOR
         sta battlefield, x
         lda #<BG_TILE_FLOOR
         sta tile_patterns, x

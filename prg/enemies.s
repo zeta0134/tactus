@@ -225,7 +225,7 @@ static_behaviors:
         .repeat 15
         .word no_behavior ; unimplemented
         .endrepeat
-        .word draw_disco_tile           ; $80 - plain floor
+        .word no_behavior               ; $80 - UNUSED
         .word draw_disco_tile           ; $84 - disco floor
         .word update_semisafe_tile      ; $88 - semisafe floor
         .word no_behavior               ; $8C - wall
@@ -263,7 +263,7 @@ direct_attack_behaviors:
         .word no_behavior
         .endrepeat
         ; floors, statics, and technical tiles
-        .word no_behavior ; $80 - plain floor
+        .word no_behavior ; $80 - UNUSED
         .word no_behavior ; $84 - disco floor
         .word no_behavior ; $88 - semisafe floor
         .word no_behavior ; $8C - wall face
@@ -327,7 +327,7 @@ bonk_behaviors:
         .repeat 15
         .word no_behavior
         .endrepeat
-        .word no_behavior ; $80 - plain floor
+        .word no_behavior ; $80 - UNUSED
         .word no_behavior ; $84 - disco floor
         .word semisolid_attacks_player ; $88 - semisafe floor
         .word solid_tile_forbids_movement     ; $8C - wall face
@@ -375,7 +375,7 @@ suspend_behaviors:
         .repeat 15
         .word no_behavior ; unimplemented
         .endrepeat
-        .word draw_cleared_disco_tile   ; $80 - plain floor
+        .word no_behavior               ; $80 - UNUSED
         .word draw_cleared_disco_tile   ; $84 - disco floor
         .word no_behavior               ; $88 - semisafe floor
         .word no_behavior               ; $8C - wall

@@ -32,8 +32,6 @@ continue:
         ldx TargetTile
         lda battlefield, x
         ; floors are unconditionally okay
-        cmp #TILE_REGULAR_FLOOR
-        beq success_label
         cmp #TILE_DISCO_FLOOR
         beq success_label
         ; Right now, one-beat hazards are also okay (they're mushroom spores)
@@ -334,7 +332,7 @@ die:
         ldx EffectiveAttackSquare
         stx TargetIndex
 
-        lda #TILE_REGULAR_FLOOR
+        lda #TILE_DISCO_FLOOR
         sta battlefield, x
         lda #<BG_TILE_FLOOR
         sta tile_patterns, x
@@ -416,7 +414,7 @@ TargetSquare := R13
         ; Now, draw a basic floor tile here, which will be underneath the player
         ldx TargetSquare
         stx TargetIndex
-        lda #TILE_REGULAR_FLOOR
+        lda #TILE_DISCO_FLOOR
         sta battlefield, x
         lda #<BG_TILE_FLOOR
         sta tile_patterns, x
@@ -519,8 +517,6 @@ check_floor:
         ldx TempIndex
         lda battlefield, x
         and #%11111100 ; we only care about the index, not the color
-        cmp #TILE_REGULAR_FLOOR
-        beq is_valid_space
         cmp #TILE_DISCO_FLOOR
         beq is_valid_space
         ; no good; this is not a floor tile. We cannot spawn anything here,
