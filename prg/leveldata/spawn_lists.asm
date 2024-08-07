@@ -114,3 +114,25 @@ sl_family_reunion:
         .byte 1
         .addr enemy_birb_advanced_left     
         .byte 2
+
+; There aren't a lot of these so I don't care too much about efficiency and repeats.
+; The "length" is a mask applied to the RNG when rolling an entry out of the table.
+; Try not to mismatch these, otherwise don't think too hard about it.
+spawnset_a53_z1_f1:
+        .byte $0 ; RNG mask
+        .addr sl_slime_pit
+
+spawnset_a53_z1_f2:
+        .byte $1 ; RNG mask
+        .addr sl_scary_scary_spiders
+        .addr sl_rockin_flock
+
+spawnset_a53_z1_f3:
+        .byte $1 ; RNG mask
+        .addr sl_aaaaaahhh_spiders
+        .addr sl_mr_whiskers
+        
+spawnset_a53_z1_f4:
+        .byte $1 ; RNG mask
+        .addr sl_reinforcements
+        .addr sl_family_reunion

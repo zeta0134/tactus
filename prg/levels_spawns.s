@@ -21,6 +21,7 @@ EntityPtr: .res 2
 SpawnListPtr: .res 2
 ConditionalPtr: .res 2
 SpawnPoolPtr: .res 2
+SpawnSetPtr: .res 2
 
     .segment "RAM"
 ; populated when an entity is spawned, call sites can
@@ -378,7 +379,7 @@ done:
 
 ; Call with SpawnListPtr set to the start of the entity list. Will
 ; proceed to spawn every entity in the list. Clobbers EntityPtr!
-.proc spawn_entity_list_NEW
+.proc spawn_entity_list
 ListLength := R18
 PackSize := R19
         ldy #0
@@ -408,7 +409,7 @@ done:
 
 ; Call with SpawnPoolPtr already populated, and difficulty settings
 ; tweaked accordingly. (Right now that's just the pool range and pop limit)
-.proc spawn_entities_from_pool
+.proc FAR_spawn_entities_from_pool
 RngResult := R17
 RngRange := R18
 ; used by spawn_pack
@@ -493,4 +494,34 @@ fixed_pack_size:
         ; another!
         jmp loop
         ; unreachable !?
+.endproc
+        
+; Call with SpawnSetPtr populated. Chooses ONE spawn list from the
+; set, entirely at random, and spawns all the enemies in that list.
+; (meant for challenge rooms and bosses, so it's really rather simple)
+.proc FAR_spawn_entities_from_spawn_set
+RngMask := R18
+        access_data_bank #<.bank(spawn_pool_data)
+        ldy #0
+        lda (SpawnSetPtr), y
+        sta RngMask
+        jsr next_room_rand
+        and RngMask
+        ; A now holds one item in the list, but we need an address
+        ; (2 bytes) and we need to skip past the length byte. do that
+        ; here:
+        asl
+        ora #1
+        tay
+        ; set up the spawn list ptr:
+        lda (SpawnSetPtr), y
+        sta SpawnListPtr+0
+        iny
+        lda (SpawnSetPtr), y
+        sta SpawnListPtr+1
+        ; and spawn the list. simple!
+        jsr spawn_entity_list
+
+        restore_previous_bank
+        rts
 .endproc

@@ -73,12 +73,17 @@
 .globalzp SpawnListPtr
 .globalzp EntityPtr
 
-.global spawn_entity_list_NEW
-.global spawn_entities_from_pool
-
 .globalzp SpawnPoolPtr
 .global SpawnPoolMin
 .global SpawnPoolMax
 .global PopulationLimit
+.global FAR_spawn_entities_from_pool
 
 .global spawn_pool_generic
+
+.globalzp SpawnSetPtr
+.global spawnset_a53_z1_f1
+.global spawnset_a53_z1_f2
+.global spawnset_a53_z1_f3
+.global spawnset_a53_z1_f4
+.global FAR_spawn_entities_from_spawn_set

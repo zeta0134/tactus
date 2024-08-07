@@ -1145,12 +1145,21 @@ loop:
         rts
 .endproc
 
+; TEMPORARY
+; TODO: Remove these and move them into the Zone definitions instead!!
+
+; difficulty settings for regular spawning
 spawn_pool_floor_min_lut:
         .byte 0, 0, 16, 48
 spawn_pool_floor_max_lut:
         .byte 32, 64, 96, 128
 spawn_pool_population_lut:
         .byte 8, 10, 12, 16
+; sets of enemies to use in challenge rooms
+spawn_set_low_lut:
+        .byte <(spawnset_a53_z1_f1), <(spawnset_a53_z1_f2), <(spawnset_a53_z1_f3), <(spawnset_a53_z1_f4)
+spawn_set_high_lut:
+        .byte >(spawnset_a53_z1_f1), >(spawnset_a53_z1_f2), >(spawnset_a53_z1_f3), >(spawnset_a53_z1_f4)
 
 .proc generate_room
 RoomPtr := R0
@@ -1205,6 +1214,7 @@ spawn_basic_enemies:
 
         st16 SpawnPoolPtr, spawn_pool_generic
         ; for now, fudge the settings based on floor?
+        ; TODO: read this out of the ZONE settings instead!
         lda #0
         sta SpawnPoolMin
         lda PlayerFloor
@@ -1217,13 +1227,23 @@ spawn_basic_enemies:
         lda spawn_pool_population_lut, x
         sta PopulationLimit
         ; fingers crossed!
-        jsr spawn_entities_from_pool
-
-
+        near_call FAR_spawn_entities_from_pool
 
         jmp room_cleared
 spawn_boss_enemies:
-        jsr spawn_boss_enemies_from_pool
+
+        ; for now, fudge the settings based on floor?
+        ; TODO: read this out of the ZONE settings instead!
+        lda PlayerFloor
+        tax
+        dex ; make it 0-based
+        lda spawn_set_low_lut, x
+        sta SpawnSetPtr+0
+        lda spawn_set_high_lut, x
+        sta SpawnSetPtr+1
+        ; that should be enough!
+        near_call FAR_spawn_entities_from_spawn_set
+
         jmp room_cleared
 room_cleared:
 
@@ -1552,64 +1572,6 @@ done:
         rts
 .endproc
 
-.proc spawn_boss_enemies_from_pool
-CollectionPtr := R0
-PoolPtr := R2
-EntityList := R4
-        ; First find the pool collection for this zone
-        lda PlayerZone
-        sec
-        sbc #1 ; the lists are 0-based, but zones are 1-based
-        asl ; the lists contain words
-        tax
-
-        .if ::DEBUG_TEST_FLOOR
-        access_data_bank #<.bank(debug_boss_zone_list)
-        ; DEBUG: use a fake list for testing new enemy types
-        lda debug_boss_zone_list, x
-        sta CollectionPtr
-        lda debug_boss_zone_list+1, x
-        sta CollectionPtr+1
-        .else
-        ; Use the real list
-        access_data_bank #<.bank(zone_list_boss)
-        lda zone_list_boss, x
-        sta CollectionPtr
-        lda zone_list_boss+1, x
-        sta CollectionPtr+1
-        .endif
-
-        ; Now load the appropriate pool list for this floor from the collection
-        lda PlayerFloor
-        sec
-        sbc #1 ; the lists are 0-based, but zones are 1-based
-        asl ; the lists contain words
-        tay
-        lda (CollectionPtr), y
-        sta PoolPtr
-        iny
-        lda (CollectionPtr), y
-        sta PoolPtr+1
-        ; Here we need to pick a random number from 0-3, and use that to index the pool to select
-        ; one of the enemy lists
-        jsr next_room_rand ; clobbers Y
-        and #%00000011
-        asl ; still indexing words
-        tay
-        lda (PoolPtr), y
-        sta EntityList
-        iny
-        lda (PoolPtr), y
-        sta EntityList+1
-        ; Finally, now that we have the entity list, spawn random enemies from it
-        jsr spawn_entity_list
-done:
-        
-        restore_previous_bank
-
-        rts
-.endproc
-
 .proc spawn_exit_block
 EntityId := R1
 EntityPattern := R2
@@ -1734,195 +1696,5 @@ test_floor_layout_pool:
         .word floor_grass_cave_mix_09
         .word floor_grass_cave_mix_10
         .word floor_grass_cave_mix_10
-
-; =============================================
-; Enemies - Pools of spawns for rooms to select
-; =============================================
-
-; Enemy lists have an arbitrary length, and can house any number
-; of spawns. ALL spawns will appear in a room that uses a list, so
-; if you want to vary the amount, make several similar lists
-
-; Each pool is a FIXED length:
-; - Basic pools have 16 entries
-; - Boss pools have 4 entries
-; If including fewer unique enemy lists, be sure
-; to duplicate the list so that it is the full size
-
-
-; =============================================
-;                Zone 1 - Boss
-; =============================================
-
-el_slime_pit:
-        .byte 3 ; length
-        .byte TILE_BASIC_SLIME,        <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_BLUE),   2
-        .byte TILE_INTERMEDIATE_SLIME, <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_YELLOW), 6
-        .byte TILE_ADVANCED_SLIME,     <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_RED),    4
-
-
-boss_pool_zone_1_floor_1:
-        ; Make sure sections add up to 4
-        .repeat 4
-        .word el_slime_pit
-        .endrepeat
-
-; =============================================
-;                Zone 2 - Boss
-; =============================================
-
-el_scary_scary_spiders:
-        .byte 3
-        .byte TILE_SPIDER_BASIC,        <BG_TILE_SPIDER,    (>BG_TILE_SPIDER    | PAL_BLUE),   2
-        .byte TILE_SPIDER_INTERMEDIATE, <BG_TILE_SPIDER,    (>BG_TILE_SPIDER    | PAL_YELLOW), 4
-        .byte TILE_MOLE_HOLE_BASIC,     <BG_TILE_MOLE_HOLE, (>BG_TILE_MOLE_HOLE | PAL_RED),    4
-
-el_rockin_flock:
-        .byte 7
-        .byte TILE_ZOMBIE_INTERMEDIATE,     <BG_TILE_ZOMBIE_IDLE,     (>BG_TILE_ZOMBIE_IDLE     | PAL_YELLOW), 4
-        .byte TILE_BIRB_LEFT_BASIC,         <BG_TILE_BIRB_IDLE_LEFT,  (>BG_TILE_BIRB_IDLE_LEFT  | PAL_YELLOW), 1
-        .byte TILE_BIRB_RIGHT_BASIC,        <BG_TILE_BIRB_IDLE_RIGHT, (>BG_TILE_BIRB_IDLE_RIGHT | PAL_YELLOW), 1
-        .byte TILE_BIRB_LEFT_INTERMEDIATE,  <BG_TILE_BIRB_IDLE_LEFT,  (>BG_TILE_BIRB_IDLE_LEFT  | PAL_BLUE),   2
-        .byte TILE_BIRB_RIGHT_INTERMEDIATE, <BG_TILE_BIRB_IDLE_RIGHT, (>BG_TILE_BIRB_IDLE_RIGHT | PAL_BLUE),   2
-        .byte TILE_BIRB_LEFT_ADVANCED,      <BG_TILE_BIRB_IDLE_LEFT,  (>BG_TILE_BIRB_IDLE_LEFT  | PAL_RED),    1
-        .byte TILE_BIRB_RIGHT_ADVANCED,     <BG_TILE_BIRB_IDLE_RIGHT, (>BG_TILE_BIRB_IDLE_RIGHT | PAL_RED),    1
-
-boss_pool_zone_1_floor_2:
-        ; Make sure sections add up to 4
-        .repeat 2
-        .word el_scary_scary_spiders
-        .endrepeat
-        .repeat 2
-        .word el_rockin_flock
-        .endrepeat
-
-; =============================================
-;                Zone 3 - Boss
-; =============================================
-
-el_aaaaaahhh_spiders:
-        .byte 4
-        .byte TILE_INTERMEDIATE_SLIME,  <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_YELLOW), 2
-        .byte TILE_SPIDER_BASIC,        <BG_TILE_SPIDER,     (>BG_TILE_SPIDER     | PAL_BLUE),   4
-        .byte TILE_SPIDER_INTERMEDIATE, <BG_TILE_SPIDER,     (>BG_TILE_SPIDER     | PAL_YELLOW), 5
-        .byte TILE_SPIDER_ADVANCED,     <BG_TILE_SPIDER,     (>BG_TILE_SPIDER     | PAL_RED),    3
-
-el_mr_whiskers:
-        .byte 4
-        .byte TILE_MOLE_HOLE_BASIC,         <BG_TILE_MOLE_HOLE,       (>BG_TILE_MOLE_HOLE       | PAL_RED),  6
-        .byte TILE_MOLE_HOLE_ADVANCED,      <BG_TILE_MOLE_HOLE,       (>BG_TILE_MOLE_HOLE       | PAL_BLUE), 4
-        .byte TILE_BIRB_LEFT_INTERMEDIATE,  <BG_TILE_BIRB_IDLE_LEFT,  (>BG_TILE_BIRB_IDLE_LEFT  | PAL_BLUE), 1
-        .byte TILE_BIRB_RIGHT_INTERMEDIATE, <BG_TILE_BIRB_IDLE_RIGHT, (>BG_TILE_BIRB_IDLE_RIGHT | PAL_BLUE), 1
-
-boss_pool_zone_1_floor_3:
-        ; Make sure sections add up to 4
-        .repeat 2
-        .word el_aaaaaahhh_spiders
-        .endrepeat
-        .repeat 2
-        .word el_mr_whiskers
-        .endrepeat
-
-; =============================================
-;                Zone 4 - Boss
-; =============================================
-
-el_reinforcements:
-        .byte 7
-        .byte TILE_ZOMBIE_ADVANCED,     <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_RED),    6
-        .byte TILE_ZOMBIE_INTERMEDIATE, <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_YELLOW), 2
-        .byte TILE_ZOMBIE_BASIC,        <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_WORLD),  2
-        .byte TILE_SPIDER_ADVANCED,     <BG_TILE_SPIDER,      (>BG_TILE_SPIDER      | PAL_RED),    4
-        .byte TILE_SPIDER_INTERMEDIATE, <BG_TILE_SPIDER,      (>BG_TILE_SPIDER      | PAL_YELLOW), 2
-        .byte TILE_SPIDER_BASIC,        <BG_TILE_SPIDER,      (>BG_TILE_SPIDER      | PAL_BLUE),   1
-        .byte TILE_ADVANCED_SLIME,      <BG_TILE_SLIME_IDLE,  (>BG_TILE_SLIME_IDLE  | PAL_RED),    2
-
-el_family_reunion:
-        .byte 14
-        .byte TILE_BASIC_SLIME,            <BG_TILE_SLIME_IDLE,     (>BG_TILE_SLIME_IDLE     | PAL_BLUE),   1
-        .byte TILE_INTERMEDIATE_SLIME,     <BG_TILE_SLIME_IDLE,     (>BG_TILE_SLIME_IDLE     | PAL_YELLOW), 1
-        .byte TILE_ADVANCED_SLIME,         <BG_TILE_SLIME_IDLE,     (>BG_TILE_SLIME_IDLE     | PAL_RED),    2
-        .byte TILE_ZOMBIE_BASIC,           <BG_TILE_ZOMBIE_IDLE,    (>BG_TILE_ZOMBIE_IDLE    | PAL_WORLD),  1
-        .byte TILE_ZOMBIE_INTERMEDIATE,    <BG_TILE_ZOMBIE_IDLE,    (>BG_TILE_ZOMBIE_IDLE    | PAL_YELLOW), 1
-        .byte TILE_ZOMBIE_ADVANCED,        <BG_TILE_ZOMBIE_IDLE,    (>BG_TILE_ZOMBIE_IDLE    | PAL_RED),    3
-        .byte TILE_SPIDER_BASIC,           <BG_TILE_SPIDER,         (>BG_TILE_SPIDER         | PAL_BLUE),   1
-        .byte TILE_SPIDER_INTERMEDIATE,    <BG_TILE_SPIDER,         (>BG_TILE_SPIDER         | PAL_YELLOW), 1
-        .byte TILE_SPIDER_ADVANCED,        <BG_TILE_SPIDER,         (>BG_TILE_SPIDER         | PAL_RED),    2
-        .byte TILE_MOLE_HOLE_BASIC,        <BG_TILE_MOLE_HOLE,      (>BG_TILE_MOLE_HOLE      | PAL_RED),    1
-        .byte TILE_MOLE_HOLE_ADVANCED,     <BG_TILE_MOLE_HOLE,      (>BG_TILE_MOLE_HOLE      | PAL_BLUE),   2
-        .byte TILE_BIRB_LEFT_BASIC,        <BG_TILE_BIRB_IDLE_LEFT, (>BG_TILE_BIRB_IDLE_LEFT | PAL_YELLOW), 1
-        .byte TILE_BIRB_LEFT_INTERMEDIATE, <BG_TILE_BIRB_IDLE_LEFT, (>BG_TILE_BIRB_IDLE_LEFT | PAL_BLUE),   1
-        .byte TILE_BIRB_LEFT_ADVANCED,     <BG_TILE_BIRB_IDLE_LEFT, (>BG_TILE_BIRB_IDLE_LEFT | PAL_RED),    2
-
-boss_pool_zone_1_floor_4:
-        ; Make sure sections add up to 4
-        .repeat 2
-        .word el_reinforcements
-        .endrepeat
-        .repeat 2
-        .word el_family_reunion
-        .endrepeat
-
-zone_1_boss_pools:
-        .word boss_pool_zone_1_floor_1 ; floor 1
-        .word boss_pool_zone_1_floor_2 ; floor 2
-        .word boss_pool_zone_1_floor_3 ; floor 3
-        .word boss_pool_zone_1_floor_4 ; floor 4
-
-zone_list_boss:
-        .word zone_1_boss_pools ; zone 1
-        .word zone_1_boss_pools ; zone 2
-        .word zone_1_boss_pools ; zone 3
-        .word zone_1_boss_pools ; zone 4
-
-
-; ============================================================================================
-;                                     DEBUG ZONES BELOW
-; ============================================================================================
-
-el_debug_enemies:
-        .byte 1
-        .byte TILE_BASIC_SLIME, <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_BLUE), 1
-        ;.byte TILE_ZOMBIE_BASIC, <BG_TILE_ZOMBIE_IDLE, (>BG_TILE_ZOMBIE_IDLE | PAL_WORLD), 4
-        ;.byte TILE_MOLE_HOLE_BASIC, <BG_TILE_MOLE_HOLE, (>BG_TILE_MOLE_HOLE | PAL_RED), 2
-        ;.byte TILE_MOLE_HOLE_ADVANCED, <BG_TILE_MOLE_HOLE, (>BG_TILE_MOLE_HOLE | PAL_BLUE), 2
-
-el_debug_boss_enemies:
-        .byte 1
-        .byte TILE_ADVANCED_SLIME, <BG_TILE_SLIME_IDLE, (>BG_TILE_SLIME_IDLE | PAL_RED), 1
-
-debug_pool:
-        .repeat 16
-        .word el_debug_enemies
-        .endrepeat
-
-debug_pool_collection:
-        .word debug_pool
-        .word debug_pool
-        .word debug_pool
-        .word debug_pool
-
-debug_zone_list:
-        .word debug_pool_collection        
-        .word debug_pool_collection
-        .word debug_pool_collection
-        .word debug_pool_collection
-
-debug_boss_pool:
-        .repeat 16
-        .word el_debug_boss_enemies
-        .endrepeat
-
-debug_boss_pool_collection:
-        .word debug_boss_pool
-        .word debug_boss_pool
-        .word debug_boss_pool
-        .word debug_boss_pool
-
-debug_boss_zone_list:
-        .word debug_boss_pool_collection        
-        .word debug_boss_pool_collection
-        .word debug_boss_pool_collection
-        .word debug_boss_pool_collection
 
 
