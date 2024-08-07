@@ -2,6 +2,7 @@
     .include "far_call.inc"
     .include "floor_preservation.inc"
     .include "rainbow.inc"
+    .include "procgen.inc"
     .include "zeropage.inc"
     .include "zpcm.inc"
 
@@ -158,7 +159,7 @@ room20_tile_patterns: .res ::BATTLEFIELD_SIZE
 room20_tile_attributes: .res ::BATTLEFIELD_SIZE
 room20_tile_detail: .res ::BATTLEFIELD_SIZE
 
-    .segment "LEVEL_RAM_3"
+    .segment "PRGRAM"
 
 room21_battlefield: .res ::BATTLEFIELD_SIZE
 room21_tile_data: .res ::BATTLEFIELD_SIZE
@@ -181,128 +182,70 @@ room23_tile_patterns: .res ::BATTLEFIELD_SIZE
 room23_tile_attributes: .res ::BATTLEFIELD_SIZE
 room23_tile_detail: .res ::BATTLEFIELD_SIZE
 
-room24_battlefield: .res ::BATTLEFIELD_SIZE
-room24_tile_data: .res ::BATTLEFIELD_SIZE
-room24_tile_flags: .res ::BATTLEFIELD_SIZE
-room24_tile_patterns: .res ::BATTLEFIELD_SIZE
-room24_tile_attributes: .res ::BATTLEFIELD_SIZE
-room24_tile_detail: .res ::BATTLEFIELD_SIZE
-
-room25_battlefield: .res ::BATTLEFIELD_SIZE
-room25_tile_data: .res ::BATTLEFIELD_SIZE
-room25_tile_flags: .res ::BATTLEFIELD_SIZE
-room25_tile_patterns: .res ::BATTLEFIELD_SIZE
-room25_tile_attributes: .res ::BATTLEFIELD_SIZE
-room25_tile_detail: .res ::BATTLEFIELD_SIZE
-
-room26_battlefield: .res ::BATTLEFIELD_SIZE
-room26_tile_data: .res ::BATTLEFIELD_SIZE
-room26_tile_flags: .res ::BATTLEFIELD_SIZE
-room26_tile_patterns: .res ::BATTLEFIELD_SIZE
-room26_tile_attributes: .res ::BATTLEFIELD_SIZE
-room26_tile_detail: .res ::BATTLEFIELD_SIZE
-
-room27_battlefield: .res ::BATTLEFIELD_SIZE
-room27_tile_data: .res ::BATTLEFIELD_SIZE
-room27_tile_flags: .res ::BATTLEFIELD_SIZE
-room27_tile_patterns: .res ::BATTLEFIELD_SIZE
-room27_tile_attributes: .res ::BATTLEFIELD_SIZE
-room27_tile_detail: .res ::BATTLEFIELD_SIZE
-
-    .segment "LEVEL_RAM_4"
-
-room28_battlefield: .res ::BATTLEFIELD_SIZE
-room28_tile_data: .res ::BATTLEFIELD_SIZE
-room28_tile_flags: .res ::BATTLEFIELD_SIZE
-room28_tile_patterns: .res ::BATTLEFIELD_SIZE
-room28_tile_attributes: .res ::BATTLEFIELD_SIZE
-room28_tile_detail: .res ::BATTLEFIELD_SIZE
-
-room29_battlefield: .res ::BATTLEFIELD_SIZE
-room29_tile_data: .res ::BATTLEFIELD_SIZE
-room29_tile_flags: .res ::BATTLEFIELD_SIZE
-room29_tile_patterns: .res ::BATTLEFIELD_SIZE
-room29_tile_attributes: .res ::BATTLEFIELD_SIZE
-room29_tile_detail: .res ::BATTLEFIELD_SIZE
-
-room30_battlefield: .res ::BATTLEFIELD_SIZE
-room30_tile_data: .res ::BATTLEFIELD_SIZE
-room30_tile_flags: .res ::BATTLEFIELD_SIZE
-room30_tile_patterns: .res ::BATTLEFIELD_SIZE
-room30_tile_attributes: .res ::BATTLEFIELD_SIZE
-room30_tile_detail: .res ::BATTLEFIELD_SIZE
-
-room31_battlefield: .res ::BATTLEFIELD_SIZE
-room31_tile_data: .res ::BATTLEFIELD_SIZE
-room31_tile_flags: .res ::BATTLEFIELD_SIZE
-room31_tile_patterns: .res ::BATTLEFIELD_SIZE
-room31_tile_attributes: .res ::BATTLEFIELD_SIZE
-room31_tile_detail: .res ::BATTLEFIELD_SIZE
-
     .segment "CODE_3"
 
 preserved_room_banks:
-    .repeat 32, i
+    .repeat FLOOR_SIZE, i
     .byte <.bank(.ident(.concat("room", .sprintf("%d", i), "_battlefield")))
     .endrepeat
 
 preserved_room_battlefield_low:
-    .repeat 32, i
+    .repeat FLOOR_SIZE, i
     .byte <.ident(.concat("room", .sprintf("%d", i), "_battlefield"))
     .endrepeat
 
 preserved_room_battlefield_high:
-    .repeat 32, i
+    .repeat FLOOR_SIZE, i
     .byte >.ident(.concat("room", .sprintf("%d", i), "_battlefield"))
     .endrepeat
 
 preserved_room_tile_data_low:
-    .repeat 32, i
+    .repeat FLOOR_SIZE, i
     .byte <.ident(.concat("room", .sprintf("%d", i), "_tile_data"))
     .endrepeat
 
 preserved_room_tile_data_high:
-    .repeat 32, i
+    .repeat FLOOR_SIZE, i
     .byte >.ident(.concat("room", .sprintf("%d", i), "_tile_data"))
     .endrepeat
 
 preserved_room_tile_flags_low:
-    .repeat 32, i
+    .repeat FLOOR_SIZE, i
     .byte <.ident(.concat("room", .sprintf("%d", i), "_tile_flags"))
     .endrepeat
 
 preserved_room_tile_flags_high:
-    .repeat 32, i
+    .repeat FLOOR_SIZE, i
     .byte >.ident(.concat("room", .sprintf("%d", i), "_tile_flags"))
     .endrepeat
 
 preserved_room_tile_patterns_low:
-    .repeat 32, i
+    .repeat FLOOR_SIZE, i
     .byte <.ident(.concat("room", .sprintf("%d", i), "_tile_patterns"))
     .endrepeat
 
 preserved_room_tile_patterns_high:
-    .repeat 32, i
+    .repeat FLOOR_SIZE, i
     .byte >.ident(.concat("room", .sprintf("%d", i), "_tile_patterns"))
     .endrepeat
 
 preserved_room_tile_attributes_low:
-    .repeat 32, i
+    .repeat FLOOR_SIZE, i
     .byte <.ident(.concat("room", .sprintf("%d", i), "_tile_attributes"))
     .endrepeat
 
 preserved_room_tile_attributes_high:
-    .repeat 32, i
+    .repeat FLOOR_SIZE, i
     .byte >.ident(.concat("room", .sprintf("%d", i), "_tile_attributes"))
     .endrepeat
 
 preserved_room_tile_detail_low:
-    .repeat 32, i
+    .repeat FLOOR_SIZE, i
     .byte <.ident(.concat("room", .sprintf("%d", i), "_tile_detail"))
     .endrepeat
 
 preserved_room_tile_detail_high:
-    .repeat 32, i
+    .repeat FLOOR_SIZE, i
     .byte >.ident(.concat("room", .sprintf("%d", i), "_tile_detail"))
     .endrepeat
 

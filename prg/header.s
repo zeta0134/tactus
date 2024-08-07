@@ -10,7 +10,8 @@
         .byte $A2, $A8          ; Mapper 682 (Rainbow) (also iNes 2.0 specifier)
         .byte $02               ; 
         .byte $00               ;
-        .byte $B0               ; PRG-NVRAM: 128k (battery backed)
+        ;.byte $B0               ; PRG-NVRAM: 128k (battery backed)
+        .byte $90               ; PRG-NVRAM: 32k (battery backed)
         .byte $00               ; CHR-RAM: 32k (shift count: 9)
         .byte $00
         .byte $00

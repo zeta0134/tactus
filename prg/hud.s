@@ -444,7 +444,9 @@ loop:
         rts
 .endproc
 
-MINIMAP_BASE = (ROW_1+22)
+; center the 6x4 map in an 8x4 region
+; (we might rearrange this later)
+MINIMAP_BASE = (ROW_1+23)
 
 chr_tile_offset BOSS_ROOM, 0, 1
 chr_tile_offset DOOR_ROOM, 0, 2
@@ -460,23 +462,22 @@ chr_tile_offset HERE_ICON_IN_THE_VOID, 0, 15
 chr_tile_offset EXTERIOR_SET, 0, 13
 chr_tile_offset CLEAREED_ROOM_SET, 0, 10
 
+room_index_to_draw_index_lut:
+        .repeat ::FLOOR_HEIGHT, h
+        .repeat ::FLOOR_WIDTH, w
+        .byte (h*32)+w
+        .endrepeat
+        .endrepeat
+
 .proc draw_minimap_tile
 RoomIndex := R0
 DrawIndex := R1
 DrawTile := R2
 NametableAddr := R12
 AttributeAddr := R14
-        ; compute the destination tile based on the room index
-        ; TODO: adjust this for 8x4 mode when we implement that, currently
-        ; it's tuned for 4x4
-        lda RoomIndex
-        and #%00011000 ; isolate the row, which is currently x8        
-        asl ;x16
-        asl ;x32
-        sta DrawIndex
-        lda RoomIndex
-        and #%00000111 ; isolate the column
-        ora DrawIndex
+
+        ldx RoomIndex
+        lda room_index_to_draw_index_lut, x
         sta DrawIndex
 
         ; Figure out what tile we should draw here
@@ -564,6 +565,7 @@ cleared_room:
         sta DrawTile
         ; this is a cleared room, so use that offset and then merge with the below code
         lda DrawTile
+        clc
         adc #CLEAREED_ROOM_SET
         sta DrawTile
         jmp done_with_interior_offset
