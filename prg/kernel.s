@@ -16,6 +16,7 @@
         .include "indicators.inc"
         .include "input.inc"
         .include "kernel.inc"
+        .include "levels.inc"
         .include "loot.inc"
         .include "nes.inc"
         .include "palette.inc"
@@ -372,6 +373,12 @@ LayoutPtr := R0
         lda #$FF
         sta ClearedRoomCooldown
 
+        ; For a new game, the player starts in zone 1-1
+        ; TODO: we'll actually almost certainly load into the HUB world here,
+        ; when we have that, and allow the hub exits to kick off the game proper.
+        ; (from the kernel's point of view, the hub is standard gameplay)
+        st16 PlayerZonePtr, zone_grasslands_floor_1
+
         ; TODO: if we are in fixed seed mode, set that here.
 
         far_call FAR_initialize_sprites
@@ -435,20 +442,21 @@ LayoutPtr := R0
 .endproc
 
 .proc advance_to_next_floor
+        
         ; If we were on the final floor, it's a victory!
-        lda PlayerZone
-        cmp #1 ; only the first floor is implemented for the demo
-        bne not_victory
-        lda PlayerFloor
-        cmp #4
-        bne not_victory
+        ;lda PlayerZone
+        ;cmp #1 ; only the first floor is implemented for the demo
+        ;bne not_victory
+        ;lda PlayerFloor
+        ;cmp #4
+        ;bne not_victory
 
-        st16 FadeToGameMode, game_end_screen_prep
-        st16 GameMode, fade_to_game_mode
-        rts
+        ;st16 FadeToGameMode, game_end_screen_prep
+        ;st16 GameMode, fade_to_game_mode
+        ;rts
 
 not_victory:
-        inc PlayerFloor
+        ;inc PlayerFloor
         
         .if ::DEBUG_TEST_FLOOR
         ; Generate an open debug floor plan, with fixed spawn locations
@@ -477,12 +485,14 @@ not_victory:
         ; Add a small boost to the music tempo based on the player's current floor
         ; This causes the music to speed up (and thus gameplay to get more difficult)
         ; as the player makes progress in the dungeon
-        lda PlayerFloor
-        sec
-        sbc #1 ; adjust to 0-3
-        asl
-        asl ; multiply by 4
-        sta tempo_adjustment
+
+        ; TODO: move this setting to the zone struct!
+        ;lda PlayerFloor
+        ;sec
+        ;sbc #1 ; adjust to 0-3
+        ;asl
+        ;asl ; multiply by 4
+        ;sta tempo_adjustment
 
         ; Now run room init and... we're good for now?
         st16 GameMode, room_init

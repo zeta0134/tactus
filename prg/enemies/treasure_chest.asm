@@ -301,28 +301,12 @@ next_room:
 TargetIndex := R0
 TileId := R1
 TargetSquare := R13
-        lda PlayerFloor
-        cmp #2
-        beq floor2
-        cmp #3
-        beq floor3
-        cmp #4
-        jeq floor4
-floor_1:
-        add16w PlayerGold, #25
-        clamp16 PlayerGold, #MAX_GOLD
-        jmp done_awarding_gold
-floor2:
+
+        ; TODO: this used to award an amount of gold based on the floor. Do we care
+        ; to make it variable based on zone somehow? (I kinda want to not?)
         add16w PlayerGold, #50
         clamp16 PlayerGold, #MAX_GOLD
-        jmp done_awarding_gold
-floor3:
-        add16w PlayerGold, #100
-        clamp16 PlayerGold, #MAX_GOLD
-        jmp done_awarding_gold
-floor4:
-        add16w PlayerGold, #250
-        clamp16 PlayerGold, #MAX_GOLD
+
 done_awarding_gold:
         ; TODO: a nice SFX
         st16 R0, sfx_coin

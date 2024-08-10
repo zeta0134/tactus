@@ -660,20 +660,25 @@ done:
 
 .proc update_zone_state
         ; TODO: rethink zones entirely, update this logic (maybe consume player zone directly)
-        lda PlayerZone
-        sec
-        sbc #1
-        sta ZoneTarget
-        lda PlayerFloor
-        sec
-        sbc #1
-        sta FloorTarget
+
+        ; lda PlayerZone
+        ; sec
+        ; sbc #1
+        ; sta ZoneTarget
+        ; lda PlayerFloor
+        ; sec
+        ; sbc #1
+        ; sta FloorTarget
+
         rts
 .endproc
 
 .proc draw_current_zone
 BannerBase := R0
 DrawTile := R1
+        ; TODO: consume the data from the player's zone pointer
+        rts
+
         lda ZoneTarget
         cmp ZoneCurrent
         bne proceed_to_draw

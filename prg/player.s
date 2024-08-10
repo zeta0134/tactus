@@ -29,6 +29,8 @@ SfxTileId: .res 1
 SingleHitAttackSquare: .res 1
 PlayerWeaponPtr: .res 2
 
+PlayerZonePtr: .res 2
+
 .segment "RAM"
 
 player_equipment_by_index: ; for indexing into this like a list
@@ -63,8 +65,6 @@ PlayerHealth: .res 1
 PlayerKeys: .res 1
 PlayerGold: .res 2
 
-PlayerZone: .res 1
-PlayerFloor: .res 1
 PlayerRoomIndex: .res 1
 
 PlayerIdleBeats: .res 1
@@ -174,11 +174,6 @@ MetaSpriteIndex := R0
         lda #0
         sta PlayerKeys
         sta PlayerRoomIndex
-
-        lda #1
-        sta PlayerZone
-        lda #1
-        sta PlayerFloor
 
         lda #0
         sta PlayerIdleBeats

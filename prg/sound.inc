@@ -61,3 +61,10 @@ SfxFrames := R4
         jsr play_sfx_dpcm
 .endscope
 .endmacro
+
+TRACK_SILENCE          = 0
+TRACK_CLICK            = 1
+TRACK_SHOWER_GROOVE    = 2
+TRACK_TITLE            = 3
+TRACK_OPTIONS          = 4
+TRACK_IN_ANOTHER_WORLD = 5

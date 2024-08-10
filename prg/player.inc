@@ -26,8 +26,6 @@
 .global PlayerKeys
 .global PlayerGold
 .global PlayerSpriteIndex
-.global PlayerZone
-.global PlayerFloor
 .global PlayerNextDirection
 .global PlayerTorchlightRadius
 
@@ -39,6 +37,8 @@
 .global PlayerChain
 
 .global PlayerNavState
+
+.globalzp PlayerZonePtr
 
 MAX_HEARTS = 5
 MAX_GOLD = 9999

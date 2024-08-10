@@ -35,17 +35,17 @@
  </tile>
  <tile id="4">
   <properties>
-   <property name="room_pool" value="OUT_OF_BOUNDS"/>
+   <property name="room_pool" value="ROOM_POOL_OUT_OF_BOUNDS"/>
   </properties>
  </tile>
  <tile id="5">
   <properties>
-   <property name="room_pool" value="BLOCKING_EXTERIOR"/>
+   <property name="room_pool" value="ROOM_POOL_BLOCKING_EXTERIOR"/>
   </properties>
  </tile>
  <tile id="6">
   <properties>
-   <property name="room_pool" value="BLOCKING_INTERIOR"/>
+   <property name="room_pool" value="ROOM_POOL_BLOCKING_INTERIOR"/>
   </properties>
  </tile>
  <tile id="15">
@@ -87,7 +87,7 @@
  </tile>
  <tile id="20">
   <properties>
-   <property name="room_pool" value="GRASSY_EXTERIOR"/>
+   <property name="room_pool" value="ROOM_POOL_GRASSY_EXTERIOR"/>
   </properties>
  </tile>
  <tile id="32">
@@ -124,7 +124,7 @@
  </tile>
  <tile id="36">
   <properties>
-   <property name="room_pool" value="CAVE_INTERIOR"/>
+   <property name="room_pool" value="ROOM_POOL_CAVE_INTERIOR"/>
   </properties>
  </tile>
  <tile id="48">
@@ -161,7 +161,7 @@
  </tile>
  <tile id="52">
   <properties>
-   <property name="room_pool" value="DEBUG_ACTION_53"/>
+   <property name="room_pool" value="ROOM_POOL_DEBUG_ACTION_53"/>
   </properties>
  </tile>
 </tileset>

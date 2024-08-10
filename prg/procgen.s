@@ -24,7 +24,12 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
+.zeropage
+BigFloorPtr: .res 2
+
 .segment "RAM"
+
+BigFloorBank: .res 1
 
 room_ptr_low: .res ::FLOOR_SIZE
 room_ptr_high: .res ::FLOOR_SIZE
@@ -42,75 +47,6 @@ RoomIndexToGenerate: .res 1
 LoadedRoomIndex: .res 1
 
 .segment "CODE_1"
-
-sprite_palette_overworld:
-        .incbin "../art/sprite_palette_overworld.pal"
-sprite_palette_underworld:
-        .incbin "../art/sprite_palette.pal"
-
-oob_palette:
-        .incbin "../art/oob_palette.pal"
-test_palette:
-        .incbin "../art/test_palette.pal"
-grassy_palette:
-        .incbin "../art/extra_grassy_palette.pal"
-dank_cave_palette:
-        .incbin "../art/dank_cave.pal"
-challenge_pit_darkblue:
-        .incbin "../art/challenge_pit_darkblue.pal"
-challenge_pit_darkred:
-        .incbin "../art/challenge_pit_darkred.pal"
-shop_palette:
-        .incbin "../art/shop_palette.pal"
-
-.proc load_room_palette
-RoomPtr := R0
-PalettePtr := R2
-        ldy #Room::BgPalette
-        lda (RoomPtr), y
-        sta PalettePtr+0
-        iny
-        lda (RoomPtr), y
-        sta PalettePtr+1
-
-        ldy #0
-bg_loop:
-        perform_zpcm_inc
-        lda (PalettePtr), y
-        sta BgPaletteBuffer, y
-        iny
-        cpy #16
-        bne bg_loop
-
-        ldy #Room::ObjPalette
-        lda (RoomPtr), y
-        sta PalettePtr+0
-        iny
-        lda (RoomPtr), y
-        sta PalettePtr+1
-
-        ldy #0
-obj_loop:
-        perform_zpcm_inc
-        lda (PalettePtr), y
-        sta ObjPaletteBuffer, y
-        iny
-        cpy #16
-        bne obj_loop
-
-        lda #1
-        sta BgPaletteDirty
-        sta ObjPaletteDirty
-
-        ; dirty fix: copy $0F into all three HUD colors, for parking between the raster split
-        lda #$0F
-        sta BgPaletteBuffer+4
-        sta BgPaletteBuffer+8
-        sta BgPaletteBuffer+12
-
-        perform_zpcm_inc
-        rts
-.endproc
 
 ; Note: relies on PlayerRoomIndex to load the room seed and other room properties
 ; (this might become important if we later decide to initialize rooms in advance)
@@ -545,19 +481,6 @@ done:
         rts
 .endproc
 
-TILE_FLAG_DETAIL = %10000000
-
-DETAIL_SPARSE_GRASS            = 0
-DETAIL_SPARSE_SHROOMS          = 2
-DETAIL_SPARSE_GRASS_SHROOMS    = 4
-DETAIL_CAVE                    = 6
-DETAIL_CAVE_SHROOMS            = 8
-DETAIL_SAND                    = 10
-DETAIL_GRASS_WALL_LOWER_BORDER = 12
-DETAIL_GRASS_WALL              = 14
-DETAIL_GRASS_WALL_UPPER_BORDER = 16
-DETAIL_GRASS_WALL_HORIZ_STRIP  = 18
-
 ; indexed by the direct values above
 detail_variants_table:
         .addr detail_sparse_grass
@@ -809,9 +732,7 @@ shuffle_loop:
 .endproc
 
 .proc choose_rooms_for_floor
-BigFloorPtr := R0
-RoomPoolPtr := R2
-RoomPoolBank := R4
+
 CurrentRoomIndex := R5
 CurrentRoomCounter := R6
 RoomPtr := R7
@@ -864,45 +785,15 @@ room_loop:
         ldx CurrentRoomCounter
         lda room_population_order, x
         sta CurrentRoomIndex
-setup_room_generation_state:
-        ldy CurrentRoomIndex
-        lda (BigFloorPtr), y
-        tax
-        lda room_pools_banks, x
-        sta RoomPoolBank
-        lda (BigFloorPtr), y
-        asl
-        tax
-        lda room_pools_lut+0, x
-        sta RoomPoolPtr+0
-        lda room_pools_lut+1, x
-        sta RoomPoolPtr+1
-        access_data_bank RoomPoolBank ; this hides the big floor! do NOT read from BigFloorPtr until we restore!
 begin_room_selection:
-        jsr next_floor_rand
-        perform_zpcm_inc
-        and #$0F ; 0-15
-        asl
-        asl
-        tay
-        ldx CurrentRoomIndex
-        lda (RoomPoolPtr), y
-        sta room_ptr_low, x
-        sta RoomPtr+0
-        iny
-        lda (RoomPoolPtr), y
-        sta room_ptr_high, x
-        sta RoomPtr+1
-        iny
-        lda (RoomPoolPtr), y
-        sta room_bank, x
-        sta RoomBank
+        ; populates RoomPtr and RoomBank
+        near_call FAR_roll_room_from_floorplan_at_current_index
 
         ; TODO: load up the room pointer and check properties and such to update
         ; our counters. Right now we don't have those (or any rooms that would set them)
         ; so we can skip that work and just use whatever we rolled. Should the counter
         ; logic fail, we might need to roll the room again.
-        access_data_bank RoomBank
+        access_data_bank RoomBank ; Note: hides BigFloorPtr! Do not read until we restore later!
         ; firstly, does this room support the exits this floorplan location requires?
         lda room_floorplan, x
         and #$0F
@@ -1002,7 +893,6 @@ accept_this_room:
         sta room_properties, x
         ; Done reading room data for now
         restore_previous_bank ; RoomBank
-        restore_previous_bank ; RoomPoolBank ; Now we may read from BigFloorPtr again
 
         inc CurrentRoomCounter
         lda CurrentRoomCounter
@@ -1040,7 +930,6 @@ reject_floor:
 
 ; Generate a maze layout, and pick the player, boss, and exit locations
 .proc FAR_init_floor
-BigFloorPtr := R0
         ; The player won't initially have navigated the floor at all, so reset
         ; the nav items set
         lda #0
@@ -1050,8 +939,6 @@ BigFloorPtr := R0
         ; seed based on the current run seed
         jsr generate_floor_seed
         far_call FAR_reset_shop_tracker
-
-        access_data_bank #<.bank(test_floor_layout_pool)
 
         ; clear out the room flags entirely
         lda #0
@@ -1063,19 +950,8 @@ flag_loop:
         cpx #::FLOOR_SIZE
         bne flag_loop
 
-        ; pick a random maze layout and load it in
-        ; TODO: maybe this could use a global seed? it'd be nice to have a game-level seed
-        jsr next_floor_rand
-
-        ; FOR NOW, pull from the only test pool we have
-        ; TODO: pick the pool to draw from based on the zone and level
-        and #$0F
-        asl
-        tax
-        lda test_floor_layout_pool, x
-        sta BigFloorPtr
-        lda test_floor_layout_pool+1, x
-        sta BigFloorPtr+1
+        near_call FAR_roll_floorplan_from_active_zone_pool
+        access_data_bank BigFloorBank
 
         ; Load in this floor's basic room properties
         lda #0
@@ -1099,15 +975,18 @@ room_floorplan_loop:
         lda room_flags, x
         ora #ROOM_FLAG_CLEARED
         sta room_flags, x
+
         ; if this is zone 1, floor 1, then allow the player to have one treasure when they start
         ; (it will spawn right away)
-        lda PlayerZone
-        cmp #1
-        bne no_starting_treasure
-        lda PlayerFloor
-        cmp #1
-        bne no_starting_treasure
-        jmp done_with_player
+        ; TODO: move this into a zone flag, if we want the behavior back
+        ; (or don't, it's kinda minor at this point)
+        ;lda PlayerZone
+        ;cmp #1
+        ;bne no_starting_treasure
+        ;lda PlayerFloor
+        ;cmp #1
+        ;bne no_starting_treasure
+        ;jmp done_with_player
 no_starting_treasure:
         lda room_flags, x
         ora #ROOM_FLAG_TREASURE_SPAWNED
@@ -1144,22 +1023,6 @@ loop:
 
         rts
 .endproc
-
-; TEMPORARY
-; TODO: Remove these and move them into the Zone definitions instead!!
-
-; difficulty settings for regular spawning
-spawn_pool_floor_min_lut:
-        .byte 0, 0, 16, 48
-spawn_pool_floor_max_lut:
-        .byte 32, 64, 96, 128
-spawn_pool_population_lut:
-        .byte 8, 10, 12, 16
-; sets of enemies to use in challenge rooms
-spawn_set_low_lut:
-        .byte <(spawnset_a53_z1_f1), <(spawnset_a53_z1_f2), <(spawnset_a53_z1_f3), <(spawnset_a53_z1_f4)
-spawn_set_high_lut:
-        .byte >(spawnset_a53_z1_f1), >(spawnset_a53_z1_f2), >(spawnset_a53_z1_f3), >(spawnset_a53_z1_f4)
 
 .proc generate_room
 RoomPtr := R0
@@ -1211,37 +1074,16 @@ no_exit_stairs:
         and #ROOM_FLAG_BOSS
         bne spawn_boss_enemies
 spawn_basic_enemies:
-
-        st16 SpawnPoolPtr, spawn_pool_generic
-        ; for now, fudge the settings based on floor?
-        ; TODO: read this out of the ZONE settings instead!
-        lda #0
-        sta SpawnPoolMin
-        lda PlayerFloor
-        tax
-        dex ; make it 0-based
-        lda spawn_pool_floor_min_lut, x
-        sta SpawnPoolMin
-        lda spawn_pool_floor_max_lut, x
-        sta SpawnPoolMax
-        lda spawn_pool_population_lut, x
-        sta PopulationLimit
-        ; fingers crossed!
+        ; Basic rooms use the spawning pool defined in the player's
+        ; current zone, and the difficulty settings therein
+        near_call FAR_setup_spawn_pool_for_current_zone
         near_call FAR_spawn_entities_from_pool
 
         jmp room_cleared
 spawn_boss_enemies:
-
-        ; for now, fudge the settings based on floor?
-        ; TODO: read this out of the ZONE settings instead!
-        lda PlayerFloor
-        tax
-        dex ; make it 0-based
-        lda spawn_set_low_lut, x
-        sta SpawnSetPtr+0
-        lda spawn_set_high_lut, x
-        sta SpawnSetPtr+1
-        ; that should be enough!
+        ; Challenge rooms roll a fixed set of encounters from the
+        ; player's current zone
+        near_call FAR_setup_spawn_set_for_current_zone
         near_call FAR_spawn_entities_from_spawn_set
 
         jmp room_cleared
@@ -1266,19 +1108,7 @@ ItemId := R2
 CurrentTile := R4 
         perform_zpcm_inc
 
-        ; TODO: pick the loot table based on the zone? maybe based on some
-        ; data from the room too. undecided!
-        ;st16 LootTablePtr, test_treasure_table
-
-        lda PlayerFloor
-        cmp #3
-        bcs pick_rare_loot
-pick_common_loot:
-        st16 LootTablePtr, common_treasure_table
-        jmp done_picking_loot
-pick_rare_loot:
-        st16 LootTablePtr, rare_treasure_table
-done_picking_loot:
+        near_call FAR_setup_shop_loot_ptrs_for_current_zone
 
         ; Loop through the entire room, scanning for any item shadow tiles that aren't populated
         lda #0
@@ -1348,7 +1178,7 @@ EntityList := R4
         access_data_bank RoomBank
 
         ; load this room's palette data
-        jsr load_room_palette
+        near_call FAR_load_room_palette
 
         ; If this room is darkened, apply torchlight
         ldx PlayerRoomIndex
@@ -1585,116 +1415,5 @@ EntityAttribute := R3
         jsr spawn_entity
         rts
 .endproc
-
-OUT_OF_BOUNDS = 0
-GRASSY_EXTERIOR = 1
-CAVE_INTERIOR = 2
-
-.segment "DATA_4"
-
-        .include "../build/rooms/Grasslands_Standard.incs"
-        .include "../build/rooms/Caves_Standard.incs"
-        .include "../build/rooms/OutOfBounds.incs"
-        .include "../build/rooms/ChallengeArena_Standard.incs"
-
-.segment "DATA_6"
-
-        .include "../build/rooms/Grasslands_Round.incs"
-        .include "../build/rooms/Shop_Standard.incs"
-
-.segment "DATA_3"
-
-room_pools_lut:
-        .word room_pool_out_of_bounds
-        .word room_pool_grassy_exterior
-        .word room_pool_cave_interior
-room_pools_banks:
-        .byte <.bank(room_pool_out_of_bounds)
-        .byte <.bank(room_pool_grassy_exterior)
-        .byte <.bank(room_pool_cave_interior)
-
-.macro room_entry room_label
-        .addr room_label
-        .byte <.bank(room_label), >.bank(room_label)
-.endmacro
-
-; =============================
-; Floors - collections of rooms
-; =============================
-
-; these are what the floors will reference for their room pools
-; 16 entries each
-
-room_pool_out_of_bounds:
-        ; You **really** shouldn't be here
-        .repeat 16
-        room_entry room_OutOfBounds
-        .endrepeat
-
-room_pool_grassy_exterior:
-        .repeat 4
-        room_entry room_Grasslands_Standard
-        .endrepeat
-        .repeat 4
-        room_entry room_Grasslands_Round
-        .endrepeat
-        .repeat 4
-        room_entry room_Shop_Standard
-        .endrepeat
-        .repeat 4
-        room_entry room_ChallengeArena_Standard
-        .endrepeat
-
-room_pool_cave_interior:
-        .repeat 8
-        room_entry room_Caves_Standard
-        .endrepeat
-        .repeat 4
-        room_entry room_Shop_Standard
-        .endrepeat
-        .repeat 4
-        room_entry room_ChallengeArena_Standard
-        .endrepeat
-
-.include "../build/floors/grass_cave_mix_01.incs"
-.include "../build/floors/grass_cave_mix_02.incs"
-.include "../build/floors/grass_cave_mix_03.incs"
-.include "../build/floors/grass_cave_mix_04.incs"
-.include "../build/floors/grass_cave_mix_05.incs"
-.include "../build/floors/grass_cave_mix_06.incs"
-.include "../build/floors/grass_cave_mix_07.incs"
-.include "../build/floors/grass_cave_mix_08.incs"
-.include "../build/floors/grass_cave_mix_09.incs"
-.include "../build/floors/grass_cave_mix_10.incs"
-
-.include "../build/floors/test_floor_corner_cases.incs"
-
-; eventually we'll want a whole big list of these
-; for now, 16 entries just like the floor mazes
-test_floor_layout_pool:
-        ; draw a specific floor for testing
-        
-        ;.repeat 16
-        ;.word floor_test_floor_corner_cases
-        ;.endrepeat    
-
-        ; the real floor data
-        
-        .word floor_grass_cave_mix_01
-        .word floor_grass_cave_mix_01
-        .word floor_grass_cave_mix_02
-        .word floor_grass_cave_mix_03
-        .word floor_grass_cave_mix_04
-        .word floor_grass_cave_mix_04
-        .word floor_grass_cave_mix_05
-        .word floor_grass_cave_mix_05
-        .word floor_grass_cave_mix_06
-        .word floor_grass_cave_mix_06
-        .word floor_grass_cave_mix_07
-        .word floor_grass_cave_mix_08
-        .word floor_grass_cave_mix_08
-        .word floor_grass_cave_mix_09
-        .word floor_grass_cave_mix_10
-        .word floor_grass_cave_mix_10
 
 

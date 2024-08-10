@@ -1,3 +1,17 @@
+; this is several includes at once, because I see no practical reason to split it out
+
+; generic macros that are used in lots of lists
+
+; 2 bytes of bank number, which isn't as crazy as it sounds if we
+; end up exceeding 2 MiB of PRG ROM at some point
+.macro banked_addr address
+    .addr address
+    .byte <.bank(address), >.bank(address)
+.endmacro
+
+; ===============
+;     SPAWNS
+; ===============
 
 .struct SpawnListEntry
     Behavior .byte
@@ -87,3 +101,58 @@
 .global spawnset_a53_z1_f3
 .global spawnset_a53_z1_f4
 .global FAR_spawn_entities_from_spawn_set
+
+; ===============
+;     ZONES
+; ===============
+
+.struct ZoneDefinition
+    GeneralSpawnPool .addr
+    ChallengeSpawnSet .addr
+
+    SpawnPoolMin .byte
+    SpawnPoolMax .byte
+    PopulationLimit .byte
+
+    FloorList .addr
+    ExitList .addr
+    MusicTrack .byte
+    AddedTempo .byte
+    
+    HudHeader .word
+    HudBanner .word
+
+    ; TODO: guaranteed loot lists? consumable lists?
+    ShopLootPtr .word
+
+.endstruct
+
+.global zone_grasslands_floor_1
+
+.global FAR_roll_floorplan_from_active_zone_pool
+.global FAR_setup_spawn_set_for_current_zone
+.global FAR_setup_spawn_pool_for_current_zone
+.global FAR_setup_shop_loot_ptrs_for_current_zone
+
+ROOM_POOL_OUT_OF_BOUNDS   = 0
+ROOM_POOL_GRASSY_EXTERIOR = 1
+ROOM_POOL_CAVE_INTERIOR   = 2
+
+; ===============
+;     ROOMS
+; ===============
+
+.struct Room
+    Properties .byte
+    Exits .byte
+    BgPalette .word
+    ObjPalette .word
+    OverlayList .word
+    TileIDsLow .byte 176
+    TileAttrsHigh .byte 176
+    BehaviorIDs .byte 176
+    FlagBytes .byte 176
+.endstruct
+
+.global FAR_load_room_palette
+.global FAR_roll_room_from_floorplan_at_current_index

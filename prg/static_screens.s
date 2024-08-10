@@ -267,22 +267,34 @@ converge:
 
         ; Zone counter
         set_ppuaddr #($2000 + $01D8)
-        lda PlayerZone ; TODO: use the actual world number
+        
+        ;lda PlayerZone ; TODO: use the actual world number
+        lda #0
+
         sta Digit
         jsr draw_single_digit_imm
         st16 StringPtr, hyphen_text
         jsr draw_string_imm
-        lda PlayerFloor ; TODO: use the actual level number
+        
+        ;lda PlayerFloor ; TODO: use the actual level number
+        lda #0
+
         sta Digit
         jsr draw_single_digit_imm
 
         set_ppuaddr #($2400 + $01D8)
-        lda PlayerZone ; TODO: use the actual world number
+        
+        ;lda PlayerZone ; TODO: use the actual world number
+        lda #0
+
         sta Digit
         jsr draw_single_digit_imm
         st16 StringPtr, hyphen_text
         jsr draw_string_imm
-        lda PlayerFloor ; TODO: use the actual level number
+        
+        ;lda PlayerFloor ; TODO: use the actual level number
+        lda #0
+
         sta Digit
         jsr draw_single_digit_imm
 

@@ -5,7 +5,7 @@
 .global FAR_load_current_room
 .global FAR_handle_room_spawns
 
-.global room_layouts, room_flags, room_floorplan, room_properties, enemies_active
+.global room_layouts, room_flags, room_floorplan, room_properties, room_bank, room_ptr_high, room_ptr_low, enemies_active
 
 ; layouts
 .global test_layout_with_four_exits
@@ -13,17 +13,8 @@
 .global far_too_many_slimes
 .global hit_box_testing
 
-.struct Room
-    Properties .byte
-    Exits .byte
-    BgPalette .word
-    ObjPalette .word
-    OverlayList .word
-    TileIDsLow .byte 176
-    TileAttrsHigh .byte 176
-    BehaviorIDs .byte 176
-    FlagBytes .byte 176
-.endstruct
+.globalzp BigFloorPtr
+.global BigFloorBank
 
 FLOOR_WIDTH = 6
 FLOOR_HEIGHT = 4
@@ -59,3 +50,16 @@ ROOM_EXIT_FLAG_NORTH    = %00000001 ; Never
 ROOM_EXIT_FLAG_EAST     = %00000010 ; Eat
 ROOM_EXIT_FLAG_SOUTH    = %00000100 ; Soggy
 ROOM_EXIT_FLAG_WEST     = %00001000 ; Waffles
+
+TILE_FLAG_DETAIL = %10000000
+
+DETAIL_SPARSE_GRASS            = 0
+DETAIL_SPARSE_SHROOMS          = 2
+DETAIL_SPARSE_GRASS_SHROOMS    = 4
+DETAIL_CAVE                    = 6
+DETAIL_CAVE_SHROOMS            = 8
+DETAIL_SAND                    = 10
+DETAIL_GRASS_WALL_LOWER_BORDER = 12
+DETAIL_GRASS_WALL              = 14
+DETAIL_GRASS_WALL_UPPER_BORDER = 16
+DETAIL_GRASS_WALL_HORIZ_STRIP  = 18
