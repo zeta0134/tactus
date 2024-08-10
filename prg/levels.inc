@@ -129,10 +129,14 @@
 
 .global zone_grasslands_floor_1
 
+; various utility functions for working with zones, since
+; their data lives in a dedicated bank
 .global FAR_roll_floorplan_from_active_zone_pool
 .global FAR_setup_spawn_set_for_current_zone
 .global FAR_setup_spawn_pool_for_current_zone
 .global FAR_setup_shop_loot_ptrs_for_current_zone
+.global FAR_current_zone_header_tile
+.global FAR_current_zone_banner_tile
 
 ROOM_POOL_OUT_OF_BOUNDS   = 0
 ROOM_POOL_GRASSY_EXTERIOR = 1

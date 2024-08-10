@@ -65,8 +65,8 @@
     .segment "DATA_3"
 
 .macro zone_banner_pos tile_x, tile_y
-    .byte HUD_WORLD_PAL | CHR_BANK_ZONES
     .byte ((tile_y*16)+tile_x)
+    .byte (HUD_WORLD_PAL | CHR_BANK_ZONES)
 .endmacro
 
 all_zones_data_page:
@@ -110,7 +110,7 @@ zone_grasslands_floor_1_mazes:
         banked_addr floor_grass_cave_mix_09
         banked_addr floor_grass_cave_mix_10
 
-        .segment "CODE_1"
+        .segment "CODE_4"
 
 .proc FAR_roll_floorplan_from_active_zone_pool
 FloorListPtr := R0
@@ -206,6 +206,40 @@ LootTablePtr := R0
         iny
         lda (PlayerZonePtr), y
         sta LootTablePtr+1
+
+        restore_previous_bank
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc FAR_current_zone_header_tile
+DrawTile := R0
+DrawAttr := R1
+        access_data_bank #<.bank(all_zones_data_page)
+
+        ldy #ZoneDefinition::HudHeader
+        lda (PlayerZonePtr), y
+        sta DrawTile
+        iny
+        lda (PlayerZonePtr), y
+        sta DrawAttr
+
+        restore_previous_bank
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc FAR_current_zone_banner_tile
+DrawTile := R0
+DrawAttr := R1
+        access_data_bank #<.bank(all_zones_data_page)
+
+        ldy #ZoneDefinition::HudBanner
+        lda (PlayerZonePtr), y
+        sta DrawTile
+        iny
+        lda (PlayerZonePtr), y
+        sta DrawAttr
 
         restore_previous_bank
         perform_zpcm_inc

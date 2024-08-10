@@ -10,6 +10,7 @@
         .include "far_call.inc"
         .include "hud.inc"
         .include "items.inc"
+        .include "levels.inc"
         .include "nes.inc"
         .include "player.inc"
         .include "ppu.inc"
@@ -32,11 +33,7 @@ HeartDisplayCurrent: .res 6
 
 HudMapDirty: .res 1
 CurrentMapIndex: .res 1
-
-ZoneTarget: .res 1
-ZoneCurrent: .res 1
-FloorTarget: .res 1
-FloorCurrent: .res 1
+ZonePtrCurrent: .res 2
 
 DisplayedGold: .res 2
 GoldSfxCooldown: .res 1
@@ -113,7 +110,6 @@ weapon_palette_table:
 ; the first frame of a given beat. Use this to update any state
 ; related to the player's most recent activities
 .proc FAR_refresh_hud
-        jsr update_zone_state
         jsr update_equipment
         rts
 .endproc
@@ -132,8 +128,8 @@ weapon_palette_table:
         lda #0
         sta CurrentMapIndex
         lda #$FF
-        sta ZoneCurrent
-        sta FloorCurrent
+        sta ZonePtrCurrent+0
+        sta ZonePtrCurrent+1
         sta WeaponDisplayCurrent
         sta TorchDisplayCurrent
         sta ArmorDisplayCurrent
@@ -658,74 +654,44 @@ done:
         rts
 .endproc
 
-.proc update_zone_state
-        ; TODO: rethink zones entirely, update this logic (maybe consume player zone directly)
-
-        ; lda PlayerZone
-        ; sec
-        ; sbc #1
-        ; sta ZoneTarget
-        ; lda PlayerFloor
-        ; sec
-        ; sbc #1
-        ; sta FloorTarget
-
-        rts
-.endproc
-
 .proc draw_current_zone
-BannerBase := R0
-DrawTile := R1
-        ; TODO: consume the data from the player's zone pointer
-        rts
-
-        lda ZoneTarget
-        cmp ZoneCurrent
+DrawTile := R0
+DrawAttr := R1
+        lda PlayerZonePtr+0
+        cmp ZonePtrCurrent+0
         bne proceed_to_draw
-        lda FloorTarget
-        cmp FloorCurrent
+        lda PlayerZonePtr+1
+        cmp ZonePtrCurrent+1
         bne proceed_to_draw
         rts
 proceed_to_draw:
         perform_zpcm_inc
-        lda ZoneTarget
-        sta ZoneCurrent
-        lda FloorTarget
-        sta FloorCurrent
+        lda PlayerZonePtr+0
+        sta ZonePtrCurrent+0
+        lda PlayerZonePtr+1
+        sta ZonePtrCurrent+1
 
-        ; The banner base is determined by the current zone index
-        lda ZoneCurrent
-        asl
-        sta BannerBase
-
-        ; first draw the top banner. the row is determined by the
-        ; current floor index, from 0-4:
-        lda FloorCurrent
-        .repeat 4
-        asl
-        .endrepeat
-        ora BannerBase
-        sta DrawTile
+        ; first draw the top banner
+        far_call FAR_current_zone_header_tile
 
         ldx #20
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_1, DrawTile, DrawAttr
         inc DrawTile
         inx
-        draw_tile_at_x ROW_1, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_1, DrawTile, DrawAttr
 
         perform_zpcm_inc
 
-        ; now proceed with the rest of the banner, which is always at a
-        ; fixed "row" of 5 within the banner graphics
-        lda #(5*16)
-        ora BannerBase
-        sta DrawTile
+        ; now proceed with the lower half of the banner; this may not be
+        ; near the header, as we usually try to only update the name/number
+        ; for efficiency reasons between floors
+        far_call FAR_current_zone_banner_tile
 
         ldx #20
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_2, DrawTile, DrawAttr
         inc DrawTile
         inx
-        draw_tile_at_x ROW_2, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_2, DrawTile, DrawAttr
 
         clc
         lda DrawTile
@@ -733,10 +699,10 @@ proceed_to_draw:
         sta DrawTile
 
         ldx #20
-        draw_tile_at_x ROW_3, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_3, DrawTile, DrawAttr
         inc DrawTile
         inx
-        draw_tile_at_x ROW_3, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_3, DrawTile, DrawAttr
 
         perform_zpcm_inc
 
@@ -746,10 +712,10 @@ proceed_to_draw:
         sta DrawTile
 
         ldx #20
-        draw_tile_at_x ROW_4, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_4, DrawTile, DrawAttr
         inc DrawTile
         inx
-        draw_tile_at_x ROW_4, DrawTile, #(HUD_WORLD_PAL | CHR_BANK_ZONES)
+        draw_tile_at_x ROW_4, DrawTile, DrawAttr
 
         ; and that should be it!
         perform_zpcm_inc

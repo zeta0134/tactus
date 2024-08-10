@@ -787,7 +787,7 @@ room_loop:
         sta CurrentRoomIndex
 begin_room_selection:
         ; populates RoomPtr and RoomBank
-        near_call FAR_roll_room_from_floorplan_at_current_index
+        far_call FAR_roll_room_from_floorplan_at_current_index
 
         ; TODO: load up the room pointer and check properties and such to update
         ; our counters. Right now we don't have those (or any rooms that would set them)
@@ -950,7 +950,7 @@ flag_loop:
         cpx #::FLOOR_SIZE
         bne flag_loop
 
-        near_call FAR_roll_floorplan_from_active_zone_pool
+        far_call FAR_roll_floorplan_from_active_zone_pool
         access_data_bank BigFloorBank
 
         ; Load in this floor's basic room properties
@@ -1076,15 +1076,15 @@ no_exit_stairs:
 spawn_basic_enemies:
         ; Basic rooms use the spawning pool defined in the player's
         ; current zone, and the difficulty settings therein
-        near_call FAR_setup_spawn_pool_for_current_zone
-        near_call FAR_spawn_entities_from_pool
+        far_call FAR_setup_spawn_pool_for_current_zone
+        far_call FAR_spawn_entities_from_pool
 
         jmp room_cleared
 spawn_boss_enemies:
         ; Challenge rooms roll a fixed set of encounters from the
         ; player's current zone
-        near_call FAR_setup_spawn_set_for_current_zone
-        near_call FAR_spawn_entities_from_spawn_set
+        far_call FAR_setup_spawn_set_for_current_zone
+        far_call FAR_spawn_entities_from_spawn_set
 
         jmp room_cleared
 room_cleared:
@@ -1108,7 +1108,7 @@ ItemId := R2
 CurrentTile := R4 
         perform_zpcm_inc
 
-        near_call FAR_setup_shop_loot_ptrs_for_current_zone
+        far_call FAR_setup_shop_loot_ptrs_for_current_zone
 
         ; Loop through the entire room, scanning for any item shadow tiles that aren't populated
         lda #0
@@ -1178,7 +1178,7 @@ EntityList := R4
         access_data_bank RoomBank
 
         ; load this room's palette data
-        near_call FAR_load_room_palette
+        far_call FAR_load_room_palette
 
         ; If this room is darkened, apply torchlight
         ldx PlayerRoomIndex

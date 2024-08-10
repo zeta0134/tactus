@@ -22,7 +22,7 @@
         .include "../build/rooms/Grasslands_Round.incs"
         .include "../build/rooms/Shop_Standard.incs"
 
-        .segment "CODE_1"
+        .segment "CODE_4"
 
 room_pools_lut:
         .word room_pool_out_of_bounds

@@ -57,7 +57,7 @@ spawn_pool_data:
     .include "leveldata/spawn_lists.asm"
     .include "leveldata/spawn_pools.asm"
 
-    .segment "CODE_1"
+    .segment "CODE_4"
 
 ; These are used to take a 5bit random number and pick something "in bounds" coordinate wise,
 ; with reasonable speed and fairness
