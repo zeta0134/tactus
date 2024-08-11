@@ -7,7 +7,7 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
-        .segment "PRGFIXED_E000"
+        .segment "CODE_0"
 
 bg_palette:
         .incbin "../art/test_palette.pal"
@@ -20,7 +20,7 @@ hud_palette:
 title_palette:
         .incbin "../art/title_bg_palette.pal"
 
-.proc initialize_ppu
+.proc FAR_initialize_ppu
         ; disable rendering
         lda #$00
         sta PPUMASK
@@ -48,7 +48,7 @@ loop:
         rts
 .endproc
 
-.proc initialize_palettes
+.proc FAR_initialize_palettes
         ;  Set the palettes up with a nice greyscale for everything
 
         ; disable rendering
@@ -66,7 +66,7 @@ palette_loop:
         cpx #32
         bne palette_loop
 
-        jsr initialize_title_palettes
+        near_call FAR_initialize_title_palettes
 
         ; Reset PPUADDR to 0,0
         lda #$00
@@ -82,7 +82,7 @@ palette_loop:
         rts
 .endproc
 
-.proc initialize_game_palettes
+.proc FAR_initialize_game_palettes
         perform_zpcm_inc
         ; Copy palette data into the palette manager
 
@@ -118,7 +118,7 @@ hud_loop:
         rts
 .endproc
 
-.proc initialize_title_palettes
+.proc FAR_initialize_title_palettes
         perform_zpcm_inc
         ; Copy palette data into the palette manager
 

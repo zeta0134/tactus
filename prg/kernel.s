@@ -182,7 +182,7 @@ LayoutPtr := R0
         sta MAP_NT_D_CONTROL
 
         ; the UI subsystem may override this, but this'll be a sane starting set for testing
-        jsr initialize_title_palettes
+        far_call FAR_initialize_title_palettes
         far_call FAR_initialize_sprites
 
         ; Enable NMI first (but not rendering)
@@ -249,7 +249,7 @@ LayoutPtr := R0
         far_call FAR_initialize_sprites
         near_call FAR_init_game_end_screen
         far_call FAR_set_old_chr_exbg
-        jsr initialize_title_palettes
+        far_call FAR_initialize_title_palettes
 
         ; The end screens do not (currently) use IRQs
         lda #0
@@ -318,7 +318,7 @@ LayoutPtr := R0
         sta MAP_NT_D_CONTROL        
 
         ; set the game palette
-        jsr initialize_game_palettes
+        far_call FAR_initialize_game_palettes
         lda #0
         jsr set_brightness
         lda #4

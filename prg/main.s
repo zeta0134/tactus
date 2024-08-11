@@ -35,8 +35,8 @@ start:
         st16 R2, ($2000)
         jsr clear_memory
 
-        jsr initialize_palettes
-        jsr initialize_ppu
+        far_call FAR_initialize_palettes
+        far_call FAR_initialize_ppu
         jsr init_irq_subsystem
 
         far_call FAR_init_audio

@@ -17,7 +17,7 @@
 .endif
 .endmacro
 
-.global initialize_ppu
-.global initialize_palettes
-.global initialize_game_palettes
-.global initialize_title_palettes
+.global FAR_initialize_ppu
+.global FAR_initialize_palettes
+.global FAR_initialize_game_palettes
+.global FAR_initialize_title_palettes
