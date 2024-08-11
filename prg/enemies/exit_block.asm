@@ -36,11 +36,19 @@ no_key:
 ; ============================================================================================================================
 
 .proc descend_stairs
+ExitIndex := R0
+TargetSquare := R13
+
         st16 FadeToGameMode, advance_to_next_floor
         st16 GameMode, fade_to_game_mode        
         
         st16 R0, sfx_teleport
         jsr play_sfx_pulse1
+
+        ldx TargetSquare
+        lda tile_data, x
+        sta ExitIndex
+        far_call FAR_load_exit_pointer_from_current_zone
 
         rts
 .endproc

@@ -33,6 +33,8 @@ PlayerZonePtr: .res 2
 
 .segment "RAM"
 
+DestinationZonePtr: .res 2
+
 player_equipment_by_index: ; for indexing into this like a list
         PlayerEquipmentWeapon: .res 1
         PlayerEquipmentTorch: .res 1

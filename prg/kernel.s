@@ -354,12 +354,6 @@ LayoutPtr := R0
 .endproc
 
 .proc game_init
-        ; TODO: have the track be part of the level data... somehow
-        lda #2 ; shower groove
-        ;lda #4 ; in another world
-
-        jsr play_track        
-
         lda #0
         sta LastBeat
         sta CurrentBeatCounter
@@ -378,6 +372,7 @@ LayoutPtr := R0
         ; when we have that, and allow the hub exits to kick off the game proper.
         ; (from the kernel's point of view, the hub is standard gameplay)
         st16 PlayerZonePtr, zone_grasslands_floor_1
+        st16 DestinationZonePtr, zone_grasslands_floor_1
 
         ; TODO: if we are in fixed seed mode, set that here.
 
@@ -390,22 +385,21 @@ LayoutPtr := R0
 .endproc
 
 .proc zone_init
-        lda #0
-        sta tempo_adjustment
-
         perform_zpcm_inc
 
-        
-        .if ::DEBUG_TEST_FLOOR
-        ; Generate an open debug floor plan, with fixed spawn locations
-        far_call FAR_demo_init_floor
-        .else
         ; Generate proper mazes and randomize player, exit, and boss
         near_call FAR_init_floor
-        .endif
-
-        ; TODO: This is where we should generate, and then preserve, ALL rooms
         near_call FAR_generate_rooms_for_floor
+
+        ; If the music for this floor has changed, get that queued up
+        ; TODO: should we try to detect a track change and fade out early?
+        far_call FAR_play_music_for_current_zone
+
+        ; We faded out to get here, so fade right back in
+        lda #0
+        jsr set_brightness
+        lda #4
+        sta TargetBrightness
 
         st16 GameMode, room_init
         rts
@@ -414,17 +408,18 @@ LayoutPtr := R0
 .proc room_init
         perform_zpcm_inc
         
-        ; TODO: don't generate the room here; instead, load the pregenerated room data
-        ; that we saved during zone init
-        ;near_call FAR_init_current_room
+        ; Load the current room (which is now pregenerated)
         near_call FAR_load_current_room
 
+        ; Despawn any remnant sprites from the previous room
+        ; (stuff like death sprites and item shadows)
         perform_zpcm_inc
         far_call FAR_despawn_unimportant_sprites
         perform_zpcm_inc
 
         ; As a hack, draw the entire floor right now (we don't have
         ; the usual active_queue to draw for us)
+        ; This will cause a couple of frames of lag!
         debug_color (TINT_G | LIGHTGRAY)
         far_call FAR_draw_battlefield_block_A
         debug_color LIGHTGRAY
@@ -442,36 +437,14 @@ LayoutPtr := R0
 .endproc
 
 .proc advance_to_next_floor
-        
-        ; If we were on the final floor, it's a victory!
-        ;lda PlayerZone
-        ;cmp #1 ; only the first floor is implemented for the demo
-        ;bne not_victory
-        ;lda PlayerFloor
-        ;cmp #4
-        ;bne not_victory
-
-        ;st16 FadeToGameMode, game_end_screen_prep
-        ;st16 GameMode, fade_to_game_mode
-        ;rts
-
-not_victory:
-        ;inc PlayerFloor
-        
-        .if ::DEBUG_TEST_FLOOR
-        ; Generate an open debug floor plan, with fixed spawn locations
-        far_call FAR_demo_init_floor
-        .else
-        ; Generate proper mazes and randomize player, exit, and boss
-        near_call FAR_init_floor
-        .endif
-
-        ; TODO: This is where we should generate, and then preserve, ALL rooms
-        near_call FAR_generate_rooms_for_floor
+        ; The exit condition that sent us here will have set a destination,
+        ; so load that in
+        mov16 PlayerZonePtr, DestinationZonePtr
 
         ; reset the player's position to the center of the room
         lda #6
         sta PlayerRow
+        lda #7
         sta PlayerCol
         ; take away the player's key
         lda #0
@@ -482,20 +455,8 @@ not_victory:
         lda #4
         sta TargetBrightness
 
-        ; Add a small boost to the music tempo based on the player's current floor
-        ; This causes the music to speed up (and thus gameplay to get more difficult)
-        ; as the player makes progress in the dungeon
-
-        ; TODO: move this setting to the zone struct!
-        ;lda PlayerFloor
-        ;sec
-        ;sbc #1 ; adjust to 0-3
-        ;asl
-        ;asl ; multiply by 4
-        ;sta tempo_adjustment
-
-        ; Now run room init and... we're good for now?
-        st16 GameMode, room_init
+        ; Now run the regular zone init logic from here
+        st16 GameMode, zone_init
 
         rts
 .endproc
