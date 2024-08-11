@@ -1,6 +1,5 @@
         .include "../build/tile_defs.inc"
         .include "chr.inc"
-        .include "compression.inc"
         .include "far_call.inc"
         .include "kernel.inc"
         .include "nes.inc"
