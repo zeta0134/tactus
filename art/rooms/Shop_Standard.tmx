@@ -4,7 +4,7 @@
   <property name="category" value="shop"/>
   <property name="dark" type="bool" value="false"/>
   <property name="exit_east" type="bool" value="true"/>
-  <property name="exit_north" type="bool" value="false"/>
+  <property name="exit_north" type="bool" value="true"/>
   <property name="exit_south" type="bool" value="true"/>
   <property name="exit_west" type="bool" value="true"/>
   <property name="forbid_spawning" type="bool" value="true"/>

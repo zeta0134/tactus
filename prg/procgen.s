@@ -89,6 +89,12 @@ loop:
         beq no_detail
         jsr roll_for_detail
 no_detail:
+        ldy CurrentTileId
+        lda (FlagsPtr), y
+        and #TILE_FLAG_EXIT
+        beq no_exit_flag
+        jsr process_exit_data
+no_exit_flag:
         inc CurrentTileId
         lda CurrentTileId
         cmp #::BATTLEFIELD_SIZE
@@ -469,11 +475,20 @@ loop:
 
         ; overlays can have detail too, so we need to roll for that here
         ; as we draw the things
+        ldy #0
         lda (OverlayPtr), y
         and #TILE_FLAG_DETAIL
         beq no_detail
         jsr roll_for_detail
 no_detail:
+        ; I don't know when we'd use it, but we might as well allow overlays
+        ; to include exits, and handle those properly. maybe warp zones?
+        ldy #0
+        lda (OverlayPtr), y
+        and #TILE_FLAG_EXIT
+        beq no_exit_flag
+        jsr process_exit_data
+no_exit_flag:
         inc16 OverlayPtr
         jmp loop
 
@@ -681,6 +696,34 @@ ScratchPal := R14
         ora ScratchPal
         sta tile_attributes, x
         ; ... and we're done?
+
+        rts
+.endproc
+
+.proc process_exit_data
+; in-use by the battlefield routine, don't clobber these
+RoomPtr := R0
+TileIdPtr := R2
+TileAddrPtr := R4
+BehaviorIdPtr := R6
+FlagsPtr := R8
+CurrentTileId := R10
+; scratch for this routine
+DetailTablePtr := R12
+ScratchPal := R14
+        ; the desired exit ID ends up in tile patterns in this case
+        ldy CurrentTileId
+        lda tile_patterns, y
+        sta tile_data, y
+
+        ; now we need to pick the exit graphic; for now, hardcode these
+        ; to stairs (later we might offer alternatives in the flags byte)
+        lda #<BG_TILE_EXIT_STAIRS
+        sta tile_patterns, y
+        lda tile_attributes, y
+        and #%11000000
+        ora #>BG_TILE_EXIT_STAIRS
+        sta tile_attributes, y
 
         rts
 .endproc
@@ -916,10 +959,10 @@ accept_this_room:
         cmp (BigFloorPtr), y
         bcc reject_floor        
 
-        ; Temporary: if we failed to pick an exit for some weird reason, reject
-        ; the whole floor
         lda FloorExitCount
-        beq reject_floor
+        ldy #BigFloor::MinExitRooms
+        cmp (BigFloorPtr), y
+        bcc reject_floor        
 
 accept_floor:
         rts

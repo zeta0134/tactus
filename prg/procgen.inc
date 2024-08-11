@@ -27,6 +27,8 @@ FLOOR_SIZE = (FLOOR_WIDTH*FLOOR_HEIGHT)
     MaxChallengeRooms .byte
     MinShopRooms .byte
     MaxShopRooms .byte
+    MinExitRooms .byte
+    MaxExitRooms .byte
 .endstruct
 
 ROOM_FLAG_VISITED            = %10000000 ; mostly for minimap purposes
@@ -52,6 +54,7 @@ ROOM_EXIT_FLAG_SOUTH    = %00000100 ; Soggy
 ROOM_EXIT_FLAG_WEST     = %00001000 ; Waffles
 
 TILE_FLAG_DETAIL = %10000000
+TILE_FLAG_EXIT   = %01000000
 
 DETAIL_SPARSE_GRASS            = 0
 DETAIL_SPARSE_SHROOMS          = 2

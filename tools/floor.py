@@ -42,6 +42,8 @@ class Floor:
     max_challenge_rooms: int
     min_shop_rooms: int
     max_shop_rooms: int
+    min_exit_rooms: int
+    max_exit_rooms: int
     
 def read_boolean_properties(tile_element):
     boolean_properties = {}
@@ -180,6 +182,8 @@ def read_floor(map_filename):
     max_challenge_rooms = integer_properties.get("max_challenge_rooms", 1)
     min_shop_rooms = integer_properties.get("min_shop_rooms", 1)
     max_shop_rooms = integer_properties.get("max_shop_rooms", 1)
+    min_exit_rooms = integer_properties.get("min_exit_rooms", 1)
+    max_exit_rooms = integer_properties.get("max_exit_rooms", 1)
 
     # finally let's make the name something useful
     (_, plain_filename) = os.path.split(map_filename)
@@ -188,7 +192,8 @@ def read_floor(map_filename):
 
     return Floor(name=safe_label, width=map_width, height=map_height, tiles=combined_tiles,
         min_challenge_rooms=min_challenge_rooms, max_challenge_rooms=max_challenge_rooms,
-        min_shop_rooms=min_shop_rooms, max_shop_rooms=max_shop_rooms)
+        min_shop_rooms=min_shop_rooms, max_shop_rooms=max_shop_rooms,
+        min_exit_rooms=min_exit_rooms, max_exit_rooms=max_exit_rooms)
 
 def tile_exit_flag_bytes(tiles):
   raw_bytes = []
@@ -225,6 +230,8 @@ def write_floor(tilemap, output_file):
     output_file.write(f"  .byte {tilemap.max_challenge_rooms} ; Max Challenge Rooms\n")
     output_file.write(f"  .byte {tilemap.min_shop_rooms} ; Min Shop Rooms\n")
     output_file.write(f"  .byte {tilemap.max_shop_rooms} ; Max Shop Rooms\n")
+    output_file.write(f"  .byte {tilemap.min_exit_rooms} ; Min Exit Rooms\n")
+    output_file.write(f"  .byte {tilemap.max_exit_rooms} ; Max Exit Rooms\n")
     output_file.write("\n")
     
 if __name__ == '__main__':

@@ -164,4 +164,9 @@
    <property name="room_pool" value="ROOM_POOL_DEBUG_ACTION_53"/>
   </properties>
  </tile>
+ <tile id="63">
+  <properties>
+   <property name="room_pool" value="ROOM_POOL_HUB_WORLD_SET_A"/>
+  </properties>
+ </tile>
 </tileset>

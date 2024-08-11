@@ -20,7 +20,8 @@
         .segment "LEVEL_DATA_ROOMS_1"
 
         .include "../build/rooms/Grasslands_Round.incs"
-        .include "../build/rooms/Shop_Standard.incs"
+        .include "../build/rooms/Shop_Standard.incs"        
+        .include "../build/rooms/HubWarpChamber.incs"
 
         .segment "CODE_4"
 
@@ -28,6 +29,7 @@ room_pools_lut:
         .word room_pool_out_of_bounds
         .word room_pool_grassy_exterior
         .word room_pool_cave_interior
+        .word room_pool_hub_world_set_a
 
 .macro room_entry room_label
         .addr room_label
@@ -72,6 +74,11 @@ room_pool_cave_interior:
         room_entry room_ChallengeArena_Standard
         .endrepeat
 
+room_pool_hub_world_set_a:
+        .repeat 16
+        room_entry room_HubWarpChamber
+        .endrepeat
+
         sprite_palette_overworld:
         .incbin "../art/sprite_palette_overworld.pal"
         sprite_palette_underworld:
@@ -91,6 +98,8 @@ room_pool_cave_interior:
                 .incbin "../art/challenge_pit_darkred.pal"
         shop_palette:
                 .incbin "../art/shop_palette.pal"
+        hub_world_palette:
+                .incbin "../art/hub_world_palette.pal"
 
 ; note: utility function, assumes the room data is already banked in, etc
 ; this code is colocated with the palettes so a simple far call is all that

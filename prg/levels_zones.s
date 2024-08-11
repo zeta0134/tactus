@@ -63,6 +63,7 @@
 
         .include "../build/floors/test_floor_corner_cases.incs"
         .include "../build/floors/test_floor_wide_open.incs"
+        .include "../build/floors/hub_world.incs"
 
         .segment "DATA_3"
 
@@ -140,13 +141,13 @@ zone_grasslands_floor_4:
         .addr hud_grasslands_pal
         .addr rare_treasure_table ; ShopLootPtr
 
-zone_hub:
+zone_hub_world:
         .addr spawn_pool_generic ; Spawn Pool (unused)
         .addr spawnset_a53_z1_f1 ; Challenge Set (unused)
         .byte 0                  ; SpawnPoolMin
         .byte 128                ; SpawnPoolMax
         .byte 0                  ; PopulationLimit (do not spawn anything! it's the hub!)
-        .addr zone_grasslands_floor_1_mazes ; Maze Pool (TODO!!)
+        .addr zone_hub_world_mazes ; Maze Pool (TODO!!)
         .addr zone_hub_exits ; Exit List
         .byte TRACK_IN_ANOTHER_WORLD   ; Music Track
         .byte 0   ; Added Tempo
@@ -167,17 +168,18 @@ zone_grasslands_floor_3_exits:
         .byte 1 ; length
         .addr zone_grasslands_floor_4
 
-; DEBUG: for now, loop back on ourselves
+; DEBUG: for now, just go back to the hub world
 ; (later we'll want a boss chamber, and a branching path)
 zone_grasslands_floor_4_exits:
         .byte 1 ; length
-        .addr zone_grasslands_floor_1
+        .addr zone_hub_world
 
 ; TODO: for the real hub there is very little point in going
 ; to any floor other than 1, but as we only have the one zone,
 ; we'll use that as a standin for the actual behavior later.
 zone_hub_exits:
-        .byte 4
+        .byte 5
+        .addr zone_hub_world ; this shouldn't generate. if it does, panic!
         .addr zone_grasslands_floor_1
         .addr zone_grasslands_floor_2
         .addr zone_grasslands_floor_3
@@ -209,6 +211,10 @@ zone_grasslands_floor_234_mazes:
         banked_addr floor_grass_cave_mix_08
         banked_addr floor_grass_cave_mix_09
         banked_addr floor_grass_cave_mix_10
+
+zone_hub_world_mazes:
+        .byte 1
+        banked_addr floor_hub_world
 
         .segment "CODE_4"
 

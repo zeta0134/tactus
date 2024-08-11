@@ -129,6 +129,10 @@
 .endstruct
 
 .global zone_grasslands_floor_1
+.global zone_grasslands_floor_2
+.global zone_grasslands_floor_3
+.global zone_grasslands_floor_4
+.global zone_hub_world
 
 ; various utility functions for working with zones, since
 ; their data lives in a dedicated bank
@@ -145,6 +149,7 @@
 ROOM_POOL_OUT_OF_BOUNDS   = 0
 ROOM_POOL_GRASSY_EXTERIOR = 1
 ROOM_POOL_CAVE_INTERIOR   = 2
+ROOM_POOL_HUB_WORLD_SET_A = 3
 
 ; ===============
 ;     ROOMS

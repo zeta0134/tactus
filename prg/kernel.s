@@ -371,8 +371,11 @@ LayoutPtr := R0
         ; TODO: we'll actually almost certainly load into the HUB world here,
         ; when we have that, and allow the hub exits to kick off the game proper.
         ; (from the kernel's point of view, the hub is standard gameplay)
-        st16 PlayerZonePtr, zone_grasslands_floor_1
-        st16 DestinationZonePtr, zone_grasslands_floor_1
+        
+        ;st16 PlayerZonePtr, zone_grasslands_floor_1
+        ;st16 DestinationZonePtr, zone_grasslands_floor_1
+        st16 PlayerZonePtr, zone_hub_world
+        st16 DestinationZonePtr, zone_hub_world
 
         ; TODO: if we are in fixed seed mode, set that here.
 
