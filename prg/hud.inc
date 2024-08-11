@@ -45,7 +45,6 @@ chr_tile_offset EQUIPMENT_ITEM_2, 6, 14
 chr_tile_offset EQUIPMENT_ITEM_3, 8, 14
 
 HUD_WORLD_PAL  = %00000000
-HUD_TEXT_PAL   = %01000000 ; text and blue are the same, the blue palette will
-HUD_BLUE_PAL   = %01000000 ; always contain white in slot 3 for simple UI elements
-HUD_YELLOW_PAL = %10000000
-HUD_RED_PAL    = %11000000
+HUD_TEXT_PAL   = %01000000
+HUD_RED_PAL    = %10000000
+HUD_PURPLE_PAL   = %11000000

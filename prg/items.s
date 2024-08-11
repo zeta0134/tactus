@@ -113,7 +113,7 @@ broadsword_lvl_3:
     .byte SPRITE_TILE_BROADSWORD           ; WorldSpriteTile
     .byte SPRITE_PAL_PURPLE                ; WorldSpriteAttr
     .byte EQUIPMENT_WEAPON_BROADSWORD      ; HudBgTile
-    .byte (HUD_WORLD_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+    .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
     .byte 0                                ; HudSpriteTile
     .byte 0                                ; HudSpriteAttr
     .word 1000                             ; ShopCost
@@ -155,7 +155,7 @@ longsword_lvl_3:
     .byte SPRITE_TILE_LONGSWORD            ; WorldSpriteTile
     .byte SPRITE_PAL_PURPLE                ; WorldSpriteAttr
     .byte EQUIPMENT_WEAPON_LONGSWORD       ; HudBgTile
-    .byte (HUD_WORLD_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+    .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
     .byte 0                                ; HudSpriteTile
     .byte 0                                ; HudSpriteAttr
     .word 1000                             ; ShopCost
@@ -197,7 +197,7 @@ spear_lvl_3:
     .byte SPRITE_TILE_SPEAR                ; WorldSpriteTile
     .byte SPRITE_PAL_PURPLE                ; WorldSpriteAttr
     .byte EQUIPMENT_WEAPON_SPEAR           ; HudBgTile
-    .byte (HUD_WORLD_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+    .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
     .byte 0                                ; HudSpriteTile
     .byte 0                                ; HudSpriteAttr
     .word 750                              ; ShopCost
@@ -239,7 +239,7 @@ flail_lvl_3:
     .byte SPRITE_TILE_FLAIL                ; WorldSpriteTile
     .byte SPRITE_PAL_PURPLE                ; WorldSpriteAttr
     .byte EQUIPMENT_WEAPON_FLAIL           ; HudBgTile
-    .byte (HUD_WORLD_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+    .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
     .byte 0                                ; HudSpriteTile
     .byte 0                                ; HudSpriteAttr
     .word 1250                             ; ShopCost
@@ -253,7 +253,7 @@ basic_torch:
     .byte SPRITE_TILE_BASIC_TORCH           ; WorldSpriteTile
     .byte SPRITE_PAL_GREY                   ; WorldSpriteAttr
     .byte EQUIPMENT_BASIC_TORCH             ; HudBgTile
-    .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+    .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr
     .byte 0                                 ; HudSpriteTile
     .byte 0                                 ; HudSpriteAttr
     .word 50                                ; ShopCost

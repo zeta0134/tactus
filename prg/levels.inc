@@ -121,6 +121,7 @@
     
     HudHeader .word
     HudBanner .word
+    HudPal .word
 
     ; TODO: guaranteed loot lists? consumable lists?
     ShopLootPtr .word
@@ -137,6 +138,7 @@
 .global FAR_setup_shop_loot_ptrs_for_current_zone
 .global FAR_current_zone_header_tile
 .global FAR_current_zone_banner_tile
+.global FAR_load_hud_palette_for_current_zone
 
 ROOM_POOL_OUT_OF_BOUNDS   = 0
 ROOM_POOL_GRASSY_EXTERIOR = 1

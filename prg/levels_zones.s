@@ -10,6 +10,7 @@
     .include "hud.inc"
     .include "levels.inc"
     .include "loot.inc"
+    .include "palette.inc"
     .include "player.inc"
     .include "prng.inc"
     .include "procgen.inc"
@@ -64,6 +65,9 @@
 
     .segment "DATA_3"
 
+hud_grasslands_pal:
+    .incbin "../art/zone_1_banner.pal"
+
 .macro zone_banner_pos tile_x, tile_y
     .byte ((tile_y*16)+tile_x)
     .byte (HUD_WORLD_PAL | CHR_BANK_ZONES)
@@ -90,6 +94,7 @@ zone_grasslands_floor_1:
     .byte 0   ; Added Tempo
     zone_banner_pos 0, 0        ; HudHeader
     zone_banner_pos 0, 5        ; HudBanner
+    .addr hud_grasslands_pal
     .addr common_treasure_table ; ShopLootPtr
 
 ; DEBUG: just loop back on ourselves for now
@@ -240,6 +245,34 @@ DrawAttr := R1
         iny
         lda (PlayerZonePtr), y
         sta DrawAttr
+
+        restore_previous_bank
+        perform_zpcm_inc
+        rts
+.endproc
+
+; note: utility function, assumes the room data is already banked in, etc
+; this code is colocated with the palettes so a simple far call is all that
+; is needed to operate it
+.proc FAR_load_hud_palette_for_current_zone
+HudPalPtr := R0
+        access_data_bank #<.bank(all_zones_data_page)
+
+        ldy #ZoneDefinition::HudPal
+        lda (PlayerZonePtr), y
+        sta HudPalPtr+0
+        iny
+        lda (PlayerZonePtr), y
+        sta HudPalPtr+1
+
+        ldy #0
+hud_bg_loop:
+        perform_zpcm_inc
+        lda (HudPalPtr), y
+        sta HudPaletteBuffer, y
+        iny
+        cpy #16
+        bne hud_bg_loop
 
         restore_previous_bank
         perform_zpcm_inc

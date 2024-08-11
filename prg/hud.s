@@ -404,36 +404,36 @@ draw_bottom_right:
         ; first, draw the border around the minimap
         ldx #19
         ; left side
-        draw_tile_at_x ROW_0, #MAP_BORDER_TL, #(HUD_BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_1, #MAP_BORDER_ML, #(HUD_BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_2, #MAP_BORDER_ML, #(HUD_BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_3, #MAP_BORDER_ML, #(HUD_BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_4, #MAP_BORDER_ML, #(HUD_BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_5, #MAP_BORDER_BL, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_0, #MAP_BORDER_TL, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_1, #MAP_BORDER_ML, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_2, #MAP_BORDER_ML, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, #MAP_BORDER_ML, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #MAP_BORDER_ML, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_5, #MAP_BORDER_BL, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         inx
         ; center loop
 loop:
         perform_zpcm_inc
-        draw_tile_at_x ROW_0, #MAP_BORDER_TM, #(HUD_BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_5, #MAP_BORDER_BM, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_0, #MAP_BORDER_TM, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_5, #MAP_BORDER_BM, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         inx
         cpx #30
         bne loop
 
         perform_zpcm_inc
         ; right side
-        draw_tile_at_x ROW_0, #MAP_BORDER_TR, #(HUD_BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_1, #MAP_BORDER_MR, #(HUD_BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_2, #MAP_BORDER_MR, #(HUD_BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_3, #MAP_BORDER_MR, #(HUD_BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_4, #MAP_BORDER_MR, #(HUD_BLUE_PAL | CHR_BANK_HUD)
-        draw_tile_at_x ROW_5, #MAP_BORDER_BR, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_0, #MAP_BORDER_TR, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_1, #MAP_BORDER_MR, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_2, #MAP_BORDER_MR, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, #MAP_BORDER_MR, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #MAP_BORDER_MR, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_5, #MAP_BORDER_BR, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         ; coin counter, static tiles
         ldx #14
-        draw_tile_at_x ROW_4, #COIN_ICON, #(HUD_YELLOW_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #COIN_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         ldx #15
-        draw_tile_at_x ROW_4, #COIN_X, #(HUD_BLUE_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #COIN_X, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         perform_zpcm_inc
 
@@ -670,6 +670,9 @@ proceed_to_draw:
         sta ZonePtrCurrent+0
         lda PlayerZonePtr+1
         sta ZonePtrCurrent+1
+
+        ; load in the proper palette for this banner (and the rest of the hud)
+        far_call FAR_load_hud_palette_for_current_zone
 
         ; first draw the top banner
         far_call FAR_current_zone_header_tile
