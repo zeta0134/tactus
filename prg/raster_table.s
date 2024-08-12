@@ -36,13 +36,23 @@ table_irq_high:         .res 32
         .segment "CODE_0"
 
 nametable_lut_x:
-        ; TODO
+        .repeat 256, i
+        .byte (i >> 3)
+        .endrepeat
 nametable_lut_y:
-        ; TODO
-scroll_y_wraparound:
-        ; TODO >_<
-
-
+        .repeat 256, i
+        .byte <((i & $F8) << 3)
+        .endrepeat
+scroll_y_wraparound_lut:
+        .repeat 176, i
+        .byte i
+        .endrepeat
+        .repeat 40, i
+        .byte i
+        .endrepeat
+        .repeat 40, i
+        .byte (136 + i)
+        .endrepeat
 
 .proc FAR_initialize_irq_table
         lda #$4C               ; JMP opcode
@@ -91,20 +101,21 @@ loop:
 
         ; now with screen shake! it's... a bit expensive, but at least only the playfield scanlines need this?
         ; note that we can bake this down to lda scroll_x_offset any time the constant is 0, to save time and data
-        lda #0                       ; 2
-        clc                          ; 2
-        adc ScrollXOffset            ; 3
-        sta table_ppuscroll_x+0      ; 4
-        tax                          ; 2
-        lda #0                       ; 2
-        clc                          ; 2
-        adc ScrollYOffset            ; 3
-        tay                          ; 2
-        lda scroll_y_wraparound, y   ; 4
-        sta table_ppuscroll_y+0      ; 4
-        lda nametable_lut_y, y       ; 4
-        ora nametable_lut_x, x       ; 4
-        sta table_ppuaddr_second+0   ; 4
+        lda #0                         ; 2
+        clc                            ; 2
+        adc ScrollXOffset              ; 3
+        sta table_ppuscroll_x+0        ; 4
+        tax                            ; 2
+        lda #0                         ; 2
+        clc                            ; 2
+        adc ScrollYOffset              ; 3
+        tay                            ; 2
+        lda scroll_y_wraparound_lut, y ; 4
+        sta table_ppuscroll_y+0        ; 4
+        tay                            ; 2
+        lda nametable_lut_y, y         ; 4
+        ora nametable_lut_x, x         ; 4
+        sta table_ppuaddr_second+0     ; 4
         ; total so far: 42 cycles
         lda #0                       ; 2
         sta table_irq_high+0         ; 4
@@ -112,9 +123,34 @@ loop:
         sta table_scanline_compare+0 ; 4
         lda #0                       ; 2
         sta table_ppumask+0          ; 4
-        ; grand total: 60 cycles
+        ; grand total: 62 cycles
         ; ... not bad really.
 
+        ; for comparison, let's try the less stupid, but slower version
+        lda (TablePpuScrollXPtr), y    ; 5
+        clc                            ; 2
+        adc ScrollXOffset              ; 3
+        sta table_ppuscroll_x, y       ; 5
+        lda (TablePpuScrollYPtr), y    ; 5
+        clc                            ; 2
+        adc ScrollYOffset              ; 3
+        tax                            ; 2
+        lda scroll_y_wraparound_lut, x ; 4
+        sta table_ppuscroll_y, y       ; 5
+        tax                            ; 2
+        lda nametable_lut_y, x         ; 4
+        ldx table_ppuscroll_x, y       ; 4
+        ora nametable_lut_x, x         ; 4
+        sta table_ppuaddr_second, y    ; 4
+        ; total so far: 54 cycles
+        lda (TableScanlineCmpPtr), y    ; 5
+        sta table_scanline_compare, y   ; 5
+        lda (TablePpuMaskPtr), y        ; 5
+        sta table_ppumask, y            ; 5
+        lda (TableIrqHighPtr), y        ; 5
+        sta table_irq_high, y           ; 5
+        ; grand total: 84 cycles
+        ; ... not bad really.
 
 
 
@@ -152,7 +188,7 @@ loop:
         lda table_ppumask, x        ; 4
         sta PPUMASK                 ; 4, sets color emphasis / greyscale
 
-        ; cleanup, etc (5)
+        ; cleanup, etc (12)
         inx                      ; 2
         ; set the IRQ function to run on the NEXT scanline here (high byte only)
         lda table_irq_high, x    ; 4
@@ -162,6 +198,7 @@ loop:
         ; register restoration from zeropage (6)
         lda IrqPreserveA ; 3
         ldx IrqPreserveX ; 3
+        
         perform_zpcm_inc ; 6
         rti ; 6
 .endproc
