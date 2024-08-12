@@ -22,6 +22,11 @@
         .include "../build/rooms/Grasslands_Round.incs"
         .include "../build/rooms/Shop_Standard.incs"        
         .include "../build/rooms/HubWarpChamber.incs"
+        .include "../build/rooms/Blocking_Chamber.incs"
+
+        .segment "LEVEL_DATA_ROOMS_2"
+
+        .include "../build/rooms/Blocking_Cave.incs"
 
         .segment "CODE_4"
 
@@ -30,6 +35,8 @@ room_pools_lut:
         .word room_pool_grassy_exterior
         .word room_pool_cave_interior
         .word room_pool_hub_world_set_a
+        .word room_pool_blocking_chamber
+        .word room_pool_blocking_cave
 
 .macro room_entry room_label
         .addr room_label
@@ -79,6 +86,28 @@ room_pool_hub_world_set_a:
         room_entry room_HubWarpChamber
         .endrepeat
 
+room_pool_blocking_chamber:
+        .repeat 8
+        room_entry room_Blocking_Chamber
+        .endrepeat
+        .repeat 4
+        room_entry room_Shop_Standard
+        .endrepeat
+        .repeat 4
+        room_entry room_ChallengeArena_Standard
+        .endrepeat
+
+room_pool_blocking_cave:
+        .repeat 8
+        room_entry room_Blocking_Cave
+        .endrepeat
+        .repeat 4
+        room_entry room_Shop_Standard
+        .endrepeat
+        .repeat 4
+        room_entry room_ChallengeArena_Standard
+        .endrepeat
+
         sprite_palette_overworld:
         .incbin "../art/sprite_palette_overworld.pal"
         sprite_palette_underworld:
@@ -100,6 +129,10 @@ room_pool_hub_world_set_a:
                 .incbin "../art/shop_palette.pal"
         hub_world_palette:
                 .incbin "../art/hub_world_palette.pal"
+        blocking_exterior_palette:
+                .incbin "../art/blocking_exterior.pal"
+        blocking_interior_palette:
+                .incbin "../art/blocking_interior.pal"
 
 ; note: utility function, assumes the room data is already banked in, etc
 ; this code is colocated with the palettes so a simple far call is all that

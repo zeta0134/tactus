@@ -22,10 +22,10 @@
 
         .segment "LEVEL_DATA_MAZE_LAYOUTS_0"
 
-        ;.include "../build/floors/blocking_01.incs"
-        ;.include "../build/floors/blocking_02.incs"
-        ;.include "../build/floors/blocking_03.incs"
-        ;.include "../build/floors/blocking_04.incs"
+        .include "../build/floors/blocking_01.incs"
+        .include "../build/floors/blocking_02.incs"
+        .include "../build/floors/blocking_03.incs"
+        .include "../build/floors/blocking_04.incs"
 
         .include "../build/floors/cave_small_01.incs"
         .include "../build/floors/cave_small_02.incs"
@@ -70,6 +70,9 @@
 hud_grasslands_pal:
         .incbin "../art/zone_1_banner.pal"
 
+hud_beach_pal:
+        .incbin "../art/zone_2_banner.pal"
+
 hud_hub_pal:
         .incbin "../art/zone_hub_banner.pal"
 
@@ -80,6 +83,29 @@ hud_hub_pal:
 
 ; for bank switching
 all_zones_data_page:
+
+;  ########  ##        #######   ######  ##    ## #### ##    ##  ######   
+;  ##     ## ##       ##     ## ##    ## ##   ##   ##  ###   ## ##    ##  
+;  ##     ## ##       ##     ## ##       ##  ##    ##  ####  ## ##        
+;  ########  ##       ##     ## ##       #####     ##  ## ## ## ##   #### 
+;  ##     ## ##       ##     ## ##       ##  ##    ##  ##  #### ##    ##  
+;  ##     ## ##       ##     ## ##    ## ##   ##   ##  ##   ### ##    ##  
+;  ########  ########  #######   ######  ##    ## #### ##    ##  ######   
+
+zone_blocking_mazes:
+        .byte 4 ; length        
+        banked_addr floor_blocking_01
+        banked_addr floor_blocking_02
+        banked_addr floor_blocking_03
+        banked_addr floor_blocking_04
+
+;    ######   ########     ###     ######   ######  ##          ###    ##    ## ########   ######  
+;   ##    ##  ##     ##   ## ##   ##    ## ##    ## ##         ## ##   ###   ## ##     ## ##    ## 
+;   ##        ##     ##  ##   ##  ##       ##       ##        ##   ##  ####  ## ##     ## ##       
+;   ##   #### ########  ##     ##  ######   ######  ##       ##     ## ## ## ## ##     ##  ######  
+;   ##    ##  ##   ##   #########       ##       ## ##       ######### ##  #### ##     ##       ## 
+;   ##    ##  ##    ##  ##     ## ##    ## ##    ## ##       ##     ## ##   ### ##     ## ##    ## 
+;    ######   ##     ## ##     ##  ######   ######  ######## ##     ## ##    ## ########   ######  
 
 zone_grasslands_floor_1:
         .addr spawn_pool_generic ; Spawn Pool
@@ -109,7 +135,7 @@ zone_grasslands_floor_2:
         zone_banner_pos 0, 1        ; HudHeader
         zone_banner_pos 0, 5        ; HudBanner
         .addr hud_grasslands_pal
-        .addr common_treasure_table ; ShopLootPtr
+        .addr rare_treasure_table ; ShopLootPtr
 
 zone_grasslands_floor_3:
         .addr spawn_pool_generic ; Spawn Pool
@@ -141,21 +167,6 @@ zone_grasslands_floor_4:
         .addr hud_grasslands_pal
         .addr rare_treasure_table ; ShopLootPtr
 
-zone_hub_world:
-        .addr spawn_pool_generic ; Spawn Pool (unused)
-        .addr spawnset_a53_z1_f1 ; Challenge Set (unused)
-        .byte 0                  ; SpawnPoolMin
-        .byte 128                ; SpawnPoolMax
-        .byte 0                  ; PopulationLimit (do not spawn anything! it's the hub!)
-        .addr zone_hub_world_mazes ; Maze Pool (TODO!!)
-        .addr zone_hub_exits ; Exit List
-        .byte TRACK_IN_ANOTHER_WORLD   ; Music Track
-        .byte 0   ; Added Tempo
-        zone_banner_pos 14, 0        ; HudHeader
-        zone_banner_pos 14, 5        ; HudBanner
-        .addr hud_hub_pal
-        .addr common_treasure_table ; ShopLootPtr
-
 zone_grasslands_floor_1_exits:
         .byte 1 ; length
         .addr zone_grasslands_floor_2
@@ -173,17 +184,6 @@ zone_grasslands_floor_3_exits:
 zone_grasslands_floor_4_exits:
         .byte 1 ; length
         .addr zone_hub_world
-
-; TODO: for the real hub there is very little point in going
-; to any floor other than 1, but as we only have the one zone,
-; we'll use that as a standin for the actual behavior later.
-zone_hub_exits:
-        .byte 5
-        .addr zone_hub_world ; this shouldn't generate. if it does, panic!
-        .addr zone_grasslands_floor_1
-        .addr zone_grasslands_floor_2
-        .addr zone_grasslands_floor_3
-        .addr zone_grasslands_floor_4
 
 zone_grasslands_floor_1_mazes:
         .byte 10 ; length        
@@ -212,9 +212,129 @@ zone_grasslands_floor_234_mazes:
         banked_addr floor_grass_cave_mix_09
         banked_addr floor_grass_cave_mix_10
 
+;  ##     ## ##     ## ########  
+;  ##     ## ##     ## ##     ## 
+;  ##     ## ##     ## ##     ## 
+;  ######### ##     ## ########  
+;  ##     ## ##     ## ##     ## 
+;  ##     ## ##     ## ##     ## 
+;  ##     ##  #######  ########  
+
+zone_hub_world:
+        .addr spawn_pool_generic ; Spawn Pool (unused)
+        .addr spawnset_a53_z1_f1 ; Challenge Set (unused)
+        .byte 0                  ; SpawnPoolMin
+        .byte 128                ; SpawnPoolMax
+        .byte 0                  ; PopulationLimit (do not spawn anything! it's the hub!)
+        .addr zone_hub_world_mazes ; Maze Pool (TODO!!)
+        .addr zone_hub_exits ; Exit List
+        .byte TRACK_IN_ANOTHER_WORLD   ; Music Track
+        .byte 0   ; Added Tempo
+        zone_banner_pos 14, 0        ; HudHeader
+        zone_banner_pos 14, 5        ; HudBanner
+        .addr hud_hub_pal
+        .addr common_treasure_table ; ShopLootPtr
+
+; TODO: for the real hub there is very little point in going
+; to any floor other than 1, but as we only have the one zone,
+; we'll use that as a standin for the actual behavior later.
+zone_hub_exits:
+        .byte 5
+        .addr zone_hub_world ; this shouldn't generate. if it does, panic!
+        .addr zone_grasslands_floor_1
+        .addr zone_beach_floor_1
+        .addr zone_hub_world ; nope!
+        .addr zone_hub_world ; nope!
+
 zone_hub_world_mazes:
         .byte 1
         banked_addr floor_hub_world
+
+;  ########  ########    ###     ######  ##     ## 
+;  ##     ## ##         ## ##   ##    ## ##     ## 
+;  ##     ## ##        ##   ##  ##       ##     ## 
+;  ########  ######   ##     ## ##       ######### 
+;  ##     ## ##       ######### ##       ##     ## 
+;  ##     ## ##       ##     ## ##    ## ##     ## 
+;  ########  ######## ##     ##  ######  ##     ## 
+
+zone_beach_floor_1:
+        .addr spawn_pool_generic ; Spawn Pool
+        .addr spawnset_a53_z1_f1 ; Challenge Set
+        .byte 0                  ; SpawnPoolMin
+        .byte 32                 ; SpawnPoolMax
+        .byte 8                  ; PopulationLimit
+        .addr zone_blocking_mazes ; Maze Pool
+        .addr zone_beach_floor_1_exits ; Exit List
+        .byte TRACK_SHOWER_GROOVE   ; Music Track
+        .byte 0   ; Added Tempo
+        zone_banner_pos 2, 0        ; HudHeader
+        zone_banner_pos 2, 5        ; HudBanner
+        .addr hud_beach_pal
+        .addr common_treasure_table ; ShopLootPtr
+
+zone_beach_floor_2:
+        .addr spawn_pool_generic ; Spawn Pool
+        .addr spawnset_a53_z1_f2 ; Challenge Set
+        .byte 0                  ; SpawnPoolMin
+        .byte 64                 ; SpawnPoolMax
+        .byte 10                 ; PopulationLimit
+        .addr zone_blocking_mazes ; Maze Pool
+        .addr zone_beach_floor_2_exits ; Exit List
+        .byte TRACK_SHOWER_GROOVE   ; Music Track
+        .byte 5   ; Added Tempo
+        zone_banner_pos 2, 1        ; HudHeader
+        zone_banner_pos 2, 5        ; HudBanner
+        .addr hud_beach_pal
+        .addr rare_treasure_table ; ShopLootPtr
+
+zone_beach_floor_3:
+        .addr spawn_pool_generic ; Spawn Pool
+        .addr spawnset_a53_z1_f3 ; Challenge Set
+        .byte 16                 ; SpawnPoolMin
+        .byte 96                 ; SpawnPoolMax
+        .byte 12                 ; PopulationLimit
+        .addr zone_blocking_mazes ; Maze Pool
+        .addr zone_beach_floor_3_exits ; Exit List
+        .byte TRACK_SHOWER_GROOVE   ; Music Track
+        .byte 10   ; Added Tempo
+        zone_banner_pos 2, 2        ; HudHeader
+        zone_banner_pos 2, 5        ; HudBanner
+        .addr hud_beach_pal
+        .addr rare_treasure_table ; ShopLootPtr
+
+zone_beach_floor_4:
+        .addr spawn_pool_generic ; Spawn Pool
+        .addr spawnset_a53_z1_f4 ; Challenge Set
+        .byte 48                 ; SpawnPoolMin
+        .byte 128                ; SpawnPoolMax
+        .byte 16                 ; PopulationLimit
+        .addr zone_blocking_mazes ; Maze Pool
+        .addr zone_beach_floor_4_exits ; Exit List
+        .byte TRACK_SHOWER_GROOVE   ; Music Track
+        .byte 15   ; Added Tempo
+        zone_banner_pos 2, 3        ; HudHeader
+        zone_banner_pos 2, 5        ; HudBanner
+        .addr hud_beach_pal
+        .addr rare_treasure_table ; ShopLootPtr
+
+zone_beach_floor_1_exits:
+        .byte 1 ; length
+        .addr zone_beach_floor_2
+
+zone_beach_floor_2_exits:
+        .byte 1 ; length
+        .addr zone_beach_floor_3
+
+zone_beach_floor_3_exits:
+        .byte 1 ; length
+        .addr zone_beach_floor_4
+
+; DEBUG: for now, just go back to the hub world
+; (later we'll want a boss chamber, and a branching path)
+zone_beach_floor_4_exits:
+        .byte 1 ; length
+        .addr zone_hub_world
 
         .segment "CODE_4"
 
