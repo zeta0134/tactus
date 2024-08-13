@@ -11,6 +11,7 @@
         .include "palette.inc"
         .include "ppu.inc"
         .include "prng.inc"
+        .include "raster_table.inc"
         .include "raster_tricks.inc"
         .include "slowam.inc"
         .include "sound.inc"
@@ -37,7 +38,7 @@ start:
 
         far_call FAR_initialize_palettes
         far_call FAR_initialize_ppu
-        jsr init_irq_subsystem
+        ;jsr init_irq_subsystem
 
         far_call FAR_init_audio
         far_call FAR_init_slowam
@@ -50,17 +51,17 @@ start:
 
         jsr initialize_prng
 
-        far_call FAR_init_nametables
-        far_call FAR_init_palettes
+        ; far_call FAR_init_nametables
+        ; far_call FAR_init_palettes
+        far_call FAR_initialize_irq_table
+        ; now it should be safe to enable interrupts, in theory
+        cli
 
         ; now enable rendering and proceed to the main game loop
         lda #$1E
         sta PPUMASK
         lda #(VBLANK_NMI | BG_1000 | OBJ_0000)
         sta PPUCTRL
-
-        cli ; enable interrupts
-
 
         ; Setup our initial kernel state
         st16 GameMode, init_engine

@@ -17,8 +17,8 @@
 .include "palette.inc"
 .include "prng.inc"
 .include "rainbow.inc"
-.include "raster_tricks.inc"
 .include "raster_table.inc"
+.include "raster_tricks.inc"
 .include "slowam.inc"
 .include "sound.inc"
 .include "zeropage.inc"
@@ -64,6 +64,16 @@ loop:
         txa
         pha
         tya
+        pha
+
+        ; because far calls will potentially change the current code and data bank,
+        ; first preserve them to the stack
+        lda code_bank_shadow
+        sta NmiCurrentBank ; might as well initialize the NMI call stack with the current bank
+        pha
+        lda data_bank_low_shadow
+        pha
+        lda data_bank_high_shadow
         pha
 
         ; is NMI disabled? if so get outta here fast
@@ -157,6 +167,11 @@ done_with_nametables:
         lda #$1E
         sta PPUMASK
 
+        ; always run this (whether it does anything meaningful is controlled with a flag)
+        ;jsr setup_irq_during_nmi
+        ;cli ; always enable interrupts; whether they get generated is up to the routine above
+        far_call_nmi FAR_setup_raster_table_for_frame
+
         ; poll for input *after* setting the scroll position
         ; TODO: move this to the game loop
         ;debug_color (TINT_B | LIGHTGRAY)
@@ -166,23 +181,9 @@ done_with_nametables:
 
         debug_color (TINT_R | LIGHTGRAY)
 
-        ; always run this (whether it does anything meaningful is controlled with a flag)
-        ;jsr setup_irq_during_nmi
-        ;cli ; always enable interrupts; whether they get generated is up to the routine above
-
 nmi_soft_disable:
         ; Here we *only* update the audio engine, nothing else. This is mostly to
         ; smooth over transitions when loading a new level.
-        
-        ; because bhop will potentially change the current code and data bank,
-        ; first preserve them to the stack
-        lda code_bank_shadow
-        sta NmiCurrentBank ; might as well initialize the NMI call stack with the current bank
-        pha
-        lda data_bank_low_shadow
-        pha
-        lda data_bank_high_shadow
-        pha
 
         far_call_nmi FAR_update_audio
         perform_zpcm_inc
@@ -211,10 +212,14 @@ nmi_soft_disable:
         rti
 .endproc
 
+irq_none:
+        rti
+
         ;
         ; Labels nmi/reset/irq are part of prg3_e000.s
         ;
         .segment "VECTORS"
         .addr nmi
         .addr reset
-        .addr irq_palette_swap
+        ;.addr irq_palette_swap
+        .addr self_modifying_irq

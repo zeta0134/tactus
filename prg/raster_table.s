@@ -41,17 +41,31 @@ table_irq_high:         .res 32
         .segment "DATA_4"
 
 NORMAL  = $1E
-RED     = NORMAL | TINT_R
-GREEN   = NORMAL | TINT_G
-BLUE    = NORMAL | TINT_B
-YELLOW  = NORMAL | TINT_R | TINT_G
-CYAN    = NORMAL | TINT_G | TINT_B
-MAGENTA = NORMAL | TINT_R | TINT_B
-DARK    = NORMAL | TINT_R | TINT_G | TINT_B
+RED     = NORMAL | LIGHTGRAY | TINT_R
+GREEN   = NORMAL | LIGHTGRAY | TINT_G
+BLUE    = NORMAL | LIGHTGRAY | TINT_B
+YELLOW  = NORMAL | LIGHTGRAY | TINT_R | TINT_G
+CYAN    = NORMAL | LIGHTGRAY | TINT_G | TINT_B
+MAGENTA = NORMAL | LIGHTGRAY | TINT_R | TINT_B
+DARK    = NORMAL | LIGHTGRAY | TINT_R | TINT_G | TINT_B
 
 ; For debugging, mostly. Eventually we want to automate generation
 rainbow_scrollx_frame_0:
         .byte 0, 1, 2, 1, 0, $FF, $FE, $FF, 0
+rainbow_scrollx_frame_1:
+        .byte 1, 2, 1, 0, $FF, $FE, $FF, 0, 0
+rainbow_scrollx_frame_2:
+        .byte 2, 1, 0, $FF, $FE, $FF, 0, 1, 0
+rainbow_scrollx_frame_3:
+        .byte 1, 0, $FF, $FE, $FF, 0, 1, 2, 0
+rainbow_scrollx_frame_4:
+        .byte 0, $FF, $FE, $FF, 0, 1, 2, 1, 0
+rainbow_scrollx_frame_5:
+        .byte $FF, $FE, $FF, 0, 1, 2, 1, 0, 0
+rainbow_scrollx_frame_6:
+        .byte $FE, $FF, 0, 1, 2, 1, 0, $FF, 0
+rainbow_scrollx_frame_7:
+        .byte $FF, 0, 1, 2, 1, 0, $FF, $FE, 0
 rainbow_scrolly_frame_0:
         .byte 0, 16, 32, 48, 64, 80, 96, 112, 176
 rainbow_scanline_frame_0:
@@ -70,8 +84,82 @@ rainbow_frame_0:
         .addr rainbow_ppumask_frame_0
         .addr rainbow_irq_frame_0
 
+rainbow_frame_1:
+        .addr rainbow_scrollx_frame_1
+        .addr rainbow_scrolly_frame_0
+        .addr rainbow_scanline_frame_0
+        .addr rainbow_ppumask_frame_0
+        .addr rainbow_irq_frame_0
+
+rainbow_frame_2:
+        .addr rainbow_scrollx_frame_2
+        .addr rainbow_scrolly_frame_0
+        .addr rainbow_scanline_frame_0
+        .addr rainbow_ppumask_frame_0
+        .addr rainbow_irq_frame_0
+
+rainbow_frame_3:
+        .addr rainbow_scrollx_frame_3
+        .addr rainbow_scrolly_frame_0
+        .addr rainbow_scanline_frame_0
+        .addr rainbow_ppumask_frame_0
+        .addr rainbow_irq_frame_0
+
+rainbow_frame_4:
+        .addr rainbow_scrollx_frame_4
+        .addr rainbow_scrolly_frame_0
+        .addr rainbow_scanline_frame_0
+        .addr rainbow_ppumask_frame_0
+        .addr rainbow_irq_frame_0
+
+rainbow_frame_5:
+        .addr rainbow_scrollx_frame_5
+        .addr rainbow_scrolly_frame_0
+        .addr rainbow_scanline_frame_0
+        .addr rainbow_ppumask_frame_0
+        .addr rainbow_irq_frame_0
+
+rainbow_frame_6:
+        .addr rainbow_scrollx_frame_6
+        .addr rainbow_scrolly_frame_0
+        .addr rainbow_scanline_frame_0
+        .addr rainbow_ppumask_frame_0
+        .addr rainbow_irq_frame_0
+
+rainbow_frame_7:
+        .addr rainbow_scrollx_frame_7
+        .addr rainbow_scrolly_frame_0
+        .addr rainbow_scanline_frame_0
+        .addr rainbow_ppumask_frame_0
+        .addr rainbow_irq_frame_0
+
 rainbow_frames:
         .addr rainbow_frame_0
+        .byte 9 ; number of scanlines for this effect
+        .byte <.bank(rainbow_frame_0)
+        .addr rainbow_frame_1
+        .byte 9 ; number of scanlines for this effect
+        .byte <.bank(rainbow_frame_1)
+        .addr rainbow_frame_2
+        .byte 9 ; number of scanlines for this effect
+        .byte <.bank(rainbow_frame_2)
+        .addr rainbow_frame_3
+        .byte 9 ; number of scanlines for this effect
+        .byte <.bank(rainbow_frame_3)
+        .addr rainbow_frame_4
+        .byte 9 ; number of scanlines for this effect
+        .byte <.bank(rainbow_frame_4)
+        .addr rainbow_frame_5
+        .byte 9 ; number of scanlines for this effect
+        .byte <.bank(rainbow_frame_5)
+        .addr rainbow_frame_6
+        .byte 9 ; number of scanlines for this effect
+        .byte <.bank(rainbow_frame_6)
+        .addr rainbow_frame_7
+        .byte 9 ; number of scanlines for this effect
+        .byte <.bank(rainbow_frame_7)
+
+        .segment "CODE_0"
 
 ; this is the one we should probably split into tables, if we
 ; find ourselves needing more than 64 effects. but for now
@@ -79,9 +167,7 @@ rainbow_frames:
 raster_effects_list:
         .addr rainbow_frames
         .byte <.bank(rainbow_frames) ; frame table bank
-        .byte 1 ; duration in frames
-
-        .segment "CODE_0"
+        .byte 8 ; duration in frames
 
 nametable_lut_x:
         .repeat 256, i
@@ -89,7 +175,7 @@ nametable_lut_x:
         .endrepeat
 nametable_lut_y:
         .repeat 256, i
-        .byte <((i & $F8) << 3)
+        .byte <((i & $F8) << 2)
         .endrepeat
 scroll_y_wraparound_lut:
         .repeat 176, i
@@ -122,6 +208,14 @@ FrameListPtr := RasterScratch+0
 FramePtr := RasterScratch+2
 BankNumber := RasterScratch+4
 Duration := RasterScratch+5
+ScanlineCount := RasterScratch+6
+        ; Note: this ends up being called **during** the last scanline of vblank!
+        ; We might be able to clean up a liiiitle bit of the code that comes before,
+        ; but the timings are extremely close. Be careful!
+
+        lda #0
+        sta RasterTableIndex
+
         ; First, read the frame list for the currently chosen raster effect
         ldx RasterEffectIndex
         lda raster_effects_list + RasterEffectEntry::FramesListPtr + 0, x
@@ -137,12 +231,16 @@ Duration := RasterScratch+5
         ; From the frame list, read in the specific frame that we are on
         lda RasterEffectFrame
         asl
+        asl
         tay
         lda (FrameListPtr), y
-        sta FramePtr
+        sta FramePtr+0
         iny
         lda (FrameListPtr), y
-        sta FramePtr
+        sta FramePtr+1
+        iny
+        lda (FrameListPtr), y
+        sta ScanlineCount
         ; Now copy the table pointers from the frame list
         ldy #0
         lda (FramePtr), y
@@ -181,6 +279,12 @@ Duration := RasterScratch+5
         sta self_modifying_irq+2 ; select the IRQ vector for the very first scanline
         lda (TableScanlineCmpPtr), y
         sta MAP_PPU_IRQ_LATCH    ; select the scanline on which it will fire (probably not 0)
+        ; Here we enable IRQs (hopefully we are still in vblank at this point)
+        lda #32
+        sta MAP_PPU_IRQ_OFFSET
+        lda #$FF ; "any value"
+        sta MAP_PPU_IRQ_ENABLE
+        cli
         ; Now we are prepped, and may copy the rest of the table
         jmp copy_raster_table
         ; TAIL CALL
@@ -189,6 +293,7 @@ Duration := RasterScratch+5
 ; set up the source pointers before calling this
 .proc copy_raster_table
 Duration := RasterScratch+5
+ScanlineCount := RasterScratch+6
         ldy #0
 loop:
         ; for comparison, let's try the less stupid, but slower version
@@ -217,8 +322,34 @@ loop:
         ; grand total: 84 cycles
         ; ... not bad really.
         iny
-        cpy Duration
+        cpy ScanlineCount
         bne loop
+
+        ; advance the animation pointer
+        inc RasterEffectFrame
+        lda RasterEffectFrame
+        cmp Duration
+        bne done
+        lda #0
+        sta RasterEffectFrame
+done:
+
+        jmp finalize_irq_table
+        ; TAIL CALL
+.endproc
+
+.proc finalize_irq_table
+        ; for now, just write $FF to the scanline compare for the last entry,
+        ; which should disable any further splits.
+        ; TODO: this is where we'll append the palette swap and maybe dialog system.
+        ; we'll need a way to configure the finalizer depending on game state and UI mode!
+
+        ; Y still holds the final entry in the table, so just reuse it
+        lda #$FF
+        sta table_scanline_compare, y
+        lda #>invalid_irq
+        sta table_irq_high, y
+
         rts
 .endproc
 
@@ -235,7 +366,7 @@ loop:
         ldx RasterTableIndex     ; 3
 
         ; first, acknowledge the IRQ and set up for the next one (12)
-        lda table_scanline_compare, x ; 4
+        lda table_scanline_compare+1, x ; 4
         sta MAP_PPU_IRQ_LATCH         ; 4 (set new cmp value)
         lda MAP_PPU_IRQ_STATUS        ; 4 (acknowledge)
 
@@ -243,6 +374,11 @@ loop:
         sta PPUADDR                ; 4 (1-screen mirroring: we don't care about the value)
         lda table_ppuscroll_y, x   ; 4
         sta PPUSCROLL              ; 4
+
+        ; set the IRQ function to run on the NEXT scanline here (high byte only)
+        ; this also gives us a bit of margin to avoid dot 256-257 more reliably
+        lda table_irq_high+1, x     ; 4
+        sta self_modifying_irq+2    ; 3
 
         ; timed so that the first write is AFTER dot 256 or so (24)
         lda table_ppuscroll_x, x    ; 4
@@ -252,12 +388,7 @@ loop:
         lda table_ppumask, x        ; 4
         sta PPUMASK                 ; 4, sets color emphasis / greyscale
 
-        ; cleanup, etc (12)
-        inx                      ; 2
-        ; set the IRQ function to run on the NEXT scanline here (high byte only)
-        lda table_irq_high, x    ; 4
-        sta self_modifying_irq+2 ; 3
-        stx RasterTableIndex     ; 3
+        inc RasterTableIndex
 
         ; register restoration from zeropage (6)
         lda IrqPreserveA ; 3
@@ -265,4 +396,12 @@ loop:
         
         perform_zpcm_inc ; 6
         rti ; 6
+.endproc
+
+.align 256
+.proc invalid_irq   ; (7)
+        ; this is a crash condition! how did we get here?
+        ; in any case, acknowledge cart IRQ and exit
+        bit MAP_PPU_IRQ_STATUS        ;
+        rti
 .endproc

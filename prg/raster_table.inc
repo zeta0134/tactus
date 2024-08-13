@@ -1,5 +1,6 @@
 .global FAR_initialize_irq_table
 .global FAR_setup_raster_table_for_frame
+.globalzp self_modifying_irq
 
 .global RasterEffectFrame, RasterEffectIndex
 
