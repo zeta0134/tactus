@@ -1,3 +1,5 @@
+.macpack longbranch
+
 .include "nes.inc"
 
 .include "../build/tile_defs.inc"
@@ -16,6 +18,7 @@
 .include "prng.inc"
 .include "rainbow.inc"
 .include "raster_tricks.inc"
+.include "raster_table.inc"
 .include "slowam.inc"
 .include "sound.inc"
 .include "zeropage.inc"
@@ -65,7 +68,7 @@ loop:
 
         ; is NMI disabled? if so get outta here fast
         lda NmiSoftDisable
-        bne nmi_soft_disable
+        jne nmi_soft_disable
 
         lda GameloopCounter
         cmp LastNmi
@@ -107,15 +110,39 @@ all_frames:
         ;     will glitch pretty badly
         ; ===========================================================
 
+        ; single-screen mirroring for the playfield: the active battlefield
+        ; goes in every bank
         lda displayed_battlefield
-        eor PpuScrollNametable
         bne right_nametable
 left_nametable:
-        lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | OBJ_8X16 | NT_2000)
-        jmp write_ppuctrl
+        lda #0
+        sta MAP_NT_A_BANK
+        sta MAP_NT_B_BANK
+        sta MAP_NT_C_BANK
+        sta MAP_NT_D_BANK
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta MAP_NT_A_CONTROL
+        sta MAP_NT_B_CONTROL
+        sta MAP_NT_C_CONTROL
+        sta MAP_NT_D_CONTROL
+        jmp done_with_nametables
 right_nametable:
-        lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | OBJ_8X16 | NT_2400)
-write_ppuctrl:
+        lda #1
+        sta MAP_NT_A_BANK
+        sta MAP_NT_B_BANK
+        sta MAP_NT_C_BANK
+        sta MAP_NT_D_BANK
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG_AT)
+        sta MAP_NT_A_CONTROL
+        sta MAP_NT_B_CONTROL
+        sta MAP_NT_C_CONTROL
+        sta MAP_NT_D_CONTROL
+done_with_nametables:
+
+        ; scroll nametable doesn't matter, so we're really just setting
+        ; up consistent rendering primitives here in case they were clobbered
+        ; during loading or something
+        lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | OBJ_8X16 | NT_2000)
         sta PPUCTRL
        
         lda PpuScrollX
@@ -140,8 +167,8 @@ write_ppuctrl:
         debug_color (TINT_R | LIGHTGRAY)
 
         ; always run this (whether it does anything meaningful is controlled with a flag)
-        jsr setup_irq_during_nmi
-        cli ; always enable interrupts; whether they get generated is up to the routine above
+        ;jsr setup_irq_during_nmi
+        ;cli ; always enable interrupts; whether they get generated is up to the routine above
 
 nmi_soft_disable:
         ; Here we *only* update the audio engine, nothing else. This is mostly to
