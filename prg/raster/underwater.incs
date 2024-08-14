@@ -1,0 +1,594 @@
+underwater_frame_0:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_0, underwater_scanline_frame_0, underwater_ppumask_common, underwater_irq_common
+underwater_frame_1:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_1, underwater_scanline_frame_1, underwater_ppumask_common, underwater_irq_common
+underwater_frame_2:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_2, underwater_scanline_frame_2, underwater_ppumask_common, underwater_irq_common
+underwater_frame_3:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_3, underwater_scanline_frame_3, underwater_ppumask_common, underwater_irq_common
+underwater_frame_4:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_4, underwater_scanline_frame_4, underwater_ppumask_common, underwater_irq_common
+underwater_frame_5:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_5, underwater_scanline_frame_5, underwater_ppumask_common, underwater_irq_common
+underwater_frame_6:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_6, underwater_scanline_frame_6, underwater_ppumask_common, underwater_irq_common
+underwater_frame_7:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_7, underwater_scanline_frame_7, underwater_ppumask_common, underwater_irq_common
+underwater_frame_8:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_8, underwater_scanline_frame_8, underwater_ppumask_common, underwater_irq_common
+underwater_frame_9:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_9, underwater_scanline_frame_9, underwater_ppumask_common, underwater_irq_common
+underwater_frame_10:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_10, underwater_scanline_frame_10, underwater_ppumask_common, underwater_irq_common
+underwater_frame_11:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_11, underwater_scanline_frame_11, underwater_ppumask_common, underwater_irq_common
+underwater_frame_12:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_12, underwater_scanline_frame_12, underwater_ppumask_common, underwater_irq_common
+underwater_frame_13:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_13, underwater_scanline_frame_13, underwater_ppumask_common, underwater_irq_common
+underwater_frame_14:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_14, underwater_scanline_frame_14, underwater_ppumask_common, underwater_irq_common
+underwater_frame_15:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_15, underwater_scanline_frame_15, underwater_ppumask_common, underwater_irq_common
+underwater_frame_16:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_16, underwater_scanline_frame_16, underwater_ppumask_common, underwater_irq_common
+underwater_frame_17:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_17, underwater_scanline_frame_17, underwater_ppumask_common, underwater_irq_common
+underwater_frame_18:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_18, underwater_scanline_frame_18, underwater_ppumask_common, underwater_irq_common
+underwater_frame_19:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_19, underwater_scanline_frame_19, underwater_ppumask_common, underwater_irq_common
+underwater_frame_20:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_20, underwater_scanline_frame_20, underwater_ppumask_common, underwater_irq_common
+underwater_frame_21:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_21, underwater_scanline_frame_21, underwater_ppumask_common, underwater_irq_common
+underwater_frame_22:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_22, underwater_scanline_frame_22, underwater_ppumask_common, underwater_irq_common
+underwater_frame_23:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_23, underwater_scanline_frame_23, underwater_ppumask_common, underwater_irq_common
+underwater_frame_24:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_24, underwater_scanline_frame_24, underwater_ppumask_common, underwater_irq_common
+underwater_frame_25:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_25, underwater_scanline_frame_25, underwater_ppumask_common, underwater_irq_common
+underwater_frame_26:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_26, underwater_scanline_frame_26, underwater_ppumask_common, underwater_irq_common
+underwater_frame_27:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_27, underwater_scanline_frame_27, underwater_ppumask_common, underwater_irq_common
+underwater_frame_28:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_28, underwater_scanline_frame_28, underwater_ppumask_common, underwater_irq_common
+underwater_frame_29:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_29, underwater_scanline_frame_29, underwater_ppumask_common, underwater_irq_common
+underwater_frame_30:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_30, underwater_scanline_frame_30, underwater_ppumask_common, underwater_irq_common
+underwater_frame_31:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_31, underwater_scanline_frame_31, underwater_ppumask_common, underwater_irq_common
+underwater_frame_32:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_32, underwater_scanline_frame_32, underwater_ppumask_common, underwater_irq_common
+underwater_frame_33:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_33, underwater_scanline_frame_33, underwater_ppumask_common, underwater_irq_common
+underwater_frame_34:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_34, underwater_scanline_frame_34, underwater_ppumask_common, underwater_irq_common
+underwater_frame_35:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_35, underwater_scanline_frame_35, underwater_ppumask_common, underwater_irq_common
+underwater_frame_36:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_36, underwater_scanline_frame_36, underwater_ppumask_common, underwater_irq_common
+underwater_frame_37:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_37, underwater_scanline_frame_37, underwater_ppumask_common, underwater_irq_common
+underwater_frame_38:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_38, underwater_scanline_frame_38, underwater_ppumask_common, underwater_irq_common
+underwater_frame_39:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_39, underwater_scanline_frame_39, underwater_ppumask_common, underwater_irq_common
+underwater_frame_40:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_40, underwater_scanline_frame_40, underwater_ppumask_common, underwater_irq_common
+underwater_frame_41:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_41, underwater_scanline_frame_41, underwater_ppumask_common, underwater_irq_common
+underwater_frame_42:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_42, underwater_scanline_frame_42, underwater_ppumask_common, underwater_irq_common
+underwater_frame_43:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_43, underwater_scanline_frame_43, underwater_ppumask_common, underwater_irq_common
+underwater_frame_44:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_44, underwater_scanline_frame_44, underwater_ppumask_common, underwater_irq_common
+underwater_frame_45:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_45, underwater_scanline_frame_45, underwater_ppumask_common, underwater_irq_common
+underwater_frame_46:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_46, underwater_scanline_frame_46, underwater_ppumask_common, underwater_irq_common
+underwater_frame_47:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_47, underwater_scanline_frame_47, underwater_ppumask_common, underwater_irq_common
+underwater_frame_48:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_48, underwater_scanline_frame_48, underwater_ppumask_common, underwater_irq_common
+underwater_frame_49:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_49, underwater_scanline_frame_49, underwater_ppumask_common, underwater_irq_common
+underwater_frame_50:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_50, underwater_scanline_frame_50, underwater_ppumask_common, underwater_irq_common
+underwater_frame_51:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_51, underwater_scanline_frame_51, underwater_ppumask_common, underwater_irq_common
+underwater_frame_52:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_52, underwater_scanline_frame_52, underwater_ppumask_common, underwater_irq_common
+underwater_frame_53:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_53, underwater_scanline_frame_53, underwater_ppumask_common, underwater_irq_common
+underwater_frame_54:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_54, underwater_scanline_frame_54, underwater_ppumask_common, underwater_irq_common
+underwater_frame_55:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_55, underwater_scanline_frame_55, underwater_ppumask_common, underwater_irq_common
+underwater_frame_56:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_56, underwater_scanline_frame_56, underwater_ppumask_common, underwater_irq_common
+underwater_frame_57:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_57, underwater_scanline_frame_57, underwater_ppumask_common, underwater_irq_common
+underwater_frame_58:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_58, underwater_scanline_frame_58, underwater_ppumask_common, underwater_irq_common
+underwater_frame_59:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_59, underwater_scanline_frame_59, underwater_ppumask_common, underwater_irq_common
+underwater_frame_60:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_60, underwater_scanline_frame_60, underwater_ppumask_common, underwater_irq_common
+underwater_frame_61:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_61, underwater_scanline_frame_61, underwater_ppumask_common, underwater_irq_common
+underwater_frame_62:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_62, underwater_scanline_frame_62, underwater_ppumask_common, underwater_irq_common
+underwater_frame_63:
+  .addr underwater_scrollx_common, underwater_scrolly_frame_63, underwater_scanline_frame_63, underwater_ppumask_common, underwater_irq_common
+
+underwater_ppumask_common:
+  .repeat 32
+  .byte $1E
+  .endrepeat
+
+underwater_irq_common:
+  .repeat 32
+  .byte >full_scroll_and_ppumask_irq
+  .endrepeat
+
+underwater_scrollx_common:
+  .repeat 32
+  .byte 0
+  .endrepeat
+
+underwater_scrolly_frame_0:
+  .byte $00, $07, $1b, $25, $3b, $47, $5b, $65, $7b, $87, $9b, $a5
+underwater_scanline_frame_0:
+  .byte $04, $0a, $1f, $2a, $3f, $4a, $5f, $6a, $7f, $8a, $9f, $aa
+underwater_scrolly_frame_1:
+  .byte $00, $06, $1a, $24, $3a, $46, $5a, $64, $7a, $86, $9a, $a4
+underwater_scanline_frame_1:
+  .byte $04, $09, $1e, $29, $3e, $49, $5e, $69, $7e, $89, $9e, $a9
+underwater_scrolly_frame_2:
+  .byte $00, $05, $19, $23, $39, $45, $59, $63, $79, $85, $99, $a3
+underwater_scanline_frame_2:
+  .byte $04, $08, $1d, $28, $3d, $48, $5d, $68, $7d, $88, $9d, $a8
+underwater_scrolly_frame_3:
+  .byte $00, $04, $18, $22, $38, $44, $58, $62, $78, $84, $98, $a2
+underwater_scanline_frame_3:
+  .byte $04, $07, $1c, $27, $3c, $47, $5c, $67, $7c, $87, $9c, $a7
+underwater_scrolly_frame_4:
+  .byte $00, $03, $17, $21, $37, $43, $57, $61, $77, $83, $97, $a1
+underwater_scanline_frame_4:
+  .byte $04, $06, $1b, $26, $3b, $46, $5b, $66, $7b, $86, $9b, $a6
+underwater_scrolly_frame_5:
+  .byte $00, $02, $16, $20, $36, $42, $56, $60, $76, $82, $96, $a0
+underwater_scanline_frame_5:
+  .byte $04, $05, $1a, $25, $3a, $45, $5a, $65, $7a, $85, $9a, $a5
+underwater_scrolly_frame_6:
+  .byte $01, $15, $1f, $35, $41, $55, $5f, $75, $81, $95, $9f
+underwater_scanline_frame_6:
+  .byte $04, $19, $24, $39, $44, $59, $64, $79, $84, $99, $a4
+underwater_scrolly_frame_7:
+  .byte $01, $14, $1e, $34, $40, $54, $5e, $74, $80, $94, $9e
+underwater_scanline_frame_7:
+  .byte $04, $18, $23, $38, $43, $58, $63, $78, $83, $98, $a3
+underwater_scrolly_frame_8:
+  .byte $01, $13, $1d, $33, $3f, $53, $5d, $73, $7f, $93, $9d
+underwater_scanline_frame_8:
+  .byte $04, $17, $22, $37, $42, $57, $62, $77, $82, $97, $a2
+underwater_scrolly_frame_9:
+  .byte $01, $12, $1c, $32, $3e, $52, $5c, $72, $7e, $92, $9c
+underwater_scanline_frame_9:
+  .byte $04, $16, $21, $36, $41, $56, $61, $76, $81, $96, $a1
+underwater_scrolly_frame_10:
+  .byte $01, $11, $1b, $31, $3d, $51, $5b, $71, $7d, $91, $9b
+underwater_scanline_frame_10:
+  .byte $04, $15, $20, $35, $40, $55, $60, $75, $80, $95, $a0
+underwater_scrolly_frame_11:
+  .byte $01, $10, $1a, $30, $3c, $50, $5a, $70, $7c, $90, $9a
+underwater_scanline_frame_11:
+  .byte $04, $14, $1f, $34, $3f, $54, $5f, $74, $7f, $94, $9f
+underwater_scrolly_frame_12:
+  .byte $01, $0f, $19, $2f, $3b, $4f, $59, $6f, $7b, $8f, $99, $af
+underwater_scanline_frame_12:
+  .byte $04, $13, $1e, $33, $3e, $53, $5e, $73, $7e, $93, $9e, $b3
+underwater_scrolly_frame_13:
+  .byte $01, $0e, $18, $2e, $3a, $4e, $58, $6e, $7a, $8e, $98, $ae
+underwater_scanline_frame_13:
+  .byte $04, $12, $1d, $32, $3d, $52, $5d, $72, $7d, $92, $9d, $b2
+underwater_scrolly_frame_14:
+  .byte $01, $0d, $17, $2d, $39, $4d, $57, $6d, $79, $8d, $97, $ad
+underwater_scanline_frame_14:
+  .byte $04, $11, $1c, $31, $3c, $51, $5c, $71, $7c, $91, $9c, $b1
+underwater_scrolly_frame_15:
+  .byte $01, $0c, $16, $2c, $38, $4c, $56, $6c, $78, $8c, $96, $ac
+underwater_scanline_frame_15:
+  .byte $04, $10, $1b, $30, $3b, $50, $5b, $70, $7b, $90, $9b, $b0
+underwater_scrolly_frame_16:
+  .byte $01, $0b, $15, $2b, $37, $4b, $55, $6b, $77, $8b, $95, $ab
+underwater_scanline_frame_16:
+  .byte $04, $0f, $1a, $2f, $3a, $4f, $5a, $6f, $7a, $8f, $9a, $af
+underwater_scrolly_frame_17:
+  .byte $01, $0a, $14, $2a, $36, $4a, $54, $6a, $76, $8a, $94, $aa
+underwater_scanline_frame_17:
+  .byte $04, $0e, $19, $2e, $39, $4e, $59, $6e, $79, $8e, $99, $ae
+underwater_scrolly_frame_18:
+  .byte $01, $09, $13, $29, $35, $49, $53, $69, $75, $89, $93, $a9
+underwater_scanline_frame_18:
+  .byte $04, $0d, $18, $2d, $38, $4d, $58, $6d, $78, $8d, $98, $ad
+underwater_scrolly_frame_19:
+  .byte $01, $08, $12, $28, $34, $48, $52, $68, $74, $88, $92, $a8
+underwater_scanline_frame_19:
+  .byte $04, $0c, $17, $2c, $37, $4c, $57, $6c, $77, $8c, $97, $ac
+underwater_scrolly_frame_20:
+  .byte $01, $07, $11, $27, $33, $47, $51, $67, $73, $87, $91, $a7
+underwater_scanline_frame_20:
+  .byte $04, $0b, $16, $2b, $36, $4b, $56, $6b, $76, $8b, $96, $ab
+underwater_scrolly_frame_21:
+  .byte $01, $06, $10, $26, $32, $46, $50, $66, $72, $86, $90, $a6
+underwater_scanline_frame_21:
+  .byte $04, $0a, $15, $2a, $35, $4a, $55, $6a, $75, $8a, $95, $aa
+underwater_scrolly_frame_22:
+  .byte $01, $05, $0f, $25, $31, $45, $4f, $65, $71, $85, $8f, $a5
+underwater_scanline_frame_22:
+  .byte $04, $09, $14, $29, $34, $49, $54, $69, $74, $89, $94, $a9
+underwater_scrolly_frame_23:
+  .byte $01, $04, $0e, $24, $30, $44, $4e, $64, $70, $84, $8e, $a4
+underwater_scanline_frame_23:
+  .byte $04, $08, $13, $28, $33, $48, $53, $68, $73, $88, $93, $a8
+underwater_scrolly_frame_24:
+  .byte $01, $03, $0d, $23, $2f, $43, $4d, $63, $6f, $83, $8d, $a3, $af, $af
+underwater_scanline_frame_24:
+  .byte $04, $07, $12, $27, $32, $47, $52, $67, $72, $87, $92, $a7, $b2, $b3
+underwater_scrolly_frame_25:
+  .byte $01, $02, $0c, $22, $2e, $42, $4c, $62, $6e, $82, $8c, $a2, $ae, $af
+underwater_scanline_frame_25:
+  .byte $04, $06, $11, $26, $31, $46, $51, $66, $71, $86, $91, $a6, $b1, $b3
+underwater_scrolly_frame_26:
+  .byte $01, $01, $0b, $21, $2d, $41, $4b, $61, $6d, $81, $8b, $a1, $ad, $af
+underwater_scanline_frame_26:
+  .byte $04, $05, $10, $25, $30, $45, $50, $65, $70, $85, $90, $a5, $b0, $b3
+underwater_scrolly_frame_27:
+  .byte $00, $0a, $20, $2c, $40, $4a, $60, $6c, $80, $8a, $a0, $ac, $af
+underwater_scanline_frame_27:
+  .byte $04, $0f, $24, $2f, $44, $4f, $64, $6f, $84, $8f, $a4, $af, $b3
+underwater_scrolly_frame_28:
+  .byte $00, $09, $1f, $2b, $3f, $49, $5f, $6b, $7f, $89, $9f, $ab, $af
+underwater_scanline_frame_28:
+  .byte $04, $0e, $23, $2e, $43, $4e, $63, $6e, $83, $8e, $a3, $ae, $b3
+underwater_scrolly_frame_29:
+  .byte $00, $08, $1e, $2a, $3e, $48, $5e, $6a, $7e, $88, $9e, $aa, $af
+underwater_scanline_frame_29:
+  .byte $04, $0d, $22, $2d, $42, $4d, $62, $6d, $82, $8d, $a2, $ad, $b3
+underwater_scrolly_frame_30:
+  .byte $00, $07, $1d, $29, $3d, $47, $5d, $69, $7d, $87, $9d, $a9, $af
+underwater_scanline_frame_30:
+  .byte $04, $0c, $21, $2c, $41, $4c, $61, $6c, $81, $8c, $a1, $ac, $b3
+underwater_scrolly_frame_31:
+  .byte $00, $06, $1c, $28, $3c, $46, $5c, $68, $7c, $86, $9c, $a8, $af
+underwater_scanline_frame_31:
+  .byte $04, $0b, $20, $2b, $40, $4b, $60, $6b, $80, $8b, $a0, $ab, $b3
+underwater_scrolly_frame_32:
+  .byte $00, $05, $1b, $27, $3b, $45, $5b, $67, $7b, $85, $9b, $a7, $af
+underwater_scanline_frame_32:
+  .byte $04, $0a, $1f, $2a, $3f, $4a, $5f, $6a, $7f, $8a, $9f, $aa, $b3
+underwater_scrolly_frame_33:
+  .byte $00, $04, $1a, $26, $3a, $44, $5a, $66, $7a, $84, $9a, $a6, $af
+underwater_scanline_frame_33:
+  .byte $04, $09, $1e, $29, $3e, $49, $5e, $69, $7e, $89, $9e, $a9, $b3
+underwater_scrolly_frame_34:
+  .byte $00, $03, $19, $25, $39, $43, $59, $65, $79, $83, $99, $a5, $af
+underwater_scanline_frame_34:
+  .byte $04, $08, $1d, $28, $3d, $48, $5d, $68, $7d, $88, $9d, $a8, $b3
+underwater_scrolly_frame_35:
+  .byte $00, $02, $18, $24, $38, $42, $58, $64, $78, $82, $98, $a4, $af
+underwater_scanline_frame_35:
+  .byte $04, $07, $1c, $27, $3c, $47, $5c, $67, $7c, $87, $9c, $a7, $b3
+underwater_scrolly_frame_36:
+  .byte $00, $01, $17, $23, $37, $41, $57, $63, $77, $81, $97, $a3, $af
+underwater_scanline_frame_36:
+  .byte $04, $06, $1b, $26, $3b, $46, $5b, $66, $7b, $86, $9b, $a6, $b3
+underwater_scrolly_frame_37:
+  .byte $00, $00, $16, $22, $36, $40, $56, $62, $76, $80, $96, $a2, $af
+underwater_scanline_frame_37:
+  .byte $04, $05, $1a, $25, $3a, $45, $5a, $65, $7a, $85, $9a, $a5, $b3
+underwater_scrolly_frame_38:
+  .byte $00, $00, $15, $21, $35, $3f, $55, $61, $75, $7f, $95, $a1, $af
+underwater_scanline_frame_38:
+  .byte $04, $05, $19, $24, $39, $44, $59, $64, $79, $84, $99, $a4, $b3
+underwater_scrolly_frame_39:
+  .byte $00, $00, $14, $20, $34, $3e, $54, $60, $74, $7e, $94, $a0, $af
+underwater_scanline_frame_39:
+  .byte $04, $05, $18, $23, $38, $43, $58, $63, $78, $83, $98, $a3, $b3
+underwater_scrolly_frame_40:
+  .byte $00, $00, $13, $1f, $33, $3d, $53, $5f, $73, $7d, $93, $9f, $af
+underwater_scanline_frame_40:
+  .byte $04, $05, $17, $22, $37, $42, $57, $62, $77, $82, $97, $a2, $b3
+underwater_scrolly_frame_41:
+  .byte $00, $00, $12, $1e, $32, $3c, $52, $5e, $72, $7c, $92, $9e, $af
+underwater_scanline_frame_41:
+  .byte $04, $05, $16, $21, $36, $41, $56, $61, $76, $81, $96, $a1, $b3
+underwater_scrolly_frame_42:
+  .byte $00, $00, $11, $1d, $31, $3b, $51, $5d, $71, $7b, $91, $9d, $af
+underwater_scanline_frame_42:
+  .byte $04, $05, $15, $20, $35, $40, $55, $60, $75, $80, $95, $a0, $b3
+underwater_scrolly_frame_43:
+  .byte $00, $00, $10, $1c, $30, $3a, $50, $5c, $70, $7a, $90, $9c, $af
+underwater_scanline_frame_43:
+  .byte $04, $05, $14, $1f, $34, $3f, $54, $5f, $74, $7f, $94, $9f, $b3
+underwater_scrolly_frame_44:
+  .byte $00, $00, $0f, $1b, $2f, $39, $4f, $5b, $6f, $79, $8f, $9b, $af
+underwater_scanline_frame_44:
+  .byte $04, $05, $13, $1e, $33, $3e, $53, $5e, $73, $7e, $93, $9e, $b3
+underwater_scrolly_frame_45:
+  .byte $00, $00, $0e, $1a, $2e, $38, $4e, $5a, $6e, $78, $8e, $9a, $ae
+underwater_scanline_frame_45:
+  .byte $04, $05, $12, $1d, $32, $3d, $52, $5d, $72, $7d, $92, $9d, $b2
+underwater_scrolly_frame_46:
+  .byte $00, $00, $0d, $19, $2d, $37, $4d, $59, $6d, $77, $8d, $99, $ad
+underwater_scanline_frame_46:
+  .byte $04, $05, $11, $1c, $31, $3c, $51, $5c, $71, $7c, $91, $9c, $b1
+underwater_scrolly_frame_47:
+  .byte $00, $00, $0c, $18, $2c, $36, $4c, $58, $6c, $76, $8c, $98, $ac
+underwater_scanline_frame_47:
+  .byte $04, $05, $10, $1b, $30, $3b, $50, $5b, $70, $7b, $90, $9b, $b0
+underwater_scrolly_frame_48:
+  .byte $00, $00, $0b, $17, $2b, $35, $4b, $57, $6b, $75, $8b, $97, $ab
+underwater_scanline_frame_48:
+  .byte $04, $05, $0f, $1a, $2f, $3a, $4f, $5a, $6f, $7a, $8f, $9a, $af
+underwater_scrolly_frame_49:
+  .byte $00, $00, $0a, $16, $2a, $34, $4a, $56, $6a, $74, $8a, $96, $aa
+underwater_scanline_frame_49:
+  .byte $04, $05, $0e, $19, $2e, $39, $4e, $59, $6e, $79, $8e, $99, $ae
+underwater_scrolly_frame_50:
+  .byte $00, $00, $09, $15, $29, $33, $49, $55, $69, $73, $89, $95, $a9
+underwater_scanline_frame_50:
+  .byte $04, $05, $0d, $18, $2d, $38, $4d, $58, $6d, $78, $8d, $98, $ad
+underwater_scrolly_frame_51:
+  .byte $00, $00, $08, $14, $28, $32, $48, $54, $68, $72, $88, $94, $a8
+underwater_scanline_frame_51:
+  .byte $04, $05, $0c, $17, $2c, $37, $4c, $57, $6c, $77, $8c, $97, $ac
+underwater_scrolly_frame_52:
+  .byte $00, $00, $07, $13, $27, $31, $47, $53, $67, $71, $87, $93, $a7
+underwater_scanline_frame_52:
+  .byte $04, $05, $0b, $16, $2b, $36, $4b, $56, $6b, $76, $8b, $96, $ab
+underwater_scrolly_frame_53:
+  .byte $00, $00, $06, $12, $26, $30, $46, $52, $66, $70, $86, $92, $a6
+underwater_scanline_frame_53:
+  .byte $04, $05, $0a, $15, $2a, $35, $4a, $55, $6a, $75, $8a, $95, $aa
+underwater_scrolly_frame_54:
+  .byte $00, $00, $05, $11, $25, $2f, $45, $51, $65, $6f, $85, $91, $a5
+underwater_scanline_frame_54:
+  .byte $04, $05, $09, $14, $29, $34, $49, $54, $69, $74, $89, $94, $a9
+underwater_scrolly_frame_55:
+  .byte $00, $00, $04, $10, $24, $2e, $44, $50, $64, $6e, $84, $90, $a4, $ae
+underwater_scanline_frame_55:
+  .byte $04, $05, $08, $13, $28, $33, $48, $53, $68, $73, $88, $93, $a8, $b3
+underwater_scrolly_frame_56:
+  .byte $00, $00, $03, $0f, $23, $2d, $43, $4f, $63, $6d, $83, $8f, $a3, $ad
+underwater_scanline_frame_56:
+  .byte $04, $05, $07, $12, $27, $32, $47, $52, $67, $72, $87, $92, $a7, $b2
+underwater_scrolly_frame_57:
+  .byte $00, $00, $02, $0e, $22, $2c, $42, $4e, $62, $6c, $82, $8e, $a2, $ac
+underwater_scanline_frame_57:
+  .byte $04, $05, $06, $11, $26, $31, $46, $51, $66, $71, $86, $91, $a6, $b1
+underwater_scrolly_frame_58:
+  .byte $00, $0d, $21, $2b, $41, $4d, $61, $6b, $81, $8d, $a1, $ab
+underwater_scanline_frame_58:
+  .byte $04, $10, $25, $30, $45, $50, $65, $70, $85, $90, $a5, $b0
+underwater_scrolly_frame_59:
+  .byte $00, $0c, $20, $2a, $40, $4c, $60, $6a, $80, $8c, $a0, $aa
+underwater_scanline_frame_59:
+  .byte $04, $0f, $24, $2f, $44, $4f, $64, $6f, $84, $8f, $a4, $af
+underwater_scrolly_frame_60:
+  .byte $00, $0b, $1f, $29, $3f, $4b, $5f, $69, $7f, $8b, $9f, $a9
+underwater_scanline_frame_60:
+  .byte $04, $0e, $23, $2e, $43, $4e, $63, $6e, $83, $8e, $a3, $ae
+underwater_scrolly_frame_61:
+  .byte $00, $0a, $1e, $28, $3e, $4a, $5e, $68, $7e, $8a, $9e, $a8
+underwater_scanline_frame_61:
+  .byte $04, $0d, $22, $2d, $42, $4d, $62, $6d, $82, $8d, $a2, $ad
+underwater_scrolly_frame_62:
+  .byte $00, $09, $1d, $27, $3d, $49, $5d, $67, $7d, $89, $9d, $a7
+underwater_scanline_frame_62:
+  .byte $04, $0c, $21, $2c, $41, $4c, $61, $6c, $81, $8c, $a1, $ac
+underwater_scrolly_frame_63:
+  .byte $00, $08, $1c, $26, $3c, $48, $5c, $66, $7c, $88, $9c, $a6
+underwater_scanline_frame_63:
+  .byte $04, $0b, $20, $2b, $40, $4b, $60, $6b, $80, $8b, $a0, $ab
+underwater_frames:
+  .addr underwater_frame_0
+  .byte 12
+  .byte <.bank(underwater_frame_0)
+  .addr underwater_frame_1
+  .byte 12
+  .byte <.bank(underwater_frame_1)
+  .addr underwater_frame_2
+  .byte 12
+  .byte <.bank(underwater_frame_2)
+  .addr underwater_frame_3
+  .byte 12
+  .byte <.bank(underwater_frame_3)
+  .addr underwater_frame_4
+  .byte 12
+  .byte <.bank(underwater_frame_4)
+  .addr underwater_frame_5
+  .byte 12
+  .byte <.bank(underwater_frame_5)
+  .addr underwater_frame_6
+  .byte 11
+  .byte <.bank(underwater_frame_6)
+  .addr underwater_frame_7
+  .byte 11
+  .byte <.bank(underwater_frame_7)
+  .addr underwater_frame_8
+  .byte 11
+  .byte <.bank(underwater_frame_8)
+  .addr underwater_frame_9
+  .byte 11
+  .byte <.bank(underwater_frame_9)
+  .addr underwater_frame_10
+  .byte 11
+  .byte <.bank(underwater_frame_10)
+  .addr underwater_frame_11
+  .byte 11
+  .byte <.bank(underwater_frame_11)
+  .addr underwater_frame_12
+  .byte 12
+  .byte <.bank(underwater_frame_12)
+  .addr underwater_frame_13
+  .byte 12
+  .byte <.bank(underwater_frame_13)
+  .addr underwater_frame_14
+  .byte 12
+  .byte <.bank(underwater_frame_14)
+  .addr underwater_frame_15
+  .byte 12
+  .byte <.bank(underwater_frame_15)
+  .addr underwater_frame_16
+  .byte 12
+  .byte <.bank(underwater_frame_16)
+  .addr underwater_frame_17
+  .byte 12
+  .byte <.bank(underwater_frame_17)
+  .addr underwater_frame_18
+  .byte 12
+  .byte <.bank(underwater_frame_18)
+  .addr underwater_frame_19
+  .byte 12
+  .byte <.bank(underwater_frame_19)
+  .addr underwater_frame_20
+  .byte 12
+  .byte <.bank(underwater_frame_20)
+  .addr underwater_frame_21
+  .byte 12
+  .byte <.bank(underwater_frame_21)
+  .addr underwater_frame_22
+  .byte 12
+  .byte <.bank(underwater_frame_22)
+  .addr underwater_frame_23
+  .byte 12
+  .byte <.bank(underwater_frame_23)
+  .addr underwater_frame_24
+  .byte 14
+  .byte <.bank(underwater_frame_24)
+  .addr underwater_frame_25
+  .byte 14
+  .byte <.bank(underwater_frame_25)
+  .addr underwater_frame_26
+  .byte 14
+  .byte <.bank(underwater_frame_26)
+  .addr underwater_frame_27
+  .byte 13
+  .byte <.bank(underwater_frame_27)
+  .addr underwater_frame_28
+  .byte 13
+  .byte <.bank(underwater_frame_28)
+  .addr underwater_frame_29
+  .byte 13
+  .byte <.bank(underwater_frame_29)
+  .addr underwater_frame_30
+  .byte 13
+  .byte <.bank(underwater_frame_30)
+  .addr underwater_frame_31
+  .byte 13
+  .byte <.bank(underwater_frame_31)
+  .addr underwater_frame_32
+  .byte 13
+  .byte <.bank(underwater_frame_32)
+  .addr underwater_frame_33
+  .byte 13
+  .byte <.bank(underwater_frame_33)
+  .addr underwater_frame_34
+  .byte 13
+  .byte <.bank(underwater_frame_34)
+  .addr underwater_frame_35
+  .byte 13
+  .byte <.bank(underwater_frame_35)
+  .addr underwater_frame_36
+  .byte 13
+  .byte <.bank(underwater_frame_36)
+  .addr underwater_frame_37
+  .byte 13
+  .byte <.bank(underwater_frame_37)
+  .addr underwater_frame_38
+  .byte 13
+  .byte <.bank(underwater_frame_38)
+  .addr underwater_frame_39
+  .byte 13
+  .byte <.bank(underwater_frame_39)
+  .addr underwater_frame_40
+  .byte 13
+  .byte <.bank(underwater_frame_40)
+  .addr underwater_frame_41
+  .byte 13
+  .byte <.bank(underwater_frame_41)
+  .addr underwater_frame_42
+  .byte 13
+  .byte <.bank(underwater_frame_42)
+  .addr underwater_frame_43
+  .byte 13
+  .byte <.bank(underwater_frame_43)
+  .addr underwater_frame_44
+  .byte 13
+  .byte <.bank(underwater_frame_44)
+  .addr underwater_frame_45
+  .byte 13
+  .byte <.bank(underwater_frame_45)
+  .addr underwater_frame_46
+  .byte 13
+  .byte <.bank(underwater_frame_46)
+  .addr underwater_frame_47
+  .byte 13
+  .byte <.bank(underwater_frame_47)
+  .addr underwater_frame_48
+  .byte 13
+  .byte <.bank(underwater_frame_48)
+  .addr underwater_frame_49
+  .byte 13
+  .byte <.bank(underwater_frame_49)
+  .addr underwater_frame_50
+  .byte 13
+  .byte <.bank(underwater_frame_50)
+  .addr underwater_frame_51
+  .byte 13
+  .byte <.bank(underwater_frame_51)
+  .addr underwater_frame_52
+  .byte 13
+  .byte <.bank(underwater_frame_52)
+  .addr underwater_frame_53
+  .byte 13
+  .byte <.bank(underwater_frame_53)
+  .addr underwater_frame_54
+  .byte 13
+  .byte <.bank(underwater_frame_54)
+  .addr underwater_frame_55
+  .byte 14
+  .byte <.bank(underwater_frame_55)
+  .addr underwater_frame_56
+  .byte 14
+  .byte <.bank(underwater_frame_56)
+  .addr underwater_frame_57
+  .byte 14
+  .byte <.bank(underwater_frame_57)
+  .addr underwater_frame_58
+  .byte 12
+  .byte <.bank(underwater_frame_58)
+  .addr underwater_frame_59
+  .byte 12
+  .byte <.bank(underwater_frame_59)
+  .addr underwater_frame_60
+  .byte 12
+  .byte <.bank(underwater_frame_60)
+  .addr underwater_frame_61
+  .byte 12
+  .byte <.bank(underwater_frame_61)
+  .addr underwater_frame_62
+  .byte 12
+  .byte <.bank(underwater_frame_62)
+  .addr underwater_frame_63
+  .byte 12
+  .byte <.bank(underwater_frame_63)
+

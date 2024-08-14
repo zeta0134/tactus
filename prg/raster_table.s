@@ -167,6 +167,8 @@ rainbow_frames:
         raster_frame rainbow_frame_6, 8
         raster_frame rainbow_frame_7, 8
         raster_frame rainbow_frame_7, 8
+
+        .include "raster/underwater.incs"
         
         .segment "CODE_0"
 
@@ -174,9 +176,9 @@ rainbow_frames:
 ; find ourselves needing more than 64 effects. but for now
 ; this is fine
 raster_effects_list:
-        .addr rainbow_frames
-        .byte <.bank(rainbow_frames) ; frame table bank
-        .byte 16 ; duration in frames
+        .addr underwater_frames
+        .byte <.bank(underwater_frames) ; frame table bank
+        .byte 64 ; duration in frames
 
 nametable_lut_x:
         .repeat 256, i

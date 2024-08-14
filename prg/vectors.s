@@ -155,16 +155,17 @@ done_with_nametables:
         lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | OBJ_8X16 | NT_2000)
         sta PPUCTRL
        
-        lda PpuScrollX
+        lda #0
         sta PPUSCROLL
-        lda PpuScrollY
+        lda #0
         sta PPUSCROLL
 
         rainbow_set_upper_bg_chr PlayfieldBgHighBank
         rainbow_set_upper_obj_chr PlayfieldObjHighBank, #SPRITE_REGION_BASE
 
         ; re-enable rendering (the IRQ may have disabled it, if it ran)
-        lda #$1E
+        ; note: sans backgrounds! we'll turn those on with a raster effect later
+        lda #(OBJ_ON | BG_OFF)
         sta PPUMASK
 
         ; always run this (whether it does anything meaningful is controlled with a flag)
