@@ -1,6 +1,10 @@
-        .include "raster_table.inc"
+        .include "../build/tile_defs.inc"
+
+        .include "kernel.inc"
         .include "nes.inc"
+        .include "palette.inc"
         .include "rainbow.inc"
+        .include "raster_table.inc"
         .include "zpcm.inc"
 
         .zeropage
@@ -23,10 +27,17 @@ TableIrqHighPtr: .res 2
 
 RasterEffectIndex: .res 1
 RasterEffectFrame: .res 1
+RasterEffectFinalizerIndex: .res 1
 
 ; very small bit of scratch space, because we
 ; shouldn't clobber R0-R31
 RasterScratch: .res 8
+
+delay_table_addr: .res 2
+delay_routine_addr: .res 2
+
+HudBgActual: .res 1
+HudObjActual: .res 1
 
         .segment "PRGRAM"
 
@@ -51,27 +62,27 @@ DARK    = NORMAL | LIGHTGRAY | TINT_R | TINT_G | TINT_B
 
 ; For debugging, mostly. Eventually we want to automate generation
 rainbow_scrollx_frame_0:
-        .byte 0, 1, 2, 1, 0, $FF, $FE, $FF, 0
+        .byte 0, 1, 2, 1, 0, $FF, $FE, $FF
 rainbow_scrollx_frame_1:
-        .byte 1, 2, 1, 0, $FF, $FE, $FF, 0, 0
+        .byte 1, 2, 1, 0, $FF, $FE, $FF, 0
 rainbow_scrollx_frame_2:
-        .byte 2, 1, 0, $FF, $FE, $FF, 0, 1, 0
+        .byte 2, 1, 0, $FF, $FE, $FF, 0, 1
 rainbow_scrollx_frame_3:
-        .byte 1, 0, $FF, $FE, $FF, 0, 1, 2, 0
+        .byte 1, 0, $FF, $FE, $FF, 0, 1, 2
 rainbow_scrollx_frame_4:
-        .byte 0, $FF, $FE, $FF, 0, 1, 2, 1, 0
+        .byte 0, $FF, $FE, $FF, 0, 1, 2, 1
 rainbow_scrollx_frame_5:
-        .byte $FF, $FE, $FF, 0, 1, 2, 1, 0, 0
+        .byte $FF, $FE, $FF, 0, 1, 2, 1, 0
 rainbow_scrollx_frame_6:
-        .byte $FE, $FF, 0, 1, 2, 1, 0, $FF, 0
+        .byte $FE, $FF, 0, 1, 2, 1, 0, $FF
 rainbow_scrollx_frame_7:
-        .byte $FF, 0, 1, 2, 1, 0, $FF, $FE, 0
+        .byte $FF, 0, 1, 2, 1, 0, $FF, $FE
 rainbow_scrolly_frame_0:
-        .byte 0, 16, 32, 48, 64, 80, 96, 112, 176
+        .byte 0, 22, 44, 66, 88, 110, 132, 154
 rainbow_scanline_frame_0:
-        .byte 4, 20, 36, 52, 68, 84, 100, 116, 180
+        .byte 4, 26, 48, 70, 92, 114, 136, 158
 rainbow_ppumask_frame_0:
-        .byte NORMAL, RED, YELLOW, GREEN, CYAN, BLUE, MAGENTA, DARK, NORMAL
+        .byte NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL
 rainbow_irq_frame_0:
         .byte >full_scroll_and_ppumask_irq, >full_scroll_and_ppumask_irq, >full_scroll_and_ppumask_irq, >full_scroll_and_ppumask_irq
         .byte >full_scroll_and_ppumask_irq, >full_scroll_and_ppumask_irq, >full_scroll_and_ppumask_irq, >full_scroll_and_ppumask_irq
@@ -133,32 +144,30 @@ rainbow_frame_7:
         .addr rainbow_ppumask_frame_0
         .addr rainbow_irq_frame_0
 
-rainbow_frames:
-        .addr rainbow_frame_0
-        .byte 9 ; number of scanlines for this effect
-        .byte <.bank(rainbow_frame_0)
-        .addr rainbow_frame_1
-        .byte 9 ; number of scanlines for this effect
-        .byte <.bank(rainbow_frame_1)
-        .addr rainbow_frame_2
-        .byte 9 ; number of scanlines for this effect
-        .byte <.bank(rainbow_frame_2)
-        .addr rainbow_frame_3
-        .byte 9 ; number of scanlines for this effect
-        .byte <.bank(rainbow_frame_3)
-        .addr rainbow_frame_4
-        .byte 9 ; number of scanlines for this effect
-        .byte <.bank(rainbow_frame_4)
-        .addr rainbow_frame_5
-        .byte 9 ; number of scanlines for this effect
-        .byte <.bank(rainbow_frame_5)
-        .addr rainbow_frame_6
-        .byte 9 ; number of scanlines for this effect
-        .byte <.bank(rainbow_frame_6)
-        .addr rainbow_frame_7
-        .byte 9 ; number of scanlines for this effect
-        .byte <.bank(rainbow_frame_7)
+.macro raster_frame frame_addr, scanlines
+        .addr frame_addr
+        .byte scanlines ; number of scanlines for this effect
+        .byte <.bank(frame_addr)
+.endmacro
 
+rainbow_frames:
+        raster_frame rainbow_frame_0, 8
+        raster_frame rainbow_frame_0, 8
+        raster_frame rainbow_frame_1, 8
+        raster_frame rainbow_frame_1, 8
+        raster_frame rainbow_frame_2, 8
+        raster_frame rainbow_frame_2, 8
+        raster_frame rainbow_frame_3, 8
+        raster_frame rainbow_frame_3, 8
+        raster_frame rainbow_frame_4, 8
+        raster_frame rainbow_frame_4, 8
+        raster_frame rainbow_frame_5, 8
+        raster_frame rainbow_frame_5, 8
+        raster_frame rainbow_frame_6, 8
+        raster_frame rainbow_frame_6, 8
+        raster_frame rainbow_frame_7, 8
+        raster_frame rainbow_frame_7, 8
+        
         .segment "CODE_0"
 
 ; this is the one we should probably split into tables, if we
@@ -167,7 +176,7 @@ rainbow_frames:
 raster_effects_list:
         .addr rainbow_frames
         .byte <.bank(rainbow_frames) ; frame table bank
-        .byte 8 ; duration in frames
+        .byte 16 ; duration in frames
 
 nametable_lut_x:
         .repeat 256, i
@@ -199,6 +208,13 @@ scroll_y_wraparound_lut:
         lda #0
         sta RasterEffectIndex
         sta RasterEffectFrame
+        lda #2
+        sta RasterEffectFinalizerIndex
+
+        lda #<inverted_delay_table
+        sta delay_table_addr+0
+        lda #>inverted_delay_table
+        sta delay_table_addr+1
 
         rts
 .endproc
@@ -339,16 +355,51 @@ done:
 .endproc
 
 .proc finalize_irq_table
+FinalizerPtr := RasterScratch+0
         ; for now, just write $FF to the scanline compare for the last entry,
         ; which should disable any further splits.
         ; TODO: this is where we'll append the palette swap and maybe dialog system.
         ; we'll need a way to configure the finalizer depending on game state and UI mode!
 
         ; Y still holds the final entry in the table, so just reuse it
+        ldx RasterEffectFinalizerIndex
+        lda finalizer_table+0, x
+        sta FinalizerPtr+0
+        lda finalizer_table+1, x
+        sta FinalizerPtr+1
+        jmp (FinalizerPtr)
+        ; tail call
+.endproc
+
+finalizer_table:
+        .addr finalizer_none
+        .addr finalizer_hud
+
+; just clears out the very last entry, no additional work needed
+.proc finalizer_none
         lda #$FF
         sta table_scanline_compare, y
         lda #>invalid_irq
         sta table_irq_high, y
+        rts
+.endproc
+
+.proc finalizer_hud
+        lda #0
+        sta table_ppuscroll_x, y
+        lda #176
+        sta table_ppuscroll_y, y
+        lda #180
+        sta table_scanline_compare, y
+        lda #>irq_hud_palette_swap
+        sta table_irq_high, y
+        ; ppumask bit isn't used
+
+        ; do this during NMI, so we don't get a race condition and flickery beat transitions
+        lda HudBgHighBank
+        sta HudBgActual
+        lda HudObjHighBank
+        sta HudObjActual
 
         rts
 .endproc
@@ -396,6 +447,429 @@ done:
         
         perform_zpcm_inc ; 6
         rti ; 6
+.endproc
+
+.align 256 
+.proc irq_hud_palette_swap
+        perform_zpcm_inc ; 6
+        ; very quickly read the delay jitter register
+        pha                    ; 3
+        lda MAP_PPU_IRQ_M2_CNT ; 4
+        asl                    ; 2
+        sta delay_table_addr+0 ; 3
+        ; finish preserving other registers
+        txa ; 2
+        pha ; 3
+        tya ; 2
+        pha ; 3
+        ; load up the delay pointer and jump there (somewhat inefficiently)
+        ldy #0 ; 2
+        lda (delay_table_addr), y ; 5
+        sta delay_routine_addr+0  ; 3
+        iny                       ; 2
+        lda (delay_table_addr), y ; 5
+        sta delay_routine_addr+1  ; 3
+        jmp (delay_routine_addr)  ; 5 + 3 + [inverse of measured IRQ jitter, range: 10 - 0]
+return_from_delay:
+        ; worst case for the above takes 73 cycles
+        ; if we trigger the interrupt on PPU dot 4, then at this exact moment we are at:
+
+        ; ppu dot here: 223
+
+        ; setup to disable rendering and switch palette memory to #$3F00
+        lda PPUSTATUS ; 4, ensure w=0
+        lda #$3F      ; 2 - PPUADDR
+        ldx #$00      ; 2
+        ldy #$00      ; 2 - PPUMASK
+
+        ; ppu dot here: 253
+        ; target dot: 311, 20 cycles
+        ;perform_zpcm_inc ; 6
+        ;jsr delay_12     ; 12
+        ;nop              ; 2
+
+        ; ppu dot here: 313
+
+        sty PPUMASK ; 4, disable rendering, write lands on 322 at the earliest, 334 at the latest (due to DPCM jitter)
+        sta PPUADDR ; 4, w=0
+        stx PPUADDR ; 4, w=1, set palette address to #$3F00 (no visible change)
+
+        ; ppu dot here: 8
+        perform_zpcm_inc
+        nop
+
+        ; ppu dot here: 44
+        ; wait until hblank (248)
+
+        ; Fix the nametable mappings for the HUD: all in bank 0
+        lda #0            ; 2
+        sta MAP_NT_A_BANK ; 4
+        sta MAP_NT_B_BANK ; 4
+        sta MAP_NT_C_BANK ; 4
+        sta MAP_NT_D_BANK ; 4
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT) ; 2
+        sta MAP_NT_A_CONTROL ; 4
+        sta MAP_NT_B_CONTROL ; 4
+        sta MAP_NT_C_CONTROL ; 4
+        sta MAP_NT_D_CONTROL ; 4
+
+        ; prep the first round of palette updates
+        lda HudPaletteBuffer+0 ; 4
+        ldx HudPaletteBuffer+1 ; 4
+        ldy HudPaletteBuffer+2 ; 4
+
+        ; delay: 68 cycles
+        jsr delay_12
+        .repeat 6
+        nop
+        .endrepeat
+
+        ; ppu dot here: 248
+
+        ; write the palette entries for BG0 0-3
+        sta PPUDATA ; 4
+        stx PPUDATA ; 4
+        sty PPUDATA ; 4
+        lda HudPaletteBuffer+3 ; 4
+        sta PPUDATA ; 4
+
+        ; ppu dot here: 308
+
+        ; prep the second round of palette updates
+        lda HudPaletteBuffer+4 ; 4
+        ldx HudPaletteBuffer+5 ; 4
+        ldy HudPaletteBuffer+6 ; 4
+
+        ; ppu dot here: 3
+
+        ; wait until hblank (248)
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        nop ; 2
+
+        ; ppu dot here: 249
+        ; write the palette entries for BG1 0-3
+        sta PPUDATA ; 4
+        stx PPUDATA ; 4
+        sty PPUDATA ; 4
+        lda HudPaletteBuffer+7 ; 4
+        sta PPUDATA ; 4
+
+        ; ppu dot here: 309
+
+        ; prep the third round of palette updates
+        lda HudPaletteBuffer+8  ; 4
+        ldx HudPaletteBuffer+9  ; 4
+        ldy HudPaletteBuffer+10 ; 4
+
+        ; ppu dot here: 4
+
+        ; wait until hblank (248)
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        nop ; 2
+
+        ; ppu dot here: 250
+        ; write the palette entries for BG2 0-3
+        sta PPUDATA ; 4
+        stx PPUDATA ; 4
+        sty PPUDATA ; 4
+        lda HudPaletteBuffer+11 ; 4
+        sta PPUDATA ; 4
+
+        ; ppu dot here: 310
+
+        ; prep the third round of palette updates
+        lda HudPaletteBuffer+12  ; 4
+        ldx HudPaletteBuffer+13  ; 4
+        ldy HudPaletteBuffer+14  ; 4
+
+        ; ppu dot here: 5
+
+        ; wait until hblank (248)
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        jsr delay_12
+        php ; 3
+        plp ; 4
+        nop ; 2
+
+        ; ppu dot here: 248
+        ; write the palette entries for BG3 0-3
+        sta PPUDATA ; 4
+        stx PPUDATA ; 4
+        sty PPUDATA ; 4
+        lda HudPaletteBuffer+15 ; 4
+        sta PPUDATA ; 4
+
+        ; ppu dot here: 308
+
+        ; At this point the BG palette is written; for now we will stop here.
+        ; We are parked on #$3F10, which mirrors BG0.0, so we can set up to re-enable rendering
+
+        ; Draw the left-side nametable, starting at the top of the HUD graphics
+HUD_SCROLL_X = 0
+;HUD_SCROLL_Y = 182
+
+;HUD_SCROLL_Y = 175 ; does not cause jitter (does cause a visible glitch)
+HUD_SCROLL_Y = 176 ; the value I want, but this causes jitter
+;HUD_SCROLL_Y = 177 ; causes neither jitter nor a visible glitch
+
+HUD_NAMETABLE = 0
+HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
+        lda #HUD_NAMETABLE  ; 2
+        sta $2006           ; 4
+        lda #HUD_SCROLL_Y   ; 2
+        sta $2005           ; 4
+        lda #HUD_SCROLL_X   ; 2
+        sta $2005           ; 4
+        lda #HUD_FUNNY_2006 ; 2
+        sta $2006           ; 4
+
+        ; ppu dot here: 39
+
+        ; since we have time to kill, we might as well compute the musical beat and set
+        ; the new animation frame right here
+
+
+        ; old cost: 16
+        ;lda currently_playing_row ; 4
+        ;and #%00000111            ; 2
+        ;tax                       ; 2
+        ;lda chr_frame_pacing, x   ; 4
+        ;sta MAP_BG_EXT_BANK       ; 4
+
+        ; new cost: 26
+        lda HudBgActual         ; 4
+        sta MAP_BG_EXT_BANK     ; 4
+        lda HudObjActual        ; 4 - %......HL
+        ror                     ; 2 - %.......H C:L
+        ror                     ; 2 - %L....... C:H
+        ror                     ; 2 - %HL......
+        and #%11000000          ; 2 (safety)
+        ora #SPRITE_REGION_BASE ; 2 (later: replace with HUD sprite base!)
+        sta MAP_CHR_0_LO        ; 4
+
+        ; ppu dot here: 117
+
+        ; now we simply wait for hblank (256), then re-enable backgrounds:
+        lda #BG_ON ; 2
+        jsr delay_12
+        jsr delay_12
+        jsr delay_12
+        .repeat 5 ; 10
+        nop
+        .endrepeat
+
+        ; ppu dot here: 261
+        sta PPUMASK ; 4
+
+        ; and again, wait another *entire* scanline, so that we can re-enable
+        ; sprites (since this scanline will have corrupted sprite evalutation)
+        lda #(BG_ON | OBJ_ON) ; 2
+
+        ; ppu dot here: 279
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        nop
+        nop
+        nop
+
+        ; ppu dot here: 256
+        sta PPUMASK
+
+        ; END timing sensitive code
+        ; cleanup and we're done!
+        sta MAP_PPU_IRQ_DISABLE
+
+        ; restore registers and return
+        pla
+        tay
+        pla
+        tax
+        pla
+        perform_zpcm_inc
+        rti
+.endproc
+
+.proc delay_12 ; 6
+        rts    ; 6
+.endproc
+
+.proc delay_20 ; 6
+        perform_zpcm_inc ; 6
+        nop    ; 2
+        rts    ; 6
+.endproc
+
+; optimization note: once we're sure this is working properly, the jitter we need
+; to erase can only feasibly span from 1-10 cycles. we could save ~6 cycles by having
+; a shorter live section of the table, and using smaller delay amounts
+.align 256
+inverted_delay_table:
+        .addr inv_delay_10 ; 7 cycles for the IRQ service routine
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+
+        .addr inv_delay_10 ; 6 cycles for inc $4011
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10
+
+        .addr inv_delay_10 ; 3 cycles to PHA
+        .addr inv_delay_10
+        .addr inv_delay_10
+
+        .addr inv_delay_10 ; 4 cycles to LDA MAP_PPU_IRQ_M2_CNT
+        .addr inv_delay_10
+        .addr inv_delay_10
+        .addr inv_delay_10 ; READ OCCURS HERE
+
+        .addr inv_delay_10 ; first real entry in the table
+        .addr inv_delay_9
+        .addr inv_delay_8
+        .addr inv_delay_7
+        .addr inv_delay_6
+        .addr inv_delay_5
+        .addr inv_delay_4
+        .addr inv_delay_3
+        .addr inv_delay_2
+        .addr inv_delay_0 ; we can't encode a delay amount of 1 cycle, but that's okay
+
+        .repeat (128-7-6-3-4-10); fill out the rest of the table for safety
+        .addr inv_delay_0
+        .endrepeat
+
+
+; various delay amounts, used in the inverted delay table
+; not espeically optimal in terms of code size, but at
+; the very least, chosen to avoid clobbering any state
+.proc inv_delay_0
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_2
+        nop ; 2
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_3
+        jmp target ; 3
+target:
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_4
+        .repeat 2
+        nop ; 4
+        .endrepeat
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_5
+        nop        ; 2
+        jmp target ; 3
+target:
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_6
+        .repeat 3
+        nop ; 6
+        .endrepeat
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_7
+        php ; 3
+        plp ; 4
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_8
+        .repeat 4
+        nop ; 8
+        .endrepeat
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_9
+        nop ; 2
+        php ; 3
+        plp ; 4
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+
+.proc inv_delay_10
+        .repeat 5
+        nop ; 10
+        .endrepeat
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_11
+        nop ; 2
+        nop ; 2
+        php ; 3
+        plp ; 4
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_12
+        .repeat 6
+        nop ; 12
+        .endrepeat
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_13
+        nop ; 2
+        nop ; 2
+        nop ; 2
+        php ; 3
+        plp ; 4
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_14
+        php ; 3
+        plp ; 4
+        php ; 3
+        plp ; 4
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_15
+        .repeat 4 ; 8
+        nop
+        .endrepeat
+        php ; 3
+        plp ; 4
+        jmp irq_hud_palette_swap::return_from_delay
+.endproc
+
+.proc inv_delay_16
+        nop ; 2
+        php ; 3
+        plp ; 4
+        php ; 3
+        plp ; 4
+        jmp irq_hud_palette_swap::return_from_delay
 .endproc
 
 .align 256
