@@ -427,13 +427,24 @@ LayoutPtr := R0
         ; the usual active_queue to draw for us)
         ; This will cause a couple of frames of lag!
         debug_color (TINT_G | LIGHTGRAY)
-        far_call FAR_draw_battlefield_block_A
+        ; old!
+        ;far_call FAR_draw_battlefield_block_A
+        ; new!
+        far_call FAR_draw_battlefield_block_A_inline
+        far_call FAR_draw_battlefield_block_B_inline
         debug_color LIGHTGRAY
         debug_color (TINT_G | LIGHTGRAY)
-        far_call FAR_draw_battlefield_block_B
+        ;old!
+        ;far_call FAR_draw_battlefield_block_B
+        ; new!
+        far_call FAR_draw_battlefield_block_C_inline
+        far_call FAR_draw_battlefield_block_D_inline
         debug_color LIGHTGRAY
         debug_color (TINT_G | LIGHTGRAY)
-        far_call FAR_draw_battlefield_block_C
+        ;old!
+        ;far_call FAR_draw_battlefield_block_C
+        ;new!
+        far_call FAR_draw_battlefield_block_E_inline
         debug_color LIGHTGRAY
 
         far_call FAR_reset_price_tracker
@@ -639,7 +650,11 @@ StartingRow := R14
 StartingTile := R15
 
         debug_color (TINT_G | LIGHTGRAY)
-        far_call FAR_draw_battlefield_block_A
+        ; old!
+        ;far_call FAR_draw_battlefield_block_A
+        ; new!
+        far_call FAR_draw_battlefield_block_A_inline
+        far_call FAR_draw_battlefield_block_B_inline
         debug_color LIGHTGRAY
 
         jsr every_gameloop
@@ -652,7 +667,12 @@ StartingRow := R14
 StartingTile := R15
 
         debug_color (TINT_G | LIGHTGRAY)
-        far_call FAR_draw_battlefield_block_B
+        ; old!
+        ;far_call FAR_draw_battlefield_block_B
+        ; new!
+        ; new!
+        far_call FAR_draw_battlefield_block_C_inline
+        far_call FAR_draw_battlefield_block_D_inline
         debug_color LIGHTGRAY
 
         jsr every_gameloop
@@ -666,7 +686,10 @@ StartingRow := R14
 StartingTile := R15
 
         debug_color (TINT_G | LIGHTGRAY)
-        far_call FAR_draw_battlefield_block_C
+        ;old!
+        ;far_call FAR_draw_battlefield_block_C
+        ;new!
+        far_call FAR_draw_battlefield_block_E_inline
         debug_color LIGHTGRAY
 
         far_call FAR_draw_prices

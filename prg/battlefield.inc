@@ -3,6 +3,12 @@
 .global FAR_draw_battlefield_block_C
 .global FAR_swap_battlefield_buffers
 
+.global FAR_draw_battlefield_block_A_inline
+.global FAR_draw_battlefield_block_B_inline
+.global FAR_draw_battlefield_block_C_inline
+.global FAR_draw_battlefield_block_D_inline
+.global FAR_draw_battlefield_block_E_inline
+
 .global battlefield
 .global tile_data
 .global tile_flags
