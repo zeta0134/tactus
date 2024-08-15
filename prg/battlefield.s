@@ -212,7 +212,6 @@ ScratchAttrByte := R8
 
         ; top left tile
         lda tile_patterns+i, x
-        and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
         ; ora #TOP_LEFT_BITS   ; this would be a nop
         sta (NametableAddr), y  ; store that to our regular nametable
         ; top-left attribute
@@ -224,7 +223,6 @@ ScratchAttrByte := R8
 
         ; top right tile
         lda tile_patterns+i, x
-        and #CORNER_MASK
         ora #TOP_RIGHT_BITS
         sta (NametableAddr), y
         ; top-right attribute
@@ -243,7 +241,6 @@ ScratchAttrByte := R8
 
         ; bottom left tile
         lda tile_patterns+i, x
-        and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
         ora #BOTTOM_LEFT_BITS
         sta (NametableAddr), y  ; store that to our regular nametable
         ; bottom-left attribute
@@ -255,7 +252,6 @@ ScratchAttrByte := R8
 
         ; bottom right tile
         lda tile_patterns+i, x
-        and #CORNER_MASK
         ora #BOTTOM_RIGHT_BITS
         sta (NametableAddr), y
         ; top-right attribute
