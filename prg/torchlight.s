@@ -19,6 +19,8 @@ current_torchlight_radius: .res 1
 target_counter: .res 1
 target_torchlight_radius: .res 1
 
+fully_lit_cooldown: .res 1
+
 torchlight_bank: .res 1
 
     .segment "TORCHLIGHT_0"
@@ -111,6 +113,7 @@ torchlight_luts_bank:
 .proc FAR_init_torchlight
     lda #0
     sta current_lighting_row
+    sta fully_lit_cooldown
 
     ; initialize all counters to 1, so they update right away
     ; when decremented the first time
@@ -131,6 +134,21 @@ torchlight_luts_bank:
 
 .proc FAR_draw_torchlight
     perform_zpcm_inc
+    lda current_torchlight_radius
+    cmp #30
+    beq at_max_brightness
+    lda #0
+    sta fully_lit_cooldown
+    jmp proceed_to_draw
+at_max_brightness:
+    lda fully_lit_cooldown
+    cmp #64
+    bcc proceed_to_draw
+    ; fully drawn at max brightness; nothing else to do.
+    rts
+proceed_to_draw:
+
+    perform_zpcm_inc
     jsr setup_torchlight_pointers
     access_data_bank torchlight_bank
     perform_zpcm_inc
@@ -143,6 +161,16 @@ torchlight_luts_bank:
     ldx current_lighting_counter
     lda torchlight_update_table, x
     sta current_lighting_row
+
+    lda current_torchlight_radius
+    cmp #30
+    bne done
+    lda fully_lit_cooldown
+    cmp #64
+    bcs done
+    inc fully_lit_cooldown
+done:
+
     perform_zpcm_inc
     rts
 .endproc
