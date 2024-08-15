@@ -141,9 +141,9 @@ rising_sprite_y:
         sec
         sbc ScratchByte
 write_sprite_y:
-        ; account for 1px screen offset
-        sec
-        sbc #1
+        ; -1 for the screen, +4 for the raster split
+        clc
+        adc #3
         ; perform the write
 
         ;sta SHADOW_OAM + OAM_Y_POS, y
