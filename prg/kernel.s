@@ -204,6 +204,7 @@ LayoutPtr := R0
 ; shared runner for all UI screens using the widget system
 ; (the widget logic contains all customizations, that's the point)
 .proc run_ui_subsystem
+        jsr poll_input
         jsr update_beat_counters_title
         perform_zpcm_inc
         far_call FAR_draw_sprites
@@ -272,6 +273,7 @@ LayoutPtr := R0
 .endproc
 
 .proc run_game_end_screen
+        jsr poll_input
         jsr update_beat_counters_title
         far_call FAR_draw_sprites
         far_call FAR_update_brightness
@@ -812,6 +814,8 @@ continue_waiting:
 .endproc
 
 .proc every_gameloop
+        jsr poll_input
+
         perform_zpcm_inc
         jsr update_beat_counters
         perform_zpcm_inc

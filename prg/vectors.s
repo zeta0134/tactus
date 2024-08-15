@@ -59,6 +59,7 @@ loop:
 .endproc
 
 .proc nmi
+        perform_zpcm_inc
         ; preserve registers
         pha
         txa
@@ -172,12 +173,9 @@ done_with_nametables:
         ;jsr setup_irq_during_nmi
         ;cli ; always enable interrupts; whether they get generated is up to the routine above
         far_call_nmi FAR_setup_raster_table_for_frame
-
-        ; poll for input *after* setting the scroll position
-        ; TODO: move this to the game loop
-        ;debug_color (TINT_B | LIGHTGRAY)
-        jsr poll_input
+        
         ; Advance the gameplay pRNG once every frame
+        ; y'know... this is probably a bad idea. is this safe if it gets interrupted?
         jsr next_gameplay_rand
 
         debug_color (TINT_R | LIGHTGRAY)

@@ -357,7 +357,6 @@ FloorListLength := R2
 
         ; pick a random maze layout and load it in
         in_range next_floor_rand, FloorListLength
-        perform_zpcm_inc
 
         ; use the drawn index to grab the relevant data from the table
         ; each table entry is 4 bytes long:

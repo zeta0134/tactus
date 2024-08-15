@@ -23,6 +23,7 @@
     jsr rand_func
     sec
 divide_loop:
+    perform_zpcm_inc
     sbc range
     bcs divide_loop
     adc range
@@ -40,5 +41,6 @@ divide_loop:
     sbc range
     bcs divide_loop
     adc range
+    perform_zpcm_inc
 .endscope
 .endmacro

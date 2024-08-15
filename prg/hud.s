@@ -202,6 +202,7 @@ done_picking_beat_length:
 
         ldx #0 ; heart container
 loop:
+        perform_zpcm_inc
         lda PlayerMaxHealth
         lsr
         lsr

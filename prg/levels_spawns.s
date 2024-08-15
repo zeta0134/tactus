@@ -12,6 +12,7 @@
     .include "rainbow.inc"
     .include "word_util.inc"
     .include "zeropage.inc"
+    .include "zpcm.inc"
 
     .zeropage
 
@@ -335,6 +336,7 @@ invalid_space:
         sta SpawnAttemptsCounter
 
 valid_space_loop:
+        perform_zpcm_inc
         dec SpawnAttemptsCounter
         beq spawn_attempt_failed
         jsr pick_safe_coordinate

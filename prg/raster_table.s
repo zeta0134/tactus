@@ -51,123 +51,6 @@ table_irq_high:         .res 32
 
         .segment "DATA_4"
 
-NORMAL  = $1E
-RED     = NORMAL | LIGHTGRAY | TINT_R
-GREEN   = NORMAL | LIGHTGRAY | TINT_G
-BLUE    = NORMAL | LIGHTGRAY | TINT_B
-YELLOW  = NORMAL | LIGHTGRAY | TINT_R | TINT_G
-CYAN    = NORMAL | LIGHTGRAY | TINT_G | TINT_B
-MAGENTA = NORMAL | LIGHTGRAY | TINT_R | TINT_B
-DARK    = NORMAL | LIGHTGRAY | TINT_R | TINT_G | TINT_B
-
-; For debugging, mostly. Eventually we want to automate generation
-rainbow_scrollx_frame_0:
-        .byte 0, 1, 2, 1, 0, $FF, $FE, $FF
-rainbow_scrollx_frame_1:
-        .byte 1, 2, 1, 0, $FF, $FE, $FF, 0
-rainbow_scrollx_frame_2:
-        .byte 2, 1, 0, $FF, $FE, $FF, 0, 1
-rainbow_scrollx_frame_3:
-        .byte 1, 0, $FF, $FE, $FF, 0, 1, 2
-rainbow_scrollx_frame_4:
-        .byte 0, $FF, $FE, $FF, 0, 1, 2, 1
-rainbow_scrollx_frame_5:
-        .byte $FF, $FE, $FF, 0, 1, 2, 1, 0
-rainbow_scrollx_frame_6:
-        .byte $FE, $FF, 0, 1, 2, 1, 0, $FF
-rainbow_scrollx_frame_7:
-        .byte $FF, 0, 1, 2, 1, 0, $FF, $FE
-rainbow_scrolly_frame_0:
-        .byte 0, 22, 44, 66, 88, 110, 132, 154
-rainbow_scanline_frame_0:
-        .byte 4, 26, 48, 70, 92, 114, 136, 158
-rainbow_ppumask_frame_0:
-        .byte NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL, NORMAL
-rainbow_irq_frame_0:
-        .byte >full_scroll_and_ppumask_irq, >full_scroll_and_ppumask_irq, >full_scroll_and_ppumask_irq, >full_scroll_and_ppumask_irq
-        .byte >full_scroll_and_ppumask_irq, >full_scroll_and_ppumask_irq, >full_scroll_and_ppumask_irq, >full_scroll_and_ppumask_irq
-        .byte >full_scroll_and_ppumask_irq
-
-rainbow_frame_0:
-        .addr rainbow_scrollx_frame_0
-        .addr rainbow_scrolly_frame_0
-        .addr rainbow_scanline_frame_0
-        .addr rainbow_ppumask_frame_0
-        .addr rainbow_irq_frame_0
-
-rainbow_frame_1:
-        .addr rainbow_scrollx_frame_1
-        .addr rainbow_scrolly_frame_0
-        .addr rainbow_scanline_frame_0
-        .addr rainbow_ppumask_frame_0
-        .addr rainbow_irq_frame_0
-
-rainbow_frame_2:
-        .addr rainbow_scrollx_frame_2
-        .addr rainbow_scrolly_frame_0
-        .addr rainbow_scanline_frame_0
-        .addr rainbow_ppumask_frame_0
-        .addr rainbow_irq_frame_0
-
-rainbow_frame_3:
-        .addr rainbow_scrollx_frame_3
-        .addr rainbow_scrolly_frame_0
-        .addr rainbow_scanline_frame_0
-        .addr rainbow_ppumask_frame_0
-        .addr rainbow_irq_frame_0
-
-rainbow_frame_4:
-        .addr rainbow_scrollx_frame_4
-        .addr rainbow_scrolly_frame_0
-        .addr rainbow_scanline_frame_0
-        .addr rainbow_ppumask_frame_0
-        .addr rainbow_irq_frame_0
-
-rainbow_frame_5:
-        .addr rainbow_scrollx_frame_5
-        .addr rainbow_scrolly_frame_0
-        .addr rainbow_scanline_frame_0
-        .addr rainbow_ppumask_frame_0
-        .addr rainbow_irq_frame_0
-
-rainbow_frame_6:
-        .addr rainbow_scrollx_frame_6
-        .addr rainbow_scrolly_frame_0
-        .addr rainbow_scanline_frame_0
-        .addr rainbow_ppumask_frame_0
-        .addr rainbow_irq_frame_0
-
-rainbow_frame_7:
-        .addr rainbow_scrollx_frame_7
-        .addr rainbow_scrolly_frame_0
-        .addr rainbow_scanline_frame_0
-        .addr rainbow_ppumask_frame_0
-        .addr rainbow_irq_frame_0
-
-.macro raster_frame frame_addr, scanlines
-        .addr frame_addr
-        .byte scanlines ; number of scanlines for this effect
-        .byte <.bank(frame_addr)
-.endmacro
-
-rainbow_frames:
-        raster_frame rainbow_frame_0, 8
-        raster_frame rainbow_frame_0, 8
-        raster_frame rainbow_frame_1, 8
-        raster_frame rainbow_frame_1, 8
-        raster_frame rainbow_frame_2, 8
-        raster_frame rainbow_frame_2, 8
-        raster_frame rainbow_frame_3, 8
-        raster_frame rainbow_frame_3, 8
-        raster_frame rainbow_frame_4, 8
-        raster_frame rainbow_frame_4, 8
-        raster_frame rainbow_frame_5, 8
-        raster_frame rainbow_frame_5, 8
-        raster_frame rainbow_frame_6, 8
-        raster_frame rainbow_frame_6, 8
-        raster_frame rainbow_frame_7, 8
-        raster_frame rainbow_frame_7, 8
-
         .include "raster/underwater.incs"
         
         .segment "CODE_0"
@@ -218,6 +101,8 @@ scroll_y_wraparound_lut:
         lda #>inverted_delay_table
         sta delay_table_addr+1
 
+        perform_zpcm_inc
+
         rts
 .endproc
 
@@ -230,6 +115,8 @@ ScanlineCount := RasterScratch+6
         ; Note: this ends up being called **during** the last scanline of vblank!
         ; We might be able to clean up a liiiitle bit of the code that comes before,
         ; but the timings are extremely close. Be careful!
+
+        perform_zpcm_inc
 
         lda #0
         sta RasterTableIndex
@@ -259,6 +146,7 @@ ScanlineCount := RasterScratch+6
         iny
         lda (FrameListPtr), y
         sta ScanlineCount
+        perform_zpcm_inc
         ; Now copy the table pointers from the frame list
         ldy #0
         lda (FramePtr), y
@@ -303,6 +191,7 @@ ScanlineCount := RasterScratch+6
         lda #$FF ; "any value"
         sta MAP_PPU_IRQ_ENABLE
         cli
+        perform_zpcm_inc
         ; Now we are prepped, and may copy the rest of the table
         jmp copy_raster_table
         ; TAIL CALL
@@ -314,6 +203,7 @@ Duration := RasterScratch+5
 ScanlineCount := RasterScratch+6
         ldy #0
 loop:
+        perform_zpcm_inc
         ; for comparison, let's try the less stupid, but slower version
         lda (TablePpuScrollXPtr), y    ; 5
         clc                            ; 2
@@ -351,6 +241,7 @@ loop:
         lda #0
         sta RasterEffectFrame
 done:
+        perform_zpcm_inc
 
         jmp finalize_irq_table
         ; TAIL CALL
@@ -383,6 +274,7 @@ finalizer_table:
         sta table_scanline_compare, y
         lda #>invalid_irq
         sta table_irq_high, y
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -403,6 +295,7 @@ finalizer_table:
         lda HudObjHighBank
         sta HudObjActual
 
+        perform_zpcm_inc
         rts
 .endproc
 

@@ -1053,7 +1053,9 @@ loop:
         jsr generate_room
         lda RoomIndexToGenerate
         sta RoomIndexToPreserve
+        perform_zpcm_inc
         far_call FAR_preserve_room
+        perform_zpcm_inc
         inc RoomIndexToGenerate
         lda RoomIndexToGenerate
         cmp #FLOOR_SIZE
@@ -1131,6 +1133,7 @@ spawn_boss_enemies:
 
         jmp room_cleared
 room_cleared:
+        perform_zpcm_inc
 
         ; If this is a shop room, roll shop loot
         ldx RoomIndexToGenerate
@@ -1141,6 +1144,7 @@ room_cleared:
         jsr roll_shop_loot
 done_with_shop_rolls:
 
+        perform_zpcm_inc
         rts
 .endproc
 
