@@ -330,7 +330,10 @@ LayoutPtr := R0
 
         ; Initially the game enables just the HUD and nothing else. Game logic
         ; will shift these around as necessary.
+
         set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD
+        ; For debugging lag, let's turn on an expensive underwater-y distortion
+        ;set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD
 
         ; Enable NMI first (but not rendering)
         lda #0
@@ -496,11 +499,6 @@ LayoutPtr := R0
         ; - Queue up any changed squares to the **active** buffer
         ; - Begin playback of any sprite animations (?)
 
-        ; - clear "moved this frame" flags from all tiles, permitting
-        ;   the updates we will perform over the next few frames
-        debug_color (TINT_R | TINT_G | LIGHTGRAY)
-        far_call FAR_clear_active_move_flags
-        debug_color LIGHTGRAY
         perform_zpcm_inc
         far_call FAR_age_sprites
         perform_zpcm_inc
@@ -519,43 +517,34 @@ StartingTile := R15
         far_call FAR_reset_price_tracker
         perform_zpcm_inc
 
-        ;- 1 frame: Update rows 0-3 of static enemies
+        ; - clear "moved this frame" flags from all tiles, permitting
+        ;   the updates we will perform over the next few frames
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
+        far_call FAR_clear_active_move_flags
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
         lda #0
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 0)
         sta StartingTile
         far_call FAR_update_static_enemy_row
-
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
-
         lda #1
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 1)
         sta StartingTile
         far_call FAR_update_static_enemy_row
-
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
-
         lda #2
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 2)
         sta StartingTile
         far_call FAR_update_static_enemy_row
-
-        debug_color LIGHTGRAY
-
-        debug_color (TINT_B | TINT_R | LIGHTGRAY)
-
-        lda #3
-        sta StartingRow
-        lda #(::BATTLEFIELD_WIDTH * 3)
-        sta StartingTile
-        far_call FAR_update_static_enemy_row
-
         debug_color LIGHTGRAY
 
         jsr every_gameloop
@@ -566,37 +555,37 @@ StartingTile := R15
 .proc update_enemies_2
 StartingRow := R14
 StartingTile := R15
-        
-        debug_color (TINT_B | TINT_R | LIGHTGRAY)
 
-        ;- 1 frame: Update rows 4-5 of static enemies, 0-1 of dynamic enemies, queue rows 0-1 to inactive buffer
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+        lda #3
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 3)
+        sta StartingTile
+        far_call FAR_update_static_enemy_row
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
         lda #4
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 4)
         sta StartingTile
         far_call FAR_update_static_enemy_row
-
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
-
         lda #5
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 5)
         sta StartingTile
         far_call FAR_update_static_enemy_row
-
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
-
-        ;- 1 frame: Update rows 6-7 of static enemies, 2-3 of dynamic enemies, queue rows 2-3 to inactive buffer
         lda #6
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 6)
         sta StartingTile
         far_call FAR_update_static_enemy_row
-
         debug_color LIGHTGRAY
 
         jsr every_gameloop
@@ -609,44 +598,35 @@ StartingRow := R14
 StartingTile := R15
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
-
         lda #7
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 7)
         sta StartingTile
         far_call FAR_update_static_enemy_row
-
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
-
-        ;- 1 frame: Update rows 8-9 of static enemies, 4-5 of dynamic enemies, queue rows 4-5 to inactive buffer
         lda #8
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 8)
         sta StartingTile
         far_call FAR_update_static_enemy_row
-
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
-
         lda #9
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 9)
         sta StartingTile
         far_call FAR_update_static_enemy_row
-
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
-
         lda #10
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 10)
         sta StartingTile
         far_call FAR_update_static_enemy_row
-
         debug_color LIGHTGRAY
 
         jsr every_gameloop

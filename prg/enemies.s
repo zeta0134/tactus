@@ -425,16 +425,27 @@ loop:
 .endproc
 
 .proc FAR_clear_active_move_flags
+        clc
         ldx #0
 loop:
         perform_zpcm_inc
-        lda tile_flags, x
-        and #%01111111
-        sta tile_flags, x
-        inx
+        .repeat 8, i       
+        lda tile_flags+i, x ; 4
+        and #%01111111      ; 2
+        sta tile_flags+i, x ; 5
+        .endrepeat
+        perform_zpcm_inc
+        .repeat 8, i       
+        lda tile_flags+i+8, x ; 4
+        and #%01111111      ; 2
+        sta tile_flags+i+8, x ; 5
+        .endrepeat
+        txa
+        adc #16
+        tax
         cpx #BATTLEFIELD_SIZE
-        bne loop
-        rts
+        jne loop
+        rts        
 .endproc
 
 .proc FAR_attack_enemy_tile
