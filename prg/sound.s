@@ -145,10 +145,10 @@ loop:
         ; to the zpcm-enabled universe
         lda code_bank_shadow
         and #<__BANK_MASK__
-        ora #8
+        ora #16
         sta MAP_PRG_8_LO
 
-        lda #(3 + 8)
+        lda #(3 + 16)
         sta MAP_PRG_E_LO
 
         perform_zpcm_inc
