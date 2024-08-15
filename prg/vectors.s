@@ -18,7 +18,6 @@
 .include "prng.inc"
 .include "rainbow.inc"
 .include "raster_table.inc"
-.include "raster_tricks.inc"
 .include "slowam.inc"
 .include "sound.inc"
 .include "zeropage.inc"
@@ -219,6 +218,5 @@ irq_none:
         ;
         .segment "VECTORS"
         .addr nmi
-        .addr reset
-        ;.addr irq_palette_swap
+        .addr reset        
         .addr self_modifying_irq

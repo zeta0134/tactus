@@ -11,7 +11,6 @@
         .include "nes.inc"
         .include "player.inc"
         .include "ppu.inc"
-        .include "raster_tricks.inc"
         .include "rainbow.inc"
         .include "sound.inc"
         .include "sprites.inc"

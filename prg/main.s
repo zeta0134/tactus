@@ -12,7 +12,6 @@
         .include "ppu.inc"
         .include "prng.inc"
         .include "raster_table.inc"
-        .include "raster_tricks.inc"
         .include "slowam.inc"
         .include "sound.inc"
         .include "word_util.inc"

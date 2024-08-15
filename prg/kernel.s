@@ -26,7 +26,6 @@
         .include "procgen.inc"
         .include "ppu.inc"
         .include "rainbow.inc"
-        .include "raster_tricks.inc"
         .include "settings.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -252,10 +251,6 @@ LayoutPtr := R0
         far_call FAR_set_old_chr_exbg
         far_call FAR_initialize_title_palettes
 
-        ; The end screens do not (currently) use IRQs
-        lda #0
-        sta raster_tricks_enabled
-
         ; Enable NMI first (but not rendering)
         lda #0
         sta NmiSoftDisable
@@ -329,10 +324,6 @@ LayoutPtr := R0
         ; copy the initial batch of graphics into CHR RAM
         jsr clear_fpga_ram
         far_call FAR_init_nametables
-
-        ; Gameplay does use IRQs
-        lda #1
-        sta raster_tricks_enabled
 
         ; Enable NMI first (but not rendering)
         lda #0
