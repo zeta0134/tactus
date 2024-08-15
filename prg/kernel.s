@@ -26,6 +26,7 @@
         .include "procgen.inc"
         .include "ppu.inc"
         .include "rainbow.inc"
+        .include "raster_table.inc"
         .include "settings.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -183,6 +184,7 @@ LayoutPtr := R0
         ; the UI subsystem may override this, but this'll be a sane starting set for testing
         far_call FAR_initialize_title_palettes
         far_call FAR_initialize_sprites
+        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_NONE
 
         ; Enable NMI first (but not rendering)
         lda #0
@@ -250,6 +252,7 @@ LayoutPtr := R0
         near_call FAR_init_game_end_screen
         far_call FAR_set_old_chr_exbg
         far_call FAR_initialize_title_palettes
+        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_NONE
 
         ; Enable NMI first (but not rendering)
         lda #0
@@ -324,6 +327,10 @@ LayoutPtr := R0
         ; copy the initial batch of graphics into CHR RAM
         jsr clear_fpga_ram
         far_call FAR_init_nametables
+
+        ; Initially the game enables just the HUD and nothing else. Game logic
+        ; will shift these around as necessary.
+        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD
 
         ; Enable NMI first (but not rendering)
         lda #0

@@ -51,14 +51,18 @@ table_irq_high:         .res 32
 
         .segment "DATA_4"
 
+        .include "raster/none.incs"
         .include "raster/underwater.incs"
-        
+
         .segment "CODE_0"
 
 ; this is the one we should probably split into tables, if we
 ; find ourselves needing more than 64 effects. but for now
 ; this is fine
 raster_effects_list:
+        .addr none_frames
+        .byte <.bank(none_frames) ; frame table bank
+        .byte 1 ; duration in frames
         .addr underwater_frames
         .byte <.bank(underwater_frames) ; frame table bank
         .byte 64 ; duration in frames
@@ -85,12 +89,12 @@ scroll_y_wraparound_lut:
 .proc FAR_initialize_irq_table
         lda #$4C               ; JMP opcode
         sta self_modifying_irq+0
-        lda #<full_scroll_and_ppumask_irq ; should be $00 consistently
+        lda #<invalid_irq ; should be $00 consistently
         sta self_modifying_irq+1
-        lda #<full_scroll_and_ppumask_irq ; will change based on which vector we should run next
+        lda #<invalid_irq ; will change based on which vector we should run next
         sta self_modifying_irq+2
 
-        lda #0
+        lda #4
         sta RasterEffectIndex
         sta RasterEffectFrame
         lda #2
@@ -100,7 +104,13 @@ scroll_y_wraparound_lut:
         sta delay_table_addr+0
         lda #>inverted_delay_table
         sta delay_table_addr+1
-
+        ; for initial safety, fill out the IRQ table with valid IRQ vectors
+        ; none of the real vectors are truly problematic if called at a bad time (they'll exit eventually)
+        ; but $0000 is unfortunate!
+        perform_zpcm_inc
+        .repeat 32, i
+        sta table_irq_high+i
+        .endrepeat
         perform_zpcm_inc
 
         rts
@@ -269,6 +279,7 @@ finalizer_table:
         .addr finalizer_hud
 
 ; just clears out the very last entry, no additional work needed
+; Note: Y still holds the final entry in the table
 .proc finalizer_none
         lda #$FF
         sta table_scanline_compare, y
@@ -278,6 +289,7 @@ finalizer_table:
         rts
 .endproc
 
+; Note: Y still holds the final entry in the table
 .proc finalizer_hud
         lda #0
         sta table_ppuscroll_x, y

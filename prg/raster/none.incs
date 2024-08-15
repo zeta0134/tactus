@@ -1,0 +1,27 @@
+; A plain no-nonsense raster setup that merely positions the playfield correctly
+; on scanline 4
+
+; TODO: all we really need to set here is the scroll position; can we simplfy this?
+
+none_frame_0:
+  .addr none_scrollx_common, none_scrolly_common, none_scanline_common, none_ppumask_common, none_irq_common
+
+none_ppumask_common:
+  .byte $1E
+
+none_irq_common:
+  .byte >full_scroll_and_ppumask_irq
+
+none_scrollx_common:
+  .byte 0
+
+none_scrolly_common:
+  .byte 0
+
+none_scanline_common:
+  .byte 4
+
+none_frames:
+  .addr none_frame_0
+  .byte 1
+  .byte <.bank(none_frame_0)
