@@ -54,19 +54,14 @@ done:
 .endproc
 
 .proc FAR_disable_all_oam_entries
-        ldx #0
-loop:
-        perform_zpcm_inc
-        lda sprite_ptr_lut_low, x
-        sta current_sprite_ptr+0
-        lda sprite_ptr_lut_high, x
-        sta current_sprite_ptr+1
-        ldy #SelfModifiedSprite::PosY
         lda #$F8
-        sta (current_sprite_ptr), y
-        inx
-        cpx #64
-        bne loop
+        .repeat 16, j
+        .repeat 4, i
+        ; 20 == lda imm, sta absl absh x 4
+        ; 83 = 20*4 + inc absl absh
+        sta SPRITE_TRANSFER_BASE + (20 * i) + (83 * j) + SelfModifiedSprite::PosY
+        .endrepeat
+        .endrepeat
         rts
 .endproc
 

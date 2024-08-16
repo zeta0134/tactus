@@ -331,9 +331,9 @@ LayoutPtr := R0
         ; Initially the game enables just the HUD and nothing else. Game logic
         ; will shift these around as necessary.
 
-        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD
+        ;set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD
         ; For debugging lag, let's turn on an expensive underwater-y distortion
-        ;set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD
+        set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD
 
         ; Enable NMI first (but not rendering)
         lda #0
