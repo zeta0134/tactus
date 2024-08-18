@@ -2,7 +2,7 @@
 <map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="16" height="11" tilewidth="16" tileheight="16" infinite="0" nextlayerid="66" nextobjectid="1">
  <properties>
   <property name="category" value="exterior"/>
-  <property name="dark" type="bool" value="false"/>
+  <property name="dark" type="bool" value="true"/>
   <property name="exit_east" type="bool" value="true"/>
   <property name="exit_north" type="bool" value="true"/>
   <property name="exit_south" type="bool" value="true"/>

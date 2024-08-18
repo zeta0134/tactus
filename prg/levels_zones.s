@@ -116,7 +116,7 @@ zone_grasslands_floor_1:
         .addr zone_grasslands_floor_1_mazes ; Maze Pool
         .addr zone_grasslands_floor_1_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
-        .byte 80   ; Added Tempo
+        .byte 0                     ; Added Tempo
         zone_banner_pos 0, 0        ; HudHeader
         zone_banner_pos 0, 5        ; HudBanner
         .addr hud_grasslands_pal
@@ -243,8 +243,8 @@ zone_hub_exits:
         .addr zone_hub_world ; this shouldn't generate. if it does, panic!
         .addr zone_grasslands_floor_1
         .addr zone_beach_floor_1
-        .addr zone_grasslands_floor_2 ; nope!
-        .addr zone_grasslands_floor_3 ; nope!
+        .addr zone_grasslands_floor_2_but_fast
+        .addr zone_hub_world ; nope!
 
 zone_hub_world_mazes:
         .byte 1
@@ -333,6 +333,35 @@ zone_beach_floor_3_exits:
 ; DEBUG: for now, just go back to the hub world
 ; (later we'll want a boss chamber, and a branching path)
 zone_beach_floor_4_exits:
+        .byte 1 ; length
+        .addr zone_hub_world
+
+; ░▒▓███████▓▒░░▒▓████████▓▒░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░  
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓██████▓▒░ ░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒▒▓███▓▒░ 
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+; ░▒▓███████▓▒░░▒▓████████▓▒░▒▓███████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░  
+
+zone_grasslands_floor_2_but_fast:
+        .addr spawn_pool_generic ; Spawn Pool
+        .addr spawnset_a53_z1_f2 ; Challenge Set
+        .byte 0                  ; SpawnPoolMin
+        .byte 64                 ; SpawnPoolMax
+        .byte 10                 ; PopulationLimit
+        .addr zone_grasslands_floor_234_mazes ; Maze Pool
+        .addr zone_debug_exits   ; Exit List
+        .byte TRACK_SHOWER_GROOVE   ; Music Track
+        .byte 80   ; Added Tempo
+        zone_banner_pos 14, 1       ; DebugHeader
+        zone_banner_pos 14, 5       ; DebugBanner
+        .addr hud_grasslands_pal
+        .addr rare_treasure_table ; ShopLootPtr
+
+; After debugging one zone, return to the hub world
+; (note: later to the debug world?)
+zone_debug_exits:
         .byte 1 ; length
         .addr zone_hub_world
 
