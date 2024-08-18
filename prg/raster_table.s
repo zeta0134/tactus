@@ -28,6 +28,7 @@ TableIrqHighPtr: .res 2
 
 RasterEffectIndex: .res 1
 RasterEffectFrame: .res 1
+RasterEffectFractionalFrame: .res 1
 RasterEffectFinalizerIndex: .res 1
 
 ; very small bit of scratch space, because we
@@ -55,6 +56,9 @@ table_ppuaddr_second:   .res 32
 table_ppumask:          .res 32
 table_irq_high:         .res 32
 
+RasterPlaybackSpeedHigh: .res 1
+RasterPlaybackSpeedLow: .res 1
+
         .segment "DATA_4"
 
         .include "raster/none.incs"
@@ -78,6 +82,12 @@ raster_effects_list:
         .byte 31 ; duration in frames
         .addr slide_left_frames
         .byte <.bank(slide_left_frames) ; frame table bank
+        .byte 31 ; duration in frames
+        .addr slide_down_frames
+        .byte <.bank(slide_down_frames) ; frame table bank
+        .byte 31 ; duration in frames
+        .addr slide_up_frames
+        .byte <.bank(slide_up_frames) ; frame table bank
         .byte 31 ; duration in frames
 
 nametable_lut_x:
@@ -107,13 +117,19 @@ scroll_y_wraparound_lut:
         lda #<invalid_irq ; will change based on which vector we should run next
         sta self_modifying_irq+2
 
-        lda #4
+        lda #0
         sta RasterEffectIndex
-        sta RasterEffectFrame
         lda #2
         sta RasterEffectFinalizerIndex
         lda #0
         sta RasterLoopPoint
+        sta RasterEffectFrame
+
+        lda #1
+        sta RasterPlaybackSpeedHigh
+        lda #0
+        sta RasterPlaybackSpeedLow
+        sta RasterEffectFractionalFrame
 
         lda #<inverted_delay_table
         sta delay_table_addr+0
@@ -283,7 +299,14 @@ loop:
         bne loop
 
         ; advance the animation pointer
-        inc RasterEffectFrame
+        clc
+        lda RasterPlaybackSpeedLow
+        adc RasterEffectFractionalFrame
+        sta RasterEffectFractionalFrame
+        lda RasterPlaybackSpeedHigh
+        adc RasterEffectFrame
+        sta RasterEffectFrame
+
         lda RasterEffectFrame
         cmp Duration
         bne done

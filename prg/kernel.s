@@ -503,6 +503,47 @@ right_nametable_active:
         rts
 .endproc
 
+; indexed by the number of frames we want the slide effect to complete in
+; (not really useful for anything else)
+slide_speed_lut_high:
+        .byte  31, 15, 10,  7,  6,  5,  4,  3,  3,  3,  2,  2,  2,  2,  2,  1
+        .byte   1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  1,  0
+        .byte   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
+        .byte   0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0,  0
+slide_speed_lut_low:
+        .byte   0,128, 85,192, 51, 42,109,224,113, 25,209,149, 98, 54, 17,240
+        .byte 210,184,161,140,121,104, 89, 74, 61, 49, 37, 27, 17,  8,  0,248
+        .byte 240,233,226,220,214,208,203,198,193,188,184,180,176,172,168,165
+        .byte 161,158,155,152,149,146,144,141,139,136,134,132,130,128,125,124
+
+.proc set_slide_speed
+        ; the slide should complete in around 75% of the duration of one frame
+        ; this gives the 3 frames of wiggle room for early setup, and the remaining
+        ; 25% of beat timing room for the player to send in their next input
+        
+        ; note that beat length caps out at 63, so this math should be safeish
+        lda TrackedBeatLength
+        lsr ; 50%
+        ;clc
+        ;adc TrackedBeatLength ; 150%
+        ;lsr ; 75%
+
+        ; sanity checks: if we are below about 4 frames, clamp there
+        cmp #4
+        bcs not_too_low
+        lda #4
+not_too_low:
+        ; if we have escaped the bounds of the table (how!?) reel it in
+        cmp #63
+        bcc not_too_high
+        lda #63
+not_too_high:
+        ; index into the speed table and set the thing
+        tax
+        set_raster_playback_speed {slide_speed_lut_high, x}, {slide_speed_lut_low, x}
+        rts
+.endproc
+
 ; A transition! How exciting...
 ; Note: this is now functionally identical to room init in the default case. Maybe remove
 ; the former?
@@ -544,6 +585,10 @@ detect_transition_type:
         beq setup_slide_right
         cmp #ROOM_TRANSITION_SLIDE_LEFT
         beq setup_slide_left
+        cmp #ROOM_TRANSITION_SLIDE_DOWN
+        beq setup_slide_down
+        cmp #ROOM_TRANSITION_SLIDE_UP
+        beq setup_slide_up
         ; This is an unrecognized transition type! Fall back to a standard init and
         ; do not attempt any bespoke transition. (Later: can we choose a default here
         ; anyway? a fade to black would be less awful than intentional jank)
@@ -552,14 +597,29 @@ detect_transition_type:
         jmp setup_default_transition
 setup_slide_right:
         jsr setup_nametables_for_slide_transition
+        jsr set_slide_speed
         set_raster_effect_safely #RASTER_EFFECT_SLIDE_RIGHT, #RASTER_FINALIZER_PLAIN_HUD, 30
         st16 GameMode, wait_for_room_transition
         rts
 setup_slide_left:
         jsr setup_nametables_for_slide_transition
+        jsr set_slide_speed
         set_raster_effect_safely #RASTER_EFFECT_SLIDE_LEFT, #RASTER_FINALIZER_PLAIN_HUD, 30
         st16 GameMode, wait_for_room_transition
         rts
+setup_slide_down:
+        jsr setup_nametables_for_slide_transition
+        jsr set_slide_speed
+        set_raster_effect_safely #RASTER_EFFECT_SLIDE_DOWN, #RASTER_FINALIZER_PLAIN_HUD, 30
+        st16 GameMode, wait_for_room_transition
+        rts
+setup_slide_up:
+        jsr setup_nametables_for_slide_transition
+        jsr set_slide_speed
+        set_raster_effect_safely #RASTER_EFFECT_SLIDE_UP, #RASTER_FINALIZER_PLAIN_HUD, 30
+        st16 GameMode, wait_for_room_transition
+        rts
+
 setup_default_transition:
         ; No transition at all! Instantly load that room, jank and all. This is the usual
         ; target after a floor init, as the "fade the palette in" logic hides the seams, and
@@ -573,7 +633,9 @@ setup_default_transition:
         lda RasterEffectFrame
         cmp #30
         bne continue_waiting
+        far_call FAR_finalize_player_pos_after_slide
         set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, 0
+        set_raster_playback_speed #1, #0
         st16 GameMode, beat_frame_1
         rts
 continue_waiting:
@@ -590,7 +652,9 @@ continue_waiting:
         far_call FAR_queue_hud
         perform_zpcm_inc
 
+        far_call FAR_determine_player_intent
         far_call FAR_draw_player
+        far_call FAR_correct_player_pos_during_slide
         perform_zpcm_inc
 
         debug_color (TINT_G | TINT_B | LIGHTGRAY)

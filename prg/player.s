@@ -14,6 +14,7 @@
         .include "player.inc"
         .include "procgen.inc"
         .include "rainbow.inc"
+        .include "raster_table.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "torchlight.inc"
@@ -214,6 +215,95 @@ sprite_failed:
         inc PlayerJumpHeightPos
 done:
         perform_zpcm_inc
+        rts
+.endproc
+
+player_horiz_offset_lut:
+        .byte   1,   1,   2,   3,   4,   7,  10,  15,  21,  28,  37,  48,  61,  75,  92, 112
+        .byte 132, 149, 163, 176, 187, 196, 203, 209, 214, 217, 220, 221, 222, 223, 223, 223
+player_vert_offset_lut:
+        .byte   1,   1,   1,   2,   3,   5,   7,  10,  14,  18,  24,  31,  39,  49,  60,  72
+        .byte  84,  95, 105, 113, 120, 126, 130, 134, 137, 139, 141, 142, 143, 143, 143, 143
+
+; Note: these apply directly to the sprite position, we'll call this every frame
+; but only during transitions. We clean up the position properly later.
+.proc correct_player_pos_during_left_slide
+        ldx RasterEffectFrame
+        ldy PlayerSpriteIndex
+        lda sprite_table + MetaSpriteState::PositionX, y
+        clc
+        adc player_horiz_offset_lut, x
+        sta sprite_table + MetaSpriteState::PositionX, y
+        rts
+.endproc
+
+.proc correct_player_pos_during_right_slide
+        ldx RasterEffectFrame
+        ldy PlayerSpriteIndex
+        lda sprite_table + MetaSpriteState::PositionX, y
+        sec
+        sbc player_horiz_offset_lut, x
+        sta sprite_table + MetaSpriteState::PositionX, y
+        rts
+.endproc
+
+.proc correct_player_pos_during_up_slide
+        ldx RasterEffectFrame
+        ldy PlayerSpriteIndex
+        lda sprite_table + MetaSpriteState::PositionY, y
+        clc
+        adc player_vert_offset_lut, x
+        cmp #224
+        bcs player_too_high
+        ; additional tomfoolery: if the player's Y position went
+        ; negative, clamp it back to 0. we only care about a small range here
+        sta sprite_table + MetaSpriteState::PositionY, y
+        rts
+player_too_high:
+        lda #0
+        sta sprite_table + MetaSpriteState::PositionY, y
+        rts
+.endproc
+
+.proc correct_player_pos_during_down_slide
+        ldx RasterEffectFrame
+        ldy PlayerSpriteIndex
+        lda sprite_table + MetaSpriteState::PositionY, y
+        sec
+        sbc player_vert_offset_lut, x
+        sta sprite_table + MetaSpriteState::PositionY, y
+        rts
+.endproc
+
+.proc FAR_correct_player_pos_during_slide
+        lda RoomTransitionType
+        cmp #ROOM_TRANSITION_SLIDE_RIGHT
+        beq correct_slide_right
+        cmp #ROOM_TRANSITION_SLIDE_LEFT
+        beq correct_slide_left
+        cmp #ROOM_TRANSITION_SLIDE_DOWN
+        beq correct_slide_down
+        cmp #ROOM_TRANSITION_SLIDE_UP
+        beq correct_slide_up
+        ; What? How did we get here?
+        rts
+correct_slide_right:
+        jsr correct_player_pos_during_right_slide
+        rts
+correct_slide_left:
+        jsr correct_player_pos_during_left_slide
+        rts
+correct_slide_down:
+        jsr correct_player_pos_during_down_slide
+        rts
+correct_slide_up:
+        jsr correct_player_pos_during_up_slide
+        rts
+.endproc
+
+.proc FAR_finalize_player_pos_after_slide
+        jsr set_player_target_coordinates
+        jsr apply_target_coordinates_immediately
         rts
 .endproc
 

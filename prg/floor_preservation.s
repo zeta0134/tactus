@@ -313,10 +313,11 @@ PreservedTileDetailPtr := R12
     ldy #0
 loop:
     perform_zpcm_inc
-    lda battlefield, y
+    .repeat 2
+    lda battlefield, y              
     sta (PreservedBattlefieldPtr), y
-    lda tile_data, y
-    sta (PreservedTileDataPtr), y
+    lda tile_data, y                
+    sta (PreservedTileDataPtr), y   
     lda tile_flags, y
     sta (PreservedTileFlagsPtr), y
     lda tile_patterns, y
@@ -326,11 +327,12 @@ loop:
     lda tile_detail, y
     sta (PreservedTileDetailPtr), y
     iny
+    .endrepeat
     cpy #BATTLEFIELD_SIZE
     bne loop
+    perform_zpcm_inc
 
     restore_previous_bank
-    perform_zpcm_inc
     rts
 .endproc
 
@@ -356,6 +358,7 @@ PreservedTileDetailPtr := R12
     ldy #0
 loop:
     perform_zpcm_inc
+    .repeat 2
     lda (PreservedBattlefieldPtr), y
     sta battlefield, y
     lda (PreservedTileDataPtr), y
@@ -369,10 +372,11 @@ loop:
     lda (PreservedTileDetailPtr), y
     sta tile_detail, y
     iny
+    .endrepeat
     cpy #BATTLEFIELD_SIZE
     bne loop
-
-    restore_previous_bank
     perform_zpcm_inc
+    
+    restore_previous_bank
     rts
 .endproc

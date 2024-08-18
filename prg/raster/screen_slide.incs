@@ -295,3 +295,361 @@ slide_left_frames:
   .byte 1, <.bank(slide_left_frame_29)
   .addr slide_left_frame_30
   .byte 1, <.bank(slide_left_frame_30)
+
+; ░▒▓███████▓▒░ ░▒▓██████▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓███████▓▒░  
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+; ░▒▓███████▓▒░ ░▒▓██████▓▒░ ░▒▓█████████████▓▒░░▒▓█▓▒░░▒▓█▓▒░ 
+                                                             
+slide_down_scrolly_frame_00: .byte 1, 0
+slide_down_scrolly_frame_01: .byte 1, 0
+slide_down_scrolly_frame_02: .byte 2, 0
+slide_down_scrolly_frame_03: .byte 2, 0
+slide_down_scrolly_frame_04: .byte 4, 0
+slide_down_scrolly_frame_05: .byte 6, 0
+slide_down_scrolly_frame_06: .byte 8, 0
+slide_down_scrolly_frame_07: .byte 12, 0
+slide_down_scrolly_frame_08: .byte 16, 0
+slide_down_scrolly_frame_09: .byte 22, 0
+slide_down_scrolly_frame_10: .byte 29, 0
+slide_down_scrolly_frame_11: .byte 38, 0
+slide_down_scrolly_frame_12: .byte 48, 0
+slide_down_scrolly_frame_13: .byte 59, 0
+slide_down_scrolly_frame_14: .byte 73, 0
+slide_down_scrolly_frame_15: .byte 88, 0
+slide_down_scrolly_frame_16: .byte 103, 0
+slide_down_scrolly_frame_17: .byte 117, 0
+slide_down_scrolly_frame_18: .byte 128, 0
+slide_down_scrolly_frame_19: .byte 138, 0
+slide_down_scrolly_frame_20: .byte 147, 0
+slide_down_scrolly_frame_21: .byte 154, 0
+slide_down_scrolly_frame_22: .byte 160, 0
+slide_down_scrolly_frame_23: .byte 164, 0
+slide_down_scrolly_frame_24: .byte 168, 0
+slide_down_scrolly_frame_25: .byte 170, 0
+slide_down_scrolly_frame_26: .byte 172, 0
+slide_down_scrolly_frame_27: .byte 174, 0
+slide_down_scrolly_frame_28: .byte 174, 0
+slide_down_scrolly_frame_29: .byte 175, 0
+slide_down_scrolly_frame_30: .byte 175, 0
+
+slide_down_scanline_frame_00: .byte 4, 180-1
+slide_down_scanline_frame_01: .byte 4, 180-1
+slide_down_scanline_frame_02: .byte 4, 180-2
+slide_down_scanline_frame_03: .byte 4, 180-2
+slide_down_scanline_frame_04: .byte 4, 180-4
+slide_down_scanline_frame_05: .byte 4, 180-6
+slide_down_scanline_frame_06: .byte 4, 180-8
+slide_down_scanline_frame_07: .byte 4, 180-12
+slide_down_scanline_frame_08: .byte 4, 180-16
+slide_down_scanline_frame_09: .byte 4, 180-22
+slide_down_scanline_frame_10: .byte 4, 180-29
+slide_down_scanline_frame_11: .byte 4, 180-38
+slide_down_scanline_frame_12: .byte 4, 180-48
+slide_down_scanline_frame_13: .byte 4, 180-59
+slide_down_scanline_frame_14: .byte 4, 180-73
+slide_down_scanline_frame_15: .byte 4, 180-88
+slide_down_scanline_frame_16: .byte 4, 180-103
+slide_down_scanline_frame_17: .byte 4, 180-117
+slide_down_scanline_frame_18: .byte 4, 180-128
+slide_down_scanline_frame_19: .byte 4, 180-138
+slide_down_scanline_frame_20: .byte 4, 180-147
+slide_down_scanline_frame_21: .byte 4, 180-154
+slide_down_scanline_frame_22: .byte 4, 180-160
+slide_down_scanline_frame_23: .byte 4, 180-164
+slide_down_scanline_frame_24: .byte 4, 180-168
+slide_down_scanline_frame_25: .byte 4, 180-170
+slide_down_scanline_frame_26: .byte 4, 180-172
+slide_down_scanline_frame_27: .byte 4, 180-174
+slide_down_scanline_frame_28: .byte 4, 180-174
+slide_down_scanline_frame_29: .byte 4, 180-175
+slide_down_scanline_frame_30: .byte 4, 180-175
+
+slide_down_ppumask_common:
+  .byte $1E, $1E
+
+slide_down_irq_common:
+  .byte >left_nametable_split_irq, >right_nametable_split_irq
+
+slide_down_scrollx_common:
+  .byte 0, 0
+
+slide_down_frame_00: .addr slide_down_scrollx_common, slide_down_scrolly_frame_00, slide_down_scanline_frame_00, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_01: .addr slide_down_scrollx_common, slide_down_scrolly_frame_01, slide_down_scanline_frame_01, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_02: .addr slide_down_scrollx_common, slide_down_scrolly_frame_02, slide_down_scanline_frame_02, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_03: .addr slide_down_scrollx_common, slide_down_scrolly_frame_03, slide_down_scanline_frame_03, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_04: .addr slide_down_scrollx_common, slide_down_scrolly_frame_04, slide_down_scanline_frame_04, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_05: .addr slide_down_scrollx_common, slide_down_scrolly_frame_05, slide_down_scanline_frame_05, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_06: .addr slide_down_scrollx_common, slide_down_scrolly_frame_06, slide_down_scanline_frame_06, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_07: .addr slide_down_scrollx_common, slide_down_scrolly_frame_07, slide_down_scanline_frame_07, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_08: .addr slide_down_scrollx_common, slide_down_scrolly_frame_08, slide_down_scanline_frame_08, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_09: .addr slide_down_scrollx_common, slide_down_scrolly_frame_09, slide_down_scanline_frame_09, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_10: .addr slide_down_scrollx_common, slide_down_scrolly_frame_10, slide_down_scanline_frame_10, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_11: .addr slide_down_scrollx_common, slide_down_scrolly_frame_11, slide_down_scanline_frame_11, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_12: .addr slide_down_scrollx_common, slide_down_scrolly_frame_12, slide_down_scanline_frame_12, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_13: .addr slide_down_scrollx_common, slide_down_scrolly_frame_13, slide_down_scanline_frame_13, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_14: .addr slide_down_scrollx_common, slide_down_scrolly_frame_14, slide_down_scanline_frame_14, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_15: .addr slide_down_scrollx_common, slide_down_scrolly_frame_15, slide_down_scanline_frame_15, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_16: .addr slide_down_scrollx_common, slide_down_scrolly_frame_16, slide_down_scanline_frame_16, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_17: .addr slide_down_scrollx_common, slide_down_scrolly_frame_17, slide_down_scanline_frame_17, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_18: .addr slide_down_scrollx_common, slide_down_scrolly_frame_18, slide_down_scanline_frame_18, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_19: .addr slide_down_scrollx_common, slide_down_scrolly_frame_19, slide_down_scanline_frame_19, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_20: .addr slide_down_scrollx_common, slide_down_scrolly_frame_20, slide_down_scanline_frame_20, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_21: .addr slide_down_scrollx_common, slide_down_scrolly_frame_21, slide_down_scanline_frame_21, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_22: .addr slide_down_scrollx_common, slide_down_scrolly_frame_22, slide_down_scanline_frame_22, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_23: .addr slide_down_scrollx_common, slide_down_scrolly_frame_23, slide_down_scanline_frame_23, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_24: .addr slide_down_scrollx_common, slide_down_scrolly_frame_24, slide_down_scanline_frame_24, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_25: .addr slide_down_scrollx_common, slide_down_scrolly_frame_25, slide_down_scanline_frame_25, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_26: .addr slide_down_scrollx_common, slide_down_scrolly_frame_26, slide_down_scanline_frame_26, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_27: .addr slide_down_scrollx_common, slide_down_scrolly_frame_27, slide_down_scanline_frame_27, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_28: .addr slide_down_scrollx_common, slide_down_scrolly_frame_28, slide_down_scanline_frame_28, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_29: .addr slide_down_scrollx_common, slide_down_scrolly_frame_29, slide_down_scanline_frame_29, slide_down_ppumask_common, slide_down_irq_common
+slide_down_frame_30: .addr slide_down_scrollx_common, slide_down_scrolly_frame_30, slide_down_scanline_frame_30, slide_down_ppumask_common, slide_down_irq_common
+
+
+slide_down_frames:
+  .addr slide_down_frame_00
+  .byte 2, <.bank(slide_down_frame_00)
+  .addr slide_down_frame_01
+  .byte 2, <.bank(slide_down_frame_01)
+  .addr slide_down_frame_02
+  .byte 2, <.bank(slide_down_frame_02)
+  .addr slide_down_frame_03
+  .byte 2, <.bank(slide_down_frame_03)
+  .addr slide_down_frame_04
+  .byte 2, <.bank(slide_down_frame_04)
+  .addr slide_down_frame_05
+  .byte 2, <.bank(slide_down_frame_05)
+  .addr slide_down_frame_06
+  .byte 2, <.bank(slide_down_frame_06)
+  .addr slide_down_frame_07
+  .byte 2, <.bank(slide_down_frame_07)
+  .addr slide_down_frame_08
+  .byte 2, <.bank(slide_down_frame_08)
+  .addr slide_down_frame_09
+  .byte 2, <.bank(slide_down_frame_09)
+  .addr slide_down_frame_10
+  .byte 2, <.bank(slide_down_frame_10)
+  .addr slide_down_frame_11
+  .byte 2, <.bank(slide_down_frame_11)
+  .addr slide_down_frame_12
+  .byte 2, <.bank(slide_down_frame_12)
+  .addr slide_down_frame_13
+  .byte 2, <.bank(slide_down_frame_13)
+  .addr slide_down_frame_14
+  .byte 2, <.bank(slide_down_frame_14)
+  .addr slide_down_frame_15
+  .byte 2, <.bank(slide_down_frame_15)
+  .addr slide_down_frame_16
+  .byte 2, <.bank(slide_down_frame_16)
+  .addr slide_down_frame_17
+  .byte 2, <.bank(slide_down_frame_17)
+  .addr slide_down_frame_18
+  .byte 2, <.bank(slide_down_frame_18)
+  .addr slide_down_frame_19
+  .byte 2, <.bank(slide_down_frame_19)
+  .addr slide_down_frame_20
+  .byte 2, <.bank(slide_down_frame_20)
+  .addr slide_down_frame_21
+  .byte 2, <.bank(slide_down_frame_21)
+  .addr slide_down_frame_22
+  .byte 2, <.bank(slide_down_frame_22)
+  .addr slide_down_frame_23
+  .byte 2, <.bank(slide_down_frame_23)
+  .addr slide_down_frame_24
+  .byte 2, <.bank(slide_down_frame_24)
+  .addr slide_down_frame_25
+  .byte 2, <.bank(slide_down_frame_25)
+  .addr slide_down_frame_26
+  .byte 2, <.bank(slide_down_frame_26)
+  .addr slide_down_frame_27
+  .byte 2, <.bank(slide_down_frame_27)
+  .addr slide_down_frame_28
+  .byte 2, <.bank(slide_down_frame_28)
+  .addr slide_down_frame_29
+  .byte 2, <.bank(slide_down_frame_29)
+  .addr slide_down_frame_30
+  .byte 2, <.bank(slide_down_frame_30)
+
+
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓███████▓▒░  
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓███████▓▒░  
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
+; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
+;  ░▒▓██████▓▒░░▒▓█▓▒░        
+  
+
+slide_up_scrolly_frame_00: .byte 175, 0
+slide_up_scrolly_frame_01: .byte 175, 0
+slide_up_scrolly_frame_02: .byte 174, 0
+slide_up_scrolly_frame_03: .byte 174, 0
+slide_up_scrolly_frame_04: .byte 172, 0
+slide_up_scrolly_frame_05: .byte 170, 0
+slide_up_scrolly_frame_06: .byte 168, 0
+slide_up_scrolly_frame_07: .byte 164, 0
+slide_up_scrolly_frame_08: .byte 160, 0
+slide_up_scrolly_frame_09: .byte 154, 0
+slide_up_scrolly_frame_10: .byte 147, 0
+slide_up_scrolly_frame_11: .byte 138, 0
+slide_up_scrolly_frame_12: .byte 128, 0
+slide_up_scrolly_frame_13: .byte 117, 0
+slide_up_scrolly_frame_14: .byte 103, 0
+slide_up_scrolly_frame_15: .byte 88, 0
+slide_up_scrolly_frame_16: .byte 73, 0
+slide_up_scrolly_frame_17: .byte 59, 0
+slide_up_scrolly_frame_18: .byte 48, 0
+slide_up_scrolly_frame_19: .byte 38, 0
+slide_up_scrolly_frame_20: .byte 29, 0
+slide_up_scrolly_frame_21: .byte 22, 0
+slide_up_scrolly_frame_22: .byte 16, 0
+slide_up_scrolly_frame_23: .byte 12, 0
+slide_up_scrolly_frame_24: .byte 8, 0
+slide_up_scrolly_frame_25: .byte 6, 0
+slide_up_scrolly_frame_26: .byte 4, 0
+slide_up_scrolly_frame_27: .byte 2, 0
+slide_up_scrolly_frame_28: .byte 2, 0
+slide_up_scrolly_frame_29: .byte 1, 0
+slide_up_scrolly_frame_30: .byte 1, 0
+
+slide_up_scanline_frame_00: .byte 4, 180-175
+slide_up_scanline_frame_01: .byte 4, 180-175
+slide_up_scanline_frame_02: .byte 4, 180-174
+slide_up_scanline_frame_03: .byte 4, 180-174
+slide_up_scanline_frame_04: .byte 4, 180-172
+slide_up_scanline_frame_05: .byte 4, 180-170
+slide_up_scanline_frame_06: .byte 4, 180-168
+slide_up_scanline_frame_07: .byte 4, 180-164
+slide_up_scanline_frame_08: .byte 4, 180-160
+slide_up_scanline_frame_09: .byte 4, 180-154
+slide_up_scanline_frame_10: .byte 4, 180-147
+slide_up_scanline_frame_11: .byte 4, 180-138
+slide_up_scanline_frame_12: .byte 4, 180-128
+slide_up_scanline_frame_13: .byte 4, 180-117
+slide_up_scanline_frame_14: .byte 4, 180-103
+slide_up_scanline_frame_15: .byte 4, 180-88
+slide_up_scanline_frame_16: .byte 4, 180-73
+slide_up_scanline_frame_17: .byte 4, 180-59
+slide_up_scanline_frame_18: .byte 4, 180-48
+slide_up_scanline_frame_19: .byte 4, 180-38
+slide_up_scanline_frame_20: .byte 4, 180-29
+slide_up_scanline_frame_21: .byte 4, 180-22
+slide_up_scanline_frame_22: .byte 4, 180-16
+slide_up_scanline_frame_23: .byte 4, 180-12
+slide_up_scanline_frame_24: .byte 4, 180-8
+slide_up_scanline_frame_25: .byte 4, 180-6
+slide_up_scanline_frame_26: .byte 4, 180-4
+slide_up_scanline_frame_27: .byte 4, 180-2
+slide_up_scanline_frame_28: .byte 4, 180-2
+slide_up_scanline_frame_29: .byte 4, 180-1
+slide_up_scanline_frame_30: .byte 4, 180-1
+
+slide_up_ppumask_common:
+  .byte $1E, $1E
+
+slide_up_irq_common:
+  .byte >right_nametable_split_irq, >left_nametable_split_irq
+
+slide_up_scrollx_common:
+  .byte 0, 0
+
+slide_up_frame_00: .addr slide_up_scrollx_common, slide_up_scrolly_frame_00, slide_up_scanline_frame_00, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_01: .addr slide_up_scrollx_common, slide_up_scrolly_frame_01, slide_up_scanline_frame_01, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_02: .addr slide_up_scrollx_common, slide_up_scrolly_frame_02, slide_up_scanline_frame_02, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_03: .addr slide_up_scrollx_common, slide_up_scrolly_frame_03, slide_up_scanline_frame_03, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_04: .addr slide_up_scrollx_common, slide_up_scrolly_frame_04, slide_up_scanline_frame_04, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_05: .addr slide_up_scrollx_common, slide_up_scrolly_frame_05, slide_up_scanline_frame_05, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_06: .addr slide_up_scrollx_common, slide_up_scrolly_frame_06, slide_up_scanline_frame_06, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_07: .addr slide_up_scrollx_common, slide_up_scrolly_frame_07, slide_up_scanline_frame_07, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_08: .addr slide_up_scrollx_common, slide_up_scrolly_frame_08, slide_up_scanline_frame_08, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_09: .addr slide_up_scrollx_common, slide_up_scrolly_frame_09, slide_up_scanline_frame_09, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_10: .addr slide_up_scrollx_common, slide_up_scrolly_frame_10, slide_up_scanline_frame_10, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_11: .addr slide_up_scrollx_common, slide_up_scrolly_frame_11, slide_up_scanline_frame_11, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_12: .addr slide_up_scrollx_common, slide_up_scrolly_frame_12, slide_up_scanline_frame_12, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_13: .addr slide_up_scrollx_common, slide_up_scrolly_frame_13, slide_up_scanline_frame_13, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_14: .addr slide_up_scrollx_common, slide_up_scrolly_frame_14, slide_up_scanline_frame_14, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_15: .addr slide_up_scrollx_common, slide_up_scrolly_frame_15, slide_up_scanline_frame_15, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_16: .addr slide_up_scrollx_common, slide_up_scrolly_frame_16, slide_up_scanline_frame_16, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_17: .addr slide_up_scrollx_common, slide_up_scrolly_frame_17, slide_up_scanline_frame_17, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_18: .addr slide_up_scrollx_common, slide_up_scrolly_frame_18, slide_up_scanline_frame_18, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_19: .addr slide_up_scrollx_common, slide_up_scrolly_frame_19, slide_up_scanline_frame_19, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_20: .addr slide_up_scrollx_common, slide_up_scrolly_frame_20, slide_up_scanline_frame_20, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_21: .addr slide_up_scrollx_common, slide_up_scrolly_frame_21, slide_up_scanline_frame_21, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_22: .addr slide_up_scrollx_common, slide_up_scrolly_frame_22, slide_up_scanline_frame_22, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_23: .addr slide_up_scrollx_common, slide_up_scrolly_frame_23, slide_up_scanline_frame_23, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_24: .addr slide_up_scrollx_common, slide_up_scrolly_frame_24, slide_up_scanline_frame_24, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_25: .addr slide_up_scrollx_common, slide_up_scrolly_frame_25, slide_up_scanline_frame_25, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_26: .addr slide_up_scrollx_common, slide_up_scrolly_frame_26, slide_up_scanline_frame_26, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_27: .addr slide_up_scrollx_common, slide_up_scrolly_frame_27, slide_up_scanline_frame_27, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_28: .addr slide_up_scrollx_common, slide_up_scrolly_frame_28, slide_up_scanline_frame_28, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_29: .addr slide_up_scrollx_common, slide_up_scrolly_frame_29, slide_up_scanline_frame_29, slide_up_ppumask_common, slide_up_irq_common
+slide_up_frame_30: .addr slide_up_scrollx_common, slide_up_scrolly_frame_30, slide_up_scanline_frame_30, slide_up_ppumask_common, slide_up_irq_common
+
+
+slide_up_frames:
+  .addr slide_up_frame_00
+  .byte 2, <.bank(slide_up_frame_00)
+  .addr slide_up_frame_01
+  .byte 2, <.bank(slide_up_frame_01)
+  .addr slide_up_frame_02
+  .byte 2, <.bank(slide_up_frame_02)
+  .addr slide_up_frame_03
+  .byte 2, <.bank(slide_up_frame_03)
+  .addr slide_up_frame_04
+  .byte 2, <.bank(slide_up_frame_04)
+  .addr slide_up_frame_05
+  .byte 2, <.bank(slide_up_frame_05)
+  .addr slide_up_frame_06
+  .byte 2, <.bank(slide_up_frame_06)
+  .addr slide_up_frame_07
+  .byte 2, <.bank(slide_up_frame_07)
+  .addr slide_up_frame_08
+  .byte 2, <.bank(slide_up_frame_08)
+  .addr slide_up_frame_09
+  .byte 2, <.bank(slide_up_frame_09)
+  .addr slide_up_frame_10
+  .byte 2, <.bank(slide_up_frame_10)
+  .addr slide_up_frame_11
+  .byte 2, <.bank(slide_up_frame_11)
+  .addr slide_up_frame_12
+  .byte 2, <.bank(slide_up_frame_12)
+  .addr slide_up_frame_13
+  .byte 2, <.bank(slide_up_frame_13)
+  .addr slide_up_frame_14
+  .byte 2, <.bank(slide_up_frame_14)
+  .addr slide_up_frame_15
+  .byte 2, <.bank(slide_up_frame_15)
+  .addr slide_up_frame_16
+  .byte 2, <.bank(slide_up_frame_16)
+  .addr slide_up_frame_17
+  .byte 2, <.bank(slide_up_frame_17)
+  .addr slide_up_frame_18
+  .byte 2, <.bank(slide_up_frame_18)
+  .addr slide_up_frame_19
+  .byte 2, <.bank(slide_up_frame_19)
+  .addr slide_up_frame_20
+  .byte 2, <.bank(slide_up_frame_20)
+  .addr slide_up_frame_21
+  .byte 2, <.bank(slide_up_frame_21)
+  .addr slide_up_frame_22
+  .byte 2, <.bank(slide_up_frame_22)
+  .addr slide_up_frame_23
+  .byte 2, <.bank(slide_up_frame_23)
+  .addr slide_up_frame_24
+  .byte 2, <.bank(slide_up_frame_24)
+  .addr slide_up_frame_25
+  .byte 2, <.bank(slide_up_frame_25)
+  .addr slide_up_frame_26
+  .byte 2, <.bank(slide_up_frame_26)
+  .addr slide_up_frame_27
+  .byte 2, <.bank(slide_up_frame_27)
+  .addr slide_up_frame_28
+  .byte 2, <.bank(slide_up_frame_28)
+  .addr slide_up_frame_29
+  .byte 2, <.bank(slide_up_frame_29)
+  .addr slide_up_frame_30
+  .byte 2, <.bank(slide_up_frame_30)

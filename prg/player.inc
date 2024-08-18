@@ -4,6 +4,8 @@
 .global FAR_update_player
 .global FAR_damage_player
 .global FAR_player_resolve_collision
+.global FAR_correct_player_pos_during_slide
+.global FAR_finalize_player_pos_after_slide
 
 .global row_number_to_tile_index_lut
 
