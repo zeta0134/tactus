@@ -5,6 +5,7 @@
     .include "../build/tile_defs.inc"
 
     .include "battlefield.inc"
+    .include "debug.inc"
     .include "enemies.inc"
     .include "far_call.inc"
     .include "levels.inc"

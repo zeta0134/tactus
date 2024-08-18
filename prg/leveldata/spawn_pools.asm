@@ -7,6 +7,16 @@
 ; Make sure all spawn pools add up to 128 in length! Repeat entries
 ; as necessary.
 
+.if ::DEBUG_SPAWN_OVERRIDE
+
+; Always spawn THIS enemy (for testing)
+spawn_pool_generic:
+    .repeat 128
+    .addr enemy_mole_basic
+    .endrepeat
+
+.else
+
 ; contains every non-weird enemy in the game
 ; suitable for use in almost all chambers.
 spawn_pool_generic:
@@ -73,4 +83,4 @@ spawn_pool_generic:
     .addr enemy_spider_advanced
     .endrepeat
 
-
+.endif

@@ -120,35 +120,6 @@ all_frames:
         ;     will glitch pretty badly
         ; ===========================================================
 
-        ; single-screen mirroring for the playfield: the active battlefield
-        ; goes in every bank
-        lda displayed_battlefield
-        bne right_nametable
-left_nametable:
-        lda #0
-        sta MAP_NT_A_BANK
-        sta MAP_NT_B_BANK
-        sta MAP_NT_C_BANK
-        sta MAP_NT_D_BANK
-        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
-        sta MAP_NT_A_CONTROL
-        sta MAP_NT_B_CONTROL
-        sta MAP_NT_C_CONTROL
-        sta MAP_NT_D_CONTROL
-        jmp done_with_nametables
-right_nametable:
-        lda #1
-        sta MAP_NT_A_BANK
-        sta MAP_NT_B_BANK
-        sta MAP_NT_C_BANK
-        sta MAP_NT_D_BANK
-        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG_AT)
-        sta MAP_NT_A_CONTROL
-        sta MAP_NT_B_CONTROL
-        sta MAP_NT_C_CONTROL
-        sta MAP_NT_D_CONTROL
-done_with_nametables:
-
         ; scroll nametable doesn't matter, so we're really just setting
         ; up consistent rendering primitives here in case they were clobbered
         ; during loading or something

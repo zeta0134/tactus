@@ -16,6 +16,7 @@ ScrollXOffset: .res 1
 ScrollYOffset: .res 1
 
 RasterTableIndex: .res 1
+RasterLoopPoint: .res 1
 
 self_modifying_irq: .res 3
 
@@ -39,6 +40,11 @@ delay_routine_addr: .res 2
 HudBgActual: .res 1
 HudObjActual: .res 1
 
+LeftNametableBank: .res 1
+RightNametableBank: .res 1
+LeftNametableAttr: .res 1
+RightNametableAttr: .res 1
+
         .segment "PRGRAM"
 
 .align 32
@@ -52,6 +58,7 @@ table_irq_high:         .res 32
         .segment "DATA_4"
 
         .include "raster/none.incs"
+        .include "raster/screen_slide.incs"
         .include "raster/underwater.incs"
 
         .segment "CODE_0"
@@ -66,6 +73,12 @@ raster_effects_list:
         .addr underwater_frames
         .byte <.bank(underwater_frames) ; frame table bank
         .byte 64 ; duration in frames
+        .addr slide_right_frames
+        .byte <.bank(slide_right_frames) ; frame table bank
+        .byte 31 ; duration in frames
+        .addr slide_left_frames
+        .byte <.bank(slide_left_frames) ; frame table bank
+        .byte 31 ; duration in frames
 
 nametable_lut_x:
         .repeat 256, i
@@ -99,6 +112,8 @@ scroll_y_wraparound_lut:
         sta RasterEffectFrame
         lda #2
         sta RasterEffectFinalizerIndex
+        lda #0
+        sta RasterLoopPoint
 
         lda #<inverted_delay_table
         sta delay_table_addr+0
@@ -111,6 +126,15 @@ scroll_y_wraparound_lut:
         .repeat 32, i
         sta table_irq_high+i
         .endrepeat
+        perform_zpcm_inc
+
+        lda #0
+        sta LeftNametableBank
+        sta RightNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)        
+        sta LeftNametableAttr
+        sta RightNametableAttr
+
         perform_zpcm_inc
 
         rts
@@ -127,6 +151,21 @@ ScanlineCount := RasterScratch+6
         ; but the timings are extremely close. Be careful!
 
         perform_zpcm_inc
+
+        ; first, setup global properties for the top of the frame. this is before vblank
+        ; ends
+        lda LeftNametableBank
+        sta MAP_NT_A_BANK
+        sta MAP_NT_C_BANK
+        lda RightNametableBank
+        sta MAP_NT_B_BANK
+        sta MAP_NT_D_BANK
+        lda LeftNametableAttr
+        sta MAP_NT_A_CONTROL
+        sta MAP_NT_C_CONTROL
+        lda RightNametableAttr
+        sta MAP_NT_B_CONTROL
+        sta MAP_NT_D_CONTROL
 
         lda #0
         sta RasterTableIndex
@@ -248,7 +287,7 @@ loop:
         lda RasterEffectFrame
         cmp Duration
         bne done
-        lda #0
+        lda RasterLoopPoint
         sta RasterEffectFrame
 done:
         perform_zpcm_inc
@@ -329,6 +368,94 @@ finalizer_table:
         lda MAP_PPU_IRQ_STATUS        ; 4 (acknowledge)
 
         ; now make the first two scrolling writes that are safe to perform early (12)
+        sta PPUADDR                ; 4 (1-screen mirroring: we don't care about the value)
+        lda table_ppuscroll_y, x   ; 4
+        sta PPUSCROLL              ; 4
+
+        ; set the IRQ function to run on the NEXT scanline here (high byte only)
+        ; this also gives us a bit of margin to avoid dot 256-257 more reliably
+        lda table_irq_high+1, x     ; 4
+        sta self_modifying_irq+2    ; 3
+
+        ; timed so that the first write is AFTER dot 256 or so (24)
+        lda table_ppuscroll_x, x    ; 4
+        sta PPUSCROLL               ; 4, sets fine_x
+        lda table_ppuaddr_second, x ; 4
+        sta PPUADDR                 ; 4, fully updates v
+        lda table_ppumask, x        ; 4
+        sta PPUMASK                 ; 4, sets color emphasis / greyscale
+
+        inc RasterTableIndex
+
+        ; register restoration from zeropage (6)
+        lda IrqPreserveA ; 3
+        ldx IrqPreserveX ; 3
+        
+        perform_zpcm_inc ; 6
+        rti ; 6
+.endproc
+
+.align 256
+.proc left_nametable_split_irq   ; (7)
+        perform_zpcm_inc ; (6)
+        ; register preservation to zeropage (6)
+        sta IrqPreserveA ; 3
+        stx IrqPreserveX ; 3
+
+        ; BEFORE the end of the scanline (mostly) (3)
+        ldx RasterTableIndex     ; 3
+
+        ; first, acknowledge the IRQ and set up for the next one (12)
+        lda table_scanline_compare+1, x ; 4
+        sta MAP_PPU_IRQ_LATCH         ; 4 (set new cmp value)
+        lda MAP_PPU_IRQ_STATUS        ; 4 (acknowledge)
+
+        ; now make the first two scrolling writes that are safe to perform early (12)
+        lda #$00                     ; 2 (left nametable)
+        sta PPUADDR                ; 4 (1-screen mirroring: we don't care about the value)
+        lda table_ppuscroll_y, x   ; 4
+        sta PPUSCROLL              ; 4
+
+        ; set the IRQ function to run on the NEXT scanline here (high byte only)
+        ; this also gives us a bit of margin to avoid dot 256-257 more reliably
+        lda table_irq_high+1, x     ; 4
+        sta self_modifying_irq+2    ; 3
+
+        ; timed so that the first write is AFTER dot 256 or so (24)
+        lda table_ppuscroll_x, x    ; 4
+        sta PPUSCROLL               ; 4, sets fine_x
+        lda table_ppuaddr_second, x ; 4
+        sta PPUADDR                 ; 4, fully updates v
+        lda table_ppumask, x        ; 4
+        sta PPUMASK                 ; 4, sets color emphasis / greyscale
+
+        inc RasterTableIndex
+
+        ; register restoration from zeropage (6)
+        lda IrqPreserveA ; 3
+        ldx IrqPreserveX ; 3
+        
+        perform_zpcm_inc ; 6
+        rti ; 6
+.endproc
+
+.align 256
+.proc right_nametable_split_irq   ; (7)
+        perform_zpcm_inc ; (6)
+        ; register preservation to zeropage (6)
+        sta IrqPreserveA ; 3
+        stx IrqPreserveX ; 3
+
+        ; BEFORE the end of the scanline (mostly) (3)
+        ldx RasterTableIndex     ; 3
+
+        ; first, acknowledge the IRQ and set up for the next one (12)
+        lda table_scanline_compare+1, x ; 4
+        sta MAP_PPU_IRQ_LATCH         ; 4 (set new cmp value)
+        lda MAP_PPU_IRQ_STATUS        ; 4 (acknowledge)
+
+        ; now make the first two scrolling writes that are safe to perform early (12)
+        lda #$04                     ; 2 (left nametable)
         sta PPUADDR                ; 4 (1-screen mirroring: we don't care about the value)
         lda table_ppuscroll_y, x   ; 4
         sta PPUSCROLL              ; 4

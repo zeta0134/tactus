@@ -116,7 +116,7 @@ zone_grasslands_floor_1:
         .addr zone_grasslands_floor_1_mazes ; Maze Pool
         .addr zone_grasslands_floor_1_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
-        .byte 0   ; Added Tempo
+        .byte 80   ; Added Tempo
         zone_banner_pos 0, 0        ; HudHeader
         zone_banner_pos 0, 5        ; HudBanner
         .addr hud_grasslands_pal
@@ -243,8 +243,8 @@ zone_hub_exits:
         .addr zone_hub_world ; this shouldn't generate. if it does, panic!
         .addr zone_grasslands_floor_1
         .addr zone_beach_floor_1
-        .addr zone_hub_world ; nope!
-        .addr zone_hub_world ; nope!
+        .addr zone_grasslands_floor_2 ; nope!
+        .addr zone_grasslands_floor_3 ; nope!
 
 zone_hub_world_mazes:
         .byte 1

@@ -140,7 +140,7 @@ MetaSpriteIndex := R0
 
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
-        lda #ITEM_BROADSWORD_L1
+        lda #ITEM_SPEAR_L2
         sta PlayerEquipmentWeapon
         lda #ITEM_LARGE_TORCH
         sta PlayerEquipmentTorch
@@ -1304,6 +1304,42 @@ already_dead:
         rts
 .endproc
 
+exit_left_lut:
+        .repeat ::FLOOR_HEIGHT, h
+        .byte (FLOOR_WIDTH-1) + (h * FLOOR_WIDTH)
+        .repeat ::FLOOR_WIDTH - 1, w
+        .byte (w) + (h * FLOOR_WIDTH)
+        .endrepeat
+        .endrepeat
+
+exit_right_lut:
+        .repeat ::FLOOR_HEIGHT, h
+        .repeat ::FLOOR_WIDTH - 1, w
+        .byte (w+1) + (h * FLOOR_WIDTH)
+        .endrepeat
+        .byte (0) + (h * FLOOR_WIDTH)
+        .endrepeat
+
+exit_up_lut:
+        .repeat ::FLOOR_WIDTH, w
+        .byte w + ((::FLOOR_HEIGHT-1) * FLOOR_WIDTH)
+        .endrepeat
+        .repeat ::FLOOR_HEIGHT-1, h
+        .repeat ::FLOOR_WIDTH, w
+        .byte (w) + (h * FLOOR_WIDTH)
+        .endrepeat
+        .endrepeat
+
+exit_down_lut:
+        .repeat ::FLOOR_HEIGHT-1, h
+        .repeat ::FLOOR_WIDTH, w
+        .byte (w) + ((h+1) * FLOOR_WIDTH)
+        .endrepeat
+        .endrepeat
+        .repeat ::FLOOR_WIDTH, w
+        .byte w + ((0) * FLOOR_WIDTH)
+        .endrepeat
+
 ; Note: checks and updates PlayerRow/PlayerCol,
 ; but does **not** update the target or tween positions.
 ; This intentionally desynchronizes the on-screen position, which
@@ -1311,6 +1347,7 @@ already_dead:
 ; room loads, we'll instantly set their new position and they'll be in
 ; the right spot based on the way they left the previous field.
 .proc detect_exit
+RoomIndexScratch := R0
         lda PlayerCol
         cmp #0
         beq exit_left
@@ -1324,33 +1361,45 @@ already_dead:
 no_exit:
         rts
 exit_left:
-        dec PlayerRoomIndex
+        ; For fun and later warping, wrap the room index around the map
+        ; 
+        ldx PlayerRoomIndex
+        lda exit_left_lut, x
+        sta PlayerRoomIndex
+        lda #ROOM_TRANSITION_SLIDE_LEFT
+        sta RoomTransitionType
         lda #(::BATTLEFIELD_WIDTH - 2)
         sta PlayerCol
         jmp converge
 exit_right:
-        inc PlayerRoomIndex
+        ldx PlayerRoomIndex
+        lda exit_right_lut, x
+        sta PlayerRoomIndex
+        lda #ROOM_TRANSITION_SLIDE_RIGHT
+        sta RoomTransitionType
         lda #1
         sta PlayerCol
         jmp converge
 exit_top:
-        lda PlayerRoomIndex
-        sec
-        sbc #::FLOOR_WIDTH
+        ldx PlayerRoomIndex
+        lda exit_up_lut, x
         sta PlayerRoomIndex
+        lda #ROOM_TRANSITION_SLIDE_UP
+        sta RoomTransitionType
         lda #(::BATTLEFIELD_HEIGHT - 2)
         sta PlayerRow
         jmp converge
 exit_bottom:
-        lda PlayerRoomIndex
-        clc
-        adc #::FLOOR_WIDTH
+        ldx PlayerRoomIndex
+        lda exit_down_lut, x
         sta PlayerRoomIndex
+        lda #ROOM_TRANSITION_SLIDE_DOWN
+        sta RoomTransitionType
         lda #1
         sta PlayerRow
         jmp converge
 converge:
-        st16 GameMode, room_init
+        st16 GameMode, room_transition
         ; mark the room as "busy", this prevents us clearing the next room prematurely
         lda #1
         sta enemies_active

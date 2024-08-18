@@ -1236,7 +1236,8 @@ apply_lightness:
         lda #30
         sta current_torchlight_radius
         sta target_torchlight_radius
-        far_call FAR_lighten_entire_inactive_torchlight
+        ; do not insta-lighten, we're doing that in the kernel now
+        ;far_call FAR_lighten_entire_inactive_torchlight
         jmp done_with_torchlight
 apply_darkness:
         lda target_torchlight_radius
@@ -1247,7 +1248,8 @@ apply_darkness:
 no_instant_darkness:
         lda PlayerTorchlightRadius
         sta target_torchlight_radius
-        far_call FAR_darken_entire_inactive_torchlight
+        ; do not insta-darken, we're doing that in the kernel now
+        ;far_call FAR_darken_entire_inactive_torchlight
 done_with_torchlight:
 
         restore_previous_bank

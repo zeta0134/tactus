@@ -1,8 +1,10 @@
 DEBUG_MODE = 1
 DEBUG_MESEN_MODE = 1
 DEBUG_TIME_WASTE = 0
-DEBUG_DISABLE_MUSIC = 0
+DEBUG_DISABLE_MUSIC = 1
 DEBUG_GOD_MODE = 1
+
+DEBUG_SPAWN_OVERRIDE = 0
 
 DEBUG_SEED = 42
 
@@ -10,9 +12,9 @@ DEBUG_SEED = 42
         .if ::DEBUG_MODE
                 lda #(BG_ON | OBJ_ON | BG_CLIP | OBJ_CLIP | flags)
                 .if ::DEBUG_MESEN_MODE
-                sta $FEED
+                        sta $FEED
                 .else
-                sta PPUMASK
+                        sta PPUMASK
                 .endif
         .endif
 .endmacro

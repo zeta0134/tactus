@@ -59,6 +59,7 @@ HudBgHighBank: .res 1
 HudObjHighBank: .res 1
 
 ClearedRoomCooldown: .res 1
+RoomTransitionType: .res 1
 
 .segment "CODE_1"
 
@@ -174,17 +175,17 @@ LayoutPtr := R0
 
         ; set up our usual extended attributes, which is necessary to properly
         ; display fonts
-        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
-        sta MAP_NT_A_CONTROL
-        sta MAP_NT_C_CONTROL
-        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG_AT)
-        sta MAP_NT_B_CONTROL
-        sta MAP_NT_D_CONTROL
+        lda #0
+        sta LeftNametableBank
+        sta RightNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG)
+        sta LeftNametableAttr
+        sta RightNametableAttr
 
         ; the UI subsystem may override this, but this'll be a sane starting set for testing
         far_call FAR_initialize_title_palettes
         far_call FAR_initialize_sprites
-        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_NONE
+        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_NONE, #0
 
         ; Enable NMI first (but not rendering)
         lda #0
@@ -240,19 +241,19 @@ LayoutPtr := R0
         sta TargetBrightness
 
         ; the end screens use typical 16x16 attributes for now, so set those up again
+        lda #0
+        sta LeftNametableBank
+        sta RightNametableBank
         lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG)
-        sta MAP_NT_A_CONTROL
-        sta MAP_NT_C_CONTROL
-        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG)
-        sta MAP_NT_B_CONTROL
-        sta MAP_NT_D_CONTROL
+        sta LeftNametableAttr
+        sta RightNametableAttr
 
         jsr clear_fpga_ram
         far_call FAR_initialize_sprites
         near_call FAR_init_game_end_screen
         far_call FAR_set_old_chr_exbg
         far_call FAR_initialize_title_palettes
-        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_NONE
+        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_NONE, #0
 
         ; Enable NMI first (but not rendering)
         lda #0
@@ -294,6 +295,8 @@ LayoutPtr := R0
 
         lda #0
         sta tempo_adjustment
+        lda #0
+        sta RoomTransitionType
 
         ; play lovely silence while we load
         ; (this also ensures the music / beat counter are in a deterministic spot when we fade back in)
@@ -310,12 +313,13 @@ LayoutPtr := R0
         far_call FAR_init_coins
 
         ; the game screen uses ExAttr for palette access, so set that up here
+        ; we'll start on the left nametable
+        lda #0
+        sta LeftNametableBank
+        sta RightNametableBank
         lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
-        sta MAP_NT_A_CONTROL
-        sta MAP_NT_C_CONTROL
-        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG_AT)
-        sta MAP_NT_B_CONTROL
-        sta MAP_NT_D_CONTROL        
+        sta LeftNametableAttr
+        sta RightNametableAttr
 
         ; set the game palette
         far_call FAR_initialize_game_palettes
@@ -331,9 +335,11 @@ LayoutPtr := R0
         ; Initially the game enables just the HUD and nothing else. Game logic
         ; will shift these around as necessary.
 
-        ;set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD
+        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, 0
         ; For debugging lag, let's turn on an expensive underwater-y distortion
-        set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD
+        ; Later, let's have rooms specify this, kay? it's irritating to change the build just to see it
+        ;set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD
+        ;set_raster_effect_safely #RASTER_EFFECT_SLIDE_LEFT, #RASTER_FINALIZER_PLAIN_HUD, #30
 
         ; Enable NMI first (but not rendering)
         lda #0
@@ -411,6 +417,9 @@ LayoutPtr := R0
         rts
 .endproc
 
+; A standard, boring room init, no transition. This is typically
+; our target after a floor transition (including the first spawn)
+; but it can also be used after a fade to black
 .proc room_init
         perform_zpcm_inc
         
@@ -441,6 +450,167 @@ LayoutPtr := R0
         far_call FAR_reset_price_tracker
 
         st16 GameMode, beat_frame_1
+        rts
+.endproc
+
+; All sliding transitions put the active nametable at $2000
+; and the inactive nametable at $2400, with matching exattr.
+; we'll restore single-screen mirroring at the end when we
+; process the first gameloop
+.proc setup_nametables_for_slide_transition
+        lda active_battlefield
+        bne right_nametable_active
+left_nametable_active:
+        lda #0
+        sta LeftNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta LeftNametableAttr
+        lda #1
+        sta RightNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG_AT)
+        sta RightNametableAttr
+        rts
+right_nametable_active:
+        lda #1
+        sta LeftNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG_AT)
+        sta LeftNametableAttr
+        lda #0
+        sta RightNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta RightNametableAttr
+        rts
+.endproc
+
+.proc reset_nametables_post_transition
+        lda active_battlefield
+        bne right_nametable_active
+left_nametable_active:
+        lda #0
+        sta LeftNametableBank
+        sta RightNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta LeftNametableAttr
+        sta RightNametableAttr
+        rts
+right_nametable_active:
+        lda #1
+        sta LeftNametableBank
+        sta RightNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG_AT)
+        sta LeftNametableAttr
+        sta RightNametableAttr
+        rts
+.endproc
+
+; A transition! How exciting...
+; Note: this is now functionally identical to room init in the default case. Maybe remove
+; the former?
+.proc room_transition
+        ; Load the current room (which is now pregenerated)
+        near_call FAR_load_current_room
+
+        ; Despawn any remnant sprites from the previous room
+        ; (stuff like death sprites and item shadows)
+        perform_zpcm_inc
+        far_call FAR_despawn_unimportant_sprites
+        perform_zpcm_inc
+
+        far_call FAR_reset_price_tracker
+
+        ; Draw the entire target floor right now!
+        ; This will cause a couple of frames of lag. We should
+        ; measure the time this takes and compensate for it with
+        ; the scroll split timings
+
+        debug_color (TINT_G | LIGHTGRAY)
+        far_call FAR_draw_battlefield_block_A_inline
+        far_call FAR_draw_battlefield_block_B_inline
+        debug_color LIGHTGRAY
+        debug_color (TINT_G | LIGHTGRAY)
+        far_call FAR_draw_battlefield_block_C_inline
+        far_call FAR_draw_battlefield_block_D_inline
+        debug_color LIGHTGRAY
+        debug_color (TINT_G | LIGHTGRAY)
+        far_call FAR_draw_battlefield_block_E_inline
+        debug_color LIGHTGRAY
+
+        ; TODO: figure out what we're going to do about torchlight here
+        ; Do we need to wait for vblank here? (probably?)
+
+detect_transition_type:
+        lda RoomTransitionType
+        cmp #ROOM_TRANSITION_SLIDE_RIGHT
+        beq setup_slide_right
+        cmp #ROOM_TRANSITION_SLIDE_LEFT
+        beq setup_slide_left
+        ; This is an unrecognized transition type! Fall back to a standard init and
+        ; do not attempt any bespoke transition. (Later: can we choose a default here
+        ; anyway? a fade to black would be less awful than intentional jank)
+
+        ; ... but for now, treat it like a room init
+        jmp setup_default_transition
+setup_slide_right:
+        jsr setup_nametables_for_slide_transition
+        set_raster_effect_safely #RASTER_EFFECT_SLIDE_RIGHT, #RASTER_FINALIZER_PLAIN_HUD, 30
+        st16 GameMode, wait_for_room_transition
+        rts
+setup_slide_left:
+        jsr setup_nametables_for_slide_transition
+        set_raster_effect_safely #RASTER_EFFECT_SLIDE_LEFT, #RASTER_FINALIZER_PLAIN_HUD, 30
+        st16 GameMode, wait_for_room_transition
+        rts
+setup_default_transition:
+        ; No transition at all! Instantly load that room, jank and all. This is the usual
+        ; target after a floor init, as the "fade the palette in" logic hides the seams, and
+        ; we tend to spawn in a cleared room anyway.
+        st16 GameMode, beat_frame_1
+        rts
+.endproc
+
+; Ha, this needs to do a dozen other things too, but ignore all that for now
+.proc wait_for_room_transition
+        lda RasterEffectFrame
+        cmp #30
+        bne continue_waiting
+        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, 0
+        st16 GameMode, beat_frame_1
+        rts
+continue_waiting:
+        ; TODO: update torchlight seams here!
+
+        ; This is most of every_gameloop, but with some alterations and omissions to help the transition out
+        jsr poll_input
+
+        perform_zpcm_inc
+        jsr update_beat_counters
+        perform_zpcm_inc
+
+        perform_zpcm_inc
+        far_call FAR_queue_hud
+        perform_zpcm_inc
+
+        far_call FAR_draw_player
+        perform_zpcm_inc
+
+        debug_color (TINT_G | TINT_B | LIGHTGRAY)
+        far_call FAR_draw_sprites
+        debug_color LIGHTGRAY
+
+        far_call FAR_update_coins
+        far_call FAR_update_indicators
+
+        perform_zpcm_inc
+        far_call FAR_update_brightness
+        perform_zpcm_inc
+
+        far_call FAR_refresh_palettes_gameloop
+        perform_zpcm_inc
+
+        jsr update_screen_shake
+        perform_zpcm_inc
+
+        jsr wait_for_next_vblank
         rts
 .endproc
 
@@ -835,7 +1005,23 @@ continue_waiting:
         ; if we lag on the first frame of a new beat, which can mostly occur during
         ; room transitions
         lda active_battlefield
-        sta displayed_battlefield
+        bne right_nametable
+left_nametable:
+        lda #0
+        sta LeftNametableBank
+        sta RightNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta LeftNametableAttr
+        sta RightNametableAttr
+        jmp done_with_nametables
+right_nametable:
+        lda #1
+        sta LeftNametableBank
+        sta RightNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG_AT)
+        sta LeftNametableAttr
+        sta RightNametableAttr
+done_with_nametables:
         jsr wait_for_next_vblank
         rts
 .endproc

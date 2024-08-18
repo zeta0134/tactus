@@ -3,6 +3,7 @@
 .global CurrentBeatCounter
 .global DisplayedRowCounter
 .global AccumulatedGameBeats
+.global RoomTransitionType
 
 .global PlayfieldBgHighBank
 .global PlayfieldObjHighBank
@@ -14,6 +15,7 @@
 
 ; kernel states
 .global init_engine
+.global room_transition
 .global room_init
 .global advance_to_next_floor
 .global fade_to_game_mode
@@ -29,3 +31,12 @@
 .globalzp ScreenShakeDepth
 .globalzp ScreenShakeSpeed
 .globalzp ScreenShakeDecayCounter
+
+; current default: no transition, instantly pop into the new room
+ROOM_TRANSITION_NONE        = 0
+; a quick, eased camera slide between adjacent rooms
+ROOM_TRANSITION_SLIDE_RIGHT = 1
+ROOM_TRANSITION_SLIDE_LEFT  = 2
+ROOM_TRANSITION_SLIDE_UP    = 3
+ROOM_TRANSITION_SLIDE_DOWN  = 4
+; TODO: more!
