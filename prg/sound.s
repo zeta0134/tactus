@@ -364,16 +364,16 @@ SfxPtr := R0
 .proc FAR_update_audio
         near_call update_fade
         
-        access_data_bank MusicCurrentBank
+        access_data_bank_nmi MusicCurrentBank
         perform_zpcm_inc
         far_call_nmi bhop_play
-        restore_previous_bank
+        restore_previous_bank_nmi
 
         perform_zpcm_inc
 
-        access_data_bank #<.bank(sfx_data)
+        access_data_bank_nmi #<.bank(sfx_data)
         near_call update_sfx
-        restore_previous_bank
+        restore_previous_bank_nmi
 
         perform_zpcm_inc
         rts

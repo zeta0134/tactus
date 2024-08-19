@@ -60,6 +60,9 @@ debugzpcm: dir $(ROM_NAME)
 profile: dir $(ROM_NAME)
 	vendor/Mesen $(ROM_NAME) debug_profile.lua
 
+debugfpga: dir $(ROM_NAME)
+	vendor/Mesen $(ROM_NAME) debug_fpgaram_writes.lua
+
 everdrive: dir $(ROM_NAME)
 	mono vendor/edlink-n8.exe $(ROM_NAME)
 

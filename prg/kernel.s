@@ -335,10 +335,10 @@ LayoutPtr := R0
         ; Initially the game enables just the HUD and nothing else. Game logic
         ; will shift these around as necessary.
 
-        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, 0
+        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, #0
         ; For debugging lag, let's turn on an expensive underwater-y distortion
         ; Later, let's have rooms specify this, kay? it's irritating to change the build just to see it
-        ;set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD
+        ;set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #30
         ;set_raster_effect_safely #RASTER_EFFECT_SLIDE_LEFT, #RASTER_FINALIZER_PLAIN_HUD, #30
 
         ; Enable NMI first (but not rendering)
@@ -586,9 +586,9 @@ detect_transition_type:
         cmp #ROOM_TRANSITION_SLIDE_LEFT
         beq setup_slide_left
         cmp #ROOM_TRANSITION_SLIDE_DOWN
-        beq setup_slide_down
+        jeq setup_slide_down
         cmp #ROOM_TRANSITION_SLIDE_UP
-        beq setup_slide_up
+        jeq setup_slide_up
         ; This is an unrecognized transition type! Fall back to a standard init and
         ; do not attempt any bespoke transition. (Later: can we choose a default here
         ; anyway? a fade to black would be less awful than intentional jank)
@@ -596,27 +596,35 @@ detect_transition_type:
         ; ... but for now, treat it like a room init
         jmp setup_default_transition
 setup_slide_right:
+        far_call FAR_reset_torchlight_raster_slide_updater
+        far_call FAR_update_torchlight_over_raster_slide_updater ; just runs the init code
         jsr setup_nametables_for_slide_transition
         jsr set_slide_speed
-        set_raster_effect_safely #RASTER_EFFECT_SLIDE_RIGHT, #RASTER_FINALIZER_PLAIN_HUD, 30
+        set_raster_effect_safely #RASTER_EFFECT_SLIDE_RIGHT, #RASTER_FINALIZER_PLAIN_HUD, #30
         st16 GameMode, wait_for_room_transition
         rts
 setup_slide_left:
+        far_call FAR_reset_torchlight_raster_slide_updater
+        far_call FAR_update_torchlight_over_raster_slide_updater ; just runs the init code
         jsr setup_nametables_for_slide_transition
         jsr set_slide_speed
-        set_raster_effect_safely #RASTER_EFFECT_SLIDE_LEFT, #RASTER_FINALIZER_PLAIN_HUD, 30
+        set_raster_effect_safely #RASTER_EFFECT_SLIDE_LEFT, #RASTER_FINALIZER_PLAIN_HUD, #30
         st16 GameMode, wait_for_room_transition
         rts
 setup_slide_down:
+        far_call FAR_reset_torchlight_raster_slide_updater
+        far_call FAR_update_torchlight_over_raster_slide_updater ; just runs the init code
         jsr setup_nametables_for_slide_transition
         jsr set_slide_speed
-        set_raster_effect_safely #RASTER_EFFECT_SLIDE_DOWN, #RASTER_FINALIZER_PLAIN_HUD, 30
+        set_raster_effect_safely #RASTER_EFFECT_SLIDE_DOWN, #RASTER_FINALIZER_PLAIN_HUD, #30
         st16 GameMode, wait_for_room_transition
         rts
 setup_slide_up:
+        far_call FAR_reset_torchlight_raster_slide_updater
+        far_call FAR_update_torchlight_over_raster_slide_updater ; just runs the init code
         jsr setup_nametables_for_slide_transition
         jsr set_slide_speed
-        set_raster_effect_safely #RASTER_EFFECT_SLIDE_UP, #RASTER_FINALIZER_PLAIN_HUD, 30
+        set_raster_effect_safely #RASTER_EFFECT_SLIDE_UP, #RASTER_FINALIZER_PLAIN_HUD, #30
         st16 GameMode, wait_for_room_transition
         rts
 
@@ -633,13 +641,25 @@ setup_default_transition:
         lda RasterEffectFrame
         cmp #30
         bne continue_waiting
+        ; catchup ALL the torchlight, right now!
+        far_call FAR_catchup_and_finalize_torchlight_raster_slide
+        ; finalize the player and prepare for the next gameplay frame
         far_call FAR_finalize_player_pos_after_slide
-        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, 0
+        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, #0
         set_raster_playback_speed #1, #0
         st16 GameMode, beat_frame_1
         rts
 continue_waiting:
-        ; TODO: update torchlight seams here!
+        ; TODO: update torchlight seams here! (do this as many times as we can afford)
+        ; (right now we're testing with 6 calls, which is rather conservative!)
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
+        far_call FAR_update_torchlight_over_raster_slide_updater
+        far_call FAR_update_torchlight_over_raster_slide_updater
+        far_call FAR_update_torchlight_over_raster_slide_updater
+        far_call FAR_update_torchlight_over_raster_slide_updater
+        far_call FAR_update_torchlight_over_raster_slide_updater
+        far_call FAR_update_torchlight_over_raster_slide_updater
+        debug_color LIGHTGRAY
 
         ; This is most of every_gameloop, but with some alterations and omissions to help the transition out
         jsr poll_input

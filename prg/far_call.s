@@ -19,6 +19,9 @@ NmiCurrentBank: .byte $00
 NmiJumpTarget: .word $0000
 NmiFarCallScratchA: .byte $00
 
+NmiCurrentDataBankLow: .byte $00
+NmiCurrentDataBankHigh: .byte $00
+
 
         .segment "PRGFIXED_E000"
 

@@ -309,7 +309,7 @@ loop:
 
         lda RasterEffectFrame
         cmp Duration
-        bne done
+        bcc done
         lda RasterLoopPoint
         sta RasterEffectFrame
 done:

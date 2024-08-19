@@ -1,7 +1,7 @@
 .global launch_far_call, launch_nmi_far_call
 .globalzp TargetBank, CurrentBank, CurrentDataBankLow, CurrentDataBankHigh, JumpTarget, FarCallScratchA
 .globalzp NmiTargetBank, NmiCurrentBank, NmiJumpTarget, NmiFarCallScratchA
-
+.globalzp NmiCurrentDataBankLow, NmiCurrentDataBankHigh
 
 ; for calls from banked code to other banked code
 .macro far_call label
@@ -60,6 +60,18 @@
         sta CurrentDataBankHigh
 .endmacro
 
+.macro access_data_bank_nmi TargetDataBank
+        lda NmiCurrentDataBankLow
+        pha
+        lda NmiCurrentDataBankHigh
+        pha
+        rainbow_set_data_bank {TargetDataBank}, #PRG_CHIPSEL_ROM
+        lda TargetDataBank
+        sta NmiCurrentDataBankLow
+        lda #PRG_CHIPSEL_ROM
+        sta NmiCurrentDataBankHigh
+.endmacro
+
 .macro access_ram_bank TargetDataBank
         lda CurrentDataBankLow
         pha
@@ -78,4 +90,12 @@
         pla
         sta CurrentDataBankLow
         rainbow_set_data_bank CurrentDataBankLow, CurrentDataBankHigh
+.endmacro
+
+.macro restore_previous_bank_nmi
+        pla
+        sta NmiCurrentDataBankHigh
+        pla
+        sta NmiCurrentDataBankLow
+        rainbow_set_data_bank NmiCurrentDataBankLow, NmiCurrentDataBankHigh
 .endmacro
