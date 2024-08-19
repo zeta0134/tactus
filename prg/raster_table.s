@@ -12,7 +12,7 @@
 ; faster than the stack, and more convenient too
 IrqPreserveA: .res 1
 IrqPreserveX: .res 1
-ScrollXOffset: .res 1
+;ScrollXOffset: .res 1
 ScrollYOffset: .res 1
 
 RasterTableIndex: .res 1
@@ -272,7 +272,7 @@ loop:
         ; for comparison, let's try the less stupid, but slower version
         lda (TablePpuScrollXPtr), y    ; 5
         clc                            ; 2
-        adc ScrollXOffset              ; 3
+        adc PpuScrollX                 ; 3
         sta table_ppuscroll_x, y       ; 5
         lda (TablePpuScrollYPtr), y    ; 5
         clc                            ; 2
