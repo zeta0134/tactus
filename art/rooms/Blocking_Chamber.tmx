@@ -9,7 +9,7 @@
   <property name="exit_west" type="bool" value="true"/>
   <property name="forbid_spawning" type="bool" value="false"/>
   <property name="room_obj_palette" value="sprite_palette_overworld"/>
-  <property name="room_palette" value="blocking_exterior_palette"/>
+  <property name="room_palette" value="blocking_interior_palette"/>
  </properties>
  <tileset firstgid="1" source="../MapTiles.tsx"/>
  <tileset firstgid="257" source="../DiscoFloorTiles.tsx"/>

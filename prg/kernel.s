@@ -632,6 +632,8 @@ setup_default_transition:
         ; No transition at all! Instantly load that room, jank and all. This is the usual
         ; target after a floor init, as the "fade the palette in" logic hides the seams, and
         ; we tend to spawn in a cleared room anyway.
+        lda #0
+        sta SuppressTorchlight
         st16 GameMode, beat_frame_1
         rts
 .endproc
@@ -647,6 +649,8 @@ setup_default_transition:
         far_call FAR_finalize_player_pos_after_slide
         set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, #0
         set_raster_playback_speed #1, #0
+        lda #0
+        sta SuppressTorchlight
         st16 GameMode, beat_frame_1
         rts
 continue_waiting:

@@ -25,6 +25,8 @@ fully_lit_cooldown: .res 1
 
 torchlight_bank: .res 1
 
+SuppressTorchlight: .res 1
+
 ; For keeping track of the rather involved update procedure between rooms
 RasterState: .res 2
 RasterTopLeftLut: .res 2
@@ -125,6 +127,7 @@ torchlight_luts_bank:
         lda #0
         sta current_lighting_row
         sta fully_lit_cooldown
+        sta SuppressTorchlight
 
         ; initialize all counters to 1, so they update right away
         ; when decremented the first time
@@ -145,6 +148,11 @@ torchlight_luts_bank:
 
 .proc FAR_draw_torchlight
         perform_zpcm_inc
+
+        lda SuppressTorchlight
+        beq safe_to_draw
+        rts
+safe_to_draw:
         lda current_torchlight_radius
         cmp #30
         beq at_max_brightness

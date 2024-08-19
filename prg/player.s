@@ -1493,6 +1493,9 @@ converge:
         ; mark the room as "busy", this prevents us clearing the next room prematurely
         lda #1
         sta enemies_active
+        ; suppress torchlight updates over the transition (resolves minor visual jank)
+        lda #1
+        sta SuppressTorchlight
         rts
 .endproc
 
