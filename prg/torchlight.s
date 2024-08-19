@@ -90,7 +90,7 @@ CleanupMode: .res 1
         .include "../build/torchlight/torchlight_30.incs"
         .include "../build/torchlight/torchlight_31.incs"
 
-        .segment "CODE_3"
+        .segment "CODE_A"
 
 torchlight_update_table:
         .byte $14, $0c, $0f, $01, $09, $0e, $04, $0a, $08, $15, $07, $12, $06, $10, $02, $05
@@ -629,15 +629,102 @@ done:
         rts
 .endproc
 
-.proc leading_up_state
-        ; Unimplemented!
-        st16 RasterState, finished_state
+; because math is dumb
+current_row_nametable_low_lut:
+        .repeat 22, i
+        .byte <(i*32)
+        .endrepeat
+current_row_nametable_high_lut:
+        .repeat 22, i
+        .byte >(i*32)
+        .endrepeat
+current_row_torchtable_low_lut:
+        .repeat 22, i
+        .byte <(i*64)
+        .endrepeat
+current_row_torchtable_high_lut:
+        .repeat 22, i
+        .byte >(i*64)
+        .endrepeat
+
+.proc leading_down_state
+NametablePtr := R0
+TorchlightPtr := R2
+        ; we need to do math on the CurrentRow
+        ldx CurrentRow
+
+        clc
+        lda LeadingNametable+0
+        adc current_row_nametable_low_lut, x
+        sta NametablePtr+0
+        lda LeadingNametable+1
+        adc current_row_nametable_high_lut, x
+        sta NametablePtr+1
+
+        clc
+        lda RasterTopLeftLut+0
+        adc current_row_torchtable_low_lut, x
+        sta TorchlightPtr+0
+        lda RasterTopLeftLut+1
+        adc current_row_torchtable_high_lut, x
+        sta TorchlightPtr+1
+
+        access_data_bank RasterTorchlightBank
+
+        jsr draw_one_half_torchlight_row
+        inc CurrentRow
+
+        restore_previous_bank
+
+        lda CurrentRow
+        cmp #22
+        bne done
+        lda #0
+        sta CurrentRow
+        st16 RasterState, trailing_down_state
+done:
         rts
 .endproc
 
-.proc leading_down_state
-        ; Unimplemented!
-        st16 RasterState, finished_state
+.proc leading_up_state
+NametablePtr := R0
+TorchlightPtr := R2
+        ; we need to do math on the CurrentRow
+        lda #21
+        sec
+        sbc CurrentRow
+        tax
+
+        clc
+        lda LeadingNametable+0
+        adc current_row_nametable_low_lut, x
+        sta NametablePtr+0
+        lda LeadingNametable+1
+        adc current_row_nametable_high_lut, x
+        sta NametablePtr+1
+
+        clc
+        lda RasterTopLeftLut+0
+        adc current_row_torchtable_low_lut, x
+        sta TorchlightPtr+0
+        lda RasterTopLeftLut+1
+        adc current_row_torchtable_high_lut, x
+        sta TorchlightPtr+1
+
+        access_data_bank RasterTorchlightBank
+
+        jsr draw_one_half_torchlight_row
+        inc CurrentRow
+
+        restore_previous_bank
+
+        lda CurrentRow
+        cmp #22
+        bne done
+        lda #0
+        sta CurrentRow
+        st16 RasterState, trailing_up_state
+done:
         rts
 .endproc
 
@@ -729,15 +816,102 @@ done:
         rts
 .endproc
 
-.proc trailing_up_state
-        ; Unimplemented!
+.proc trailing_down_state
+NametablePtr := R0
+TorchlightPtr := R2
+        ; Safety: if we can't draw yet, bail!
+        lda CleanupMode
+        bne safe_to_draw
+        ldx RasterEffectFrame
+        lda CurrentRow
+        cmp safe_row_y_lut, x
+        bcc safe_to_draw
+not_safe:
+        rts
+
+safe_to_draw:
+        ; we need to do math on the CurrentRow
+        ldx CurrentRow
+
+        clc
+        lda TrailingNametable+0
+        adc current_row_nametable_low_lut, x
+        sta NametablePtr+0
+        lda TrailingNametable+1
+        adc current_row_nametable_high_lut, x
+        sta NametablePtr+1
+
+        clc
+        lda RasterTopLeftLut+0
+        adc current_row_torchtable_low_lut, x
+        sta TorchlightPtr+0
+        lda RasterTopLeftLut+1
+        adc current_row_torchtable_high_lut, x
+        sta TorchlightPtr+1
+
+        access_data_bank RasterTorchlightBank
+
+        jsr draw_one_half_torchlight_row
+        inc CurrentRow
+
+        restore_previous_bank
+
+        lda CurrentRow
+        cmp #22
+        bne done
         st16 RasterState, finished_state
+done:
         rts
 .endproc
 
-.proc trailing_down_state
-        ; Unimplemented!
+.proc trailing_up_state
+NametablePtr := R0
+TorchlightPtr := R2
+        ; Safety: if we can't draw yet, bail!
+        lda CleanupMode
+        bne safe_to_draw
+        ldx RasterEffectFrame
+        lda CurrentRow
+        cmp safe_row_y_lut, x
+        bcc safe_to_draw
+not_safe:
+        rts
+
+safe_to_draw:
+        ; we need to do math on the CurrentRow
+        lda #21
+        sec
+        sbc CurrentRow
+        tax
+
+        clc
+        lda TrailingNametable+0
+        adc current_row_nametable_low_lut, x
+        sta NametablePtr+0
+        lda TrailingNametable+1
+        adc current_row_nametable_high_lut, x
+        sta NametablePtr+1
+
+        clc
+        lda RasterTopLeftLut+0
+        adc current_row_torchtable_low_lut, x
+        sta TorchlightPtr+0
+        lda RasterTopLeftLut+1
+        adc current_row_torchtable_high_lut, x
+        sta TorchlightPtr+1
+
+        access_data_bank RasterTorchlightBank
+
+        jsr draw_one_half_torchlight_row
+        inc CurrentRow
+
+        restore_previous_bank
+
+        lda CurrentRow
+        cmp #22
+        bne done
         st16 RasterState, finished_state
+done:
         rts
 .endproc
 
