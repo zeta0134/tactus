@@ -3,9 +3,10 @@
 .global FAR_generate_rooms_for_floor
 
 .global FAR_load_current_room
-.global FAR_handle_room_spawns
+.global FAR_update_room_state
 
-.global room_layouts, room_flags, room_floorplan, room_properties, room_bank, room_ptr_high, room_ptr_low, enemies_active
+.global room_layouts, room_flags, room_floorplan, room_properties, room_bank, room_ptr_high, room_ptr_low
+.global first_beat_after_load, enemies_active
 
 ; layouts
 .global test_layout_with_four_exits

@@ -39,6 +39,8 @@ room_floorplan: .res ::FLOOR_SIZE ; properties of this cell in the floor's maze 
 room_properties: .res ::FLOOR_SIZE ; properties of the selected room that populates this cell
 room_population_order: .res ::FLOOR_SIZE
 enemies_active: .res 1
+first_beat_after_load: .res 1
+chest_spawn_cooldown: .res 1
 
 rooms_rerolled: .res 2
 floors_rerolled: .res 2
@@ -1262,45 +1264,59 @@ done_with_torchlight:
         lda #1
         sta HudMapDirty
 
-        ; set the initial enemies active counter to nonzero,
-        ; so we process at least one full beat before considering the room to be "empty"
+        ; Flag this as a freshly loaded room, which mostly affects room state
         lda #1
-        sta enemies_active
+        sta first_beat_after_load
 
         rts
 .endproc
 
 ; Called during gameplay, not during generation. Handles ongoing room flag
 ; state, and checks for any entities that need to spawn post-generation
-.proc FAR_handle_room_spawns
+.proc FAR_update_room_state
 EntityId := R1
 EntityPattern := R2
 EntityAttribute := R3
-check_room_clear:
-        lda enemies_active
+        ; sanity: if this room is freshly loaded, don't do any of this. the enemies
+        ; haven't had a real processing round yet, and we are operating on incomplete
+        ; information (possibly stale from the previous room)
+        lda first_beat_after_load
         bne all_done
 
+        ldx PlayerRoomIndex
+check_room_clear:
+        lda enemies_active
+        bne room_not_clear
+room_is_clear:
         perform_zpcm_inc
+        lda room_flags, x
+        ora #ROOM_FLAG_CLEARED ; set the clear flag
+        sta room_flags, x
+        jmp done_with_clear_checks
+room_not_clear:
+        lda room_flags, x
+        and #($FF - ROOM_FLAG_CLEARED) ; unset the room clear flag
+        sta room_flags, x
+        lda #0
+        sta chest_spawn_cooldown
+done_with_clear_checks:
 
-        ; Is this room already cleared?
+        ; If the room is clear, and we haven't spawned the chest yet,
+        ; then do so
         ldx PlayerRoomIndex
         lda room_flags, x
         and #ROOM_FLAG_CLEARED
-        bne check_chest_spawn
-
-        ; This room is freshly cleared! Mark it so
-        lda room_flags, x
-        ora #ROOM_FLAG_CLEARED
-        sta room_flags, x
-        lda #1
-        sta HudMapDirty
-        jmp all_done
-
-check_chest_spawn:
+        beq done_with_chest_spawns
         lda room_flags, x
         and #ROOM_FLAG_TREASURE_SPAWNED
-        bne all_done
-
+        bne done_with_chest_spawns
+        lda chest_spawn_cooldown
+        cmp #2
+        bcc done_with_chest_spawns
+perform_chest_spawning:
+        ; TODO: instead of rolling a random chest here, we should check for the
+        ; hidden chest (if present) as part of the map data, and spawn in that
+        ; specific chest. (this whole mechanic doesn't exist yet)
         perform_zpcm_inc
 
         ; spawn in a chest
@@ -1312,10 +1328,13 @@ check_chest_spawn:
         sta EntityAttribute
         jsr spawn_entity
 
+        ; Flag this chest as spawned, so we don't try to spawn it again later
         ldx PlayerRoomIndex
         lda room_flags, x
         ora #ROOM_FLAG_TREASURE_SPAWNED
         sta room_flags, x
+done_with_chest_spawns:
+        inc chest_spawn_cooldown
         
 all_done:
         perform_zpcm_inc

@@ -761,7 +761,7 @@ continue_waiting:
         ; - Resolve the player's action
         debug_color (TINT_B | LIGHTGRAY)
         far_call FAR_update_player
-        near_call FAR_handle_room_spawns
+        near_call FAR_update_room_state
         debug_color LIGHTGRAY
 
         perform_zpcm_inc
@@ -898,6 +898,10 @@ StartingTile := R15
         sta StartingTile
         far_call FAR_update_static_enemy_row
         debug_color LIGHTGRAY
+
+        ; Now that we have run all enemy logic, it is safe to run clear checks and such
+        lda #0
+        sta first_beat_after_load
 
         jsr every_gameloop
         st16 GameMode, draw_battlefield_A
