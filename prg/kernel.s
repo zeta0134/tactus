@@ -186,6 +186,7 @@ LayoutPtr := R0
         far_call FAR_initialize_title_palettes
         far_call FAR_initialize_sprites
         set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_NONE, #0
+        set_raster_playback_speed #1, #0
 
         ; Enable NMI first (but not rendering)
         lda #0
@@ -254,6 +255,7 @@ LayoutPtr := R0
         far_call FAR_set_old_chr_exbg
         far_call FAR_initialize_title_palettes
         set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_NONE, #0
+        set_raster_playback_speed #1, #0
 
         ; Enable NMI first (but not rendering)
         lda #0
@@ -338,9 +340,10 @@ LayoutPtr := R0
         set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, #0
         ; For debugging lag, let's turn on an expensive underwater-y distortion
         ; Later, let's have rooms specify this, kay? it's irritating to change the build just to see it
-        ;set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #30
+        ;set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #0
         ;set_raster_effect_safely #RASTER_EFFECT_SLIDE_LEFT, #RASTER_FINALIZER_PLAIN_HUD, #30
 
+        set_raster_playback_speed #1, #0
         ; Enable NMI first (but not rendering)
         lda #0
         sta NmiSoftDisable
@@ -647,7 +650,14 @@ setup_default_transition:
         far_call FAR_catchup_and_finalize_torchlight_raster_slide
         ; finalize the player and prepare for the next gameplay frame
         far_call FAR_finalize_player_pos_after_slide
+        ; TODO: should we set the target nametable to both slots here? otherwise
+        ; a laggy beat_frame_1 seems to briefly render the wrong nametable at
+        ; fast tempo. Investigate!
+
         set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, #0
+        ; For great debugging!
+        ;set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #0
+
         set_raster_playback_speed #1, #0
         lda #0
         sta SuppressTorchlight
