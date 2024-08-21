@@ -16,7 +16,7 @@ TrackedBeatLength: .res 1
 CurrentRow: .res 1
 LastTrackedRow: .res 1
 
-.segment "CODE_1"
+.segment "CODE_0"
 
 .proc FAR_beat_tracker_init
     ldy #63

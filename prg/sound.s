@@ -39,15 +39,38 @@ NmiSafePtr: .res 2
 FADE_SPEED = 8
 
         .segment "DATA_2"
+        .proc zeta_silence
+        .include "../art/music/silence.asm"
+        .endproc
+        
+        .segment "DATA_2"
+        .proc zeta_click_track
+        .include "../art/music/click_track.asm"
+        .endproc
 
-        .proc zeta_tactus_ost
-        .include "../art/music/music.asm"
+        .segment "DATA_2"
+        .proc zeta_title
+        .include "../art/music/title.asm"
+        .endproc
+
+        .segment "DATA_2"
+        .proc zeta_options
+        .include "../art/music/options.asm"
+        .endproc
+
+        .segment "DATA_2"
+        .proc zeta_game_over
+        .include "../art/music/game_over.asm"
         .endproc
 
         .segment "DATA_5"
+        .proc persune_in_another_world
+        .include "../art/music/in_another_world.asm"
+        .endproc
 
-        .proc persune_tactus_ost
-        .include "../art/music/persune.asm"
+        .segment "DATA_6"
+        .proc zeta_shower_groove
+        .include "../art/music/shower_groove.asm"
         .endproc
 
         .segment "PRGFIXED_E000"
@@ -55,45 +78,57 @@ FADE_SPEED = 8
 ; todo: figure out if we can move this elsewhere? it might grow
 
 track_table_module_low:
-        .repeat 5
-        .lobytes zeta_tactus_ost
-        .endrepeat
-        .lobytes persune_tactus_ost
+        .lobytes zeta_silence
+        .lobytes zeta_click_track
+        .lobytes zeta_title
+        .lobytes zeta_options
+        .lobytes zeta_game_over
+        .lobytes zeta_shower_groove
+        .lobytes persune_in_another_world
 
 track_table_module_high:
-        .repeat 5
-        .hibytes zeta_tactus_ost
-        .endrepeat
-        .hibytes persune_tactus_ost
+        .hibytes zeta_silence
+        .hibytes zeta_click_track
+        .hibytes zeta_title
+        .hibytes zeta_options
+        .hibytes zeta_game_over
+        .hibytes zeta_shower_groove
+        .hibytes persune_in_another_world
 
 track_table_bank:
-        .repeat 5
-        .lobytes .bank(zeta_tactus_ost)
-        .endrepeat
-        .lobytes .bank(persune_tactus_ost)
+        .lobytes .bank(zeta_silence)
+        .lobytes .bank(zeta_click_track)
+        .lobytes .bank(zeta_title)
+        .lobytes .bank(zeta_options)
+        .lobytes .bank(zeta_game_over)
+        .lobytes .bank(zeta_shower_groove)
+        .lobytes .bank(persune_in_another_world)
         
 track_table_song:
         .byte 0 ; silence (used for transitions)
-        .byte 1 ; click track (meant for debugging)
-        .byte 2 ; level music
-        .byte 3 ; title music
-        .byte 4 ; options music
+        .byte 0 ; click track (meant for debugging)
+        .byte 0 ; title
+        .byte 0 ; options
+        .byte 0 ; gameover
+        .byte 0 ; shower groove
         .byte 0 ; in another world (warp zone)
 
 track_table_num_variants:
         .byte 1 ; silence 
         .byte 1 ; click_track
-        .byte 1 ; level music
         .byte 1 ; title music
         .byte 1 ; options music
+        .byte 1 ; gameover music
+        .byte 1 ; level music
         .byte 1 ; in another world (warp zone)
 
 track_table_variant_length:
         .byte 0 ; silence
         .byte 0 ; click_track
-        .byte 0 ; level music
         .byte 0 ; title music
         .byte 0 ; options music
+        .byte 0 ; gameover music
+        .byte 0 ; level music
         .byte 0 ; in another world (warp zone)
 
 ; bhop calls these functions for bank swapping and ZPCM tomfoolery

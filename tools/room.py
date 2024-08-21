@@ -380,6 +380,7 @@ def write_overlay_list(tilemap, output_file):
     output_file.write(ca65_label("overlays_"+tilemap.name) + "\n")
     for overlay in tilemap.overlays:
         direction = overlay.string_properties.get("direction")
+        special_conditions = overlay.string_properties.get("special_conditions", "$00")
         direction_bits = direction_ids[direction]
         if direction in ["north", "east", "south", "west"]:
             for adjacent_type in ["adjacent_interior", "adjacent_exterior", "adjacent_challenge", "adjacent_shop"]:
@@ -387,6 +388,7 @@ def write_overlay_list(tilemap, output_file):
                     adjacent_bits = adjacent_ids[adjacent_type]
                     conditional_bits = adjacent_bits | direction_bits
                     output_file.write(f"  .byte {ca65_byte_literal(conditional_bits)} ; cardinal conditional\n")
+                    output_file.write(f"  .byte {special_conditions} ; special conditional\n")
                     output_file.write(f"  .addr room_{tilemap.name}_{safe_label(overlay.name)} ; {overlay.name}\n")
         if direction in ["northeast", "southeast", "southwest", "northwest"]:
             for ns_type in ["ns_interior", "ns_exterior", "ns_challenge", "ns_shop"]:
@@ -397,6 +399,7 @@ def write_overlay_list(tilemap, output_file):
                         ew_bits = ew_ids[ew_type]
                         conditional_bits = ns_bits | ew_bits | direction_bits
                         output_file.write(f"  .byte {ca65_byte_literal(conditional_bits)} ; diagonal conditional\n")
+                        output_file.write(f"  .byte {special_conditions} ; special conditional\n")
                         output_file.write(f"  .addr room_{tilemap.name}_{safe_label(overlay.name)} ; {overlay.name}\n")
     # always write a final terminator byte, this signifies the end of the overlay list
     output_file.write("  .byte $FF\n")

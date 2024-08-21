@@ -145,6 +145,20 @@ overlay_conditional_lut_high:
         .byte >invalid_conditional            ; %1110 = Invalid (3 exits?)
         .byte >invalid_conditional            ; %1111 = Invalid (4 exits?)
 
+special_conditional_lut_low:
+        .byte <invalid_conditional ; never taken (we skip this case with a beq)
+        .byte <open_corner_ne
+        .byte <open_corner_se
+        .byte <open_corner_sw
+        .byte <open_corner_nw
+
+special_conditional_lut_high:
+        .byte >invalid_conditional
+        .byte >open_corner_ne
+        .byte >open_corner_se
+        .byte >open_corner_sw
+        .byte >open_corner_nw
+
 .proc draw_battlefield_overlays
 RoomPtr := R0
 OverlayPtr := R2
@@ -184,16 +198,26 @@ loop:
         cmp ScratchByte
         bne reject_this_overlay
 
-        ; now, based on the exit type for this overlay, choose a conditional function
+        ; now, based on the exit type for this overlay, choose a directional conditional function
         ldx ScratchByte
         lda overlay_conditional_lut_low, x
         sta ConditionalPtr+0
         lda overlay_conditional_lut_high, x
         sta ConditionalPtr+1
         jmp (ConditionalPtr) ; will jump to either "draw" or "reject" below
-
-draw_this_overlay:
-        inc16 OverlayListPtr ; skip past the conditional byte
+directional_conditions_passed:
+        ; some overlays 
+        ldy #1
+        lda (OverlayListPtr), y
+        beq special_conditions_passed ; most overlays don't have special conditions; early out here
+        tax
+        lda special_conditional_lut_low, x
+        sta ConditionalPtr+0
+        lda special_conditional_lut_high, x
+        sta ConditionalPtr+1
+        jmp (ConditionalPtr)
+special_conditions_passed:
+        add16b OverlayListPtr, #2 ; skip past both conditional bytes
         ; read the overlay pointer and prep for drawing
         ldy #0
         lda (OverlayListPtr), y
@@ -208,9 +232,7 @@ draw_this_overlay:
         jmp loop
 reject_this_overlay:
         ; just skip past the pointer and keep going
-        inc16 OverlayListPtr
-        inc16 OverlayListPtr
-        inc16 OverlayListPtr
+        add16b OverlayListPtr, #4
         jmp loop
 done:
         rts
@@ -236,7 +258,7 @@ ScratchByte := R9
         and #ROOM_CATEGORY_MASK
         cmp ScratchByte
         bne reject
-        jmp draw_battlefield_overlays::draw_this_overlay
+        jmp draw_battlefield_overlays::directional_conditions_passed
 reject:
         jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
@@ -255,7 +277,7 @@ ScratchByte := R9
         and #ROOM_CATEGORY_MASK
         cmp ScratchByte
         bne reject
-        jmp draw_battlefield_overlays::draw_this_overlay
+        jmp draw_battlefield_overlays::directional_conditions_passed
 reject:
         jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
@@ -274,7 +296,7 @@ ScratchByte := R9
         and #ROOM_CATEGORY_MASK
         cmp ScratchByte
         bne reject
-        jmp draw_battlefield_overlays::draw_this_overlay
+        jmp draw_battlefield_overlays::directional_conditions_passed
 reject:
         jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
@@ -293,7 +315,7 @@ ScratchByte := R9
         and #ROOM_CATEGORY_MASK
         cmp ScratchByte
         bne reject
-        jmp draw_battlefield_overlays::draw_this_overlay
+        jmp draw_battlefield_overlays::directional_conditions_passed
 reject:
         jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
@@ -330,7 +352,7 @@ ScratchByte := R9
         and #ROOM_CATEGORY_MASK
         cmp ScratchByte
         bne reject
-        jmp draw_battlefield_overlays::draw_this_overlay
+        jmp draw_battlefield_overlays::directional_conditions_passed
 reject:
         jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
@@ -367,7 +389,7 @@ ScratchByte := R9
         and #ROOM_CATEGORY_MASK
         cmp ScratchByte
         bne reject
-        jmp draw_battlefield_overlays::draw_this_overlay
+        jmp draw_battlefield_overlays::directional_conditions_passed
 reject:
         jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
@@ -404,7 +426,7 @@ ScratchByte := R9
         and #ROOM_CATEGORY_MASK
         cmp ScratchByte
         bne reject
-        jmp draw_battlefield_overlays::draw_this_overlay
+        jmp draw_battlefield_overlays::directional_conditions_passed
 reject:
         jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
@@ -441,8 +463,263 @@ ScratchByte := R9
         and #ROOM_CATEGORY_MASK
         cmp ScratchByte
         bne reject
-        jmp draw_battlefield_overlays::draw_this_overlay
+        jmp draw_battlefield_overlays::directional_conditions_passed
 reject:
+        jmp draw_battlefield_overlays::reject_this_overlay
+.endproc
+
+; Open corners require that the 3 adjacent rooms all have:
+; - the same room category as this room
+; - an open exit, collectively making a 2x2 fully navigable square
+.proc open_corner_ne
+ScratchByte := R9
+        ldx RoomIndexToGenerate
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        sta ScratchByte
+
+        ; NORTH!
+        lda RoomIndexToGenerate
+        sec
+        sbc #::FLOOR_WIDTH
+        tax
+        ; does our category match?
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject_this_overlay
+        ; Does this chamber have SOUTH+EAST exits open?
+        lda room_floorplan, x
+        and #(ROOM_EXIT_FLAG_SOUTH | ROOM_EXIT_FLAG_EAST)
+        cmp #(ROOM_EXIT_FLAG_SOUTH | ROOM_EXIT_FLAG_EAST)
+        bne reject_this_overlay
+
+        ; EAST!
+        lda RoomIndexToGenerate
+        clc
+        adc #1
+        tax
+        ; does our category match?
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject_this_overlay
+        ; Does this chamber have NORTH+WEST exits open?
+        lda room_floorplan, x
+        and #(ROOM_EXIT_FLAG_NORTH | ROOM_EXIT_FLAG_WEST)
+        cmp #(ROOM_EXIT_FLAG_NORTH | ROOM_EXIT_FLAG_WEST)
+        bne reject_this_overlay
+
+        ; NORTH+EAST!
+        lda RoomIndexToGenerate
+        sec
+        sbc #::FLOOR_WIDTH
+        clc
+        adc #1
+        tax
+        ; does our category match?
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject_this_overlay
+        ; Does this chamber have SOUTH+WEST exits open?
+        lda room_floorplan, x
+        and #(ROOM_EXIT_FLAG_SOUTH | ROOM_EXIT_FLAG_WEST)
+        cmp #(ROOM_EXIT_FLAG_SOUTH | ROOM_EXIT_FLAG_WEST)
+        bne reject_this_overlay
+
+        ; This overlay is valid!
+        jmp draw_battlefield_overlays::special_conditions_passed
+reject_this_overlay:
+        jmp draw_battlefield_overlays::reject_this_overlay
+.endproc
+
+.proc open_corner_se
+ScratchByte := R9
+        ldx RoomIndexToGenerate
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        sta ScratchByte
+
+        ; SOUTH!
+        lda RoomIndexToGenerate
+        clc
+        adc #::FLOOR_WIDTH
+        tax
+        ; does our category match?
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject_this_overlay
+        ; Does this chamber have NORTH+EAST exits open?
+        lda room_floorplan, x
+        and #(ROOM_EXIT_FLAG_NORTH | ROOM_EXIT_FLAG_EAST)
+        cmp #(ROOM_EXIT_FLAG_NORTH | ROOM_EXIT_FLAG_EAST)
+        bne reject_this_overlay
+
+        ; EAST!
+        lda RoomIndexToGenerate
+        clc
+        adc #1
+        tax
+        ; does our category match?
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject_this_overlay
+        ; Does this chamber have SOUTH+WEST exits open?
+        lda room_floorplan, x
+        and #(ROOM_EXIT_FLAG_SOUTH | ROOM_EXIT_FLAG_WEST)
+        cmp #(ROOM_EXIT_FLAG_SOUTH | ROOM_EXIT_FLAG_WEST)
+        bne reject_this_overlay
+
+        ; SOUTH+EAST!
+        lda RoomIndexToGenerate
+        clc
+        adc #::FLOOR_WIDTH
+        clc
+        adc #1
+        tax
+        ; does our category match?
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject_this_overlay
+        ; Does this chamber have NORTH+WEST exits open?
+        lda room_floorplan, x
+        and #(ROOM_EXIT_FLAG_NORTH | ROOM_EXIT_FLAG_WEST)
+        cmp #(ROOM_EXIT_FLAG_NORTH | ROOM_EXIT_FLAG_WEST)
+        bne reject_this_overlay
+
+        ; This overlay is valid!
+        jmp draw_battlefield_overlays::special_conditions_passed
+reject_this_overlay:
+        jmp draw_battlefield_overlays::reject_this_overlay
+.endproc
+
+.proc open_corner_sw
+        ScratchByte := R9
+        ldx RoomIndexToGenerate
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        sta ScratchByte
+
+        ; SOUTH!
+        lda RoomIndexToGenerate
+        clc
+        adc #::FLOOR_WIDTH
+        tax
+        ; does our category match?
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject_this_overlay
+        ; Does this chamber have NORTH+WEST exits open?
+        lda room_floorplan, x
+        and #(ROOM_EXIT_FLAG_NORTH | ROOM_EXIT_FLAG_WEST)
+        cmp #(ROOM_EXIT_FLAG_NORTH | ROOM_EXIT_FLAG_WEST)
+        bne reject_this_overlay
+
+        ; WEST!
+        lda RoomIndexToGenerate
+        sec
+        sbc #1
+        tax
+        ; does our category match?
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject_this_overlay
+        ; Does this chamber have SOUTH+EAST exits open?
+        lda room_floorplan, x
+        and #(ROOM_EXIT_FLAG_SOUTH | ROOM_EXIT_FLAG_EAST)
+        cmp #(ROOM_EXIT_FLAG_SOUTH | ROOM_EXIT_FLAG_EAST)
+        bne reject_this_overlay
+
+        ; SOUTH+WEST!
+        lda RoomIndexToGenerate
+        clc
+        adc #::FLOOR_WIDTH
+        sec
+        sbc #1
+        tax
+        ; does our category match?
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject_this_overlay
+        ; Does this chamber have NORTH+EAST exits open?
+        lda room_floorplan, x
+        and #(ROOM_EXIT_FLAG_NORTH | ROOM_EXIT_FLAG_EAST)
+        cmp #(ROOM_EXIT_FLAG_NORTH | ROOM_EXIT_FLAG_EAST)
+        bne reject_this_overlay
+
+        ; This overlay is valid!
+        jmp draw_battlefield_overlays::special_conditions_passed
+reject_this_overlay:
+        jmp draw_battlefield_overlays::reject_this_overlay
+.endproc
+
+.proc open_corner_nw
+ScratchByte := R9
+        ldx RoomIndexToGenerate
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        sta ScratchByte
+
+        ; NORTH!
+        lda RoomIndexToGenerate
+        sec
+        sbc #::FLOOR_WIDTH
+        tax
+        ; does our category match?
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject_this_overlay
+        ; Does this chamber have SOUTH+WEST exits open?
+        lda room_floorplan, x
+        and #(ROOM_EXIT_FLAG_SOUTH | ROOM_EXIT_FLAG_WEST)
+        cmp #(ROOM_EXIT_FLAG_SOUTH | ROOM_EXIT_FLAG_WEST)
+        bne reject_this_overlay
+
+        ; WEST!
+        lda RoomIndexToGenerate
+        sec
+        sbc #1
+        tax
+        ; does our category match?
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject_this_overlay
+        ; Does this chamber have NORTH+EAST exits open?
+        lda room_floorplan, x
+        and #(ROOM_EXIT_FLAG_NORTH | ROOM_EXIT_FLAG_EAST)
+        cmp #(ROOM_EXIT_FLAG_NORTH | ROOM_EXIT_FLAG_EAST)
+        bne reject_this_overlay
+
+        ; NORTH+WEST!
+        lda RoomIndexToGenerate
+        sec
+        sbc #::FLOOR_WIDTH
+        sec
+        sbc #1
+        tax
+        ; does our category match?
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp ScratchByte
+        bne reject_this_overlay
+        ; Does this chamber have SOUTH+EAST exits open?
+        lda room_floorplan, x
+        and #(ROOM_EXIT_FLAG_SOUTH | ROOM_EXIT_FLAG_EAST)
+        cmp #(ROOM_EXIT_FLAG_SOUTH | ROOM_EXIT_FLAG_EAST)
+        bne reject_this_overlay
+
+        ; This overlay is valid!
+        jmp draw_battlefield_overlays::special_conditions_passed
+reject_this_overlay:
         jmp draw_battlefield_overlays::reject_this_overlay
 .endproc
 

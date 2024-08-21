@@ -101,7 +101,7 @@ title_ui_layout:
 .proc options_controller_init
 CurrentWidgetIndex := R20
         ; Play the options track on the options screen
-        lda #4
+        lda #TRACK_OPTIONS
         jsr play_track
 
         ldy CurrentWidgetIndex
@@ -143,7 +143,7 @@ stay_here:
         far_call FAR_set_title_exbg
 
         ; Play the title track on the title screen
-        lda #3
+        lda #TRACK_TITLE
         jsr play_track
 
         ldy CurrentWidgetIndex

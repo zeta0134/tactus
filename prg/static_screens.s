@@ -238,7 +238,7 @@ game_over:
         jsr play_sfx_noise
 
         ; TODO; replace this with the game over jingle, when and if we have one
-        lda #0
+        lda #TRACK_GAMEOVER
         jsr play_track
 
 converge:

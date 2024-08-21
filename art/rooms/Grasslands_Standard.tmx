@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="16" height="11" tilewidth="16" tileheight="16" infinite="0" nextlayerid="148" nextobjectid="1">
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="16" height="11" tilewidth="16" tileheight="16" infinite="0" nextlayerid="160" nextobjectid="1">
  <properties>
   <property name="category" value="exterior"/>
   <property name="dark" type="bool" value="false"/>
@@ -981,6 +981,182 @@
 </data>
   </layer>
   <layer id="51" name="Attributes" width="16" height="11" opacity="0.24">
+   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+  </layer>
+ </group>
+ <group id="157" name="Open Corner: NE Grass+Grass" class="overlay" tintcolor="#ff00ff">
+  <properties>
+   <property name="direction" value="northeast"/>
+   <property name="ew_challenge" type="bool" value="false"/>
+   <property name="ew_exterior" type="bool" value="true"/>
+   <property name="ew_interior" type="bool" value="false"/>
+   <property name="ew_shop" type="bool" value="false"/>
+   <property name="ns_challenge" type="bool" value="false"/>
+   <property name="ns_exterior" type="bool" value="true"/>
+   <property name="ns_interior" type="bool" value="false"/>
+   <property name="ns_shop" type="bool" value="false"/>
+   <property name="special_conditions" value="OVERLAY_OPEN_NE"/>
+  </properties>
+  <layer id="158" name="Base" width="16" height="11">
+   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,518,518,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,518,518,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,518,518,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+  </layer>
+  <layer id="159" name="Attributes" width="16" height="11" opacity="0.26">
+   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+  </layer>
+ </group>
+ <group id="154" name="Open Corner: SE Grass+Grass" class="overlay" tintcolor="#ff00ff">
+  <properties>
+   <property name="direction" value="southeast"/>
+   <property name="ew_challenge" type="bool" value="false"/>
+   <property name="ew_exterior" type="bool" value="true"/>
+   <property name="ew_interior" type="bool" value="false"/>
+   <property name="ew_shop" type="bool" value="false"/>
+   <property name="ns_challenge" type="bool" value="false"/>
+   <property name="ns_exterior" type="bool" value="true"/>
+   <property name="ns_interior" type="bool" value="false"/>
+   <property name="ns_shop" type="bool" value="false"/>
+   <property name="special_conditions" value="OVERLAY_OPEN_SE"/>
+  </properties>
+  <layer id="155" name="Base" width="16" height="11">
+   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,518,518,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,518,518
+</data>
+  </layer>
+  <layer id="156" name="Attributes" width="16" height="11" opacity="0.22">
+   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+  </layer>
+ </group>
+ <group id="151" name="Open Corner: SW Grass+Grass" class="overlay" tintcolor="#ff00ff">
+  <properties>
+   <property name="direction" value="southwest"/>
+   <property name="ew_challenge" type="bool" value="false"/>
+   <property name="ew_exterior" type="bool" value="true"/>
+   <property name="ew_interior" type="bool" value="false"/>
+   <property name="ew_shop" type="bool" value="false"/>
+   <property name="ns_challenge" type="bool" value="false"/>
+   <property name="ns_exterior" type="bool" value="true"/>
+   <property name="ns_interior" type="bool" value="false"/>
+   <property name="ns_shop" type="bool" value="false"/>
+   <property name="special_conditions" value="OVERLAY_OPEN_SW"/>
+  </properties>
+  <layer id="152" name="Base" width="16" height="11">
+   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+518,518,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+518,518,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+  </layer>
+  <layer id="153" name="Attributes" width="16" height="11" opacity="0.21">
+   <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+  </layer>
+ </group>
+ <group id="148" name="Open Corner: NW Grass+Grass" class="overlay" tintcolor="#ff00ff">
+  <properties>
+   <property name="direction" value="northwest"/>
+   <property name="ew_challenge" type="bool" value="false"/>
+   <property name="ew_exterior" type="bool" value="true"/>
+   <property name="ew_interior" type="bool" value="false"/>
+   <property name="ew_shop" type="bool" value="false"/>
+   <property name="ns_challenge" type="bool" value="false"/>
+   <property name="ns_exterior" type="bool" value="true"/>
+   <property name="ns_interior" type="bool" value="false"/>
+   <property name="ns_shop" type="bool" value="false"/>
+   <property name="special_conditions" value="OVERLAY_OPEN_NW"/>
+  </properties>
+  <layer id="149" name="Base" width="16" height="11">
+   <data encoding="csv">
+518,518,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+518,518,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+518,518,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+  </layer>
+  <layer id="150" name="Attributes" width="16" height="11" opacity="0.24">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

@@ -171,3 +171,8 @@ ROOM_POOL_BLOCKING_INTERIOR = 5
 
 .global FAR_load_room_palette
 .global FAR_roll_room_from_floorplan_at_current_index
+
+OVERLAY_OPEN_NE = 1
+OVERLAY_OPEN_SE = 2
+OVERLAY_OPEN_SW = 3
+OVERLAY_OPEN_NW = 4

@@ -64,7 +64,8 @@ SfxFrames := R4
 
 TRACK_SILENCE          = 0
 TRACK_CLICK            = 1
-TRACK_SHOWER_GROOVE    = 2
-TRACK_TITLE            = 3
-TRACK_OPTIONS          = 4
-TRACK_IN_ANOTHER_WORLD = 5
+TRACK_TITLE            = 2
+TRACK_OPTIONS          = 3
+TRACK_GAMEOVER         = 4
+TRACK_SHOWER_GROOVE    = 5
+TRACK_IN_ANOTHER_WORLD = 6

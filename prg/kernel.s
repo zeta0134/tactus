@@ -751,7 +751,7 @@ continue_waiting:
         far_call FAR_swap_battlefield_buffers
 
         ; Reset special effects that depend on the current beat
-        near_call FAR_reset_palette_cycler
+        far_call FAR_reset_palette_cycler
 
         perform_zpcm_inc
 
@@ -1074,7 +1074,7 @@ continue_waiting:
         jsr update_beat_counters
         perform_zpcm_inc
 
-        near_call FAR_update_palette_cycler
+        far_call FAR_update_palette_cycler
 
         perform_zpcm_inc
         far_call FAR_queue_hud

@@ -70,7 +70,7 @@ done:
         rts
 .endproc
 
-        .segment "CODE_1"
+        .segment "CODE_0"
 
 ; call this once, during beat_1, BEFORE resolving the player (who is generally
 ; indirectly triggering this logic via enemy routines)
