@@ -251,7 +251,7 @@ LayoutPtr := R0
 
         jsr clear_fpga_ram
         far_call FAR_initialize_sprites
-        near_call FAR_init_game_end_screen
+        far_call FAR_init_game_end_screen
         far_call FAR_set_old_chr_exbg
         far_call FAR_initialize_title_palettes
         set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_NONE, #0
@@ -280,7 +280,7 @@ LayoutPtr := R0
         far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
 
-        near_call FAR_update_game_end_screen
+        far_call FAR_update_game_end_screen
 
         jsr wait_for_next_vblank
         rts

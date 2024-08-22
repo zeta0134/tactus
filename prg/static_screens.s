@@ -24,7 +24,7 @@
 TitleCursorIndex: .res 1
 
 
-.segment "CODE_1"
+.segment "CODE_0"
 
 BLANK_TILE = 250
 
@@ -192,7 +192,7 @@ thank_you_text: .asciiz "THANK YOU FOR PLAYING!"
 StringPtr := R0
 NumberWord := R0
 Digit := R0
-        far_call FAR_init_nametables
+        near_call FAR_init_nametables
 
         ; We don't know which nametable will be active, so
         ; all drawing commands will be run twice, once for each half
