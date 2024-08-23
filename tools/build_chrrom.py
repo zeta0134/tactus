@@ -252,19 +252,19 @@ raw_chr_banks = [read_raw_chr(f) for f in raw_chr_filenames]
 png_chr_banks = [read_png_chr(f) for f in png_chr_filenames]
 chr_bytes = generate_chr(background_tiles, sprite_tiles, raw_chr_banks + png_chr_banks)
 
-os.makedirs("build/expanded_tiles",exist_ok=True)
 
 with open('build/output_chr.bin', 'wb') as chr_file:
   chr_file.write(bytes(chr_bytes))
 
-for background_filename in background_filenames:
-  expanded_tile = read_background_tile(background_filename)
-  test_destination = "build/expanded_tiles/bg_"+background_filename.name
-  expanded_tile.save(test_destination)
-for sprite_filename in sprite_filenames:
-  expanded_tile = read_sprite_tile(sprite_filename)
-  test_destination = "build/expanded_tiles/sprite_"+sprite_filename.name
-  expanded_tile.save(test_destination)
+#os.makedirs("build/expanded_tiles",exist_ok=True)
+#for background_filename in background_filenames:
+#  expanded_tile = read_background_tile(background_filename)
+#  test_destination = "build/expanded_tiles/bg_"+background_filename.name
+#  expanded_tile.save(test_destination)
+#for sprite_filename in sprite_filenames:
+#  expanded_tile = read_sprite_tile(sprite_filename)
+#  test_destination = "build/expanded_tiles/sprite_"+sprite_filename.name
+#  expanded_tile.save(test_destination)
 
 def constant_name(filename):
   file_str = str(pathlib.PurePath(pathlib.PurePath(filename).name).stem)
