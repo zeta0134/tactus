@@ -15,13 +15,17 @@ BACKGROUND_PNG_FILES := $(wildcard $(ARTDIR)/background_tiles/*.png)
 SPRITE_PNG_FILES := $(wildcard $(ARTDIR)/sprite_tiles/*.png)
 RAW_CHR_TILES := $(wildcard $(ARTDIR)/raw_chr/*.chr)
 
+FLOOR_TMX_FILES := $(wildcard $(ARTDIR)/floors/*.tmx)
+FLOOR_INCS_FILES := \
+	$(patsubst $(ARTDIR)/floors/%.tmx,$(BUILDDIR)/floors/%.incs,$(FLOOR_TMX_FILES)) \
+
 ROOM_TMX_FILES := $(wildcard $(ARTDIR)/rooms/*.tmx)
 ROOM_INCS_FILES := \
 	$(patsubst $(ARTDIR)/rooms/%.tmx,$(BUILDDIR)/rooms/%.incs,$(ROOM_TMX_FILES)) \
 
-FLOOR_TMX_FILES := $(wildcard $(ARTDIR)/floors/*.tmx)
-FLOOR_INCS_FILES := \
-	$(patsubst $(ARTDIR)/floors/%.tmx,$(BUILDDIR)/floors/%.incs,$(FLOOR_TMX_FILES)) \
+STRUCTURE_TMX_FILES := $(wildcard $(ARTDIR)/structures/*.tmx)
+STRUCTURE_INCS_FILES := \
+	$(patsubst $(ARTDIR)/structures/%.tmx,$(BUILDDIR)/structures/%.incs,$(STRUCTURE_TMX_FILES)) \
 
 .PRECIOUS: $(BIN_FILES) $(LAYOUT_INCS_FILES) $(FLOOR_INCS_FILES) $(ROOM_INCS_FILES)
 
@@ -31,6 +35,7 @@ dir:
 	@mkdir -p build
 	@mkdir -p build/floors
 	@mkdir -p build/rooms
+	@mkdir -p build/structures
 
 clean:
 	-@rm -rf build
@@ -72,7 +77,7 @@ $(ROM_NAME): $(BUILDDIR)/output_chr.bin $(BUILDDIR)/torchlight/torchlight_0.incs
 	# We need to talk about
 	tools/parallel_universes.py build/tactus-zpcm.bin build/tactus-base.bin 131072 $@
 
-$(BUILDDIR)/%.o: $(SOURCEDIR)/%.s $(BIN_FILES) $(FLOOR_INCS_FILES) $(ROOM_INCS_FILES)
+$(BUILDDIR)/%.o: $(SOURCEDIR)/%.s $(BIN_FILES) $(FLOOR_INCS_FILES) $(ROOM_INCS_FILES) $(STRUCTURE_INCS_FILES)
 	ca65 -g -o $@ $<
 
 $(BUILDDIR)/rooms/%.incs: $(ARTDIR)/rooms/%.tmx
@@ -80,6 +85,9 @@ $(BUILDDIR)/rooms/%.incs: $(ARTDIR)/rooms/%.tmx
 
 $(BUILDDIR)/floors/%.incs: $(ARTDIR)/floors/%.tmx
 	tools/floor.py $< $@
+
+$(BUILDDIR)/structures/%.incs: $(ARTDIR)/structures/%.tmx
+	tools/structure.py $< $@
 
 $(BUILDDIR)/output_chr.bin: $(BACKGROUND_PNG_FILES) $(SPRITE_PNG_FILES) $(RAW_CHR_TILES)
 	tools/build_chrrom.py

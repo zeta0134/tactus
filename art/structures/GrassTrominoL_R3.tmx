@@ -30,7 +30,7 @@
 </data>
  </layer>
  <group id="39" name="Requirements">
-  <layer id="40" name="BehavioralTiles" width="6" height="7" opacity="0.49" tintcolor="#00ffff">
+  <layer id="40" name="Base" width="6" height="7" opacity="0.49" tintcolor="#00ffff">
    <data encoding="csv">
 273,273,273,273,273,0,
 273,273,273,273,273,273,
