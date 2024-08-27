@@ -172,6 +172,19 @@ ROOM_POOL_BLOCKING_INTERIOR = 5
 .global FAR_load_room_palette
 .global FAR_roll_room_from_floorplan_at_current_index
 
+; ==================
+;     STRUCTURES
+; ==================
+
+.struct StructureDefinition
+    MinPosX .byte
+    MaxPosX .byte
+    MinPosY .byte
+    MaxPosY .byte
+    TileList .addr
+    Requirements .addr
+.endstruct
+
 OVERLAY_OPEN_NE = 1
 OVERLAY_OPEN_SE = 2
 OVERLAY_OPEN_SW = 3
