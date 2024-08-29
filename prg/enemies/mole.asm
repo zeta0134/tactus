@@ -300,15 +300,17 @@ spawn_new_wrench:
         sta tile_flags, y
         
 despawn_old_wrench:
-        ; mark ourselves as floor; we're done
-        ; (no puff stool this time, projectiles can't be attacked)
-        ldx CurrentTile
-        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_WORLD 
-
         ; clean up the other flags for posterity
         lda #0
         sta tile_data, x
         sta tile_flags, x
+
+        ; Draw a regular floor tile where we just were
+        ldx CurrentTile
+        stx DiscoTile
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        jsr draw_disco_tile_here
 
         rts
 .endproc
@@ -404,17 +406,19 @@ TargetSquare := R13
         ; All projectiles do 1 damage to the player on hit
         far_call FAR_damage_player
 
-        ; Now, despawn the projectile:
-        ; draw a basic floor tile here, which will be underneath the player
-        ldx TargetSquare
-        stx TargetIndex
-        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_WORLD
-
         lda #0
         sta tile_data, x
         sta tile_flags, x
-        
+
+        ; Draw a regular floor tile where we just were
+        ldx TargetSquare
+        stx DiscoTile
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        jsr draw_disco_tile_here
         ; draw it now!
+        ldx TargetSquare
+        stx TargetIndex
         jsr draw_active_tile
 
         rts
