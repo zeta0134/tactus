@@ -5,16 +5,16 @@
  </properties>
  <tileset firstgid="1" source="../MapTiles.tsx"/>
  <tileset firstgid="257" source="../DiscoFloorTiles.tsx"/>
- <tileset firstgid="513" source="../Attributes.tsx"/>
- <tileset firstgid="517" source="../TechnicalTiles.tsx"/>
+ <tileset firstgid="321" source="../Attributes.tsx"/>
+ <tileset firstgid="325" source="../TechnicalTiles.tsx"/>
  <layer id="1" name="Base" width="5" height="7">
   <data encoding="csv">
 0,0,0,0,0,
-0,261,291,262,0,
-0,276,536,274,0,
-0,276,534,274,0,
-0,276,180,274,0,
-0,277,259,278,0,
+0,261,275,262,0,
+0,268,344,266,0,
+0,268,342,266,0,
+0,268,180,266,0,
+0,269,259,270,0,
 0,0,0,0,0
 </data>
  </layer>
@@ -24,7 +24,7 @@
 0,0,0,0,0,
 0,0,0,0,0,
 0,0,0,0,0,
-0,0,515,0,0,
+0,0,323,0,0,
 0,0,0,0,0,
 0,0,0,0,0
 </data>
@@ -32,13 +32,13 @@
  <group id="39" name="Requirements">
   <layer id="40" name="Base" width="5" height="7" opacity="0.49" tintcolor="#00ffff">
    <data encoding="csv">
-273,273,273,273,273,
-273,273,273,273,273,
-273,273,273,273,273,
-273,273,273,273,273,
-273,273,273,273,273,
-273,273,273,273,273,
-273,273,273,273,273
+265,265,265,265,265,
+265,265,265,265,265,
+265,265,265,265,265,
+265,265,265,265,265,
+265,265,265,265,265,
+265,265,265,265,265,
+265,265,265,265,265
 </data>
   </layer>
  </group>

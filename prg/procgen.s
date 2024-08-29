@@ -42,6 +42,9 @@ enemies_active: .res 1
 first_beat_after_load: .res 1
 chest_spawn_cooldown: .res 1
 
+current_clear_status: .res 1
+previous_clear_status: .res 1
+
 rooms_rerolled: .res 2
 floors_rerolled: .res 2
 
@@ -794,11 +797,11 @@ detail_sparse_grass:
         .repeat 27
         .word BG_TILE_DISCO_FLOOR_TILES_0000 ; blank floor
         .endrepeat
-        .word BG_TILE_DISCO_FLOOR_TILES_0022 ; 2-bladed grass tuft
-        .word BG_TILE_DISCO_FLOOR_TILES_0022 ; 2-bladed grass tuft
-        .word BG_TILE_DISCO_FLOOR_TILES_0023 ; 3-bladed grass tuft
-        .word BG_TILE_DISCO_FLOOR_TILES_0023 ; 3-bladed grass tuft
-        .word BG_TILE_DISCO_FLOOR_TILES_0024 ; thick grass tuft
+        .word BG_TILE_DISCO_FLOOR_TILES_0014 ; 2-bladed grass tuft
+        .word BG_TILE_DISCO_FLOOR_TILES_0014 ; 2-bladed grass tuft
+        .word BG_TILE_DISCO_FLOOR_TILES_0015 ; 3-bladed grass tuft
+        .word BG_TILE_DISCO_FLOOR_TILES_0015 ; 3-bladed grass tuft
+        .word BG_TILE_DISCO_FLOOR_TILES_0025 ; thick grass tuft
 
 detail_sparse_shrooms:
         .repeat 26
@@ -808,8 +811,8 @@ detail_sparse_shrooms:
         .word BG_TILE_DISCO_FLOOR_TILES_0006 ; plain mushroom
         .word BG_TILE_DISCO_FLOOR_TILES_0007 ; tall mushroom
         .word BG_TILE_DISCO_FLOOR_TILES_0007 ; tall mushroom
-        .word BG_TILE_DISCO_FLOOR_TILES_0008 ; two mushrooms
-        .word BG_TILE_DISCO_FLOOR_TILES_0008 ; two mushrooms
+        .word BG_TILE_DISCO_FLOOR_TILES_0024 ; two mushrooms
+        .word BG_TILE_DISCO_FLOOR_TILES_0024 ; two mushrooms
 
 detail_sparse_grass_shrooms:
         .repeat 26
@@ -817,45 +820,45 @@ detail_sparse_grass_shrooms:
         .endrepeat
         .word BG_TILE_DISCO_FLOOR_TILES_0006 ; plain mushroom
         .word BG_TILE_DISCO_FLOOR_TILES_0007 ; tall mushroom
-        .word BG_TILE_DISCO_FLOOR_TILES_0008 ; two mushrooms
-        .word BG_TILE_DISCO_FLOOR_TILES_0022 ; 2-bladed grass tuft
-        .word BG_TILE_DISCO_FLOOR_TILES_0023 ; 3-bladed grass tuft        
-        .word BG_TILE_DISCO_FLOOR_TILES_0024 ; thick grass tuft
+        .word BG_TILE_DISCO_FLOOR_TILES_0024 ; two mushrooms
+        .word BG_TILE_DISCO_FLOOR_TILES_0014 ; 2-bladed grass tuft
+        .word BG_TILE_DISCO_FLOOR_TILES_0015 ; 3-bladed grass tuft        
+        .word BG_TILE_DISCO_FLOOR_TILES_0025 ; thick grass tuft
 
 detail_cave:
         .repeat 16
         .word BG_TILE_DISCO_FLOOR_TILES_0000 ; blank floor
         .endrepeat
         .repeat 11
-        .word BG_TILE_DISCO_FLOOR_TILES_0018 ; pocked floor
+        .word BG_TILE_DISCO_FLOOR_TILES_0010 ; pocked floor
         .endrepeat
-        .word BG_TILE_DISCO_FLOOR_TILES_0038 ; round rock
-        .word BG_TILE_DISCO_FLOOR_TILES_0039 ; many pocks
-        .word BG_TILE_DISCO_FLOOR_TILES_0039 ; many pocks
-        .word BG_TILE_DISCO_FLOOR_TILES_0039 ; many pocks
-        .word BG_TILE_DISCO_FLOOR_TILES_0040 ; two rocks
+        .word BG_TILE_DISCO_FLOOR_TILES_0022 ; round rock
+        .word BG_TILE_DISCO_FLOOR_TILES_0023 ; many pocks
+        .word BG_TILE_DISCO_FLOOR_TILES_0023 ; many pocks
+        .word BG_TILE_DISCO_FLOOR_TILES_0023 ; many pocks
+        .word BG_TILE_DISCO_FLOOR_TILES_0026 ; two rocks
 
 detail_cave_shrooms:
         .repeat 16
         .word BG_TILE_DISCO_FLOOR_TILES_0000 ; blank floor
         .endrepeat
         .repeat 9
-        .word BG_TILE_DISCO_FLOOR_TILES_0018 ; pocked floor
+        .word BG_TILE_DISCO_FLOOR_TILES_0010 ; pocked floor
         .endrepeat
-        .word BG_TILE_DISCO_FLOOR_TILES_0038 ; round rock
-        .word BG_TILE_DISCO_FLOOR_TILES_0039 ; many pocks
-        .word BG_TILE_DISCO_FLOOR_TILES_0039 ; many pocks
-        .word BG_TILE_DISCO_FLOOR_TILES_0040 ; two rocks
+        .word BG_TILE_DISCO_FLOOR_TILES_0022 ; round rock
+        .word BG_TILE_DISCO_FLOOR_TILES_0023 ; many pocks
+        .word BG_TILE_DISCO_FLOOR_TILES_0023 ; many pocks
+        .word BG_TILE_DISCO_FLOOR_TILES_0026 ; two rocks
         .word BG_TILE_DISCO_FLOOR_TILES_0006 ; plain mushroom
         .word BG_TILE_DISCO_FLOOR_TILES_0007 ; tall mushroom
-        .word BG_TILE_DISCO_FLOOR_TILES_0008 ; two mushrooms
+        .word BG_TILE_DISCO_FLOOR_TILES_0024 ; two mushrooms
 
 detail_sand:
         .repeat 29
-        .word BG_TILE_DISCO_FLOOR_TILES_0036 ; plain sand
+        .word BG_TILE_DISCO_FLOOR_TILES_0020 ; plain sand
         .endrepeat
         .repeat 3
-        .word BG_TILE_DISCO_FLOOR_TILES_0018 ; sand with seashell
+        .word BG_TILE_DISCO_FLOOR_TILES_0021 ; sand with seashell
         .endrepeat
 
 detail_grass_wall_lower_border:
@@ -1558,19 +1561,27 @@ EntityAttribute := R3
         ; haven't had a real processing round yet, and we are operating on incomplete
         ; information (possibly stale from the previous room)
         lda first_beat_after_load
-        bne all_done
+        bne room_state_init
+
+        lda current_clear_status
+        sta previous_clear_status
 
         ldx PlayerRoomIndex
 check_room_clear:
         lda enemies_active
         bne room_not_clear
 room_is_clear:
+        lda #1
+        sta current_clear_status
         perform_zpcm_inc
         lda room_flags, x
         ora #ROOM_FLAG_CLEARED ; set the clear flag
         sta room_flags, x
         jmp done_with_clear_checks
 room_not_clear:
+        lda #0
+        sta current_clear_status
+        perform_zpcm_inc
         lda room_flags, x
         and #($FF - ROOM_FLAG_CLEARED) ; unset the room clear flag
         sta room_flags, x
@@ -1618,7 +1629,24 @@ all_done:
         ; reset the enemies active counter for the next beat
         lda #0
         sta enemies_active
+        rts
 
+room_state_init:
+        lda #0
+        sta enemies_active
+        lda #1
+        sta previous_clear_status
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_CLEARED
+        bne init_room_clear
+init_room_not_clear:
+        lda #0
+        sta current_clear_status
+        rts
+init_room_clear:
+        lda #1
+        sta current_clear_status
         rts
 .endproc
 

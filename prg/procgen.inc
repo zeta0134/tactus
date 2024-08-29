@@ -17,6 +17,9 @@
 .globalzp BigFloorPtr
 .global BigFloorBank
 
+.global current_clear_status
+.global previous_clear_status
+
 FLOOR_WIDTH = 6
 FLOOR_HEIGHT = 4
 FLOOR_SIZE = (FLOOR_WIDTH*FLOOR_HEIGHT)

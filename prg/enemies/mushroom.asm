@@ -280,109 +280,104 @@ CurrentTile := R15
         rts
 .endproc
 
-spore_plain_lut:
+spores_lut:
+spores_n:
         .word BG_TILE_SPORES_N_PLAIN
-        .word BG_TILE_SPORES_NE_PLAIN
-        .word BG_TILE_SPORES_E_PLAIN
-        .word BG_TILE_SPORES_SE_PLAIN
-        .word BG_TILE_SPORES_S_PLAIN
-        .word BG_TILE_SPORES_SW_PLAIN
-        .word BG_TILE_SPORES_W_PLAIN
-        .word BG_TILE_SPORES_NW_PLAIN
-spore_solid_lut:
+        .word BG_TILE_SPORES_N_PLAIN
         .word BG_TILE_SPORES_N_SOLID
-        .word BG_TILE_SPORES_NE_SOLID
-        .word BG_TILE_SPORES_E_SOLID
-        .word BG_TILE_SPORES_SE_SOLID
-        .word BG_TILE_SPORES_S_SOLID
-        .word BG_TILE_SPORES_SW_SOLID
-        .word BG_TILE_SPORES_W_SOLID
-        .word BG_TILE_SPORES_NW_SOLID
-spore_outline_lut:
+        .word BG_TILE_SPORES_N_SOLID
+        .word BG_TILE_SPORES_N_SOLID
         .word BG_TILE_SPORES_N_OUTLINE
+        .word BG_TILE_SPORES_N_OUTLINE
+        .word BG_TILE_SPORES_N_OUTLINE
+spores_ne:
+        .word BG_TILE_SPORES_NE_PLAIN
+        .word BG_TILE_SPORES_NE_PLAIN
+        .word BG_TILE_SPORES_NE_SOLID
+        .word BG_TILE_SPORES_NE_SOLID
+        .word BG_TILE_SPORES_NE_SOLID
         .word BG_TILE_SPORES_NE_OUTLINE
+        .word BG_TILE_SPORES_NE_OUTLINE
+        .word BG_TILE_SPORES_NE_OUTLINE
+spores_e:
+        .word BG_TILE_SPORES_E_PLAIN
+        .word BG_TILE_SPORES_E_PLAIN
+        .word BG_TILE_SPORES_E_SOLID
+        .word BG_TILE_SPORES_E_SOLID
+        .word BG_TILE_SPORES_E_SOLID
         .word BG_TILE_SPORES_E_OUTLINE
+        .word BG_TILE_SPORES_E_OUTLINE
+        .word BG_TILE_SPORES_E_OUTLINE
+spores_se:
+        .word BG_TILE_SPORES_SE_PLAIN
+        .word BG_TILE_SPORES_SE_PLAIN
+        .word BG_TILE_SPORES_SE_SOLID
+        .word BG_TILE_SPORES_SE_SOLID
+        .word BG_TILE_SPORES_SE_SOLID
         .word BG_TILE_SPORES_SE_OUTLINE
+        .word BG_TILE_SPORES_SE_OUTLINE
+        .word BG_TILE_SPORES_SE_OUTLINE
+spores_s:
+        .word BG_TILE_SPORES_S_PLAIN
+        .word BG_TILE_SPORES_S_PLAIN
+        .word BG_TILE_SPORES_S_SOLID
+        .word BG_TILE_SPORES_S_SOLID
+        .word BG_TILE_SPORES_S_SOLID
         .word BG_TILE_SPORES_S_OUTLINE
+        .word BG_TILE_SPORES_S_OUTLINE
+        .word BG_TILE_SPORES_S_OUTLINE
+spores_sw:
+        .word BG_TILE_SPORES_SW_PLAIN
+        .word BG_TILE_SPORES_SW_PLAIN
+        .word BG_TILE_SPORES_SW_SOLID
+        .word BG_TILE_SPORES_SW_SOLID
+        .word BG_TILE_SPORES_SW_SOLID
         .word BG_TILE_SPORES_SW_OUTLINE
+        .word BG_TILE_SPORES_SW_OUTLINE
+        .word BG_TILE_SPORES_SW_OUTLINE
+spores_w:
+        .word BG_TILE_SPORES_W_PLAIN
+        .word BG_TILE_SPORES_W_PLAIN
+        .word BG_TILE_SPORES_W_SOLID
+        .word BG_TILE_SPORES_W_SOLID
+        .word BG_TILE_SPORES_W_SOLID
         .word BG_TILE_SPORES_W_OUTLINE
-        .word BG_TILE_SPORES_NW_OUTLINE
+        .word BG_TILE_SPORES_W_OUTLINE
+        .word BG_TILE_SPORES_W_OUTLINE
+spores_nw:
+        .word BG_TILE_SPORES_W_PLAIN
+        .word BG_TILE_SPORES_W_PLAIN
+        .word BG_TILE_SPORES_W_SOLID
+        .word BG_TILE_SPORES_W_SOLID
+        .word BG_TILE_SPORES_W_SOLID
+        .word BG_TILE_SPORES_W_OUTLINE
+        .word BG_TILE_SPORES_W_OUTLINE
+        .word BG_TILE_SPORES_W_OUTLINE
 
 ; Note: This is only for DRAWING the smoke puff! Any other data you need to stuff into
 ; this thing, do that at the call site.
 ; note: uses smokepuff input variables, since it is almost the same logic
 .proc draw_spore_here
-        ; The smoke puff needs to obey the same accesibility rules as the disco tile so
-        ; that it meshes well with the underlying floor. Do all of those same checks here
+TargetFuncPtr := R0
+        ; run the disco selection logic based on the player's preference
+        ; (DiscoTile==SmokePuffTile, and DiscoRow==SmokePuffRow, so that setup is done by this point)
+        ldx setting_disco_floor
+        lda disco_behavior_lut_low, x
+        sta TargetFuncPtr+0
+        lda disco_behavior_lut_high, x
+        sta TargetFuncPtr+1
+        jsr _disco_trampoline
 
-        ; If the current room is cleared, we release the player from the perils of the tempo, and the
-        ; floor stops dancing. (these would look very spastic if they flickered with the player's moves)
-        ldx PlayerRoomIndex
-        lda room_flags, x
-        and #ROOM_FLAG_CLEARED
-        bne cleared_tile
-        ; If we are in disco accessibility mode 3, treat all rooms as cleared for disco purposes,
-        ; effectively suppressing the animation entirely
-        lda setting_disco_floor
-        cmp #DISCO_FLOOR_STATIC
-        beq cleared_tile
-        ; If we are in mode 2, don't draw the checkerboard pattern. Instead, treat all tiles as though
-        ; they are unlit. This still allows the detail to dance with the music
-        cmp #DISCO_FLOOR_NO_OUTLINE
-        beq regular_tile
-
-        ; Otherwise, we want to draw a checkerboard pattern, which alternates every time the beat advances
-        ; we can do this with an XOR of these low bits: X coordinate, Y coordinate, Beat Counter
-        lda SmokePuffRow
-        eor SmokePuffTile
-        eor CurrentBeatCounter
-        and #%00000001
-        bne disco_tile
-
-        ; Here we diverge heavily; the smoke puff tiles have a completely different
-        ; layout in memory. Note that smoke puffs now always use the world color, which
-        ; diverges from their old behavior (they used to preserve the enemy color) since
-        ; this looks weird with their disco floor variants
-regular_tile:
-        ; "regular" and "cleared" tiles are the same for smoke poffs
-cleared_tile:
-        perform_zpcm_inc
+        ora SmokePuffDirection
+        asl ; expand from byte to word alignment
+        tay
         ldx SmokePuffTile
-        ldy SmokePuffDirection
-        lda spore_plain_lut+0, y
-        sta tile_patterns, x
-        lda spore_plain_lut+1, y
-        sta tile_attributes, x
-        jmp converge
-disco_tile:
-        perform_zpcm_inc
-        ; disco tiles have two accessibility modes: regular and outline, so handle that here
-        lda setting_disco_floor
-        cmp #DISCO_FLOOR_OUTLINE
-        beq outlined_disco_tile
-full_disco_tile:
-        perform_zpcm_inc
-        ldx SmokePuffTile
-        ldy SmokePuffDirection
-        lda spore_solid_lut+0, y
-        sta tile_patterns, x
-        lda spore_solid_lut+1, y
-        sta tile_attributes, x
-        jmp converge
-outlined_disco_tile:
-        perform_zpcm_inc
-        ldx SmokePuffTile
-        ldy SmokePuffDirection
-        lda spore_outline_lut+0, y
-        sta tile_patterns, x
-        lda spore_outline_lut+1, y
-        sta tile_attributes, x
-        jmp converge
-
-converge:
-        ; draw_with_pal, adjusted for our temporary stash
         lda #TILE_ONE_BEAT_HAZARD
         sta battlefield, x
+        lda spores_lut+0, y
+        sta tile_patterns, x
+        lda spores_lut+1, y
+        sta tile_attributes, x
 
         ; set our "already processed" flag, since we don't want our "one beat hazard" logic to
         ; erase this tile's properties before the next beat

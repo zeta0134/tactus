@@ -2,68 +2,256 @@
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
 
+DISCO_OFFSET_NO_ANIMATION      = 0
+DISCO_OFFSET_GROOVEMENT        = 1
+DISCO_OFFSET_SOLID_GROWING     = 2
+DISCO_OFFSET_SOLID_STATIC      = 3
+DISCO_OFFSET_SOLID_SHRINKING   = 4
+DISCO_OFFSET_OUTLINE_GROWING   = 5
+DISCO_OFFSET_OUTLINE_STATIC    = 6
+DISCO_OFFSET_OUTLINE_SHRINKING = 7
+
+disco_tile_offset_lut_low:
+        .byte $00, $80, $00, $80, $00, $80, $00, $80
+disco_tile_offset_lut_high:
+        .byte $00, $00, $04, $04, $08, $08, $0C, $0C
+
+; got to bounce to the music
+.proc _disco_trampoline
+TargetFuncPtr := R0
+        jmp (TargetFuncPtr)
+.endproc
+
+; one subroutine per accessibility mode, so we can decide which floor variant
+; to choose with extreme flexibility
+
+; Absolutely no movement whatsoever! The most extreme accessibility option for
+; the floor tiles.
+.proc disco_reduced_motion
+        lda #DISCO_OFFSET_NO_ANIMATION
+        rts
+.endproc
+
+; Floor tiles dance when the room is active, and are still otherwise
+.proc disco_just_groovement
+        ; BASIC check: if the room is cleared, always return a cleared tile
+        lda current_clear_status
+        beq not_cleared
+        lda #DISCO_OFFSET_NO_ANIMATION
+        rts
+not_cleared:
+        lda #DISCO_OFFSET_GROOVEMENT
+        rts
+.endproc
+
+.proc disco_solid_instant_squares
+        ; BASIC check: if the room is cleared, always return a cleared tile
+        lda current_clear_status
+        beq not_cleared
+cleared:
+        lda previous_clear_status
+        bne cleared_not_shrinking
+cleared_shrinking:
+        ; work out the parity and decide whether to show a shrinking groovement
+        ; tile or a plain groovement tile (art currently requires these to match)
+        lda DiscoRow
+        eor DiscoTile
+        eor CurrentBeatCounter
+        and #%00000001
+        bne just_groovement
+        lda #DISCO_OFFSET_SOLID_SHRINKING
+        rts
+just_groovement:
+        lda #DISCO_OFFSET_GROOVEMENT
+        rts
+cleared_not_shrinking:
+        lda #DISCO_OFFSET_NO_ANIMATION
+        rts
+not_cleared:
+        lda DiscoRow
+        eor DiscoTile
+        eor CurrentBeatCounter
+        and #%00000001
+        beq just_groovement
+        lda previous_clear_status
+        beq not_cleared_static
+not_cleared_growing:
+        lda #DISCO_OFFSET_SOLID_GROWING
+        rts
+not_cleared_static:
+        lda #DISCO_OFFSET_SOLID_STATIC
+        rts
+.endproc
+
+; "Frozen" parity ignores the current beat entirely, but still grows/shrinks
+; into place to indicate changes in room tempo state
+.proc disco_solid_frozen_squares
+        ; BASIC check: if the room is cleared, always return a cleared tile
+        lda current_clear_status
+        beq not_cleared
+cleared:
+        lda previous_clear_status
+        bne cleared_not_shrinking
+cleared_shrinking:
+        ; work out the parity and decide whether to show a shrinking groovement
+        ; tile or a plain groovement tile (art currently requires these to match)
+        lda DiscoRow
+        eor DiscoTile
+        and #%00000001
+        bne just_groovement
+        lda #DISCO_OFFSET_SOLID_SHRINKING
+        rts
+just_groovement:
+        lda #DISCO_OFFSET_GROOVEMENT
+        rts
+cleared_not_shrinking:
+        lda #DISCO_OFFSET_NO_ANIMATION
+        rts
+not_cleared:
+        lda DiscoRow
+        eor DiscoTile
+        and #%00000001
+        bne just_groovement
+        lda previous_clear_status
+        beq not_cleared_static
+not_cleared_growing:
+        lda #DISCO_OFFSET_SOLID_GROWING
+        rts
+not_cleared_static:
+        lda #DISCO_OFFSET_SOLID_STATIC
+        rts
+.endproc
+
+.proc disco_outline_instant_squares
+        ; BASIC check: if the room is cleared, always return a cleared tile
+        lda current_clear_status
+        beq not_cleared
+cleared:
+        lda previous_clear_status
+        bne cleared_not_shrinking
+cleared_shrinking:
+        ; work out the parity and decide whether to show a shrinking groovement
+        ; tile or a plain groovement tile (art currently requires these to match)
+        lda DiscoRow
+        eor DiscoTile
+        eor CurrentBeatCounter
+        and #%00000001
+        bne just_groovement
+        lda #DISCO_OFFSET_OUTLINE_SHRINKING
+        rts
+just_groovement:
+        lda #DISCO_OFFSET_GROOVEMENT
+        rts
+cleared_not_shrinking:
+        lda #DISCO_OFFSET_NO_ANIMATION
+        rts
+not_cleared:
+        lda DiscoRow
+        eor DiscoTile
+        eor CurrentBeatCounter
+        and #%00000001
+        beq just_groovement
+        lda previous_clear_status
+        beq not_cleared_static
+not_cleared_growing:
+        lda #DISCO_OFFSET_OUTLINE_GROWING
+        rts
+not_cleared_static:
+        lda #DISCO_OFFSET_OUTLINE_STATIC
+        rts
+.endproc
+
+; "Frozen" parity ignores the current beat entirely, but still grows/shrinks
+; into place to indicate changes in room tempo state
+.proc disco_outline_frozen_squares
+        ; BASIC check: if the room is cleared, always return a cleared tile
+        lda current_clear_status
+        beq not_cleared
+cleared:
+        lda previous_clear_status
+        bne cleared_not_shrinking
+cleared_shrinking:
+        ; work out the parity and decide whether to show a shrinking groovement
+        ; tile or a plain groovement tile (art currently requires these to match)
+        lda DiscoRow
+        eor DiscoTile
+        and #%00000001
+        bne just_groovement
+        lda #DISCO_OFFSET_OUTLINE_SHRINKING
+        rts
+just_groovement:
+        lda #DISCO_OFFSET_GROOVEMENT
+        rts
+cleared_not_shrinking:
+        lda #DISCO_OFFSET_NO_ANIMATION
+        rts
+not_cleared:
+        lda DiscoRow
+        eor DiscoTile
+        and #%00000001
+        bne just_groovement
+        lda previous_clear_status
+        beq not_cleared_static
+not_cleared_growing:
+        lda #DISCO_OFFSET_OUTLINE_GROWING
+        rts
+not_cleared_static:
+        lda #DISCO_OFFSET_OUTLINE_STATIC
+        rts
+.endproc
+
+disco_behavior_lut_low:
+        .byte <disco_solid_instant_squares
+        .byte <disco_solid_frozen_squares
+        .byte <disco_outline_instant_squares
+        .byte <disco_outline_frozen_squares
+        .byte <disco_just_groovement
+        .byte <disco_reduced_motion
+
+disco_behavior_lut_high:
+        .byte >disco_solid_instant_squares
+        .byte >disco_solid_frozen_squares
+        .byte >disco_outline_instant_squares
+        .byte >disco_outline_frozen_squares
+        .byte >disco_just_groovement
+        .byte >disco_reduced_motion
+
 .proc draw_disco_tile
+TargetFuncPtr := R0
 CurrentRow := R14
 CurrentTile := R15
 
 TileIdLow := R16
 TileAttrHigh := R17
+        ; Setup for the disco routines to use
+        ; (this lets us share disco routines with other tile types that
+        ; have different zp scratch arrangements)
+        lda CurrentRow
+        sta DiscoRow
+        lda CurrentTile
+        sta DiscoTile
 
         ; first, load the detail variant for this floor, we'll use this as our base
         ldx CurrentTile
         lda tile_detail, x
         sta TileIdLow
 
-        ; If the current room is cleared, we release the player from the perils of the tempo, and the
-        ; floor stops dancing. (these would look very spastic if they flickered with the player's moves)
-        ldx PlayerRoomIndex
-        lda room_flags, x
-        and #ROOM_FLAG_CLEARED
-        bne cleared_tile
-        ; If we are in disco accessibility mode 3, treat all rooms as cleared for disco purposes,
-        ; effectively suppressing the animation entirely
-        lda setting_disco_floor
-        cmp #DISCO_FLOOR_STATIC
-        beq cleared_tile
-        ; If we are in mode 2, don't draw the checkerboard pattern. Instead, treat all tiles as though
-        ; they are unlit. This still allows the detail to dance with the music
-        cmp #DISCO_FLOOR_NO_OUTLINE
-        beq regular_tile
-
-        ; Otherwise, we want to draw a checkerboard pattern, which alternates every time the beat advances
-        ; we can do this with an XOR of these low bits: X coordinate, Y coordinate, Beat Counter
-        lda CurrentRow
-        eor CurrentTile
-        eor CurrentBeatCounter
-        and #%00000001
-        bne disco_tile
-
-regular_tile:
-        ; unlit tiles still animate, so do that here. animations are always the 3rd variant
-        lda #$0C
-        jmp converge
-cleared_tile:
-        lda #$00
-        jmp converge
-disco_tile:
-        ; disco tiles have two accessibility modes: regular and outline, so handle that here
-        lda setting_disco_floor
-        cmp #DISCO_FLOOR_OUTLINE
-        beq outlined_disco_tile
-full_disco_tile:
-        lda #$04
-        jmp converge
-outlined_disco_tile:
-        lda #$08
-        jmp converge
-
-converge:
-        ;ora #$80
+        ; run the selection logic based on the player's preference
+        ldx setting_disco_floor
+        lda disco_behavior_lut_low, x
+        sta TargetFuncPtr+0
+        lda disco_behavior_lut_high, x
+        sta TargetFuncPtr+1
+        jsr _disco_trampoline
+        ; at this point, A contains the index into the disco tile lookup table
+        tax
+        lda disco_tile_offset_lut_low, x
+        ora TileIdLow
+        sta TileIdLow
+        lda disco_tile_offset_lut_high, x
         sta TileAttrHigh
-        ; TODO: what if this room needs a different palette for floor tiles?
-        ; Ideally we could specify this as part of the map data... there's 2 free bits
-        ; in the detail byte
 
+        ; now perform the actual draw
         ldx CurrentTile
         ; draw_with_pal, adjusted for our temporary stash
         lda #TILE_DISCO_FLOOR
@@ -72,7 +260,6 @@ converge:
         sta tile_patterns, x
         lda TileAttrHigh
         sta tile_attributes, x
-
         rts
 .endproc
 

@@ -953,9 +953,8 @@ StartingTile := R15
 .endproc
 
 .proc decide_how_to_wait_for_the_next_beat
-        ldx PlayerRoomIndex
-        lda room_flags, x
-        and #ROOM_FLAG_CLEARED
+        lda current_clear_status
+        and previous_clear_status
         beq normal_gameplay_beat_checking
 room_cleared:
         st16 GameMode, wait_for_the_next_cleared_room_beat

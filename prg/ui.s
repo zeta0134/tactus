@@ -70,11 +70,15 @@ disco_types:
         .addr disco_option_1_str
         .addr disco_option_2_str
         .addr disco_option_3_str
+        .addr disco_option_4_str
+        .addr disco_option_5_str
 
-disco_option_0_str: .asciiz "DISCO SQUARES"
-disco_option_1_str: .asciiz "DISCO OUTLINES"
-disco_option_2_str: .asciiz "JUST GROOVEMENT"
-disco_option_3_str: .asciiz "NO MOTION"
+disco_option_0_str: .asciiz "INSTANT SQUARES"
+disco_option_1_str: .asciiz "FROZEN SQUARES"
+disco_option_2_str: .asciiz "INSTANT OUTLINES"
+disco_option_3_str: .asciiz "FROZEN OUTLINES"
+disco_option_4_str: .asciiz "JUST GROOVEMENT"
+disco_option_5_str: .asciiz "NO MOTION"
 
 considerations:
         .byte 2

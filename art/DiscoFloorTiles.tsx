@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="DiscoFloorTiles" tilewidth="16" tileheight="16" tilecount="64" columns="16">
- <image source="tilesets/disco_floor_tiles_tiled.png" width="256" height="64"/>
+<tileset version="1.10" tiledversion="1.11.0" name="DiscoFloorTiles" tilewidth="16" tileheight="16" tilecount="64" columns="8">
+ <image source="tilesets/disco_floor_tiles_tiled.png" width="128" height="64"/>
  <tile id="0" type="floor"/>
  <tile id="1" type="floor"/>
  <tile id="2" type="floor"/>
@@ -33,36 +33,4 @@
  <tile id="29" type="floor"/>
  <tile id="30" type="floor"/>
  <tile id="31" type="floor"/>
- <tile id="32" type="floor"/>
- <tile id="33" type="floor"/>
- <tile id="34" type="floor"/>
- <tile id="35" type="floor"/>
- <tile id="36" type="floor"/>
- <tile id="37" type="floor"/>
- <tile id="38" type="floor"/>
- <tile id="39" type="floor"/>
- <tile id="40" type="floor"/>
- <tile id="41" type="floor"/>
- <tile id="42" type="floor"/>
- <tile id="43" type="floor"/>
- <tile id="44" type="floor"/>
- <tile id="45" type="floor"/>
- <tile id="46" type="floor"/>
- <tile id="47" type="floor"/>
- <tile id="48" type="floor"/>
- <tile id="49" type="floor"/>
- <tile id="50" type="floor"/>
- <tile id="51" type="floor"/>
- <tile id="52" type="floor"/>
- <tile id="53" type="floor"/>
- <tile id="54" type="floor"/>
- <tile id="55" type="floor"/>
- <tile id="56" type="floor"/>
- <tile id="57" type="floor"/>
- <tile id="58" type="floor"/>
- <tile id="59" type="floor"/>
- <tile id="60" type="floor"/>
- <tile id="61" type="floor"/>
- <tile id="62" type="floor"/>
- <tile id="63" type="floor"/>
 </tileset>
