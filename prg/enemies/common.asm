@@ -330,14 +330,12 @@ EnemyHealth := R11
 die:
         ; Replace ourselves with a regular floor, and spawn the usual death juice
         ldx EffectiveAttackSquare
-        stx TargetIndex
-
-        lda #TILE_DISCO_FLOOR
-        sta battlefield, x
-        lda #<BG_TILE_FLOOR
-        sta tile_patterns, x
-        lda #(>BG_TILE_FLOOR | PAL_WORLD)
-        sta tile_attributes, x
+        stx DiscoTile
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        jsr draw_disco_tile_here
+        lda EffectiveAttackSquare
+        sta TargetIndex
         jsr draw_active_tile
 
         ldx EffectiveAttackSquare

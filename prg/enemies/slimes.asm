@@ -257,10 +257,13 @@ EffectiveAttackSquare := R10
 
         ; slimes all have 1 HP, so there is no health bar. Just delete
         ; the slime by replacing it
-
         ldx EffectiveAttackSquare
-        stx TargetIndex
-        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_WORLD
+        stx DiscoTile
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        jsr draw_disco_tile_here
+        lda EffectiveAttackSquare
+        sta TargetIndex
         jsr draw_active_tile
 
         ldx EffectiveAttackSquare

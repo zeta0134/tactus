@@ -231,6 +231,8 @@ TileAttrHigh := R17
         lda CurrentTile
         sta DiscoTile
 
+        ; TODO - OPTIMIZATION: we could fall through to the below function?
+
         ; first, load the detail variant for this floor, we'll use this as our base
         ldx CurrentTile
         lda tile_detail, x
@@ -253,6 +255,46 @@ TileAttrHigh := R17
 
         ; now perform the actual draw
         ldx CurrentTile
+        ; draw_with_pal, adjusted for our temporary stash
+        lda #TILE_DISCO_FLOOR
+        sta battlefield, x
+        lda TileIdLow
+        sta tile_patterns, x
+        lda TileAttrHigh
+        sta tile_attributes, x
+        rts
+.endproc
+
+; Like the above, but expects DiscoRow/DiscoTile to be set by the
+; calling function. Mostly used by "enemy taking damage" routines
+.proc draw_disco_tile_here
+TargetFuncPtr := R0
+
+TileIdLow := R16
+TileAttrHigh := R17
+
+        ; first, load the detail variant for this floor, we'll use this as our base
+        ldx DiscoTile
+        lda tile_detail, x
+        sta TileIdLow
+
+        ; run the selection logic based on the player's preference
+        ldx setting_disco_floor
+        lda disco_behavior_lut_low, x
+        sta TargetFuncPtr+0
+        lda disco_behavior_lut_high, x
+        sta TargetFuncPtr+1
+        jsr _disco_trampoline
+        ; at this point, A contains the index into the disco tile lookup table
+        tax
+        lda disco_tile_offset_lut_low, x
+        ora TileIdLow
+        sta TileIdLow
+        lda disco_tile_offset_lut_high, x
+        sta TileAttrHigh
+
+        ; now perform the actual draw
+        ldx DiscoTile
         ; draw_with_pal, adjusted for our temporary stash
         lda #TILE_DISCO_FLOOR
         sta battlefield, x
