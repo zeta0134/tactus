@@ -139,10 +139,6 @@ proceed_with_jump:
         ; Draw ourselves at the target (keep our color palette)
         draw_at_y_with_pal_x TILE_BIRB_RIGHT_FLYING, BG_TILE_BIRB_FLYING_RIGHT
 
-        ; Now, draw a puff of smoke at our current location
-        ; this should use the same palette that we use
-        draw_at_x_keeppal TILE_SMOKE_PUFF, BG_TILE_SMOKE_PUFF
-
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
         sta tile_data, x
@@ -151,9 +147,18 @@ proceed_with_jump:
         lda #FLAG_MOVED_THIS_FRAME
         ora tile_flags, x
         sta tile_flags, y
-        ; And finally clear the data flags for the puff of smoke, just to keep things tidy
+        ; Clear the data flags for the puff of smoke, just to keep things tidy
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
+
+        ; Finally, draw a puff of smoke at our old location        
+        lda #DUST_DIRECTION_W
+        sta SmokePuffDirection
+        lda CurrentTile
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        jsr draw_smoke_puff
 
         rts
 .endproc
@@ -209,9 +214,6 @@ proceed_with_jump:
         ; Draw ourselves at the target (keep our color palette)
         draw_at_y_with_pal_x TILE_BIRB_LEFT_FLYING, BG_TILE_BIRB_FLYING_LEFT 
 
-        ; Now, draw a puff of smoke at our current location
-        ; this should use the same palette that we use
-        draw_at_x_keeppal TILE_SMOKE_PUFF, BG_TILE_SMOKE_PUFF
         ; Write our new position to the data byte for the puff of smoke
         lda TargetTile
         sta tile_data, x
@@ -220,9 +222,18 @@ proceed_with_jump:
         lda #FLAG_MOVED_THIS_FRAME
         ora tile_flags, x
         sta tile_flags, y
-        ; And finally clear the data flags for the puff of smoke, just to keep things tidy
+        ; Clear the data flags for the puff of smoke, just to keep things tidy
         lda #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
+
+        ; Finally, draw a puff of smoke at our old location        
+        lda #DUST_DIRECTION_E
+        sta SmokePuffDirection
+        lda CurrentTile
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        jsr draw_smoke_puff
 
         rts
 .endproc
