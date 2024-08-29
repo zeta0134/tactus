@@ -739,10 +739,6 @@ continue_waiting:
 
 .proc beat_frame_1
         perform_zpcm_inc
-        inc16 AccumulatedGameBeats
-        inc CurrentBeatCounter
-        lda CurrentBeat
-        sta LastBeat
 
         ; reset animation tracking to the start of the musical row
         MACRO_reset_gameplay_position
@@ -765,6 +761,11 @@ continue_waiting:
         debug_color LIGHTGRAY
 
         perform_zpcm_inc
+        
+        inc16 AccumulatedGameBeats
+        inc CurrentBeatCounter
+        lda CurrentBeat
+        sta LastBeat
 
         ; - Queue up any changed squares to the **active** buffer
         ; - Begin playback of any sprite animations (?)
