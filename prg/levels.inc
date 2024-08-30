@@ -189,3 +189,5 @@ OVERLAY_OPEN_NE = 1
 OVERLAY_OPEN_SE = 2
 OVERLAY_OPEN_SW = 3
 OVERLAY_OPEN_NW = 4
+
+.global FAR_demo_test_structure_spawning

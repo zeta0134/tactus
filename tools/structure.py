@@ -273,8 +273,8 @@ def write_structure_tiles(structure, output_file):
 
     structure_position_bytes = []
     structure_distances = []
-    for x in range(0, structure.width):
-        for y in range(0, structure.height):
+    for y in range(0, structure.height):
+        for x in range(0, structure.width):
             # the map index is based on the larger room size
             map_index = y * 16 + x
             structure_position_bytes.append(map_index)

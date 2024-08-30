@@ -51,7 +51,9 @@ floors_rerolled: .res 2
 RoomIndexToGenerate: .res 1
 LoadedRoomIndex: .res 1
 
-.segment "CODE_1"
+        ; should match levels_structures.s! it relies on several of our functions,
+        ; and the far-call overhead for those functions is significant
+        .segment "CODE_1"
 
 ; Note: relies on PlayerRoomIndex to load the room seed and other room properties
 ; (this might become important if we later decide to initialize rooms in advance)
@@ -92,13 +94,13 @@ loop:
         lda (FlagsPtr), y
         and #TILE_FLAG_DETAIL
         beq no_detail
-        jsr roll_for_detail
+        near_call FAR_roll_for_detail
 no_detail:
         ldy CurrentTileId
         lda (FlagsPtr), y
         and #TILE_FLAG_EXIT
         beq no_exit_flag
-        jsr process_exit_data
+        near_call FAR_process_exit_data
 no_exit_flag:
         inc CurrentTileId
         lda CurrentTileId
@@ -108,6 +110,9 @@ no_exit_flag:
         perform_zpcm_inc
         jsr draw_battlefield_overlays
         perform_zpcm_inc
+
+        ; TODO: structure gen right here!
+        near_call FAR_demo_test_structure_spawning
 
         rts
 .endproc
@@ -761,7 +766,7 @@ loop:
         lda (OverlayPtr), y
         and #TILE_FLAG_DETAIL
         beq no_detail
-        jsr roll_for_detail
+        near_call FAR_roll_for_detail
 no_detail:
         ; I don't know when we'd use it, but we might as well allow overlays
         ; to include exits, and handle those properly. maybe warp zones?
@@ -769,7 +774,7 @@ no_detail:
         lda (OverlayPtr), y
         and #TILE_FLAG_EXIT
         beq no_exit_flag
-        jsr process_exit_data
+        near_call FAR_process_exit_data
 no_exit_flag:
         inc16 OverlayPtr
         jmp loop
@@ -933,7 +938,7 @@ detail_grass_wall_horiz_strip:
         .word BG_TILE_MAP_TILES_0180 ; grass wall horiz strip w/ light square flower
         .word BG_TILE_MAP_TILES_0180 ; grass wall horiz strip w/ light square flower
 
-.proc roll_for_detail
+.proc FAR_roll_for_detail
 ; in-use by the battlefield routine, don't clobber these
 RoomPtr := R0
 TileIdPtr := R2
@@ -982,7 +987,7 @@ ScratchPal := R14
         rts
 .endproc
 
-.proc process_exit_data
+.proc FAR_process_exit_data
 ; in-use by the battlefield routine, don't clobber these
 RoomPtr := R0
 TileIdPtr := R2

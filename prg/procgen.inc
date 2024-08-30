@@ -1,6 +1,8 @@
 .global FAR_demo_init_floor
 .global FAR_init_floor
 .global FAR_generate_rooms_for_floor
+.global FAR_roll_for_detail
+.global FAR_process_exit_data
 
 .global FAR_load_current_room
 .global FAR_update_room_state
