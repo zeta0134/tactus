@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="1" height="1" tilewidth="16" tileheight="16" infinite="0" nextlayerid="41" nextobjectid="1">
+ <properties>
+  <property name="avoid_map_edge" type="bool" value="true"/>
+ </properties>
+ <tileset firstgid="1" source="../MapTiles.tsx"/>
+ <tileset firstgid="257" source="../DiscoFloorTiles.tsx"/>
+ <tileset firstgid="289" source="../Attributes.tsx"/>
+ <tileset firstgid="293" source="../TechnicalTiles.tsx"/>
+ <layer id="1" name="Base" width="1" height="1">
+  <data encoding="csv">
+0
+</data>
+ </layer>
+ <layer id="2" name="Attributes" width="1" height="1" opacity="0.2">
+  <data encoding="csv">
+0
+</data>
+ </layer>
+ <group id="39" name="Requirements">
+  <layer id="40" name="Base" width="1" height="1" opacity="0.49" tintcolor="#00ffff">
+   <data encoding="csv">
+0
+</data>
+  </layer>
+ </group>
+</map>

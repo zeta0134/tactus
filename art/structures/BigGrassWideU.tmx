@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="13" height="8" tilewidth="16" tileheight="16" infinite="0" nextlayerid="41" nextobjectid="1">
+ <properties>
+  <property name="avoid_map_edge" type="bool" value="true"/>
+ </properties>
+ <tileset firstgid="1" source="../MapTiles.tsx"/>
+ <tileset firstgid="257" source="../DiscoFloorTiles.tsx"/>
+ <tileset firstgid="289" source="../Attributes.tsx"/>
+ <tileset firstgid="293" source="../TechnicalTiles.tsx"/>
+ <layer id="1" name="Base" width="13" height="8">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,261,275,275,275,275,275,275,275,275,275,262,0,
+0,268,312,312,313,313,313,313,313,312,312,266,0,
+0,268,311,311,177,178,178,178,179,311,311,266,0,
+0,268,310,310,258,259,259,259,260,310,310,266,0,
+0,268,177,179,266,0,0,0,268,177,179,266,0,
+0,269,259,259,270,0,0,0,269,259,259,270,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <layer id="2" name="Attributes" width="13" height="8" opacity="0.2">
+  <data encoding="csv">
+0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,291,291,291,291,291,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,291,291,0,0,0,0,0,291,291,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0
+</data>
+ </layer>
+ <group id="39" name="Requirements">
+  <layer id="40" name="Base" width="13" height="8" opacity="0.49" tintcolor="#00ffff">
+   <data encoding="csv">
+265,265,265,265,265,265,265,265,265,265,265,265,265,
+265,265,265,265,265,265,265,265,265,265,265,265,265,
+265,265,265,265,265,265,265,265,265,265,265,265,265,
+265,265,265,265,265,265,265,265,265,265,265,265,265,
+265,265,265,265,265,265,265,265,265,265,265,265,265,
+265,265,265,265,265,265,265,265,265,265,265,265,265,
+265,265,265,265,265,265,0,265,265,265,265,265,265,
+265,265,265,265,265,265,0,265,265,265,265,265,265
+</data>
+  </layer>
+ </group>
+</map>

@@ -26,6 +26,11 @@
         .include "../build/structures/GrassTrominoL_R2.incs"
         .include "../build/structures/GrassTrominoL_R3.incs"
 
+        .include "../build/structures/BigGrass3x3.incs"
+        .include "../build/structures/BigGrassDoubleSquare_R0.incs"
+        .include "../build/structures/BigGrassDoubleSquare_R1.incs"
+        .include "../build/structures/BigGrassWideU.incs"
+
 .macro structure_entry structure_label
         .addr structure_label
         .byte <.bank(structure_label), >.bank(structure_label)
@@ -53,6 +58,13 @@ test_structure_list_small:
         structure_entry structure_GrassTrominoL_R2
         structure_entry structure_GrassTrominoL_R3
         structure_entry structure_GrassTrominoL_R3
+
+test_structure_list_big:
+        .byte $3 ; RNG Mask
+        structure_entry structure_BigGrass3x3
+        structure_entry structure_BigGrassDoubleSquare_R0
+        structure_entry structure_BigGrassDoubleSquare_R1
+        structure_entry structure_BigGrassWideU 
 
 
         ; should match procgen.s! we rely on several of its functions, and the far call overhead
@@ -308,8 +320,8 @@ done:
 ; RoomPtr := R0 - from call site
 StructureList := R2
 MaxStructures := R4
-        st16 StructureList, test_structure_list_small
-        lda #3
+        st16 StructureList, test_structure_list_big
+        lda #1
         sta MaxStructures
         jsr roll_structures_from_list
         rts
