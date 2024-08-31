@@ -301,6 +301,7 @@ spawn_new_wrench:
         
 despawn_old_wrench:
         ; clean up the other flags for posterity
+        ldx CurrentTile
         lda #0
         sta tile_data, x
         sta tile_flags, x
