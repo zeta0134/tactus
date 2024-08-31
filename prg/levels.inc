@@ -5,8 +5,8 @@
 ; 2 bytes of bank number, which isn't as crazy as it sounds if we
 ; end up exceeding 2 MiB of PRG ROM at some point
 .macro banked_addr address
-    .addr address
-    .byte <.bank(address), >.bank(address)
+        .addr address
+        .byte <.bank(address), >.bank(address)
 .endmacro
 
 ; ===============
@@ -14,73 +14,73 @@
 ; ===============
 
 .struct SpawnListEntry
-    Behavior .byte
-    TileLow .byte
-    TileHighAttr .byte
-    Data .byte
-    Flags .byte
-    SpawnCheck .addr
+        Behavior .byte
+        TileLow .byte
+        TileHighAttr .byte
+        Data .byte
+        Flags .byte
+        SpawnCheck .addr
 .endstruct
 
 .macro basic_spawn_entry behavior, tile_id, pal
-    .byte behavior           ; Behavior
-    .byte (<tile_id)         ; TileLow
-    .byte ((>tile_id) | pal) ; TileHighAttr
-    .byte $0                 ; Data
-    .byte $0                 ; Flags
-    .addr single_disco_tile  ; SpawnCheck
+        .byte behavior           ; Behavior
+        .byte (<tile_id)         ; TileLow
+        .byte ((>tile_id) | pal) ; TileHighAttr
+        .byte $0                 ; Data
+        .byte $0                 ; Flags
+        .addr single_disco_tile  ; SpawnCheck
 .endmacro
 
 .macro full_spawn_entry behavior, tile_id, pal, data, flags, spawn_condition
-    .byte behavior           ; Behavior
-    .byte (<tile_id)         ; TileLow
-    .byte ((>tile_id) | pal) ; TileHighAttr
-    .byte data               ; Data
-    .byte flags              ; Flags
-    .addr spawn_condition    ; SpawnCheck
+        .byte behavior           ; Behavior
+        .byte (<tile_id)         ; TileLow
+        .byte ((>tile_id) | pal) ; TileHighAttr
+        .byte data               ; Data
+        .byte flags              ; Flags
+        .addr spawn_condition    ; SpawnCheck
 .endmacro
 
 .struct SpawnSetEntry
-    SpawnList .addr
-    Conditions .addr
-    Bank .byte
+        SpawnList .addr
+        Conditions .addr
+        Bank .byte
 .endstruct
 
 .macro spawn_set_entry list_ptr
-    .addr list_ptr
-    .addr always_valid
-    .byte <.bank(list_ptr)
+        .addr list_ptr
+        .addr always_valid
+        .byte <.bank(list_ptr)
 .endmacro
 
 .macro conditional_spawn_set_entry list_ptr, condition_func
-    .addr list_ptr
-    .addr condition_func
-    .byte <.bank(list_ptr)
+        .addr list_ptr
+        .addr condition_func
+        .byte <.bank(list_ptr)
 .endmacro
 
 .struct SpawnPoolEntry
-    Behavior .byte
-    TileLow .byte
-    TileHighAttr .byte
-    Data .byte
-    Flags .byte
-    SpawnCheck .addr
-    RoomCompatibility .byte
-    Aggression .byte ; excessive danger
-    Trickiness .byte ; unusual setup / resistance to standard techniques
-    LootReward .byte ; unusually high rewards
-    Tankiness .byte  ; unusually high health or defense
-    PackSizeMin .byte
-    PackSizeMax .byte
+        Behavior .byte
+        TileLow .byte
+        TileHighAttr .byte
+        Data .byte
+        Flags .byte
+        SpawnCheck .addr
+        RoomCompatibility .byte
+        Aggression .byte ; excessive danger
+        Trickiness .byte ; unusual setup / resistance to standard techniques
+        LootReward .byte ; unusually high rewards
+        Tankiness .byte  ; unusually high health or defense
+        PackSizeMin .byte
+        PackSizeMax .byte
 .endstruct
 
 .macro default_spawn_pool_details
-    .byte 0 ; compatible with all rooms
-    .byte 0, 0, 0, 0 ; aggression, trickiness, loot, tankiness
+        .byte 0 ; compatible with all rooms
+        .byte 0, 0, 0, 0 ; aggression, trickiness, loot, tankiness
 .endmacro
 
 .macro pack_size pack_min, pack_max
-    .byte pack_min, pack_max ; pack size: min, max
+        .byte pack_min, pack_max ; pack size: min, max
 .endmacro
 
 .global SpawnedEntityIndex
@@ -107,26 +107,37 @@
 ; ===============
 
 .struct ZoneDefinition
-    GeneralSpawnPool .addr
-    ChallengeSpawnSet .addr
+        GeneralSpawnPool .addr
+        ChallengeSpawnSet .addr
 
-    SpawnPoolMin .byte
-    SpawnPoolMax .byte
-    PopulationLimit .byte
+        SpawnPoolMin .byte
+        SpawnPoolMax .byte
+        PopulationLimit .byte
 
-    FloorList .addr
-    ExitList .addr
-    MusicTrack .byte
-    AddedTempo .byte
-    
-    HudHeader .word
-    HudBanner .word
-    HudPal .word
+        FloorList .addr
+        ExitList .addr
+        MusicTrack .byte
+        AddedTempo .byte
 
-    ; TODO: guaranteed loot lists? consumable lists?
-    ShopLootPtr .word
+        HudHeader .word
+        HudBanner .word
+        HudPal .word
+
+        ; TODO: guaranteed loot lists? consumable lists?
+        ShopLootPtr .word
+
+        InteriorStructureLargeSet .word
+        InteriorStructureLargeMaxMax .byte
+        InteriorStructureSmallSet .word
+        InteriorStructureSmallMaxMax .byte
+        ExteriorStructureLargeSet .word
+        ExteriorStructureLargeMaxMax .byte
+        ExteriorStructureSmallSet .word
+        ExteriorStructureSmallMaxMax .byte
 
 .endstruct
+
+.global all_zones_data_page
 
 .global zone_grasslands_floor_1
 .global zone_grasslands_floor_2
@@ -158,15 +169,15 @@ ROOM_POOL_BLOCKING_INTERIOR = 5
 ; ===============
 
 .struct Room
-    Properties .byte
-    Exits .byte
-    BgPalette .word
-    ObjPalette .word
-    OverlayList .word
-    TileIDsLow .byte 176
-    TileAttrsHigh .byte 176
-    BehaviorIDs .byte 176
-    FlagBytes .byte 176
+        Properties .byte
+        Exits .byte
+        BgPalette .word
+        ObjPalette .word
+        OverlayList .word
+        TileIDsLow .byte 176
+        TileAttrsHigh .byte 176
+        BehaviorIDs .byte 176
+        FlagBytes .byte 176
 .endstruct
 
 .global FAR_load_room_palette
@@ -177,12 +188,12 @@ ROOM_POOL_BLOCKING_INTERIOR = 5
 ; ==================
 
 .struct StructureDefinition
-    MinPosX .byte
-    MaxPosX .byte
-    MinPosY .byte
-    MaxPosY .byte
-    TileList .addr
-    Requirements .addr
+        MinPosX .byte
+        MaxPosX .byte
+        MinPosY .byte
+        MaxPosY .byte
+        TileList .addr
+        Requirements .addr
 .endstruct
 
 OVERLAY_OPEN_NE = 1
@@ -190,4 +201,8 @@ OVERLAY_OPEN_SE = 2
 OVERLAY_OPEN_SW = 3
 OVERLAY_OPEN_NW = 4
 
-.global FAR_demo_test_structure_spawning
+.global FAR_spawn_structures_from_zonedef
+
+.global test_structure_set_small
+.global test_structure_set_big
+.global empty_structure_set

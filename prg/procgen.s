@@ -110,9 +110,8 @@ no_exit_flag:
         perform_zpcm_inc
         jsr draw_battlefield_overlays
         perform_zpcm_inc
-
-        ; TODO: structure gen right here!
-        near_call FAR_demo_test_structure_spawning
+        near_call FAR_spawn_structures_from_zonedef
+        perform_zpcm_inc
 
         rts
 .endproc

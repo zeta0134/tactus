@@ -31,6 +31,8 @@
         .include "../build/structures/BigGrassDoubleSquare_R1.incs"
         .include "../build/structures/BigGrassWideU.incs"
 
+        .include "../build/structures/AbsolutelyNothing.incs"
+
 .macro structure_entry structure_label
         .addr structure_label
         .byte <.bank(structure_label), >.bank(structure_label)
@@ -40,7 +42,13 @@
 ; (keep all structure lists in a single bank. doesn't matter which one really)
 all_structure_lists:
 
-test_structure_list_small:
+empty_structure_set:
+        ; It's Bucket o' Nothing!
+        .byte $0 ; RNG Mask
+        structure_entry structure_AbsolutelyNothing
+        ; Free for only 99.99.99!!!
+
+test_structure_set_small:
         .byte $F ; RNG Mask
         structure_entry structure_GrassMonomino
         structure_entry structure_GrassDominoR0
@@ -59,7 +67,7 @@ test_structure_list_small:
         structure_entry structure_GrassTrominoL_R3
         structure_entry structure_GrassTrominoL_R3
 
-test_structure_list_big:
+test_structure_set_big:
         .byte $3 ; RNG Mask
         structure_entry structure_BigGrass3x3
         structure_entry structure_BigGrassDoubleSquare_R0
@@ -98,6 +106,7 @@ ScratchPal := R14
         sta OverlayPtr+1
 
 loop:
+        perform_zpcm_inc
         ldy #0
         lda (OverlayPtr), y
         cmp #$FF
@@ -131,6 +140,7 @@ loop:
         lda (OverlayPtr), y
         and #TILE_FLAG_DETAIL
         beq no_detail
+        perform_zpcm_inc
         near_call FAR_roll_for_detail
 no_detail:
         ; I don't know when we'd use it, but we might as well allow structures
@@ -139,11 +149,13 @@ no_detail:
         lda (OverlayPtr), y
         and #TILE_FLAG_EXIT
         beq no_exit_flag
+        perform_zpcm_inc
         near_call FAR_process_exit_data
 no_exit_flag:
         inc16 OverlayPtr
         jmp loop
 done:
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -168,6 +180,7 @@ RequirementsPtr := R18
         sta RequirementsPtr+1
 
 loop:
+        perform_zpcm_inc
         ldy #0
         lda (RequirementsPtr), y
         cmp #$FF
@@ -182,9 +195,11 @@ loop:
         inc16 RequirementsPtr
         jmp loop
 failure:
+        perform_zpcm_inc
         lda #$FF
         rts
 success:
+        perform_zpcm_inc
         lda #0
         rts
 .endproc
@@ -218,6 +233,7 @@ TempPosY := R20
         adc TempPosX
         sta TempPosX
 use_x_directly:
+        perform_zpcm_inc
 
         ; Y pos!
         ldy #StructureDefinition::MinPosY
@@ -235,6 +251,7 @@ use_x_directly:
         adc TempPosY
         sta TempPosY
 use_y_directly:
+        perform_zpcm_inc
 
         ldx TempPosY
         lda row_number_to_tile_index_lut, x
@@ -263,12 +280,13 @@ StructurePtr := R5
 ; Scratch:
 StructureBank := R16
 FailedSpawnAttempts := R17
+        access_data_bank #<.bank(all_structure_lists)
+
         ; sanity
         lda MaxStructures
         jeq done
-
-        access_data_bank #<.bank(all_structure_lists)
 loop:
+        perform_zpcm_inc
         ; pick a structure out of the list at random
         jsr next_room_rand
         ldy #0
@@ -289,6 +307,7 @@ loop:
         lda (StructureList), y
         sta StructureBank
 
+        perform_zpcm_inc
         access_data_bank StructureBank
         ; first, pick a random location for this structure
         jsr roll_for_structure_position
@@ -314,15 +333,101 @@ done:
         rts
 .endproc
 
-; just unconditionally try to spawn 3 structures from the list. what
-; could possibly go wrong?
-.proc FAR_demo_test_structure_spawning
+.proc FAR_spawn_structures_from_zonedef
 ; RoomPtr := R0 - from call site
 StructureList := R2
 MaxStructures := R4
-        st16 StructureList, test_structure_list_big
-        lda #1
+        ; the player's starting chamber should never
+        ; spawn structures (as they might intersect with the
+        ; player's spawn coordinates, and we don't currently
+        ; prevent this)
+        lda PlayerRoomIndex
+        cmp RoomIndexToGenerate
+        beq skip_structure_spawning
+
+        ldx RoomIndexToGenerate
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_INTERIOR
+        beq roll_interior_sets
+        cmp #ROOM_CATEGORY_EXTERIOR
+        jeq roll_exterior_sets
+        ; shops and challenge rooms should never spawn structures
+skip_structure_spawning:
+        rts
+
+roll_interior_sets:
+        perform_zpcm_inc
+        access_data_bank #<.bank(all_zones_data_page)
+        ldy #ZoneDefinition::InteriorStructureLargeMaxMax
+        lda (PlayerZonePtr), y
+        beq done_with_interior_large_structures ; please don't divide by zero
         sta MaxStructures
+        inc MaxStructures  ; in_range rolls from 0 - N-1
+        perform_zpcm_inc
+        in_range_smol next_room_rand, MaxStructures
+        sta MaxStructures
+        ldy #ZoneDefinition::InteriorStructureLargeSet
+        lda (PlayerZonePtr), y
+        sta StructureList+0
+        iny
+        lda (PlayerZonePtr), y
+        sta StructureList+1
         jsr roll_structures_from_list
+done_with_interior_large_structures:
+        ldy #ZoneDefinition::InteriorStructureSmallMaxMax
+        lda (PlayerZonePtr), y
+        beq done_with_interior_small_structures ; please don't divide by zero
+        sta MaxStructures
+        inc MaxStructures  ; in_range rolls from 0 - N-1
+        perform_zpcm_inc
+        in_range_smol next_room_rand, MaxStructures
+        sta MaxStructures
+        ldy #ZoneDefinition::InteriorStructureSmallSet
+        lda (PlayerZonePtr), y
+        sta StructureList+0
+        iny
+        lda (PlayerZonePtr), y
+        sta StructureList+1
+        jsr roll_structures_from_list
+done_with_interior_small_structures:
+        restore_previous_bank
+        rts
+
+roll_exterior_sets:
+        access_data_bank #<.bank(all_zones_data_page)
+        ldy #ZoneDefinition::ExteriorStructureLargeMaxMax
+        lda (PlayerZonePtr), y
+        beq done_with_exterior_large_structures ; please don't divide by zero
+        sta MaxStructures
+        inc MaxStructures  ; in_range rolls from 0 - N-1
+        perform_zpcm_inc
+        in_range_smol next_room_rand, MaxStructures
+        sta MaxStructures
+        ldy #ZoneDefinition::ExteriorStructureLargeSet
+        lda (PlayerZonePtr), y
+        sta StructureList+0
+        iny
+        lda (PlayerZonePtr), y
+        sta StructureList+1
+        jsr roll_structures_from_list
+done_with_exterior_large_structures:
+        ldy #ZoneDefinition::ExteriorStructureSmallMaxMax
+        lda (PlayerZonePtr), y
+        beq done_with_exterior_small_structures ; please don't divide by zero
+        sta MaxStructures
+        inc MaxStructures  ; in_range rolls from 0 - N-1
+        perform_zpcm_inc
+        in_range_smol next_room_rand, MaxStructures
+        sta MaxStructures
+        ldy #ZoneDefinition::ExteriorStructureSmallSet
+        lda (PlayerZonePtr), y
+        sta StructureList+0
+        iny
+        lda (PlayerZonePtr), y
+        sta StructureList+1
+        jsr roll_structures_from_list
+done_with_exterior_small_structures:
+        restore_previous_bank
         rts
 .endproc

@@ -121,6 +121,15 @@ zone_grasslands_floor_1:
         zone_banner_pos 0, 5        ; HudBanner
         .addr hud_grasslands_pal
         .addr common_treasure_table ; ShopLootPtr
+        .addr test_structure_set_big   ;InteriorStructureLargeSet
+        .byte 1                        ;InteriorStructureLargeMaxMax
+        .addr test_structure_set_small ;InteriorStructureSmallSet
+        .byte 1                        ;InteriorStructureSmallMaxMax
+        .addr test_structure_set_big   ;ExteriorStructureLargeSet
+        .byte 1                        ;ExteriorStructureLargeMaxMax
+        .addr test_structure_set_small ;ExteriorStructureSmallSet
+        .byte 3                        ;ExteriorStructureSmallMaxMax
+
 
 zone_grasslands_floor_2:
         .addr spawn_pool_generic ; Spawn Pool
@@ -136,6 +145,14 @@ zone_grasslands_floor_2:
         zone_banner_pos 0, 5        ; HudBanner
         .addr hud_grasslands_pal
         .addr rare_treasure_table ; ShopLootPtr
+        .addr test_structure_set_big   ;InteriorStructureLargeSet
+        .byte 1                        ;InteriorStructureLargeMaxMax
+        .addr test_structure_set_small ;InteriorStructureSmallSet
+        .byte 1                        ;InteriorStructureSmallMaxMax
+        .addr test_structure_set_big   ;ExteriorStructureLargeSet
+        .byte 1                        ;ExteriorStructureLargeMaxMax
+        .addr test_structure_set_small ;ExteriorStructureSmallSet
+        .byte 3                        ;ExteriorStructureSmallMaxMax
 
 zone_grasslands_floor_3:
         .addr spawn_pool_generic ; Spawn Pool
@@ -151,6 +168,14 @@ zone_grasslands_floor_3:
         zone_banner_pos 0, 5        ; HudBanner
         .addr hud_grasslands_pal
         .addr rare_treasure_table ; ShopLootPtr
+        .addr test_structure_set_big   ;InteriorStructureLargeSet
+        .byte 1                        ;InteriorStructureLargeMaxMax
+        .addr test_structure_set_small ;InteriorStructureSmallSet
+        .byte 1                        ;InteriorStructureSmallMaxMax
+        .addr test_structure_set_big   ;ExteriorStructureLargeSet
+        .byte 1                        ;ExteriorStructureLargeMaxMax
+        .addr test_structure_set_small ;ExteriorStructureSmallSet
+        .byte 3                        ;ExteriorStructureSmallMaxMax
 
 zone_grasslands_floor_4:
         .addr spawn_pool_generic ; Spawn Pool
@@ -166,6 +191,14 @@ zone_grasslands_floor_4:
         zone_banner_pos 0, 5        ; HudBanner
         .addr hud_grasslands_pal
         .addr rare_treasure_table ; ShopLootPtr
+        .addr test_structure_set_big   ;InteriorStructureLargeSet
+        .byte 1                        ;InteriorStructureLargeMaxMax
+        .addr test_structure_set_small ;InteriorStructureSmallSet
+        .byte 1                        ;InteriorStructureSmallMaxMax
+        .addr test_structure_set_big   ;ExteriorStructureLargeSet
+        .byte 1                        ;ExteriorStructureLargeMaxMax
+        .addr test_structure_set_small ;ExteriorStructureSmallSet
+        .byte 3                        ;ExteriorStructureSmallMaxMax
 
 zone_grasslands_floor_1_exits:
         .byte 1 ; length
@@ -234,6 +267,14 @@ zone_hub_world:
         zone_banner_pos 14, 5        ; HudBanner
         .addr hud_hub_pal
         .addr common_treasure_table ; ShopLootPtr
+        .addr empty_structure_set ;InteriorStructureLargeSet
+        .byte 0                   ;InteriorStructureLargeMaxMax
+        .addr empty_structure_set ;InteriorStructureSmallSet
+        .byte 0                   ;InteriorStructureSmallMaxMax
+        .addr empty_structure_set ;ExteriorStructureLargeSet
+        .byte 0                   ;ExteriorStructureLargeMaxMax
+        .addr empty_structure_set ;ExteriorStructureSmallSet
+        .byte 0                   ;ExteriorStructureSmallMaxMax
 
 ; TODO: for the real hub there is very little point in going
 ; to any floor other than 1, but as we only have the one zone,
@@ -272,6 +313,14 @@ zone_beach_floor_1:
         zone_banner_pos 2, 5        ; HudBanner
         .addr hud_beach_pal
         .addr common_treasure_table ; ShopLootPtr
+        .addr empty_structure_set ;InteriorStructureLargeSet
+        .byte 0                   ;InteriorStructureLargeMaxMax
+        .addr empty_structure_set ;InteriorStructureSmallSet
+        .byte 0                   ;InteriorStructureSmallMaxMax
+        .addr empty_structure_set ;ExteriorStructureLargeSet
+        .byte 0                   ;ExteriorStructureLargeMaxMax
+        .addr empty_structure_set ;ExteriorStructureSmallSet
+        .byte 0                   ;ExteriorStructureSmallMaxMax
 
 zone_beach_floor_2:
         .addr spawn_pool_generic ; Spawn Pool
@@ -287,6 +336,14 @@ zone_beach_floor_2:
         zone_banner_pos 2, 5        ; HudBanner
         .addr hud_beach_pal
         .addr rare_treasure_table ; ShopLootPtr
+        .addr empty_structure_set ;InteriorStructureLargeSet
+        .byte 0                   ;InteriorStructureLargeMaxMax
+        .addr empty_structure_set ;InteriorStructureSmallSet
+        .byte 0                   ;InteriorStructureSmallMaxMax
+        .addr empty_structure_set ;ExteriorStructureLargeSet
+        .byte 0                   ;ExteriorStructureLargeMaxMax
+        .addr empty_structure_set ;ExteriorStructureSmallSet
+        .byte 0                   ;ExteriorStructureSmallMaxMax
 
 zone_beach_floor_3:
         .addr spawn_pool_generic ; Spawn Pool
@@ -302,6 +359,14 @@ zone_beach_floor_3:
         zone_banner_pos 2, 5        ; HudBanner
         .addr hud_beach_pal
         .addr rare_treasure_table ; ShopLootPtr
+        .addr empty_structure_set ;InteriorStructureLargeSet
+        .byte 0                   ;InteriorStructureLargeMaxMax
+        .addr empty_structure_set ;InteriorStructureSmallSet
+        .byte 0                   ;InteriorStructureSmallMaxMax
+        .addr empty_structure_set ;ExteriorStructureLargeSet
+        .byte 0                   ;ExteriorStructureLargeMaxMax
+        .addr empty_structure_set ;ExteriorStructureSmallSet
+        .byte 0                   ;ExteriorStructureSmallMaxMax
 
 zone_beach_floor_4:
         .addr spawn_pool_generic ; Spawn Pool
@@ -317,6 +382,14 @@ zone_beach_floor_4:
         zone_banner_pos 2, 5        ; HudBanner
         .addr hud_beach_pal
         .addr rare_treasure_table ; ShopLootPtr
+        .addr empty_structure_set ;InteriorStructureLargeSet
+        .byte 0                   ;InteriorStructureLargeMaxMax
+        .addr empty_structure_set ;InteriorStructureSmallSet
+        .byte 0                   ;InteriorStructureSmallMaxMax
+        .addr empty_structure_set ;ExteriorStructureLargeSet
+        .byte 0                   ;ExteriorStructureLargeMaxMax
+        .addr empty_structure_set ;ExteriorStructureSmallSet
+        .byte 0                   ;ExteriorStructureSmallMaxMax
 
 zone_beach_floor_1_exits:
         .byte 1 ; length
@@ -358,6 +431,14 @@ zone_grasslands_floor_2_but_fast:
         zone_banner_pos 14, 5       ; DebugBanner
         .addr hud_grasslands_pal
         .addr rare_treasure_table ; ShopLootPtr
+        .addr test_structure_set_big   ;InteriorStructureLargeSet
+        .byte 1                        ;InteriorStructureLargeMaxMax
+        .addr test_structure_set_small ;InteriorStructureSmallSet
+        .byte 1                        ;InteriorStructureSmallMaxMax
+        .addr test_structure_set_big   ;ExteriorStructureLargeSet
+        .byte 1                        ;ExteriorStructureLargeMaxMax
+        .addr test_structure_set_small ;ExteriorStructureSmallSet
+        .byte 3                        ;ExteriorStructureSmallMaxMax
 
 ; After debugging one zone, return to the hub world
 ; (note: later to the debug world?)

@@ -18,6 +18,7 @@
 
 .globalzp BigFloorPtr
 .global BigFloorBank
+.global RoomIndexToGenerate
 
 .global current_clear_status
 .global previous_clear_status
