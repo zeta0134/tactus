@@ -1,5 +1,3 @@
-        
-
         .include "hearts.inc"
         .include "zeropage.inc"
 
