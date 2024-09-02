@@ -1,8 +1,8 @@
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
-
-.proc update_slime
+        .segment "ENEMY_UPDATE"
+.proc ENEMY_UPDATE_update_slime
 CurrentTile := R15
         inc enemies_active
         ldx CurrentTile
@@ -15,14 +15,14 @@ CurrentTile := R15
         ; Basic slimes have no update behavior; they are stationary
         rts
 intermediate:
-        jsr update_intermediate_slime
+        near_call ENEMY_UPDATE_update_intermediate_slime
         rts
 advanced:
-        jsr update_advanced_slime
+        near_call ENEMY_UPDATE_update_advanced_slime
         rts
 .endproc
 
-.proc update_intermediate_slime
+.proc ENEMY_UPDATE_update_intermediate_slime
 TargetTile := R0
 CurrentRow := R14
 CurrentTile := R15
@@ -102,12 +102,12 @@ proceed_with_jump:
         sta SmokePuffTile
         lda CurrentRow
         sta SmokePuffRow
-        jsr draw_smoke_puff
+        near_call ENEMY_UPDATE_draw_smoke_puff
 
         rts
 .endproc
 
-.proc update_advanced_slime
+.proc ENEMY_UPDATE_update_advanced_slime
 TargetTile := R0
 TargetRow := R1
 CurrentRow := R14
@@ -212,7 +212,7 @@ proceed_with_jump:
         sta SmokePuffTile
         lda CurrentRow
         sta SmokePuffRow
-        jsr draw_smoke_puff
+        near_call ENEMY_UPDATE_draw_smoke_puff
 
         rts
 .endproc
@@ -220,8 +220,8 @@ proceed_with_jump:
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
-
-.proc direct_attack_slime
+        .segment "ENEMY_ATTACK"
+.proc ENEMY_ATTACK_direct_attack_slime
 AttackSquare := R3
 EffectiveAttackSquare := R10 
         ; If we have *just moved*, then ignore this attack
@@ -232,17 +232,17 @@ EffectiveAttackSquare := R10
         ; Copy in the attack square, so we can use shared logic to process the effect
         lda AttackSquare
         sta EffectiveAttackSquare
-        jsr attack_slime_common
+        near_call ENEMY_ATTACK_attack_slime_common
 ignore_attack:
         rts
 .endproc
 
-.proc indirect_attack_slime
-        jsr attack_slime_common
+.proc ENEMY_ATTACK_indirect_attack_slime
+        near_call ENEMY_ATTACK_attack_slime_common
         rts
 .endproc
 
-.proc attack_slime_common
+.proc ENEMY_ATTACK_attack_slime_common
 ; For drawing tiles
 TargetIndex := R0
 TileId := R1
@@ -261,7 +261,7 @@ EffectiveAttackSquare := R10
         stx DiscoTile
         lda tile_index_to_row_lut, x
         sta DiscoRow
-        jsr draw_disco_tile_here
+        near_call ENEMY_UPDATE_draw_disco_tile_here
         lda EffectiveAttackSquare
         sta TargetIndex
         jsr draw_active_tile
@@ -273,7 +273,7 @@ EffectiveAttackSquare := R10
 
         ; Juice: spawn a floaty, flashy death skull above our tile
         ; #RIP
-        jsr spawn_death_sprite_here
+        near_call ENEMY_ATTACK_spawn_death_sprite_here
 
         ; A slime died! Increment the player's ongoing combo
         inc PlayerCombo

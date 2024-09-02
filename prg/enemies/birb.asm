@@ -1,8 +1,9 @@
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
+        .segment "ENEMY_UPDATE"
 
-.proc update_birb_left
+.proc ENEMY_UPDATE_update_birb_left
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
@@ -45,7 +46,7 @@ all_done:
         rts
 .endproc
 
-.proc update_birb_right
+.proc ENEMY_UPDATE_update_birb_right
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
@@ -88,7 +89,7 @@ all_done:
         rts
 .endproc
 
-.proc update_birb_flying_right
+.proc ENEMY_UPDATE_update_birb_flying_right
 TargetRow := R0
 TargetTile := R1
 ; these are provided for us
@@ -158,12 +159,12 @@ proceed_with_jump:
         sta SmokePuffTile
         lda CurrentRow
         sta SmokePuffRow
-        jsr draw_smoke_puff
+        near_call ENEMY_UPDATE_draw_smoke_puff
 
         rts
 .endproc
 
-.proc update_birb_flying_left
+.proc ENEMY_UPDATE_update_birb_flying_left
 TargetRow := R0
 TargetTile := R1
 ; these are provided for us
@@ -233,7 +234,7 @@ proceed_with_jump:
         sta SmokePuffTile
         lda CurrentRow
         sta SmokePuffRow
-        jsr draw_smoke_puff
+        near_call ENEMY_UPDATE_draw_smoke_puff
 
         rts
 .endproc
@@ -241,8 +242,9 @@ proceed_with_jump:
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
+        .segment "ENEMY_ATTACK"
 
-.proc direct_attack_birb
+.proc ENEMY_ATTACK_direct_attack_birb
 AttackSquare := R3
 EnemyHealth := R11
         ldx AttackSquare
@@ -267,11 +269,11 @@ advanced_hp:
         lda #4
         sta EnemyHealth
 done:
-        jsr direct_attack_with_hp
+        near_call ENEMY_ATTACK_direct_attack_with_hp
         rts
 .endproc
 
-.proc indirect_attack_birb
+.proc ENEMY_ATTACK_indirect_attack_birb
 EffectiveAttackSquare := R10 
 EnemyHealth := R11
         ldx EffectiveAttackSquare
@@ -296,6 +298,6 @@ advanced_hp:
         lda #4
         sta EnemyHealth
 done:
-        jsr indirect_attack_with_hp
+        near_call ENEMY_ATTACK_indirect_attack_with_hp
         rts
 .endproc

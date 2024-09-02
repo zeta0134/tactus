@@ -1,8 +1,9 @@
 ; ============================================================================================================================
 ; ===                                           Utility Functions                                                          ===
 ; ============================================================================================================================
+        .segment "ENEMY_UPDATE"
 
-.proc pick_random_cardinal
+.proc ENEMY_UPDATE_pick_random_cardinal
 TargetRow := R0
 TargetTile := R1
 ; these are provided for us
@@ -50,7 +51,7 @@ west:
         rts
 .endproc
 
-.proc target_player_cardinal
+.proc ENEMY_UPDATE_target_player_cardinal
 TargetRow := R0
 TargetTile := R1
 PlayerDistanceRow := R2
@@ -150,8 +151,9 @@ move_up:
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
+        .segment "ENEMY_UPDATE"
 
-.proc update_zombie_base
+.proc ENEMY_UPDATE_update_zombie_base
 IdleDelay := R0
 ; these are provided for us
 CurrentRow := R14
@@ -194,7 +196,7 @@ no_change:
         rts
 .endproc
 
-.proc update_zombie_anticipate
+.proc ENEMY_UPDATE_update_zombie_anticipate
 TargetRow := R0
 TargetTile := R1
 PlayerDistance := R2
@@ -208,17 +210,17 @@ CurrentTile := R15
         lda CurrentRow
         sta TargetRow
 
-        jsr player_manhattan_distance
+        near_call ENEMY_UPDATE_player_manhattan_distance
 track_player:        
         ; If we're outside the tracking radius, choose our next position randomly
         ; (here, A already has the distance from before)
         cmp #ZOMBIE_TARGET_RADIUS
         bcs randomly_choose_direction
         ; Otherwise target the player
-        jsr target_player_cardinal
+        near_call ENEMY_UPDATE_target_player_cardinal
         jmp location_chosen
 randomly_choose_direction:
-        jsr pick_random_cardinal
+        near_call ENEMY_UPDATE_pick_random_cardinal
 location_chosen:
         ; Now our destination tile is in TargetTile, make sure it's valid
         if_valid_destination proceed_with_jump
@@ -275,7 +277,7 @@ proceed_with_jump:
         sta SmokePuffTile
         lda CurrentRow
         sta SmokePuffRow
-        jsr draw_smoke_puff
+        near_call ENEMY_UPDATE_draw_smoke_puff
 
         rts
 .endproc
@@ -283,8 +285,8 @@ proceed_with_jump:
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
-
-.proc direct_attack_zombie
+        .segment "ENEMY_ATTACK"
+.proc ENEMY_ATTACK_direct_attack_zombie
 AttackSquare := R3
 EnemyHealth := R11
         ldx AttackSquare
@@ -309,11 +311,11 @@ advanced_hp:
         lda #6
         sta EnemyHealth
 done:
-        jsr direct_attack_with_hp
+        near_call ENEMY_ATTACK_direct_attack_with_hp
         rts
 .endproc
 
-.proc indirect_attack_zombie
+.proc ENEMY_ATTACK_indirect_attack_zombie
 EffectiveAttackSquare := R10 
 EnemyHealth := R11
         ldx EffectiveAttackSquare
@@ -338,6 +340,6 @@ advanced_hp:
         lda #6
         sta EnemyHealth
 done:
-        jsr indirect_attack_with_hp
+        near_call ENEMY_ATTACK_indirect_attack_with_hp
         rts
 .endproc

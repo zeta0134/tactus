@@ -1,8 +1,8 @@
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
-
-.proc update_challenge_spike
+        .segment "ENEMY_UPDATE"
+.proc ENEMY_UPDATE_update_challenge_spike
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
@@ -81,8 +81,8 @@ lowering_state:
 ; ============================================================================================================================
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================
-
-.proc challenge_spike_solid_test
+        .segment "ENEMY_COLLIDE"
+.proc ENEMY_COLLIDE_challenge_spike_solid_test
 TargetSquare := R13
 TargetRow := R14
 TargetCol := R15
@@ -91,7 +91,7 @@ TargetCol := R15
         ldx TargetSquare
         lda tile_data, x
         beq no_collision
-        jsr forbid_player_movement
+        near_call ENEMY_COLLIDE_forbid_player_movement
 no_collision:
         rts
 .endproc

@@ -1,18 +1,18 @@
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
-
-.proc update_smoke_puff
+        .segment "ENEMY_UPDATE"
+.proc ENEMY_UPDATE_update_smoke_puff
         ; All a smoke puff needs to do is return to normal floor after one beat
-        jsr draw_disco_tile
+        near_call ENEMY_UPDATE_draw_disco_tile
         rts
 .endproc
 
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
-
-.proc direct_attack_puff
+        .segment "ENEMY_ATTACK"
+.proc ENEMY_ATTACK_direct_attack_puff
 ; R0 and R1 are reserved for the enemy behaviors to use
 ; Current target square to consider for attacking
 PlayerSquare := R2
@@ -49,6 +49,8 @@ TargetCol := R15
 
         rts
 .endproc
+
+        .segment "ENEMY_UPDATE"
 
 OFFSET_N  =  0 * 4
 OFFSET_NE =  5 * 4
@@ -144,7 +146,7 @@ smoke_puff_nw:
 
 ; Note: This is only for DRAWING the smoke puff! Any other data you need to stuff into
 ; this thing, do that at the call site.
-.proc draw_smoke_puff
+.proc ENEMY_UPDATE_draw_smoke_puff
 TargetFuncPtr := R0
         ; run the disco selection logic based on the player's preference
         ; (DiscoTile==SmokePuffTile, and DiscoRow==SmokePuffRow, so that setup is done by this point)

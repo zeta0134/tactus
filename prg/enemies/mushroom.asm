@@ -1,4 +1,5 @@
-.proc update_mushroom
+        .segment "ENEMY_UPDATE"
+.proc ENEMY_UPDATE_update_mushroom
 IdleDelay := R0
 ; these are provided for us
 CurrentRow := R14
@@ -65,7 +66,7 @@ perform_attack:
         lda CurrentRow
         sta SmokePuffRow
         dec SmokePuffRow
-        jsr spawn_spore_tile
+        near_call ENEMY_UPDATE_spawn_spore_tile
 
         lda #DUST_DIRECTION_S
         sta SmokePuffDirection
@@ -76,7 +77,7 @@ perform_attack:
         lda CurrentRow
         sta SmokePuffRow
         inc SmokePuffRow
-        jsr spawn_spore_tile
+        near_call ENEMY_UPDATE_spawn_spore_tile
 
         lda #DUST_DIRECTION_W
         sta SmokePuffDirection
@@ -86,7 +87,7 @@ perform_attack:
         sta SmokePuffTile
         lda CurrentRow
         sta SmokePuffRow
-        jsr spawn_spore_tile
+        near_call ENEMY_UPDATE_spawn_spore_tile
 
         lda #DUST_DIRECTION_E
         sta SmokePuffDirection
@@ -96,7 +97,7 @@ perform_attack:
         sta SmokePuffTile
         lda CurrentRow
         sta SmokePuffRow
-        jsr spawn_spore_tile
+        near_call ENEMY_UPDATE_spawn_spore_tile
 
         ; everything except the basic variety also spawns diagonals, so check for that here
         ldx CurrentTile
@@ -114,7 +115,7 @@ perform_attack:
         lda CurrentRow
         sta SmokePuffRow
         dec SmokePuffRow
-        jsr spawn_spore_tile
+        near_call ENEMY_UPDATE_spawn_spore_tile
 
         lda #DUST_DIRECTION_NE
         sta SmokePuffDirection
@@ -125,7 +126,7 @@ perform_attack:
         lda CurrentRow
         sta SmokePuffRow
         dec SmokePuffRow
-        jsr spawn_spore_tile
+        near_call ENEMY_UPDATE_spawn_spore_tile
 
         lda #DUST_DIRECTION_SW
         sta SmokePuffDirection
@@ -136,7 +137,7 @@ perform_attack:
         lda CurrentRow
         sta SmokePuffRow
         inc SmokePuffRow
-        jsr spawn_spore_tile
+        near_call ENEMY_UPDATE_spawn_spore_tile
 
         lda #DUST_DIRECTION_SE
         sta SmokePuffDirection
@@ -147,13 +148,13 @@ perform_attack:
         lda CurrentRow
         sta SmokePuffRow
         inc SmokePuffRow
-        jsr spawn_spore_tile
+        near_call ENEMY_UPDATE_spawn_spore_tile
 
 skip_spawning_diagonal_spores:
         rts
 .endproc
 
-.proc spawn_spore_tile
+.proc ENEMY_UPDATE_spawn_spore_tile
         ; First off, is this even a valid location for a spore to spawn? Basically
         ; this follows the same rules as any other enemy movement, but also allows
         ; overwriting nearby spore tiles
@@ -180,11 +181,12 @@ check_one_beat_hazards:
 valid_destination_failure:
         rts
 proceed_to_spawn:
-        jsr draw_spore_here
+        near_call ENEMY_UPDATE_draw_spore_here
         rts        
 .endproc
 
-.proc direct_attack_mushroom
+        .segment "ENEMY_ATTACK"
+.proc ENEMY_ATTACK_direct_attack_mushroom
 AttackSquare := R3
 EnemyHealth := R11
         ldx AttackSquare
@@ -216,11 +218,11 @@ weird_hp:
         lda #4
         sta EnemyHealth
 done:
-        jsr direct_attack_with_hp
+        near_call ENEMY_ATTACK_direct_attack_with_hp
         rts
 .endproc
 
-.proc indirect_attack_mushroom
+.proc ENEMY_ATTACK_indirect_attack_mushroom
 EffectiveAttackSquare := R10 
 EnemyHealth := R11
         ldx EffectiveAttackSquare
@@ -252,11 +254,12 @@ weird_hp:
         lda #4
         sta EnemyHealth
 done:
-        jsr indirect_attack_with_hp
+        near_call ENEMY_ATTACK_indirect_attack_with_hp
         rts
 .endproc
 
-.proc update_one_beat_hazard
+        .segment "ENEMY_UPDATE"
+.proc ENEMY_UPDATE_update_one_beat_hazard
 CurrentTile := R15
         ldx CurrentTile
         bail_if_already_moved
@@ -264,11 +267,12 @@ CurrentTile := R15
         ; it's been one beat! stop being a one beat hazard, thx.
         ldx CurrentTile
         draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_WORLD
-        jsr draw_disco_tile
+        near_call ENEMY_UPDATE_draw_disco_tile
         rts
 .endproc
 
-.proc hazard_damages_player
+        .segment "ENEMY_COLLIDE"
+.proc ENEMY_COLLIDE_hazard_damages_player
 DamageAmount := R0
         ; hazards to 2 dmg to the player (for now)
         lda #2
@@ -282,6 +286,8 @@ DamageAmount := R0
 
         rts
 .endproc
+
+        .segment "ENEMY_UPDATE"
 
 spores_lut:
 spores_n:
@@ -360,7 +366,7 @@ spores_nw:
 ; Note: This is only for DRAWING the smoke puff! Any other data you need to stuff into
 ; this thing, do that at the call site.
 ; note: uses smokepuff input variables, since it is almost the same logic
-.proc draw_spore_here
+.proc ENEMY_UPDATE_draw_spore_here
 TargetFuncPtr := R0
         ; run the disco selection logic based on the player's preference
         ; (DiscoTile==SmokePuffTile, and DiscoRow==SmokePuffRow, so that setup is done by this point)

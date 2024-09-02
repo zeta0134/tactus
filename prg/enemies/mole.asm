@@ -1,13 +1,13 @@
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
-
+        .segment "ENEMY_UPDATE"
 MOLE_NORTH = 0
 MOLE_EAST = 1
 MOLE_SOUTH = 2
 MOLE_WEST = 3
 
-.proc update_mole_hole
+.proc ENEMY_UPDATE_update_mole_hole
 IdleDelay := R0
 ; these are provided for us
 CurrentRow := R14
@@ -35,7 +35,7 @@ done:
 
         ; Okay first, we cannot rise out of the ground if the player is too close,
         ; both for engine and gameplay reasons, so compute that
-        jsr player_manhattan_distance
+        near_call ENEMY_UPDATE_player_manhattan_distance
         cmp #MOLE_SUPPRESSION_RADIUS
         bcc do_nothing
 
@@ -102,7 +102,7 @@ do_nothing:
         rts
 .endproc
 
-.proc update_mole_throwing
+.proc ENEMY_UPDATE_update_mole_throwing
 TargetRow := R0
 TargetTile := R1
 ; these are provided for us
@@ -173,7 +173,7 @@ switch_to_idle_pose:
         rts
 .endproc
 
-.proc update_mole_idle
+.proc ENEMY_UPDATE_update_mole_idle
 IdleDelay := R0
 ; these are provided for us
 CurrentRow := R14
@@ -221,7 +221,7 @@ continue_waiting:
         rts
 .endproc
 
-.proc update_wrench_projectile
+.proc ENEMY_UPDATE_update_wrench_projectile
 TargetRow := R0
 TargetTile := R1
 ; these are provided for us
@@ -311,7 +311,7 @@ despawn_old_wrench:
         stx DiscoTile
         lda tile_index_to_row_lut, x
         sta DiscoRow
-        jsr draw_disco_tile_here
+        near_call ENEMY_UPDATE_draw_disco_tile_here
 
         rts
 .endproc
@@ -319,8 +319,8 @@ despawn_old_wrench:
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
-
-.proc direct_attack_mole_idle
+        .segment "ENEMY_ATTACK"
+.proc ENEMY_ATTACK_direct_attack_mole_idle
 AttackSquare := R3
 EnemyHealth := R11
         ldx AttackSquare
@@ -338,11 +338,11 @@ advanced_hp:
         lda #6
         sta EnemyHealth
 done:
-        jsr direct_attack_with_hp
+        near_call ENEMY_ATTACK_direct_attack_with_hp
         rts
 .endproc
 
-.proc direct_attack_mole_throwing
+.proc ENEMY_ATTACK_direct_attack_mole_throwing
 AttackSquare := R3
 EnemyHealth := R11
         ldx AttackSquare
@@ -360,11 +360,11 @@ advanced_hp:
         lda #6
         sta EnemyHealth
 done:
-        jsr direct_attack_with_hp
+        near_call ENEMY_ATTACK_direct_attack_with_hp
         rts
 .endproc
 
-.proc direct_attack_mole_hole
+.proc ENEMY_ATTACK_direct_attack_mole_hole
 AttackSquare := R3
 EffectiveAttackSquare := R10 
 EnemyHealth := R11
@@ -392,15 +392,15 @@ advanced_hp:
 done:
         lda AttackSquare
         sta EffectiveAttackSquare
-        jsr indirect_attack_with_hp
+        near_call ENEMY_ATTACK_indirect_attack_with_hp
         rts
 .endproc
 
 ; ============================================================================================================================
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================
-
-.proc projectile_attacks_player
+        .segment "ENEMY_COLLIDE"
+.proc ENEMY_COLLIDE_projectile_attacks_player
 DamageAmount := R0
 
 TargetIndex := R0
@@ -421,7 +421,7 @@ TargetSquare := R13
         stx DiscoTile
         lda tile_index_to_row_lut, x
         sta DiscoRow
-        jsr draw_disco_tile_here
+        near_call ENEMY_UPDATE_draw_disco_tile_here
         ; draw it now!
         ldx TargetSquare
         stx TargetIndex

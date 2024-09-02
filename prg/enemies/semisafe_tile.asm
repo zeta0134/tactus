@@ -1,9 +1,9 @@
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
+        .segment "ENEMY_UPDATE"
 
-
-.proc update_semisafe_tile
+.proc ENEMY_UPDATE_update_semisafe_tile
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
@@ -22,8 +22,8 @@ CurrentTile := R15
 ; ============================================================================================================================
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================
-
-.proc semisolid_attacks_player
+        .segment "ENEMY_COLLIDE"
+.proc ENEMY_COLLIDE_semisolid_attacks_player
 DamageAmount := R0
 
 PuffSquare := R12
@@ -48,7 +48,7 @@ apply_damage:
         ldx TargetSquare
         lda tile_data, x
         sta PuffSquare
-        jsr spawn_damage_sprite_here
+        near_call ENEMY_COLLIDE_spawn_damage_sprite_here
         ; Finally, clear out our damage value, just to be extra sure it doesn't apply twice
         ldx TargetSquare
         lda #0

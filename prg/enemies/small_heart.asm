@@ -1,10 +1,10 @@
 ; ============================================================================================================================
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================
-
+        .segment "ENEMY_COLLIDE"
 ; TODO: this might be going away! it might also switch to being
 ; some temporary part of the room state, a sprite, etc etc.
-.proc collect_small_heart
+.proc ENEMY_COLLIDE_collect_small_heart
 HealingAmount := R0
 
 TargetIndex := R0

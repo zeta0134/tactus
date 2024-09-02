@@ -1,4 +1,4 @@
-.global launch_far_call, launch_nmi_far_call
+.global launch_far_call, launch_nmi_far_call, init_far_calls
 .globalzp TargetBank, CurrentBank, CurrentDataBankLow, CurrentDataBankHigh, JumpTarget, FarCallScratchA
 .globalzp NmiTargetBank, NmiCurrentBank, NmiJumpTarget, NmiFarCallScratchA
 .globalzp NmiCurrentDataBankLow, NmiCurrentDataBankHigh

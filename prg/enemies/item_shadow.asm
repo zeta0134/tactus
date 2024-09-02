@@ -1,4 +1,5 @@
-.proc draw_item_sprite
+        .segment "ENEMY_UPDATE"
+.proc ENEMY_UPDATE_draw_item_sprite
 ; as used by FAR_apply_item_world_metasprite 
 MetaSpriteIndex := R0
 ItemIndex := R1
@@ -54,8 +55,8 @@ CurrentTile := R15
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
-
-.proc update_item_shadow
+        .segment "ENEMY_UPDATE"
+.proc ENEMY_UPDATE_update_item_shadow
 ItemPtr         := R0
 ItemCost        := R2
 PriceColor      := R4
@@ -149,7 +150,7 @@ proceed_to_spawn_sprite:
         txa
         sta tile_metasprite, y
 
-        jsr draw_item_sprite
+        near_call ENEMY_UPDATE_draw_item_sprite
 
         ; Okay, now we just need to preserve the WeaponClass byte as tile flags. for later use
         ; when this thing is collected by the player
@@ -169,8 +170,8 @@ sprite_failed:
 ; ============================================================================================================================
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================
-
-.proc collect_item
+        .segment "ENEMY_COLLIDE"
+.proc ENEMY_COLLIDE_collect_item
 ; for processing shop items
 ItemPtr := R0
 ItemCost := R2
@@ -282,7 +283,7 @@ revert_to_disco_tile:
 deny_collection:
         ; If the player can't afford this item, or can't pick it up for some other reason, then
         ; block their movement just like any wall
-        jsr solid_tile_forbids_movement
+        near_call ENEMY_COLLIDE_solid_tile_forbids_movement
 
         st16 R0, sfx_too_poor_pulse1
         jsr play_sfx_pulse1
@@ -295,8 +296,8 @@ deny_collection:
 ; ============================================================================================================================
 ; ===                                             Suspend Behaviors                                                        ===
 ; ============================================================================================================================
-
-.proc suspend_item_shadow
+        .segment "ENEMY_UTIL"
+.proc ENEMY_UTIL_suspend_item_shadow
 CurrentSquare := R15
         ; all we need to do is forget about our metasprite; we'll need to respawn it
         ; when we later resume

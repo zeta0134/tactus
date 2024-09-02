@@ -98,7 +98,8 @@ semisafe_failure:
         sta tile_attributes, y
 .endmacro
 
-.proc spawn_death_sprite_here
+        .segment "ENEMY_ATTACK"
+.proc ENEMY_ATTACK_spawn_death_sprite_here
 MetaSpriteIndex := R0
 AttackSquare := R3
 EffectiveAttackSquare := R10
@@ -136,7 +137,8 @@ sprite_failed:
         rts
 .endproc
 
-.proc spawn_damage_sprite_here
+        .segment "ENEMY_COLLIDE"
+.proc ENEMY_COLLIDE_spawn_damage_sprite_here
 MetaSpriteIndex := R0
 PuffSquare := R12
 TargetSquare := R13
@@ -225,8 +227,9 @@ TargetSquare := R13
 sprite_failed:
         rts
 .endproc
+        .segment "ENEMY_COLLIDE"
 
-.proc find_puff_tile
+.proc ENEMY_COLLIDE_find_puff_tile
 PuffSquare := R12
 TargetSquare := R13
         lda #$FF        ; A value of $FF indicates search failure
@@ -259,16 +262,11 @@ done:
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
 
-.proc no_behavior
-        ; does what it says on the tin
-        rts
-.endproc
-
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
-
-.proc direct_attack_with_hp
+        .segment "ENEMY_ATTACK"
+.proc ENEMY_ATTACK_direct_attack_with_hp
 AttackSquare := R3
 EffectiveAttackSquare := R10 
         ; If we have *just moved*, then ignore this attack
@@ -279,17 +277,17 @@ EffectiveAttackSquare := R10
         ; Copy in the attack square, so we can use shared logic to process the effect
         lda AttackSquare
         sta EffectiveAttackSquare
-        jsr attack_with_hp_common
+        near_call ENEMY_ATTACK_attack_with_hp_common
 ignore_attack:
         rts
 .endproc
 
-.proc indirect_attack_with_hp
-        jsr attack_with_hp_common
+.proc ENEMY_ATTACK_indirect_attack_with_hp
+        near_call ENEMY_ATTACK_attack_with_hp_common
         rts
 .endproc
 
-.proc attack_with_hp_common
+.proc ENEMY_ATTACK_attack_with_hp_common
 OriginalAttackSquare := R3
 
 ; For drawing tiles
@@ -333,7 +331,7 @@ die:
         stx DiscoTile
         lda tile_index_to_row_lut, x
         sta DiscoRow
-        jsr draw_disco_tile_here
+        near_call ENEMY_UPDATE_draw_disco_tile_here
         lda EffectiveAttackSquare
         sta TargetIndex
         jsr draw_active_tile
@@ -345,7 +343,7 @@ die:
 
         ; Juice: spawn a floaty, flashy death skull above our tile
         ; #RIP
-        jsr spawn_death_sprite_here
+        near_call ENEMY_ATTACK_spawn_death_sprite_here
 
         ; A standard enemy died! Increment the player's ongoing combo
         inc PlayerCombo
@@ -371,8 +369,8 @@ die:
 ; ============================================================================================================================
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================
-
-.proc basic_enemy_attacks_player
+        .segment "ENEMY_COLLIDE"
+.proc ENEMY_COLLIDE_basic_enemy_attacks_player
 DamageAmount := R0
 
 TargetIndex := R0
@@ -386,7 +384,7 @@ TargetSquare := R13
 
         ; Now the tricky part: we need to scan the map and find this enemy's poof
         ; (It might not exist if we have a bugged board, so handle that safely)
-        jsr find_puff_tile
+        near_call ENEMY_COLLIDE_find_puff_tile
         lda PuffSquare
         cmp #$FF
         beq no_puff_found
@@ -428,7 +426,7 @@ TargetSquare := R13
         jsr draw_active_tile
         
         ; Since we just damaged the player, spawn a hit sprite
-        jsr spawn_damage_sprite_here
+        near_call ENEMY_COLLIDE_spawn_damage_sprite_here
 
         rts
 no_puff_found:
@@ -436,16 +434,16 @@ no_puff_found:
         ; This *shouldn't* happen for basic enemies, but if we can't kick the enemy back,
         ; we should try to at least separate it from the player. (If this also fails the
         ; player will soft lock and die very quickly.)
-        jsr forbid_player_movement
+        near_call ENEMY_COLLIDE_forbid_player_movement
         rts
 .endproc
 
-.proc solid_tile_forbids_movement
-        jsr forbid_player_movement
+.proc ENEMY_COLLIDE_solid_tile_forbids_movement
+        near_call ENEMY_COLLIDE_forbid_player_movement
         rts
 .endproc
 
-.proc forbid_player_movement
+.proc ENEMY_COLLIDE_forbid_player_movement
 TargetRow := R14
 TargetCol := R15
         ; if our current and target position is already the same, bail; nothing to do
@@ -479,7 +477,7 @@ proceed_to_forbid:
 ; ============================================================================================================================
 ; ===                                             Suspend Behaviors                                                        ===
 ; ============================================================================================================================
-
+        .segment "ENEMY_UTIL"
 ; These are used to take a 5bit random number and pick something "in bounds" coordinate wise,
 ; with reasonable speed and fairness
 random_row_table:
@@ -493,7 +491,7 @@ random_col_table:
         .endrepeat
 
 ; result in R0
-.proc find_safe_coordinate
+.proc ENEMY_UTIL_find_safe_coordinate
 TempCol := R0
 TempRow := R1
 ; TODO: track attempts, to guard against failure?
@@ -523,14 +521,14 @@ check_floor:
         beq is_valid_space
         ; no good; this is not a floor tile. We cannot spawn anything here,
         ; try again
-        jmp find_safe_coordinate
+        jmp ENEMY_UTIL_find_safe_coordinate
 is_valid_space:
         lda TempIndex
         sta FinalIndex
         rts
 .endproc
 
-.proc move_away_from_map_edge
+.proc ENEMY_UTIL_move_away_from_map_edge
 NewSquare := R0
 CurrentSquare := R15
         ; This is a generic implementation that simply teleports the enemy to a valid tile somewhere
@@ -554,7 +552,7 @@ CurrentSquare := R15
         ; This enemy is in a safe spot; we're done
         rts
 adjustment_needed:
-        jsr find_safe_coordinate
+        near_call ENEMY_UTIL_find_safe_coordinate
         ; move ourselves to the new coordinate
         ldx CurrentSquare
         ldy NewSquare
@@ -572,9 +570,7 @@ adjustment_needed:
         ; do not move detail. detail always stays behind
 
         ; okay, now draw a cleared disco tile at our current location
-        jsr draw_cleared_disco_tile
+        near_call ENEMY_UTIL_draw_cleared_disco_tile
 
         rts
 .endproc
-
-

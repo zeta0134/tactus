@@ -3,7 +3,7 @@
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
-
+        .segment "ENEMY_ATTACK"
 TREASURE_ITEM = 0
 TREASURE_HEART = 1
 TREASURE_GOLD = 2
@@ -32,7 +32,7 @@ treasure_category_table:
         ;.byte TREASURE_ITEM
         ;.endrepeat
 
-.proc attack_treasure_chest
+.proc ENEMY_ATTACK_attack_treasure_chest
 MetaSpriteIndex := R0
 WeaponClassTemp := R1
 TargetIndex := R0
@@ -49,7 +49,7 @@ WeaponPtr := R11
         lda room_flags, x
         and #ROOM_FLAG_BOSS
         beq spawn_treasure
-        jsr spawn_big_key
+        near_call ENEMY_ATTACK_spawn_big_key
         rts
 spawn_treasure:
         perform_zpcm_inc
@@ -61,24 +61,24 @@ spawn_treasure:
 check_nav:
         cmp #TREASURE_NAV
         bne check_item
-        jsr spawn_nav_item
+        near_call ENEMY_ATTACK_spawn_nav_item
         rts
 check_item:
         cmp #TREASURE_ITEM
         bne check_gold
-        jsr spawn_item
+        near_call ENEMY_ATTACK_spawn_item
         rts
 check_gold:
         cmp #TREASURE_GOLD
         bne spawn_heart
-        jsr spawn_gold_sack
+        near_call ENEMY_ATTACK_spawn_gold_sack
         rts
 spawn_heart:
-        jsr spawn_heart_container
+        near_call ENEMY_ATTACK_spawn_heart_container
         rts
 .endproc
 
-.proc spawn_heart_container
+.proc ENEMY_ATTACK_spawn_heart_container
 TargetIndex := R0
 TileId := R1
 AttackSquare := R3
@@ -93,7 +93,7 @@ AttackSquare := R3
         beq okay_to_spawn
         ; ... then we must not increase their health any further.
         ; Spawn a gold sack instead
-        jsr spawn_gold_sack
+        near_call ENEMY_ATTACK_spawn_gold_sack
         rts
 
 okay_to_spawn:
@@ -111,7 +111,7 @@ okay_to_spawn:
         rts
 .endproc
 
-.proc spawn_gold_sack
+.proc ENEMY_ATTACK_spawn_gold_sack
 TargetIndex := R0
 TileId := R1
 AttackSquare := R3
@@ -129,7 +129,7 @@ AttackSquare := R3
         rts
 .endproc
 
-.proc spawn_big_key
+.proc ENEMY_ATTACK_spawn_big_key
 TargetIndex := R0
 TileId := R1
 AttackSquare := R3
@@ -147,7 +147,7 @@ AttackSquare := R3
         rts
 .endproc
 
-.proc spawn_item
+.proc ENEMY_ATTACK_spawn_item
 ; for draw_active_tile
 TargetIndex := R0
 
@@ -183,7 +183,7 @@ ItemId := R18
         rts
 .endproc
 
-.proc spawn_nav_item
+.proc ENEMY_ATTACK_spawn_nav_item
 ; for draw_active_tile
 TargetIndex := R0
 TileId := R1
@@ -195,7 +195,8 @@ AttackSquare := R3 ; do not clobber! (don't clobber R2 or R4-R15 either!)
         cmp #1
         beq spawn_map
         ; the player has mapped this area; revert to generating a regular item instead
-        jmp spawn_item
+        near_call ENEMY_ATTACK_spawn_item
+        rts
 spawn_compass:
         inc PlayerNavState
         ldx AttackSquare
@@ -224,8 +225,8 @@ converge:
 ; ============================================================================================================================
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================
-
-.proc collect_heart_container
+        .segment "ENEMY_COLLIDE"
+.proc ENEMY_COLLIDE_collect_heart_container
 NewHeartType := R0
 
 TargetIndex := R0
@@ -253,7 +254,7 @@ TargetSquare := R13
         rts
 .endproc
 
-.proc collect_key
+.proc ENEMY_COLLIDE_collect_key
 TargetIndex := R0
 TileId := R1
 TargetSquare := R13
@@ -299,7 +300,7 @@ next_room:
         rts
 .endproc
 
-.proc collect_gold_sack
+.proc ENEMY_COLLIDE_collect_gold_sack
 TargetIndex := R0
 TileId := R1
 TargetSquare := R13

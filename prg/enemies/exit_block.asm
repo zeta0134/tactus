@@ -1,8 +1,8 @@
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
-
-.proc attack_exit_block
+        .segment "ENEMY_ATTACK"
+.proc ENEMY_ATTACK_attack_exit_block
 TargetIndex := R0
 TileId := R1
 AttackSquare := R3
@@ -34,8 +34,8 @@ no_key:
 ; ============================================================================================================================
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================
-
-.proc descend_stairs
+        .segment "ENEMY_COLLIDE"
+.proc ENEMY_COLLIDE_descend_stairs
 ExitIndex := R0
 TargetSquare := R13
 

@@ -1,9 +1,9 @@
 ; ============================================================================================================================
 ; ===                                           Utility Functions                                                          ===
 ; ============================================================================================================================
-
+        .segment "ENEMY_UPDATE"
 ; Result in A, clobbers R0
-.proc player_manhattan_distance
+.proc ENEMY_UPDATE_player_manhattan_distance
 PlayerDistance := R2
 CurrentRow := R14
 CurrentTile := R15
@@ -39,10 +39,10 @@ add_col_distance:
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
-
+        .segment "ENEMY_UPDATE"
 ; Spiders store their beat counter in tile_data, and damage in the low 7 bits of tile_flags
 
-.proc update_spider_base
+.proc ENEMY_UPDATE_update_spider_base
 IdleDelay := R0
 ; these are provided for us
 CurrentRow := R14
@@ -88,7 +88,7 @@ no_change:
 ; do a bit better when tracking the player, but still make stupid decisions. We
 ; want them to try to always move if they're not completely blocked, and we want
 ; the whole "randomly pick a direction" logic to be much less stupid.
-.proc update_spider_anticipate
+.proc ENEMY_UPDATE_update_spider_anticipate
 TargetRow := R0
 TargetTile := R1
 PlayerDistance := R2
@@ -102,7 +102,7 @@ CurrentTile := R15
         lda CurrentRow
         sta TargetRow
 
-        jsr player_manhattan_distance
+        near_call ENEMY_UPDATE_player_manhattan_distance
 track_player:
         ; First the row
         ; If we're outside the tracking radius, choose it randomly
@@ -242,7 +242,7 @@ proceed_with_jump:
         sta SmokePuffTile
         lda CurrentRow
         sta SmokePuffRow
-        jsr draw_smoke_puff
+        near_call ENEMY_UPDATE_draw_smoke_puff
 
         rts
 .endproc
@@ -250,8 +250,8 @@ proceed_with_jump:
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
-
-.proc direct_attack_spider
+        .segment "ENEMY_ATTACK"
+.proc ENEMY_ATTACK_direct_attack_spider
 AttackSquare := R3
 EnemyHealth := R11
         ldx AttackSquare
@@ -276,11 +276,11 @@ advanced_hp:
         lda #6
         sta EnemyHealth
 done:
-        jsr direct_attack_with_hp
+        near_call ENEMY_ATTACK_direct_attack_with_hp
         rts
 .endproc
 
-.proc indirect_attack_spider
+.proc ENEMY_ATTACK_indirect_attack_spider
 EffectiveAttackSquare := R10 
 EnemyHealth := R11
         ldx EffectiveAttackSquare
@@ -305,6 +305,6 @@ advanced_hp:
         lda #6
         sta EnemyHealth
 done:
-        jsr indirect_attack_with_hp
+        near_call ENEMY_ATTACK_indirect_attack_with_hp
         rts
 .endproc

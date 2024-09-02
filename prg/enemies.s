@@ -190,7 +190,16 @@ tile_index_to_col_lut:
         .endrepeat
         .endrepeat
 
-.segment "CODE_2"
+.proc FIXED_no_behavior
+        ; does what it says on the tin
+        rts
+.endproc
+
+.proc __trampoline
+        perform_zpcm_inc
+        jmp (DestPtr)
+        ; tail call
+.endproc
 
 .include "enemies/common.asm"
 
@@ -209,197 +218,43 @@ tile_index_to_col_lut:
 .include "enemies/smoke_puff.asm"
 .include "enemies/treasure_chest.asm"
 
+.segment "ENEMY_UPDATE"
+
 static_behaviors:
-        .word update_smoke_puff         ; $00
-        .word update_slime              ; $04
-        .word update_spider_base        ; $08
-        .word update_spider_anticipate  ; $0C
-        .word update_zombie_base        ; $10
-        .word update_zombie_anticipate  ; $14
-        .word update_birb_left          ; $18
-        .word update_birb_right         ; $1C
-        .word update_birb_flying_left   ; $20
-        .word update_birb_flying_right  ; $24
-        .word update_mole_hole          ; $28
-        .word update_mole_throwing      ; $2C
-        .word update_mole_idle          ; $30
-        .word update_wrench_projectile  ; $34
-        .word update_challenge_spike    ; $38
-        .word update_mushroom           ; $3C
-        .word update_one_beat_hazard    ; $40
+        .word ENEMY_UPDATE_update_smoke_puff         ; $00
+        .word ENEMY_UPDATE_update_slime              ; $04
+        .word ENEMY_UPDATE_update_spider_base        ; $08
+        .word ENEMY_UPDATE_update_spider_anticipate  ; $0C
+        .word ENEMY_UPDATE_update_zombie_base        ; $10
+        .word ENEMY_UPDATE_update_zombie_anticipate  ; $14
+        .word ENEMY_UPDATE_update_birb_left          ; $18
+        .word ENEMY_UPDATE_update_birb_right         ; $1C
+        .word ENEMY_UPDATE_update_birb_flying_left   ; $20
+        .word ENEMY_UPDATE_update_birb_flying_right  ; $24
+        .word ENEMY_UPDATE_update_mole_hole          ; $28
+        .word ENEMY_UPDATE_update_mole_throwing      ; $2C
+        .word ENEMY_UPDATE_update_mole_idle          ; $30
+        .word ENEMY_UPDATE_update_wrench_projectile  ; $34
+        .word ENEMY_UPDATE_update_challenge_spike    ; $38
+        .word ENEMY_UPDATE_update_mushroom           ; $3C
+        .word ENEMY_UPDATE_update_one_beat_hazard    ; $40
         .repeat 15
-        .word no_behavior ; unimplemented
+        .word FIXED_no_behavior ; unimplemented
         .endrepeat
-        .word no_behavior               ; $80 - UNUSED
-        .word draw_disco_tile           ; $84 - disco floor
-        .word update_semisafe_tile      ; $88 - semisafe floor
-        .word no_behavior               ; $8C - wall
-        .word update_item_shadow        ; $90 - item shadow
-        .word no_behavior               ; $94 - UNUSED
-        .word no_behavior               ; $98 - treasure chest
-        .word no_behavior               ; $9C - big key
-        .word no_behavior               ; $A0 - gold sack
-        .word no_behavior               ; $A4 - UNUSED
+        .word FIXED_no_behavior               ; $80 - UNUSED
+        .word ENEMY_UPDATE_draw_disco_tile           ; $84 - disco floor
+        .word ENEMY_UPDATE_update_semisafe_tile      ; $88 - semisafe floor
+        .word FIXED_no_behavior               ; $8C - wall
+        .word ENEMY_UPDATE_update_item_shadow        ; $90 - item shadow
+        .word FIXED_no_behavior               ; $94 - UNUSED
+        .word FIXED_no_behavior               ; $98 - treasure chest
+        .word FIXED_no_behavior               ; $9C - big key
+        .word FIXED_no_behavior               ; $A0 - gold sack
+        .word FIXED_no_behavior               ; $A4 - UNUSED
         ; safety: fill out the rest of the table
         .repeat 22
-        .word no_behavior
+        .word FIXED_no_behavior
         .endrepeat
-
-direct_attack_behaviors:
-        ; enemies
-        .word direct_attack_puff
-        .word direct_attack_slime
-        .word direct_attack_spider
-        .word direct_attack_spider
-        .word direct_attack_zombie
-        .word direct_attack_zombie
-        .word direct_attack_birb
-        .word direct_attack_birb
-        .word direct_attack_birb
-        .word direct_attack_birb
-        .word direct_attack_mole_hole
-        .word direct_attack_mole_throwing
-        .word direct_attack_mole_idle
-        .word no_behavior ; wrench projectile
-        .word no_behavior ; challenge spike
-        .word direct_attack_mushroom
-        .word no_behavior ; one beat hazard
-        .repeat 15
-        .word no_behavior
-        .endrepeat
-        ; floors, statics, and technical tiles
-        .word no_behavior ; $80 - UNUSED
-        .word no_behavior ; $84 - disco floor
-        .word no_behavior ; $88 - semisafe floor
-        .word no_behavior ; $8C - wall face
-        .word no_behavior ; $90 - item shadow
-        .word no_behavior ; $94 - UNUSED
-        .word attack_treasure_chest ; $98 - treasure chest
-        .word no_behavior ; $9C - big key
-        .word no_behavior ; $A0 - gold sack
-        .word no_behavior ; $A4 - UNUSED
-        .word attack_exit_block ; $A8 - exit block
-        .word no_behavior ; $AC - exit stairs
-        ; safety: fill out the rest of the table
-        .repeat 23
-        .word no_behavior
-        .endrepeat
-
-indirect_attack_behaviors:
-        .word no_behavior ; smoke puff can't attack itself
-        .word indirect_attack_slime
-        .word indirect_attack_spider
-        .word indirect_attack_spider
-        .word indirect_attack_zombie
-        .word indirect_attack_zombie
-        .word indirect_attack_birb
-        .word indirect_attack_birb
-        .word indirect_attack_birb
-        .word indirect_attack_birb
-        .word no_behavior ; moles - do not move, and therefore will never be indirectly attacked
-        .word no_behavior
-        .word no_behavior
-        .word no_behavior ; wrench projectile
-        .word no_behavior ; challenge spike
-        .word indirect_attack_mushroom
-        .word no_behavior ; one beat hazard
-        .repeat 15
-        .word no_behavior
-        .endrepeat
-        ; safety: fill out the rest of the table
-        .repeat 32
-        .word no_behavior
-        .endrepeat
-
-bonk_behaviors:
-        .word no_behavior ; standing in a smoke puff is fine
-        .word basic_enemy_attacks_player
-        .word basic_enemy_attacks_player
-        .word basic_enemy_attacks_player
-        .word basic_enemy_attacks_player
-        .word basic_enemy_attacks_player
-        .word basic_enemy_attacks_player
-        .word basic_enemy_attacks_player
-        .word basic_enemy_attacks_player
-        .word basic_enemy_attacks_player
-        .word no_behavior ; mole holes, when unoccupied, do no damage
-        .word basic_enemy_attacks_player ; moles when bonked, mostly with the flail/boots, *do* do damage
-        .word basic_enemy_attacks_player
-        .word projectile_attacks_player  ; projectiles do damage, but also need to erase themselves
-        .word challenge_spike_solid_test
-        .word basic_enemy_attacks_player ; $3C - mushroom
-        .word hazard_damages_player      ; $40 one beat hazards just do damage
-        .repeat 15
-        .word no_behavior
-        .endrepeat
-        .word no_behavior ; $80 - UNUSED
-        .word no_behavior ; $84 - disco floor
-        .word semisolid_attacks_player ; $88 - semisafe floor
-        .word solid_tile_forbids_movement     ; $8C - wall face
-        .word collect_item ; $90 - item shadow
-        .word no_behavior  ; $94 - UNUSED
-        .word solid_tile_forbids_movement ; $98 - treasure chest
-        .word collect_key ; $9C - big key
-        .word collect_gold_sack ; $A0 - gold sack
-        .word no_behavior       ; $A4 - UNUSED
-        .word solid_tile_forbids_movement ; $A8 - exit block
-        .word descend_stairs ; $AC - exit stairs
-        .word collect_small_heart ; $B0
-        .word no_behavior ; $B4
-        .word no_behavior ; $B8
-        .word no_behavior ; $BC
-        .word no_behavior ; $C0
-        .word no_behavior ; $C4
-        .word no_behavior ; $C8
-        .word collect_heart_container ; $CC - heart container
-        ; safety: fill out the rest of the table
-        .repeat 12
-        .word no_behavior
-        .endrepeat
-
-; called just before suspending the map, typically because the player
-; is moving to an adjacent room. handles all sorts of fun jank
-suspend_behaviors:
-        .word draw_cleared_disco_tile  ; smoke puff
-        .word move_away_from_map_edge  ; slime
-        .word move_away_from_map_edge  ; spider
-        .word move_away_from_map_edge  ; spider (anticipating)
-        .word move_away_from_map_edge  ; zombie
-        .word move_away_from_map_edge  ; zombie (anticipating)
-        .word move_away_from_map_edge  ; birb (left)
-        .word move_away_from_map_edge  ; birb (right)
-        .word move_away_from_map_edge  ; birb (flying, left)
-        .word move_away_from_map_edge  ; birb (flying, right)
-        .word no_behavior              ; mole hole
-        .word no_behavior              ; mole throwing
-        .word no_behavior              ; mole idle
-        .word draw_cleared_disco_tile  ; wrench
-        .word no_behavior              ; challenge spike
-        .word no_behavior              ; mushroom
-        .word no_behavior              ; one beat hazard
-        .repeat 15
-        .word no_behavior ; unimplemented
-        .endrepeat
-        .word no_behavior               ; $80 - UNUSED
-        .word draw_cleared_disco_tile   ; $84 - disco floor
-        .word no_behavior               ; $88 - semisafe floor
-        .word no_behavior               ; $8C - wall
-        .word suspend_item_shadow       ; $90 - item shadow
-        .word no_behavior               ; $94 - UNUSED
-        .word no_behavior               ; $98 - treasure chest
-        .word no_behavior               ; $9C - big key
-        .word no_behavior               ; $A0 - gold sack
-        .word no_behavior               ; $A4 - UNUSED
-        ; safety: fill out the rest of the table
-        .repeat 22
-        .word no_behavior
-        .endrepeat
-
-.proc __trampoline
-        perform_zpcm_inc
-        jmp (DestPtr)
-        ; tail call
-.endproc
 
 ; Note: parameters are intentionally backloaded, to allow the behavior functions to use R0+
 ; without conflict
@@ -428,29 +283,73 @@ loop:
         rts
 .endproc
 
-.proc FAR_clear_active_move_flags
-        clc
-        ldx #0
-loop:
-        perform_zpcm_inc
-        .repeat 8, i       
-        lda tile_flags+i, x ; 4
-        and #%01111111      ; 2
-        sta tile_flags+i, x ; 5
+.segment "ENEMY_ATTACK"
+
+direct_attack_behaviors:
+        ; enemies
+        .word ENEMY_ATTACK_direct_attack_puff
+        .word ENEMY_ATTACK_direct_attack_slime
+        .word ENEMY_ATTACK_direct_attack_spider
+        .word ENEMY_ATTACK_direct_attack_spider
+        .word ENEMY_ATTACK_direct_attack_zombie
+        .word ENEMY_ATTACK_direct_attack_zombie
+        .word ENEMY_ATTACK_direct_attack_birb
+        .word ENEMY_ATTACK_direct_attack_birb
+        .word ENEMY_ATTACK_direct_attack_birb
+        .word ENEMY_ATTACK_direct_attack_birb
+        .word ENEMY_ATTACK_direct_attack_mole_hole
+        .word ENEMY_ATTACK_direct_attack_mole_throwing
+        .word ENEMY_ATTACK_direct_attack_mole_idle
+        .word FIXED_no_behavior ; wrench projectile
+        .word FIXED_no_behavior ; challenge spike
+        .word ENEMY_ATTACK_direct_attack_mushroom
+        .word FIXED_no_behavior ; one beat hazard
+        .repeat 15
+        .word FIXED_no_behavior
         .endrepeat
-        perform_zpcm_inc
-        .repeat 8, i       
-        lda tile_flags+i+8, x ; 4
-        and #%01111111      ; 2
-        sta tile_flags+i+8, x ; 5
+        ; floors, statics, and technical tiles
+        .word FIXED_no_behavior ; $80 - UNUSED
+        .word FIXED_no_behavior ; $84 - disco floor
+        .word FIXED_no_behavior ; $88 - semisafe floor
+        .word FIXED_no_behavior ; $8C - wall face
+        .word FIXED_no_behavior ; $90 - item shadow
+        .word FIXED_no_behavior ; $94 - UNUSED
+        .word ENEMY_ATTACK_attack_treasure_chest ; $98 - treasure chest
+        .word FIXED_no_behavior ; $9C - big key
+        .word FIXED_no_behavior ; $A0 - gold sack
+        .word FIXED_no_behavior ; $A4 - UNUSED
+        .word ENEMY_ATTACK_attack_exit_block ; $A8 - exit block
+        .word FIXED_no_behavior ; $AC - exit stairs
+        ; safety: fill out the rest of the table
+        .repeat 23
+        .word FIXED_no_behavior
         .endrepeat
-        txa
-        adc #16
-        tax
-        cpx #BATTLEFIELD_SIZE
-        jne loop
-        rts        
-.endproc
+
+indirect_attack_behaviors:
+        .word FIXED_no_behavior ; smoke puff can't attack itself
+        .word ENEMY_ATTACK_indirect_attack_slime
+        .word ENEMY_ATTACK_indirect_attack_spider
+        .word ENEMY_ATTACK_indirect_attack_spider
+        .word ENEMY_ATTACK_indirect_attack_zombie
+        .word ENEMY_ATTACK_indirect_attack_zombie
+        .word ENEMY_ATTACK_indirect_attack_birb
+        .word ENEMY_ATTACK_indirect_attack_birb
+        .word ENEMY_ATTACK_indirect_attack_birb
+        .word ENEMY_ATTACK_indirect_attack_birb
+        .word FIXED_no_behavior ; moles - do not move, and therefore will never be indirectly attacked
+        .word FIXED_no_behavior
+        .word FIXED_no_behavior
+        .word FIXED_no_behavior ; wrench projectile
+        .word FIXED_no_behavior ; challenge spike
+        .word ENEMY_ATTACK_indirect_attack_mushroom
+        .word FIXED_no_behavior ; one beat hazard
+        .repeat 15
+        .word FIXED_no_behavior
+        .endrepeat
+        ; safety: fill out the rest of the table
+        .repeat 32
+        .word FIXED_no_behavior
+        .endrepeat
 
 .proc FAR_attack_enemy_tile
 ; R0 and R1 are reserved for the enemy behaviors to use
@@ -486,6 +385,54 @@ TargetCol := R15
         rts
 .endproc
 
+.segment "ENEMY_COLLIDE"
+
+bonk_behaviors:
+        .word FIXED_no_behavior ; standing in a smoke puff is fine
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player
+        .word FIXED_no_behavior ; mole holes, when unoccupied, do no damage
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player ; moles when bonked, mostly with the flail/boots, *do* do damage
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player
+        .word ENEMY_COLLIDE_projectile_attacks_player  ; projectiles do damage, but also need to erase themselves
+        .word ENEMY_COLLIDE_challenge_spike_solid_test
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player ; $3C - mushroom
+        .word ENEMY_COLLIDE_hazard_damages_player      ; $40 one beat hazards just do damage
+        .repeat 15
+        .word FIXED_no_behavior
+        .endrepeat
+        .word FIXED_no_behavior ; $80 - UNUSED
+        .word FIXED_no_behavior ; $84 - disco floor
+        .word ENEMY_COLLIDE_semisolid_attacks_player ; $88 - semisafe floor
+        .word ENEMY_COLLIDE_solid_tile_forbids_movement     ; $8C - wall face
+        .word ENEMY_COLLIDE_collect_item ; $90 - item shadow
+        .word FIXED_no_behavior  ; $94 - UNUSED
+        .word ENEMY_COLLIDE_solid_tile_forbids_movement ; $98 - treasure chest
+        .word ENEMY_COLLIDE_collect_key ; $9C - big key
+        .word ENEMY_COLLIDE_collect_gold_sack ; $A0 - gold sack
+        .word FIXED_no_behavior       ; $A4 - UNUSED
+        .word ENEMY_COLLIDE_solid_tile_forbids_movement ; $A8 - exit block
+        .word ENEMY_COLLIDE_descend_stairs ; $AC - exit stairs
+        .word ENEMY_COLLIDE_collect_small_heart ; $B0
+        .word FIXED_no_behavior ; $B4
+        .word FIXED_no_behavior ; $B8
+        .word FIXED_no_behavior ; $BC
+        .word FIXED_no_behavior ; $C0
+        .word FIXED_no_behavior ; $C4
+        .word FIXED_no_behavior ; $C8
+        .word ENEMY_COLLIDE_collect_heart_container ; $CC - heart container
+        ; safety: fill out the rest of the table
+        .repeat 12
+        .word FIXED_no_behavior
+        .endrepeat
+
 .proc FAR_player_collides_with_tile
 TargetSquare := R13
 ; This is our target position after movement. It might be the same as our player position;
@@ -508,6 +455,46 @@ TargetCol := R15
 
         rts
 .endproc
+
+.segment "ENEMY_UTIL"
+
+; called just before suspending the map, typically because the player
+; is moving to an adjacent room. handles all sorts of fun jank
+suspend_behaviors:
+        .word ENEMY_UTIL_draw_cleared_disco_tile  ; smoke puff
+        .word ENEMY_UTIL_move_away_from_map_edge  ; slime
+        .word ENEMY_UTIL_move_away_from_map_edge  ; spider
+        .word ENEMY_UTIL_move_away_from_map_edge  ; spider (anticipating)
+        .word ENEMY_UTIL_move_away_from_map_edge  ; zombie
+        .word ENEMY_UTIL_move_away_from_map_edge  ; zombie (anticipating)
+        .word ENEMY_UTIL_move_away_from_map_edge  ; birb (left)
+        .word ENEMY_UTIL_move_away_from_map_edge  ; birb (right)
+        .word ENEMY_UTIL_move_away_from_map_edge  ; birb (flying, left)
+        .word ENEMY_UTIL_move_away_from_map_edge  ; birb (flying, right)
+        .word FIXED_no_behavior              ; mole hole
+        .word FIXED_no_behavior              ; mole throwing
+        .word FIXED_no_behavior              ; mole idle
+        .word ENEMY_UTIL_draw_cleared_disco_tile  ; wrench
+        .word FIXED_no_behavior              ; challenge spike
+        .word FIXED_no_behavior              ; mushroom
+        .word FIXED_no_behavior              ; one beat hazard
+        .repeat 15
+        .word FIXED_no_behavior ; unimplemented
+        .endrepeat
+        .word FIXED_no_behavior               ; $80 - UNUSED
+        .word ENEMY_UTIL_draw_cleared_disco_tile   ; $84 - disco floor
+        .word FIXED_no_behavior               ; $88 - semisafe floor
+        .word FIXED_no_behavior               ; $8C - wall
+        .word ENEMY_UTIL_suspend_item_shadow       ; $90 - item shadow
+        .word FIXED_no_behavior               ; $94 - UNUSED
+        .word FIXED_no_behavior               ; $98 - treasure chest
+        .word FIXED_no_behavior               ; $9C - big key
+        .word FIXED_no_behavior               ; $A0 - gold sack
+        .word FIXED_no_behavior               ; $A4 - UNUSED
+        ; safety: fill out the rest of the table
+        .repeat 22
+        .word FIXED_no_behavior
+        .endrepeat
 
 ; Note: parameters are intentionally backloaded, to allow the behavior functions to use R0+
 ; without conflict
@@ -534,4 +521,28 @@ loop:
         cmp #BATTLEFIELD_SIZE
         bne loop
         rts
+.endproc
+
+.proc FAR_clear_active_move_flags
+        clc
+        ldx #0
+loop:
+        perform_zpcm_inc
+        .repeat 8, i       
+        lda tile_flags+i, x ; 4
+        and #%01111111      ; 2
+        sta tile_flags+i, x ; 5
+        .endrepeat
+        perform_zpcm_inc
+        .repeat 8, i       
+        lda tile_flags+i+8, x ; 4
+        and #%01111111      ; 2
+        sta tile_flags+i+8, x ; 5
+        .endrepeat
+        txa
+        adc #16
+        tax
+        cpx #BATTLEFIELD_SIZE
+        jne loop
+        rts        
 .endproc

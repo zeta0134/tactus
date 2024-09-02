@@ -1,6 +1,7 @@
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
+        .segment "ENEMY_UPDATE"
 
 DISCO_OFFSET_NO_ANIMATION      = 0
 DISCO_OFFSET_GROOVEMENT        = 1
@@ -27,13 +28,13 @@ TargetFuncPtr := R0
 
 ; Absolutely no movement whatsoever! The most extreme accessibility option for
 ; the floor tiles.
-.proc disco_reduced_motion
+.proc ENEMY_UPDATE_disco_reduced_motion
         lda #DISCO_OFFSET_NO_ANIMATION
         rts
 .endproc
 
 ; Floor tiles dance when the room is active, and are still otherwise
-.proc disco_just_groovement
+.proc ENEMY_UPDATE_disco_just_groovement
         ; BASIC check: if the room is cleared, always return a cleared tile
         lda current_clear_status
         beq not_cleared
@@ -44,7 +45,7 @@ not_cleared:
         rts
 .endproc
 
-.proc disco_solid_instant_squares
+.proc ENEMY_UPDATE_disco_solid_instant_squares
         ; BASIC check: if the room is cleared, always return a cleared tile
         lda current_clear_status
         beq not_cleared
@@ -85,7 +86,7 @@ not_cleared_static:
 
 ; "Frozen" parity ignores the current beat entirely, but still grows/shrinks
 ; into place to indicate changes in room tempo state
-.proc disco_solid_frozen_squares
+.proc ENEMY_UPDATE_disco_solid_frozen_squares
         ; BASIC check: if the room is cleared, always return a cleared tile
         lda current_clear_status
         beq not_cleared
@@ -122,7 +123,7 @@ not_cleared_static:
         rts
 .endproc
 
-.proc disco_outline_instant_squares
+.proc ENEMY_UPDATE_disco_outline_instant_squares
         ; BASIC check: if the room is cleared, always return a cleared tile
         lda current_clear_status
         beq not_cleared
@@ -163,7 +164,7 @@ not_cleared_static:
 
 ; "Frozen" parity ignores the current beat entirely, but still grows/shrinks
 ; into place to indicate changes in room tempo state
-.proc disco_outline_frozen_squares
+.proc ENEMY_UPDATE_disco_outline_frozen_squares
         ; BASIC check: if the room is cleared, always return a cleared tile
         lda current_clear_status
         beq not_cleared
@@ -201,22 +202,22 @@ not_cleared_static:
 .endproc
 
 disco_behavior_lut_low:
-        .byte <disco_solid_instant_squares
-        .byte <disco_solid_frozen_squares
-        .byte <disco_outline_instant_squares
-        .byte <disco_outline_frozen_squares
-        .byte <disco_just_groovement
-        .byte <disco_reduced_motion
+        .byte <ENEMY_UPDATE_disco_solid_instant_squares
+        .byte <ENEMY_UPDATE_disco_solid_frozen_squares
+        .byte <ENEMY_UPDATE_disco_outline_instant_squares
+        .byte <ENEMY_UPDATE_disco_outline_frozen_squares
+        .byte <ENEMY_UPDATE_disco_just_groovement
+        .byte <ENEMY_UPDATE_disco_reduced_motion
 
 disco_behavior_lut_high:
-        .byte >disco_solid_instant_squares
-        .byte >disco_solid_frozen_squares
-        .byte >disco_outline_instant_squares
-        .byte >disco_outline_frozen_squares
-        .byte >disco_just_groovement
-        .byte >disco_reduced_motion
+        .byte >ENEMY_UPDATE_disco_solid_instant_squares
+        .byte >ENEMY_UPDATE_disco_solid_frozen_squares
+        .byte >ENEMY_UPDATE_disco_outline_instant_squares
+        .byte >ENEMY_UPDATE_disco_outline_frozen_squares
+        .byte >ENEMY_UPDATE_disco_just_groovement
+        .byte >ENEMY_UPDATE_disco_reduced_motion
 
-.proc draw_disco_tile
+.proc ENEMY_UPDATE_draw_disco_tile
 TargetFuncPtr := R0
 CurrentRow := R14
 CurrentTile := R15
@@ -267,7 +268,7 @@ TileAttrHigh := R17
 
 ; Like the above, but expects DiscoRow/DiscoTile to be set by the
 ; calling function. Mostly used by "enemy taking damage" routines
-.proc draw_disco_tile_here
+.proc ENEMY_UPDATE_draw_disco_tile_here
 TargetFuncPtr := R0
 
 TileIdLow := R16
@@ -308,11 +309,11 @@ TileAttrHigh := R17
 ; ============================================================================================================================
 ; ===                                             Suspend Behaviors                                                        ===
 ; ============================================================================================================================
-
+        .segment "ENEMY_UTIL"
 
 ; used anytime we need to guarantee that this disco tile is in its base state, usually
 ; when suspending a room (otherwise it looks weird on re-entry)
-.proc draw_cleared_disco_tile
+.proc ENEMY_UTIL_draw_cleared_disco_tile
 CurrentTile := R15
         ; draw_with_pal, adjusted for our temporary stash
         ldx CurrentTile
