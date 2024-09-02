@@ -6,6 +6,7 @@
         .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
+        .include "hearts.inc"
         .include "input.inc"
         .include "items.inc"
         .include "kernel.inc"
@@ -63,8 +64,6 @@ PlayerJumpHeightPos: .res 2
 PlayerMovementBlocked: .res 1
 PlayerTorchlightRadius: .res 1
 
-PlayerMaxHealth: .res 1
-PlayerHealth: .res 1
 PlayerKeys: .res 1
 PlayerGold: .res 2
 
@@ -107,7 +106,9 @@ jump_height_table:
         .byte 10, 14, 11, 7, 2, 0
 
 .proc FAR_init_player
+NewHeartType := R0
 MetaSpriteIndex := R0
+HeartCount := R2
         ; spawn in the player sprite
         far_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
@@ -152,9 +153,39 @@ MetaSpriteIndex := R0
         sta PlayerEquipmentBombs
         sta PlayerEquipmentSpell
 
-        lda #20
-        sta PlayerHealth
-        sta PlayerMaxHealth
+        near_call FAR_initialize_hearts_for_game
+        
+        ; All the heart types, yes!
+        lda #HEART_TYPE_REGULAR_ARMORED
+        sta NewHeartType
+        near_call FAR_add_heart
+        lda #HEART_TYPE_REGULAR_ARMORED
+        sta NewHeartType
+        near_call FAR_add_heart
+        lda #HEART_TYPE_REGULAR_ARMORED
+        sta NewHeartType
+        near_call FAR_add_heart
+        lda #HEART_TYPE_REGULAR
+        sta NewHeartType
+        near_call FAR_add_heart
+        lda #HEART_TYPE_REGULAR
+        sta NewHeartType
+        near_call FAR_add_heart
+        lda #HEART_TYPE_TEMPORARY
+        sta NewHeartType
+        near_call FAR_add_heart
+
+        ; Some glass hearts, yes yes!
+;        lda #3
+;        sta HeartCount
+;heart_loop:
+;        lda #HEART_TYPE_GLASS
+;        sta NewHeartType
+;        near_call FAR_add_heart
+;        dec HeartCount
+;        bne heart_loop
+        
+
         st16 PlayerGold, 150
 .else
         ; The player should start with a standard L1-DAGGER
@@ -168,9 +199,19 @@ MetaSpriteIndex := R0
         sta PlayerEquipmentBombs
         sta PlayerEquipmentSpell
 
-        lda #8
-        sta PlayerHealth
-        sta PlayerMaxHealth
+        ; 2 regular hearts makes the starting player *quite* squishy.
+        ; that's the point!
+        near_call FAR_initialize_hearts_for_game
+
+        lda #2
+        sta HeartCount
+heart_loop:
+        lda #HEART_TYPE_REGULAR
+        sta NewHeartType
+        near_call FAR_add_heart
+        dec HeartCount
+        bne heart_loop
+
         st16 PlayerGold, 0
 .endif  
 
@@ -1342,12 +1383,11 @@ TargetCol := R15
 
 ; TODO: *completely* rework this for the new heart containers system
 .proc FAR_damage_player
+IncomingDamage := R0
 
-        .repeat 2
-        lda PlayerHealth
-        beq already_dead
-        dec PlayerHealth
-        .endrepeat
+        near_call FAR_receive_damage
+        jsr FIXED_is_player_considered_dead
+        bne already_dead
 
         lda #1
         sta ScreenShakeDepth
@@ -1389,6 +1429,7 @@ apply_damage_animation:
         lda #<SPRITE_TILE_PLAYER_HIT
         sta sprite_table + MetaSpriteState::TileIndex, x
 action_overrides_damage_animation:
+        rts
 
 already_dead:
         rts
@@ -1500,8 +1541,14 @@ converge:
 .endproc
 
 .proc detect_critical_existence_failure
-        lda PlayerHealth
-        bne existence_proven
+        jsr FIXED_is_player_considered_dead
+        beq existence_proven
+
+        ; TODO: items that activate on death (amulet!?)
+        ; TODO: setup for a proper "dying" beat (greyscale background, player
+        ; frozen in dmg state, etc)
+        ; POSTPONED: fix hearts first :)
+
         ; Whelp; that's the end of the line
         ; TODO: I dunno, screen shake? palette greyscale? SFX? Juice this up.
         st16 FadeToGameMode, game_end_screen_prep

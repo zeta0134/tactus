@@ -6,6 +6,7 @@
         .include "debug.inc"
         .include "far_call.inc"
         .include "chr.inc"
+        .include "hearts.inc"
         .include "input.inc"
         .include "kernel.inc"
         .include "nes.inc"
@@ -197,8 +198,8 @@ Digit := R0
         ; We don't know which nametable will be active, so
         ; all drawing commands will be run twice, once for each half
 
-        lda PlayerHealth
-        jeq game_over
+        jsr FIXED_is_player_considered_dead
+        jne game_over
 victory:
         set_ppuaddr #($2000 + $010C)
         st16 StringPtr, victory_text

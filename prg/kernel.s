@@ -12,6 +12,7 @@
         .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
+        .include "hearts.inc"
         .include "hud.inc"
         .include "indicators.inc"
         .include "input.inc"
@@ -759,6 +760,8 @@ continue_waiting:
         far_call FAR_update_player
         near_call FAR_update_room_state
         debug_color LIGHTGRAY
+
+        far_call FAR_reset_hearts_for_beat
 
         perform_zpcm_inc
         

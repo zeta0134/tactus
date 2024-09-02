@@ -401,10 +401,15 @@ done:
 ; ============================================================================================================================
 
 .proc projectile_attacks_player
+DamageAmount := R0
+
 TargetIndex := R0
 TileId := R1
 TargetSquare := R13
-        ; All projectiles do 1 damage to the player on hit
+        ; projectiles do 2 dmg
+        ; ... TODO: move these into a global constants file, for easier balancing
+        lda #2
+        sta DamageAmount
         far_call FAR_damage_player
 
         lda #0

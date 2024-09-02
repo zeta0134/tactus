@@ -8,6 +8,7 @@
         .include "chr.inc"
         .include "debug.inc"
         .include "far_call.inc"
+        .include "hearts.inc"
         .include "hud.inc"
         .include "items.inc"
         .include "levels.inc"
@@ -76,6 +77,7 @@ chr_tile_offset ARMORED_HEART_BEATING,    6, 5
 chr_tile_offset ARMORED_HEART_DEPLETED,   8, 5
 chr_tile_offset FRAGILE_HEART_BASE,      10, 5
 chr_tile_offset FRAGILE_HEART_BEATING,   12, 5
+chr_tile_offset HEART_NOTHING_BASE,      10, 7
 chr_tile_offset HEART_CONTAINER_BASE,    12, 7
 chr_tile_offset HEART_CONTAINER_BEATING, 14, 7
 chr_tile_offset SPELL_A_DISABLED,   0, 14
@@ -167,10 +169,15 @@ weapon_palette_table:
 
 ; Update functions!
 
-; the top 5 bits are the type of heart this is,
-; and the lower 2 bits describe a "fullness" in quarter-hearts
-HEART_STATE_NONE    = $00
-HEART_STATE_REGULAR = $10
+; the top 4 bits are the type of heart this is,
+; and the lower 3 bits describe a "fullness" in quarter-hearts
+HEART_STATE_NONE              = $00
+HEART_STATE_REGULAR           = $10
+HEART_STATE_GLASS             = $20
+HEART_STATE_REGULAR_ARMORED   = $30
+HEART_STATE_TEMPORARY         = $40
+HEART_STATE_TEMPORARY_ARMORED = $50
+
 ; bit 2 is used for beat tracking, to have the hearts pulse along
 ; with the rhythm
 HEART_STATE_BEATING = $08
@@ -179,9 +186,9 @@ HEART_STATE_BEATING = $08
 CurrentBeat := R0
 TargetHealth := R1
         ; if the player has more than 4 hearts, use an 8-beat pattern
-        lda PlayerMaxHealth
-        cmp #17
-        bcs use_8_beats
+        lda heart_type+4
+        cmp #HEART_TYPE_NONE
+        bne use_8_beats
 use_4_beats:
         lda currently_playing_row
         and #%00011000
@@ -200,51 +207,30 @@ done_picking_beat_length:
         ; to quarter-heart display later, and eventually treat each heart container
         ; as its own bespoke entity.
 
-        ldx #0 ; heart container
+        ; NEW HEARTNESS
+
+        ldx #0
 loop:
         perform_zpcm_inc
-        lda PlayerMaxHealth
-        lsr
-        lsr
-        sta TargetHealth
-        cpx TargetHealth
-        bcs empty_heart
-
-        ; for now, treat player health as half-hearts
-        ; if health is >= than the current slot number, then
-        ; fill all quarter-hearts
-        lda PlayerHealth
-        lsr
-        lsr
-        sta TargetHealth
-        cpx TargetHealth
-        bcc full_quarter_hearts
-        beq variable_quarter_hearts
-empty_quarter_hearts:
-        lda #(%00000000 | HEART_STATE_REGULAR)
-        jmp apply_beat_counter
-full_quarter_hearts:
-        lda #(%00000100 | HEART_STATE_REGULAR)
-        jmp apply_beat_counter
-variable_quarter_hearts:
-        ; mask the player's health and display that number
-        ; of quarter-hearts here
-        lda PlayerHealth
-        and #%00000011
-        ora #HEART_STATE_REGULAR
-        jmp apply_beat_counter
-apply_beat_counter:
-        ; if we are on the curernt beat, this will be a beating heart
+        ; grab the type of this particular heart
+        lda heart_type, x
+        ; move this into the top 4 bits, to conform with the drawing code
+        asl
+        asl
+        asl
+        asl
+        sta HeartDisplayTarget, x
+        ; grab its health and get that in place
+        lda heart_hp, x
+        ; if this heart is beating, get that flag in place
         cpx CurrentBeat
-        bne converge
+        bne done_applying_beat
         ora #HEART_STATE_BEATING
-        jmp converge
-empty_heart:
-        lda #HEART_STATE_NONE
-converge:
+done_applying_beat:
+        ora HeartDisplayTarget, x
         sta HeartDisplayTarget, x
         inx
-        cpx #6
+        cpx #TOTAL_HEART_SLOTS
         bne loop
         rts
 .endproc
@@ -267,6 +253,14 @@ loop:
         beq empty_heart
         cmp #HEART_STATE_REGULAR
         beq regular_heart
+        cmp #HEART_STATE_GLASS
+        beq glass_heart
+        cmp #HEART_STATE_REGULAR_ARMORED
+        beq regular_armored_heart
+        cmp #HEART_STATE_TEMPORARY
+        beq temporary_heart
+        cmp #HEART_STATE_TEMPORARY_ARMORED
+        beq temporary_armored_heart
         ; if we got here, something went wrong! draw nothing
         inx
         inx
@@ -276,6 +270,18 @@ empty_heart:
         jmp done_with_this_heart
 regular_heart:
         jsr draw_regular_heart
+        jmp done_with_this_heart
+glass_heart:
+        jsr draw_glass_heart
+        jmp done_with_this_heart
+regular_armored_heart:
+        jsr draw_regular_armored_heart
+        jmp done_with_this_heart
+temporary_heart:
+        jsr draw_temporary_heart
+        jmp done_with_this_heart
+temporary_armored_heart:
+        jsr draw_temporary_armored_heart
         jmp done_with_this_heart
 skip_heart:
         inx
@@ -301,11 +307,40 @@ done_with_this_heart:
         rts
 .endproc
 
+.proc draw_glass_heart
+        perform_zpcm_inc
+        ; is this a beating heart?
+        lda HeartDisplayTarget, y
+        and #%00001000
+        beq inert_heart
+beating_heart:
+        draw_tile_at_x ROW_3, #FRAGILE_HEART_BEATING+0,  #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #FRAGILE_HEART_BEATING+16, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_at_x ROW_3, #FRAGILE_HEART_BEATING+1,  #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #FRAGILE_HEART_BEATING+17, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        rts
+inert_heart:
+        draw_tile_at_x ROW_3, #FRAGILE_HEART_BASE+0,  #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #FRAGILE_HEART_BASE+16, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_at_x ROW_3, #FRAGILE_HEART_BASE+1,  #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #FRAGILE_HEART_BASE+17, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        rts
+.endproc
+
 .proc draw_regular_heart
 HeartFullBase := R3
 HeartEmptyBase := R4
 TileId := R5
+ColorAttributes := R6
         perform_zpcm_inc
+
+        lda #(HUD_RED_PAL | CHR_BANK_HUD)
+        sta ColorAttributes
+
         ; is this a beating heart?
         lda HeartDisplayTarget, y
         and #%00001000
@@ -322,7 +357,101 @@ inert_heart:
         lda #HEART_CONTAINER_BASE
         sta HeartEmptyBase
 done_with_beating_checks:
+        jmp draw_quartered_heart_common
+.endproc
 
+.proc draw_regular_armored_heart
+HeartFullBase := R3
+HeartEmptyBase := R4
+TileId := R5
+ColorAttributes := R6
+        perform_zpcm_inc
+
+        lda #(HUD_RED_PAL | CHR_BANK_HUD)
+        sta ColorAttributes
+
+        ; is this a beating heart?
+        lda HeartDisplayTarget, y
+        and #%00001000
+        beq inert_heart
+beating_heart:
+        lda #ARMORED_HEART_BEATING
+        sta HeartFullBase
+        lda #ARMORED_HEART_DEPLETED
+        sta HeartEmptyBase
+        jmp done_with_beating_checks
+inert_heart:
+        lda #ARMORED_HEART_BASE
+        sta HeartFullBase
+        lda #ARMORED_HEART_DEPLETED
+        sta HeartEmptyBase
+done_with_beating_checks:
+        jmp draw_quartered_heart_common
+.endproc
+
+.proc draw_temporary_heart
+HeartFullBase := R3
+HeartEmptyBase := R4
+TileId := R5
+ColorAttributes := R6
+        perform_zpcm_inc
+
+        lda #(HUD_PURPLE_PAL | CHR_BANK_HUD)
+        sta ColorAttributes
+
+        ; is this a beating heart?
+        lda HeartDisplayTarget, y
+        and #%00001000
+        beq inert_heart
+beating_heart:
+        lda #FULL_HEART_BEATING
+        sta HeartFullBase
+        lda #HEART_NOTHING_BASE
+        sta HeartEmptyBase
+        jmp done_with_beating_checks
+inert_heart:
+        lda #FULL_HEART_BASE
+        sta HeartFullBase
+        lda #HEART_NOTHING_BASE
+        sta HeartEmptyBase
+done_with_beating_checks:
+        jmp draw_quartered_heart_common
+.endproc
+
+.proc draw_temporary_armored_heart
+HeartFullBase := R3
+HeartEmptyBase := R4
+TileId := R5
+ColorAttributes := R6
+        perform_zpcm_inc
+
+        lda #(HUD_PURPLE_PAL | CHR_BANK_HUD)
+        sta ColorAttributes
+
+        ; is this a beating heart?
+        lda HeartDisplayTarget, y
+        and #%00001000
+        beq inert_heart
+beating_heart:
+        lda #ARMORED_HEART_BEATING
+        sta HeartFullBase
+        lda #ARMORED_HEART_DEPLETED
+        sta HeartEmptyBase
+        jmp done_with_beating_checks
+inert_heart:
+        lda #ARMORED_HEART_BASE
+        sta HeartFullBase
+        lda #ARMORED_HEART_DEPLETED
+        sta HeartEmptyBase
+done_with_beating_checks:
+        jmp draw_quartered_heart_common
+.endproc
+
+.proc draw_quartered_heart_common
+HeartFullBase := R3
+HeartEmptyBase := R4
+TileId := R5
+ColorAttributes := R6
         perform_zpcm_inc
 
 top_left:
@@ -337,7 +466,7 @@ top_left_empty:
         lda HeartEmptyBase
 draw_top_left:
         sta TileId
-        draw_tile_at_x ROW_3, TileId, #(HUD_RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, TileId, ColorAttributes
 
         perform_zpcm_inc
 
@@ -355,7 +484,7 @@ draw_bottom_left:
         clc
         adc #TILE_ROW_OFFSET
         sta TileId
-        draw_tile_at_x ROW_4, TileId, #(HUD_RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, TileId, ColorAttributes
 
         perform_zpcm_inc
         inx
@@ -374,7 +503,7 @@ draw_top_right:
         clc
         adc #TILE_COL_OFFSET
         sta TileId
-        draw_tile_at_x ROW_3, TileId, #(HUD_RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_3, TileId, ColorAttributes
 
         perform_zpcm_inc
 
@@ -392,7 +521,7 @@ draw_bottom_right:
         clc
         adc #TILE_COL_OFFSET + TILE_ROW_OFFSET
         sta TileId
-        draw_tile_at_x ROW_4, TileId, #(HUD_RED_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, TileId, ColorAttributes
 
         perform_zpcm_inc
         inx

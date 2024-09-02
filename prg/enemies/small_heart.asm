@@ -2,24 +2,19 @@
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================
 
+; TODO: this might be going away! it might also switch to being
+; some temporary part of the room state, a sprite, etc etc.
 .proc collect_small_heart
+HealingAmount := R0
+
 TargetIndex := R0
 TileId := R1
 TargetSquare := R13
 
-        ; Add 1 to the player's health pool
-        lda PlayerHealth
-        clc
-        adc #1
-        sta PlayerHealth
-        ; Now if we've just overhealed them...
-        lda PlayerHealth
-        cmp PlayerMaxHealth
-        bcc not_overhealed
-        ; ... then we set cap health to maximum
-        lda PlayerMaxHealth
-        sta PlayerHealth
-not_overhealed:
+        lda #4
+        sta HealingAmount
+        far_call FAR_receive_healing
+
         st16 R0, sfx_small_heart
         jsr play_sfx_triangle
 

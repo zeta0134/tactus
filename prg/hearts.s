@@ -3,14 +3,25 @@
 
         .segment "RAM"
 
-MAX_REGULAR_HEARTS := 5
-MAX_TEMPORARY_HEARTS := 1
-TOTAL_HEART_SLOTS := 6
-
 heart_hp: .res ::TOTAL_HEART_SLOTS
 heart_type: .res ::TOTAL_HEART_SLOTS
 
 already_damaged: .res 1
+
+        .segment "PRGFIXED_E000"
+
+.proc FIXED_is_player_considered_dead
+        lda heart_hp+0
+        .repeat ::TOTAL_HEART_SLOTS-1, i
+        ora heart_hp+i+1
+        .endrepeat
+        beq hes_dead_jim
+        lda #0
+        rts
+hes_dead_jim:
+        lda #$FF
+        rts
+.endproc
 
         .segment "CODE_4"
 
@@ -22,22 +33,19 @@ initial_heart_hp:
         .byte 4 ; temporary
         .byte 4 ; temporary armored
 
-.proc reset_hearts_for_beat
-        lda #0
-        sta already_damaged
+.proc FAR_initialize_hearts_for_game
+        lda #HEART_TYPE_NONE
+        ldy #0
+        .repeat ::TOTAL_HEART_SLOTS, i
+        sta heart_type+i
+        sty heart_hp+i
+        .endrepeat
         rts
 .endproc
-        
-.proc is_player_considered_dead
-        lda heart_hp+0
-        .repeat ::TOTAL_HEART_SLOTS-1, i
-        ora heart_hp+i+1
-        .endrepeat
-        beq hes_dead_jim
+
+.proc FAR_reset_hearts_for_beat
         lda #0
-        rts
-hes_dead_jim:
-        lda #$FF
+        sta already_damaged
         rts
 .endproc
 
@@ -64,22 +72,20 @@ done_shifting_hearts:
 .endproc
 
 ; this can succeed or fail! The return value is written back to R0
-.proc add_heart
+.proc FAR_add_heart
 NewHeartType := R0
 ReturnStatus := R0
 DestinationSlot := R1
         ; sanity check: is there room for another heart?
         lda heart_type+TOTAL_HEART_SLOTS-1
         cmp #HEART_TYPE_NONE
+        ; TODO: should non-temp hearts be allowed to replace temp hearts?
         beq safe_to_add
 failed_to_add_heart:
         lda #$FF
         sta ReturnStatus
         rts
 safe_to_add:
-        lda #0
-        sta ReturnStatus
-
         ldx #0
 find_destination_slot_loop:
         lda heart_type, x
@@ -125,15 +131,17 @@ done_shifting:
         tay
         lda initial_heart_hp, y
         sta heart_hp, x
+
+        lda #0
+        sta ReturnStatus
         rts
 .endproc
 
-; damage amount in A
-.proc receive_damage
+; damage amount in R0, clobbers R1-R3
+.proc FAR_receive_damage
 RemainingDamage := R0
 CurrentHeartIndex := R1
 HeartDmgProc := R2
-        sta RemainingDamage
         lda #TOTAL_HEART_SLOTS
         sta CurrentHeartIndex
 loop:
@@ -152,8 +160,9 @@ return_from_dmg:
         beq done
         ; Also bail if we've run out of hearts to process
         ; (if this occurs, the player is almost certainly dead)
-        dec CurrentHeartIndex
+        lda CurrentHeartIndex
         beq done
+        dec CurrentHeartIndex
         jmp loop
 done:
         rts
@@ -169,12 +178,17 @@ heart_damage_functions:
 
 .proc heart_none_dmg
         ; Has absolutely no effect. RemainingDmg is unchanged.
-        jmp receive_damage::return_from_dmg
+        jmp FAR_receive_damage::return_from_dmg
 .endproc
 
 .proc heart_regular_dmg
 RemainingDamage := R0
 CurrentHeartIndex := R1
+        ; if damage is blocked for this beat, don't take anything and
+        ; cancel the incoming damage entirely
+        lda already_damaged
+        bne cancel_incoming_damage
+
         ldx CurrentHeartIndex
         lda heart_hp, x
         sec
@@ -187,23 +201,30 @@ some_damage_remains:
         clc
         adc #1
         sta RemainingDamage
-        jmp receive_damage::return_from_dmg
+        jmp FAR_receive_damage::return_from_dmg
 took_all_damage:
         sta heart_hp, x
+cancel_incoming_damage:
         lda #0
         sta RemainingDamage
-        jmp receive_damage::return_from_dmg
+        jmp FAR_receive_damage::return_from_dmg
 .endproc
 
 .proc heart_glass_dmg
 RemainingDamage := R0
 CurrentHeartIndex := R1
+        ; don't take damage multiple times in one beat
+        lda already_damaged
+        bne cancel_incoming_damage
         ; only take damage if there is actually incoming dmg remaining
         ; (we shouldn't actually be called in this case, but better to be
         ; safe)
         lda RemainingDamage
         bne shatterheart
-        jmp receive_damage::return_from_dmg
+cancel_incoming_damage:
+        lda #0
+        sta RemainingDamage
+        jmp FAR_receive_damage::return_from_dmg
 shatterheart:
         ; This heart is broken! Not only do we set its HP to 0, we 
         ; also reset the container state to nothing. Glass hearts
@@ -217,17 +238,23 @@ shatterheart:
         sta RemainingDamage
         lda #1
         sta already_damaged
-        jmp receive_damage::return_from_dmg
+        jmp FAR_receive_damage::return_from_dmg
 .endproc
 
 .proc heart_regular_armored_dmg
 RemainingDamage := R0
 CurrentHeartIndex := R1
+        ; don't take damage multiple times in one beat
+        lda already_damaged
+        bne cancel_incoming_damage
         ; Safety: If incoming damage happens to be 0, we're done
         ; (otherwise we would force it to 1 and deal damage when we shouldn't have)
         lda RemainingDamage
         bne continue
-        jmp receive_damage::return_from_dmg
+cancel_incoming_damage:
+        lda #0
+        sta RemainingDamage
+        jmp FAR_receive_damage::return_from_dmg
 continue:
         ; First, reduce incoming damage by half, rounded down
         ; (don't worry about preserving it, we block damage propogation anyway)
@@ -251,8 +278,12 @@ process_reduced_damage:
         ; zero out remaining damage and exit; we're done here.
         lda #0
         sta RemainingDamage
-        jmp receive_damage::return_from_dmg
+        jmp FAR_receive_damage::return_from_dmg
 break_heart_armor:
+        ; When breaking heart armor, explicitly protect the left-most hearts from future
+        ; damage sources on the same beat
+        lda #1
+        sta already_damaged
         lda #HEART_TYPE_REGULAR
         sta heart_type, x
         ; TODO: play a SFX, maybe spawn some heart armor particles, etc.
@@ -265,19 +296,25 @@ break_heart_armor:
         sta heart_hp, x
         lda #0
         sta RemainingDamage
-        jmp receive_damage::return_from_dmg
+        jmp FAR_receive_damage::return_from_dmg
 last_heart:
         lda #1
         sta heart_hp, x
         lda #0
         sta RemainingDamage
-        jmp receive_damage::return_from_dmg
+        jmp FAR_receive_damage::return_from_dmg
 .endproc
 
 ; Like regular hearts, but these VANISH when depleted
 .proc heart_temporary_dmg
 RemainingDamage := R0
 CurrentHeartIndex := R1
+        ; don't take damage multiple times in one beat
+        ; (this really shouldn't happen for temporary hearts with
+        ; the current design, but just in case...)
+        lda already_damaged
+        bne cancel_incoming_damage
+
         ldx CurrentHeartIndex
         lda heart_hp, x
         sec
@@ -299,22 +336,29 @@ check_vanish:
         ; if we depleted ourselves to 0, then go away!
         lda heart_hp, x
         beq destroy_self
-        jmp receive_damage::return_from_dmg
+        jmp FAR_receive_damage::return_from_dmg
 destroy_self:
         ; TODO: play SFX, spawn particles, etc
         jsr remove_this_heart
-        jmp receive_damage::return_from_dmg
+        jmp FAR_receive_damage::return_from_dmg
+cancel_incoming_damage:
+        lda #0
+        sta RemainingDamage
+        jmp FAR_receive_damage::return_from_dmg
 .endproc
 
 ; Like armored hearts, but vanish when depleted
 .proc heart_temporary_armored_dmg
 RemainingDamage := R0
 CurrentHeartIndex := R1
+        ; don't take damage multiple times in one beat
+        lda already_damaged
+        bne cancel_incoming_damage
         ; Safety: If incoming damage happens to be 0, we're done
         ; (otherwise we would force it to 1 and deal damage when we shouldn't have)
         lda RemainingDamage
         bne continue
-        jmp receive_damage::return_from_dmg
+        jmp FAR_receive_damage::return_from_dmg
 continue:
         ; First, reduce incoming damage by half, rounded down
         ; (don't worry about preserving it, we block damage propogation anyway)
@@ -336,10 +380,15 @@ process_reduced_damage:
         ; otherwise, keep the new value
         sta heart_hp, x
         ; zero out remaining damage and exit; we're done here.
+cancel_incoming_damage:
         lda #0
         sta RemainingDamage
-        jmp receive_damage::return_from_dmg
+        jmp FAR_receive_damage::return_from_dmg
 break_heart_armor:
+        ; When breaking heart armor, explicitly protect the left-most hearts from future
+        ; damage sources on the same beat
+        lda #1
+        sta already_damaged
         ; Zero out remaining damage; we block this from propagating
         lda #0
         sta RemainingDamage
@@ -347,15 +396,14 @@ break_heart_armor:
         ; armored hearts do not apply the mercy rule, as they should really
         ; never be in slot 0 to begin with
         jsr remove_this_heart
-        jmp receive_damage::return_from_dmg
+        jmp FAR_receive_damage::return_from_dmg
 .endproc
 
-; healing amount in A
-.proc receive_healing
+; healing amount in R0
+.proc FAR_receive_healing
 RemainingHealing := R0
 CurrentHeartIndex := R1
 HeartHealingProc := R2
-        sta RemainingHealing
         lda #0
         sta CurrentHeartIndex
 loop:
@@ -376,7 +424,7 @@ return_from_healing:
         ; (if this occurs, the player's healthbar is completely full)
         inc CurrentHeartIndex
         lda CurrentHeartIndex
-        cmp #TOTAL_HEART_SLOTS-1
+        cmp #TOTAL_HEART_SLOTS
         beq done
         jmp loop
 done:
@@ -393,7 +441,7 @@ heart_healing_functions:
 
 .proc heart_do_not_heal
         ; Do not pass go. Do not collect $200
-        jmp receive_healing::return_from_healing
+        jmp FAR_receive_healing::return_from_healing
 .endproc
 
 .proc heart_heal_to_four
@@ -404,7 +452,7 @@ CurrentHeartIndex := R1
         lda heart_hp, x
         cmp #4
         bcc apply_healing
-        jmp receive_healing::return_from_healing
+        jmp FAR_receive_healing::return_from_healing
 apply_healing:
         lda heart_hp, x
         clc
@@ -414,12 +462,12 @@ apply_healing:
         sta heart_hp, x
         lda #0
         sta RemainingHealing
-        jmp receive_healing::return_from_healing
+        jmp FAR_receive_healing::return_from_healing
 handle_overflow:
         sec
         sbc #4
         sta RemainingHealing
         lda #4
         sta heart_hp, x
-        jmp receive_healing::return_from_healing
+        jmp FAR_receive_healing::return_from_healing
 .endproc

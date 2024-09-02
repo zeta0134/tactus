@@ -83,9 +83,14 @@ TargetIndex := R0
 TileId := R1
 AttackSquare := R3
         ; If the player is already at max hearts...
-        lda PlayerMaxHealth
-        cmp #(MAX_HEARTS * 4)
-        bne okay_to_spawn
+        ldx #(MAX_REGULAR_HEARTS-1)
+        lda heart_type, x
+        cmp #HEART_TYPE_NONE      ; empty containers are fine
+        beq okay_to_spawn
+        cmp #HEART_TYPE_TEMPORARY ; temporary containers are also fine
+        beq okay_to_spawn
+        cmp #HEART_TYPE_TEMPORARY_ARMORED
+        beq okay_to_spawn
         ; ... then we must not increase their health any further.
         ; Spawn a gold sack instead
         jsr spawn_gold_sack
@@ -166,9 +171,9 @@ ItemId := R18
         ; roll, so use that RNG and the appropriate table
 
         ; the real loot table
-        st16 LootTablePtr, common_chest_treasure_table
+        ;st16 LootTablePtr, common_chest_treasure_table
         ; zeta needs to obtain a specific item for testing
-        ;st16 LootTablePtr, test_specific_item_table
+        st16 LootTablePtr, test_specific_item_table
 
         far_call FAR_roll_gameplay_loot
         ldx AttackSquare
@@ -221,18 +226,15 @@ converge:
 ; ============================================================================================================================
 
 .proc collect_heart_container
+NewHeartType := R0
+
 TargetIndex := R0
 TileId := R1
 TargetSquare := R13
-        lda PlayerMaxHealth
-        clc
-        adc #4
-        sta PlayerMaxHealth
-
-        lda PlayerHealth
-        clc
-        adc #4
-        sta PlayerHealth
+        
+        lda #HEART_TYPE_REGULAR
+        sta NewHeartType
+        far_call FAR_add_heart
 
         st16 R0, sfx_heart_container
         jsr play_sfx_pulse1

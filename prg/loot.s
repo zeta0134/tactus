@@ -304,7 +304,7 @@ combo_offset_lut:
 test_specific_item_table:
     .byte 10
     .repeat 10
-    .byte ITEM_GO_GO_BOOTS
+    .byte ITEM_SMALL_FRIES
     .endrepeat
 
 ; simply includes all the items. balance? what's that?

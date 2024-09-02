@@ -269,7 +269,10 @@ CurrentTile := R15
 .endproc
 
 .proc hazard_damages_player
-        ; hazards do 1 damage to the player on hit
+DamageAmount := R0
+        ; hazards to 2 dmg to the player (for now)
+        lda #2
+        sta DamageAmount
         far_call FAR_damage_player
 
         ; unlike regular enemies, hazards don't disappear.

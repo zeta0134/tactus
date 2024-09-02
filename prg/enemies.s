@@ -9,6 +9,7 @@
         .include "enemies.inc"
         .include "far_call.inc"
         .include "kernel.inc"
+        .include "hearts.inc"
         .include "hud.inc"
         .include "items.inc"
         .include "levels.inc"

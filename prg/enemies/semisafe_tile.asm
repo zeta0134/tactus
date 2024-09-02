@@ -24,6 +24,8 @@ CurrentTile := R15
 ; ============================================================================================================================
 
 .proc semisolid_attacks_player
+DamageAmount := R0
+
 PuffSquare := R12
 TargetSquare := R13
         ; if we have "stored" an attack, then hit the player with it (ouch!)
@@ -33,9 +35,12 @@ TargetSquare := R13
         rts
 
 apply_damage:
-        ; For now, the semisafe tile always does 1 damage to the player. Stronger
+        ; For now, the semisafe tile always does 2 damage to the player. Stronger
         ; attacks, if they exist, might need special consideration here?
+        lda #2
+        sta DamageAmount
         far_call FAR_damage_player
+        
         ; Now we need to spawn a damage sprite. Using the original logic, the PuffSquare
         ; is where the enemy is standing (they never moved) and the TargetSquare is where
         ; the player is standing. To set this up, copy the tile_data (storing the attacking

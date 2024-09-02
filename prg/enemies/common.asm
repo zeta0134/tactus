@@ -373,11 +373,15 @@ die:
 ; ============================================================================================================================
 
 .proc basic_enemy_attacks_player
+DamageAmount := R0
+
 TargetIndex := R0
 TileId := R1
 PuffSquare := R12
 TargetSquare := R13
-        ; All basic enemies do 1 damage to the player on hit
+        ; basic attacks do 2 damage for now
+        lda #2
+        sta DamageAmount
         far_call FAR_damage_player
 
         ; Now the tricky part: we need to scan the map and find this enemy's poof
