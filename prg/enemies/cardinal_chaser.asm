@@ -92,7 +92,8 @@ CurrentTile := R15
 TargetTile := R0
 TargetRow := R1
 PlayerDistance := R2
-RandomScratch := R3
+RandomScratch0 := R3
+RandomScratch1 := R4
 
 NumCandidates := R1
 
@@ -101,9 +102,11 @@ CurrentRow := R14
 CurrentTile := R15
         jsr _setup_cardinal_targets_common
 
-        ; We'll use a single random byte as tiebreaker bits
+        ; We'll use some random bytes to unbias the target directions
         jsr next_gameplay_rand
-        sta RandomScratch
+        sta RandomScratch0
+        jsr next_gameplay_rand
+        sta RandomScratch1
 
         ; For the weights, work out the manhattan distance for each potential
         ; target tile. We'll try to prefer the shortest distance to close
@@ -116,8 +119,13 @@ CurrentTile := R15
         sta TargetRow
         near_call ENEMY_UPDATE_target_manhattan_distance_to_player
         lda PlayerDistance
-        rol RandomScratch
-        rol ; PlayerDistance = (PlayerDistance * 2) + 0-1
+         ; PlayerDistance = (PlayerDistance * 8) + 0-7
+        rol RandomScratch0
+        rol
+        rol RandomScratch0
+        rol
+        rol RandomScratch1
+        rol
         sta candidate_weights+i
         .endrepeat
 
