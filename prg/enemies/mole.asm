@@ -421,7 +421,7 @@ TargetSquare := R13
         stx DiscoTile
         lda tile_index_to_row_lut, x
         sta DiscoRow
-        near_call ENEMY_UPDATE_draw_disco_tile_here
+        far_call ENEMY_UPDATE_draw_disco_tile_here
         ; draw it now!
         ldx TargetSquare
         stx TargetIndex

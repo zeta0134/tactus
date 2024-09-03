@@ -3,148 +3,128 @@
 ; ============================================================================================================================
         .segment "ENEMY_UPDATE"
 
-.proc ENEMY_UPDATE_pick_random_cardinal
-TargetRow := R0
-TargetTile := R1
-; these are provided for us
+.proc _setup_cardinal_targets_common
 CurrentRow := R14
 CurrentTile := R15
-        lda CurrentRow
-        sta TargetRow
+        ; setup the properties for all 4 directions, should they be chosen
+        ; North
         lda CurrentTile
-        sta TargetTile
-
-        jsr next_gameplay_rand
-        and #%00000011
-        beq east
-        cmp #1
-        beq south
-        cmp #2
-        beq west
-north:
-        dec TargetRow
-        lda TargetTile
         sec
         sbc #::BATTLEFIELD_WIDTH
-        sta TargetTile
-        lda #DUST_DIRECTION_S
-        sta SmokePuffDirection
-        rts
-east:
-        inc TargetTile
-        lda #DUST_DIRECTION_W
-        sta SmokePuffDirection
-        rts
-south:
-        inc TargetRow
-        lda TargetTile
+        sta candidate_tiles+0
+        ; South
         clc
-        adc #::BATTLEFIELD_WIDTH
-        sta TargetTile
+        adc #(::BATTLEFIELD_WIDTH * 2)
+        sta candidate_tiles+1
+        ; East
+        sec
+        sbc #(::BATTLEFIELD_WIDTH - 1)
+        sta candidate_tiles+2
+        ; West
+        sec
+        sbc #2
+        sta candidate_tiles+3
+
+        lda CurrentRow
+        sta candidate_rows+2 ; East
+        sta candidate_rows+3 ; West
+        clc
+        adc #1
+        sta candidate_rows+1 ; South
+        sec
+        sbc #2
+        sta candidate_rows+0 ; North
+
+        lda #DUST_DIRECTION_S
+        sta candidate_directions+0 ; North
         lda #DUST_DIRECTION_N
-        sta SmokePuffDirection
-        rts
-west:
-        dec TargetTile
+        sta candidate_directions+1 ; South
+        lda #DUST_DIRECTION_W
+        sta candidate_directions+2 ; East
         lda #DUST_DIRECTION_E
-        sta SmokePuffDirection
+        sta candidate_directions+3 ; West
         rts
 .endproc
 
-.proc ENEMY_UPDATE_target_player_cardinal
-TargetRow := R0
-TargetTile := R1
-PlayerDistanceRow := R2
-PlayerDistanceCol := R3
+; Result in R0, Returns $FF on failure
+.proc ENEMY_UPDATE_pick_random_cardinal
+ChosenDestination := R0
+NumCandidates := R1
+; Clobbered: R2-R3
+
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
-        lda CurrentRow
-        sta TargetRow
-        lda CurrentTile
-        sta TargetTile
+        jsr _setup_cardinal_targets_common
 
-        ; Compute the absolute distance the player is away from us on both axis, independently
-
-        ; First the row
-        lda PlayerRow
-        sec
-        sbc CurrentRow
-        bpl save_row_distance
-fix_row_minus:
-        eor #$FF
-        clc
-        adc #1
-save_row_distance:
-        sta PlayerDistanceRow
-
-        ; Now the column
-        lda PlayerCol
-        ldx CurrentTile
-        sec
-        sbc tile_index_to_col_lut, x
-        bpl save_col_distance
-fix_col_minus:
-        eor #$FF
-        clc
-        adc #1
-save_col_distance:
-        sta PlayerDistanceCol
-
-        ; Now, whichever of these is bigger will be our axis of travel. If they re the same size,
-        ; pick randomly
-        lda PlayerDistanceRow
-        sec
-        sbc PlayerDistanceCol
-        beq choose_randomly
-        bmi move_horizontally
-        jmp move_vertically
-choose_randomly:
+        ; setup completely random weights for the directions,
+        ; so we pick a given valid tile completely arbitrarily
+        ; (the 2 upper bits are sufficient for a larger/smaller
+        ; check, the lower 6 bits can be ignored. don't waste cycles
+        ; zeroing them out)
         jsr next_gameplay_rand
-        bmi move_horizontally
-        jmp move_vertically
+        lsr
+        ror candidate_weights+0
+        lsr
+        ror candidate_weights+0
+        lsr
+        ror candidate_weights+1
+        lsr
+        ror candidate_weights+1
+        lsr
+        ror candidate_weights+2
+        lsr
+        ror candidate_weights+2
+        lsr
+        ror candidate_weights+3
+        lsr
+        ror candidate_weights+3
 
-move_horizontally:
-        ; If the player is to our right...
-        lda PlayerCol
-        ldx CurrentTile
-        sec
-        sbc tile_index_to_col_lut, x
-        bmi move_left
-move_right: 
-        inc TargetTile
-        lda #DUST_DIRECTION_W
-        sta SmokePuffDirection
+        ; actually pick the direction
+        lda #4
+        sta NumCandidates
+        near_call ENEMY_UPDATE_choose_destination
         rts
-move_left:
-        dec TargetTile
-        lda #DUST_DIRECTION_E
-        sta SmokePuffDirection
-        rts
+.endproc
 
-move_vertically:
-        ; If the player is below us...
-        lda PlayerRow
-        sec
-        sbc CurrentRow
-        bmi move_up
-move_down:
-        inc TargetRow
-        lda TargetTile
-        clc
-        adc #::BATTLEFIELD_WIDTH
+; Result in R0, Returns $FF on failure
+.proc ENEMY_UPDATE_target_player_cardinal
+TargetTile := R0
+TargetRow := R1
+PlayerDistance := R2
+RandomScratch := R3
+
+NumCandidates := R1
+
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+        jsr _setup_cardinal_targets_common
+
+        ; We'll use a single random byte as tiebreaker bits
+        jsr next_gameplay_rand
+        sta RandomScratch
+
+        ; For the weights, work out the manhattan distance for each potential
+        ; target tile. We'll try to prefer the shortest distance to close
+        ; the gap
+
+        .repeat 4, i
+        lda candidate_tiles+i
         sta TargetTile
-        lda #DUST_DIRECTION_N
-        sta SmokePuffDirection
-        rts
-move_up:
-        dec TargetRow
-        lda TargetTile
-        sec
-        sbc #::BATTLEFIELD_WIDTH
-        sta TargetTile
-        lda #DUST_DIRECTION_S
-        sta SmokePuffDirection
+        lda candidate_rows+i
+        sta TargetRow
+        near_call ENEMY_UPDATE_target_manhattan_distance_to_player
+        lda PlayerDistance
+        rol RandomScratch
+        rol ; PlayerDistance = (PlayerDistance * 2) + 0-1
+        sta candidate_weights+i
+        .endrepeat
+
+        ; actually pick the direction
+        lda #4
+        sta NumCandidates
+        near_call ENEMY_UPDATE_choose_destination
         rts
 .endproc
 
@@ -197,18 +177,12 @@ no_change:
 .endproc
 
 .proc ENEMY_UPDATE_update_zombie_anticipate
-TargetRow := R0
-TargetTile := R1
-PlayerDistance := R2
+DestinationTile := R0
+
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
         inc enemies_active
-
-        lda CurrentTile
-        sta TargetTile
-        lda CurrentRow
-        sta TargetRow
 
         near_call ENEMY_UPDATE_player_manhattan_distance
 track_player:        
@@ -222,16 +196,21 @@ track_player:
 randomly_choose_direction:
         near_call ENEMY_UPDATE_pick_random_cardinal
 location_chosen:
-        ; Now our destination tile is in TargetTile, make sure it's valid
-        if_valid_destination proceed_with_jump
+        lda DestinationTile
+        cmp #$FF
+        bne proceed_with_jump
 jump_failed:
-        if_semisafe_destination make_target_dangerous
+        ; TODO: unbreak this! ALL enemies will need this functionality,
+        ; so build it into the candidate logic.
+
+        ;if_semisafe_destination make_target_dangerous
         jmp return_to_idle_without_moving
+
 make_target_dangerous:
         ; write our own position into the target tile, as this will help
         ; the damage sprite to spawn in the right location if the player
         ; takes the hit
-        ldx TargetTile
+        ldx DestinationTile
         lda CurrentTile
         sta tile_data, x
         ; additionally, for update order reasons, mark the target as "already moved",
@@ -252,7 +231,7 @@ return_to_idle_without_moving:
 
 proceed_with_jump:        
         ldx CurrentTile
-        ldy TargetTile
+        ldy DestinationTile
         ; Draw ourselves at the target (keep our color palette)
         draw_at_y_with_pal_x TILE_ZOMBIE_BASE, BG_TILE_ZOMBIE_IDLE
         ; Fix our counter at the destination tile so we start fresh
@@ -260,7 +239,7 @@ proceed_with_jump:
         sta tile_data, y
 
         ; Write our new position to the data byte for the puff of smoke
-        lda TargetTile
+        lda DestinationTile
         sta tile_data, x
 
         ; Move our data flags to the destination, and flag ourselves as having just moved

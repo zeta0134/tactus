@@ -261,7 +261,7 @@ EffectiveAttackSquare := R10
         stx DiscoTile
         lda tile_index_to_row_lut, x
         sta DiscoRow
-        near_call ENEMY_UPDATE_draw_disco_tile_here
+        far_call ENEMY_UPDATE_draw_disco_tile_here
         lda EffectiveAttackSquare
         sta TargetIndex
         jsr draw_active_tile

@@ -1,42 +1,4 @@
 ; ============================================================================================================================
-; ===                                           Utility Functions                                                          ===
-; ============================================================================================================================
-        .segment "ENEMY_UPDATE"
-; Result in A, clobbers R0
-.proc ENEMY_UPDATE_player_manhattan_distance
-PlayerDistance := R2
-CurrentRow := R14
-CurrentTile := R15
-        ; First the row
-        lda PlayerRow
-        sec
-        sbc CurrentRow
-        bpl add_row_distance
-fix_row_minus:
-        eor #$FF
-        clc
-        adc #1
-add_row_distance:
-        sta PlayerDistance
-        ; Now the column
-        lda PlayerCol
-        ldx CurrentTile
-        sec
-        sbc tile_index_to_col_lut, x
-        bpl add_col_distance
-fix_col_minus:
-        eor #$FF
-        clc
-        adc #1
-add_col_distance:
-        clc
-        adc PlayerDistance
-        sta PlayerDistance
-        perform_zpcm_inc
-        rts
-.endproc
-
-; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
         .segment "ENEMY_UPDATE"

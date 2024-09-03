@@ -15,6 +15,9 @@
 continue:
 .endmacro
 
+; clobbers a, x
+; put TargetTile wherever you want
+; TODO: does this really need to be a macro?
 .macro if_valid_destination success_label,
         ; Screen edges are never okay
         ldx TargetTile
@@ -97,6 +100,79 @@ semisafe_failure:
         ora #>tile_id
         sta tile_attributes, y
 .endmacro
+
+        .segment "ENEMY_UPDATE"
+; Result in A, clobbers R0
+; This variant always uses the player's current position
+; against the active tile's current position
+.proc ENEMY_UPDATE_player_manhattan_distance
+PlayerDistance := R2
+CurrentRow := R14
+CurrentTile := R15
+        ; First the row
+        lda PlayerRow
+        sec
+        sbc CurrentRow
+        bpl add_row_distance
+fix_row_minus:
+        eor #$FF
+        clc
+        adc #1
+add_row_distance:
+        sta PlayerDistance
+        ; Now the column
+        lda PlayerCol
+        ldx CurrentTile
+        sec
+        sbc tile_index_to_col_lut, x
+        bpl add_col_distance
+fix_col_minus:
+        eor #$FF
+        clc
+        adc #1
+add_col_distance:
+        clc
+        adc PlayerDistance
+        sta PlayerDistance
+        perform_zpcm_inc
+        rts
+.endproc
+
+; Result in A, clobbers R2
+; TargetTile in R0
+; TargetRow in R1
+.proc ENEMY_UPDATE_target_manhattan_distance_to_player
+TargetTile := R0
+TargetRow := R1
+PlayerDistance := R2
+        ; First the row
+        lda PlayerRow
+        sec
+        sbc TargetRow
+        bpl add_row_distance
+fix_row_minus:
+        eor #$FF
+        clc
+        adc #1
+add_row_distance:
+        sta PlayerDistance
+        ; Now the column
+        lda PlayerCol
+        ldx TargetTile
+        sec
+        sbc tile_index_to_col_lut, x
+        bpl add_col_distance
+fix_col_minus:
+        eor #$FF
+        clc
+        adc #1
+add_col_distance:
+        clc
+        adc PlayerDistance
+        sta PlayerDistance
+        perform_zpcm_inc
+        rts
+.endproc
 
         .segment "ENEMY_ATTACK"
 .proc ENEMY_ATTACK_spawn_death_sprite_here
@@ -261,6 +337,50 @@ done:
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
+        .segment "RAM"
+candidate_tiles:      .res 8
+candidate_weights:    .res 8
+candidate_rows:       .res 8 ; for smoke puffs
+candidate_directions: .res 8 ; also for smoke puffs
+
+; Given up to 8 candidate directions, chooses the "best" one with caller-provided
+; rates that is actually a valid destination tile. Tries to be reasonably efficient
+; under these constraints. Most enemies use this in some form or fashion.
+        .segment "ENEMY_UPDATE"
+.proc ENEMY_UPDATE_choose_destination
+ChosenDestination := R0
+NumCandidates := R1
+ScratchChosenWeight := R2
+TargetTile := R3
+        lda #$FF
+        sta ChosenDestination
+        sta ScratchChosenWeight
+        ldy #0
+loop:
+        lda candidate_weights, y  ; if we've already selected a better, valid candidate tile
+        cmp ScratchChosenWeight ; then skip over the expensive "is valid" check entirely
+        bcs destination_failure
+        lda candidate_tiles, y
+        sta TargetTile
+        if_valid_destination destination_success
+destination_failure:
+        ; TODO: handle semisafe detection too!
+        iny
+        cpy NumCandidates
+        bne loop
+        rts
+destination_success:
+        lda candidate_tiles, y
+        sta ChosenDestination
+        lda candidate_weights, y
+        sta ScratchChosenWeight
+        lda candidate_directions, y
+        sta SmokePuffDirection
+        iny 
+        cpy NumCandidates
+        bne loop
+        rts
+.endproc
 
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
@@ -331,7 +451,7 @@ die:
         stx DiscoTile
         lda tile_index_to_row_lut, x
         sta DiscoRow
-        near_call ENEMY_UPDATE_draw_disco_tile_here
+        far_call ENEMY_UPDATE_draw_disco_tile_here
         lda EffectiveAttackSquare
         sta TargetIndex
         jsr draw_active_tile
