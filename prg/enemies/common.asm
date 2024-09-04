@@ -343,17 +343,20 @@ candidate_weights:    .res 8
 candidate_rows:       .res 8 ; for smoke puffs
 candidate_directions: .res 8 ; also for smoke puffs
 
+ValidDestination: .res 1
+SemisafeDestination: .res 1
+NumCandidates: .res 1
+ScratchChosenWeight: .res 1
+TargetTile: .res 1
+
 ; Given up to 8 candidate directions, chooses the "best" one with caller-provided
 ; rates that is actually a valid destination tile. Tries to be reasonably efficient
 ; under these constraints. Most enemies use this in some form or fashion.
         .segment "ENEMY_UPDATE"
 .proc ENEMY_UPDATE_choose_destination
-ChosenDestination := R0
-NumCandidates := R1
-ScratchChosenWeight := R2
-TargetTile := R3
         lda #$FF
-        sta ChosenDestination
+        sta ValidDestination
+        sta SemisafeDestination
         sta ScratchChosenWeight
         ldy #0
 loop:
@@ -363,6 +366,7 @@ loop:
         lda candidate_tiles, y
         sta TargetTile
         if_valid_destination destination_success
+        if_semisafe_destination semisafe_destination_success
 destination_failure:
         ; TODO: handle semisafe detection too!
         iny
@@ -371,7 +375,9 @@ destination_failure:
         rts
 destination_success:
         lda candidate_tiles, y
-        sta ChosenDestination
+        sta ValidDestination
+        lda #$FF
+        sta SemisafeDestination
         lda candidate_weights, y
         sta ScratchChosenWeight
         lda candidate_directions, y
@@ -379,6 +385,19 @@ destination_success:
         iny 
         cpy NumCandidates
         bne loop
+        rts
+semisafe_destination_success:
+        lda candidate_tiles, y
+        sta SemisafeDestination
+        lda #$FF
+        sta ValidDestination
+        lda candidate_weights, y
+        sta ScratchChosenWeight
+        lda candidate_directions, y
+        sta SmokePuffDirection
+        iny 
+        cpy NumCandidates
+        jne loop
         rts
 .endproc
 

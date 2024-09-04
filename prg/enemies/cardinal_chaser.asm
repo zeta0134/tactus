@@ -48,10 +48,6 @@ CurrentTile := R15
 
 ; Result in R0, Returns $FF on failure
 .proc ENEMY_UPDATE_pick_random_cardinal
-ChosenDestination := R0
-NumCandidates := R1
-; Clobbered: R2-R3
-
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
@@ -94,8 +90,6 @@ TargetRow := R1
 PlayerDistance := R2
 RandomScratch0 := R3
 RandomScratch1 := R4
-
-NumCandidates := R1
 
 ; these are provided for us
 CurrentRow := R14
@@ -185,8 +179,6 @@ no_change:
 .endproc
 
 .proc ENEMY_UPDATE_update_zombie_anticipate
-DestinationTile := R0
-
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
@@ -204,21 +196,19 @@ track_player:
 randomly_choose_direction:
         near_call ENEMY_UPDATE_pick_random_cardinal
 location_chosen:
-        lda DestinationTile
+        lda ValidDestination
         cmp #$FF
         bne proceed_with_jump
 jump_failed:
-        ; TODO: unbreak this! ALL enemies will need this functionality,
-        ; so build it into the candidate logic.
-
-        ;if_semisafe_destination make_target_dangerous
+        lda SemisafeDestination
+        cmp #$FF
+        bne make_target_dangerous
         jmp return_to_idle_without_moving
-
 make_target_dangerous:
         ; write our own position into the target tile, as this will help
         ; the damage sprite to spawn in the right location if the player
         ; takes the hit
-        ldx DestinationTile
+        ldx SemisafeDestination
         lda CurrentTile
         sta tile_data, x
         ; additionally, for update order reasons, mark the target as "already moved",
@@ -239,7 +229,7 @@ return_to_idle_without_moving:
 
 proceed_with_jump:        
         ldx CurrentTile
-        ldy DestinationTile
+        ldy ValidDestination
         ; Draw ourselves at the target (keep our color palette)
         draw_at_y_with_pal_x TILE_ZOMBIE_BASE, BG_TILE_ZOMBIE_IDLE
         ; Fix our counter at the destination tile so we start fresh
@@ -247,7 +237,7 @@ proceed_with_jump:
         sta tile_data, y
 
         ; Write our new position to the data byte for the puff of smoke
-        lda DestinationTile
+        lda ValidDestination
         sta tile_data, x
 
         ; Move our data flags to the destination, and flag ourselves as having just moved
