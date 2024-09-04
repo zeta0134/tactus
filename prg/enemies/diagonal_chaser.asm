@@ -2,8 +2,140 @@
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
         .segment "ENEMY_UPDATE"
-; Spiders store their beat counter in tile_data, and damage in the low 7 bits of tile_flags
 
+.proc _setup_diagonal_targets_common
+CurrentRow := R14
+CurrentTile := R15
+        ; setup the properties for all 4 directions, should they be chosen
+
+        ; North-West
+        lda CurrentTile
+        sec
+        sbc #(::BATTLEFIELD_WIDTH+1)
+        sta candidate_tiles+0
+        ; North-East
+        clc
+        adc #2
+        sta candidate_tiles+1
+        ; South-West
+        clc
+        adc #((::BATTLEFIELD_WIDTH * 2) - 2)
+        sta candidate_tiles+2
+        ; South-East
+        clc
+        adc #2
+        sta candidate_tiles+3
+
+        lda CurrentRow
+        sec
+        sbc #1
+        sta candidate_rows+0 ; North-West
+        sta candidate_rows+1 ; North-East
+        clc
+        adc #2
+        sta candidate_rows+2 ; South-West
+        sta candidate_rows+3 ; South-East
+
+        lda #DUST_DIRECTION_SE
+        sta candidate_directions+0 ; North-West
+        lda #DUST_DIRECTION_SW
+        sta candidate_directions+1 ; North-East
+        lda #DUST_DIRECTION_NE
+        sta candidate_directions+2 ; South-West
+        lda #DUST_DIRECTION_NW
+        sta candidate_directions+3 ; South-East
+        rts
+.endproc
+
+; Result in R0, Returns $FF on failure
+; TODO: other than the subroutine at the top, this is identical to cardinal. combine
+; to save space?
+.proc ENEMY_UPDATE_pick_random_diagonal
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+        jsr _setup_diagonal_targets_common
+
+        ; setup completely random weights for the directions,
+        ; so we pick a given valid tile completely arbitrarily
+        ; (the 2 upper bits are sufficient for a larger/smaller
+        ; check, the lower 6 bits can be ignored. don't waste cycles
+        ; zeroing them out)
+        jsr next_gameplay_rand
+        lsr
+        ror candidate_weights+0
+        lsr
+        ror candidate_weights+0
+        lsr
+        ror candidate_weights+1
+        lsr
+        ror candidate_weights+1
+        lsr
+        ror candidate_weights+2
+        lsr
+        ror candidate_weights+2
+        lsr
+        ror candidate_weights+3
+        lsr
+        ror candidate_weights+3
+
+        ; actually pick the direction
+        lda #4
+        sta NumCandidates
+        near_call ENEMY_UPDATE_choose_destination
+        rts
+.endproc
+
+; Result in R0, Returns $FF on failure
+; TODO: other than the subroutine at the top, this is identical to cardinal. combine
+; to save space?
+.proc ENEMY_UPDATE_target_player_diagonal
+TargetTile := R0
+TargetRow := R1
+PlayerDistance := R2
+RandomScratch0 := R3
+RandomScratch1 := R4
+
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+        jsr _setup_diagonal_targets_common
+
+        ; We'll use some random bytes to unbias the target directions
+        jsr next_gameplay_rand
+        sta RandomScratch0
+        jsr next_gameplay_rand
+        sta RandomScratch1
+
+        ; For the weights, work out the manhattan distance for each potential
+        ; target tile. We'll try to prefer the shortest distance to close
+        ; the gap
+
+        .repeat 4, i
+        lda candidate_tiles+i
+        sta TargetTile
+        lda candidate_rows+i
+        sta TargetRow
+        near_call ENEMY_UPDATE_target_manhattan_distance_to_player
+        lda PlayerDistance
+         ; PlayerDistance = (PlayerDistance * 8) + 0-7
+        rol RandomScratch0
+        rol
+        rol RandomScratch0
+        rol
+        rol RandomScratch1
+        rol
+        sta candidate_weights+i
+        .endrepeat
+
+        ; actually pick the direction
+        lda #4
+        sta NumCandidates
+        near_call ENEMY_UPDATE_choose_destination
+        rts
+.endproc
+
+; Spiders store their beat counter in tile_data, and damage in the low 7 bits of tile_flags
 .proc ENEMY_UPDATE_update_spider_base
 IdleDelay := R0
 ; these are provided for us
@@ -51,18 +183,10 @@ no_change:
 ; want them to try to always move if they're not completely blocked, and we want
 ; the whole "randomly pick a direction" logic to be much less stupid.
 .proc ENEMY_UPDATE_update_spider_anticipate
-TargetRow := R0
-TargetTile := R1
-PlayerDistance := R2
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
         inc enemies_active
-
-        lda CurrentTile
-        sta TargetTile
-        lda CurrentRow
-        sta TargetRow
 
         near_call ENEMY_UPDATE_player_manhattan_distance
 track_player:
@@ -70,90 +194,26 @@ track_player:
         ; If we're outside the tracking radius, choose it randomly
         ; (here, A already has the distance from before)
         cmp #SPIDER_TARGET_RADIUS
-        bcs randomly_target_row
-        ; Otherwise target the player on the vertical axis
-        lda PlayerRow
-        sec
-        sbc CurrentRow
-        beq randomly_target_row
-        bpl move_down
-move_up:
-        lda TargetTile
-        sec
-        sbc #::BATTLEFIELD_WIDTH
-        sta TargetTile
-        dec TargetRow
-        lda #DUST_DIRECTION_N ; temp
-        sta SmokePuffDirection
-        jmp row_target_converge
-move_down:
-        lda TargetTile
-        clc
-        adc #::BATTLEFIELD_WIDTH
-        sta TargetTile
-        inc TargetRow
-        lda #DUST_DIRECTION_S ; temp
-        sta SmokePuffDirection
-        jmp row_target_converge
-randomly_target_row:
-        jsr next_gameplay_rand
-        bmi move_up
-        jmp move_down
-row_target_converge:
-        ; Now the column
-        ; If we're outside the tracking radius, choose it randomly
-        lda PlayerDistance
-        cmp #SPIDER_TARGET_RADIUS
-        bcs randomly_target_col
-        ; Otherwise target the player on the horizontal axis
-        lda PlayerCol
-        ldx CurrentTile
-        sec
-        sbc tile_index_to_col_lut, x
-        beq randomly_target_col
-        bpl move_right
-move_left:
-        dec TargetTile
-        lda SmokePuffDirection
-        cmp #DUST_DIRECTION_N
-        bne dust_sw
-dust_nw:
-        lda #DUST_DIRECTION_SE
-        sta SmokePuffDirection
-        jmp col_target_converge
-dust_sw:
-        lda #DUST_DIRECTION_NE
-        sta SmokePuffDirection
-        jmp col_target_converge
-move_right:
-        inc TargetTile
-        lda SmokePuffDirection
-        cmp #DUST_DIRECTION_N
-        bne dust_se
-dust_ne:
-        lda #DUST_DIRECTION_SW
-        sta SmokePuffDirection
-        jmp col_target_converge
-dust_se:
-        lda #DUST_DIRECTION_NW
-        sta SmokePuffDirection
-        jmp col_target_converge
-randomly_target_col:
-        jsr next_gameplay_rand
-        bmi move_left
-        jmp move_right
-col_target_converge:
-        
-        ; Now our destination tile is in TargetTile, make sure it's valid
-        if_valid_destination proceed_with_jump
+        bcs randomly_choose_direction
+        ; Otherwise target the player
+        near_call ENEMY_UPDATE_target_player_diagonal
+        jmp location_chosen
+randomly_choose_direction:
+        near_call ENEMY_UPDATE_pick_random_diagonal
+location_chosen:
+        lda ValidDestination
+        cmp #$FF
+        bne proceed_with_jump
 jump_failed:
-        if_semisafe_destination make_target_dangerous
+        lda SemisafeDestination
+        cmp #$FF
+        bne make_target_dangerous
         jmp return_to_idle_without_moving
 make_target_dangerous:
         ; write our own position into the target tile, as this will help
         ; the damage sprite to spawn in the right location if the player
         ; takes the hit
-        ldx TargetTile
+        ldx SemisafeDestination
         lda CurrentTile
         sta tile_data, x
         ; additionally, for update order reasons, mark the target as "already moved",
@@ -163,22 +223,18 @@ make_target_dangerous:
         sta tile_flags, x
         ;jmp return_to_idle_without_moving ; (fall through)
 return_to_idle_without_moving:
-
         ; Turn ourselves back into an idle pose
         ldx CurrentTile
         draw_at_x_keeppal TILE_SPIDER_BASE, BG_TILE_SPIDER
-
-
         ; Zero out our delay counter, so we start fresh
         lda #0
         sta tile_data, x
 
-        ; And all done
         rts
 
 proceed_with_jump:
         ldx CurrentTile
-        ldy TargetTile
+        ldy ValidDestination
         ; Draw ourselves at the target (keep our color palette)
         draw_at_y_with_pal_x TILE_SPIDER_BASE, BG_TILE_SPIDER
 
@@ -187,7 +243,7 @@ proceed_with_jump:
         sta tile_data, y
 
         ; Write our new position to the data byte for the puff of smoke
-        lda TargetTile
+        lda ValidDestination
         sta tile_data, x
 
         ; Move our data flags to the destination, and flag ourselves as having just moved

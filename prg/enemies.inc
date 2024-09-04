@@ -84,7 +84,7 @@ TILE_EXIT_STAIRS = ($AC | %00)
 .global FAR_suspend_entire_room
 
 ; Below this distance, mobs will prefer to move directly towards the player
-SPIDER_TARGET_RADIUS = 5
+SPIDER_TARGET_RADIUS = 16
 ZOMBIE_TARGET_RADIUS = 16
 
 ; Below this distance, moles will not rise out of the ground
