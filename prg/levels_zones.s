@@ -115,7 +115,7 @@ zone_grasslands_floor_1:
         .byte 8                  ; PopulationLimit
         .addr zone_grasslands_floor_1_mazes ; Maze Pool
         .addr zone_grasslands_floor_1_exits ; Exit List
-        .byte TRACK_SHOWER_GROOVE   ; Music Track
+        .byte TRACK_BOUNCY          ; Music Track
         .byte 0                     ; Added Tempo
         zone_banner_pos 0, 0        ; HudHeader
         zone_banner_pos 0, 5        ; HudBanner
@@ -139,7 +139,7 @@ zone_grasslands_floor_2:
         .byte 10                 ; PopulationLimit
         .addr zone_grasslands_floor_234_mazes ; Maze Pool
         .addr zone_grasslands_floor_2_exits ; Exit List
-        .byte TRACK_SHOWER_GROOVE   ; Music Track
+        .byte TRACK_BOUNCY          ; Music Track
         .byte 5   ; Added Tempo
         zone_banner_pos 0, 1        ; HudHeader
         zone_banner_pos 0, 5        ; HudBanner
@@ -162,7 +162,7 @@ zone_grasslands_floor_3:
         .byte 12                 ; PopulationLimit
         .addr zone_grasslands_floor_234_mazes ; Maze Pool
         .addr zone_grasslands_floor_3_exits ; Exit List
-        .byte TRACK_SHOWER_GROOVE   ; Music Track
+        .byte TRACK_BOUNCY          ; Music Track
         .byte 10   ; Added Tempo
         zone_banner_pos 0, 2        ; HudHeader
         zone_banner_pos 0, 5        ; HudBanner
@@ -185,7 +185,7 @@ zone_grasslands_floor_4:
         .byte 16                 ; PopulationLimit
         .addr zone_grasslands_floor_234_mazes ; Maze Pool
         .addr zone_grasslands_floor_4_exits ; Exit List
-        .byte TRACK_SHOWER_GROOVE   ; Music Track
+        .byte TRACK_BOUNCY          ; Music Track
         .byte 15   ; Added Tempo
         zone_banner_pos 0, 3        ; HudHeader
         zone_banner_pos 0, 5        ; HudBanner
@@ -260,8 +260,8 @@ zone_hub_world:
         .byte 128                ; SpawnPoolMax
         .byte 0                  ; PopulationLimit (do not spawn anything! it's the hub!)
         .addr zone_hub_world_mazes ; Maze Pool (TODO!!)
-        .addr zone_hub_exits ; Exit List
-        .byte TRACK_IN_ANOTHER_WORLD   ; Music Track
+        .addr zone_hub_exits     ; Exit List
+        .byte TRACK_OPTIONS      ; Music Track
         .byte 0   ; Added Tempo
         zone_banner_pos 14, 0        ; HudHeader
         zone_banner_pos 14, 5        ; HudBanner
