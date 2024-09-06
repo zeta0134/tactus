@@ -273,6 +273,7 @@ TargetFuncPtr := R0
 
 TileIdLow := R16
 TileAttrHigh := R17
+        perform_zpcm_inc
 
         ; first, load the detail variant for this floor, we'll use this as our base
         ldx DiscoTile
@@ -303,6 +304,7 @@ TileAttrHigh := R17
         sta tile_patterns, x
         lda TileAttrHigh
         sta tile_attributes, x
+        perform_zpcm_inc
         rts
 .endproc
 

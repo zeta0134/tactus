@@ -761,8 +761,8 @@ continue_waiting:
         near_call FAR_update_room_state
         debug_color LIGHTGRAY
 
+        perform_zpcm_inc
         far_call FAR_reset_hearts_for_beat
-
         perform_zpcm_inc
         
         inc16 AccumulatedGameBeats

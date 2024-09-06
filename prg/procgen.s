@@ -1636,6 +1636,7 @@ all_done:
         rts
 
 room_state_init:
+        perform_zpcm_inc
         lda #0
         sta enemies_active
         lda #1

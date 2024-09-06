@@ -1,5 +1,6 @@
         .include "hearts.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
         .segment "RAM"
 
@@ -76,6 +77,7 @@ done_shifting_hearts:
 NewHeartType := R0
 ReturnStatus := R0
 DestinationSlot := R1
+        perform_zpcm_inc
         ; sanity check: is there room for another heart?
         lda heart_type+TOTAL_HEART_SLOTS-1
         cmp #HEART_TYPE_NONE
@@ -88,6 +90,7 @@ failed_to_add_heart:
 safe_to_add:
         ldx #0
 find_destination_slot_loop:
+        perform_zpcm_inc
         lda heart_type, x
         cmp #HEART_TYPE_NONE
         beq found_slot
@@ -117,6 +120,7 @@ found_slot:
         stx DestinationSlot
         ldx #TOTAL_HEART_SLOTS-1
 shift_loop:
+        perform_zpcm_inc
         cpx DestinationSlot
         beq done_shifting
         lda heart_hp-1, x
@@ -134,6 +138,7 @@ done_shifting:
 
         lda #0
         sta ReturnStatus
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -145,6 +150,7 @@ HeartDmgProc := R2
         lda #TOTAL_HEART_SLOTS
         sta CurrentHeartIndex
 loop:
+        perform_zpcm_inc
         ldx CurrentHeartIndex
         lda heart_type, x
         asl
@@ -165,6 +171,7 @@ return_from_dmg:
         dec CurrentHeartIndex
         jmp loop
 done:
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -411,6 +418,7 @@ HeartHealingProc := R2
         lda #0
         sta CurrentHeartIndex
 loop:
+        perform_zpcm_inc
         ldx CurrentHeartIndex
         lda heart_type, x
         asl
@@ -432,6 +440,7 @@ return_from_healing:
         beq done
         jmp loop
 done:
+        perform_zpcm_inc
         rts
 .endproc
 

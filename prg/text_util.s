@@ -174,6 +174,7 @@ ten_thousands_loop:
         jmp ten_thousands_loop
 
 compute_thousands:
+        perform_zpcm_inc
         lda #0
         sta ThousandsDigit
 thousands_loop:
@@ -184,6 +185,7 @@ thousands_loop:
         jmp thousands_loop
 
 compute_hundreds:
+        perform_zpcm_inc
         lda #0
         sta HundredsDigit
 hundreds_loop:
@@ -194,6 +196,7 @@ hundreds_loop:
         jmp hundreds_loop
 
 compute_tens:
+        perform_zpcm_inc
         lda #0
         sta TensDigit
 tens_loop:
@@ -204,11 +207,13 @@ tens_loop:
         jmp tens_loop
 
 compute_ones:
+        perform_zpcm_inc
         ; at this stage, NumberWord's lowest byte is already
         ; between 0 and 9, so just use it directly
         lda NumberWord+0
         sta OnesDigit
 
+        perform_zpcm_inc
         rts
 .endproc
 

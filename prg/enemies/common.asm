@@ -360,6 +360,7 @@ TargetTile: .res 1
         sta ScratchChosenWeight
         ldy #0
 loop:
+        perform_zpcm_inc
         lda candidate_weights, y  ; if we've already selected a better, valid candidate tile
         cmp ScratchChosenWeight ; then skip over the expensive "is valid" check entirely
         bcs destination_failure

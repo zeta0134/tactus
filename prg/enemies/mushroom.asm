@@ -368,6 +368,7 @@ spores_nw:
 ; note: uses smokepuff input variables, since it is almost the same logic
 .proc ENEMY_UPDATE_draw_spore_here
 TargetFuncPtr := R0
+        perform_zpcm_inc
         ; run the disco selection logic based on the player's preference
         ; (DiscoTile==SmokePuffTile, and DiscoRow==SmokePuffRow, so that setup is done by this point)
         ldx setting_disco_floor
@@ -397,5 +398,6 @@ TargetFuncPtr := R0
         sta tile_flags, x
 
         ; And done!
+        perform_zpcm_inc
         rts
 .endproc

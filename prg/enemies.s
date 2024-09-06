@@ -265,6 +265,7 @@ StartingTile := R15
         lda #::BATTLEFIELD_WIDTH
         sta Length
 loop:
+        perform_zpcm_inc
         ldx StartingTile
         lda battlefield, x
         ; the top 6 bits index into the behavior table, which is a list of **words**

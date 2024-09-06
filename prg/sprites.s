@@ -55,12 +55,14 @@ done:
 
 .proc FAR_disable_all_oam_entries
         lda #$F8
-        .repeat 16, j
+        perform_zpcm_inc
+        .repeat 4, z
+        .repeat 4, j
         .repeat 4, i
-        ; 20 == lda imm, sta absl absh x 4
-        ; 83 = 20*4 + inc absl absh
-        sta SPRITE_TRANSFER_BASE + (20 * i) + (83 * j) + SelfModifiedSprite::PosY
+        sta SPRITE_TRANSFER_BASE + (20 * i) + (83 * (j + (z * 4))) + SelfModifiedSprite::PosY
         .endrepeat
+        .endrepeat
+        perform_zpcm_inc
         .endrepeat
         rts
 .endproc

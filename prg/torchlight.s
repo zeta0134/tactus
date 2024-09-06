@@ -437,6 +437,7 @@ safe_row_y_lut:
         .byte 12, 14, 16, 17, 18, 19, 20, 20, 21, 21, 21, 21, 21, 21, 21, 21
 
 .proc __torchlight_raster_trampoline
+        perform_zpcm_inc
         jmp (RasterState)
 .endproc
 
@@ -471,6 +472,7 @@ not_done_yet:
 
 .proc init_state
 Scratch := R0
+        perform_zpcm_inc
         ; First determine the leading/trailing nametable pointers to start with
         ; (we might tweak these as we go)
         lda active_battlefield
@@ -494,6 +496,8 @@ done_with_nametables:
         sta RasterTopLeftLut+1
         lda torchlight_luts_bank, x
         sta RasterTorchlightBank
+
+        perform_zpcm_inc
 
         lda #0
         sta Scratch
@@ -526,6 +530,8 @@ done_with_nametables:
         adc RasterTopLeftLut+1
         sta RasterTopLeftLut+1
 
+        perform_zpcm_inc
+
         lda #0
         sta CurrentRow
 
@@ -541,18 +547,23 @@ done_with_nametables:
         beq setup_slide_up
         ; ... what? this shouldn't be possible! (oh no)
         st16 RasterState, finished_state
+        perform_zpcm_inc
         rts
 setup_slide_right:
         st16 RasterState, leading_right_state
+        perform_zpcm_inc
         rts
 setup_slide_left:
         st16 RasterState, leading_left_state
+        perform_zpcm_inc
         rts
 setup_slide_up:
         st16 RasterState, leading_up_state
+        perform_zpcm_inc
         rts
 setup_slide_down:
         st16 RasterState, leading_down_state
+        perform_zpcm_inc
         rts
 .endproc
 

@@ -148,6 +148,7 @@ smoke_puff_nw:
 ; this thing, do that at the call site.
 .proc ENEMY_UPDATE_draw_smoke_puff
 TargetFuncPtr := R0
+        perform_zpcm_inc
         ; run the disco selection logic based on the player's preference
         ; (DiscoTile==SmokePuffTile, and DiscoRow==SmokePuffRow, so that setup is done by this point)
         ldx setting_disco_floor
@@ -167,5 +168,6 @@ TargetFuncPtr := R0
         sta tile_patterns, x
         lda smoke_puff_lut+1, y
         sta tile_attributes, x
+        perform_zpcm_inc
         rts
 .endproc
