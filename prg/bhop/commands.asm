@@ -225,8 +225,8 @@ no_parameter_byte:
         ; large delay values don't make much sense anyway, so lop off the high bit
         ; here to avoid this edge case
         and #$7F
-        clc
-        adc #1
+        ;clc
+        ;adc #1
         ldy channel_index
         sta effect_note_delay, y
         rts

@@ -73,7 +73,7 @@ FADE_SPEED = 8
         .include "../art/music/shower_groove.asm"
         .endproc
 
-        .segment "DATA_6"
+        .segment "DATA_7"
         .proc zeta_bouncy
         .include "../art/music/bouncy.asm"
         .endproc
