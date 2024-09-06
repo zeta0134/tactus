@@ -201,6 +201,8 @@ some_damage_remains:
         clc
         adc #1
         sta RemainingDamage
+        lda #0
+        sta heart_hp, x
         jmp FAR_receive_damage::return_from_dmg
 took_all_damage:
         sta heart_hp, x
@@ -327,6 +329,8 @@ some_damage_remains:
         clc
         adc #1
         sta RemainingDamage
+        lda #0
+        sta heart_hp, x
         jmp check_vanish
 took_all_damage:
         sta heart_hp, x

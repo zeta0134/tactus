@@ -156,13 +156,10 @@ HeartCount := R2
         near_call FAR_initialize_hearts_for_game
         
         ; All the heart types, yes!
-        lda #HEART_TYPE_REGULAR_ARMORED
+        lda #HEART_TYPE_REGULAR
         sta NewHeartType
         near_call FAR_add_heart
-        lda #HEART_TYPE_REGULAR_ARMORED
-        sta NewHeartType
-        near_call FAR_add_heart
-        lda #HEART_TYPE_REGULAR_ARMORED
+        lda #HEART_TYPE_REGULAR
         sta NewHeartType
         near_call FAR_add_heart
         lda #HEART_TYPE_REGULAR
@@ -174,6 +171,10 @@ HeartCount := R2
         lda #HEART_TYPE_TEMPORARY
         sta NewHeartType
         near_call FAR_add_heart
+
+        ; Reduce the health of the last heart by 1/4, for testing a thing
+        lda #3
+        sta heart_hp+4
 
         ; Some glass hearts, yes yes!
 ;        lda #3
