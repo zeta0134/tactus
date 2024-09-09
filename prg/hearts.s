@@ -28,11 +28,11 @@ hes_dead_jim:
 
 initial_heart_hp:
         .byte 0 ; none
-        .byte 4 ; regular
+        .byte 0 ; regular (on pickup we then heal from the LEFT, typically)
         .byte 1 ; glass
-        .byte 4 ; regular armored
-        .byte 4 ; temporary
-        .byte 4 ; temporary armored
+        .byte 4 ; regular armored   ; these aren't added as whole hearts usually
+        .byte 4 ; temporary         ; these draw on top of the healthbar and are a separate thing
+        .byte 4 ; temporary armored ; thhese aren't added as whole hearts usually
 
 .proc FAR_initialize_hearts_for_game
         lda #HEART_TYPE_NONE

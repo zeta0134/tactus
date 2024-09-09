@@ -229,13 +229,21 @@ converge:
 .proc ENEMY_COLLIDE_collect_heart_container
 NewHeartType := R0
 
+HealingAmount := R0
+
 TargetIndex := R0
 TileId := R1
 TargetSquare := R13
         
+        ; Add one heart container to the player's maximum
         lda #HEART_TYPE_REGULAR
         sta NewHeartType
         far_call FAR_add_heart
+        ; Regular heart containers start empty (otherwise it looks weird)
+        ; so heal the player 4 HP to award the health it awards
+        lda #4
+        sta HealingAmount
+        far_call FAR_receive_healing
 
         st16 R0, sfx_heart_container
         jsr play_sfx_pulse1

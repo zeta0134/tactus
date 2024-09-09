@@ -112,6 +112,7 @@ jump_height_table:
 
 .proc FAR_init_player
 NewHeartType := R0
+HealingAmount := R0
 MetaSpriteIndex := R0
 HeartCount := R2
         ; spawn in the player sprite
@@ -177,10 +178,6 @@ HeartCount := R2
         sta NewHeartType
         near_call FAR_add_heart
 
-        ; Reduce the health of the last heart by 1/4, for testing a thing
-        lda #3
-        sta heart_hp+4
-
         ; Some glass hearts, yes yes!
 ;        lda #3
 ;        sta HeartCount
@@ -190,7 +187,11 @@ HeartCount := R2
 ;        near_call FAR_add_heart
 ;        dec HeartCount
 ;        bne heart_loop
-        
+
+        ; Heal the player to full! (regular hearts start empty)
+        lda #255
+        sta HealingAmount
+        near_call FAR_receive_healing
 
         st16 PlayerGold, 150
 .else
@@ -218,8 +219,16 @@ heart_loop:
         dec HeartCount
         bne heart_loop
 
+        ; Heal the player to full! (regular hearts start empty)
+        lda #255
+        sta HealingAmount
+        near_call FAR_receive_healing
+
         st16 PlayerGold, 0
-.endif  
+.endif
+        
+
+
 
         lda #0
         sta PlayerKeys
