@@ -261,7 +261,7 @@ zone_hub_world:
         .byte 0                  ; PopulationLimit (do not spawn anything! it's the hub!)
         .addr zone_hub_world_mazes ; Maze Pool (TODO!!)
         .addr zone_hub_exits     ; Exit List
-        .byte TRACK_OPTIONS      ; Music Track
+        .byte TRACK_IN_ANOTHER_WORLD ; Music Track
         .byte 0   ; Added Tempo
         zone_banner_pos 14, 0        ; HudHeader
         zone_banner_pos 14, 5        ; HudBanner

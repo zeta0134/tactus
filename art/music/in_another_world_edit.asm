@@ -7,7 +7,7 @@
 	.word ft_sample_list
 	.word ft_samples
 	.word ft_groove_list
-	.byte 0 ; flags
+	.byte 1 ; flags
 	.word 3600 ; NTSC speed
 	.word 3000 ; PAL speed
 
@@ -287,204 +287,1116 @@ ft_s0_frames:
 	.word ft_s0f99
 ft_s0f0:
 	.word ft_s0p0c0, ft_s0p0c1, ft_s0p0c2, ft_s0p0c3, ft_s0p0c5, ft_s0p0c0, ft_s0p0c0, ft_s0p0c4
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c1),<.bank(ft_s0p0c2),<.bank(ft_s0p0c3),<.bank(ft_s0p0c5),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c4)
 ft_s0f1:
 	.word ft_s0p0c4, ft_s0p1c1, ft_s0p0c4, ft_s0p1c3, ft_s0p1c5, ft_s0p0c4, ft_s0p0c4, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p1c1),<.bank(ft_s0p0c4),<.bank(ft_s0p1c3),<.bank(ft_s0p1c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4)
 ft_s0f2:
 	.word ft_s0p0c4, ft_s0p1c1, ft_s0p0c4, ft_s0p2c3, ft_s0p1c5, ft_s0p0c4, ft_s0p0c4, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p1c1),<.bank(ft_s0p0c4),<.bank(ft_s0p2c3),<.bank(ft_s0p1c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4)
 ft_s0f3:
 	.word ft_s0p0c4, ft_s0p1c1, ft_s0p0c4, ft_s0p1c3, ft_s0p1c5, ft_s0p0c4, ft_s0p0c4, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p1c1),<.bank(ft_s0p0c4),<.bank(ft_s0p1c3),<.bank(ft_s0p1c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4)
 ft_s0f4:
 	.word ft_s0p0c0, ft_s0p4c1, ft_s0p0c2, ft_s0p0c3, ft_s0p4c5, ft_s0p0c0, ft_s0p0c0, ft_s0p0c4
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p4c1),<.bank(ft_s0p0c2),<.bank(ft_s0p0c3),<.bank(ft_s0p4c5),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c4)
 ft_s0f5:
 	.word ft_s0p0c4, ft_s0p4c1, ft_s0p0c4, ft_s0p1c3, ft_s0p5c5, ft_s0p0c4, ft_s0p0c4, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p4c1),<.bank(ft_s0p0c4),<.bank(ft_s0p1c3),<.bank(ft_s0p5c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4)
 ft_s0f6:
 	.word ft_s0p0c4, ft_s0p4c1, ft_s0p0c4, ft_s0p2c3, ft_s0p5c5, ft_s0p0c4, ft_s0p0c4, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p4c1),<.bank(ft_s0p0c4),<.bank(ft_s0p2c3),<.bank(ft_s0p5c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4)
 ft_s0f7:
 	.word ft_s0p0c4, ft_s0p4c1, ft_s0p0c4, ft_s0p1c3, ft_s0p5c5, ft_s0p0c4, ft_s0p0c4, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p4c1),<.bank(ft_s0p0c4),<.bank(ft_s0p1c3),<.bank(ft_s0p5c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4)
 ft_s0f8:
 	.word ft_s0p4c0, ft_s0p0c1, ft_s0p4c2, ft_s0p0c3, ft_s0p8c5, ft_s0p0c0, ft_s0p4c7, ft_s0p0c4
+	.byte <.bank(ft_s0p4c0),<.bank(ft_s0p0c1),<.bank(ft_s0p4c2),<.bank(ft_s0p0c3),<.bank(ft_s0p8c5),<.bank(ft_s0p0c0),<.bank(ft_s0p4c7),<.bank(ft_s0p0c4)
 ft_s0f9:
 	.word ft_s0p5c0, ft_s0p1c1, ft_s0p5c2, ft_s0p1c3, ft_s0p1c5, ft_s0p0c4, ft_s0p5c7, ft_s0p0c4
+	.byte <.bank(ft_s0p5c0),<.bank(ft_s0p1c1),<.bank(ft_s0p5c2),<.bank(ft_s0p1c3),<.bank(ft_s0p1c5),<.bank(ft_s0p0c4),<.bank(ft_s0p5c7),<.bank(ft_s0p0c4)
 ft_s0f10:
 	.word ft_s0p6c0, ft_s0p1c1, ft_s0p6c2, ft_s0p2c3, ft_s0p1c5, ft_s0p0c4, ft_s0p4c7, ft_s0p0c4
+	.byte <.bank(ft_s0p6c0),<.bank(ft_s0p1c1),<.bank(ft_s0p6c2),<.bank(ft_s0p2c3),<.bank(ft_s0p1c5),<.bank(ft_s0p0c4),<.bank(ft_s0p4c7),<.bank(ft_s0p0c4)
 ft_s0f11:
 	.word ft_s0p5c0, ft_s0p1c1, ft_s0p5c2, ft_s0p1c3, ft_s0p1c5, ft_s0p0c4, ft_s0p5c7, ft_s0p0c4
+	.byte <.bank(ft_s0p5c0),<.bank(ft_s0p1c1),<.bank(ft_s0p5c2),<.bank(ft_s0p1c3),<.bank(ft_s0p1c5),<.bank(ft_s0p0c4),<.bank(ft_s0p5c7),<.bank(ft_s0p0c4)
 ft_s0f12:
 	.word ft_s0p8c0, ft_s0p4c1, ft_s0p8c2, ft_s0p0c3, ft_s0p4c5, ft_s0p0c0, ft_s0p8c7, ft_s0p0c4
+	.byte <.bank(ft_s0p8c0),<.bank(ft_s0p4c1),<.bank(ft_s0p8c2),<.bank(ft_s0p0c3),<.bank(ft_s0p4c5),<.bank(ft_s0p0c0),<.bank(ft_s0p8c7),<.bank(ft_s0p0c4)
 ft_s0f13:
 	.word ft_s0p9c0, ft_s0p4c1, ft_s0p9c2, ft_s0p1c3, ft_s0p5c5, ft_s0p0c4, ft_s0p9c7, ft_s0p0c4
+	.byte <.bank(ft_s0p9c0),<.bank(ft_s0p4c1),<.bank(ft_s0p9c2),<.bank(ft_s0p1c3),<.bank(ft_s0p5c5),<.bank(ft_s0p0c4),<.bank(ft_s0p9c7),<.bank(ft_s0p0c4)
 ft_s0f14:
 	.word ft_s0p10c0, ft_s0p4c1, ft_s0p10c2, ft_s0p2c3, ft_s0p5c5, ft_s0p0c4, ft_s0p8c7, ft_s0p0c4
+	.byte <.bank(ft_s0p10c0),<.bank(ft_s0p4c1),<.bank(ft_s0p10c2),<.bank(ft_s0p2c3),<.bank(ft_s0p5c5),<.bank(ft_s0p0c4),<.bank(ft_s0p8c7),<.bank(ft_s0p0c4)
 ft_s0f15:
 	.word ft_s0p11c0, ft_s0p4c1, ft_s0p11c2, ft_s0p39c3, ft_s0p5c5, ft_s0p0c4, ft_s0p11c7, ft_s0p51c4
+	.byte <.bank(ft_s0p11c0),<.bank(ft_s0p4c1),<.bank(ft_s0p11c2),<.bank(ft_s0p39c3),<.bank(ft_s0p5c5),<.bank(ft_s0p0c4),<.bank(ft_s0p11c7),<.bank(ft_s0p51c4)
 ft_s0f16:
 	.word ft_s0p48c0, ft_s0p0c1, ft_s0p4c2, ft_s0p52c3, ft_s0p8c5, ft_s0p8c6, ft_s0p12c7, ft_s0p4c4
+	.byte <.bank(ft_s0p48c0),<.bank(ft_s0p0c1),<.bank(ft_s0p4c2),<.bank(ft_s0p52c3),<.bank(ft_s0p8c5),<.bank(ft_s0p8c6),<.bank(ft_s0p12c7),<.bank(ft_s0p4c4)
 ft_s0f17:
 	.word ft_s0p5c7, ft_s0p1c1, ft_s0p5c2, ft_s0p53c3, ft_s0p1c5, ft_s0p9c6, ft_s0p5c7, ft_s0p5c4
+	.byte <.bank(ft_s0p5c7),<.bank(ft_s0p1c1),<.bank(ft_s0p5c2),<.bank(ft_s0p53c3),<.bank(ft_s0p1c5),<.bank(ft_s0p9c6),<.bank(ft_s0p5c7),<.bank(ft_s0p5c4)
 ft_s0f18:
 	.word ft_s0p14c7, ft_s0p1c1, ft_s0p6c2, ft_s0p54c3, ft_s0p1c5, ft_s0p10c6, ft_s0p14c7, ft_s0p6c4
+	.byte <.bank(ft_s0p14c7),<.bank(ft_s0p1c1),<.bank(ft_s0p6c2),<.bank(ft_s0p54c3),<.bank(ft_s0p1c5),<.bank(ft_s0p10c6),<.bank(ft_s0p14c7),<.bank(ft_s0p6c4)
 ft_s0f19:
 	.word ft_s0p5c7, ft_s0p1c1, ft_s0p5c2, ft_s0p55c3, ft_s0p1c5, ft_s0p9c6, ft_s0p5c7, ft_s0p7c4
+	.byte <.bank(ft_s0p5c7),<.bank(ft_s0p1c1),<.bank(ft_s0p5c2),<.bank(ft_s0p55c3),<.bank(ft_s0p1c5),<.bank(ft_s0p9c6),<.bank(ft_s0p5c7),<.bank(ft_s0p7c4)
 ft_s0f20:
 	.word ft_s0p52c0, ft_s0p4c1, ft_s0p8c2, ft_s0p52c3, ft_s0p4c5, ft_s0p12c6, ft_s0p16c7, ft_s0p4c4
+	.byte <.bank(ft_s0p52c0),<.bank(ft_s0p4c1),<.bank(ft_s0p8c2),<.bank(ft_s0p52c3),<.bank(ft_s0p4c5),<.bank(ft_s0p12c6),<.bank(ft_s0p16c7),<.bank(ft_s0p4c4)
 ft_s0f21:
 	.word ft_s0p9c7, ft_s0p4c1, ft_s0p9c2, ft_s0p53c3, ft_s0p5c5, ft_s0p13c6, ft_s0p9c7, ft_s0p5c4
+	.byte <.bank(ft_s0p9c7),<.bank(ft_s0p4c1),<.bank(ft_s0p9c2),<.bank(ft_s0p53c3),<.bank(ft_s0p5c5),<.bank(ft_s0p13c6),<.bank(ft_s0p9c7),<.bank(ft_s0p5c4)
 ft_s0f22:
 	.word ft_s0p16c7, ft_s0p4c1, ft_s0p10c2, ft_s0p54c3, ft_s0p5c5, ft_s0p14c6, ft_s0p16c7, ft_s0p6c4
+	.byte <.bank(ft_s0p16c7),<.bank(ft_s0p4c1),<.bank(ft_s0p10c2),<.bank(ft_s0p54c3),<.bank(ft_s0p5c5),<.bank(ft_s0p14c6),<.bank(ft_s0p16c7),<.bank(ft_s0p6c4)
 ft_s0f23:
 	.word ft_s0p11c7, ft_s0p4c1, ft_s0p11c2, ft_s0p55c3, ft_s0p5c5, ft_s0p15c6, ft_s0p11c7, ft_s0p7c4
+	.byte <.bank(ft_s0p11c7),<.bank(ft_s0p4c1),<.bank(ft_s0p11c2),<.bank(ft_s0p55c3),<.bank(ft_s0p5c5),<.bank(ft_s0p15c6),<.bank(ft_s0p11c7),<.bank(ft_s0p7c4)
 ft_s0f24:
 	.word ft_s0p48c0, ft_s0p12c1, ft_s0p12c2, ft_s0p4c3, ft_s0p12c5, ft_s0p8c6, ft_s0p12c7, ft_s0p4c4
+	.byte <.bank(ft_s0p48c0),<.bank(ft_s0p12c1),<.bank(ft_s0p12c2),<.bank(ft_s0p4c3),<.bank(ft_s0p12c5),<.bank(ft_s0p8c6),<.bank(ft_s0p12c7),<.bank(ft_s0p4c4)
 ft_s0f25:
 	.word ft_s0p5c7, ft_s0p13c1, ft_s0p13c2, ft_s0p5c3, ft_s0p13c5, ft_s0p9c6, ft_s0p5c7, ft_s0p5c4
+	.byte <.bank(ft_s0p5c7),<.bank(ft_s0p13c1),<.bank(ft_s0p13c2),<.bank(ft_s0p5c3),<.bank(ft_s0p13c5),<.bank(ft_s0p9c6),<.bank(ft_s0p5c7),<.bank(ft_s0p5c4)
 ft_s0f26:
 	.word ft_s0p14c7, ft_s0p13c1, ft_s0p14c2, ft_s0p6c3, ft_s0p13c5, ft_s0p10c6, ft_s0p14c7, ft_s0p6c4
+	.byte <.bank(ft_s0p14c7),<.bank(ft_s0p13c1),<.bank(ft_s0p14c2),<.bank(ft_s0p6c3),<.bank(ft_s0p13c5),<.bank(ft_s0p10c6),<.bank(ft_s0p14c7),<.bank(ft_s0p6c4)
 ft_s0f27:
 	.word ft_s0p5c7, ft_s0p13c1, ft_s0p13c2, ft_s0p7c3, ft_s0p13c5, ft_s0p9c6, ft_s0p5c7, ft_s0p7c4
+	.byte <.bank(ft_s0p5c7),<.bank(ft_s0p13c1),<.bank(ft_s0p13c2),<.bank(ft_s0p7c3),<.bank(ft_s0p13c5),<.bank(ft_s0p9c6),<.bank(ft_s0p5c7),<.bank(ft_s0p7c4)
 ft_s0f28:
 	.word ft_s0p52c0, ft_s0p16c1, ft_s0p16c2, ft_s0p4c3, ft_s0p16c5, ft_s0p12c6, ft_s0p16c7, ft_s0p4c4
+	.byte <.bank(ft_s0p52c0),<.bank(ft_s0p16c1),<.bank(ft_s0p16c2),<.bank(ft_s0p4c3),<.bank(ft_s0p16c5),<.bank(ft_s0p12c6),<.bank(ft_s0p16c7),<.bank(ft_s0p4c4)
 ft_s0f29:
 	.word ft_s0p9c7, ft_s0p16c1, ft_s0p17c2, ft_s0p5c3, ft_s0p17c5, ft_s0p13c6, ft_s0p9c7, ft_s0p5c4
+	.byte <.bank(ft_s0p9c7),<.bank(ft_s0p16c1),<.bank(ft_s0p17c2),<.bank(ft_s0p5c3),<.bank(ft_s0p17c5),<.bank(ft_s0p13c6),<.bank(ft_s0p9c7),<.bank(ft_s0p5c4)
 ft_s0f30:
 	.word ft_s0p16c7, ft_s0p16c1, ft_s0p16c2, ft_s0p6c3, ft_s0p17c5, ft_s0p14c6, ft_s0p16c7, ft_s0p6c4
+	.byte <.bank(ft_s0p16c7),<.bank(ft_s0p16c1),<.bank(ft_s0p16c2),<.bank(ft_s0p6c3),<.bank(ft_s0p17c5),<.bank(ft_s0p14c6),<.bank(ft_s0p16c7),<.bank(ft_s0p6c4)
 ft_s0f31:
 	.word ft_s0p11c7, ft_s0p16c1, ft_s0p17c2, ft_s0p7c3, ft_s0p17c5, ft_s0p15c6, ft_s0p11c7, ft_s0p7c4
+	.byte <.bank(ft_s0p11c7),<.bank(ft_s0p16c1),<.bank(ft_s0p17c2),<.bank(ft_s0p7c3),<.bank(ft_s0p17c5),<.bank(ft_s0p15c6),<.bank(ft_s0p11c7),<.bank(ft_s0p7c4)
 ft_s0f32:
 	.word ft_s0p48c0, ft_s0p12c1, ft_s0p12c2, ft_s0p4c3, ft_s0p20c5, ft_s0p8c6, ft_s0p12c7, ft_s0p4c4
+	.byte <.bank(ft_s0p48c0),<.bank(ft_s0p12c1),<.bank(ft_s0p12c2),<.bank(ft_s0p4c3),<.bank(ft_s0p20c5),<.bank(ft_s0p8c6),<.bank(ft_s0p12c7),<.bank(ft_s0p4c4)
 ft_s0f33:
 	.word ft_s0p5c7, ft_s0p13c1, ft_s0p13c2, ft_s0p5c3, ft_s0p13c5, ft_s0p9c6, ft_s0p5c7, ft_s0p5c4
+	.byte <.bank(ft_s0p5c7),<.bank(ft_s0p13c1),<.bank(ft_s0p13c2),<.bank(ft_s0p5c3),<.bank(ft_s0p13c5),<.bank(ft_s0p9c6),<.bank(ft_s0p5c7),<.bank(ft_s0p5c4)
 ft_s0f34:
 	.word ft_s0p14c7, ft_s0p13c1, ft_s0p14c2, ft_s0p6c3, ft_s0p13c5, ft_s0p10c6, ft_s0p14c7, ft_s0p6c4
+	.byte <.bank(ft_s0p14c7),<.bank(ft_s0p13c1),<.bank(ft_s0p14c2),<.bank(ft_s0p6c3),<.bank(ft_s0p13c5),<.bank(ft_s0p10c6),<.bank(ft_s0p14c7),<.bank(ft_s0p6c4)
 ft_s0f35:
 	.word ft_s0p5c7, ft_s0p13c1, ft_s0p13c2, ft_s0p7c3, ft_s0p13c5, ft_s0p9c6, ft_s0p5c7, ft_s0p7c4
+	.byte <.bank(ft_s0p5c7),<.bank(ft_s0p13c1),<.bank(ft_s0p13c2),<.bank(ft_s0p7c3),<.bank(ft_s0p13c5),<.bank(ft_s0p9c6),<.bank(ft_s0p5c7),<.bank(ft_s0p7c4)
 ft_s0f36:
 	.word ft_s0p52c0, ft_s0p16c1, ft_s0p16c2, ft_s0p4c3, ft_s0p16c5, ft_s0p12c6, ft_s0p16c7, ft_s0p4c4
+	.byte <.bank(ft_s0p52c0),<.bank(ft_s0p16c1),<.bank(ft_s0p16c2),<.bank(ft_s0p4c3),<.bank(ft_s0p16c5),<.bank(ft_s0p12c6),<.bank(ft_s0p16c7),<.bank(ft_s0p4c4)
 ft_s0f37:
 	.word ft_s0p9c7, ft_s0p16c1, ft_s0p17c2, ft_s0p5c3, ft_s0p17c5, ft_s0p13c6, ft_s0p9c7, ft_s0p5c4
+	.byte <.bank(ft_s0p9c7),<.bank(ft_s0p16c1),<.bank(ft_s0p17c2),<.bank(ft_s0p5c3),<.bank(ft_s0p17c5),<.bank(ft_s0p13c6),<.bank(ft_s0p9c7),<.bank(ft_s0p5c4)
 ft_s0f38:
 	.word ft_s0p16c7, ft_s0p16c1, ft_s0p16c2, ft_s0p6c3, ft_s0p17c5, ft_s0p14c6, ft_s0p16c7, ft_s0p6c4
+	.byte <.bank(ft_s0p16c7),<.bank(ft_s0p16c1),<.bank(ft_s0p16c2),<.bank(ft_s0p6c3),<.bank(ft_s0p17c5),<.bank(ft_s0p14c6),<.bank(ft_s0p16c7),<.bank(ft_s0p6c4)
 ft_s0f39:
 	.word ft_s0p11c7, ft_s0p16c1, ft_s0p17c2, ft_s0p7c3, ft_s0p17c5, ft_s0p15c6, ft_s0p11c7, ft_s0p7c4
+	.byte <.bank(ft_s0p11c7),<.bank(ft_s0p16c1),<.bank(ft_s0p17c2),<.bank(ft_s0p7c3),<.bank(ft_s0p17c5),<.bank(ft_s0p15c6),<.bank(ft_s0p11c7),<.bank(ft_s0p7c4)
 ft_s0f40:
 	.word ft_s0p0c0, ft_s0p12c1, ft_s0p0c2, ft_s0p8c3, ft_s0p20c5, ft_s0p16c6, ft_s0p20c7, ft_s0p8c4
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p12c1),<.bank(ft_s0p0c2),<.bank(ft_s0p8c3),<.bank(ft_s0p20c5),<.bank(ft_s0p16c6),<.bank(ft_s0p20c7),<.bank(ft_s0p8c4)
 ft_s0f41:
 	.word ft_s0p0c4, ft_s0p13c1, ft_s0p0c4, ft_s0p9c3, ft_s0p13c5, ft_s0p0c4, ft_s0p0c4, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p13c1),<.bank(ft_s0p0c4),<.bank(ft_s0p9c3),<.bank(ft_s0p13c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4)
 ft_s0f42:
 	.word ft_s0p0c4, ft_s0p13c1, ft_s0p0c4, ft_s0p10c3, ft_s0p13c5, ft_s0p0c4, ft_s0p0c4, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p13c1),<.bank(ft_s0p0c4),<.bank(ft_s0p10c3),<.bank(ft_s0p13c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4)
 ft_s0f43:
 	.word ft_s0p0c4, ft_s0p13c1, ft_s0p0c4, ft_s0p11c3, ft_s0p13c5, ft_s0p0c4, ft_s0p0c4, ft_s0p11c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p13c1),<.bank(ft_s0p0c4),<.bank(ft_s0p11c3),<.bank(ft_s0p13c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p11c4)
 ft_s0f44:
 	.word ft_s0p0c0, ft_s0p24c1, ft_s0p0c2, ft_s0p12c3, ft_s0p24c5, ft_s0p0c0, ft_s0p24c7, ft_s0p8c4
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p24c1),<.bank(ft_s0p0c2),<.bank(ft_s0p12c3),<.bank(ft_s0p24c5),<.bank(ft_s0p0c0),<.bank(ft_s0p24c7),<.bank(ft_s0p8c4)
 ft_s0f45:
 	.word ft_s0p0c4, ft_s0p25c1, ft_s0p0c4, ft_s0p13c3, ft_s0p25c5, ft_s0p0c4, ft_s0p0c4, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p25c1),<.bank(ft_s0p0c4),<.bank(ft_s0p13c3),<.bank(ft_s0p25c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4)
 ft_s0f46:
 	.word ft_s0p0c4, ft_s0p25c5, ft_s0p0c4, ft_s0p14c3, ft_s0p24c1, ft_s0p0c4, ft_s0p0c4, ft_s0p14c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p25c5),<.bank(ft_s0p0c4),<.bank(ft_s0p14c3),<.bank(ft_s0p24c1),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p14c4)
 ft_s0f47:
 	.word ft_s0p12c0, ft_s0p20c1, ft_s0p36c2, ft_s0p16c3, ft_s0p28c5, ft_s0p0c0, ft_s0p28c7, ft_s0p8c4
+	.byte <.bank(ft_s0p12c0),<.bank(ft_s0p20c1),<.bank(ft_s0p36c2),<.bank(ft_s0p16c3),<.bank(ft_s0p28c5),<.bank(ft_s0p0c0),<.bank(ft_s0p28c7),<.bank(ft_s0p8c4)
 ft_s0f48:
 	.word ft_s0p0c4, ft_s0p21c1, ft_s0p0c4, ft_s0p17c3, ft_s0p22c1, ft_s0p0c4, ft_s0p29c7, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p21c1),<.bank(ft_s0p0c4),<.bank(ft_s0p17c3),<.bank(ft_s0p22c1),<.bank(ft_s0p0c4),<.bank(ft_s0p29c7),<.bank(ft_s0p0c4)
 ft_s0f49:
 	.word ft_s0p0c4, ft_s0p22c1, ft_s0p0c4, ft_s0p18c3, ft_s0p30c5, ft_s0p0c4, ft_s0p30c7, ft_s0p14c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p22c1),<.bank(ft_s0p0c4),<.bank(ft_s0p18c3),<.bank(ft_s0p30c5),<.bank(ft_s0p0c4),<.bank(ft_s0p30c7),<.bank(ft_s0p14c4)
 ft_s0f50:
 	.word ft_s0p16c0, ft_s0p24c1, ft_s0p40c2, ft_s0p56c3, ft_s0p24c5, ft_s0p0c0, ft_s0p40c7, ft_s0p8c4
+	.byte <.bank(ft_s0p16c0),<.bank(ft_s0p24c1),<.bank(ft_s0p40c2),<.bank(ft_s0p56c3),<.bank(ft_s0p24c5),<.bank(ft_s0p0c0),<.bank(ft_s0p40c7),<.bank(ft_s0p8c4)
 ft_s0f51:
 	.word ft_s0p0c4, ft_s0p25c1, ft_s0p0c4, ft_s0p17c3, ft_s0p25c5, ft_s0p0c4, ft_s0p37c7, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p25c1),<.bank(ft_s0p0c4),<.bank(ft_s0p17c3),<.bank(ft_s0p25c5),<.bank(ft_s0p0c4),<.bank(ft_s0p37c7),<.bank(ft_s0p0c4)
 ft_s0f52:
 	.word ft_s0p18c0, ft_s0p25c5, ft_s0p0c4, ft_s0p58c3, ft_s0p24c1, ft_s0p0c4, ft_s0p36c7, ft_s0p42c4
+	.byte <.bank(ft_s0p18c0),<.bank(ft_s0p25c5),<.bank(ft_s0p0c4),<.bank(ft_s0p58c3),<.bank(ft_s0p24c1),<.bank(ft_s0p0c4),<.bank(ft_s0p36c7),<.bank(ft_s0p42c4)
 ft_s0f53:
 	.word ft_s0p48c0, ft_s0p28c1, ft_s0p20c2, ft_s0p20c3, ft_s0p32c5, ft_s0p8c6, ft_s0p32c7, ft_s0p16c4
+	.byte <.bank(ft_s0p48c0),<.bank(ft_s0p28c1),<.bank(ft_s0p20c2),<.bank(ft_s0p20c3),<.bank(ft_s0p32c5),<.bank(ft_s0p8c6),<.bank(ft_s0p32c7),<.bank(ft_s0p16c4)
 ft_s0f54:
 	.word ft_s0p5c7, ft_s0p29c1, ft_s0p21c2, ft_s0p21c3, ft_s0p30c1, ft_s0p9c6, ft_s0p29c7, ft_s0p17c4
+	.byte <.bank(ft_s0p5c7),<.bank(ft_s0p29c1),<.bank(ft_s0p21c2),<.bank(ft_s0p21c3),<.bank(ft_s0p30c1),<.bank(ft_s0p9c6),<.bank(ft_s0p29c7),<.bank(ft_s0p17c4)
 ft_s0f55:
 	.word ft_s0p58c0, ft_s0p30c1, ft_s0p22c2, ft_s0p22c3, ft_s0p34c5, ft_s0p22c6, ft_s0p34c7, ft_s0p18c4
+	.byte <.bank(ft_s0p58c0),<.bank(ft_s0p30c1),<.bank(ft_s0p22c2),<.bank(ft_s0p22c3),<.bank(ft_s0p34c5),<.bank(ft_s0p22c6),<.bank(ft_s0p34c7),<.bank(ft_s0p18c4)
 ft_s0f56:
 	.word ft_s0p52c0, ft_s0p32c1, ft_s0p24c2, ft_s0p20c3, ft_s0p36c5, ft_s0p24c6, ft_s0p36c7, ft_s0p16c4
+	.byte <.bank(ft_s0p52c0),<.bank(ft_s0p32c1),<.bank(ft_s0p24c2),<.bank(ft_s0p20c3),<.bank(ft_s0p36c5),<.bank(ft_s0p24c6),<.bank(ft_s0p36c7),<.bank(ft_s0p16c4)
 ft_s0f57:
 	.word ft_s0p9c7, ft_s0p33c1, ft_s0p25c2, ft_s0p21c3, ft_s0p34c1, ft_s0p25c6, ft_s0p37c7, ft_s0p17c4
+	.byte <.bank(ft_s0p9c7),<.bank(ft_s0p33c1),<.bank(ft_s0p25c2),<.bank(ft_s0p21c3),<.bank(ft_s0p34c1),<.bank(ft_s0p25c6),<.bank(ft_s0p37c7),<.bank(ft_s0p17c4)
 ft_s0f58:
 	.word ft_s0p62c0, ft_s0p34c1, ft_s0p26c2, ft_s0p26c3, ft_s0p32c1, ft_s0p26c6, ft_s0p38c7, ft_s0p22c4
+	.byte <.bank(ft_s0p62c0),<.bank(ft_s0p34c1),<.bank(ft_s0p26c2),<.bank(ft_s0p26c3),<.bank(ft_s0p32c1),<.bank(ft_s0p26c6),<.bank(ft_s0p38c7),<.bank(ft_s0p22c4)
 ft_s0f59:
 	.word ft_s0p64c0, ft_s0p28c1, ft_s0p20c2, ft_s0p20c3, ft_s0p40c5, ft_s0p8c6, ft_s0p32c7, ft_s0p16c4
+	.byte <.bank(ft_s0p64c0),<.bank(ft_s0p28c1),<.bank(ft_s0p20c2),<.bank(ft_s0p20c3),<.bank(ft_s0p40c5),<.bank(ft_s0p8c6),<.bank(ft_s0p32c7),<.bank(ft_s0p16c4)
 ft_s0f60:
 	.word ft_s0p65c0, ft_s0p29c1, ft_s0p21c2, ft_s0p21c3, ft_s0p30c1, ft_s0p9c6, ft_s0p29c7, ft_s0p17c4
+	.byte <.bank(ft_s0p65c0),<.bank(ft_s0p29c1),<.bank(ft_s0p21c2),<.bank(ft_s0p21c3),<.bank(ft_s0p30c1),<.bank(ft_s0p9c6),<.bank(ft_s0p29c7),<.bank(ft_s0p17c4)
 ft_s0f61:
 	.word ft_s0p66c0, ft_s0p30c1, ft_s0p22c2, ft_s0p22c3, ft_s0p34c5, ft_s0p22c6, ft_s0p34c7, ft_s0p18c4
+	.byte <.bank(ft_s0p66c0),<.bank(ft_s0p30c1),<.bank(ft_s0p22c2),<.bank(ft_s0p22c3),<.bank(ft_s0p34c5),<.bank(ft_s0p22c6),<.bank(ft_s0p34c7),<.bank(ft_s0p18c4)
 ft_s0f62:
 	.word ft_s0p68c0, ft_s0p32c1, ft_s0p24c2, ft_s0p20c3, ft_s0p36c5, ft_s0p24c6, ft_s0p36c7, ft_s0p16c4
+	.byte <.bank(ft_s0p68c0),<.bank(ft_s0p32c1),<.bank(ft_s0p24c2),<.bank(ft_s0p20c3),<.bank(ft_s0p36c5),<.bank(ft_s0p24c6),<.bank(ft_s0p36c7),<.bank(ft_s0p16c4)
 ft_s0f63:
 	.word ft_s0p69c0, ft_s0p33c1, ft_s0p25c2, ft_s0p21c3, ft_s0p34c1, ft_s0p25c6, ft_s0p37c7, ft_s0p17c4
+	.byte <.bank(ft_s0p69c0),<.bank(ft_s0p33c1),<.bank(ft_s0p25c2),<.bank(ft_s0p21c3),<.bank(ft_s0p34c1),<.bank(ft_s0p25c6),<.bank(ft_s0p37c7),<.bank(ft_s0p17c4)
 ft_s0f64:
 	.word ft_s0p70c0, ft_s0p34c1, ft_s0p26c2, ft_s0p26c3, ft_s0p32c1, ft_s0p26c6, ft_s0p38c7, ft_s0p22c4
+	.byte <.bank(ft_s0p70c0),<.bank(ft_s0p34c1),<.bank(ft_s0p26c2),<.bank(ft_s0p26c3),<.bank(ft_s0p32c1),<.bank(ft_s0p26c6),<.bank(ft_s0p38c7),<.bank(ft_s0p22c4)
 ft_s0f65:
 	.word ft_s0p48c0, ft_s0p36c1, ft_s0p28c2, ft_s0p44c3, ft_s0p44c5, ft_s0p8c6, ft_s0p32c7, ft_s0p16c4
+	.byte <.bank(ft_s0p48c0),<.bank(ft_s0p36c1),<.bank(ft_s0p28c2),<.bank(ft_s0p44c3),<.bank(ft_s0p44c5),<.bank(ft_s0p8c6),<.bank(ft_s0p32c7),<.bank(ft_s0p16c4)
 ft_s0f66:
 	.word ft_s0p5c7, ft_s0p21c1, ft_s0p29c2, ft_s0p45c3, ft_s0p22c1, ft_s0p9c6, ft_s0p29c7, ft_s0p17c4
+	.byte <.bank(ft_s0p5c7),<.bank(ft_s0p21c1),<.bank(ft_s0p29c2),<.bank(ft_s0p45c3),<.bank(ft_s0p22c1),<.bank(ft_s0p9c6),<.bank(ft_s0p29c7),<.bank(ft_s0p17c4)
 ft_s0f67:
 	.word ft_s0p58c0, ft_s0p22c1, ft_s0p30c2, ft_s0p46c3, ft_s0p30c5, ft_s0p22c6, ft_s0p34c7, ft_s0p18c4
+	.byte <.bank(ft_s0p58c0),<.bank(ft_s0p22c1),<.bank(ft_s0p30c2),<.bank(ft_s0p46c3),<.bank(ft_s0p30c5),<.bank(ft_s0p22c6),<.bank(ft_s0p34c7),<.bank(ft_s0p18c4)
 ft_s0f68:
 	.word ft_s0p52c0, ft_s0p24c1, ft_s0p32c2, ft_s0p44c3, ft_s0p24c5, ft_s0p24c6, ft_s0p36c7, ft_s0p16c4
+	.byte <.bank(ft_s0p52c0),<.bank(ft_s0p24c1),<.bank(ft_s0p32c2),<.bank(ft_s0p44c3),<.bank(ft_s0p24c5),<.bank(ft_s0p24c6),<.bank(ft_s0p36c7),<.bank(ft_s0p16c4)
 ft_s0f69:
 	.word ft_s0p9c7, ft_s0p25c1, ft_s0p33c2, ft_s0p45c3, ft_s0p25c5, ft_s0p25c6, ft_s0p37c7, ft_s0p17c4
+	.byte <.bank(ft_s0p9c7),<.bank(ft_s0p25c1),<.bank(ft_s0p33c2),<.bank(ft_s0p45c3),<.bank(ft_s0p25c5),<.bank(ft_s0p25c6),<.bank(ft_s0p37c7),<.bank(ft_s0p17c4)
 ft_s0f70:
 	.word ft_s0p62c0, ft_s0p25c5, ft_s0p34c2, ft_s0p50c3, ft_s0p24c1, ft_s0p26c6, ft_s0p38c7, ft_s0p22c4
+	.byte <.bank(ft_s0p62c0),<.bank(ft_s0p25c5),<.bank(ft_s0p34c2),<.bank(ft_s0p50c3),<.bank(ft_s0p24c1),<.bank(ft_s0p26c6),<.bank(ft_s0p38c7),<.bank(ft_s0p22c4)
 ft_s0f71:
 	.word ft_s0p48c0, ft_s0p36c1, ft_s0p28c2, ft_s0p44c3, ft_s0p28c5, ft_s0p8c6, ft_s0p32c7, ft_s0p16c4
+	.byte <.bank(ft_s0p48c0),<.bank(ft_s0p36c1),<.bank(ft_s0p28c2),<.bank(ft_s0p44c3),<.bank(ft_s0p28c5),<.bank(ft_s0p8c6),<.bank(ft_s0p32c7),<.bank(ft_s0p16c4)
 ft_s0f72:
 	.word ft_s0p5c7, ft_s0p21c1, ft_s0p29c2, ft_s0p45c3, ft_s0p22c1, ft_s0p9c6, ft_s0p29c7, ft_s0p17c4
+	.byte <.bank(ft_s0p5c7),<.bank(ft_s0p21c1),<.bank(ft_s0p29c2),<.bank(ft_s0p45c3),<.bank(ft_s0p22c1),<.bank(ft_s0p9c6),<.bank(ft_s0p29c7),<.bank(ft_s0p17c4)
 ft_s0f73:
 	.word ft_s0p58c0, ft_s0p22c1, ft_s0p30c2, ft_s0p46c3, ft_s0p30c5, ft_s0p22c6, ft_s0p34c7, ft_s0p18c4
+	.byte <.bank(ft_s0p58c0),<.bank(ft_s0p22c1),<.bank(ft_s0p30c2),<.bank(ft_s0p46c3),<.bank(ft_s0p30c5),<.bank(ft_s0p22c6),<.bank(ft_s0p34c7),<.bank(ft_s0p18c4)
 ft_s0f74:
 	.word ft_s0p52c0, ft_s0p24c1, ft_s0p32c2, ft_s0p44c3, ft_s0p24c5, ft_s0p24c6, ft_s0p36c7, ft_s0p16c4
+	.byte <.bank(ft_s0p52c0),<.bank(ft_s0p24c1),<.bank(ft_s0p32c2),<.bank(ft_s0p44c3),<.bank(ft_s0p24c5),<.bank(ft_s0p24c6),<.bank(ft_s0p36c7),<.bank(ft_s0p16c4)
 ft_s0f75:
 	.word ft_s0p9c7, ft_s0p25c1, ft_s0p33c2, ft_s0p45c3, ft_s0p25c5, ft_s0p25c6, ft_s0p37c7, ft_s0p17c4
+	.byte <.bank(ft_s0p9c7),<.bank(ft_s0p25c1),<.bank(ft_s0p33c2),<.bank(ft_s0p45c3),<.bank(ft_s0p25c5),<.bank(ft_s0p25c6),<.bank(ft_s0p37c7),<.bank(ft_s0p17c4)
 ft_s0f76:
 	.word ft_s0p62c0, ft_s0p25c5, ft_s0p34c2, ft_s0p50c3, ft_s0p24c1, ft_s0p26c6, ft_s0p38c7, ft_s0p22c4
+	.byte <.bank(ft_s0p62c0),<.bank(ft_s0p25c5),<.bank(ft_s0p34c2),<.bank(ft_s0p50c3),<.bank(ft_s0p24c1),<.bank(ft_s0p26c6),<.bank(ft_s0p38c7),<.bank(ft_s0p22c4)
 ft_s0f77:
 	.word ft_s0p0c0, ft_s0p36c1, ft_s0p0c2, ft_s0p28c3, ft_s0p28c5, ft_s0p16c6, ft_s0p20c7, ft_s0p8c4
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p36c1),<.bank(ft_s0p0c2),<.bank(ft_s0p28c3),<.bank(ft_s0p28c5),<.bank(ft_s0p16c6),<.bank(ft_s0p20c7),<.bank(ft_s0p8c4)
 ft_s0f78:
 	.word ft_s0p0c4, ft_s0p21c1, ft_s0p0c4, ft_s0p29c3, ft_s0p22c1, ft_s0p0c4, ft_s0p0c4, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p21c1),<.bank(ft_s0p0c4),<.bank(ft_s0p29c3),<.bank(ft_s0p22c1),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4)
 ft_s0f79:
 	.word ft_s0p0c4, ft_s0p22c1, ft_s0p0c4, ft_s0p30c3, ft_s0p30c5, ft_s0p0c4, ft_s0p0c4, ft_s0p14c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p22c1),<.bank(ft_s0p0c4),<.bank(ft_s0p30c3),<.bank(ft_s0p30c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p14c4)
 ft_s0f80:
 	.word ft_s0p0c0, ft_s0p16c1, ft_s0p0c2, ft_s0p32c3, ft_s0p16c5, ft_s0p0c0, ft_s0p48c7, ft_s0p8c4
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p16c1),<.bank(ft_s0p0c2),<.bank(ft_s0p32c3),<.bank(ft_s0p16c5),<.bank(ft_s0p0c0),<.bank(ft_s0p48c7),<.bank(ft_s0p8c4)
 ft_s0f81:
 	.word ft_s0p0c4, ft_s0p16c1, ft_s0p0c4, ft_s0p33c3, ft_s0p17c5, ft_s0p0c4, ft_s0p0c4, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p16c1),<.bank(ft_s0p0c4),<.bank(ft_s0p33c3),<.bank(ft_s0p17c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4)
 ft_s0f82:
 	.word ft_s0p0c4, ft_s0p16c1, ft_s0p0c4, ft_s0p34c3, ft_s0p17c5, ft_s0p0c4, ft_s0p0c4, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p16c1),<.bank(ft_s0p0c4),<.bank(ft_s0p34c3),<.bank(ft_s0p17c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4)
 ft_s0f83:
 	.word ft_s0p0c4, ft_s0p16c1, ft_s0p0c4, ft_s0p35c3, ft_s0p17c5, ft_s0p0c4, ft_s0p0c4, ft_s0p11c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p16c1),<.bank(ft_s0p0c4),<.bank(ft_s0p35c3),<.bank(ft_s0p17c5),<.bank(ft_s0p0c4),<.bank(ft_s0p0c4),<.bank(ft_s0p11c4)
 ft_s0f84:
 	.word ft_s0p20c0, ft_s0p12c1, ft_s0p36c2, ft_s0p36c3, ft_s0p20c5, ft_s0p0c0, ft_s0p4c7, ft_s0p8c4
+	.byte <.bank(ft_s0p20c0),<.bank(ft_s0p12c1),<.bank(ft_s0p36c2),<.bank(ft_s0p36c3),<.bank(ft_s0p20c5),<.bank(ft_s0p0c0),<.bank(ft_s0p4c7),<.bank(ft_s0p8c4)
 ft_s0f85:
 	.word ft_s0p0c4, ft_s0p13c1, ft_s0p0c4, ft_s0p1c3, ft_s0p13c5, ft_s0p0c4, ft_s0p5c7, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p13c1),<.bank(ft_s0p0c4),<.bank(ft_s0p1c3),<.bank(ft_s0p13c5),<.bank(ft_s0p0c4),<.bank(ft_s0p5c7),<.bank(ft_s0p0c4)
 ft_s0f86:
 	.word ft_s0p0c4, ft_s0p13c1, ft_s0p0c4, ft_s0p38c3, ft_s0p13c5, ft_s0p0c4, ft_s0p4c7, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p13c1),<.bank(ft_s0p0c4),<.bank(ft_s0p38c3),<.bank(ft_s0p13c5),<.bank(ft_s0p0c4),<.bank(ft_s0p4c7),<.bank(ft_s0p0c4)
 ft_s0f87:
 	.word ft_s0p0c4, ft_s0p13c1, ft_s0p0c4, ft_s0p39c3, ft_s0p13c5, ft_s0p0c4, ft_s0p5c7, ft_s0p11c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p13c1),<.bank(ft_s0p0c4),<.bank(ft_s0p39c3),<.bank(ft_s0p13c5),<.bank(ft_s0p0c4),<.bank(ft_s0p5c7),<.bank(ft_s0p11c4)
 ft_s0f88:
 	.word ft_s0p24c0, ft_s0p16c1, ft_s0p40c2, ft_s0p40c3, ft_s0p16c5, ft_s0p0c0, ft_s0p8c7, ft_s0p8c4
+	.byte <.bank(ft_s0p24c0),<.bank(ft_s0p16c1),<.bank(ft_s0p40c2),<.bank(ft_s0p40c3),<.bank(ft_s0p16c5),<.bank(ft_s0p0c0),<.bank(ft_s0p8c7),<.bank(ft_s0p8c4)
 ft_s0f89:
 	.word ft_s0p0c4, ft_s0p16c1, ft_s0p0c4, ft_s0p1c3, ft_s0p17c5, ft_s0p0c4, ft_s0p9c7, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p16c1),<.bank(ft_s0p0c4),<.bank(ft_s0p1c3),<.bank(ft_s0p17c5),<.bank(ft_s0p0c4),<.bank(ft_s0p9c7),<.bank(ft_s0p0c4)
 ft_s0f90:
 	.word ft_s0p0c4, ft_s0p16c1, ft_s0p0c4, ft_s0p38c3, ft_s0p17c5, ft_s0p0c4, ft_s0p8c7, ft_s0p0c4
+	.byte <.bank(ft_s0p0c4),<.bank(ft_s0p16c1),<.bank(ft_s0p0c4),<.bank(ft_s0p38c3),<.bank(ft_s0p17c5),<.bank(ft_s0p0c4),<.bank(ft_s0p8c7),<.bank(ft_s0p0c4)
 ft_s0f91:
 	.word ft_s0p18c0, ft_s0p16c1, ft_s0p0c4, ft_s0p39c3, ft_s0p17c5, ft_s0p0c4, ft_s0p11c7, ft_s0p27c4
+	.byte <.bank(ft_s0p18c0),<.bank(ft_s0p16c1),<.bank(ft_s0p0c4),<.bank(ft_s0p39c3),<.bank(ft_s0p17c5),<.bank(ft_s0p0c4),<.bank(ft_s0p11c7),<.bank(ft_s0p27c4)
 ft_s0f92:
 	.word ft_s0p48c0, ft_s0p0c1, ft_s0p4c2, ft_s0p52c3, ft_s0p48c5, ft_s0p8c6, ft_s0p12c7, ft_s0p4c4
+	.byte <.bank(ft_s0p48c0),<.bank(ft_s0p0c1),<.bank(ft_s0p4c2),<.bank(ft_s0p52c3),<.bank(ft_s0p48c5),<.bank(ft_s0p8c6),<.bank(ft_s0p12c7),<.bank(ft_s0p4c4)
 ft_s0f93:
 	.word ft_s0p5c7, ft_s0p1c1, ft_s0p5c2, ft_s0p53c3, ft_s0p1c5, ft_s0p9c6, ft_s0p5c7, ft_s0p5c4
+	.byte <.bank(ft_s0p5c7),<.bank(ft_s0p1c1),<.bank(ft_s0p5c2),<.bank(ft_s0p53c3),<.bank(ft_s0p1c5),<.bank(ft_s0p9c6),<.bank(ft_s0p5c7),<.bank(ft_s0p5c4)
 ft_s0f94:
 	.word ft_s0p14c7, ft_s0p1c1, ft_s0p6c2, ft_s0p54c3, ft_s0p1c5, ft_s0p10c6, ft_s0p14c7, ft_s0p6c4
+	.byte <.bank(ft_s0p14c7),<.bank(ft_s0p1c1),<.bank(ft_s0p6c2),<.bank(ft_s0p54c3),<.bank(ft_s0p1c5),<.bank(ft_s0p10c6),<.bank(ft_s0p14c7),<.bank(ft_s0p6c4)
 ft_s0f95:
 	.word ft_s0p5c7, ft_s0p1c1, ft_s0p5c2, ft_s0p55c3, ft_s0p1c5, ft_s0p9c6, ft_s0p5c7, ft_s0p7c4
+	.byte <.bank(ft_s0p5c7),<.bank(ft_s0p1c1),<.bank(ft_s0p5c2),<.bank(ft_s0p55c3),<.bank(ft_s0p1c5),<.bank(ft_s0p9c6),<.bank(ft_s0p5c7),<.bank(ft_s0p7c4)
 ft_s0f96:
 	.word ft_s0p52c0, ft_s0p4c1, ft_s0p8c2, ft_s0p52c3, ft_s0p4c5, ft_s0p12c6, ft_s0p16c7, ft_s0p28c4
+	.byte <.bank(ft_s0p52c0),<.bank(ft_s0p4c1),<.bank(ft_s0p8c2),<.bank(ft_s0p52c3),<.bank(ft_s0p4c5),<.bank(ft_s0p12c6),<.bank(ft_s0p16c7),<.bank(ft_s0p28c4)
 ft_s0f97:
 	.word ft_s0p9c7, ft_s0p4c1, ft_s0p9c2, ft_s0p53c3, ft_s0p5c5, ft_s0p13c6, ft_s0p9c7, ft_s0p29c4
+	.byte <.bank(ft_s0p9c7),<.bank(ft_s0p4c1),<.bank(ft_s0p9c2),<.bank(ft_s0p53c3),<.bank(ft_s0p5c5),<.bank(ft_s0p13c6),<.bank(ft_s0p9c7),<.bank(ft_s0p29c4)
 ft_s0f98:
 	.word ft_s0p16c7, ft_s0p4c1, ft_s0p10c2, ft_s0p54c3, ft_s0p5c5, ft_s0p14c6, ft_s0p16c7, ft_s0p30c4
+	.byte <.bank(ft_s0p16c7),<.bank(ft_s0p4c1),<.bank(ft_s0p10c2),<.bank(ft_s0p54c3),<.bank(ft_s0p5c5),<.bank(ft_s0p14c6),<.bank(ft_s0p16c7),<.bank(ft_s0p30c4)
 ft_s0f99:
 	.word ft_s0p11c7, ft_s0p4c1, ft_s0p11c2, ft_s0p55c3, ft_s0p5c5, ft_s0p15c6, ft_s0p11c7, ft_s0p31c4
+	.byte <.bank(ft_s0p11c7),<.bank(ft_s0p4c1),<.bank(ft_s0p11c2),<.bank(ft_s0p55c3),<.bank(ft_s0p5c5),<.bank(ft_s0p15c6),<.bank(ft_s0p11c7),<.bank(ft_s0p31c4)
+
+; Bank 0
+ft_s1_frames:
+	.word ft_s1f0
+	.word ft_s1f1
+	.word ft_s1f2
+	.word ft_s1f3
+	.word ft_s1f4
+	.word ft_s1f5
+	.word ft_s1f6
+	.word ft_s1f7
+	.word ft_s1f8
+	.word ft_s1f9
+	.word ft_s1f10
+	.word ft_s1f11
+	.word ft_s1f12
+	.word ft_s1f13
+	.word ft_s1f14
+	.word ft_s1f15
+	.word ft_s1f16
+	.word ft_s1f17
+	.word ft_s1f18
+	.word ft_s1f19
+	.word ft_s1f20
+	.word ft_s1f21
+	.word ft_s1f22
+	.word ft_s1f23
+	.word ft_s1f24
+	.word ft_s1f25
+	.word ft_s1f26
+	.word ft_s1f27
+	.word ft_s1f28
+	.word ft_s1f29
+	.word ft_s1f30
+	.word ft_s1f31
+	.word ft_s1f32
+	.word ft_s1f33
+	.word ft_s1f34
+	.word ft_s1f35
+	.word ft_s1f36
+	.word ft_s1f37
+	.word ft_s1f38
+	.word ft_s1f39
+	.word ft_s1f40
+	.word ft_s1f41
+	.word ft_s1f42
+	.word ft_s1f43
+	.word ft_s1f44
+	.word ft_s1f45
+	.word ft_s1f46
+	.word ft_s1f47
+	.word ft_s1f48
+	.word ft_s1f49
+	.word ft_s1f50
+	.word ft_s1f51
+	.word ft_s1f52
+	.word ft_s1f53
+	.word ft_s1f54
+	.word ft_s1f55
+	.word ft_s1f56
+	.word ft_s1f57
+	.word ft_s1f58
+	.word ft_s1f59
+	.word ft_s1f60
+	.word ft_s1f61
+	.word ft_s1f62
+	.word ft_s1f63
+	.word ft_s1f64
+	.word ft_s1f65
+	.word ft_s1f66
+	.word ft_s1f67
+	.word ft_s1f68
+	.word ft_s1f69
+	.word ft_s1f70
+	.word ft_s1f71
+	.word ft_s1f72
+	.word ft_s1f73
+	.word ft_s1f74
+	.word ft_s1f75
+	.word ft_s1f76
+	.word ft_s1f77
+	.word ft_s1f78
+	.word ft_s1f79
+	.word ft_s1f80
+	.word ft_s1f81
+	.word ft_s1f82
+	.word ft_s1f83
+	.word ft_s1f84
+	.word ft_s1f85
+	.word ft_s1f86
+	.word ft_s1f87
+	.word ft_s1f88
+	.word ft_s1f89
+	.word ft_s1f90
+	.word ft_s1f91
+	.word ft_s1f92
+	.word ft_s1f93
+	.word ft_s1f94
+	.word ft_s1f95
+	.word ft_s1f96
+	.word ft_s1f97
+	.word ft_s1f98
+	.word ft_s1f99
+ft_s1f0:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f1:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f2:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f3:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f4:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f5:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f6:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f7:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f8:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f9:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f10:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f11:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f12:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f13:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f14:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f15:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f16:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f17:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f18:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f19:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f20:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f21:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f22:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f23:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f24:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f25:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f26:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f27:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f28:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f29:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f30:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f31:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f32:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f33:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f34:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f35:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f36:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f37:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f38:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f39:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f40:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f41:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f42:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f43:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f44:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f45:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f46:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f47:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f48:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f49:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f50:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f51:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f52:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f53:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f54:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f55:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f56:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f57:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f58:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f59:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f60:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f61:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f62:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f63:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f64:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f65:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f66:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f67:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f68:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f69:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f70:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f71:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f72:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f73:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f74:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f75:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f76:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f77:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f78:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f79:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f80:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f81:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f82:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f83:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f84:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f85:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f86:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f87:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f88:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f89:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f90:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f91:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f92:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f93:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f94:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f95:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f96:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f97:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f98:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+ft_s1f99:
+	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p2c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.byte <.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s1p2c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0)
+
+
+; Bank 0
+ft_s2_frames:
+	.word ft_s2f0
+	.word ft_s2f1
+	.word ft_s2f2
+	.word ft_s2f3
+	.word ft_s2f4
+	.word ft_s2f5
+	.word ft_s2f6
+	.word ft_s2f7
+	.word ft_s2f8
+	.word ft_s2f9
+	.word ft_s2f10
+	.word ft_s2f11
+	.word ft_s2f12
+	.word ft_s2f13
+	.word ft_s2f14
+	.word ft_s2f15
+	.word ft_s2f16
+	.word ft_s2f17
+	.word ft_s2f18
+	.word ft_s2f19
+	.word ft_s2f20
+	.word ft_s2f21
+	.word ft_s2f22
+	.word ft_s2f23
+	.word ft_s2f24
+	.word ft_s2f25
+	.word ft_s2f26
+	.word ft_s2f27
+	.word ft_s2f28
+	.word ft_s2f29
+	.word ft_s2f30
+	.word ft_s2f31
+	.word ft_s2f32
+	.word ft_s2f33
+	.word ft_s2f34
+	.word ft_s2f35
+	.word ft_s2f36
+	.word ft_s2f37
+	.word ft_s2f38
+	.word ft_s2f39
+	.word ft_s2f40
+	.word ft_s2f41
+	.word ft_s2f42
+	.word ft_s2f43
+	.word ft_s2f44
+	.word ft_s2f45
+	.word ft_s2f46
+	.word ft_s2f47
+	.word ft_s2f48
+	.word ft_s2f49
+	.word ft_s2f50
+	.word ft_s2f51
+	.word ft_s2f52
+	.word ft_s2f53
+	.word ft_s2f54
+	.word ft_s2f55
+	.word ft_s2f56
+	.word ft_s2f57
+	.word ft_s2f58
+	.word ft_s2f59
+	.word ft_s2f60
+	.word ft_s2f61
+	.word ft_s2f62
+	.word ft_s2f63
+	.word ft_s2f64
+	.word ft_s2f65
+	.word ft_s2f66
+	.word ft_s2f67
+	.word ft_s2f68
+	.word ft_s2f69
+	.word ft_s2f70
+	.word ft_s2f71
+	.word ft_s2f72
+	.word ft_s2f73
+	.word ft_s2f74
+	.word ft_s2f75
+	.word ft_s2f76
+	.word ft_s2f77
+	.word ft_s2f78
+	.word ft_s2f79
+	.word ft_s2f80
+	.word ft_s2f81
+	.word ft_s2f82
+	.word ft_s2f83
+	.word ft_s2f84
+	.word ft_s2f85
+	.word ft_s2f86
+	.word ft_s2f87
+	.word ft_s2f88
+	.word ft_s2f89
+	.word ft_s2f90
+	.word ft_s2f91
+	.word ft_s2f92
+	.word ft_s2f93
+	.word ft_s2f94
+	.word ft_s2f95
+	.word ft_s2f96
+	.word ft_s2f97
+	.word ft_s2f98
+	.word ft_s2f99
+ft_s2f0:
+	.word ft_s2p0c0, ft_s2p0c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p0c0),<.bank(ft_s2p0c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f1:
+	.word ft_s2p1c0, ft_s2p0c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p1c0),<.bank(ft_s2p0c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f2:
+	.word ft_s2p1c0, ft_s2p0c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p1c0),<.bank(ft_s2p0c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f3:
+	.word ft_s2p1c0, ft_s2p0c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p1c0),<.bank(ft_s2p0c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f4:
+	.word ft_s2p2c0, ft_s2p1c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p2c0),<.bank(ft_s2p1c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f5:
+	.word ft_s2p3c0, ft_s2p1c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p3c0),<.bank(ft_s2p1c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f6:
+	.word ft_s2p3c0, ft_s2p1c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p3c0),<.bank(ft_s2p1c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f7:
+	.word ft_s2p3c0, ft_s2p1c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p3c0),<.bank(ft_s2p1c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f8:
+	.word ft_s2p4c0, ft_s2p0c1, ft_s2p1c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p4c0),<.bank(ft_s2p0c1),<.bank(ft_s2p1c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f9:
+	.word ft_s2p1c0, ft_s2p0c1, ft_s2p2c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p1c0),<.bank(ft_s2p0c1),<.bank(ft_s2p2c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f10:
+	.word ft_s2p1c0, ft_s2p0c1, ft_s2p1c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p1c0),<.bank(ft_s2p0c1),<.bank(ft_s2p1c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f11:
+	.word ft_s2p1c0, ft_s2p0c1, ft_s2p2c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p1c0),<.bank(ft_s2p0c1),<.bank(ft_s2p2c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f12:
+	.word ft_s2p2c0, ft_s2p1c1, ft_s2p3c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p2c0),<.bank(ft_s2p1c1),<.bank(ft_s2p3c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f13:
+	.word ft_s2p3c0, ft_s2p1c1, ft_s2p4c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p3c0),<.bank(ft_s2p1c1),<.bank(ft_s2p4c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f14:
+	.word ft_s2p3c0, ft_s2p1c1, ft_s2p3c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p3c0),<.bank(ft_s2p1c1),<.bank(ft_s2p3c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f15:
+	.word ft_s2p3c0, ft_s2p1c1, ft_s2p5c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p3c0),<.bank(ft_s2p1c1),<.bank(ft_s2p5c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f16:
+	.word ft_s2p4c0, ft_s2p0c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
+	.byte <.bank(ft_s2p4c0),<.bank(ft_s2p0c1),<.bank(ft_s2p6c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p6c4)
+ft_s2f17:
+	.word ft_s2p1c0, ft_s2p0c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
+	.byte <.bank(ft_s2p1c0),<.bank(ft_s2p0c1),<.bank(ft_s2p7c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p7c4)
+ft_s2f18:
+	.word ft_s2p1c0, ft_s2p0c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
+	.byte <.bank(ft_s2p1c0),<.bank(ft_s2p0c1),<.bank(ft_s2p6c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p6c4)
+ft_s2f19:
+	.word ft_s2p1c0, ft_s2p0c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
+	.byte <.bank(ft_s2p1c0),<.bank(ft_s2p0c1),<.bank(ft_s2p7c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p7c4)
+ft_s2f20:
+	.word ft_s2p2c0, ft_s2p1c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
+	.byte <.bank(ft_s2p2c0),<.bank(ft_s2p1c1),<.bank(ft_s2p8c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p8c4)
+ft_s2f21:
+	.word ft_s2p3c0, ft_s2p1c1, ft_s2p9c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
+	.byte <.bank(ft_s2p3c0),<.bank(ft_s2p1c1),<.bank(ft_s2p9c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p9c4)
+ft_s2f22:
+	.word ft_s2p3c0, ft_s2p1c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
+	.byte <.bank(ft_s2p3c0),<.bank(ft_s2p1c1),<.bank(ft_s2p8c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p8c4)
+ft_s2f23:
+	.word ft_s2p3c0, ft_s2p1c1, ft_s2p10c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p10c4
+	.byte <.bank(ft_s2p3c0),<.bank(ft_s2p1c1),<.bank(ft_s2p10c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p10c4)
+ft_s2f24:
+	.word ft_s2p5c0, ft_s2p2c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
+	.byte <.bank(ft_s2p5c0),<.bank(ft_s2p2c1),<.bank(ft_s2p6c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p6c4)
+ft_s2f25:
+	.word ft_s2p6c0, ft_s2p2c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
+	.byte <.bank(ft_s2p6c0),<.bank(ft_s2p2c1),<.bank(ft_s2p7c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p7c4)
+ft_s2f26:
+	.word ft_s2p6c0, ft_s2p2c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
+	.byte <.bank(ft_s2p6c0),<.bank(ft_s2p2c1),<.bank(ft_s2p6c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p6c4)
+ft_s2f27:
+	.word ft_s2p6c0, ft_s2p2c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
+	.byte <.bank(ft_s2p6c0),<.bank(ft_s2p2c1),<.bank(ft_s2p7c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p7c4)
+ft_s2f28:
+	.word ft_s2p7c0, ft_s2p3c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
+	.byte <.bank(ft_s2p7c0),<.bank(ft_s2p3c1),<.bank(ft_s2p8c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p8c4)
+ft_s2f29:
+	.word ft_s2p8c0, ft_s2p3c1, ft_s2p9c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
+	.byte <.bank(ft_s2p8c0),<.bank(ft_s2p3c1),<.bank(ft_s2p9c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p9c4)
+ft_s2f30:
+	.word ft_s2p8c0, ft_s2p3c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
+	.byte <.bank(ft_s2p8c0),<.bank(ft_s2p3c1),<.bank(ft_s2p8c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p8c4)
+ft_s2f31:
+	.word ft_s2p8c0, ft_s2p3c1, ft_s2p10c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p10c4
+	.byte <.bank(ft_s2p8c0),<.bank(ft_s2p3c1),<.bank(ft_s2p10c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p10c4)
+ft_s2f32:
+	.word ft_s2p9c0, ft_s2p2c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
+	.byte <.bank(ft_s2p9c0),<.bank(ft_s2p2c1),<.bank(ft_s2p6c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p6c4)
+ft_s2f33:
+	.word ft_s2p6c0, ft_s2p2c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
+	.byte <.bank(ft_s2p6c0),<.bank(ft_s2p2c1),<.bank(ft_s2p7c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p7c4)
+ft_s2f34:
+	.word ft_s2p6c0, ft_s2p2c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
+	.byte <.bank(ft_s2p6c0),<.bank(ft_s2p2c1),<.bank(ft_s2p6c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p6c4)
+ft_s2f35:
+	.word ft_s2p6c0, ft_s2p2c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
+	.byte <.bank(ft_s2p6c0),<.bank(ft_s2p2c1),<.bank(ft_s2p7c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p7c4)
+ft_s2f36:
+	.word ft_s2p7c0, ft_s2p3c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
+	.byte <.bank(ft_s2p7c0),<.bank(ft_s2p3c1),<.bank(ft_s2p8c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p8c4)
+ft_s2f37:
+	.word ft_s2p8c0, ft_s2p3c1, ft_s2p9c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
+	.byte <.bank(ft_s2p8c0),<.bank(ft_s2p3c1),<.bank(ft_s2p9c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p9c4)
+ft_s2f38:
+	.word ft_s2p8c0, ft_s2p3c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
+	.byte <.bank(ft_s2p8c0),<.bank(ft_s2p3c1),<.bank(ft_s2p8c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p8c4)
+ft_s2f39:
+	.word ft_s2p8c0, ft_s2p3c1, ft_s2p10c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p10c4
+	.byte <.bank(ft_s2p8c0),<.bank(ft_s2p3c1),<.bank(ft_s2p10c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p10c4)
+ft_s2f40:
+	.word ft_s2p9c0, ft_s2p2c1, ft_s2p11c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p11c4
+	.byte <.bank(ft_s2p9c0),<.bank(ft_s2p2c1),<.bank(ft_s2p11c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p11c4)
+ft_s2f41:
+	.word ft_s2p6c0, ft_s2p2c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p6c0),<.bank(ft_s2p2c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f42:
+	.word ft_s2p6c0, ft_s2p2c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p6c0),<.bank(ft_s2p2c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f43:
+	.word ft_s2p6c0, ft_s2p2c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p6c0),<.bank(ft_s2p2c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f44:
+	.word ft_s2p10c0, ft_s2p4c1, ft_s2p12c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p10c0),<.bank(ft_s2p4c1),<.bank(ft_s2p12c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f45:
+	.word ft_s2p11c0, ft_s2p5c1, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p11c0),<.bank(ft_s2p5c1),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f46:
+	.word ft_s2p12c0, ft_s2p6c1, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p12c0),<.bank(ft_s2p6c1),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f47:
+	.word ft_s2p13c0, ft_s2p7c1, ft_s2p1c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p13c0),<.bank(ft_s2p7c1),<.bank(ft_s2p1c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f48:
+	.word ft_s2p14c0, ft_s2p8c1, ft_s2p2c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p14c0),<.bank(ft_s2p8c1),<.bank(ft_s2p2c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f49:
+	.word ft_s2p15c0, ft_s2p9c1, ft_s2p1c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p15c0),<.bank(ft_s2p9c1),<.bank(ft_s2p1c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f50:
+	.word ft_s2p10c0, ft_s2p4c1, ft_s2p3c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p10c0),<.bank(ft_s2p4c1),<.bank(ft_s2p3c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f51:
+	.word ft_s2p11c0, ft_s2p5c1, ft_s2p4c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p11c0),<.bank(ft_s2p5c1),<.bank(ft_s2p4c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f52:
+	.word ft_s2p12c0, ft_s2p6c1, ft_s2p3c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p12c0),<.bank(ft_s2p6c1),<.bank(ft_s2p3c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f53:
+	.word ft_s2p13c0, ft_s2p7c1, ft_s2p6c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
+	.byte <.bank(ft_s2p13c0),<.bank(ft_s2p7c1),<.bank(ft_s2p6c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p6c4)
+ft_s2f54:
+	.word ft_s2p14c0, ft_s2p8c1, ft_s2p7c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
+	.byte <.bank(ft_s2p14c0),<.bank(ft_s2p8c1),<.bank(ft_s2p7c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p7c4)
+ft_s2f55:
+	.word ft_s2p15c0, ft_s2p9c1, ft_s2p21c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p21c4
+	.byte <.bank(ft_s2p15c0),<.bank(ft_s2p9c1),<.bank(ft_s2p21c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p21c4)
+ft_s2f56:
+	.word ft_s2p10c0, ft_s2p4c1, ft_s2p8c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
+	.byte <.bank(ft_s2p10c0),<.bank(ft_s2p4c1),<.bank(ft_s2p8c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p8c4)
+ft_s2f57:
+	.word ft_s2p11c0, ft_s2p5c1, ft_s2p9c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
+	.byte <.bank(ft_s2p11c0),<.bank(ft_s2p5c1),<.bank(ft_s2p9c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p9c4)
+ft_s2f58:
+	.word ft_s2p12c0, ft_s2p6c1, ft_s2p24c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p24c4
+	.byte <.bank(ft_s2p12c0),<.bank(ft_s2p6c1),<.bank(ft_s2p24c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p24c4)
+ft_s2f59:
+	.word ft_s2p13c0, ft_s2p7c1, ft_s2p6c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
+	.byte <.bank(ft_s2p13c0),<.bank(ft_s2p7c1),<.bank(ft_s2p6c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p6c4)
+ft_s2f60:
+	.word ft_s2p14c0, ft_s2p8c1, ft_s2p7c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
+	.byte <.bank(ft_s2p14c0),<.bank(ft_s2p8c1),<.bank(ft_s2p7c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p7c4)
+ft_s2f61:
+	.word ft_s2p15c0, ft_s2p9c1, ft_s2p21c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p21c4
+	.byte <.bank(ft_s2p15c0),<.bank(ft_s2p9c1),<.bank(ft_s2p21c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p21c4)
+ft_s2f62:
+	.word ft_s2p10c0, ft_s2p4c1, ft_s2p8c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
+	.byte <.bank(ft_s2p10c0),<.bank(ft_s2p4c1),<.bank(ft_s2p8c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p8c4)
+ft_s2f63:
+	.word ft_s2p11c0, ft_s2p5c1, ft_s2p9c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
+	.byte <.bank(ft_s2p11c0),<.bank(ft_s2p5c1),<.bank(ft_s2p9c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p9c4)
+ft_s2f64:
+	.word ft_s2p12c0, ft_s2p6c1, ft_s2p24c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p24c4
+	.byte <.bank(ft_s2p12c0),<.bank(ft_s2p6c1),<.bank(ft_s2p24c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p24c4)
+ft_s2f65:
+	.word ft_s2p13c0, ft_s2p7c1, ft_s2p6c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
+	.byte <.bank(ft_s2p13c0),<.bank(ft_s2p7c1),<.bank(ft_s2p6c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p6c4)
+ft_s2f66:
+	.word ft_s2p14c0, ft_s2p8c1, ft_s2p7c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
+	.byte <.bank(ft_s2p14c0),<.bank(ft_s2p8c1),<.bank(ft_s2p7c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p7c4)
+ft_s2f67:
+	.word ft_s2p15c0, ft_s2p9c1, ft_s2p21c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p21c4
+	.byte <.bank(ft_s2p15c0),<.bank(ft_s2p9c1),<.bank(ft_s2p21c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p21c4)
+ft_s2f68:
+	.word ft_s2p10c0, ft_s2p4c1, ft_s2p8c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
+	.byte <.bank(ft_s2p10c0),<.bank(ft_s2p4c1),<.bank(ft_s2p8c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p8c4)
+ft_s2f69:
+	.word ft_s2p11c0, ft_s2p5c1, ft_s2p9c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
+	.byte <.bank(ft_s2p11c0),<.bank(ft_s2p5c1),<.bank(ft_s2p9c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p9c4)
+ft_s2f70:
+	.word ft_s2p12c0, ft_s2p6c1, ft_s2p24c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p24c4
+	.byte <.bank(ft_s2p12c0),<.bank(ft_s2p6c1),<.bank(ft_s2p24c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p24c4)
+ft_s2f71:
+	.word ft_s2p13c0, ft_s2p7c1, ft_s2p6c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
+	.byte <.bank(ft_s2p13c0),<.bank(ft_s2p7c1),<.bank(ft_s2p6c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p6c4)
+ft_s2f72:
+	.word ft_s2p14c0, ft_s2p8c1, ft_s2p7c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
+	.byte <.bank(ft_s2p14c0),<.bank(ft_s2p8c1),<.bank(ft_s2p7c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p7c4)
+ft_s2f73:
+	.word ft_s2p15c0, ft_s2p9c1, ft_s2p21c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p21c4
+	.byte <.bank(ft_s2p15c0),<.bank(ft_s2p9c1),<.bank(ft_s2p21c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p21c4)
+ft_s2f74:
+	.word ft_s2p10c0, ft_s2p4c1, ft_s2p8c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
+	.byte <.bank(ft_s2p10c0),<.bank(ft_s2p4c1),<.bank(ft_s2p8c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p8c4)
+ft_s2f75:
+	.word ft_s2p11c0, ft_s2p5c1, ft_s2p9c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
+	.byte <.bank(ft_s2p11c0),<.bank(ft_s2p5c1),<.bank(ft_s2p9c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p9c4)
+ft_s2f76:
+	.word ft_s2p12c0, ft_s2p6c1, ft_s2p24c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p24c4
+	.byte <.bank(ft_s2p12c0),<.bank(ft_s2p6c1),<.bank(ft_s2p24c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p24c4)
+ft_s2f77:
+	.word ft_s2p13c0, ft_s2p7c1, ft_s2p25c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p11c4
+	.byte <.bank(ft_s2p13c0),<.bank(ft_s2p7c1),<.bank(ft_s2p25c2),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p11c4)
+ft_s2f78:
+	.word ft_s2p14c0, ft_s2p8c1, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p14c0),<.bank(ft_s2p8c1),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f79:
+	.word ft_s2p15c0, ft_s2p9c1, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p15c0),<.bank(ft_s2p9c1),<.bank(ft_s0p0c0),<.bank(ft_s1p1c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f80:
+	.word ft_s2p7c0, ft_s2p3c1, ft_s2p26c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p7c0),<.bank(ft_s2p3c1),<.bank(ft_s2p26c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f81:
+	.word ft_s2p8c0, ft_s2p3c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p8c0),<.bank(ft_s2p3c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f82:
+	.word ft_s2p8c0, ft_s2p3c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p8c0),<.bank(ft_s2p3c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f83:
+	.word ft_s2p8c0, ft_s2p3c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p8c0),<.bank(ft_s2p3c1),<.bank(ft_s0p0c0),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f84:
+	.word ft_s2p9c0, ft_s2p2c1, ft_s2p1c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p9c0),<.bank(ft_s2p2c1),<.bank(ft_s2p1c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f85:
+	.word ft_s2p6c0, ft_s2p2c1, ft_s2p2c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p6c0),<.bank(ft_s2p2c1),<.bank(ft_s2p2c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f86:
+	.word ft_s2p6c0, ft_s2p2c1, ft_s2p1c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p6c0),<.bank(ft_s2p2c1),<.bank(ft_s2p1c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f87:
+	.word ft_s2p6c0, ft_s2p2c1, ft_s2p2c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p6c0),<.bank(ft_s2p2c1),<.bank(ft_s2p2c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f88:
+	.word ft_s2p7c0, ft_s2p3c1, ft_s2p3c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p7c0),<.bank(ft_s2p3c1),<.bank(ft_s2p3c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f89:
+	.word ft_s2p8c0, ft_s2p3c1, ft_s2p4c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p8c0),<.bank(ft_s2p3c1),<.bank(ft_s2p4c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f90:
+	.word ft_s2p8c0, ft_s2p3c1, ft_s2p3c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p8c0),<.bank(ft_s2p3c1),<.bank(ft_s2p3c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f91:
+	.word ft_s2p8c0, ft_s2p3c1, ft_s2p5c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
+	.byte <.bank(ft_s2p8c0),<.bank(ft_s2p3c1),<.bank(ft_s2p5c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p0c4)
+ft_s2f92:
+	.word ft_s2p16c0, ft_s2p0c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
+	.byte <.bank(ft_s2p16c0),<.bank(ft_s2p0c1),<.bank(ft_s2p6c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p6c4)
+ft_s2f93:
+	.word ft_s2p1c0, ft_s2p0c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
+	.byte <.bank(ft_s2p1c0),<.bank(ft_s2p0c1),<.bank(ft_s2p7c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p7c4)
+ft_s2f94:
+	.word ft_s2p1c0, ft_s2p0c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
+	.byte <.bank(ft_s2p1c0),<.bank(ft_s2p0c1),<.bank(ft_s2p6c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p6c4)
+ft_s2f95:
+	.word ft_s2p1c0, ft_s2p0c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
+	.byte <.bank(ft_s2p1c0),<.bank(ft_s2p0c1),<.bank(ft_s2p7c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p7c4)
+ft_s2f96:
+	.word ft_s2p2c0, ft_s2p1c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
+	.byte <.bank(ft_s2p2c0),<.bank(ft_s2p1c1),<.bank(ft_s2p8c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p8c4)
+ft_s2f97:
+	.word ft_s2p3c0, ft_s2p1c1, ft_s2p9c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
+	.byte <.bank(ft_s2p3c0),<.bank(ft_s2p1c1),<.bank(ft_s2p9c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p9c4)
+ft_s2f98:
+	.word ft_s2p3c0, ft_s2p1c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
+	.byte <.bank(ft_s2p3c0),<.bank(ft_s2p1c1),<.bank(ft_s2p8c2),<.bank(ft_s1p0c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p8c4)
+ft_s2f99:
+	.word ft_s2p3c0, ft_s2p1c1, ft_s2p10c2, ft_s1p2c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p10c4
+	.byte <.bank(ft_s2p3c0),<.bank(ft_s2p1c1),<.bank(ft_s2p10c2),<.bank(ft_s1p2c3),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s0p0c0),<.bank(ft_s2p10c4)
+
+	.segment "MUSIC_2"
+
+; Song 0 (warp zone)
+
 ; Bank 0
 ft_s0p0c0:
 	.byte $7F, $1F
@@ -1302,308 +2214,9 @@ ft_s0p69c0:
 ft_s0p70c0:
 	.byte $E0, $93, $02, $91, $81, $F6, $35, $00, $36, $0A, $38, $03, $36, $03, $3D, $03, $3A, $07
 
-; Bank 0
-ft_s1_frames:
-	.word ft_s1f0
-	.word ft_s1f1
-	.word ft_s1f2
-	.word ft_s1f3
-	.word ft_s1f4
-	.word ft_s1f5
-	.word ft_s1f6
-	.word ft_s1f7
-	.word ft_s1f8
-	.word ft_s1f9
-	.word ft_s1f10
-	.word ft_s1f11
-	.word ft_s1f12
-	.word ft_s1f13
-	.word ft_s1f14
-	.word ft_s1f15
-	.word ft_s1f16
-	.word ft_s1f17
-	.word ft_s1f18
-	.word ft_s1f19
-	.word ft_s1f20
-	.word ft_s1f21
-	.word ft_s1f22
-	.word ft_s1f23
-	.word ft_s1f24
-	.word ft_s1f25
-	.word ft_s1f26
-	.word ft_s1f27
-	.word ft_s1f28
-	.word ft_s1f29
-	.word ft_s1f30
-	.word ft_s1f31
-	.word ft_s1f32
-	.word ft_s1f33
-	.word ft_s1f34
-	.word ft_s1f35
-	.word ft_s1f36
-	.word ft_s1f37
-	.word ft_s1f38
-	.word ft_s1f39
-	.word ft_s1f40
-	.word ft_s1f41
-	.word ft_s1f42
-	.word ft_s1f43
-	.word ft_s1f44
-	.word ft_s1f45
-	.word ft_s1f46
-	.word ft_s1f47
-	.word ft_s1f48
-	.word ft_s1f49
-	.word ft_s1f50
-	.word ft_s1f51
-	.word ft_s1f52
-	.word ft_s1f53
-	.word ft_s1f54
-	.word ft_s1f55
-	.word ft_s1f56
-	.word ft_s1f57
-	.word ft_s1f58
-	.word ft_s1f59
-	.word ft_s1f60
-	.word ft_s1f61
-	.word ft_s1f62
-	.word ft_s1f63
-	.word ft_s1f64
-	.word ft_s1f65
-	.word ft_s1f66
-	.word ft_s1f67
-	.word ft_s1f68
-	.word ft_s1f69
-	.word ft_s1f70
-	.word ft_s1f71
-	.word ft_s1f72
-	.word ft_s1f73
-	.word ft_s1f74
-	.word ft_s1f75
-	.word ft_s1f76
-	.word ft_s1f77
-	.word ft_s1f78
-	.word ft_s1f79
-	.word ft_s1f80
-	.word ft_s1f81
-	.word ft_s1f82
-	.word ft_s1f83
-	.word ft_s1f84
-	.word ft_s1f85
-	.word ft_s1f86
-	.word ft_s1f87
-	.word ft_s1f88
-	.word ft_s1f89
-	.word ft_s1f90
-	.word ft_s1f91
-	.word ft_s1f92
-	.word ft_s1f93
-	.word ft_s1f94
-	.word ft_s1f95
-	.word ft_s1f96
-	.word ft_s1f97
-	.word ft_s1f98
-	.word ft_s1f99
-ft_s1f0:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f1:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f2:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f3:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f4:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f5:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f6:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f7:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f8:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f9:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f10:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f11:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f12:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f13:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f14:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f15:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f16:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f17:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f18:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f19:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f20:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f21:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f22:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f23:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f24:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f25:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f26:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f27:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f28:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f29:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f30:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f31:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f32:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f33:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f34:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f35:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f36:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f37:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f38:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f39:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f40:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f41:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f42:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f43:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f44:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f45:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f46:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f47:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f48:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f49:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f50:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f51:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f52:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f53:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f54:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f55:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f56:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f57:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f58:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f59:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f60:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f61:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f62:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f63:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f64:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f65:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f66:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f67:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f68:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f69:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f70:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f71:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f72:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f73:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f74:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f75:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f76:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f77:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f78:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f79:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f80:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f81:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f82:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f83:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f84:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f85:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f86:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f87:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f88:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f89:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f90:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f91:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f92:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f93:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f94:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f95:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f96:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f97:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f98:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
-ft_s1f99:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s1p2c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+
+; Song 1 (silence)
+
 ; Bank 0
 ft_s1p0c3:
 	.byte $82, $07, $A0, $01, $85, $96, $7F, $85, $96, $00, $85, $96, $00, $83, $85, $96, $00, $07
@@ -1617,308 +2230,8 @@ ft_s1p2c3:
 	.byte $A0, $01, $85, $96, $7F, $07, $85, $96, $00, $07, $85, $96, $00, $07, $85, $96, $00, $06, $86, $11
 	.byte $00, $00
 
-; Bank 0
-ft_s2_frames:
-	.word ft_s2f0
-	.word ft_s2f1
-	.word ft_s2f2
-	.word ft_s2f3
-	.word ft_s2f4
-	.word ft_s2f5
-	.word ft_s2f6
-	.word ft_s2f7
-	.word ft_s2f8
-	.word ft_s2f9
-	.word ft_s2f10
-	.word ft_s2f11
-	.word ft_s2f12
-	.word ft_s2f13
-	.word ft_s2f14
-	.word ft_s2f15
-	.word ft_s2f16
-	.word ft_s2f17
-	.word ft_s2f18
-	.word ft_s2f19
-	.word ft_s2f20
-	.word ft_s2f21
-	.word ft_s2f22
-	.word ft_s2f23
-	.word ft_s2f24
-	.word ft_s2f25
-	.word ft_s2f26
-	.word ft_s2f27
-	.word ft_s2f28
-	.word ft_s2f29
-	.word ft_s2f30
-	.word ft_s2f31
-	.word ft_s2f32
-	.word ft_s2f33
-	.word ft_s2f34
-	.word ft_s2f35
-	.word ft_s2f36
-	.word ft_s2f37
-	.word ft_s2f38
-	.word ft_s2f39
-	.word ft_s2f40
-	.word ft_s2f41
-	.word ft_s2f42
-	.word ft_s2f43
-	.word ft_s2f44
-	.word ft_s2f45
-	.word ft_s2f46
-	.word ft_s2f47
-	.word ft_s2f48
-	.word ft_s2f49
-	.word ft_s2f50
-	.word ft_s2f51
-	.word ft_s2f52
-	.word ft_s2f53
-	.word ft_s2f54
-	.word ft_s2f55
-	.word ft_s2f56
-	.word ft_s2f57
-	.word ft_s2f58
-	.word ft_s2f59
-	.word ft_s2f60
-	.word ft_s2f61
-	.word ft_s2f62
-	.word ft_s2f63
-	.word ft_s2f64
-	.word ft_s2f65
-	.word ft_s2f66
-	.word ft_s2f67
-	.word ft_s2f68
-	.word ft_s2f69
-	.word ft_s2f70
-	.word ft_s2f71
-	.word ft_s2f72
-	.word ft_s2f73
-	.word ft_s2f74
-	.word ft_s2f75
-	.word ft_s2f76
-	.word ft_s2f77
-	.word ft_s2f78
-	.word ft_s2f79
-	.word ft_s2f80
-	.word ft_s2f81
-	.word ft_s2f82
-	.word ft_s2f83
-	.word ft_s2f84
-	.word ft_s2f85
-	.word ft_s2f86
-	.word ft_s2f87
-	.word ft_s2f88
-	.word ft_s2f89
-	.word ft_s2f90
-	.word ft_s2f91
-	.word ft_s2f92
-	.word ft_s2f93
-	.word ft_s2f94
-	.word ft_s2f95
-	.word ft_s2f96
-	.word ft_s2f97
-	.word ft_s2f98
-	.word ft_s2f99
-ft_s2f0:
-	.word ft_s2p0c0, ft_s2p0c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f1:
-	.word ft_s2p1c0, ft_s2p0c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f2:
-	.word ft_s2p1c0, ft_s2p0c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f3:
-	.word ft_s2p1c0, ft_s2p0c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f4:
-	.word ft_s2p2c0, ft_s2p1c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f5:
-	.word ft_s2p3c0, ft_s2p1c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f6:
-	.word ft_s2p3c0, ft_s2p1c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f7:
-	.word ft_s2p3c0, ft_s2p1c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f8:
-	.word ft_s2p4c0, ft_s2p0c1, ft_s2p1c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f9:
-	.word ft_s2p1c0, ft_s2p0c1, ft_s2p2c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f10:
-	.word ft_s2p1c0, ft_s2p0c1, ft_s2p1c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f11:
-	.word ft_s2p1c0, ft_s2p0c1, ft_s2p2c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f12:
-	.word ft_s2p2c0, ft_s2p1c1, ft_s2p3c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f13:
-	.word ft_s2p3c0, ft_s2p1c1, ft_s2p4c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f14:
-	.word ft_s2p3c0, ft_s2p1c1, ft_s2p3c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f15:
-	.word ft_s2p3c0, ft_s2p1c1, ft_s2p5c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f16:
-	.word ft_s2p4c0, ft_s2p0c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
-ft_s2f17:
-	.word ft_s2p1c0, ft_s2p0c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
-ft_s2f18:
-	.word ft_s2p1c0, ft_s2p0c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
-ft_s2f19:
-	.word ft_s2p1c0, ft_s2p0c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
-ft_s2f20:
-	.word ft_s2p2c0, ft_s2p1c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
-ft_s2f21:
-	.word ft_s2p3c0, ft_s2p1c1, ft_s2p9c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
-ft_s2f22:
-	.word ft_s2p3c0, ft_s2p1c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
-ft_s2f23:
-	.word ft_s2p3c0, ft_s2p1c1, ft_s2p10c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p10c4
-ft_s2f24:
-	.word ft_s2p5c0, ft_s2p2c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
-ft_s2f25:
-	.word ft_s2p6c0, ft_s2p2c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
-ft_s2f26:
-	.word ft_s2p6c0, ft_s2p2c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
-ft_s2f27:
-	.word ft_s2p6c0, ft_s2p2c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
-ft_s2f28:
-	.word ft_s2p7c0, ft_s2p3c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
-ft_s2f29:
-	.word ft_s2p8c0, ft_s2p3c1, ft_s2p9c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
-ft_s2f30:
-	.word ft_s2p8c0, ft_s2p3c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
-ft_s2f31:
-	.word ft_s2p8c0, ft_s2p3c1, ft_s2p10c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p10c4
-ft_s2f32:
-	.word ft_s2p9c0, ft_s2p2c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
-ft_s2f33:
-	.word ft_s2p6c0, ft_s2p2c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
-ft_s2f34:
-	.word ft_s2p6c0, ft_s2p2c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
-ft_s2f35:
-	.word ft_s2p6c0, ft_s2p2c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
-ft_s2f36:
-	.word ft_s2p7c0, ft_s2p3c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
-ft_s2f37:
-	.word ft_s2p8c0, ft_s2p3c1, ft_s2p9c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
-ft_s2f38:
-	.word ft_s2p8c0, ft_s2p3c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
-ft_s2f39:
-	.word ft_s2p8c0, ft_s2p3c1, ft_s2p10c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p10c4
-ft_s2f40:
-	.word ft_s2p9c0, ft_s2p2c1, ft_s2p11c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p11c4
-ft_s2f41:
-	.word ft_s2p6c0, ft_s2p2c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f42:
-	.word ft_s2p6c0, ft_s2p2c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f43:
-	.word ft_s2p6c0, ft_s2p2c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f44:
-	.word ft_s2p10c0, ft_s2p4c1, ft_s2p12c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f45:
-	.word ft_s2p11c0, ft_s2p5c1, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f46:
-	.word ft_s2p12c0, ft_s2p6c1, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f47:
-	.word ft_s2p13c0, ft_s2p7c1, ft_s2p1c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f48:
-	.word ft_s2p14c0, ft_s2p8c1, ft_s2p2c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f49:
-	.word ft_s2p15c0, ft_s2p9c1, ft_s2p1c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f50:
-	.word ft_s2p10c0, ft_s2p4c1, ft_s2p3c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f51:
-	.word ft_s2p11c0, ft_s2p5c1, ft_s2p4c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f52:
-	.word ft_s2p12c0, ft_s2p6c1, ft_s2p3c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f53:
-	.word ft_s2p13c0, ft_s2p7c1, ft_s2p6c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
-ft_s2f54:
-	.word ft_s2p14c0, ft_s2p8c1, ft_s2p7c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
-ft_s2f55:
-	.word ft_s2p15c0, ft_s2p9c1, ft_s2p21c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p21c4
-ft_s2f56:
-	.word ft_s2p10c0, ft_s2p4c1, ft_s2p8c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
-ft_s2f57:
-	.word ft_s2p11c0, ft_s2p5c1, ft_s2p9c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
-ft_s2f58:
-	.word ft_s2p12c0, ft_s2p6c1, ft_s2p24c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p24c4
-ft_s2f59:
-	.word ft_s2p13c0, ft_s2p7c1, ft_s2p6c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
-ft_s2f60:
-	.word ft_s2p14c0, ft_s2p8c1, ft_s2p7c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
-ft_s2f61:
-	.word ft_s2p15c0, ft_s2p9c1, ft_s2p21c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p21c4
-ft_s2f62:
-	.word ft_s2p10c0, ft_s2p4c1, ft_s2p8c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
-ft_s2f63:
-	.word ft_s2p11c0, ft_s2p5c1, ft_s2p9c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
-ft_s2f64:
-	.word ft_s2p12c0, ft_s2p6c1, ft_s2p24c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p24c4
-ft_s2f65:
-	.word ft_s2p13c0, ft_s2p7c1, ft_s2p6c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
-ft_s2f66:
-	.word ft_s2p14c0, ft_s2p8c1, ft_s2p7c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
-ft_s2f67:
-	.word ft_s2p15c0, ft_s2p9c1, ft_s2p21c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p21c4
-ft_s2f68:
-	.word ft_s2p10c0, ft_s2p4c1, ft_s2p8c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
-ft_s2f69:
-	.word ft_s2p11c0, ft_s2p5c1, ft_s2p9c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
-ft_s2f70:
-	.word ft_s2p12c0, ft_s2p6c1, ft_s2p24c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p24c4
-ft_s2f71:
-	.word ft_s2p13c0, ft_s2p7c1, ft_s2p6c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
-ft_s2f72:
-	.word ft_s2p14c0, ft_s2p8c1, ft_s2p7c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
-ft_s2f73:
-	.word ft_s2p15c0, ft_s2p9c1, ft_s2p21c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p21c4
-ft_s2f74:
-	.word ft_s2p10c0, ft_s2p4c1, ft_s2p8c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
-ft_s2f75:
-	.word ft_s2p11c0, ft_s2p5c1, ft_s2p9c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
-ft_s2f76:
-	.word ft_s2p12c0, ft_s2p6c1, ft_s2p24c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p24c4
-ft_s2f77:
-	.word ft_s2p13c0, ft_s2p7c1, ft_s2p25c2, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p11c4
-ft_s2f78:
-	.word ft_s2p14c0, ft_s2p8c1, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f79:
-	.word ft_s2p15c0, ft_s2p9c1, ft_s0p0c0, ft_s1p1c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f80:
-	.word ft_s2p7c0, ft_s2p3c1, ft_s2p26c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f81:
-	.word ft_s2p8c0, ft_s2p3c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f82:
-	.word ft_s2p8c0, ft_s2p3c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f83:
-	.word ft_s2p8c0, ft_s2p3c1, ft_s0p0c0, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f84:
-	.word ft_s2p9c0, ft_s2p2c1, ft_s2p1c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f85:
-	.word ft_s2p6c0, ft_s2p2c1, ft_s2p2c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f86:
-	.word ft_s2p6c0, ft_s2p2c1, ft_s2p1c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f87:
-	.word ft_s2p6c0, ft_s2p2c1, ft_s2p2c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f88:
-	.word ft_s2p7c0, ft_s2p3c1, ft_s2p3c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f89:
-	.word ft_s2p8c0, ft_s2p3c1, ft_s2p4c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f90:
-	.word ft_s2p8c0, ft_s2p3c1, ft_s2p3c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f91:
-	.word ft_s2p8c0, ft_s2p3c1, ft_s2p5c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p0c4
-ft_s2f92:
-	.word ft_s2p16c0, ft_s2p0c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
-ft_s2f93:
-	.word ft_s2p1c0, ft_s2p0c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
-ft_s2f94:
-	.word ft_s2p1c0, ft_s2p0c1, ft_s2p6c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p6c4
-ft_s2f95:
-	.word ft_s2p1c0, ft_s2p0c1, ft_s2p7c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p7c4
-ft_s2f96:
-	.word ft_s2p2c0, ft_s2p1c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
-ft_s2f97:
-	.word ft_s2p3c0, ft_s2p1c1, ft_s2p9c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p9c4
-ft_s2f98:
-	.word ft_s2p3c0, ft_s2p1c1, ft_s2p8c2, ft_s1p0c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p8c4
-ft_s2f99:
-	.word ft_s2p3c0, ft_s2p1c1, ft_s2p10c2, ft_s1p2c3, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s2p10c4
+; Song 2 (pause)
+
 ; Bank 0
 ft_s2p0c0:
 	.byte $93, $02, $91, $7F, $F1, $7F, $00, $8F, $11, $00, $03, $E1, $27, $02, $2A, $01, $33, $02, $3A, $02

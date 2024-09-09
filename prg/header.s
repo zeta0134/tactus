@@ -5,8 +5,8 @@
 ;
 .segment "HEADER"
         .byte "NES", $1a
-        .byte $20               ; 32x 16KB PRG-ROM banks = 512 KB total
-        .byte $80               ; 0x 8KB CHR-ROM banks = 0 KB total
+        .byte $40               ; 64x 16KB PRG-ROM banks = 1024 KB total
+        .byte $80               ; 128x 8KB CHR-ROM banks = 1024 KB total
         .byte $A2, $A8          ; Mapper 682 (Rainbow) (also iNes 2.0 specifier)
         .byte $02               ; 
         .byte $00               ;

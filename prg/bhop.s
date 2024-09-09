@@ -3,15 +3,16 @@
 .include "bhop/zsaw.asm"
 .endif
 
+; game specific
+.include "far_call.inc"
+.include "zpcm.inc"
+
 .scope BHOP
 .include "bhop/bhop_internal.inc"
 .include "bhop/longbranch.inc"
 
 .include "bhop/commands.asm"
 .include "bhop/effects.asm"
-
-; game specific
-.include "zpcm.inc"
 
         .segment BHOP_ZP_SEGMENT
 ; scratch ptr, used for all sorts of indirect reads
@@ -23,6 +24,8 @@ channel_index: .byte $00
 scratch_byte: .byte $00
 
         .segment BHOP_RAM_SEGMENT
+bhop_init_active: .byte $00
+
 music_header_ptr: .word $0000
 tempo_counter: .word $0000
 tempo_cmp: .word $0000
@@ -651,12 +654,18 @@ done_with_sequence:
         rts 
 .endproc
 
+        .segment BHOP_INIT_SEGMENT
+
 ; param: song index (a)
 ;        Low byte pointer to the music data (x)
 ;        High byte pointer to the music data (y)
 .proc bhop_init
         ; preserve parameters
         sta target_song
+
+        ; safety: signal to the play routine that it should not run
+        lda #1
+        sta bhop_init_active
 
         perform_zpcm_inc
 
@@ -708,7 +717,7 @@ done_with_sequence:
         beq song_uses_groove
 song_uses_speed:
         tax
-        jsr set_speed
+        far_call set_speed
 song_uses_groove:
         ldy #SongInfo::groove_position
         lda (bhop_ptr), y
@@ -727,7 +736,7 @@ song_uses_groove:
         perform_zpcm_inc
 
         ; If this song has grooves enabled, then apply the first groove right away
-        jsr update_groove
+        far_call update_groove
         ; Now, to work around an off-by-one startup condition with when advance_pattern_rows
         ; gets called for the first time, reset the groove position
         lda groove_index
@@ -737,8 +746,8 @@ song_uses_groove:
 
         ; initialize at the first frame, and prime our pattern pointers
         ldx #0
-        jsr jump_to_frame
-        jsr load_frame_patterns
+        far_call jump_to_frame
+        far_call load_frame_patterns
 
         perform_zpcm_inc
 
@@ -845,14 +854,14 @@ effect_init_loop:
 
         .if ::BHOP_ZSAW_ENABLED
         ; if Z-Saw happens to be playing, silence it
-        jsr zsaw_silence
+        far_call zsaw_silence
         ; Now fully re-initialize Z-Saw just in case
-        jsr zsaw_init
-        jsr zsaw_enable
+        far_call zsaw_init
+        far_call zsaw_enable
         .endif
 
         .if ::BHOP_ZPCM_ENABLED
-        jsr zpcm_enable
+        far_call zpcm_enable
         .endif
 
         ; finally, enable all channels except DMC
@@ -861,13 +870,19 @@ effect_init_loop:
 
         ; enable any expansion audio chips here, if they can be disabled
         .if ::BHOP_VRC6_ENABLED
-        jsr bhop_vrc6_init
+        far_call bhop_vrc6_init
         .endif
+
+        ; finally it is safe to permit the play routine to run
+        lda #0
+        sta bhop_init_active
 
         perform_zpcm_inc
 
         rts
 .endproc
+
+        .segment BHOP_PLAYER_SEGMENT
 
 ; speed goes in x
 .proc set_speed
@@ -2627,6 +2642,12 @@ reset_counter:
 .endproc
 
 .proc bhop_play
+        ; if we are initializing a song, bail! lag is better than a crash
+        lda bhop_init_active
+        beq safe_to_continue
+        rts
+safe_to_continue:
+
 .if ::BHOP_PATTERN_BANKING
         lda module_bank
         sta current_music_bank

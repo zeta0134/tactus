@@ -4,6 +4,7 @@ __BHOP_CONFIG = 1
 ; Configuration variables, adjust these to taste for your specific project
 
 ; Where should BHOP live?
+.define BHOP_INIT_SEGMENT "CODE_SOUND"
 .define BHOP_PLAYER_SEGMENT "CODE_BHOP"
 .define BHOP_RAM_SEGMENT "RAM"
 .define BHOP_ZP_SEGMENT "ZEROPAGE"
@@ -14,7 +15,7 @@ __BHOP_CONFIG = 1
 
 ; Banking support. Disabled by default, as the relevant
 ; mapper code is project specific.
-BHOP_PATTERN_BANKING = 0
+BHOP_PATTERN_BANKING = 1
 
 .if ::BHOP_PATTERN_BANKING
 .import bhop_apply_music_bank

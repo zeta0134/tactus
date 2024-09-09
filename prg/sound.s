@@ -38,42 +38,44 @@ NmiSafePtr: .res 2
 
 FADE_SPEED = 8
 
-        .segment "DATA_2"
+        .segment "MUSIC_0"
         .proc zeta_silence
         .include "../art/music/silence.asm"
         .endproc
         
-        .segment "DATA_2"
+        .segment "MUSIC_0"
         .proc zeta_click_track
         .include "../art/music/click_track.asm"
         .endproc
 
-        .segment "DATA_2"
+        .segment "MUSIC_0"
         .proc zeta_title
         .include "../art/music/title.asm"
         .endproc
 
-        .segment "DATA_2"
+        .segment "MUSIC_0"
         .proc zeta_options
         .include "../art/music/options.asm"
         .endproc
 
-        .segment "DATA_2"
+        .segment "MUSIC_0"
         .proc zeta_game_over
         .include "../art/music/game_over.asm"
         .endproc
 
-        .segment "DATA_5"
+        .segment "MUSIC_1"
+        ; and MUSIC_2
+        ; and MUSIC_3
         .proc persune_in_another_world
-        .include "../art/music/in_another_world.asm"
+        .include "../art/music/in_another_world_edit.asm"
         .endproc
 
-        .segment "DATA_6"
+        .segment "MUSIC_4"
         .proc zeta_shower_groove
         .include "../art/music/shower_groove.asm"
         .endproc
 
-        .segment "DATA_7"
+        .segment "MUSIC_5"
         .proc zeta_bouncy
         .include "../art/music/bouncy.asm"
         .endproc
@@ -129,7 +131,7 @@ track_table_num_variants:
         .byte 1 ; options music
         .byte 1 ; gameover music
         .byte 1 ; level music
-        .byte 1 ; in another world (warp zone)
+        .byte 3 ; in another world (warp zone)
         .byte 3 ; bouncy
 
 ; bhop calls these functions for bank swapping and ZPCM tomfoolery
@@ -193,11 +195,18 @@ loop:
 .endproc
 .export bhop_disable_zpcm
 
+.proc bhop_apply_music_bank
+        sta MAP_PRG_A_LO
+        rts
+.endproc
+.export bhop_apply_music_bank
+
 .proc bhop_apply_dpcm_bank
         sta MAP_PRG_C_LO
         rts
 .endproc
 .export bhop_apply_dpcm_bank
+
 
 ; interface functions should mostly live in fixed; we'll call these often, and several
 ; need A to remain unclobbered
@@ -235,9 +244,14 @@ done:
         sta MusicCurrentBank
         access_data_bank MusicCurrentBank
 
+        ldx MusicCurrentTrack
         lda track_table_module_low, x
         ldy track_table_module_high, x
         far_call bhop_set_module_addr
+
+        ldx MusicCurrentTrack
+        lda track_table_bank, x
+        far_call bhop_set_module_bank
 
         perform_zpcm_inc
 
@@ -376,14 +390,22 @@ SfxPtr := R0
 
         access_data_bank MusicCurrentBank
 
+        ldx MusicCurrentTrack
         lda track_table_module_low, x
         ldy track_table_module_high, x
         far_call bhop_set_module_addr
 
+        ldx MusicCurrentTrack
+        lda track_table_bank, x
+        far_call bhop_set_module_bank
+
+
+
         perform_zpcm_inc
 
+        ldx MusicCurrentTrack
         lda track_table_song, x
-        far_call bhop_init
+        near_call bhop_init
 
         ; init some custom bhop features here as well
         lda #0
