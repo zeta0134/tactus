@@ -409,3 +409,24 @@ sfx_too_poor_pulse2:
         pulse_init       PITCH_CS2,   $2,      $F,          3
         pulse_init       PITCH_CS2,   $2,      $0,          2
         pulse_init       PITCH_CS2,   $2,      $F,          5
+
+sfx_pause:
+        ; Length in rows
+        .byte 14
+        ;                pitch,    duty,  volume,     length
+        pulse_init       PITCH_A3,   $2,      $B,          1
+        pulse_cont_duty              $2,      $0,          0
+        pulse_init       PITCH_E4,   $2,      $E,          1
+        pulse_cont_duty              $2,      $0,          0
+        pulse_init       PITCH_A4,   $2,      $D,          1
+        pulse_cont_duty              $2,      $0,          0
+        pulse_init       PITCH_E5,   $2,      $E,          1
+        pulse_cont_duty              $2,      $0,          0
+        pulse_init       PITCH_A5,   $2,      $B,          1
+        pulse_cont_duty              $2,      $0,          0
+        pulse_init       PITCH_E5,   $2,      $4,          1
+        pulse_cont_duty              $2,      $0,          0
+        pulse_init       PITCH_A5,   $2,      $3,          1
+        pulse_cont_duty              $2,      $0,          0
+
+        

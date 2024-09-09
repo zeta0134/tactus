@@ -223,7 +223,8 @@ victory:
         jsr draw_string_imm
 
         ; TODO; replace this with the victory track, when and if we have one
-        lda #0
+        lda #TRACK_SILENCE
+        ldy #TRACK_VARIANT_NORMAL
         jsr play_track
 
         jmp converge
@@ -240,6 +241,7 @@ game_over:
 
         ; TODO; replace this with the game over jingle, when and if we have one
         lda #TRACK_GAMEOVER
+        ldy #TRACK_VARIANT_NORMAL
         jsr play_track
 
 converge:

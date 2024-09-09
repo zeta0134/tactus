@@ -23,6 +23,9 @@
 .global title_prep
 .global options_prep
 .global game_end_screen_prep
+.global draw_battlefield_A
+.global draw_battlefield_B
+.global draw_battlefield_C
 
 .globalzp PpuScrollX
 .globalzp PpuScrollY

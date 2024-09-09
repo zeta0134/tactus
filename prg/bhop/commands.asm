@@ -1,9 +1,9 @@
         .segment BHOP_ZP_SEGMENT
 ; dungeon-game specific variables
-current_music_variant: .byte $00
+target_song: .byte $00
 target_music_variant: .byte $00
 tempo_adjustment: .byte $00
-.exportzp current_music_variant, target_music_variant, tempo_adjustment
+.exportzp target_music_variant, tempo_adjustment
 
         .segment BHOP_PLAYER_SEGMENT
 
@@ -139,25 +139,7 @@ no_parameter_byte:
 .endproc
 
 .proc cmd_eff_jump
-        ; game specific modifications, to support track variants
-
-        ; compute difference
-        sec
-        lda target_music_variant
-        sbc current_music_variant
-        sta scratch_byte
-
-        ; reset current to target
-        lda target_music_variant
-        sta current_music_variant
-
-        ; fetch real target, and apply difference
         fetch_pattern_byte
-        clc
-        adc scratch_byte
-
-        ; original bhop logic follows
-
         sta frame_counter ; target frame counter
         lda row_cmp
         sta row_counter ; target row (so we immediately advance)

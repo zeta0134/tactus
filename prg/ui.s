@@ -106,6 +106,7 @@ title_ui_layout:
 CurrentWidgetIndex := R20
         ; Play the options track on the options screen
         lda #TRACK_OPTIONS
+        ldy #TRACK_VARIANT_NORMAL
         jsr play_track
 
         ldy CurrentWidgetIndex
@@ -148,6 +149,7 @@ stay_here:
 
         ; Play the title track on the title screen
         lda #TRACK_TITLE
+        ldy #TRACK_VARIANT_NORMAL
         jsr play_track
 
         ldy CurrentWidgetIndex

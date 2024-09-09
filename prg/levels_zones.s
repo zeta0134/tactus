@@ -609,11 +609,28 @@ hud_bg_loop:
         rts
 .endproc
 
-.proc FAR_play_music_for_current_zone
+.proc FAR_play_music_for_current_room
         access_data_bank #<.bank(all_zones_data_page)
 
+        ; the track number comes from the zone, of course
         ldy #ZoneDefinition::MusicTrack
         lda (PlayerZonePtr), y
+        pha
+
+        ; the track variant depends on the player's room. right now we just use
+        ; the "interior" category to mean variant 1, and any other category to mean
+        ; variant 0. later this might change!
+        ldy PlayerRoomIndex
+        lda room_properties, y
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_INTERIOR
+        bne normal_variant
+        ldy #TRACK_VARIANT_INTERIOR
+        jmp done_picking_variant
+normal_variant:
+        ldy #TRACK_VARIANT_NORMAL
+done_picking_variant:
+        pla
         jsr play_track
 
         ldy #ZoneDefinition::AddedTempo

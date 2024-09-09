@@ -228,7 +228,8 @@ LayoutPtr := R0
         sta tempo_adjustment
 
         ; Play lovely silence while we're loading
-        lda #0
+        lda #TRACK_SILENCE
+        ldy #TRACK_VARIANT_NORMAL
         jsr play_track
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
@@ -303,7 +304,8 @@ LayoutPtr := R0
 
         ; play lovely silence while we load
         ; (this also ensures the music / beat counter are in a deterministic spot when we fade back in)
-        lda #0
+        lda #TRACK_SILENCE
+        ldy #TRACK_VARIANT_NORMAL
         jsr play_track
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
@@ -407,10 +409,6 @@ LayoutPtr := R0
         near_call FAR_init_floor
         near_call FAR_generate_rooms_for_floor
 
-        ; If the music for this floor has changed, get that queued up
-        ; TODO: should we try to detect a track change and fade out early?
-        far_call FAR_play_music_for_current_zone
-
         ; We faded out to get here, so fade right back in
         lda #0
         jsr set_brightness
@@ -429,6 +427,10 @@ LayoutPtr := R0
         
         ; Load the current room (which is now pregenerated)
         near_call FAR_load_current_room
+
+        ; If the music for this room has changed, get that queued up
+        ; TODO: should we try to detect a track change and fade out early?
+        far_call FAR_play_music_for_current_room
 
         ; Despawn any remnant sprites from the previous room
         ; (stuff like death sprites and item shadows)
@@ -554,6 +556,9 @@ not_too_high:
 .proc room_transition
         ; Load the current room (which is now pregenerated)
         near_call FAR_load_current_room
+
+        ; switch music track/variant if necessary
+        far_call FAR_play_music_for_current_room
 
         ; Despawn any remnant sprites from the previous room
         ; (stuff like death sprites and item shadows)
@@ -971,6 +976,7 @@ normal_gameplay_beat_checking:
 .proc wait_for_the_next_cleared_room_beat
         ; If the player's input has arrived...
         lda PlayerNextDirection
+        ora PlayerIntendsToPause
         ; ... then go ahead and process this beat!
         jne player_input_forces_a_beat
 
@@ -1037,6 +1043,7 @@ process_next_beat_now:
         ; The time for the next beat has come.
         ; If the player's input HAS arrived:
         lda PlayerNextDirection
+        ora PlayerIntendsToPause
         beq no_input_received
 input_received:
         ; Then immediatly process this beat

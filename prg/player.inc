@@ -43,5 +43,8 @@
 .globalzp PlayerZonePtr
 .global DestinationZonePtr
 
+.global PlayerIntendsToPause
+.global PlayerIsPaused
+
 MAX_HEARTS = 5
 MAX_GOLD = 9999

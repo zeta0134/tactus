@@ -10,9 +10,11 @@
         .include "input.inc"
         .include "items.inc"
         .include "kernel.inc"
+        .include "levels.inc"
         .include "bhop/longbranch.inc"
         .include "nes.inc"
         .include "player.inc"
+        .include "palette.inc"
         .include "procgen.inc"
         .include "rainbow.inc"
         .include "raster_table.inc"
@@ -85,6 +87,9 @@ PlayerNavState: .res 1
 
 PlayerPreviousSuccessfulDirection: .res 1
 
+PlayerIntendsToPause: .res 1
+PlayerIsPaused: .res 1
+
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
 DIRECTION_SOUTH = 3
@@ -142,9 +147,9 @@ HeartCount := R2
 
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
-        lda #ITEM_SPEAR_L2
+        lda #ITEM_BROADSWORD_L1
         sta PlayerEquipmentWeapon
-        lda #ITEM_LARGE_TORCH
+        lda #ITEM_BASIC_TORCH
         sta PlayerEquipmentTorch
         lda #ITEM_NONE
         sta PlayerEquipmentArmor
@@ -352,12 +357,35 @@ correct_slide_up:
 ; Called once every frame, after input has been processed.
 ; Updates variables related to the desired direction and 
 ; whether a down press has occurred at all this frame
+
+; Notable: Only one (1) button takes action on a given gameplay
+; beat. There is a priority for simultaneous presses, but we should
+; never leave the output of this function in a state that suggests
+; multiple actions on the same beat. Absolutely not allowed, this
+; constraint simplifies logic elsewhere. We can conditionally choose
+; whether to recognize the button, but if we do recognize it, it cancels
+; all the other possibilities when chosen.
+
 .proc FAR_determine_player_intent
+        lda #(KEY_START)
+        bit ButtonsDown
+        beq check_directional_buttons
+        lda #1
+        sta PlayerIntendsToPause
+        lda #0
+        sta PlayerNextDirection
+        rts
+
+check_directional_buttons:
         lda #(KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT)
         bit ButtonsDown
         bne handle_button_press
         rts ; all done
 handle_button_press:
+        ; Only one button can take effect
+        lda #0
+        sta PlayerIntendsToPause
+
         ; For now, the last button press we receive in a given beat
         ; will be the one that counts once we begin processing.
         ; TODO: detect if we receive an extra button press? we'd need 
@@ -686,6 +714,9 @@ no_darkness:
 
         ; Detect being dead and, if necessary, transition to the end screen
         jsr detect_critical_existence_failure
+
+        ; Detect pausing. (The boss key, the mom alert, etc.)
+        jsr detect_pause_action
 
         rts
 .endproc
@@ -1538,12 +1569,22 @@ converge:
         ; suppress torchlight updates over the transition (resolves minor visual jank)
         lda #1
         sta SuppressTorchlight
+        ; we may not PAUSE over the exit transition. this normally shouldn't occur, but
+        ; an enemy might have forced us to the screen edge or something, so be safe
+        lda #0
+        sta PlayerIntendsToPause
         rts
 .endproc
 
 .proc detect_critical_existence_failure
         jsr FIXED_is_player_considered_dead
         beq existence_proven
+
+        ; If we wanted to pause to avoid our fate, **TOO BAD.**
+        ; (yes, this means an activating on-death item can eat a pause
+        ; input; deal with it.)
+        lda #0
+        sta PlayerIntendsToPause
 
         ; TODO: items that activate on death (amulet!?)
         ; TODO: setup for a proper "dying" beat (greyscale background, player
@@ -1556,7 +1597,8 @@ converge:
         st16 GameMode, fade_to_game_mode
 
         ; STOP the music
-        lda #0
+        lda #TRACK_SILENCE
+        ldy #TRACK_VARIANT_NORMAL
         sta play_track
 
         ; Oops
@@ -1567,5 +1609,61 @@ converge:
         st16 R0, sfx_death_spin_tri
         jsr play_sfx_triangle
 existence_proven:
+        rts
+.endproc
+
+.proc detect_pause_action
+        lda PlayerIntendsToPause
+        bne proceed_to_pause
+        lda PlayerIsPaused
+        bne continue_being_paused
+        rts
+proceed_to_pause:
+        ; Most importantly, consume the intent!
+        lda #0
+        sta PlayerIntendsToPause
+
+        ; Are we pausing or unpausing?
+        lda PlayerIsPaused
+        beq perform_pause
+perform_unpause:
+        lda #0
+        sta PlayerIsPaused
+        lda #4
+        sta TargetBrightness
+
+        near_call FAR_play_music_for_current_room
+
+        st16 R0, sfx_pause
+        jsr play_sfx_pulse1
+
+        rts
+perform_pause:
+        lda #1
+        sta PlayerIsPaused
+        lda #3
+        sta TargetBrightness
+
+        lda #TRACK_VARIANT_PAUSE
+        jsr play_variant
+
+        st16 R0, sfx_pause
+        jsr play_sfx_pulse1
+
+        jmp continue_being_paused
+        rts
+
+continue_being_paused:
+        ; Put player in the "idle" pose during a pause
+        ldx PlayerSpriteIndex
+        lda #<SPRITE_TILE_PLAYER_IDLE
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+        ; Important: do NOT process any actual game logic while we are paused!
+        ; Jump ahead to battlefield drawing, which will re-use the state we just computed.
+        ; (why not just wait? because beat_frame_1 still switches the buffers; we need to
+        ; draw or it'll flip back to the previous frame)
+        st16 GameMode, draw_battlefield_A
+
         rts
 .endproc

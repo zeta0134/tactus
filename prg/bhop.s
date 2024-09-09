@@ -656,7 +656,7 @@ done_with_sequence:
 ;        High byte pointer to the music data (y)
 .proc bhop_init
         ; preserve parameters
-        pha ; song index
+        sta target_song
 
         perform_zpcm_inc
 
@@ -678,7 +678,11 @@ done_with_sequence:
         ; switch to the requested song
         prepare_ptr_with_fixed_offset music_header_ptr, FtModuleHeader::song_list
 
-        pla
+        ; GAME SPECIFIC: add the current variant when indexing into the song list
+        lda target_song
+        clc
+        adc target_music_variant
+
         asl ; song list is made of words
         tay
         lda (bhop_ptr), y
@@ -900,6 +904,25 @@ done:
 
 ; frame number goes in x
 .proc jump_to_frame
+        ; GAME SPECIFIC: when loading new frames, re-index into the song data. This is
+        ; what actually implements music variant switching at pattern boundaries.
+
+        ; switch to the requested song
+        prepare_ptr_with_fixed_offset music_header_ptr, FtModuleHeader::song_list
+
+        ; GAME SPECIFIC: add the current variant when indexing into the song list
+        lda target_song
+        clc
+        adc target_music_variant
+
+        asl ; song list is made of words
+        tay
+        lda (bhop_ptr), y
+        sta song_ptr
+        iny
+        lda (bhop_ptr), y
+        sta song_ptr+1
+
         ; load the frame pointer list from the song data; we're going to rewrite
         ; frame_ptr here anyway, so use it as temp storage
         prepare_ptr song_ptr

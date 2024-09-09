@@ -154,7 +154,7 @@
 .global FAR_current_zone_header_tile
 .global FAR_current_zone_banner_tile
 .global FAR_load_hud_palette_for_current_zone
-.global FAR_play_music_for_current_zone
+.global FAR_play_music_for_current_room
 .global FAR_load_exit_pointer_from_current_zone
 
 ROOM_POOL_OUT_OF_BOUNDS     = 0

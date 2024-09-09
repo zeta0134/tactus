@@ -38,6 +38,8 @@
 .global sfx_too_poor_pulse1
 .global sfx_too_poor_pulse2
 
+.global sfx_pause
+
 .macro play_dpcm sample_addr, length
 .scope
 SampleAddr := R0
@@ -70,3 +72,7 @@ TRACK_GAMEOVER         = 4
 TRACK_SHOWER_GROOVE    = 5
 TRACK_IN_ANOTHER_WORLD = 6
 TRACK_BOUNCY           = 7
+
+TRACK_VARIANT_NORMAL   = 0 ; every track has this
+TRACK_VARIANT_INTERIOR = 1 ; most level themes have these
+TRACK_VARIANT_PAUSE    = 2

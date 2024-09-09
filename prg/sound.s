@@ -130,17 +130,7 @@ track_table_num_variants:
         .byte 1 ; gameover music
         .byte 1 ; level music
         .byte 1 ; in another world (warp zone)
-        .byte 1 ; bouncy
-
-track_table_variant_length:
-        .byte 0 ; silence
-        .byte 0 ; click_track
-        .byte 0 ; title music
-        .byte 0 ; options music
-        .byte 0 ; gameover music
-        .byte 0 ; level music
-        .byte 0 ; in another world (warp zone)
-        .byte 0 ; bouncy
+        .byte 3 ; bouncy
 
 ; bhop calls these functions for bank swapping and ZPCM tomfoolery
 .proc bhop_enable_zpcm
@@ -212,7 +202,6 @@ loop:
 ; interface functions should mostly live in fixed; we'll call these often, and several
 ; need A to remain unclobbered
 
-; inputs: track number in A
 .proc fade_to_track
         perform_zpcm_inc
         sta MusicTargetTrack
@@ -222,18 +211,21 @@ loop:
         lda MusicCurrentTrack
         bne done
         lda MusicTargetTrack
+        ldy #TRACK_VARIANT_NORMAL
         jsr play_track
 done:
         rts
 .endproc
 
-; inputs: track number in A
+; inputs: track number in A, initial variant in Y
 .proc play_track
         perform_zpcm_inc
         .if ::DEBUG_DISABLE_MUSIC
         ; ignore the requested track, and queue up the click track instead
         lda #1
         .endif
+        sty target_music_variant
+
         cmp MusicCurrentTrack
         jeq no_change
         sta MusicCurrentTrack
@@ -249,19 +241,21 @@ done:
 
         perform_zpcm_inc
 
+        ldx MusicCurrentTrack
         lda track_table_song, x
         far_call bhop_init
-        ; all new tracks should start with variant 0
-        ; (the map load routine might override this immediately, but if it
-        ; doesn't, we still need to clear the state from the previous track)
-        lda #0
-        sta target_music_variant
         lda #0
         sta global_attenuation
         restore_previous_bank
 
         far_call FAR_beat_tracker_init
+
 no_change:
+        ; safely re-apply the current music variant (again)
+        ; to be sure it is applied even if we did not actually change songs
+        lda target_music_variant
+        jsr play_variant
+
         rts
 .endproc
 
@@ -269,20 +263,15 @@ no_change:
 .proc play_variant
         ldx MusicCurrentTrack
         cmp track_table_num_variants, x
+        beq invalid_variant ; variant index must be LESS than the total count
         bcs invalid_variant
-                
-        ; use the variant index as a loop counter
-        tay
-        lda #0
-loop:
-        clc
-        adc track_table_variant_length, x
-        dey
-        bne loop
+        ; this variant is valid, so apply it
         sta target_music_variant
-
+        rts
 invalid_variant:
-        ; ignore this variant and do nothing
+        ; switch to variant 0 instead, which is always present and safe
+        lda #0
+        sta target_music_variant
         rts
 .endproc
 
@@ -444,6 +433,7 @@ SfxPtr := R0
         bne done_with_fade
         ; Otherwise, switch to the target track
         lda MusicTargetTrack
+        ldy #TRACK_VARIANT_NORMAL
         jsr play_track
 done_with_fade:
         rts
