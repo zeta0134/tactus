@@ -147,9 +147,9 @@ HeartCount := R2
 
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
-        lda #ITEM_BROADSWORD_L1
+        lda #ITEM_BROADSWORD_L2
         sta PlayerEquipmentWeapon
-        lda #ITEM_BASIC_TORCH
+        lda #ITEM_LARGE_TORCH
         sta PlayerEquipmentTorch
         lda #ITEM_NONE
         sta PlayerEquipmentArmor
@@ -369,11 +369,17 @@ correct_slide_up:
 .proc FAR_determine_player_intent
         lda #(KEY_START)
         bit ButtonsDown
-        beq check_directional_buttons
+        beq check_pause_state
         lda #1
         sta PlayerIntendsToPause
         lda #0
         sta PlayerNextDirection
+        rts
+
+        ; While actually paused, the only valid action is to attempt to unpause!
+check_pause_state:
+        lda PlayerIsPaused
+        beq check_directional_buttons
         rts
 
 check_directional_buttons:
