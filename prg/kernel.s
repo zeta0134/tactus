@@ -1163,6 +1163,8 @@ done_with_nametables:
 
         ; how we determine the beat sync for the playfield depends on the current game mode,
         ; so check that here
+        lda PlayerIsPaused
+        bne paused_gameplay
         ldx PlayerRoomIndex
         lda room_flags, x
         and #ROOM_FLAG_CLEARED
@@ -1185,6 +1187,15 @@ normal_gameplay:
         ldx TrackedGameplayPos
         lda tracked_animation_frame, x
         sta PlayfieldBgHighBank
+        sta PlayfieldObjHighBank
+        rts
+paused_gameplay:
+        ; During a pause state, the sprite layer continues to update (so the player's idle animaton works)
+        ; but the background layer is permanently frozen on frame 0, freezing enemies in place
+        lda #0
+        sta PlayfieldBgHighBank
+        ldx TrackedMusicPos
+        lda tracked_animation_frame, x
         sta PlayfieldObjHighBank
         rts
 .endproc
