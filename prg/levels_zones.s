@@ -285,7 +285,7 @@ zone_hub_exits:
         .addr zone_grasslands_floor_1
         .addr zone_beach_floor_1
         .addr zone_grasslands_floor_2_but_fast
-        .addr zone_hub_world ; nope!
+        .addr zone_grasslands_floor_2 ; for quickly demoing normal caves
 
 zone_hub_world_mazes:
         .byte 1
