@@ -11,4 +11,4 @@
 .import global_attenuation ; UNIMPLEMENTED!
 
 ;.import row_counter
-.import currently_playing_row
+.import currently_playing_row, currently_playing_frame

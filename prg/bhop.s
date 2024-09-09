@@ -36,8 +36,9 @@ frame_counter: .byte $00
 frame_cmp: .byte $00
 
 currently_playing_row: .byte $00
+currently_playing_frame: .byte $00
 
-.export currently_playing_row
+.export currently_playing_row, currently_playing_frame
 
 module_flags: .byte $00
 
@@ -681,6 +682,7 @@ done_with_sequence:
         sta tempo_counter+1
         sta row_counter
         sta currently_playing_row
+        sta currently_playing_frame
         sta frame_counter
         sta groove_index
 
@@ -1220,6 +1222,8 @@ no_frame_advance:
         ; which we can use to track the musical beat
         lda row_counter
         sta currently_playing_row
+        lda frame_counter
+        sta currently_playing_frame
 
         inc row_counter
 done_advancing_rows:

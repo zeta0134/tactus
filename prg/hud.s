@@ -195,7 +195,14 @@ use_4_beats:
         jmp done_picking_beat_length
 use_8_beats:
         lda currently_playing_row
-        and #%00111000
+        and #%00011000
+        sta CurrentBeat
+        lda currently_playing_frame
+        .repeat 5
+        asl
+        .endrepeat
+        and #%00100000
+        ora CurrentBeat
 done_picking_beat_length:
         .repeat 3
         lsr
