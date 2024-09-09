@@ -1561,6 +1561,12 @@ done_with_torchlight:
 EntityId := R1
 EntityPattern := R2
 EntityAttribute := R3
+        ; safety: if we are currently paused, don't process any of this
+        lda PlayerIsPaused
+        beq not_paused
+        rts
+not_paused:
+
         ; sanity: if this room is freshly loaded, don't do any of this. the enemies
         ; haven't had a real processing round yet, and we are operating on incomplete
         ; information (possibly stale from the previous room)
