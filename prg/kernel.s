@@ -251,6 +251,22 @@ LayoutPtr := R0
         sta LeftNametableAttr
         sta RightNametableAttr
 
+        ; Jank: actually apply those right now, since the endscreen drawing routines
+        ; expect to be able to use PPUDATA for some reason
+        ; (they're getting redone soon)
+        lda LeftNametableBank
+        sta MAP_NT_A_BANK
+        sta MAP_NT_C_BANK
+        lda RightNametableBank
+        sta MAP_NT_B_BANK
+        sta MAP_NT_D_BANK
+        lda LeftNametableAttr
+        sta MAP_NT_A_CONTROL
+        sta MAP_NT_C_CONTROL
+        lda RightNametableAttr
+        sta MAP_NT_B_CONTROL
+        sta MAP_NT_D_CONTROL
+
         jsr clear_fpga_ram
         far_call FAR_initialize_sprites
         far_call FAR_init_game_end_screen
