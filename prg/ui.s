@@ -8,6 +8,7 @@
         .include "nes.inc"
         .include "input.inc"
         .include "rainbow.inc"
+        .include "player.inc"
         .include "prng.inc"
         .include "settings.inc"
         .include "sound.inc"
@@ -160,6 +161,10 @@ stay_here:
         ; Setup the title nametable
         far_call FAR_copy_title_nametable
         far_call FAR_set_title_exbg
+
+        ; The title screen should apply the last player palette that was
+        ; used, for consistency (and so we don't have a "preferred" skin tone)
+        near_call FAR_apply_player_palette
 
         ; Play the title track on the title screen
         lda #TRACK_TITLE

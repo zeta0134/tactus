@@ -91,8 +91,6 @@ PlayerPreviousSuccessfulDirection: .res 1
 PlayerIntendsToPause: .res 1
 PlayerIsPaused: .res 1
 
-PlayerPaletteIndex: .res 1
-
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
 DIRECTION_SOUTH = 3
@@ -152,12 +150,6 @@ HeartCount := R2
 
         lda #10
         sta PlayerTorchlightRadius
-
-        ; TODO: load this from the save file!
-        lda setting_player_palette
-        asl
-        asl
-        sta PlayerPaletteIndex
 
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
@@ -262,10 +254,29 @@ sprite_failed:
         rts
 .endproc
 
+; So things other than main gameplay can do this, mostly for
+; the title screen and eventual save screen, etc etc
+.proc FAR_apply_player_palette
+        lda setting_player_palette
+        asl
+        asl
+        tax
+        lda player_palettes+1, x
+        sta ObjPaletteBuffer+1
+        lda player_palettes+2, x
+        sta ObjPaletteBuffer+2
+        lda player_palettes+3, x
+        sta ObjPaletteBuffer+3
+        rts
+.endproc
+
 ; Called once every frame
 .proc FAR_draw_player
         ; Based on the player's chosen sprite index, update their base sprite colors
-        ldx PlayerPaletteIndex
+        lda setting_player_palette
+        asl
+        asl
+        tax
         lda player_palettes+1, x
         sta ObjPaletteBuffer+1
         lda player_palettes+2, x
