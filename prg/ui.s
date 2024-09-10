@@ -58,7 +58,7 @@ options_ui_layout:
         widget_cursor
         widget_text_label options_str, 4, 3
         widget_text_options disco_floor_str, disco_types, setting_disco_floor, 8, 5
-        widget_text_options disco_floor_str, player_palette_types, setting_player_palette, 8, 7
+        widget_text_options player_palette_str, player_palette_types, setting_player_palette, 8, 7
         widget_text_button back_to_title_str, return_to_title, 8, 20
         .addr $0000 ; end of list
 
