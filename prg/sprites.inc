@@ -12,6 +12,7 @@ ONE_SPRITE = 4
         BehaviorFlags .byte ; and also palette
         TileIndex .byte
         LifetimeBeats .byte
+        SpecialBehavior .byte
 .endstruct
 
 ; These come first so we can use the behavior
@@ -23,6 +24,9 @@ SPRITE_ACTIVE      = %00010000
 SPRITE_RISE        = %00001000
 SPRITE_ONE_BEAT    = %00000100
 ; the last 2 bits are the sprite palette
+
+; Special behavior flags, for special behaviors
+SPRITE_FLOAT       = %10000000
 
 .global sprite_table
 

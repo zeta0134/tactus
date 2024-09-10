@@ -27,6 +27,12 @@ SHUFFLE_MASK = %00011111
 
 .segment "CODE_0"
 
+floaty_sprite_lut:
+        ; 8 entries for rising
+        .byte 2, 2, 2, 2, 2, 2, 1, 1
+        ; 8 entries for falling
+        .byte 0, 0, 0, 0, 0, 0, 1, 1
+
 .proc FAR_initialize_sprites
 MetaSpriteIndex := R0
         perform_zpcm_inc
@@ -41,6 +47,7 @@ loop:
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
         sta sprite_table + MetaSpriteState::TileIndex, x
         sta sprite_table + MetaSpriteState::LifetimeBeats, x
+        sta sprite_table + MetaSpriteState::SpecialBehavior, x
         lda #.sizeof(MetaSpriteState)
         clc
         adc MetaSpriteIndex
@@ -113,6 +120,10 @@ draw:
         lda sprite_table + MetaSpriteState::BehaviorFlags, x
         and #SPRITE_RISE
         bne rising_sprite_y
+        ; Y position might be modified differently if we are in FLOAT mode (items use this)
+        lda sprite_table + MetaSpriteState::SpecialBehavior, x
+        and #SPRITE_FLOAT
+        bne floating_sprite_y
 normal_sprite_y:
         lda sprite_table + MetaSpriteState::PositionY, x
         jmp write_sprite_y
@@ -137,6 +148,28 @@ rising_sprite_y:
         pla
         sec
         sbc ScratchByte
+        jmp write_sprite_y
+floating_sprite_y:
+        ; Sprite position is the original position minus an entry in the
+        ; float lut, which is itself indexed by the current musical beat and
+        ; the tracked row within that beat
+        lda CurrentBeat
+        asl ; x2
+        asl ; x4
+        asl ; x8
+        and #%00001000 ; isolate that bit
+        sta ScratchByte
+        ldy TrackedMusicPos
+        lda tracked_row_buffer, y
+        and #%00000111
+        ora ScratchByte
+        ; Index
+        tay
+        lda sprite_table + MetaSpriteState::PositionY, x
+        sec
+        sbc floaty_sprite_lut, y
+        ; jmp write_sprite_y ; fall through
+
 write_sprite_y:
         ; -1 for the screen, +4 for the raster split
         clc
@@ -267,7 +300,12 @@ loop:
 table_is_full:
         lda #$FF
         sta MetaSpriteIndex
+        rts
 found:
+        ; initialize some things
+        ldx MetaSpriteIndex
+        lda #0
+        sta sprite_table + MetaSpriteState::SpecialBehavior, x
         rts
 .endproc
 

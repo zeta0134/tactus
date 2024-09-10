@@ -17,10 +17,6 @@ CurrentTile := R15
         ; Load the real item
         lda tile_data, x
         sta ItemIndex
-
-        ; For testing, load a lvl 1 dagger
-        ;lda #ITEM_DAGGER_L1
-        ;sta ItemIndex
         
         far_call FAR_apply_item_world_metasprite
         perform_zpcm_inc
@@ -45,6 +41,10 @@ CurrentTile := R15
         clc
         adc #BATTLEFIELD_OFFSET_Y
         sta sprite_table + MetaSpriteState::PositionY, x
+
+        ; Items should bob up and down, so set our special floaty flag
+        lda #SPRITE_FLOAT
+        sta sprite_table + MetaSpriteState::SpecialBehavior, x
 
         ; that should be it?
         perform_zpcm_inc
