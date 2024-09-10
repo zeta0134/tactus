@@ -83,6 +83,12 @@ data_bank_high_shadow: .res 1
 	lda #%00000100 ; zpcm on, exp6 off, exp9 off
 	sta MAP_SND_EXP_CTRL
 
+	; While we're in here, silence all three expansion channels
+	lda #0
+	sta MAP_SND_P1_CTRL
+	sta MAP_SND_P2_CTRL
+	sta MAP_SND_SAW_ACC
+
 	rts
 .endproc
 

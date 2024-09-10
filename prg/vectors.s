@@ -38,18 +38,31 @@ loop:
 .endproc
 
 .proc reset
-        cld            ; make sure decimal mode is off (not that it does anything)
+        inc NmiSoftDisable ; no! (earliest possible nonzero)
+
         sei            ; Disable interrupts
+        cld            ; make sure decimal mode is off (not that it does anything)
         ldx #$ff       ; initialize stack
         txs
 
+        lda #1
+        sta NmiSoftDisable ; no really! (set it to the sane expected value)
+
         jsr rainbow_init
+
+        ; Silence 2A03 audio early
+        lda #0
+        sta $4015
 
         ; Wait for the PPU to finish warming up
         spinwait_for_vblank
         spinwait_for_vblank
 
-        ; Initialize zero page and stack
+        ; Disable NMI properly
+        lda #0
+        sta PPUCTRL
+
+        ; Initialize zero page and stack (which clears NmiSoftDisable)
         clear_page $0000
         clear_page $0100
 
