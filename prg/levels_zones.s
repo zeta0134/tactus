@@ -120,7 +120,10 @@ zone_grasslands_floor_1:
         zone_banner_pos 0, 0        ; HudHeader
         zone_banner_pos 0, 5        ; HudBanner
         .addr hud_grasslands_pal
-        .addr common_treasure_table ; ShopLootPtr
+        .addr common_treasure_table     ; ShopLootPtr0
+        .addr common_treasure_table     ; ShopLootPtr1
+        .addr common_treasure_table     ; ShopLootPtr2
+        .addr consumable_treasure_table ; ShopLootPtr3
         .addr test_structure_set_big   ;InteriorStructureLargeSet
         .byte 1                        ;InteriorStructureLargeMaxMax
         .addr test_structure_set_small ;InteriorStructureSmallSet
@@ -144,7 +147,10 @@ zone_grasslands_floor_2:
         zone_banner_pos 0, 1        ; HudHeader
         zone_banner_pos 0, 5        ; HudBanner
         .addr hud_grasslands_pal
-        .addr rare_treasure_table ; ShopLootPtr
+        .addr rare_treasure_table       ; ShopLootPtr0
+        .addr rare_treasure_table       ; ShopLootPtr1
+        .addr common_treasure_table     ; ShopLootPtr2
+        .addr consumable_treasure_table ; ShopLootPtr3
         .addr test_structure_set_big   ;InteriorStructureLargeSet
         .byte 1                        ;InteriorStructureLargeMaxMax
         .addr test_structure_set_small ;InteriorStructureSmallSet
@@ -167,7 +173,10 @@ zone_grasslands_floor_3:
         zone_banner_pos 0, 2        ; HudHeader
         zone_banner_pos 0, 5        ; HudBanner
         .addr hud_grasslands_pal
-        .addr rare_treasure_table ; ShopLootPtr
+        .addr rare_treasure_table       ; ShopLootPtr0
+        .addr rare_treasure_table       ; ShopLootPtr1
+        .addr common_treasure_table     ; ShopLootPtr2
+        .addr consumable_treasure_table ; ShopLootPtr3
         .addr test_structure_set_big   ;InteriorStructureLargeSet
         .byte 1                        ;InteriorStructureLargeMaxMax
         .addr test_structure_set_small ;InteriorStructureSmallSet
@@ -190,7 +199,10 @@ zone_grasslands_floor_4:
         zone_banner_pos 0, 3        ; HudHeader
         zone_banner_pos 0, 5        ; HudBanner
         .addr hud_grasslands_pal
-        .addr rare_treasure_table ; ShopLootPtr
+        .addr rare_treasure_table       ; ShopLootPtr0
+        .addr rare_treasure_table       ; ShopLootPtr1
+        .addr common_treasure_table     ; ShopLootPtr2
+        .addr consumable_treasure_table ; ShopLootPtr3
         .addr test_structure_set_big   ;InteriorStructureLargeSet
         .byte 1                        ;InteriorStructureLargeMaxMax
         .addr test_structure_set_small ;InteriorStructureSmallSet
@@ -266,7 +278,10 @@ zone_hub_world:
         zone_banner_pos 14, 0        ; HudHeader
         zone_banner_pos 14, 5        ; HudBanner
         .addr hud_hub_pal
-        .addr common_treasure_table ; ShopLootPtr
+        .addr rare_treasure_table       ; ShopLootPtr0 (unused)
+        .addr rare_treasure_table       ; ShopLootPtr1
+        .addr common_treasure_table     ; ShopLootPtr2
+        .addr consumable_treasure_table ; ShopLootPtr3
         .addr empty_structure_set ;InteriorStructureLargeSet
         .byte 0                   ;InteriorStructureLargeMaxMax
         .addr empty_structure_set ;InteriorStructureSmallSet
@@ -312,7 +327,10 @@ zone_beach_floor_1:
         zone_banner_pos 2, 0        ; HudHeader
         zone_banner_pos 2, 5        ; HudBanner
         .addr hud_beach_pal
-        .addr common_treasure_table ; ShopLootPtr
+        .addr common_treasure_table     ; ShopLootPtr0
+        .addr common_treasure_table     ; ShopLootPtr1
+        .addr common_treasure_table     ; ShopLootPtr2
+        .addr consumable_treasure_table ; ShopLootPtr3
         .addr empty_structure_set ;InteriorStructureLargeSet
         .byte 0                   ;InteriorStructureLargeMaxMax
         .addr empty_structure_set ;InteriorStructureSmallSet
@@ -335,7 +353,10 @@ zone_beach_floor_2:
         zone_banner_pos 2, 1        ; HudHeader
         zone_banner_pos 2, 5        ; HudBanner
         .addr hud_beach_pal
-        .addr rare_treasure_table ; ShopLootPtr
+        .addr rare_treasure_table       ; ShopLootPtr0
+        .addr rare_treasure_table       ; ShopLootPtr1
+        .addr common_treasure_table     ; ShopLootPtr2
+        .addr consumable_treasure_table ; ShopLootPtr3
         .addr empty_structure_set ;InteriorStructureLargeSet
         .byte 0                   ;InteriorStructureLargeMaxMax
         .addr empty_structure_set ;InteriorStructureSmallSet
@@ -358,7 +379,10 @@ zone_beach_floor_3:
         zone_banner_pos 2, 2        ; HudHeader
         zone_banner_pos 2, 5        ; HudBanner
         .addr hud_beach_pal
-        .addr rare_treasure_table ; ShopLootPtr
+        .addr rare_treasure_table       ; ShopLootPtr0
+        .addr rare_treasure_table       ; ShopLootPtr1
+        .addr common_treasure_table     ; ShopLootPtr2
+        .addr consumable_treasure_table ; ShopLootPtr3
         .addr empty_structure_set ;InteriorStructureLargeSet
         .byte 0                   ;InteriorStructureLargeMaxMax
         .addr empty_structure_set ;InteriorStructureSmallSet
@@ -381,7 +405,10 @@ zone_beach_floor_4:
         zone_banner_pos 2, 3        ; HudHeader
         zone_banner_pos 2, 5        ; HudBanner
         .addr hud_beach_pal
-        .addr rare_treasure_table ; ShopLootPtr
+        .addr rare_treasure_table       ; ShopLootPtr0
+        .addr rare_treasure_table       ; ShopLootPtr1
+        .addr common_treasure_table     ; ShopLootPtr2
+        .addr consumable_treasure_table ; ShopLootPtr3
         .addr empty_structure_set ;InteriorStructureLargeSet
         .byte 0                   ;InteriorStructureLargeMaxMax
         .addr empty_structure_set ;InteriorStructureSmallSet
@@ -430,7 +457,10 @@ zone_grasslands_floor_2_but_fast:
         zone_banner_pos 14, 1       ; DebugHeader
         zone_banner_pos 14, 5       ; DebugBanner
         .addr hud_grasslands_pal
-        .addr rare_treasure_table ; ShopLootPtr
+        .addr rare_treasure_table       ; ShopLootPtr0
+        .addr rare_treasure_table       ; ShopLootPtr1
+        .addr common_treasure_table     ; ShopLootPtr2
+        .addr consumable_treasure_table ; ShopLootPtr3
         .addr test_structure_set_big   ;InteriorStructureLargeSet
         .byte 1                        ;InteriorStructureLargeMaxMax
         .addr test_structure_set_small ;InteriorStructureSmallSet
@@ -533,9 +563,15 @@ FloorListLength := R2
 
 .proc FAR_setup_shop_loot_ptrs_for_current_zone
 LootTablePtr := R0
+LootTableIndex := R2
         access_data_bank #<.bank(all_zones_data_page)
 
-        ldy #ZoneDefinition::ShopLootPtr
+        lda LootTableIndex
+        and #%00000011
+        asl
+        clc
+        adc #ZoneDefinition::ShopLootPtr0
+        tay
         lda (PlayerZonePtr), y
         sta LootTablePtr+0
         iny

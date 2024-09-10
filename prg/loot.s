@@ -376,6 +376,18 @@ rare_treasure_table:
     .byte ITEM_GO_GO_BOOTS
     .byte ITEM_GO_GO_BOOTS
 
+consumable_treasure_table:
+    ; FOOOOOOOOOOD! (Also should have bombs, heart containers, etc)
+    .byte 8
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_MEDIUM_FRIES
+    .byte ITEM_MEDIUM_FRIES
+    .byte ITEM_MEDIUM_FRIES
+    .byte ITEM_LARGE_FRIES
+
 common_chest_treasure_table:
     .byte 16
     .byte ITEM_BROADSWORD_L1

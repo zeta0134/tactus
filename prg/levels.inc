@@ -123,8 +123,11 @@
         HudBanner .word
         HudPal .word
 
-        ; TODO: guaranteed loot lists? consumable lists?
-        ShopLootPtr .word
+        ; Each individual index in a shop gets one of these
+        ShopLootPtr0 .word
+        ShopLootPtr1 .word
+        ShopLootPtr2 .word
+        ShopLootPtr3 .word
 
         InteriorStructureLargeSet .word
         InteriorStructureLargeMaxMax .byte

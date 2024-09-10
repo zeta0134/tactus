@@ -17,7 +17,7 @@
 title_nametable:
         .incbin "../art/raw_nametables/title_screen.nam"
 
-.segment "CODE_0"
+.segment "CODE_2"
 
 ; note: set PPUADDR and PPUCTRL appropriately before calling
 .proc memcpy_ppudata

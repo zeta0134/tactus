@@ -33,6 +33,7 @@
 .global common_treasure_table
 .global common_chest_treasure_table
 .global rare_treasure_table
+.global consumable_treasure_table
 
 .macro set_loot_table loot_table
     st16 LootTable, loot_table

@@ -1436,12 +1436,17 @@ done_with_shop_rolls:
 
 .proc roll_shop_loot
 LootTablePtr := R0
+LootTableIndex := R2
 ItemId := R2
 ; R3 is clobbered by the loot rolling function
-CurrentTile := R4 
+CurrentTile := R4
+NextLootIndex := R5
+
         perform_zpcm_inc
 
-        far_call FAR_setup_shop_loot_ptrs_for_current_zone
+        jsr next_room_rand
+        and #%00000011
+        sta NextLootIndex
 
         ; Loop through the entire room, scanning for any item shadow tiles that aren't populated
         lda #0
@@ -1456,6 +1461,15 @@ loop:
                            ; not sure if we'll use this, but it allows us to have the map data
                            ; specify a forced roll and control the purchase flag?
         bne done_with_tile
+
+        lda NextLootIndex
+        sta LootTableIndex
+        far_call FAR_setup_shop_loot_ptrs_for_current_zone
+
+        inc NextLootIndex
+        lda NextLootIndex
+        and #%00000011
+        sta NextLootIndex
 
         far_call FAR_roll_shop_loot
         ldx CurrentTile

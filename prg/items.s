@@ -322,7 +322,7 @@ small_fries:
 medium_fries:
         .byte SLOT_CONSUMABLE                 ; SlotId (irrelevant)
         .byte SPRITE_TILE_MEDIUM_FRIES        ; WorldSpriteTile (obviously broken)
-        .byte SPRITE_PAL_RED                  ; WorldSpriteAttr
+        .byte SPRITE_PAL_GREY                 ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
         .byte 0                               ; HudSpriteTile (unused)
@@ -336,16 +336,16 @@ medium_fries:
 large_fries:
         .byte SLOT_CONSUMABLE                 ; SlotId (irrelevant)
         .byte SPRITE_TILE_LARGE_FRIES         ; WorldSpriteTile (obviously broken)
-        .byte SPRITE_PAL_RED                  ; WorldSpriteAttr
+        .byte SPRITE_PAL_GREY                 ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
         .byte 0                               ; HudSpriteTile (unused)
         .byte 0                               ; HudSpriteAttr (unused)
-        .word 225                             ; ShopCost
+        .word 250                             ; ShopCost
         .byte WEAPON_DAGGER                   ; WeaponShape    (unused)
         .addr no_effect                       ; DamageFunc     (unused)
         .addr no_effect                       ; TorchlightFunc (unused)
-        .addr heal_12_hp                      ; UseFunc
+        .addr heal_all_hp                     ; UseFunc
 
 ; Note: as an item with a custom effect, these are just special-case checked
 ; in the player movement code
@@ -543,6 +543,18 @@ HealingAmount := R0
 .proc heal_12_hp
 HealingAmount := R0
         lda #12
+        sta HealingAmount
+        far_call FAR_receive_healing
+
+        st16 R0, sfx_small_heart
+        jsr play_sfx_triangle
+
+        rts
+.endproc
+
+.proc heal_all_hp
+HealingAmount := R0
+        lda #255 ; all of it!
         sta HealingAmount
         far_call FAR_receive_healing
 
