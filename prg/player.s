@@ -18,6 +18,7 @@
         .include "procgen.inc"
         .include "rainbow.inc"
         .include "raster_table.inc"
+        .include "settings.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "torchlight.inc"
@@ -90,6 +91,8 @@ PlayerPreviousSuccessfulDirection: .res 1
 PlayerIntendsToPause: .res 1
 PlayerIsPaused: .res 1
 
+PlayerPaletteIndex: .res 1
+
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
 DIRECTION_SOUTH = 3
@@ -105,6 +108,10 @@ player_tile_index_table:
         .endrepeat
 
 .segment "CODE_4"
+
+; 4 bytes each, mostly so we can use NEXXT to design the things
+player_palettes:
+        .incbin "art/player_palettes_1.pal"
 
 JUMP_HEIGHT_END = 5
 jump_height_table:
@@ -145,6 +152,12 @@ HeartCount := R2
 
         lda #10
         sta PlayerTorchlightRadius
+
+        ; TODO: load this from the save file!
+        lda setting_player_palette
+        asl
+        asl
+        sta PlayerPaletteIndex
 
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
@@ -251,6 +264,15 @@ sprite_failed:
 
 ; Called once every frame
 .proc FAR_draw_player
+        ; Based on the player's chosen sprite index, update their base sprite colors
+        ldx PlayerPaletteIndex
+        lda player_palettes+1, x
+        sta ObjPaletteBuffer+1
+        lda player_palettes+2, x
+        sta ObjPaletteBuffer+2
+        lda player_palettes+3, x
+        sta ObjPaletteBuffer+3
+
         ; For now, always lerp the player's current position to their target position
         jsr lerp_player_to_target_coordinates
 

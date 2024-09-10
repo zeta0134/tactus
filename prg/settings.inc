@@ -1,6 +1,7 @@
 .global FAR_init_settings
 
 .global setting_disco_floor
+.global setting_player_palette
 
 DISCO_FLOOR_SOLID_INSTANT_SQUARES   = 0
 DISCO_FLOOR_SOLID_FROZEN_SQUARES    = 1

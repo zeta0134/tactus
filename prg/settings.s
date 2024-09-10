@@ -3,6 +3,7 @@
     .segment "RAM"
 
 setting_disco_floor: .res 1
+setting_player_palette: .res 1
 
     .segment "CODE_1"
 
@@ -14,6 +15,9 @@ setting_disco_floor: .res 1
     ;lda #DISCO_FLOOR_NO_OUTLINE
     ;lda #DISCO_FLOOR_STATIC
     sta setting_disco_floor
+
+    lda #0
+    sta setting_player_palette
 
     rts
 .endproc

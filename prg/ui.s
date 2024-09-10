@@ -57,15 +57,17 @@ options_ui_layout:
         widget_cursor
         widget_text_label options_str, 4, 3
         widget_text_options disco_floor_str, disco_types, setting_disco_floor, 8, 5
+        widget_text_options disco_floor_str, player_palette_types, setting_player_palette, 8, 7
         widget_text_button back_to_title_str, return_to_title, 8, 20
         .addr $0000 ; end of list
 
 options_str:       .asciiz "- OPTIONS -"
 disco_floor_str:   .asciiz "FLOOR: "
+player_palette_str:   .asciiz "PLAYER: "
 back_to_title_str: .asciiz "RETURN TO TITLE "
 
 disco_types:
-        .byte 4 ; length of option set
+        .byte 6 ; length of option set
         .addr disco_option_0_str
         .addr disco_option_1_str
         .addr disco_option_2_str
@@ -79,6 +81,18 @@ disco_option_2_str: .asciiz "INSTANT OUTLINES"
 disco_option_3_str: .asciiz "FROZEN OUTLINES"
 disco_option_4_str: .asciiz "JUST GROOVEMENT"
 disco_option_5_str: .asciiz "NO MOTION"
+
+player_palette_types:
+        .byte 4 ; length of option set
+        .addr player_palette_option_0_str
+        .addr player_palette_option_1_str
+        .addr player_palette_option_2_str
+        .addr player_palette_option_3_str
+
+player_palette_option_0_str: .asciiz "PEONY"
+player_palette_option_1_str: .asciiz "PERIWINKLE"
+player_palette_option_2_str: .asciiz "PETUNIA"
+player_palette_option_3_str: .asciiz "PROTEA"
 
 considerations:
         .byte 2
