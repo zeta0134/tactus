@@ -11,7 +11,6 @@
 
     .segment "PRGRAM"
 
-MAX_ACTIVE_COINS = 12
 coin_state: .res ::MAX_ACTIVE_COINS
 coin_state_duration: .res ::MAX_ACTIVE_COINS
 coin_pos_x_pixels: .res ::MAX_ACTIVE_COINS
@@ -30,7 +29,6 @@ coin_tile_id: .res ::MAX_ACTIVE_COINS
 coin_attributes: .res ::MAX_ACTIVE_COINS
 coin_value: .res ::MAX_ACTIVE_COINS
 
-MAX_QUEUED_COINS = 32
 queued_coin_id: .res ::MAX_QUEUED_COINS
 queued_coin_pos: .res ::MAX_QUEUED_COINS
 
@@ -193,6 +191,14 @@ loop:
 .proc FAR_update_coins
 CoinStatePtr := R0
 CoinIndex := R15
+    ; If we are paused, do not update! Not only does this look/feel weird,
+    ; the pause indicator is going to use our sprite slots for its own drawing,
+    ; and we'd otherwise conflict.
+    lda PlayerIsPaused
+    beq safe_to_update
+    rts
+safe_to_update:
+
     ; try to spawn a new coin every frame
     jsr spawn_one_new_coin
     ; draw all active coins
@@ -341,7 +347,6 @@ done_advancing_active_coins:
 
 SHUFFLE_NEXT_SPRITE = 5
 SHUFFLE_NEXT_FRAME = 7
-FIRST_COIN_SPRITE = 32
 
 .proc draw_coins
 CoinIndex := R0

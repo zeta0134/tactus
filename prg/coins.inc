@@ -1,3 +1,9 @@
+; Controls for update and drawing
+MAX_ACTIVE_COINS = 12
+MAX_QUEUED_COINS = 32
+FIRST_COIN_SPRITE = 32
+
+
 .global FIXED_spawn_coin
 .global FAR_init_coins
 .global FAR_update_coins

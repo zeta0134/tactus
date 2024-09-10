@@ -1,6 +1,7 @@
     .macpack longbranch
 
     .include "../build/tile_defs.inc"
+    .include "beat_tracker.inc"
     .include "indicators.inc"
     .include "kernel.inc"
     .include "player.inc"
@@ -15,12 +16,9 @@ LastDisplayedComboBeat: .res 1
 LastDisplayedChain: .res 1
 ComboBounceHeightPos: .res 1
 ChainBounceHeightPos: .res 1
+PauseBouncePos: .res 1
 
     .segment "CODE_3"
-
-; TODO: move these up top
-FIRST_INDICATOR_OAM_INDEX = 32+12
-SECOND_INDICATOR_OAM_INDEX = 32+12+3
 
 combo_left_lut:
     .byte $00
@@ -109,6 +107,8 @@ cleanup:
     sta LastDisplayedChain
     lda CurrentBeatCounter
     sta LastDisplayedComboBeat
+    ; as it's convenient, check for and draw the pause indicator here
+    jsr draw_pause_indicator
     rts
 .endproc
 
@@ -379,5 +379,116 @@ combo_in_range:
     inc ComboBounceHeightPos
 done_with_combo:
     perform_zpcm_inc
+    rts
+.endproc
+
+pause_bounce_lut:
+    .byte 0, 0, 0, 0, 0, 0, 0 ; padding for reverse draw order ripple
+    ;.byte 3, 3, 2, 1, 0, 0 ; short bounce
+    .byte 3, 3, 3, 3, 2, 2, 1, 1 ; extended bounce
+    .repeat 64 ; padding for safety
+    .byte 0 
+    .endrepeat
+
+; in reverse, since that is the order in which we draw
+pause_tiles_lut:
+    .byte SPRITE_TILE_PAUSE_INDICATOR_EP + 2 ; symbol
+    .byte SPRITE_TILE_PAUSE_INDICATOR_EP + 0 ; E
+    .byte SPRITE_TILE_PAUSE_INDICATOR_US + 2 ; S
+    .byte SPRITE_TILE_PAUSE_INDICATOR_US + 0 ; U
+    .byte SPRITE_TILE_PAUSE_INDICATOR_PA + 2 ; A
+    .byte SPRITE_TILE_PAUSE_INDICATOR_PA + 0 ; P
+    .byte SPRITE_TILE_PAUSE_INDICATOR_EP + 2 ; symbol
+
+.proc draw_pause_indicator
+CurrentPosX := R0
+BasePosY := R1
+CurrentBounceOffset := R2
+CurrentLetterIndex := R3
+SpritePtr := R4
+
+    ; only actually draw if we are paused!
+    lda PlayerIsPaused
+    bne perform_draw
+    ; otherwise set the counter way after a single beat
+    ; so we don't have a weird startup
+    lda #16
+    sta PauseBouncePos
+    rts
+perform_draw:
+
+    lda TrackedMusicPos
+    bne keep_current_bounce_position
+    lda #0
+    sta PauseBouncePos
+keep_current_bounce_position:
+
+    lda PlayerRow
+    cmp #5
+    bcs regular_pos
+avoid_player_pos:
+    lda #132
+    jmp store_height
+regular_pos:
+    lda #48
+store_height:
+    sta BasePosY
+
+    lda #160
+    sta CurrentPosX
+
+    lda PauseBouncePos
+    sta CurrentBounceOffset
+
+    lda #0
+    sta CurrentLetterIndex
+
+loop:
+    ; Draw a thing!
+    lda #PAUSE_INDICATOR_OAM_INDEX
+    clc
+    adc CurrentLetterIndex
+    tay
+    lda sprite_ptr_lut_low, y
+    sta SpritePtr+0
+    lda sprite_ptr_lut_high, y
+    sta SpritePtr+1
+
+    lda CurrentPosX
+    ldy #SelfModifiedSprite::PosX
+    sta (SpritePtr), y
+
+    lda BasePosY
+    sec
+    ldx CurrentBounceOffset
+    sbc pause_bounce_lut, x
+    ldy #SelfModifiedSprite::PosY
+    sta (SpritePtr), y
+
+    ldx CurrentLetterIndex
+    lda pause_tiles_lut, x
+    ldy #SelfModifiedSprite::TileId
+    sta (SpritePtr), y
+
+    lda #1 ; yellowish palette
+    ldy #SelfModifiedSprite::Attributes
+    sta (SpritePtr), y
+
+    ; Increment all the things and advance
+    inc CurrentLetterIndex
+    lda CurrentLetterIndex
+    cmp #7
+    beq done
+
+    lda CurrentPosX
+    sec
+    sbc #12
+    sta CurrentPosX
+
+    inc CurrentBounceOffset
+    jmp loop
+
+done:
+    inc PauseBouncePos
     rts
 .endproc
