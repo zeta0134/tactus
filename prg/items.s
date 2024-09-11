@@ -48,6 +48,10 @@ item_table:
         .word medium_fries
         .word large_fries
         .word go_go_boots
+        .word gold_sack
+        .word heart_container
+        .word temporary_heart
+        .word heart_armor
         ; safety
         .repeat 128
         .word no_item
@@ -278,8 +282,8 @@ large_torch:
         .addr do_nothing                        ; UseFunc
 
 compass:
-        .byte SLOT_CONSUMABLE                 ; SlotId (irrelevant)
-        .byte SPRITE_TILE_COMPASS             ; WorldSpriteTile (obviously broken)
+        .byte SLOT_CONSUMABLE                 ; SlotId
+        .byte SPRITE_TILE_COMPASS             ; WorldSpriteTile
         .byte SPRITE_PAL_PURPLE               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -292,8 +296,8 @@ compass:
         .addr reveal_special_rooms            ; UseFunc
 
 map:
-        .byte SLOT_CONSUMABLE                 ; SlotId (irrelevant)
-        .byte SPRITE_TILE_MAP                 ; WorldSpriteTile (obviously broken)
+        .byte SLOT_CONSUMABLE                 ; SlotId
+        .byte SPRITE_TILE_MAP                 ; WorldSpriteTile
         .byte SPRITE_PAL_GREY                 ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -306,8 +310,8 @@ map:
         .addr reveal_all_rooms                ; UseFunc
 
 small_fries:
-        .byte SLOT_CONSUMABLE                 ; SlotId (irrelevant)
-        .byte SPRITE_TILE_SMALL_FRIES         ; WorldSpriteTile (obviously broken)
+        .byte SLOT_CONSUMABLE                 ; SlotId
+        .byte SPRITE_TILE_SMALL_FRIES         ; WorldSpriteTile
         .byte SPRITE_PAL_GREY                 ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -320,8 +324,8 @@ small_fries:
         .addr heal_4_hp                       ; UseFunc
 
 medium_fries:
-        .byte SLOT_CONSUMABLE                 ; SlotId (irrelevant)
-        .byte SPRITE_TILE_MEDIUM_FRIES        ; WorldSpriteTile (obviously broken)
+        .byte SLOT_CONSUMABLE                 ; SlotId
+        .byte SPRITE_TILE_MEDIUM_FRIES        ; WorldSpriteTile
         .byte SPRITE_PAL_GREY                 ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -334,8 +338,8 @@ medium_fries:
         .addr heal_8_hp                       ; UseFunc
 
 large_fries:
-        .byte SLOT_CONSUMABLE                 ; SlotId (irrelevant)
-        .byte SPRITE_TILE_LARGE_FRIES         ; WorldSpriteTile (obviously broken)
+        .byte SLOT_CONSUMABLE                 ; SlotId
+        .byte SPRITE_TILE_LARGE_FRIES         ; WorldSpriteTile
         .byte SPRITE_PAL_GREY                 ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -350,8 +354,8 @@ large_fries:
 ; Note: as an item with a custom effect, these are just special-case checked
 ; in the player movement code
 go_go_boots:
-        .byte SLOT_BOOTS                      ; SlotId (irrelevant)
-        .byte SPRITE_TILE_GO_GO_BOOTS         ; WorldSpriteTile (obviously broken)
+        .byte SLOT_BOOTS                      ; SlotId
+        .byte SPRITE_TILE_GO_GO_BOOTS         ; WorldSpriteTile
         .byte SPRITE_PAL_GREY                 ; WorldSpriteAttr
         .byte EQUIPMENT_GO_GO_BOOTS           ; HudBgTile
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -362,6 +366,62 @@ go_go_boots:
         .addr no_effect                       ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
+
+gold_sack:
+        .byte SLOT_CONSUMABLE                 ; SlotId
+        .byte SPRITE_TILE_GOLD_SACK           ; WorldSpriteTile
+        .byte SPRITE_PAL_GREY                 ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                               ; HudSpriteTile (unused)
+        .byte 0                               ; HudSpriteAttr (unused)
+        .word 0                               ; ShopCost (does not spawn in shops)
+        .byte WEAPON_DAGGER                   ; WeaponShape (unused)
+        .addr no_effect                       ; DamageFunc
+        .addr no_effect                       ; TorchlightFunc
+        .addr give_100_gold                   ; UseFunc
+
+heart_container:
+        .byte SLOT_CONSUMABLE                 ; SlotId
+        .byte SPRITE_TILE_HEART_CONTAINER     ; WorldSpriteTile
+        .byte SPRITE_PAL_RED                  ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                               ; HudSpriteTile (unused)
+        .byte 0                               ; HudSpriteAttr (unused)
+        .word 250                             ; ShopCost
+        .byte WEAPON_DAGGER                   ; WeaponShape (unused)
+        .addr no_effect                       ; DamageFunc
+        .addr no_effect                       ; TorchlightFunc
+        .addr give_heart_container            ; UseFunc
+
+temporary_heart:
+        .byte SLOT_CONSUMABLE                 ; SlotId
+        .byte SPRITE_TILE_HEART_CONTAINER     ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE               ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                               ; HudSpriteTile (unused)
+        .byte 0                               ; HudSpriteAttr (unused)
+        .word 50                              ; ShopCost
+        .byte WEAPON_DAGGER                   ; WeaponShape (unused)
+        .addr no_effect                       ; DamageFunc
+        .addr no_effect                       ; TorchlightFunc
+        .addr give_temporary_heart            ; UseFunc
+
+heart_armor:
+        .byte SLOT_CONSUMABLE                 ; SlotId
+        .byte SPRITE_TILE_HEART_ARMOR         ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE               ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                               ; HudSpriteTile (unused)
+        .byte 0                               ; HudSpriteAttr (unused)
+        .word 100                             ; ShopCost
+        .byte WEAPON_DAGGER                   ; WeaponShape (unused)
+        .addr no_effect                       ; DamageFunc
+        .addr no_effect                       ; TorchlightFunc
+        .addr give_heart_armor                ; UseFunc
 
         .segment "CODE_0"
 
@@ -488,6 +548,7 @@ done_with_this_room:
         st16 R0, sfx_heart_container
         jsr play_sfx_pulse1
 
+        lda #0 ; return success
         rts
 .endproc
 
@@ -512,55 +573,171 @@ done_with_this_room:
         st16 R0, sfx_heart_container
         jsr play_sfx_pulse1
 
+        lda #0 ; return success
         rts
 .endproc
 
-; TODO: rewrite all of these when we completely overhaul hearts
 .proc heal_4_hp
-HealingAmount := R0
         lda #4
-        sta HealingAmount
-        far_call FAR_receive_healing
-
-        st16 R0, sfx_small_heart
-        jsr play_sfx_triangle
-
-        rts
+        jmp _heal_player_common
 .endproc
 
 .proc heal_8_hp
-HealingAmount := R0
         lda #8
-        sta HealingAmount
-        far_call FAR_receive_healing
-
-        st16 R0, sfx_small_heart
-        jsr play_sfx_triangle
-
-        rts
+        jmp _heal_player_common
 .endproc
 
 .proc heal_12_hp
-HealingAmount := R0
         lda #12
-        sta HealingAmount
-        far_call FAR_receive_healing
-
-        st16 R0, sfx_small_heart
-        jsr play_sfx_triangle
-
-        rts
+        jmp _heal_player_common
 .endproc
 
 .proc heal_all_hp
-HealingAmount := R0
         lda #255 ; all of it!
+        jmp _heal_player_common
+.endproc
+
+; Healing amount in A
+.proc _heal_player_common
+HealingAmount := R0
         sta HealingAmount
         far_call FAR_receive_healing
 
         st16 R0, sfx_small_heart
         jsr play_sfx_triangle
 
+        ; TODO: cancel healing / return failure if the player is already at max health?
+
+        lda #0 ; return success
+        rts
+.endproc
+
+.proc give_heart_container
+NewHeartType := R0
+HealingAmount := R0
+        ; Can the player actually hold an additional heart?
+        ldx #(MAX_REGULAR_HEARTS-1)
+        lda heart_type, x
+        cmp #HEART_TYPE_NONE      ; empty containers are fine
+        beq okay_to_increase
+        cmp #HEART_TYPE_TEMPORARY ; temporary containers are also fine
+        beq okay_to_increase
+        cmp #HEART_TYPE_TEMPORARY_ARMORED
+        beq okay_to_increase
+        ; Oh no! Whelp; cancel the thing then.
+        lda #$FF ; return failure
+        rts
+
+okay_to_increase:
+        ; Add one heart container to the player's maximum
+        lda #HEART_TYPE_REGULAR
+        sta NewHeartType
+        far_call FAR_add_heart
+
+        ; Regular heart containers start empty (otherwise it looks weird)
+        ; so heal the player 4 HP to award the health it contains
+        lda #4
+        sta HealingAmount
+        far_call FAR_receive_healing
+        ; TODO: these are kinda uncommon. Maybe they should award a full heal?
+
+        ; And we're done!
+        lda #0 ; return success
+        rts
+.endproc
+
+.proc give_temporary_heart
+NewHeartType := R0
+        ; Can the player actually hold an additional temporary heart?
+        ; For this routine we intentionally restrict the player to 1
+        ; full temporary heart maximum. (The underlying HP system CAN
+        ; handle more than one, so this is a balance choice that we 
+        ; may later revisit.)
+
+        ; Starting from the left, examime each heart we find
+        ldx #0
+find_heart_loop:
+        lda heart_type, x
+        ; If we encounter an empty heart slot, we can spawn
+        ; a temporary heart here
+        cmp #HEART_TYPE_NONE
+        beq okay_to_add
+        ; If we encounter a temporary heart slot, we may be able
+        ; to refill its health
+        cmp #HEART_TYPE_TEMPORARY
+        beq okay_to_heal
+        cmp #HEART_TYPE_TEMPORARY_ARMORED
+        beq okay_to_heal
+        ; Otherwise keep checking
+        inx
+        cpx #TOTAL_HEART_SLOTS
+        bne find_heart_loop
+
+fail_to_collect:
+        ; Oh no! Whelp; cancel the thing then.
+        lda #$FF ; return failure
+        rts
+
+okay_to_add:
+        ; Add one heart container to the player's maximum
+        lda #HEART_TYPE_TEMPORARY
+        sta NewHeartType
+        far_call FAR_add_heart
+        ; And we're done!
+        lda #0 ; return success
+        rts
+
+okay_to_heal:
+        ; At this stage, X is pointing at the temporary heart
+        ; If the temporary heart is full, we fail!
+        lda heart_hp, x
+        cmp #4
+        beq fail_to_collect
+        ; Otherwise, top it up.
+        lda #4
+        sta heart_hp, x
+        ; Success!
+        lda #0 ; return success
+        rts
+.endproc
+
+.proc give_heart_armor
+        ; Starting from the left, look for the first
+        ; normal/temporary heart that is unarmored
+        ldx #0
+find_heart_loop:
+        lda heart_type, x
+        cmp #HEART_TYPE_REGULAR
+        beq upgrade_to_armored
+        cmp #HEART_TYPE_TEMPORARY
+        beq upgrade_to_temporary_armored
+        ; Otherwise keep checking
+        inx
+        cpx #TOTAL_HEART_SLOTS
+        bne find_heart_loop
+fail_to_collect:
+        ; Oh no! Whelp; cancel the thing then.
+        lda #$FF ; return failure
+        rts
+
+upgrade_to_armored:
+        lda #HEART_TYPE_REGULAR_ARMORED
+        sta heart_type, x
+        lda #0 ; return success
+        rts
+
+upgrade_to_temporary_armored:
+        lda #HEART_TYPE_TEMPORARY_ARMORED
+        sta heart_type, x
+        lda #0 ; return success
+        rts
+.endproc
+
+.proc give_100_gold
+        add16w PlayerGold, #100
+        clamp16 PlayerGold, #MAX_GOLD
+
+        lda #0
         rts
 .endproc
 
@@ -629,12 +806,15 @@ ItemPtr := R2
 
 ; TODO: maybe rework this to accept an item ID, to make it more generic?
 .proc FAR_pickup_item
-NewItem := R0
-OldItem := R0
-
+InputNewItem := R0
+OutputOldItem := R0
 ItemPtr := R16
+NewItem := R18
         perform_zpcm_inc
         access_data_bank #<.bank(item_table)
+
+        lda InputNewItem
+        sta NewItem
 
         lda NewItem
         asl
@@ -644,16 +824,12 @@ ItemPtr := R16
         lda item_table+1, y
         sta ItemPtr+1
 
-        lda NewItem
-        pha
         ; Play a joyous SFX
         ; TODO: should this be a different sound depending on the type of item? (yes, but how?)
         st16 R0, sfx_equip_ability_pulse1
         jsr play_sfx_pulse1
         st16 R0, sfx_equip_ability_pulse2
         jsr play_sfx_pulse2
-        pla
-        sta NewItem
 
         ldy #ItemDef::SlotId
         lda (ItemPtr), y
@@ -668,9 +844,8 @@ pickup_equipped_item:
         tax
         lda NewItem
         sta player_equipment_by_index, y
-        stx OldItem
-
-restore_previous_bank
+        stx OutputOldItem
+        restore_previous_bank
         perform_zpcm_inc
         rts
 
@@ -682,10 +857,19 @@ pickup_consumable_item:
         lda (ItemPtr), y
         sta ItemFuncPtr+1
         jsr __item_logic_trampoline
-
+        ; The return value in A indicates if the consumable item was consumed successfully
+        beq successful_consumable_item
+failed_consumable_item:
+        ; Put the consumable item back in the square (the calling function can use this
+        ; state as an error check)
+        lda NewItem
+        sta OutputOldItem
+        restore_previous_bank
+        rts
+successful_consumable_item:
+        ; Clear out the old item slot; we "consumed" the new item and left nothing behind
         lda #0
-        sta OldItem
-
+        sta OutputOldItem
         restore_previous_bank
         rts
 .endproc

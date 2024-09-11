@@ -97,17 +97,18 @@ AttackSquare := R3
         rts
 
 okay_to_spawn:
-        ; Super easy: replace the chest with a heart container tile
+        ; Mostly easy: replace the chest with an item shadow
         ldx AttackSquare
-        stx TargetIndex
-        draw_at_x_withpal TILE_HEART_CONTAINER, BG_TILE_FULL_HEART, PAL_RED
+        stx TargetIndex        
+        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_WORLD
 
         lda #0
-        sta tile_data, x
         sta tile_flags, x
-
         jsr draw_active_tile
-        
+        ; The item data is simply a big heart container, neat as you please
+        lda #ITEM_HEART_CONTAINER
+        sta tile_data, x
+
         rts
 .endproc
 
@@ -115,16 +116,17 @@ okay_to_spawn:
 TargetIndex := R0
 TileId := R1
 AttackSquare := R3
-        ; Super easy: replace the chest with a gold sack tile
+        ; Mostly easy: replace the chest with an item shadow
         ldx AttackSquare
-        stx TargetIndex
-        draw_at_x_withpal TILE_GOLD_SACK, BG_TILE_GOLD_SACK, PAL_YELLOW
+        stx TargetIndex        
+        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_WORLD
 
         lda #0
-        sta tile_data, x
         sta tile_flags, x
-
         jsr draw_active_tile
+        ; The item data is simply a gold sack. Easy!
+        lda #ITEM_GOLD_SACK
+        sta tile_data, x
         
         rts
 .endproc

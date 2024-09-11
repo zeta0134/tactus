@@ -435,6 +435,7 @@ bonk_behaviors:
         .endrepeat
 
 .proc FAR_player_collides_with_tile
+; Called functions may use/clobber R0 - R12
 TargetSquare := R13
 ; This is our target position after movement. It might be the same as our player position;
 ; regardless, this is where we want to go on this frame. What happens when we land?

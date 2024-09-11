@@ -172,14 +172,14 @@ sprite_failed:
 ; ============================================================================================================================
         .segment "ENEMY_COLLIDE"
 .proc ENEMY_COLLIDE_collect_item
-; for processing shop items
-ItemPtr := R0
-ItemCost := R2
-ItemSlot := R4
-
 ; for running the shared pickup item logic
 NewItem := R0
 OldItem := R0
+; item pickup logic may clobber R1-R7, so give it lots of breathing room
+
+; for processing shop items
+ItemPtr := R8
+ItemCost := R10
 
 ; for use by draw_active_tile later
 TargetIndex := R0
@@ -210,9 +210,6 @@ try_item_collection:
         iny
         lda (ItemPtr), y
         sta ItemCost+1
-        ldy #ItemDef::SlotId
-        lda (ItemPtr), y
-        sta ItemSlot
 
         restore_previous_bank
 
@@ -220,11 +217,28 @@ try_item_collection:
         ldx TargetSquare
         lda tile_flags, x
         and #ITEM_FOR_PURCHASE
-        beq perform_collection        
+        beq player_can_afford_item        
 
         cmp16 PlayerGold, ItemCost
         jcc deny_collection ; Can't afford it. Sorry!
 
+player_can_afford_item:
+        ; Attempt to collect the item. On failure, OldItem will be equal to the item we tried to pick up!
+        ldx TargetSquare
+        lda tile_data, x
+        sta NewItem
+        far_call FAR_pickup_item
+        ; If the pickup attempt failed, deny the move and take no further action
+        ldx TargetSquare
+        lda OldItem
+        cmp tile_data, x
+        beq deny_collection
+        ; The pickup attempt succeeded. If this was a purchase, deduct the price at this point
+        ldx TargetSquare
+        lda tile_flags, x
+        and #ITEM_FOR_PURCHASE
+        beq item_is_free
+item_is_for_sale:
         ; "We take Visa."
         sec
         lda PlayerGold+0
@@ -233,13 +247,7 @@ try_item_collection:
         lda PlayerGold+1
         sbc ItemCost+1
         sta PlayerGold+1
-
-perform_collection:
-        ldx TargetSquare
-        lda tile_data, x
-        sta NewItem
-        far_call FAR_pickup_item ; sets OldItem to the previous slot contents, if any
-
+item_is_free:
         ; we need to despawn our metasprite (the player's going to occupy this square, it should vanish)
         ldx TargetSquare
         lda tile_metasprite, x
@@ -285,6 +293,8 @@ deny_collection:
         ; block their movement just like any wall
         near_call ENEMY_COLLIDE_solid_tile_forbids_movement
 
+        ; TODO: should we have different "cancel" sounds for purchase / nonpurchase? We could
+        ; do that here easily, or we could move this into the item collection logic.
         st16 R0, sfx_too_poor_pulse1
         jsr play_sfx_pulse1
         st16 R0, sfx_too_poor_pulse2
