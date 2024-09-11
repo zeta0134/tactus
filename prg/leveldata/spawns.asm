@@ -48,22 +48,22 @@ enemy_spider_advanced:
 ; mushrooms are synchronized to the beat. we can spawn them offset so they aren't all
 ; attacking at the same time
 enemy_mushroom_basic_beat_0:
-        full_spawn_entry TILE_MUSHROOM_BASIC, BG_TILE_MUSHROOM_IDLE, PAL_RED, 0, 0, cross_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM_BASIC, BG_TILE_MUSHROOM_IDLE, PAL_RED, 0, 0, ring_of_disco_tiles
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_basic_beat_1:
-        full_spawn_entry TILE_MUSHROOM_BASIC, BG_TILE_MUSHROOM_IDLE, PAL_RED, 1, 0, cross_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM_BASIC, BG_TILE_MUSHROOM_IDLE, PAL_RED, 1, 0, ring_of_disco_tiles
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_basic_beat_2:
-        full_spawn_entry TILE_MUSHROOM_BASIC, BG_TILE_MUSHROOM_IDLE, PAL_RED, 2, 0, cross_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM_BASIC, BG_TILE_MUSHROOM_IDLE, PAL_RED, 2, 0, ring_of_disco_tiles
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_basic_beat_3:
-        full_spawn_entry TILE_MUSHROOM_BASIC, BG_TILE_MUSHROOM_IDLE, PAL_RED, 3, 0, cross_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM_BASIC, BG_TILE_MUSHROOM_IDLE, PAL_RED, 3, 0, ring_of_disco_tiles
         default_spawn_pool_details
         pack_size 1, 1
 
