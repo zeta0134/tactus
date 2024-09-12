@@ -241,8 +241,8 @@ spore_offsets:
         .byte <(                 0 - 1)
         .byte <(                 0 + 1)
         .byte <( BATTLEFIELD_WIDTH - 1)
-        .byte <( BATTLEFIELD_WIDTH - 1)
-        .byte <( BATTLEFIELD_WIDTH - 1)
+        .byte <( BATTLEFIELD_WIDTH + 0)
+        .byte <( BATTLEFIELD_WIDTH + 1)
 
 .proc ENEMY_ATTACK_cleanup_own_spores
 TargetIndex := R0
