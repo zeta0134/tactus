@@ -247,6 +247,13 @@ item_is_for_sale:
         lda PlayerGold+1
         sbc ItemCost+1
         sta PlayerGold+1
+
+        ; It turns out that the detail is clobbered during level gen, since this square was not
+        ; originally a disco tile. Zero it out here so that the newly drawn disco tile doesn't
+        ; end up with some random pattern
+        ldx TargetSquare
+        lda #0
+        sta tile_detail, x
 item_is_free:
         ; we need to despawn our metasprite (the player's going to occupy this square, it should vanish)
         ldx TargetSquare
