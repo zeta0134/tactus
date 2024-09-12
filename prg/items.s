@@ -600,13 +600,18 @@ done_with_this_room:
 ; Healing amount in A
 .proc _heal_player_common
 HealingAmount := R0
+        ; sanity check: does the player have any health to heal?
+        far_call FAR_missing_health
+        bne proceed_to_heal
+        ; this food item would do nothing! cancel the pickup/purchase
+        lda #$FF ; return failure
+        rts
+proceed_to_heal:
         sta HealingAmount
         far_call FAR_receive_healing
 
         st16 R0, sfx_small_heart
         jsr play_sfx_triangle
-
-        ; TODO: cancel healing / return failure if the player is already at max health?
 
         lda #0 ; return success
         rts

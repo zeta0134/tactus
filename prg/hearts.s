@@ -484,3 +484,39 @@ handle_overflow:
         sta heart_hp, x
         jmp FAR_receive_healing::return_from_healing
 .endproc
+
+; Mostly used when applying healing items and deciding what to
+; spawn. How much HP *could* the player gain, if we healed them right now?
+; That value is returned in A
+.proc FAR_missing_health
+HealableMax := R0
+HealableCurrent := R1
+        ldx #0
+        stx HealableMax
+        stx HealableCurrent
+loop:
+        lda heart_type, x
+        cmp #HEART_TYPE_REGULAR
+        beq consider_this_heart
+        cmp #HEART_TYPE_REGULAR_ARMORED
+        beq consider_this_heart
+        jmp done_with_this_heart
+consider_this_heart:
+        clc
+        lda HealableCurrent
+        adc heart_hp, x
+        sta HealableCurrent
+        clc
+        lda HealableMax
+        adc #4
+        sta HealableMax
+done_with_this_heart:
+        inx
+        cpx #TOTAL_HEART_SLOTS
+        bne loop
+
+        sec
+        lda HealableMax
+        sbc HealableCurrent
+        rts
+.endproc

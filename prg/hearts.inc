@@ -26,3 +26,5 @@ HEART_TYPE_TEMPORARY_ARMORED = 5
 ; damage/healing amount in R0, clobbers R1-R3
 .global FAR_receive_damage
 .global FAR_receive_healing
+; Missing (healable) health in A
+.global FAR_missing_health
