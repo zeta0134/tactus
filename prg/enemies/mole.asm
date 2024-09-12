@@ -339,6 +339,15 @@ advanced_hp:
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_direct_attack_with_hp
+        ; did we die? if so, cleanup the result of our attack
+        ldx AttackSquare
+        lda battlefield, x
+        and #%11111100
+        cmp #TILE_MOLE_IDLE
+        beq not_dead
+        jsr ENEMY_ATTACK_cleanup_own_wrench
+not_dead:
+        rts
         rts
 .endproc
 
@@ -393,6 +402,113 @@ done:
         lda AttackSquare
         sta EffectiveAttackSquare
         near_call ENEMY_ATTACK_indirect_attack_with_hp
+        rts
+.endproc
+
+.proc ENEMY_ATTACK_cleanup_own_wrench
+TargetIndex := R0
+AttackSquare := R3
+        ; Look for wrenches in the four cardinally adjacent directions
+        ; that WE could plausibly have thrown. (don't erase some other mole's wrench!)
+        ; This means the wrench's travel direction needs to be directly away from us
+
+        ; North!
+        sec
+        lda AttackSquare
+        sbc #BATTLEFIELD_WIDTH
+        sta DiscoTile
+        tax
+        ; is this a spore tile? don't erase just anything
+        lda battlefield, x
+        ; Is this a wrench?
+        and #%11111100
+        cmp #TILE_WRENCH_PROJECTILE
+        bne not_our_wrench_n
+        ; Is this OUR wrench?
+        lda tile_data, x
+        cmp #MOLE_NORTH
+        bne not_our_wrench_n
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_disco_tile_here
+        lda DiscoTile
+        sta TargetIndex
+        jsr draw_active_tile
+not_our_wrench_n:
+
+        ; East!
+        clc
+        lda AttackSquare
+        adc #1
+        sta DiscoTile
+        tax
+        ; is this a spore tile? don't erase just anything
+        lda battlefield, x
+        ; Is this a wrench?
+        and #%11111100
+        cmp #TILE_WRENCH_PROJECTILE
+        bne not_our_wrench_e
+        ; Is this OUR wrench?
+        lda tile_data, x
+        cmp #MOLE_EAST
+        bne not_our_wrench_e
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_disco_tile_here
+        lda DiscoTile
+        sta TargetIndex
+        jsr draw_active_tile
+not_our_wrench_e:
+
+        ; South!
+        clc
+        lda AttackSquare
+        adc #BATTLEFIELD_WIDTH
+        sta DiscoTile
+        tax
+        ; is this a spore tile? don't erase just anything
+        lda battlefield, x
+        ; Is this a wrench?
+        and #%11111100
+        cmp #TILE_WRENCH_PROJECTILE
+        bne not_our_wrench_s
+        ; Is this OUR wrench?
+        lda tile_data, x
+        cmp #MOLE_SOUTH
+        bne not_our_wrench_s
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_disco_tile_here
+        lda DiscoTile
+        sta TargetIndex
+        jsr draw_active_tile
+not_our_wrench_s:
+        
+        ; West!
+        sec
+        lda AttackSquare
+        sbc #1
+        sta DiscoTile
+        tax
+        ; is this a spore tile? don't erase just anything
+        lda battlefield, x
+        ; Is this a wrench?
+        and #%11111100
+        cmp #TILE_WRENCH_PROJECTILE
+        bne not_our_wrench_w
+        ; Is this OUR wrench?
+        lda tile_data, x
+        cmp #MOLE_WEST
+        bne not_our_wrench_w
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_disco_tile_here
+        lda DiscoTile
+        sta TargetIndex
+        jsr draw_active_tile
+not_our_wrench_w:
+        
+        ; Whew!
         rts
 .endproc
 
