@@ -1074,7 +1074,7 @@ input_received:
 no_input_received:        
         ; The player's input might arrive late, so give them some time. If we get to
         ; an actual row of 2 or more, THEN process the beat without waiting any longer:
-        lda currently_playing_row
+        lda CurrentRowForMode
         and #%00000111
         cmp #2
         bcs process_next_beat_now

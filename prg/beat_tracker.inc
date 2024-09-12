@@ -8,6 +8,7 @@
 .global TrackedGameplayPos
 .global TrackedBeatLength
 .global CurrentBeat
+.global CurrentRowForMode
 
 .macro MACRO_reset_gameplay_position
     lda #0

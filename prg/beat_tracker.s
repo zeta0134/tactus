@@ -1,5 +1,6 @@
     .include "bhop/bhop.inc"
     .include "beat_tracker.inc"
+    .include "settings.inc"
     .include "zeropage.inc"
     .include "zpcm.inc"
 
@@ -13,7 +14,7 @@ TrackedGameplayPos: .res 1
 CurrentBeat: .res 1
 TrackedBeatLength: .res 1
 
-CurrentRow: .res 1
+CurrentRowForMode: .res 1
 LastTrackedRow: .res 1
 
 .segment "CODE_0"
@@ -54,9 +55,22 @@ beat_frame_pacing:
 ; the longest by far
 
 .proc update_beat_tracker
+    lda setting_game_mode
+    cmp #GAME_MODE_DOUBLETIME
+    beq doubletime_mode
+standard_mode:
     lda currently_playing_row ; from bhop
     and #%00000111
-    sta CurrentRow
+    sta CurrentRowForMode
+    jmp done_with_game_modes
+doubletime_mode:
+    lda currently_playing_row ; from bhop
+    asl
+    and #%00000110
+    sta CurrentRowForMode
+    jmp done_with_game_modes
+
+done_with_game_modes:
     bne increment_music_head
     ; if this is row 0, AND the LastTrackedRow is nonzero:
     lda LastTrackedRow
@@ -77,7 +91,7 @@ increment_music_head:
     sta TrackedMusicPos
 write_data:
     ldx TrackedMusicPos
-    lda CurrentRow
+    lda CurrentRowForMode
     sta tracked_row_buffer, x
     sta LastTrackedRow
 done_with_music:
@@ -103,6 +117,16 @@ done_with_music:
     inc TrackedGameplayPos
 done:
 gameplay_reached_music_pos:
+    ; Sanity bounds check: don't allow tracked gameplay position to exceed
+    ; the current beat length. If we do, it can play stale animation data from
+    ; slower tempos and this looks very jittery!
+    lda TrackedGameplayPos
+    cmp TrackedBeatLength
+    bcc gameplay_in_bounds
+    lda TrackedBeatLength
+    sta TrackedGameplayPos
+    ;dec TrackedGameplayPos
+gameplay_in_bounds:
     rts
 gameplay_oob:
     lda #62
