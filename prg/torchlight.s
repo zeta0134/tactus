@@ -142,6 +142,8 @@ torchlight_luts_bank:
 
 ; For now, each call to update_torchlight should draw one (1) row and exit
 .proc FAR_update_torchlight
+        ; each update does a single inc/dec, so call it a few times to speed it up somewhat
+        jsr update_current_radius
         jsr update_current_radius
         rts
 .endproc
@@ -264,7 +266,6 @@ increase_current:
 decrease_current:
         dec current_torchlight_radius
 skip_update_target:
-
         rts
 .endproc
 

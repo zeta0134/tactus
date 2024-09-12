@@ -1543,7 +1543,7 @@ apply_darkness:
         lda target_torchlight_radius
         cmp #30
         bne no_instant_darkness
-        lda #0
+        lda #PLAYER_BASE_TORCHLIGHT
         sta current_torchlight_radius
 no_instant_darkness:
         lda PlayerTorchlightRadius

@@ -148,7 +148,7 @@ HeartCount := R2
         lda #JUMP_HEIGHT_END
         sta PlayerJumpHeightPos
 
-        lda #10
+        lda #PLAYER_BASE_TORCHLIGHT
         sta PlayerTorchlightRadius
 
 .if ::DEBUG_GOD_MODE
