@@ -422,8 +422,8 @@ LayoutPtr := R0
         perform_zpcm_inc
 
         ; Generate proper mazes and randomize player, exit, and boss
-        near_call FAR_init_floor
-        near_call FAR_generate_rooms_for_floor
+        far_call FAR_init_floor
+        far_call FAR_generate_rooms_for_floor
 
         ; We faded out to get here, so fade right back in
         lda #0
@@ -442,7 +442,7 @@ LayoutPtr := R0
         perform_zpcm_inc
         
         ; Load the current room (which is now pregenerated)
-        near_call FAR_load_current_room
+        far_call FAR_load_current_room
 
         ; If the music for this room has changed, get that queued up
         ; TODO: should we try to detect a track change and fade out early?
@@ -571,7 +571,7 @@ not_too_high:
 ; the former?
 .proc room_transition
         ; Load the current room (which is now pregenerated)
-        near_call FAR_load_current_room
+        far_call FAR_load_current_room
 
         ; switch music track/variant if necessary
         far_call FAR_play_music_for_current_room
@@ -779,7 +779,7 @@ continue_waiting:
         ; - Resolve the player's action
         debug_color (TINT_B | LIGHTGRAY)
         far_call FAR_update_player
-        near_call FAR_update_room_state
+        far_call FAR_update_room_state
         debug_color LIGHTGRAY
 
         perform_zpcm_inc
@@ -980,12 +980,19 @@ StartingTile := R15
 .proc decide_how_to_wait_for_the_next_beat
         lda current_clear_status
         and previous_clear_status
-        beq normal_gameplay_beat_checking
+        beq room_not_cleared
 room_cleared:
         st16 GameMode, wait_for_the_next_cleared_room_beat
         rts
-normal_gameplay_beat_checking:
+room_not_cleared:
+        lda setting_game_mode
+        cmp #GAME_MODE_PATIENT
+        beq patient_mode
+standard_mode:
         st16 GameMode, wait_for_the_next_standard_gameplay_beat
+        rts
+patient_mode:
+        st16 GameMode, wait_for_the_next_indefinite_gameplay_beat
         rts
 .endproc
 
@@ -1077,6 +1084,42 @@ process_next_beat_now:
         st16 GameMode, beat_frame_1
         rts ; do that now
 continue_waiting:
+        ; We have LOTS of time on this particular frame, so update the torchlight a whole
+        ; heck of a bunch to catch it up with the player's current location
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
+        far_call FAR_draw_torchlight
+        debug_color LIGHTGRAY
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
+        far_call FAR_draw_torchlight
+        debug_color LIGHTGRAY
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
+        far_call FAR_draw_torchlight
+        debug_color LIGHTGRAY
+
+        jsr every_gameloop
+        rts
+.endproc
+
+.proc wait_for_the_next_indefinite_gameplay_beat
+        ; when we transition from standard -> cleared, do take the first on-beat
+        ; transition right away. this eliminates a delay cycle with disco tiles still
+        ; visible
+        lda #$FF
+        sta ClearedRoomCooldown
+
+        ; Process a beat transition whenever. We are not synced to the rhythm at all!
+        ; If the player's input HAS arrived:
+        lda PlayerNextDirection
+        ora PlayerIntendsToPause
+        beq continue_waiting
+input_received:
+        ; Then immediatly process this beat
+        st16 GameMode, beat_frame_1
+        rts ; do that now
+continue_waiting:
+        ; Unlike the standard mode, we will continue waiting *indefinitely.* The whole game
+        ; pauses here and patiently waits for our input, whenever it arrives
+
         ; We have LOTS of time on this particular frame, so update the torchlight a whole
         ; heck of a bunch to catch it up with the player's current location
         debug_color (TINT_R | TINT_G | LIGHTGRAY)

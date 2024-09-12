@@ -53,7 +53,7 @@ LoadedRoomIndex: .res 1
 
         ; should match levels_structures.s! it relies on several of our functions,
         ; and the far-call overhead for those functions is significant
-        .segment "CODE_1"
+        .segment "CODE_2"
 
 ; Note: relies on PlayerRoomIndex to load the room seed and other room properties
 ; (this might become important if we later decide to initialize rooms in advance)

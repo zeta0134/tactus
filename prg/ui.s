@@ -57,15 +57,17 @@ options_ui_layout:
         widget_controller options_controller_init
         widget_cursor
         widget_text_label options_str, 4, 3
-        widget_text_options disco_floor_str, disco_types, setting_disco_floor, 8, 5
+        widget_text_options disco_floor_str,    disco_types,          setting_disco_floor,    8, 5
         widget_text_options player_palette_str, player_palette_types, setting_player_palette, 8, 7
+        widget_text_options game_mode_str,      game_mode_types,      setting_game_mode,      8, 9
         widget_text_button back_to_title_str, return_to_title, 8, 20
         .addr $0000 ; end of list
 
-options_str:       .asciiz "- OPTIONS -"
-disco_floor_str:   .asciiz "FLOOR: "
-player_palette_str:   .asciiz "PLAYER: "
-back_to_title_str: .asciiz "RETURN TO TITLE "
+options_str:        .asciiz "- OPTIONS -"
+disco_floor_str:    .asciiz "FLOOR: "
+player_palette_str: .asciiz "PLAYER: "
+game_mode_str:      .asciiz "GAME MODE: "
+back_to_title_str:  .asciiz "RETURN TO TITLE "
 
 disco_types:
         .byte 6 ; length of option set
@@ -95,13 +97,15 @@ player_palette_option_1_str: .asciiz "PERIWINKLE"
 player_palette_option_2_str: .asciiz "PETUNIA"
 player_palette_option_3_str: .asciiz "PROTEA"
 
-considerations:
-        .byte 2
-        .addr option_not_considered
-        .addr option_considered
+game_mode_types:
+        .byte 3 ; length of option set
+        .addr game_mode_standard_str
+        .addr game_mode_patient_str
+        .addr game_mode_doubletime_str
 
-option_not_considered: .asciiz "NOT CONSIDERED"
-option_considered:     .asciiz "CONSIDERED    "
+game_mode_standard_str:   .asciiz "STANDARD"
+game_mode_patient_str:    .asciiz "PATIENT"
+game_mode_doubletime_str: .asciiz "DOUBLETIME"
 
 empty_string: .asciiz ""
 

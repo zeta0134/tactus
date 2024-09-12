@@ -77,7 +77,7 @@ test_structure_set_big:
 
         ; should match procgen.s! we rely on several of its functions, and the far call overhead
         ; would be rather significant
-        .segment "CODE_1"
+        .segment "CODE_2"
 
 ; Very similar to draw_single_battlefield_overlay, but accounting for an
 ; additional offset for the top-left corner
