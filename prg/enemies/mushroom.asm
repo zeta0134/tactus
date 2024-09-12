@@ -219,42 +219,59 @@ weird_hp:
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_direct_attack_with_hp
+        ; did we die? if so, cleanup the result of our attack
+        ldx AttackSquare
+        lda battlefield, x
+        and #%11111100
+        cmp #TILE_MUSHROOM_BASE
+        beq not_dead
+        jsr ENEMY_ATTACK_cleanup_own_spores
+not_dead:
         rts
 .endproc
 
-.proc ENEMY_ATTACK_indirect_attack_mushroom
-EffectiveAttackSquare := R10 
-EnemyHealth := R11
-        ldx EffectiveAttackSquare
+; If we attack a mushroom on the same beat that it would have released
+; spores, we "cancel" that attack, like with other enemies. Unfortunately
+; those spores are already drawn in place, so we need to check for them
+; here and remove the tiles, otherwise the player can take damage.
+spore_offsets:
+        .byte <(-BATTLEFIELD_WIDTH - 1)
+        .byte <(-BATTLEFIELD_WIDTH + 0)
+        .byte <(-BATTLEFIELD_WIDTH + 1)
+        .byte <(                 0 - 1)
+        .byte <(                 0 + 1)
+        .byte <( BATTLEFIELD_WIDTH - 1)
+        .byte <( BATTLEFIELD_WIDTH - 1)
+        .byte <( BATTLEFIELD_WIDTH - 1)
+
+.proc ENEMY_ATTACK_cleanup_own_spores
+TargetIndex := R0
+ConsiderationIndex := R10
+AttackSquare := R3
+        lda #0
+        sta ConsiderationIndex
+loop:
+        clc
+        lda AttackSquare
+        ldy ConsiderationIndex
+        adc spore_offsets, y
+        sta DiscoTile
+        tax
+        ; is this a spore tile? don't erase just anything
         lda battlefield, x
-        and #%00000011
-        cmp #%00
-        beq weird_hp
-        cmp #%01
-        beq intermediate_hp
-        cmp #%10
-        beq advanced_hp
-basic_hp:
-        set_loot_table basic_loot_table
-        lda #2
-        sta EnemyHealth
-        jmp done
-intermediate_hp:
-        set_loot_table intermediate_loot_table
-        lda #4
-        sta EnemyHealth
-        jmp done
-advanced_hp:
-        set_loot_table advanced_loot_table
-        lda #6
-        sta EnemyHealth
-        jmp done
-weird_hp:
-        set_loot_table advanced_loot_table
-        lda #4
-        sta EnemyHealth
-done:
-        near_call ENEMY_ATTACK_indirect_attack_with_hp
+        cmp #TILE_ONE_BEAT_HAZARD ; TODO: is this check specific enough?
+        bne not_a_spore
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_disco_tile_here
+        lda DiscoTile
+        sta TargetIndex
+        jsr draw_active_tile
+not_a_spore:
+        inc ConsiderationIndex
+        lda ConsiderationIndex
+        cmp #8
+        bne loop
         rts
 .endproc
 

@@ -342,7 +342,7 @@ indirect_attack_behaviors:
         .word FIXED_no_behavior
         .word FIXED_no_behavior ; wrench projectile
         .word FIXED_no_behavior ; challenge spike
-        .word ENEMY_ATTACK_indirect_attack_mushroom
+        .word FIXED_no_behavior ; mushrooms - do not move
         .word FIXED_no_behavior ; one beat hazard
         .repeat 15
         .word FIXED_no_behavior
