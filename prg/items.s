@@ -52,6 +52,7 @@ item_table:
         .word heart_container
         .word temporary_heart
         .word heart_armor
+        .word defensive_shield
         ; safety
         .repeat 128
         .word no_item
@@ -70,6 +71,7 @@ no_item:
         .addr no_effect                       ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 dagger_lvl_1:
         .byte SLOT_WEAPON                     ; SlotId
@@ -84,6 +86,7 @@ dagger_lvl_1:
         .addr flat_1                          ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 broadsword_lvl_1:
         .byte SLOT_WEAPON                     ; SlotId
@@ -98,6 +101,7 @@ broadsword_lvl_1:
         .addr flat_1                          ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 broadsword_lvl_2:
         .byte SLOT_WEAPON                     ; SlotId
@@ -112,6 +116,7 @@ broadsword_lvl_2:
         .addr flat_2                          ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 broadsword_lvl_3:
         .byte SLOT_WEAPON                      ; SlotId
@@ -126,6 +131,7 @@ broadsword_lvl_3:
         .addr flat_3                           ; DamageFunc
         .addr no_effect                        ; TorchlightFunc
         .addr do_nothing                       ; UseFunc
+        .addr no_effect                        ; DmgReductionFunc
 
 longsword_lvl_1:
         .byte SLOT_WEAPON                     ; SlotId
@@ -140,6 +146,7 @@ longsword_lvl_1:
         .addr flat_1                          ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 longsword_lvl_2:
         .byte SLOT_WEAPON                     ; SlotId
@@ -154,6 +161,7 @@ longsword_lvl_2:
         .addr flat_2                          ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 longsword_lvl_3:
         .byte SLOT_WEAPON                      ; SlotId
@@ -168,6 +176,7 @@ longsword_lvl_3:
         .addr flat_3                           ; DamageFunc
         .addr no_effect                        ; TorchlightFunc
         .addr do_nothing                       ; UseFunc
+        .addr no_effect                        ; DmgReductionFunc
 
 spear_lvl_1:
         .byte SLOT_WEAPON                     ; SlotId
@@ -182,6 +191,7 @@ spear_lvl_1:
         .addr flat_1                          ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 spear_lvl_2:
         .byte SLOT_WEAPON                     ; SlotId
@@ -196,6 +206,7 @@ spear_lvl_2:
         .addr flat_2                          ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 spear_lvl_3:
         .byte SLOT_WEAPON                      ; SlotId
@@ -210,6 +221,7 @@ spear_lvl_3:
         .addr flat_3                           ; DamageFunc
         .addr no_effect                        ; TorchlightFunc
         .addr do_nothing                       ; UseFunc
+        .addr no_effect                        ; DmgReductionFunc
 
 flail_lvl_1:
         .byte SLOT_WEAPON                     ; SlotId
@@ -224,6 +236,7 @@ flail_lvl_1:
         .addr flat_1                          ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 flail_lvl_2:
         .byte SLOT_WEAPON                     ; SlotId
@@ -238,6 +251,7 @@ flail_lvl_2:
         .addr flat_2                          ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 flail_lvl_3:
         .byte SLOT_WEAPON                      ; SlotId
@@ -252,6 +266,7 @@ flail_lvl_3:
         .addr flat_3                           ; DamageFunc
         .addr no_effect                        ; TorchlightFunc
         .addr do_nothing                       ; UseFunc
+        .addr no_effect                        ; DmgReductionFunc
 
 basic_torch:
         .byte SLOT_TORCH                        ; SlotId
@@ -266,6 +281,7 @@ basic_torch:
         .addr no_effect                         ; DamageFunc
         .addr flat_8                            ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
 
 large_torch:
         .byte SLOT_TORCH                        ; SlotId
@@ -280,6 +296,7 @@ large_torch:
         .addr no_effect                         ; DamageFunc
         .addr flat_15                           ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
 
 compass:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -294,6 +311,7 @@ compass:
         .addr no_effect                       ; DamageFunc     (unused)
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr reveal_special_rooms            ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 map:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -308,6 +326,7 @@ map:
         .addr no_effect                       ; DamageFunc     (unused)
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr reveal_all_rooms                ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 small_fries:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -322,6 +341,7 @@ small_fries:
         .addr no_effect                       ; DamageFunc     (unused)
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr heal_4_hp                       ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 medium_fries:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -336,6 +356,7 @@ medium_fries:
         .addr no_effect                       ; DamageFunc     (unused)
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr heal_8_hp                       ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 large_fries:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -350,6 +371,7 @@ large_fries:
         .addr no_effect                       ; DamageFunc     (unused)
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr heal_all_hp                     ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 ; Note: as an item with a custom effect, these are just special-case checked
 ; in the player movement code
@@ -366,6 +388,7 @@ go_go_boots:
         .addr no_effect                       ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 gold_sack:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -380,6 +403,7 @@ gold_sack:
         .addr no_effect                       ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr give_100_gold                   ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 heart_container:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -394,6 +418,7 @@ heart_container:
         .addr no_effect                       ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr give_heart_container            ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 temporary_heart:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -408,6 +433,7 @@ temporary_heart:
         .addr no_effect                       ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr give_temporary_heart            ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
 
 heart_armor:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -422,6 +448,22 @@ heart_armor:
         .addr no_effect                       ; DamageFunc
         .addr no_effect                       ; TorchlightFunc
         .addr give_heart_armor                ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
+
+defensive_shield:
+        .byte SLOT_ARMOR                        ; SlotId
+        .byte SPRITE_TILE_SHIELD                ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
+        .byte EQUIPMENT_ARMOR_SHIELD            ; HudBgTile (unused)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                                 ; HudSpriteTile (unused)
+        .byte 0                                 ; HudSpriteAttr (unused)
+        .word 500                               ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr no_effect                         ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr give_heart_armor                  ; UseFunc
+        .addr flat_1                            ; DmgReductionFunc
 
         .segment "CODE_0"
 
@@ -600,13 +642,16 @@ done_with_this_room:
 ; Healing amount in A
 .proc _heal_player_common
 HealingAmount := R0
+        pha ; preserve the desired healing amount
         ; sanity check: does the player have any health to heal?
         far_call FAR_missing_health
         bne proceed_to_heal
+        pla ; restore (and throw it away)
         ; this food item would do nothing! cancel the pickup/purchase
         lda #$FF ; return failure
         rts
 proceed_to_heal:
+        pla ; restore
         sta HealingAmount
         far_call FAR_receive_healing
 
@@ -1003,5 +1048,60 @@ torchlight_maximum_satisfied:
         restore_previous_bank
         perform_zpcm_inc
         lda TorchlightTotal
+        rts
+.endproc
+
+; item index in A
+.proc item_damage_reduction_common
+DmgReductionTotal := R0
+        asl
+        tax
+        lda item_table+0, x
+        sta ItemPtr+0
+        lda item_table+1, x
+        sta ItemPtr+1
+        ldy #ItemDef::DmgReductionFunc
+        lda (ItemPtr), y
+        sta ItemFuncPtr+0
+        iny
+        lda (ItemPtr), y
+        sta ItemFuncPtr+1
+        jsr __item_logic_trampoline
+        clc
+        adc DmgReductionTotal
+        sta DmgReductionTotal
+        rts
+.endproc
+
+; Returns dmg reduction amount in A, based on the currently loaded item
+; Clobbers: TODO, probably at least X,Y
+.proc FAR_dmg_reduction
+DmgReductionTotal := R0
+        perform_zpcm_inc
+        access_data_bank #<.bank(item_table)
+
+        ; Loop through all 5 equipment slots and keep a running sum of their damage
+        ; contributions
+        lda #0
+        sta DmgReductionTotal
+
+        lda PlayerEquipmentWeapon
+        jsr item_damage_reduction_common
+        perform_zpcm_inc
+        lda PlayerEquipmentTorch
+        jsr item_damage_reduction_common
+        perform_zpcm_inc
+        lda PlayerEquipmentArmor
+        jsr item_damage_reduction_common
+        perform_zpcm_inc
+        lda PlayerEquipmentBoots
+        jsr item_damage_reduction_common
+        perform_zpcm_inc
+        lda PlayerEquipmentAccessory
+        jsr item_damage_reduction_common
+        perform_zpcm_inc
+
+        restore_previous_bank
+        lda DmgReductionTotal
         rts
 .endproc

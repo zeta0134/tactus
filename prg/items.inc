@@ -11,6 +11,7 @@
     DamageFunc .addr
     TorchlightFunc .addr
     UseFunc .addr
+    DmgReductionFunc .addr
 .endstruct
 
 SLOT_WEAPON     = 0
@@ -50,6 +51,7 @@ ITEM_GOLD_SACK       = 22
 ITEM_HEART_CONTAINER = 23
 ITEM_TEMPORARY_HEART = 24
 ITEM_HEART_ARMOR     = 25
+ITEM_SHIELD          = 26
 
 ; utilities for drawing items
 .global FAR_apply_item_world_metasprite
@@ -60,6 +62,7 @@ ITEM_HEART_ARMOR     = 25
 .global FAR_pickup_item
 .global FAR_weapon_dmg
 .global FAR_equipment_torchlight
+.global FAR_dmg_reduction
 
 ; various utilities for generating loot. be mindful of the RNG seed!
 .global FAR_reset_shop_tracker

@@ -328,7 +328,7 @@ test_treasure_table:
 
 ; heavily weighted towards L1 weapons, but occasionally has some L2 and other interesting stuff
 common_treasure_table:
-    .byte 25
+    .byte 27
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L1
@@ -354,10 +354,12 @@ common_treasure_table:
     .byte ITEM_TEMPORARY_HEART
     .byte ITEM_HEART_ARMOR
     .byte ITEM_HEART_ARMOR
+    .byte ITEM_SHIELD
+    .byte ITEM_SHIELD
 
 ; heavily weighted towards L2 items, some L3 items too
 rare_treasure_table:
-    .byte 25
+    .byte 29
     .byte ITEM_BROADSWORD_L2
     .byte ITEM_BROADSWORD_L2
     .byte ITEM_BROADSWORD_L2
@@ -383,6 +385,10 @@ rare_treasure_table:
     .byte ITEM_HEART_CONTAINER
     .byte ITEM_HEART_CONTAINER
     .byte ITEM_HEART_CONTAINER
+    .byte ITEM_SHIELD
+    .byte ITEM_SHIELD
+    .byte ITEM_SHIELD
+    .byte ITEM_SHIELD
 
 consumable_treasure_table:
     ; FOOOOOOOOOOD! (Also should have bombs, heart containers, etc)
@@ -401,7 +407,7 @@ consumable_treasure_table:
     .byte ITEM_HEART_ARMOR
 
 common_chest_treasure_table:
-    .byte 16
+    .byte 17
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_LONGSWORD_L1
     .byte ITEM_SPEAR_L1
@@ -418,6 +424,7 @@ common_chest_treasure_table:
     .byte ITEM_SMALL_FRIES
     .byte ITEM_SMALL_FRIES
     .byte ITEM_SMALL_FRIES
+    .byte ITEM_HEART_ARMOR
 
 MAX_CHAIN = 8
 MAX_COMBO = 4 ; actually 5, but we need to decrement

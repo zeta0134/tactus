@@ -292,7 +292,7 @@ CurrentTile := R15
 .proc ENEMY_COLLIDE_hazard_damages_player
 DamageAmount := R0
         ; hazards to 2 dmg to the player (for now)
-        lda #2
+        lda #4
         sta DamageAmount
         far_call FAR_damage_player
 

@@ -1,0 +1,72 @@
+; ======================================================================
+;                         Layouts and Widgets
+; ======================================================================
+
+title_ui_layout:
+        widget_controller title_controller_init
+        widget_player_cursor
+        widget_text_button empty_string, go_to_gameplay, 12, 10
+        widget_text_button empty_string, go_to_options, 12, 13
+        .addr $0000 ; end of list
+
+; ======================================================================
+;                       Screen Specific Logic
+; ======================================================================
+
+.proc title_controller_init
+        CurrentWidgetIndex := R20
+        ; the title screen for now doesn't use extended attributes, so
+        ; turn those off
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG)
+        sta MAP_NT_A_CONTROL
+        sta MAP_NT_C_CONTROL
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG)
+        sta MAP_NT_B_CONTROL
+        sta MAP_NT_D_CONTROL
+
+        ; Setup the title nametable
+        far_call FAR_copy_title_nametable
+        far_call FAR_set_title_exbg
+
+        ; The title screen should apply the last player palette that was
+        ; used, for consistency (and so we don't have a "preferred" skin tone)
+        near_call FAR_apply_player_palette
+
+        ; Play the title track on the title screen
+        lda #TRACK_TITLE
+        ldy #TRACK_VARIANT_NORMAL
+        jsr play_track
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y title_controller_update
+        rts
+.endproc
+
+.proc title_controller_update
+CurrentWidgetIndex := R20
+        ; while on the title screen, continuously clock the rng seeds. this helps
+        ; with entropy when starting a brand new game, even in emulators with an
+        ; otherwise deterministic boot state
+        jsr next_run_rand
+        jsr next_gameplay_rand
+
+        rts
+.endproc
+
+.proc go_to_options
+        st16 R0, sfx_teleport
+        jsr play_sfx_pulse2
+
+        st16 FadeToGameMode, options_prep
+        st16 GameMode, fade_to_game_mode
+        rts
+.endproc
+
+.proc go_to_gameplay
+        st16 R0, sfx_teleport
+        jsr play_sfx_pulse2
+
+        st16 FadeToGameMode, game_prep
+        st16 GameMode, fade_to_game_mode
+        rts
+.endproc

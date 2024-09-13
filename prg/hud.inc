@@ -21,10 +21,10 @@ chr_tile_offset EQUIPMENT_WEAPON_LONGSWORD,  4, 2
 chr_tile_offset EQUIPMENT_WEAPON_SPEAR,      6, 2
 chr_tile_offset EQUIPMENT_WEAPON_FLAIL,      8, 2
 
-chr_tile_offset EQUIPMENT_ARMOR_1, 0, 4
-chr_tile_offset EQUIPMENT_ARMOR_2, 2, 4
-chr_tile_offset EQUIPMENT_ARMOR_3, 4, 4
-chr_tile_offset EQUIPMENT_ARMOR_4, 6, 4
+chr_tile_offset EQUIPMENT_ARMOR_SHIELD,  0, 4
+chr_tile_offset EQUIPMENT_ARMOR_2,       2, 4
+chr_tile_offset EQUIPMENT_ARMOR_3,       4, 4
+chr_tile_offset EQUIPMENT_ARMOR_4,       6, 4
 
 chr_tile_offset EQUIPMENT_ACCESSORY_1, 0, 6
 chr_tile_offset EQUIPMENT_ACCESSORY_2, 2, 6

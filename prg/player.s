@@ -157,8 +157,9 @@ HeartCount := R2
         sta PlayerEquipmentWeapon
         lda #ITEM_LARGE_TORCH
         sta PlayerEquipmentTorch
-        lda #ITEM_NONE
+        lda #ITEM_SHIELD
         sta PlayerEquipmentArmor
+        lda #ITEM_NONE
         sta PlayerEquipmentBoots
         sta PlayerEquipmentAccessory
         sta PlayerEquipmentBombs
@@ -215,7 +216,7 @@ HeartCount := R2
         ; that's the point!
         near_call FAR_initialize_hearts_for_game
 
-        lda #2
+        lda #3
         sta HeartCount
 heart_loop:
         lda #HEART_TYPE_REGULAR
@@ -1461,10 +1462,22 @@ TargetCol := R15
         rts
 .endproc
 
-; TODO: *completely* rework this for the new heart containers system
 .proc FAR_damage_player
 IncomingDamage := R0
-
+DamageReduction := R0
+        lda IncomingDamage
+        pha
+        far_call FAR_dmg_reduction
+        pla
+        sec
+        sbc DamageReduction
+        bmi cap_to_minimum
+        beq cap_to_minimum
+        jmp damage_amount_okay
+cap_to_minimum:
+        lda #1
+damage_amount_okay:
+        sta IncomingDamage
         near_call FAR_receive_damage
         jsr FIXED_is_player_considered_dead
         bne already_dead

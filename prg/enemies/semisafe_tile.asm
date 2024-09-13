@@ -37,7 +37,7 @@ TargetSquare := R13
 apply_damage:
         ; For now, the semisafe tile always does 2 damage to the player. Stronger
         ; attacks, if they exist, might need special consideration here?
-        lda #2
+        lda #4
         sta DamageAmount
         far_call FAR_damage_player
         

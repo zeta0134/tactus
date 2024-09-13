@@ -524,7 +524,7 @@ TileId := R1
 TargetSquare := R13
         ; projectiles do 2 dmg
         ; ... TODO: move these into a global constants file, for easier balancing
-        lda #2
+        lda #4
         sta DamageAmount
         far_call FAR_damage_player
 

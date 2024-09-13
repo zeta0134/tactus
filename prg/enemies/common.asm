@@ -517,8 +517,8 @@ TargetIndex := R0
 TileId := R1
 PuffSquare := R12
 TargetSquare := R13
-        ; basic attacks do 2 damage for now
-        lda #2
+        ; basic attacks do 4 damage (1 full heart)
+        lda #4
         sta DamageAmount
         far_call FAR_damage_player
 
