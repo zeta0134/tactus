@@ -231,6 +231,42 @@ disco_floor_bottom:
         cpx #96
         bne disco_floor_bottom
 
+        ; draw some colored enemies so the battlefield isn't empty
+        ; (and we can preview the color thing)
+        ; these will still use WALL logic, so they don't actually update
+
+        ldx #(3 * BATTLEFIELD_WIDTH + 2)
+        lda #TILE_WALL
+        sta battlefield, x
+        lda #<BG_TILE_MUSHROOM_IDLE
+        sta tile_patterns, x
+        lda #(>BG_TILE_MUSHROOM_IDLE | PAL_RED)
+        sta tile_attributes, x
+
+        ldx #(2 * BATTLEFIELD_WIDTH + 7)
+        lda #TILE_WALL
+        sta battlefield, x
+        lda #<BG_TILE_MUSHROOM_IDLE
+        sta tile_patterns, x
+        lda #(>BG_TILE_MUSHROOM_IDLE | PAL_BLUE)
+        sta tile_attributes, x
+
+        ldx #(4 * BATTLEFIELD_WIDTH + 9)
+        lda #TILE_WALL
+        sta battlefield, x
+        lda #<BG_TILE_MUSHROOM_IDLE
+        sta tile_patterns, x
+        lda #(>BG_TILE_MUSHROOM_IDLE | PAL_YELLOW)
+        sta tile_attributes, x
+
+        ldx #(3 * BATTLEFIELD_WIDTH + 12)
+        lda #TILE_WALL
+        sta battlefield, x
+        lda #<BG_TILE_MUSHROOM_IDLE
+        sta tile_patterns, x
+        lda #(>BG_TILE_MUSHROOM_IDLE | PAL_WORLD)
+        sta tile_attributes, x
+
         ldy CurrentWidgetIndex
         set_widget_state_y options_battlefield_draw
 
@@ -304,7 +340,7 @@ CurrentWidgetIndex := R20
 widget_last_beat := widgets_data0
         
         ; while waiting, we can update some other nonessential things
-        near_call FAR_apply_player_palette
+        far_call FAR_apply_player_palette
         lda #1
         sta ObjPaletteDirty
 

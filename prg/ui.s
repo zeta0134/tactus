@@ -51,7 +51,7 @@ widgets_data7: .res ::MAX_WIDGETS
 ; beat counting effects
 LastBeat: .res 1
 
-        .segment "CODE_4"
+        .segment "CODE_B"
 
 ; some common strings and utilities shared by many layouts
 empty_string: .asciiz ""

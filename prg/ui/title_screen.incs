@@ -30,7 +30,7 @@ title_ui_layout:
 
         ; The title screen should apply the last player palette that was
         ; used, for consistency (and so we don't have a "preferred" skin tone)
-        near_call FAR_apply_player_palette
+        far_call FAR_apply_player_palette
 
         ; Play the title track on the title screen
         lda #TRACK_TITLE
