@@ -10,6 +10,7 @@
         .include "nes.inc"
         .include "input.inc"
         .include "rainbow.inc"
+        .include "palette.inc"
         .include "player.inc"
         .include "prng.inc"
         .include "procgen.inc"

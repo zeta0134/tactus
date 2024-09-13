@@ -103,8 +103,27 @@ stay_here:
 ; is extremely lightweight and will manage the rest of its state.
 ; We just want the battlefield to apply disco logic for the most part.
 .proc options_battlefield_init
+MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
 widget_last_beat := widgets_data0
+widget_player_sprite_index := widgets_data1
+
+        far_call FAR_find_unused_sprite
+        lda MetaSpriteIndex
+        ldy CurrentWidgetIndex
+        sta widget_player_sprite_index, y
+
+        ldx widget_player_sprite_index, y
+        lda #(SPRITE_ACTIVE | SPRITE_PAL_0)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+        lda #80
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda #64
+        sta sprite_table + MetaSpriteState::PositionY, x
+        lda #<SPRITE_TILE_PLAYER
+        sta sprite_table + MetaSpriteState::TileIndex, x
 
         ldx CurrentWidgetIndex
         lda CurrentBeat
@@ -258,6 +277,11 @@ CurrentWidgetIndex := R20
 CurrentWidgetIndex := R20
 widget_last_beat := widgets_data0
         
+        ; while waiting, we can update some other nonessential things
+        near_call FAR_apply_player_palette
+        lda #1
+        sta ObjPaletteDirty
+
         ldx CurrentWidgetIndex
         lda CurrentBeat
         cmp widget_last_beat, x
