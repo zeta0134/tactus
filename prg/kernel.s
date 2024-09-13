@@ -209,7 +209,6 @@ LayoutPtr := R0
 ; (the widget logic contains all customizations, that's the point)
 .proc run_ui_subsystem
         jsr poll_input
-        jsr update_beat_counters_title
         perform_zpcm_inc
         far_call FAR_draw_sprites
         perform_zpcm_inc
@@ -218,6 +217,7 @@ LayoutPtr := R0
         far_call FAR_refresh_palettes_gameloop
 
         far_call FAR_update_widgets
+        jsr update_beat_counters_title
 
         jsr wait_for_next_vblank
         rts

@@ -122,6 +122,10 @@ stay_here:
         rts
 .endproc
 
+OPTIONS_DISCO_STATE_APPEARING    := 0
+OPTIONS_DISCO_STATE_ACTIVE       := 1
+OPTIONS_DISCO_STATE_DISAPPEARING := 2
+
 ; Note: obviously clobbers the active battlefield. If we
 ; decide to make this screen available during gameplay, be
 ; sure to preserve the battlefield state. Generally there is
@@ -133,6 +137,14 @@ MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
 widget_last_beat := widgets_data0
 widget_player_sprite_index := widgets_data1
+widget_disco_state := widgets_data2
+widget_disco_active_setting := widgets_data3
+
+        ldx CurrentWidgetIndex
+        lda #OPTIONS_DISCO_STATE_APPEARING
+        sta widget_disco_state, x
+        lda setting_disco_floor
+        sta widget_disco_active_setting, x
 
         far_call FAR_find_unused_sprite
         lda MetaSpriteIndex
@@ -298,9 +310,63 @@ StartingRow := R14
 StartingTile := R15
 CurrentWidgetIndex := R20
 
+widget_last_beat := widgets_data0
+widget_player_sprite_index := widgets_data1
+widget_disco_state := widgets_data2
+widget_disco_active_setting := widgets_data3
+
+        ; check to see if we need to switch sub-states due to a setting change
+        ldx CurrentWidgetIndex
+        lda setting_disco_floor
+        cmp widget_disco_active_setting, x
+        beq no_change_needed
+        ; if we are currently appearing, we are fine to proceed (this will update the setting)
+        lda widget_disco_state, x
+        cmp #OPTIONS_DISCO_STATE_APPEARING
+        beq no_change_needed
+        ; otherwise, flip to the "disappearing" state to force a transition
+        lda #OPTIONS_DISCO_STATE_DISAPPEARING
+        sta widget_disco_state, x
+no_change_needed:
+
+        ; now perform setup for this specific sub-state
+        ldx CurrentWidgetIndex
+        lda widget_disco_state, x
+        cmp #OPTIONS_DISCO_STATE_ACTIVE
+        beq disco_tiles_active_state
+        cmp #OPTIONS_DISCO_STATE_DISAPPEARING
+        beq disco_tiles_disappearing_state
+disco_tiles_appearing_state:
+        lda setting_disco_floor
+        sta widget_disco_active_setting, x
         lda #0
         sta current_clear_status
+        lda #1
         sta previous_clear_status
+        lda #OPTIONS_DISCO_STATE_ACTIVE
+        sta widget_disco_state, x
+        jmp converge
+disco_tiles_active_state:
+        lda #0
+        sta current_clear_status
+        lda #0
+        sta previous_clear_status
+        jmp converge
+disco_tiles_disappearing_state:
+        lda #1
+        sta current_clear_status
+        lda #0
+        sta previous_clear_status
+        lda #OPTIONS_DISCO_STATE_APPEARING
+        sta widget_disco_state, x
+converge:
+        
+        ; now, preserve the real setting and temporarily load the state-specific one
+        lda setting_disco_floor
+        pha
+        ldx CurrentWidgetIndex
+        lda widget_disco_active_setting, x
+        sta setting_disco_floor
 
         lda CurrentBeat
         sta CurrentBeatCounter
@@ -329,6 +395,12 @@ CurrentWidgetIndex := R20
         sta StartingTile
         far_call FAR_update_static_enemy_row
 
+        ; un-clobber the disco setting that we preserved
+        pla
+        sta setting_disco_floor
+
+        ; and we... should be set?
+
         ldy CurrentWidgetIndex
         set_widget_state_y options_battlefield_wait_for_beat
 
@@ -351,7 +423,10 @@ widget_last_beat := widgets_data0
         rts
 advance:
         sta widget_last_beat, x
-        set_widget_state_y options_battlefield_draw
+
+        ;set_widget_state_y options_battlefield_draw
+        ; draw right now!
+        jsr options_battlefield_draw
 
         rts
 .endproc
