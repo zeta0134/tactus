@@ -279,6 +279,29 @@ disco_floor_bottom:
         lda #(>BG_TILE_MUSHROOM_IDLE | PAL_WORLD)
         sta tile_attributes, x
 
+        ; finally draw in some bouncy floor mushrooms, to demonstrate the groovement setting
+        ldx #(3 * BATTLEFIELD_WIDTH + 4)
+        lda #<BG_TILE_DISCO_FLOOR_TILES_0006 ; plain mushroom
+        sta tile_patterns, x
+        sta tile_detail, x
+        ldx #(3 * BATTLEFIELD_WIDTH + 11)
+        lda #<BG_TILE_DISCO_FLOOR_TILES_0006 ; plain mushroom
+        sta tile_patterns, x
+        sta tile_detail, x
+        ldx #(4 * BATTLEFIELD_WIDTH + 14)
+        lda #<BG_TILE_DISCO_FLOOR_TILES_0006 ; plain mushroom
+        sta tile_patterns, x
+        sta tile_detail, x
+
+        ldx #(3 * BATTLEFIELD_WIDTH + 8)
+        lda #<BG_TILE_DISCO_FLOOR_TILES_0007 ; tall mushroom
+        sta tile_patterns, x
+        sta tile_detail, x
+        ldx #(4 * BATTLEFIELD_WIDTH + 3)
+        lda #<BG_TILE_DISCO_FLOOR_TILES_0007 ; tall mushroom
+        sta tile_patterns, x
+        sta tile_detail, x
+
         ldy CurrentWidgetIndex
         set_widget_state_y options_battlefield_draw
 
