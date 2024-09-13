@@ -2,14 +2,20 @@
 ;                         Layouts and Widgets
 ; ======================================================================
 
+.macro widget_options_battlefield
+    .addr options_battlefield_init
+    .byte 0, 0, 0, 0, 0, 0, 0, 0
+.endmacro
+
 options_ui_layout:
         widget_controller options_controller_init
         widget_cursor
-        widget_text_label options_str, 4, 3
-        widget_text_options disco_floor_str,    disco_types,          setting_disco_floor,    8, 5
-        widget_text_options player_palette_str, player_palette_types, setting_player_palette, 8, 7
-        widget_text_options game_mode_str,      game_mode_types,      setting_game_mode,      8, 9
-        widget_text_button back_to_title_str, return_to_title, 8, 20
+        widget_text_label options_str, 4, 14
+        widget_text_options disco_floor_str,    disco_types,          setting_disco_floor,    8, 16
+        widget_text_options player_palette_str, player_palette_types, setting_player_palette, 8, 18
+        widget_text_options game_mode_str,      game_mode_types,      setting_game_mode,      8, 20
+        widget_text_button back_to_title_str, return_to_title, 8, 26
+        widget_options_battlefield
         .addr $0000 ; end of list
 
 options_str:        .asciiz "- OPTIONS -"
@@ -87,5 +93,179 @@ stay_here:
 
         st16 FadeToGameMode, title_prep
         st16 GameMode, fade_to_game_mode
+        rts
+.endproc
+
+; Note: obviously clobbers the active battlefield. If we
+; decide to make this screen available during gameplay, be
+; sure to preserve the battlefield state. Generally there is
+; no need to preserve anything else; the options battlefield
+; is extremely lightweight and will manage the rest of its state.
+; We just want the battlefield to apply disco logic for the most part.
+.proc options_battlefield_init
+CurrentWidgetIndex := R20
+widget_last_beat := widgets_data0
+
+        ldx CurrentWidgetIndex
+        lda CurrentBeat
+        sta widget_last_beat, x
+
+        ldx #0
+top_wall_loop:
+        lda #TILE_WALL
+        sta battlefield, x
+        lda #<BG_TILE_MAP_TILES_0231 ; cave wall, lower midsection
+        sta tile_patterns, x
+        sta tile_detail, x
+        lda #((>BG_TILE_MAP_TILES_0231) | PAL_YELLOW) ; cave wall, lower midsection
+        sta tile_attributes, x
+        lda #0
+        sta tile_flags, x
+        sta tile_data, x
+        inx
+        cpx #16
+        bne top_wall_loop
+
+bottom_wall_loop:
+        lda #TILE_WALL
+        sta battlefield, x
+        lda #<BG_TILE_MAP_TILES_0247 ; cave wall, front midsection
+        sta tile_patterns, x
+        sta tile_detail, x
+        lda #((>BG_TILE_MAP_TILES_0247) | PAL_RED) ; cave wall, lower midsection
+        sta tile_attributes, x
+        lda #0
+        sta tile_flags, x
+        sta tile_data, x
+        inx
+        cpx #32
+        bne bottom_wall_loop
+
+disco_floor_top:
+        lda #TILE_DISCO_FLOOR
+        sta battlefield, x
+        lda #<BG_TILE_DISCO_FLOOR_TILES_0002 ; disco floor with upper dashed lines
+        sta tile_patterns, x
+        sta tile_detail, x
+        lda #((>BG_TILE_DISCO_FLOOR_TILES_0002) | PAL_WORLD) ; cave wall, lower midsection
+        sta tile_attributes, x
+        lda #0
+        sta tile_flags, x
+        sta tile_data, x
+        inx
+        cpx #48
+        bne disco_floor_top
+
+disco_floor_mid:
+        lda #TILE_DISCO_FLOOR
+        sta battlefield, x
+        lda #<BG_TILE_DISCO_FLOOR_TILES_0000 ; disco floor, plain
+        sta tile_patterns, x
+        sta tile_detail, x
+        lda #((>BG_TILE_DISCO_FLOOR_TILES_0000) | PAL_WORLD) ; cave wall, lower midsection
+        sta tile_attributes, x
+        lda #0
+        sta tile_flags, x
+        sta tile_data, x
+        inx
+        cpx #80
+        bne disco_floor_mid
+
+disco_floor_bottom:
+        lda #TILE_DISCO_FLOOR
+        sta battlefield, x
+        lda #<BG_TILE_DISCO_FLOOR_TILES_0018 ; disco floor with lower dashed lines
+        sta tile_patterns, x
+        sta tile_detail, x
+        lda #((>BG_TILE_DISCO_FLOOR_TILES_0018) | PAL_WORLD) ; cave wall, lower midsection
+        sta tile_attributes, x
+        lda #0
+        sta tile_flags, x
+        sta tile_data, x
+        inx
+        cpx #96
+        bne disco_floor_bottom
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y options_battlefield_draw
+
+        rts
+.endproc
+
+; todo: if necessary, break this out into several states
+; (but ideally we do it all in one go and skip the dual-nametable thing)
+.proc options_battlefield_draw
+CurrentWidgetIndex := R20
+        ; we want to draw to the LEFT battlefield, so we set "active" to
+        ; the RIGHT battlefield (we're cheating a bit here)
+        lda #1
+        sta active_battlefield
+
+        far_call FAR_draw_battlefield_block_A_inline
+        far_call FAR_draw_battlefield_block_B_inline
+        far_call FAR_draw_battlefield_block_C_inline
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y options_battlefield_update
+
+        rts
+.endproc
+
+; TODO: if necessary, break this out into several states
+.proc options_battlefield_update
+StartingRow := R14
+StartingTile := R15
+CurrentWidgetIndex := R20
+
+        lda #0
+        sta current_clear_status
+        sta previous_clear_status
+
+        lda CurrentBeat
+        sta CurrentBeatCounter
+
+        lda #2
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 2)
+        sta StartingTile
+        far_call FAR_update_static_enemy_row
+
+        lda #3
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 3)
+        sta StartingTile
+        far_call FAR_update_static_enemy_row
+
+        lda #4
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 4)
+        sta StartingTile
+        far_call FAR_update_static_enemy_row
+
+        lda #5
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 5)
+        sta StartingTile
+        far_call FAR_update_static_enemy_row
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y options_battlefield_wait_for_beat
+
+        rts
+.endproc
+
+.proc options_battlefield_wait_for_beat
+CurrentWidgetIndex := R20
+widget_last_beat := widgets_data0
+        
+        ldx CurrentWidgetIndex
+        lda CurrentBeat
+        cmp widget_last_beat, x
+        bne advance
+        rts
+advance:
+        sta widget_last_beat, x
+        set_widget_state_y options_battlefield_draw
+
         rts
 .endproc

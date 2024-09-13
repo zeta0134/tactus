@@ -1,8 +1,10 @@
         .include "../build/tile_defs.inc"
 
+        .include "battlefield.inc"
         .include "beat_tracker.inc"
         .include "chr.inc"
         .include "charmap.inc"
+        .include "enemies.inc"
         .include "far_call.inc"
         .include "kernel.inc"
         .include "nes.inc"
@@ -10,6 +12,7 @@
         .include "rainbow.inc"
         .include "player.inc"
         .include "prng.inc"
+        .include "procgen.inc"
         .include "settings.inc"
         .include "sound.inc"
         .include "sprites.inc"
