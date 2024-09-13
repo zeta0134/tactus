@@ -66,12 +66,38 @@ game_mode_doubletime_str: .asciiz "DOUBLETIME"
 ;                       Screen Specific Logic
 ; ======================================================================
 
+options_battlefield_bg_palette:
+        .incbin "../art/dank_cave.pal"
+options_obj_palette:
+        .incbin "../art/options_sprite_palette.pal"
+
 .proc options_controller_init
 CurrentWidgetIndex := R20
         ; Play the options track on the options screen
         lda #TRACK_OPTIONS
         ldy #TRACK_VARIANT_NORMAL
         jsr play_track
+
+        ; the options screen DOES use extended attributes, so set that up
+        lda #0
+        sta LeftNametableBank
+        sta RightNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta LeftNametableAttr
+        sta RightNametableAttr
+
+        ; Get the option palettes loaded in
+        ldy #0
+bg_loop:
+        perform_zpcm_inc
+        lda options_battlefield_bg_palette, y
+        sta BgPaletteBuffer, y
+        lda options_obj_palette, y
+        sta ObjPaletteBuffer, y
+        iny
+        cpy #16
+        bne bg_loop
+
 
         ldy CurrentWidgetIndex
         set_widget_state_y options_controller_update

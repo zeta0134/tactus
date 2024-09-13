@@ -14,6 +14,7 @@
         .include "player.inc"
         .include "prng.inc"
         .include "procgen.inc"
+        .include "raster_table.inc"
         .include "settings.inc"
         .include "sound.inc"
         .include "sprites.inc"
