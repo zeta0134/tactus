@@ -3,7 +3,7 @@
         .include "battlefield.inc"
         .include "beat_tracker.inc"
         .include "chr.inc"
-        .include "charmap.inc"
+        ;.include "charmap.inc"
         .include "enemies.inc"
         .include "far_call.inc"
         .include "kernel.inc"
@@ -920,7 +920,7 @@ PaletteIndex := T7
         sta StringPtr+0
         lda widget_text_string_high, y
         sta StringPtr+1
-        lda #CHR_BANK_OLD_CHRRAM
+        lda #CHR_BANK_FONT_MARSHMALLOW
         sta TileBase
         lda #0 ; sure, why not
         sta PaletteIndex
@@ -1015,7 +1015,7 @@ option_out_of_range:
 converge:
         perform_zpcm_inc
         ; finally, draw the stupid thing
-        lda #CHR_BANK_OLD_CHRRAM
+        lda #CHR_BANK_FONT_MARSHMALLOW
         sta TileBase
         lda #%01000000 ; sure, why not
         sta PaletteIndex        

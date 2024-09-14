@@ -6,6 +6,12 @@ setting_disco_floor: .res 1
 setting_player_palette: .res 1
 setting_game_mode: .res 1
 
+setting_player_palette_preset: .res 1
+setting_personal_color_1: .res 1
+setting_personal_color_2: .res 1
+setting_personal_color_3: .res 1
+
+
     .segment "CODE_1"
 
 ; This will eventually become much more involved. For now, settings

@@ -10,19 +10,27 @@
 options_ui_layout:
         widget_controller options_controller_init
         widget_cursor
-        widget_text_label options_str, 4, 14
-        widget_text_options disco_floor_str,    disco_types,          setting_disco_floor,    8, 16
-        widget_text_options player_palette_str, player_palette_types, setting_player_palette, 8, 18
-        widget_text_options game_mode_str,      game_mode_types,      setting_game_mode,      8, 20
-        widget_text_button back_to_title_str, return_to_title, 8, 26
+        widget_text_label game_options_str, 2, 13
+        widget_text_options game_mode_str,      game_mode_types,      setting_game_mode,      4, 15
+        widget_text_options disco_floor_str,    disco_types,          setting_disco_floor,    4, 16
+        widget_text_label player_options_str, 2, 18
+        widget_text_options player_palette_preset_str, player_palette_preset_types, setting_player_palette, 4, 20
+        widget_text_label player_palette_outfit_str, 4, 22
+        widget_text_label player_palette_shoes_str, 4, 23
+        widget_text_label player_palette_face_str, 4, 24
+        widget_text_button back_to_title_str, return_to_title, 9, 26
         widget_options_battlefield
         .addr $0000 ; end of list
 
-options_str:        .asciiz "- OPTIONS -"
-disco_floor_str:    .asciiz "FLOOR: "
-player_palette_str: .asciiz "PLAYER: "
-game_mode_str:      .asciiz "GAME MODE: "
-back_to_title_str:  .asciiz "RETURN TO TITLE "
+game_options_str:   .asciiz "GAMEPLAY OPTIONS"
+game_mode_str:      .asciiz "Rhythm "
+disco_floor_str:    .asciiz "Floor  "
+player_options_str: .asciiz "PLAYER PALETTE"
+player_palette_preset_str: .asciiz "Preset  "
+player_palette_outfit_str: .asciiz "Pajamas "
+player_palette_shoes_str:  .asciiz "Phones  "
+player_palette_face_str:   .asciiz "Phace   "
+back_to_title_str:  .asciiz "RETURN TO TITLE"
 
 disco_types:
         .byte 6 ; length of option set
@@ -40,17 +48,19 @@ disco_option_3_str: .asciiz "FROZEN OUTLINES"
 disco_option_4_str: .asciiz "JUST GROOVEMENT"
 disco_option_5_str: .asciiz "NO MOTION"
 
-player_palette_types:
-        .byte 4 ; length of option set
-        .addr player_palette_option_0_str
-        .addr player_palette_option_1_str
-        .addr player_palette_option_2_str
-        .addr player_palette_option_3_str
+player_palette_preset_types:
+        .byte 4 ; selectable length of option set
+        .addr player_palette_preset_option_0_str
+        .addr player_palette_preset_option_1_str
+        .addr player_palette_preset_option_2_str
+        .addr player_palette_preset_option_3_str
+        .addr player_palette_preset_option_custom_str
 
-player_palette_option_0_str: .asciiz "PEONY"
-player_palette_option_1_str: .asciiz "PERIWINKLE"
-player_palette_option_2_str: .asciiz "PETUNIA"
-player_palette_option_3_str: .asciiz "PROTEA"
+player_palette_preset_option_0_str:      .asciiz "PEONY"
+player_palette_preset_option_1_str:      .asciiz "PERIWINKLE"
+player_palette_preset_option_2_str:      .asciiz "PETUNIA"
+player_palette_preset_option_3_str:      .asciiz "PROTEA"
+player_palette_preset_option_custom_str: .asciiz "PERSONALIZED"
 
 game_mode_types:
         .byte 3 ; length of option set
