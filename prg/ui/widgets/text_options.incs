@@ -89,7 +89,7 @@ widget_options_table_high := widgets_data5
 widget_data_target_low := widgets_data6
 widget_data_target_high := widgets_data7
         st16 R0, sfx_select_cursor
-        jsr play_sfx_pulse2
+        jsr play_sfx_pulse1
 
         jsr _erase_option
 

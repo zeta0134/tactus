@@ -9,11 +9,12 @@
         .include "kernel.inc"
         .include "nes.inc"
         .include "input.inc"
-        .include "rainbow.inc"
+        .include "math_util.inc"
         .include "palette.inc"
         .include "player.inc"
         .include "prng.inc"
         .include "procgen.inc"
+        .include "rainbow.inc"
         .include "raster_table.inc"
         .include "settings.inc"
         .include "sound.inc"
@@ -47,7 +48,7 @@ widgets_data5: .res ::MAX_WIDGETS
 widgets_data6: .res ::MAX_WIDGETS
 widgets_data7: .res ::MAX_WIDGETS
 ; not part of the widget definition, can be used as scratch space
-widgets_data8: .res ::MAX_WIDGETS
+;widgets_data8: .res ::MAX_WIDGETS
 ;widgets_data9: .res ::MAX_WIDGETS
 ;widgets_data10: .res ::MAX_WIDGETS
 

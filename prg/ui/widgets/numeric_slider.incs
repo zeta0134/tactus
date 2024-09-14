@@ -8,6 +8,7 @@
 
 
 .proc widget_numeric_slider_init
+MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
 
 ; rename the data labels to something more readable
@@ -19,6 +20,13 @@ widget_tile_width := widgets_data4
 widget_range_max := widgets_data5
 widget_data_target_low := widgets_data6
 widget_data_target_high := widgets_data7
+
+widget_metasprite_index := widgets_data2
+;widget_label_string_high := widgets_data3
+
+NametableAddr := T0
+AttributeAddr := T2
+
         ; set our cursor position based on the leftmost tile position
         ldy CurrentWidgetIndex
         lda widget_tile_x, y
@@ -43,8 +51,245 @@ widget_data_target_high := widgets_data7
 
         ; draw the initial label and options for this widget
         jsr _draw_widget_label
-        
-        ; 
 
+        ; The slider graphics come immediately after the label. The string
+        ; drawing routine has left NametableAddr and AttrAddr, and Y is the
+        ; number of tiles that were drawn relative to our position
+        ; firstly, we'll use the tile position to remember our left-most coordinate
+        tya
+        ldx CurrentWidgetIndex
+        clc
+        adc widget_tile_x, x
+        sta widget_tile_x, x ; now holds the left-most position of the slider bar, in tiles
+
+        ; okay, now draw the left edge of the slider bar
+        lda #1
+        sta (NametableAddr), y
+        lda #(CHR_BANK_FONT_MARSHMALLOW | PAL_BLUE)
+        sta (AttributeAddr), y
+        iny
+
+        ; compute the number of inner segments that we need
+        lda widget_tile_width, x
+        beq done_with_mid_segments ; a width of 0 is nonsense, but for safety
+        tax
+        dex
+        beq done_with_mid_segments ; a width of 1 is also nonsense
+        dex
+        beq done_with_mid_segments ; a width of 2 is the minimum possible (and quite silly looking)
+
+        ; draw all of those segments
+mid_segment_loop:
+        lda #2
+        sta (NametableAddr), y
+        lda #(CHR_BANK_FONT_MARSHMALLOW | PAL_BLUE)
+        sta (AttributeAddr), y
+        iny
+        dex
+        bne mid_segment_loop
+done_with_mid_segments:
+
+        ; finally, draw the last segment
+        lda #3
+        sta (NametableAddr), y
+        lda #(CHR_BANK_FONT_MARSHMALLOW | PAL_BLUE)
+        sta (AttributeAddr), y
+
+        ; now that we're done with the label, we can repurpose its pointer
+        ; bytes as scratch space
+        far_call FAR_find_unused_sprite
+        lda MetaSpriteIndex
+        ldy CurrentWidgetIndex
+        sta widget_metasprite_index, y
+
+        ; Initialize the sprite's non-coordinate attributes
+        ldx widget_metasprite_index, y
+        lda #(SPRITE_ACTIVE | SPRITE_PAL_1)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+        lda #<SPRITE_TILE_UI_SLIDER
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+        ; Position the sprite properly
+        jsr apply_ui_slider_position
+
+        ; now switch to the update function
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_numeric_slider_update
+
+        rts
+.endproc
+
+.proc apply_ui_slider_position
+MinPixelX := R0
+MaxPixelX := R1
+WidthInPixels := R2
+DataValuePtr := R3 ; and R4
+
+CurrentWidgetIndex := R20
+
+; rename the data labels to something more readable
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_metasprite_index := widgets_data2
+widget_tile_width := widgets_data4
+widget_range_max := widgets_data5
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
+        ; Work out the Y position first, as it's reasonably straightforard
+        ; TODO: apply camera offset here?
+
+        ldx CurrentWidgetIndex
+        ldy widget_metasprite_index, x
+        lda widget_tile_y, x
+        ; multiply by 8
+        .repeat 3
+        asl
+        .endrepeat
+        ; add 1 for visual alignment with the slider
+        clc
+        adc #1
+        sta sprite_table + MetaSpriteState::PositionY, y
+
+        ; The X position is considerably more tricky, as we need to scale the range
+        ; from [0 - range_max] to the pixel coordinate [tile_x*8 - (tile_x+tile_width)*8]
+        ; work out the pixel coordinates first, to make this simpler
+        lda widget_tile_x, x
+        .repeat 3
+        asl
+        .endrepeat
+        sta MinPixelX
+        lda widget_tile_x, x
+        clc
+        adc widget_tile_width, x
+        ; minus one, so we don't run off the end
+        sec
+        sbc #1
+        .repeat 3
+        asl
+        .endrepeat
+        sta MaxPixelX
+        sec
+        sbc MinPixelX
+        sta WidthInPixels
+
+        ; Now we need to solve for:
+        ;
+        ;     x          data
+        ; ---------- = ---------
+        ; PixelWidth   (max_range-1)
+
+        ; This can be slow. Don't overthink it!
+
+        ldx CurrentWidgetIndex
+        lda widget_data_target_low, x
+        sta DataValuePtr+0
+        lda widget_data_target_high, x
+        sta DataValuePtr+1
+
+        ; setup for the mult
+        ldy #0
+        lda (DataValuePtr), y ; data
+        ldy WidthInPixels     ; PixelWidth
+        jsr mul8_multiply
+        ; now divide that result by the max range
+        sta dividend+0
+        sty dividend+1
+        ldx CurrentWidgetIndex
+        lda widget_range_max, x
+        sec
+        sbc #1
+        sta divisor
+        jsr div16_divide
+        ; the resulting quotient is the number of pixels
+        ; the slider should appear at, to the right of its usual minimum
+        lda quotient
+        clc
+        adc MinPixelX ; A now holds desired pixel X position
+        ldx CurrentWidgetIndex
+        ldy widget_metasprite_index, x
+        sta sprite_table + MetaSpriteState::PositionX, y
+
+        ; whew!
+        rts
+.endproc
+
+.proc widget_numeric_slider_update
+CurrentWidgetIndex := R20
+        ; if we aren't even hovered, no change
+        ldy CurrentWidgetIndex
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_HOVER
+        bne check_for_forward_input
+        rts
+check_for_forward_input:
+        lda #(KEY_RIGHT | KEY_A)
+        bit ButtonsDown
+        beq check_for_reverse_input
+        jsr increase_slider_position
+        jmp redraw_self
+check_for_reverse_input:
+        lda #(KEY_LEFT)
+        bit ButtonsDown
+        beq nothing_to_do
+        jsr decrease_slider_position
+        jmp redraw_self
+nothing_to_do:
+        rts
+redraw_self:
+        jsr apply_ui_slider_position
+        rts
+.endproc
+
+.proc increase_slider_position
+DataValuePtr := R0
+CurrentWidgetIndex := R20
+widget_range_max := widgets_data5
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
+        st16 R0, sfx_select_cursor
+        jsr play_sfx_pulse1
+
+        ldx CurrentWidgetIndex
+        lda widget_data_target_low, x
+        sta DataValuePtr+0
+        lda widget_data_target_high, x
+        sta DataValuePtr+1
+
+        ldy #0
+        lda (DataValuePtr), y
+        clc
+        adc #1
+        cmp widget_range_max, x
+        bcs cancel_change
+        sta (DataValuePtr), y
+
+cancel_change:
+        rts
+.endproc
+
+.proc decrease_slider_position
+DataValuePtr := R0
+CurrentWidgetIndex := R20
+widget_range_max := widgets_data5
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
+        st16 R0, sfx_select_cursor
+        jsr play_sfx_pulse2
+
+        ldx CurrentWidgetIndex
+        lda widget_data_target_low, x
+        sta DataValuePtr+0
+        lda widget_data_target_high, x
+        sta DataValuePtr+1
+
+        ldy #0
+        lda (DataValuePtr), y
+        beq cancel_change
+        sec
+        sbc #1
+        sta (DataValuePtr), y
+cancel_change:
         rts
 .endproc
