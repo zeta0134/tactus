@@ -1,0 +1,593 @@
+.macro widget_cursor ; no parameters needed
+    .addr widget_cursor_init
+    .byte 0, 0, 0, 0, 0, 0, 0, 0
+.endmacro
+
+.macro widget_player_cursor ; the player is the cursor. purely visual
+    .addr widget_player_cursor_init
+    .byte 0, 0, 0, 0, 0, 0, 0, 0
+.endmacro
+
+.proc widget_cursor_init
+MetaSpriteIndex := R0
+CurrentWidgetIndex := R20
+        
+widget_sprite_index := widgets_data0
+widget_cursor_nav_index := widgets_data1
+
+; low bytes, to help with lerping smoothness
+widget_sprite_position_low_x := widgets_data2
+widget_sprite_position_low_y := widgets_data3
+widget_sprite_position_high_x := widgets_data4
+widget_sprite_position_high_y := widgets_data5
+
+widget_frames_at_this_location := widgets_data7
+
+        ; firstly, set our tracked index to be invalid, which
+        ; gives consistent behavior. we want our first update to perform
+        ; a scan of the list, but we also want to give all the widgets
+        ; a chance to initialize themselves first, so we wait one frame
+        ; before triggering that scan for the first time
+        ldy CurrentWidgetIndex
+        lda #$FF
+        sta widget_cursor_nav_index, y
+
+        lda #0
+        sta widget_sprite_position_low_x, y
+        sta widget_sprite_position_low_y, y
+        sta widget_sprite_position_high_x, y
+        lda #$F8
+        sta widget_sprite_position_high_y, y
+
+        far_call FAR_find_unused_sprite
+        lda MetaSpriteIndex
+        ldy CurrentWidgetIndex
+        sta widget_sprite_index, y
+
+        ldx widget_sprite_index, y
+        lda #(SPRITE_ACTIVE | SPRITE_PAL_1)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+        lda #0
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda #$F0 ; offscreen for now 
+        sta sprite_table + MetaSpriteState::PositionY, x
+        lda #<SPRITE_TILE_MENU_CURSOR_SPIN
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_cursor_update
+
+        rts
+.endproc
+
+.proc widget_cursor_update
+TargetWidgetIndex := R0
+CurrentWidgetIndex := R20
+
+widget_sprite_index := widgets_data0
+widget_cursor_nav_index := widgets_data1
+
+        jsr clear_hover_states
+
+        ldy CurrentWidgetIndex
+        lda widget_cursor_nav_index, y
+        sta TargetWidgetIndex
+
+        ; if we are not currently pointing to a navigable element, try to find oue
+        ; (this is our startup state; we'll usually be pointing at ourselves, and
+        ; the cursor is not considered 'active') 
+
+        ldx TargetWidgetIndex
+        cmp #$FF
+        beq find_new_widget
+continue_considering:
+        lda widgets_state_flags, x
+        and #WIDGET_STATE_NAVIGABLE
+        bne target_valid
+find_new_widget:
+        perform_zpcm_inc
+        jsr find_first_active_widget
+        ldy CurrentWidgetIndex
+        lda TargetWidgetIndex
+        sta widget_cursor_nav_index, y
+        cmp #$FF
+        bne new_target_acquired
+target_invalid:
+        ; hide ourselves immediately and do nothing
+        ldx widget_sprite_index, y
+        lda #$F0 ; offscreen for now 
+        sta sprite_table + MetaSpriteState::PositionY, x
+        rts
+new_target_acquired:
+        perform_zpcm_inc
+        ; initialize our position to the target's position
+        ; with no lerping
+        jsr snap_to_widget_position
+        jmp update_at_active_position
+target_valid:
+        ; if the user has pressed the UP or DOWN buttons,
+        ; try to find a new target (which should remain valid)
+        lda #KEY_DOWN
+        bit ButtonsDown
+        bne handle_move_down
+        lda #KEY_UP
+        bit ButtonsDown
+        bne handle_move_up
+        jmp update_at_active_position
+handle_move_down:
+        jsr move_to_next_active_widget
+        perform_zpcm_inc
+        ldy CurrentWidgetIndex
+        lda TargetWidgetIndex
+        sta widget_cursor_nav_index, y
+        jmp update_at_active_position
+handle_move_up:
+        jsr move_to_previous_active_widget
+        perform_zpcm_inc
+        ldy CurrentWidgetIndex
+        lda TargetWidgetIndex
+        sta widget_cursor_nav_index, y
+        ; fall through
+update_at_active_position:
+        perform_zpcm_inc
+        ; smoothly lerp the cursor to its current position
+        jsr lerp_to_widget_position
+        jsr apply_cursor_position_to_sprite
+        ; tell the widget we're pointing at that it should become
+        ; "hovered", whatever that widget thinks that means
+        jsr set_hover_state
+        rts
+.endproc
+
+; Just like the regular cursor widget, but with the player sprite
+; as the active tile
+.proc widget_player_cursor_init
+MetaSpriteIndex := R0
+CurrentWidgetIndex := R20
+        
+widget_sprite_index := widgets_data0
+widget_cursor_nav_index := widgets_data1
+
+; low bytes, to help with lerping smoothness
+widget_sprite_position_low_x := widgets_data2
+widget_sprite_position_low_y := widgets_data3
+widget_sprite_position_high_x := widgets_data4
+widget_sprite_position_high_y := widgets_data5
+
+widget_beats_at_this_location := widgets_data6
+widget_frames_at_this_location := widgets_data7
+
+        ; firstly, set our tracked index to be invalid, which
+        ; gives consistent behavior. we want our first update to perform
+        ; a scan of the list, but we also want to give all the widgets
+        ; a chance to initialize themselves first, so we wait one frame
+        ; before triggering that scan for the first time
+        ldy CurrentWidgetIndex
+        lda #$FF
+        sta widget_cursor_nav_index, y
+
+        lda #0
+        sta widget_sprite_position_low_x, y
+        sta widget_sprite_position_low_y, y
+        sta widget_sprite_position_high_x, y
+        lda #$F8
+        sta widget_sprite_position_high_y, y
+
+        lda #(JUMP_HEIGHT_END-1)
+        sta widget_frames_at_this_location, y
+        lda #0
+        sta widget_beats_at_this_location, y
+
+        far_call FAR_find_unused_sprite
+        lda MetaSpriteIndex
+        ldy CurrentWidgetIndex
+        sta widget_sprite_index, y
+
+        ldx widget_sprite_index, y
+        lda #(SPRITE_ACTIVE | SPRITE_PAL_0)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+        lda #0
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda #$F0 ; offscreen for now 
+        sta sprite_table + MetaSpriteState::PositionY, x
+        lda #<SPRITE_TILE_PLAYER
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_player_cursor_update
+
+        rts
+.endproc
+
+JUMP_HEIGHT_END = 5
+jump_height_table:
+        .byte 14, 14, 11, 7, 2, 0
+        ;.byte 20, 28, 22, 14, 4, 0
+
+.proc widget_player_cursor_update
+HeightOffsetScratch := R0
+
+CurrentWidgetIndex := R20
+
+widget_sprite_index := widgets_data0
+widget_sprite_position_high_x := widgets_data4
+widget_sprite_position_high_y := widgets_data5
+widget_beats_at_this_location := widgets_data6
+widget_frames_at_this_location := widgets_data7
+        ; first off, do everything the original cursor update does, more or less
+        jsr widget_cursor_update
+        perform_zpcm_inc
+        ; now adjust the player's position based on how long we've been here
+        ldy CurrentWidgetIndex
+        lda widget_frames_at_this_location, y
+        tax
+        lda jump_height_table, x
+        sta HeightOffsetScratch
+        lda widget_frames_at_this_location, y
+        cmp #JUMP_HEIGHT_END
+        beq no_adjustment
+        clc
+        adc #1
+        sta widget_frames_at_this_location, y
+no_adjustment:
+        perform_zpcm_inc
+        ; apply the player offset to the metasprite position
+        lda widget_sprite_index, y
+        tax
+        lda widget_sprite_position_high_x, y
+        sec
+        sbc #3
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda widget_sprite_position_high_y, y
+        sec
+        sbc #4 ; constant, to line our feet up with the ground
+        sbc HeightOffsetScratch ; variable, based on jump timing
+        sta sprite_table + MetaSpriteState::PositionY, x
+
+        perform_zpcm_inc
+
+        jsr count_beats ; preserves X
+        ; if we've been at this position for long enough, switch to the idle fidget
+        ldy CurrentWidgetIndex
+        lda widget_beats_at_this_location, y
+        cmp #16
+        bcs use_idle_pose
+use_regular_pose: 
+        lda #<SPRITE_TILE_PLAYER
+        sta sprite_table + MetaSpriteState::TileIndex, x
+        rts
+use_idle_pose:
+        lda #<SPRITE_TILE_PLAYER_IDLE
+        sta sprite_table + MetaSpriteState::TileIndex, x
+        rts
+.endproc
+
+
+.proc count_beats
+CurrentWidgetIndex := R20
+
+widget_sprite_index := widgets_data0
+widget_sprite_position_high_x := widgets_data4
+widget_sprite_position_high_y := widgets_data5
+widget_beats_at_this_location := widgets_data6
+        lda CurrentBeat
+        cmp LastBeat
+        bne process_next_beat
+        rts
+process_next_beat:
+        sta LastBeat
+        ldy CurrentWidgetIndex
+        lda widget_beats_at_this_location, y
+        clc
+        adc #1
+        beq counter_maxed
+        sta widget_beats_at_this_location, y
+counter_maxed:
+        rts
+.endproc
+
+; result placed in R0
+; returns #$FF on failure
+.proc find_first_active_widget
+TargetWidgetIndex := R0
+        ldy #0
+loop:
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_NAVIGABLE
+        bne found_one
+        iny
+        cmp #::MAX_WIDGETS
+        bne loop
+did_not_find_one:
+        lda #$FF
+        sta TargetWidgetIndex
+        rts
+found_one:
+        tya
+        sta TargetWidgetIndex
+        rts
+.endproc
+
+; for right now, widgets are in a simple linked list, and
+; we traverse the items in that list in order. we might expand
+; on this later, but we're thinking this will serve our needs
+; for a good long while
+.proc move_to_next_active_widget
+TargetWidgetIndex := R0
+CurrentWidgetIndex := R20
+widget_beats_at_this_location := widgets_data6
+widget_frames_at_this_location := widgets_data7
+        ; starting at our position +1, scan forward for an active widget
+        ldy TargetWidgetIndex
+        iny
+        cpy #::MAX_WIDGETS   ; safety: if we run off the end of the list, bail
+        beq did_not_find_one
+loop:
+        perform_zpcm_inc
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_NAVIGABLE
+        bne found_one
+        iny
+        cpy #::MAX_WIDGETS
+        bne loop
+did_not_find_one:
+        ; leave the target unchanged!
+        rts
+found_one:
+        tya
+        sta TargetWidgetIndex
+        ; reset our "frames at this location" counter to 0
+        ; (the player cursor relies on this for jump height shenanigans)
+        ldy CurrentWidgetIndex
+        lda #0
+        sta widget_beats_at_this_location, y
+        sta widget_frames_at_this_location, y
+
+        ; preserve?
+        lda R0
+        pha
+        st16 R0, sfx_move_cursor
+        jsr play_sfx_pulse2
+        pla
+        sta R0
+
+        perform_zpcm_inc
+
+        rts
+.endproc
+
+.proc move_to_previous_active_widget
+TargetWidgetIndex := R0
+CurrentWidgetIndex := R20
+widget_beats_at_this_location := widgets_data6
+widget_frames_at_this_location := widgets_data7
+        ; starting at our position -1, scan forward for an active widget
+        ldy TargetWidgetIndex
+        beq did_not_find_one
+        dey
+loop:
+        perform_zpcm_inc
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_NAVIGABLE
+        bne found_one
+        cpy #0
+        beq did_not_find_one
+        dey
+        bne loop
+did_not_find_one:
+        ; leave the target unchanged!
+        rts
+found_one:
+        tya
+        sta TargetWidgetIndex
+        ; reset our "frames at this location" counter to 0
+        ; (the player cursor relies on this for jump height shenanigans)
+        ldy CurrentWidgetIndex
+        lda #0
+        sta widget_beats_at_this_location, y
+        sta widget_frames_at_this_location, y
+
+        ; preserve
+        lda R0
+        pha
+        st16 R0, sfx_move_cursor
+        jsr play_sfx_pulse2
+        pla
+        sta R0
+
+        perform_zpcm_inc
+
+        rts
+.endproc
+
+.proc snap_to_widget_position
+TargetWidgetIndex := R0
+CurrentWidgetIndex := R20
+
+widget_sprite_index := widgets_data0
+widget_sprite_position_low_x := widgets_data2
+widget_sprite_position_low_y := widgets_data3
+widget_sprite_position_high_x := widgets_data4
+widget_sprite_position_high_y := widgets_data5
+
+        ldy CurrentWidgetIndex
+        ldx TargetWidgetIndex
+        lda widgets_cursor_pos_x, x
+        sta widget_sprite_position_high_x, y
+        lda widgets_cursor_pos_y, x
+        sta widget_sprite_position_high_y, y
+
+        ldy CurrentWidgetIndex
+        lda #0
+        sta widget_sprite_position_low_x, y
+        sta widget_sprite_position_low_y, y
+
+        rts
+.endproc
+
+.proc lerp_to_widget_position
+TargetWidgetIndex := R0
+CurrentWidgetIndex := R20
+
+LerpCurrentPos := R2
+LerpTargetPos := R4
+; lerping clobbers R6,R7
+
+widget_sprite_position_low_x := widgets_data2
+widget_sprite_position_low_y := widgets_data3
+widget_sprite_position_high_x := widgets_data4
+widget_sprite_position_high_y := widgets_data5
+        ; setup!
+        ldy CurrentWidgetIndex
+
+        ; X position!
+        lda widget_sprite_position_low_x, y
+        sta LerpCurrentPos
+        lda widget_sprite_position_high_x, y
+        sta LerpCurrentPos+1
+        lda #0
+        sta LerpTargetPos
+        ldy TargetWidgetIndex
+        lda widgets_cursor_pos_x, y
+        sta LerpTargetPos+1
+        jsr lerp_coordinate ; clobbers A, preserves X and Y
+        ldy CurrentWidgetIndex
+        lda LerpCurrentPos
+        sta widget_sprite_position_low_x, y
+        lda LerpCurrentPos+1
+        sta widget_sprite_position_high_x, y
+
+        ; Y position!
+        lda widget_sprite_position_low_y, y
+        sta LerpCurrentPos
+        lda widget_sprite_position_high_y, y
+        sta LerpCurrentPos+1
+        lda #0
+        sta LerpTargetPos
+        ldy TargetWidgetIndex
+        lda widgets_cursor_pos_y, y
+        sta LerpTargetPos+1
+        jsr lerp_coordinate ; clobbers A, preserves X and Y
+        ldy CurrentWidgetIndex
+        lda LerpCurrentPos
+        sta widget_sprite_position_low_y, y
+        lda LerpCurrentPos+1
+        sta widget_sprite_position_high_y, y
+
+        rts
+.endproc
+
+.proc apply_cursor_position_to_sprite
+CurrentWidgetIndex := R20
+
+widget_sprite_index := widgets_data0
+widget_sprite_position_high_x := widgets_data4
+widget_sprite_position_high_y := widgets_data5
+
+        ; super basic!
+        ldy CurrentWidgetIndex
+        lda widget_sprite_index, y
+        tax
+
+        lda widget_sprite_position_high_x, y
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda widget_sprite_position_high_y, y
+        sta sprite_table + MetaSpriteState::PositionY, x
+
+        rts
+.endproc
+
+.proc clear_hover_states
+        ldy #0
+loop:
+        lda widgets_state_flags, y
+        and #($FF - WIDGET_STATE_HOVER)
+        sta widgets_state_flags, y
+        iny
+        cpy #::MAX_WIDGETS
+        bne loop
+        rts
+.endproc
+
+.proc set_hover_state
+TargetWidgetIndex := R0
+        ldx TargetWidgetIndex
+        lda widgets_state_flags, x
+        ora #WIDGET_STATE_HOVER
+        sta widgets_state_flags, x
+        rts
+.endproc
+
+; lifted straight from dungeon game, with little to no modification
+.proc lerp_coordinate
+CurrentPos := R2
+TargetPos := R4
+Distance := R6
+        sec
+        lda TargetPos
+        sbc CurrentPos
+        sta Distance
+        lda TargetPos+1
+        sbc CurrentPos+1
+        sta Distance+1
+        ; for sign checks, we need a third distance byte; we'll use
+        ; #0 for both incoming values
+        lda #0
+        sbc #0
+        sta Distance+2
+
+        ; sanity check: are we already very close to the target?
+        ; If our distance byte is either $00 or $FF, then there is
+        ; less than 1px remaining
+        lda Distance+1
+        cmp #$00
+        beq arrived_at_target
+        cmp #$FF
+        beq arrived_at_target
+
+        perform_zpcm_inc
+
+        ; this is a signed comparison, and it's much easier to simply split the code here
+        lda Distance+2
+        bmi negative_distance
+
+positive_distance:
+        ; divide the distance by 2
+.repeat 1
+        lsr Distance+1
+        ror Distance
+.endrepeat
+        jmp store_result
+
+negative_distance:
+        ; divide the distance by 2
+.repeat 1
+        sec
+        ror Distance+1
+        ror Distance
+.endrepeat
+
+store_result:
+        ; apply the computed distance/4 to the current position
+        clc
+        lda CurrentPos
+        adc Distance
+        sta CurrentPos
+        lda CurrentPos+1
+        adc Distance+1
+        sta CurrentPos+1
+        ; and we're done!
+        rts
+
+arrived_at_target:
+        ; go ahead and apply the target position completely, to skip the tail end of the lerp
+        lda TargetPos + 1
+        sta CurrentPos + 1
+        lda #0
+        sta CurrentPos
+        rts
+.endproc

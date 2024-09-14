@@ -1,0 +1,50 @@
+.macro widget_numeric_slider label_string, tile_width, range_max, data_target, tile_x, tile_y
+    .addr widget_numeric_slider_init
+    .byte tile_x, tile_y
+    .addr label_string
+    .byte tile_width, range_max
+    .addr data_target
+.endmacro
+
+
+.proc widget_numeric_slider_init
+CurrentWidgetIndex := R20
+
+; rename the data labels to something more readable
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_label_string_low := widgets_data2
+widget_label_string_high := widgets_data3
+widget_tile_width := widgets_data4
+widget_range_max := widgets_data5
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
+        ; set our cursor position based on the leftmost tile position
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        asl ; x2
+        asl ; x4
+        asl ; x8
+        sec
+        sbc #17
+        sta widgets_cursor_pos_x, y
+        lda widget_tile_y, y
+        asl ; x2
+        asl ; x4
+        asl ; x8
+        sec
+        sbc #4
+        sta widgets_cursor_pos_y, y
+
+        ; flag this widget as active for cursor navigation purposes
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+
+        ; draw the initial label and options for this widget
+        jsr _draw_widget_label
+        
+        ; 
+
+        rts
+.endproc

@@ -1,0 +1,267 @@
+.macro widget_text_options label_string, option_list, data_target, tile_x, tile_y
+    .addr widget_text_options_init
+    .byte tile_x, tile_y
+    .addr label_string
+    .addr option_list
+    .addr data_target
+.endmacro
+
+.proc widget_text_options_init
+CurrentWidgetIndex := R20
+
+; rename the data labels to something more readable
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_label_string_low := widgets_data2
+widget_label_string_high := widgets_data3
+widget_options_table_low := widgets_data4
+widget_options_table_high := widgets_data5
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
+
+        ; set our cursor position based on the leftmost tile position
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        asl ; x2
+        asl ; x4
+        asl ; x8
+        sec
+        sbc #17
+        sta widgets_cursor_pos_x, y
+        lda widget_tile_y, y
+        asl ; x2
+        asl ; x4
+        asl ; x8
+        sec
+        sbc #4
+        sta widgets_cursor_pos_y, y
+
+        ; flag this widget as active for cursor navigation purposes
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+
+        ; draw the initial label and options for this widget
+        jsr _draw_widget_label
+        jsr _draw_option
+
+        ; now switch to the update function
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_text_options_update
+        rts
+.endproc
+
+.proc widget_text_options_update
+CurrentWidgetIndex := R20
+        ; if we aren't even hovered, no change
+        ldy CurrentWidgetIndex
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_HOVER
+        bne check_for_forward_input
+        rts
+check_for_forward_input:
+        lda #(KEY_RIGHT | KEY_A)
+        bit ButtonsDown
+        beq check_for_reverse_input
+        jsr cycle_to_next_option
+        jmp redraw_self
+check_for_reverse_input:
+        lda #(KEY_LEFT)
+        bit ButtonsDown
+        beq nothing_to_do
+        jsr cycle_to_previous_option
+        jmp redraw_self
+nothing_to_do:
+        rts
+redraw_self:
+        jsr _draw_widget_label
+        jsr _draw_option
+        rts
+.endproc
+
+.proc cycle_to_next_option
+OptionsTablePtr := R0
+DataValuePtr := R2
+CurrentWidgetIndex := R20
+
+widget_options_table_low := widgets_data4
+widget_options_table_high := widgets_data5
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
+        st16 R0, sfx_select_cursor
+        jsr play_sfx_pulse2
+
+        jsr _erase_option
+
+        ldy CurrentWidgetIndex
+        lda widget_options_table_low, y
+        sta OptionsTablePtr+0
+        lda widget_options_table_high, y
+        sta OptionsTablePtr+1
+        lda widget_data_target_low, y
+        sta DataValuePtr+0
+        lda widget_data_target_high, y
+        sta DataValuePtr+1
+
+        ldy #0
+        ;inc (DataValuePtr), y
+        lda (DataValuePtr), y
+        clc
+        adc #1
+        ; did we run past the end of the table?
+        cmp (OptionsTablePtr), y ; first byte contains the length
+        bcs wraparound
+        sta (DataValuePtr), y
+        rts
+wraparound:
+        lda #0
+        sta (DataValuePtr), y
+        rts
+.endproc
+
+.proc cycle_to_previous_option
+OptionsTablePtr := R0
+DataValuePtr := R2
+CurrentWidgetIndex := R20
+
+widget_options_table_low := widgets_data4
+widget_options_table_high := widgets_data5
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
+        st16 R0, sfx_select_cursor
+        jsr play_sfx_pulse2
+
+        jsr _erase_option
+
+        ldy CurrentWidgetIndex
+        lda widget_options_table_low, y
+        sta OptionsTablePtr+0
+        lda widget_options_table_high, y
+        sta OptionsTablePtr+1
+        lda widget_data_target_low, y
+        sta DataValuePtr+0
+        lda widget_data_target_high, y
+        sta DataValuePtr+1
+
+        ldy #0
+
+        lda (DataValuePtr), y
+        beq wraparound
+        sec
+        sbc #1
+        sta (DataValuePtr), y
+        rts
+wraparound:
+        lda (OptionsTablePtr), y
+        sec
+        sbc #1
+        sta (DataValuePtr), y
+        rts
+.endproc
+
+.proc _draw_option
+        jsr _draw_option_common
+        jsr FIXED_draw_string
+        rts
+.endproc
+
+.proc _erase_option
+        jsr _draw_option_common
+        jsr FIXED_erase_string
+        rts
+.endproc
+
+range_error_str: .asciiz "RANGE ERROR!"
+
+.proc _draw_option_common
+OptionsTablePtr := R0
+DataValuePtr := R2
+CurrentWidgetIndex := R20
+
+; arguments to string drawing functions
+NametableAddr := T0
+AttributeAddr := T2
+TileX := T4
+TileY := T5
+StringPtr := T4
+TileBase := T6
+PaletteIndex := T7
+
+StringLenPtr := T0
+StringLength := T2
+
+; rename the data labels to something more readable
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_label_string_low := widgets_data2
+widget_label_string_high := widgets_data3
+widget_options_table_low := widgets_data4
+widget_options_table_high := widgets_data5
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
+        perform_zpcm_inc
+
+        ; first, we need to skip over the label portion, so work that out
+        ldy CurrentWidgetIndex
+        lda widget_label_string_low, y
+        sta StringLenPtr+0
+        lda widget_label_string_high, y
+        sta StringLenPtr+1
+        jsr FIXED_strlen
+        ; however long the label is, add that much to the starting X position
+        ; in tiles for string drawing
+        ldy CurrentWidgetIndex
+        lda StringLength
+        clc
+        adc widget_tile_x, y
+        sta TileX
+        lda widget_tile_y, y
+        sta TileY
+        st16 NametableAddr, $5000
+        st16 AttributeAddr, $5800
+        far_call FAR_nametable_from_coordinates
+        perform_zpcm_inc
+        ; Now pick out the appropriate entry from the options table
+        ldy CurrentWidgetIndex
+        lda widget_options_table_low, y
+        sta OptionsTablePtr+0
+        lda widget_options_table_high, y
+        sta OptionsTablePtr+1
+        lda widget_data_target_low, y
+        sta DataValuePtr+0
+        lda widget_data_target_high, y
+        sta DataValuePtr+1
+
+        ldy #0
+        lda (DataValuePtr), y
+        ; sanity check: have we somehow exceeded the bounds of the table?
+        cmp (OptionsTablePtr), y
+        bcs option_out_of_range
+option_in_range:
+        ; use the current value to index into the list of option strings
+        asl
+        clc
+        adc #1
+        tay
+        lda (OptionsTablePtr), y
+        sta StringPtr+0
+        iny
+        lda (OptionsTablePtr), y
+        sta StringPtr+1
+        jmp converge
+option_out_of_range:
+        lda #<range_error_str
+        sta StringPtr+0
+        lda #>range_error_str
+        sta StringPtr+1
+converge:
+        perform_zpcm_inc
+        ; finally, draw the stupid thing
+        lda #CHR_BANK_FONT_MARSHMALLOW
+        sta TileBase
+        lda #%01000000 ; sure, why not
+        sta PaletteIndex        
+        ; setup complete, the calling function will decide what to do
+        ; with this string information. common, out!
+        rts
+.endproc

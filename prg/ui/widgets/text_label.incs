@@ -1,0 +1,31 @@
+.macro widget_text_label text_string, tile_x, tile_y
+    .addr widget_text_label_init
+    .byte tile_x, tile_y
+    .addr text_string
+    .byte 0, 0, 0, 0
+.endmacro
+
+.proc widget_text_label_init
+CurrentWidgetIndex := R20
+
+; rename the data labels to something more readable
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_text_string_low := widgets_data2
+widget_text_string_high := widgets_data3
+
+; arguments to string drawing functions
+NametableAddr := T0
+AttributeAddr := T2
+TileX := T4
+TileY := T5
+StringPtr := T4
+TileBase := T6
+PaletteIndex := T7
+        jsr _draw_widget_label
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_no_behavior
+
+        rts
+.endproc

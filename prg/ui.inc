@@ -25,39 +25,6 @@
     .byte 0, 0, 0, 0, 0, 0, 0, 0
 .endmacro
 
-.macro widget_cursor ; no parameters needed
-    .addr widget_cursor_init
-    .byte 0, 0, 0, 0, 0, 0, 0, 0
-.endmacro
-
-.macro widget_player_cursor ; the player is the cursor. purely visual
-    .addr widget_player_cursor_init
-    .byte 0, 0, 0, 0, 0, 0, 0, 0
-.endmacro
-
-.macro widget_text_label text_string, tile_x, tile_y
-    .addr widget_text_label_init
-    .byte tile_x, tile_y
-    .addr text_string
-    .byte 0, 0, 0, 0
-.endmacro
-
-.macro widget_text_options label_string, option_list, data_target, tile_x, tile_y
-    .addr widget_text_options_init
-    .byte tile_x, tile_y
-    .addr label_string
-    .addr option_list
-    .addr data_target
-.endmacro
-
-.macro widget_text_button text_string, action_func_ptr, tile_x, tile_y
-    .addr widget_text_button_init
-    .byte tile_x, tile_y
-    .addr text_string
-    .addr action_func_ptr
-    .byte 0, 0
-.endmacro
-
 ; mostly for the cursor
 WIDGET_STATE_NAVIGABLE  = %10000000
 ; to tell the widget what the cursor is doing

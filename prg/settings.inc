@@ -4,6 +4,11 @@
 .global setting_player_palette
 .global setting_game_mode
 
+.global setting_player_palette_preset
+.global setting_personal_color_1
+.global setting_personal_color_2
+.global setting_personal_color_3
+
 DISCO_FLOOR_SOLID_INSTANT_SQUARES   = 0
 DISCO_FLOOR_SOLID_FROZEN_SQUARES    = 1
 DISCO_FLOOR_OUTLINE_INSTANT_SQUARES = 2
