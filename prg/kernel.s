@@ -1000,6 +1000,9 @@ patient_mode:
         ; If the player's input has arrived...
         lda PlayerNextDirection
         ora PlayerIntendsToPause
+        ora PlayerIntendsToWait
+        ora PlayerIntendsToBomb
+        ora PlayerIntendsToCast
         ; ... then go ahead and process this beat!
         jne player_input_forces_a_beat
 
@@ -1067,6 +1070,9 @@ process_next_beat_now:
         ; If the player's input HAS arrived:
         lda PlayerNextDirection
         ora PlayerIntendsToPause
+        ora PlayerIntendsToWait
+        ora PlayerIntendsToBomb
+        ora PlayerIntendsToCast
         beq no_input_received
 input_received:
         ; Then immediatly process this beat
@@ -1111,6 +1117,9 @@ continue_waiting:
         ; If the player's input HAS arrived:
         lda PlayerNextDirection
         ora PlayerIntendsToPause
+        ora PlayerIntendsToWait
+        ora PlayerIntendsToBomb
+        ora PlayerIntendsToCast
         beq continue_waiting
 input_received:
         ; Then immediatly process this beat

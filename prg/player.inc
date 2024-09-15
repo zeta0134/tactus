@@ -44,6 +44,9 @@
 .globalzp PlayerZonePtr
 .global DestinationZonePtr
 
+.global PlayerIntendsToWait
+.global PlayerIntendsToBomb
+.global PlayerIntendsToCast
 .global PlayerIntendsToPause
 .global PlayerIsPaused
 

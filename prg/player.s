@@ -91,6 +91,10 @@ PlayerPreviousSuccessfulDirection: .res 1
 PlayerIntendsToPause: .res 1
 PlayerIsPaused: .res 1
 
+PlayerIntendsToWait: .res 1
+PlayerIntendsToBomb: .res 1
+PlayerIntendsToCast: .res 1
+
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
 DIRECTION_SOUTH = 3
@@ -232,9 +236,6 @@ heart_loop:
 
         st16 PlayerGold, 0
 .endif
-        
-
-
 
         lda #0
         sta PlayerKeys
@@ -247,6 +248,13 @@ heart_loop:
         sta PlayerCombo
         sta PlayerChain
         sta PlayerChainGrace
+
+        lda #0
+        sta PlayerIntendsToBomb
+        sta PlayerIntendsToCast
+        sta PlayerIntendsToWait
+        sta PlayerIntendsToPause
+        sta PlayerNextDirection
 
         rts
 
@@ -414,11 +422,11 @@ correct_slide_up:
         ; While actually paused, the only valid action is to attempt to unpause!
 check_pause_state:
         lda PlayerIsPaused
-        beq check_directional_buttons
+        beq check_action_buttons
         rts
 
-check_directional_buttons:
-        lda #(KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT)
+check_action_buttons:
+        lda #(KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT | KEY_SELECT | KEY_B  | KEY_A)
         bit ButtonsDown
         bne handle_button_press
         rts ; all done
@@ -438,6 +446,10 @@ check_north:
         beq check_east
         lda #DIRECTION_NORTH
         sta PlayerNextDirection
+        lda #0
+        sta PlayerIntendsToWait
+        sta PlayerIntendsToBomb
+        sta PlayerIntendsToCast
         rts
 check_east:
         lda #KEY_RIGHT
@@ -445,6 +457,10 @@ check_east:
         beq check_south        
         lda #DIRECTION_EAST
         sta PlayerNextDirection
+        lda #0
+        sta PlayerIntendsToWait
+        sta PlayerIntendsToBomb
+        sta PlayerIntendsToCast
         rts
 check_south:
         lda #KEY_DOWN
@@ -452,14 +468,56 @@ check_south:
         beq check_west
         lda #DIRECTION_SOUTH
         sta PlayerNextDirection
+        lda #0
+        sta PlayerIntendsToWait
+        sta PlayerIntendsToBomb
+        sta PlayerIntendsToCast
         rts
 check_west:
         lda #KEY_LEFT
         bit ButtonsDown
-        beq no_valid_press ; this shouldn't be reachable
+        beq check_wait ; this shouldn't be reachable
         lda #DIRECTION_WEST
-        sta PlayerNextDirection        
-no_valid_press:
+        sta PlayerNextDirection
+        lda #0
+        sta PlayerIntendsToWait
+        sta PlayerIntendsToBomb
+        sta PlayerIntendsToCast
+        rts   
+check_wait:
+        lda #KEY_SELECT
+        bit ButtonsDown
+        beq check_bomb ; this shouldn't be reachable
+        lda #1
+        sta PlayerIntendsToWait
+        lda #0
+        sta PlayerNextDirection
+        sta PlayerIntendsToBomb
+        sta PlayerIntendsToCast
+        rts
+check_bomb:
+        lda #KEY_B
+        bit ButtonsDown
+        beq check_spellcast ; this shouldn't be reachable
+        lda #1
+        sta PlayerIntendsToBomb
+        lda #0
+        sta PlayerIntendsToWait
+        sta PlayerNextDirection
+        sta PlayerIntendsToCast
+        rts
+check_spellcast:
+        lda #KEY_A
+        bit ButtonsDown
+        beq no_valid_press ; this shouldn't be reachable
+        lda #1
+        sta PlayerIntendsToCast
+        lda #0
+        sta PlayerIntendsToBomb
+        sta PlayerIntendsToWait
+        sta PlayerNextDirection
+        rts
+no_valid_press: ; not really sure how this label gets hit, but whatever
         rts
 .endproc
 
@@ -758,6 +816,13 @@ no_darkness:
 
         ; Detect pausing. (The boss key, the mom alert, etc.)
         jsr detect_pause_action
+
+        ; TODO: Detect other types of intent here. These aren't implemented,
+        ; so just clear the intent flags for now.
+        lda #0
+        sta PlayerIntendsToBomb
+        sta PlayerIntendsToCast
+        sta PlayerIntendsToWait
 
         rts
 .endproc
