@@ -62,9 +62,6 @@ TILE_WALL           = $8C
 TILE_ITEM_SHADOW = ($90 | %00)
 TILE_TREASURE_CHEST = ($98 | %10)
 TILE_BIG_KEY = ($9C | %01)
-TILE_GOLD_SACK = ($A0 | %10)
-TILE_HEART_CONTAINER = ($CC | %11)
-TILE_SMALL_HEART = ($B0 | %11)
 
 ; Interactable blocks
 TILE_EXIT_BLOCK = ($A8 | %01)

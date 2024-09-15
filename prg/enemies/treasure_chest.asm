@@ -4,33 +4,6 @@
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
         .segment "ENEMY_ATTACK"
-TREASURE_ITEM = 0
-TREASURE_HEART = 1
-TREASURE_GOLD = 2
-TREASURE_NAV = 3
-
-; control frequency of gold, weapon, and heart container drops
-; right now it feels like we should favor weapons, as the player
-; has to work pretty hard to get a chest to spawn. Hearts are useful,
-; gold not so much, it feels like a nothing drop
-treasure_category_table:
-        .repeat 4
-        .byte TREASURE_GOLD
-        .endrepeat
-        .repeat 3
-        .byte TREASURE_ITEM
-        .endrepeat
-        .repeat 1
-        .byte TREASURE_HEART
-        .endrepeat
-        .repeat 8
-        .byte TREASURE_NAV
-        .endrepeat
-        
-        ; force a specific drop
-        ;.repeat 16
-        ;.byte TREASURE_ITEM
-        ;.endrepeat
 
 .proc ENEMY_ATTACK_attack_treasure_chest
 MetaSpriteIndex := R0
@@ -55,79 +28,12 @@ spawn_treasure:
         perform_zpcm_inc
         ; determine which weapon category to spawn
         jsr next_gameplay_rand
-        and #%00001111
-        tax
-        lda treasure_category_table, x
-check_nav:
-        cmp #TREASURE_NAV
-        bne check_item
+        bmi spawn_item
+spawn_nav:
         near_call ENEMY_ATTACK_spawn_nav_item
         rts
-check_item:
-        cmp #TREASURE_ITEM
-        bne check_gold
+spawn_item:
         near_call ENEMY_ATTACK_spawn_item
-        rts
-check_gold:
-        cmp #TREASURE_GOLD
-        bne spawn_heart
-        near_call ENEMY_ATTACK_spawn_gold_sack
-        rts
-spawn_heart:
-        near_call ENEMY_ATTACK_spawn_heart_container
-        rts
-.endproc
-
-.proc ENEMY_ATTACK_spawn_heart_container
-TargetIndex := R0
-TileId := R1
-AttackSquare := R3
-        ; If the player is already at max hearts...
-        ldx #(MAX_REGULAR_HEARTS-1)
-        lda heart_type, x
-        cmp #HEART_TYPE_NONE      ; empty containers are fine
-        beq okay_to_spawn
-        cmp #HEART_TYPE_TEMPORARY ; temporary containers are also fine
-        beq okay_to_spawn
-        cmp #HEART_TYPE_TEMPORARY_ARMORED
-        beq okay_to_spawn
-        ; ... then we must not increase their health any further.
-        ; Spawn a gold sack instead
-        near_call ENEMY_ATTACK_spawn_gold_sack
-        rts
-
-okay_to_spawn:
-        ; Mostly easy: replace the chest with an item shadow
-        ldx AttackSquare
-        stx TargetIndex        
-        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_WORLD
-
-        lda #0
-        sta tile_flags, x
-        jsr draw_active_tile
-        ; The item data is simply a big heart container, neat as you please
-        lda #ITEM_HEART_CONTAINER
-        sta tile_data, x
-
-        rts
-.endproc
-
-.proc ENEMY_ATTACK_spawn_gold_sack
-TargetIndex := R0
-TileId := R1
-AttackSquare := R3
-        ; Mostly easy: replace the chest with an item shadow
-        ldx AttackSquare
-        stx TargetIndex        
-        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_WORLD
-
-        lda #0
-        sta tile_flags, x
-        jsr draw_active_tile
-        ; The item data is simply a gold sack. Easy!
-        lda #ITEM_GOLD_SACK
-        sta tile_data, x
-        
         rts
 .endproc
 
@@ -173,15 +79,31 @@ ItemId := R18
         ; roll, so use that RNG and the appropriate table
 
         ; the real loot table
-        ;st16 LootTablePtr, common_chest_treasure_table
+        st16 LootTablePtr, common_chest_treasure_table
         ; zeta needs to obtain a specific item for testing
-        st16 LootTablePtr, test_specific_item_table
+        ;st16 LootTablePtr, test_specific_item_table
 
         far_call FAR_roll_gameplay_loot
+
+        ; Sanity check: is the player currently carrying equipment matching this loot?
+        ; If so, revert to a gold sack instead
+        lda ItemId
+        ; Note: this is a temp function, so only check relevant slots for now. This is
+        ; getting massively overhauled later.
+        cmp PlayerEquipmentWeapon
+        beq reject_item
+        cmp PlayerEquipmentTorch
+        beq reject_item
+
+accept_item:
         ldx AttackSquare
         lda ItemId
         sta tile_data, x
-
+        rts
+reject_item:
+        ldx AttackSquare
+        lda #ITEM_GOLD_SACK
+        sta tile_data, x
         rts
 .endproc
 
@@ -228,42 +150,10 @@ converge:
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================
         .segment "ENEMY_COLLIDE"
-.proc ENEMY_COLLIDE_collect_heart_container
-NewHeartType := R0
 
-HealingAmount := R0
-
-TargetIndex := R0
-TileId := R1
-TargetSquare := R13
-        
-        ; Add one heart container to the player's maximum
-        lda #HEART_TYPE_REGULAR
-        sta NewHeartType
-        far_call FAR_add_heart
-        ; Regular heart containers start empty (otherwise it looks weird)
-        ; so heal the player 4 HP to award the health it awards
-        lda #4
-        sta HealingAmount
-        far_call FAR_receive_healing
-
-        st16 R0, sfx_heart_container
-        jsr play_sfx_pulse1
-
-        ; Now, draw a basic floor tile here, which will be underneath the player
-        ldx TargetSquare
-        stx TargetIndex
-        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_WORLD
-
-        lda #0
-        sta tile_data, x
-        sta tile_flags, x
-
-        jsr draw_active_tile
-
-        rts
-.endproc
-
+; TODO: rework this into an item? (what color will it be?)
+; Alternate: rework it *properly* into an entity that follows the player
+; (and can be stolen!)
 .proc ENEMY_COLLIDE_collect_key
 TargetIndex := R0
 TileId := R1
@@ -306,35 +196,6 @@ next_room:
 
         lda #1
         sta HudMapDirty
-
-        rts
-.endproc
-
-.proc ENEMY_COLLIDE_collect_gold_sack
-TargetIndex := R0
-TileId := R1
-TargetSquare := R13
-
-        ; TODO: this used to award an amount of gold based on the floor. Do we care
-        ; to make it variable based on zone somehow? (I kinda want to not?)
-        add16w PlayerGold, #50
-        clamp16 PlayerGold, #MAX_GOLD
-
-done_awarding_gold:
-        ; TODO: a nice SFX
-        st16 R0, sfx_coin
-        jsr play_sfx_pulse1
-
-        ; Now, draw a basic floor tile here, which will be underneath the player
-        ldx TargetSquare
-        stx TargetIndex
-        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_WORLD
-
-        lda #0
-        sta tile_data, x
-        sta tile_flags, x
-
-        jsr draw_active_tile
 
         rts
 .endproc

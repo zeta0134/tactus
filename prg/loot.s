@@ -301,30 +301,12 @@ combo_offset_lut:
 ;                    TREASURE TABLES
 ; ========================================================
 
+; 10 copies mostly so the RNG doesn't freak out and loop 255 times
 test_specific_item_table:
     .byte 10
     .repeat 10
     .byte ITEM_SMALL_FRIES
     .endrepeat
-
-; simply includes all the items. balance? what's that?
-test_treasure_table:
-    .byte 15
-    .byte ITEM_BROADSWORD_L1
-    .byte ITEM_BROADSWORD_L2
-    .byte ITEM_BROADSWORD_L3
-    .byte ITEM_LONGSWORD_L1
-    .byte ITEM_LONGSWORD_L2
-    .byte ITEM_LONGSWORD_L3
-    .byte ITEM_SPEAR_L1
-    .byte ITEM_SPEAR_L2
-    .byte ITEM_SPEAR_L3
-    .byte ITEM_FLAIL_L1
-    .byte ITEM_FLAIL_L2
-    .byte ITEM_FLAIL_L3
-    .byte ITEM_BASIC_TORCH
-    .byte ITEM_LARGE_TORCH
-    .byte ITEM_GO_GO_BOOTS
 
 ; heavily weighted towards L1 weapons, but occasionally has some L2 and other interesting stuff
 common_treasure_table:
@@ -407,25 +389,16 @@ consumable_treasure_table:
     .byte ITEM_HEART_ARMOR
 
 common_chest_treasure_table:
-    .byte 17
-    .byte ITEM_BROADSWORD_L1
-    .byte ITEM_LONGSWORD_L1
-    .byte ITEM_SPEAR_L1
-    .byte ITEM_FLAIL_L1
-    .byte ITEM_BASIC_TORCH
+    .byte 8
+    .byte ITEM_BASIC_TORCH ; TODO: this ought to move to the "helpful" chest
     .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_BASIC_TORCH
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_BASIC_TORCH
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
+    .byte ITEM_MEDIUM_FRIES
     .byte ITEM_HEART_ARMOR
-
+    .byte ITEM_TEMPORARY_HEART
+    .byte ITEM_GOLD_SACK
+    .byte ITEM_GOLD_SACK
+    .byte ITEM_GOLD_SACK
+    
 MAX_CHAIN = 8
 MAX_COMBO = 4 ; actually 5, but we need to decrement
 

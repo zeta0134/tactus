@@ -214,7 +214,6 @@ tile_index_to_col_lut:
 .include "enemies/mushroom.asm"
 .include "enemies/slimes.asm"
 .include "enemies/semisafe_tile.asm"
-.include "enemies/small_heart.asm"
 .include "enemies/smoke_puff.asm"
 .include "enemies/treasure_chest.asm"
 
@@ -400,35 +399,35 @@ bonk_behaviors:
         .word ENEMY_COLLIDE_basic_enemy_attacks_player
         .word ENEMY_COLLIDE_basic_enemy_attacks_player
         .word FIXED_no_behavior ; mole holes, when unoccupied, do no damage
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player ; moles when bonked, mostly with the flail/boots, *do* do damage
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player  ; moles when bonked, mostly with the flail/boots, *do* do damage
         .word ENEMY_COLLIDE_basic_enemy_attacks_player
-        .word ENEMY_COLLIDE_projectile_attacks_player  ; projectiles do damage, but also need to erase themselves
+        .word ENEMY_COLLIDE_projectile_attacks_player   ; projectiles do damage, but also need to erase themselves
         .word ENEMY_COLLIDE_challenge_spike_solid_test
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player ; $3C - mushroom
-        .word ENEMY_COLLIDE_hazard_damages_player      ; $40 one beat hazards just do damage
+        .word ENEMY_COLLIDE_basic_enemy_attacks_player  ; $3C - mushroom
+        .word ENEMY_COLLIDE_hazard_damages_player       ; $40 one beat hazards just do damage
         .repeat 15
         .word FIXED_no_behavior
         .endrepeat
-        .word FIXED_no_behavior ; $80 - UNUSED
-        .word FIXED_no_behavior ; $84 - disco floor
-        .word ENEMY_COLLIDE_semisolid_attacks_player ; $88 - semisafe floor
-        .word ENEMY_COLLIDE_solid_tile_forbids_movement     ; $8C - wall face
-        .word ENEMY_COLLIDE_collect_item ; $90 - item shadow
-        .word FIXED_no_behavior  ; $94 - UNUSED
+        .word FIXED_no_behavior                         ; $80 - UNUSED
+        .word FIXED_no_behavior                         ; $84 - disco floor
+        .word ENEMY_COLLIDE_semisolid_attacks_player    ; $88 - semisafe floor
+        .word ENEMY_COLLIDE_solid_tile_forbids_movement ; $8C - wall face
+        .word ENEMY_COLLIDE_collect_item                ; $90 - item shadow
+        .word FIXED_no_behavior                         ; $94 - UNUSED
         .word ENEMY_COLLIDE_solid_tile_forbids_movement ; $98 - treasure chest
-        .word ENEMY_COLLIDE_collect_key ; $9C - big key
-        .word ENEMY_COLLIDE_collect_gold_sack ; $A0 - gold sack
-        .word FIXED_no_behavior       ; $A4 - UNUSED
+        .word ENEMY_COLLIDE_collect_key                 ; $9C - big key
+        .word FIXED_no_behavior                         ; $A0 - UNUSED
+        .word FIXED_no_behavior                         ; $A4 - UNUSED
         .word ENEMY_COLLIDE_solid_tile_forbids_movement ; $A8 - exit block
-        .word ENEMY_COLLIDE_descend_stairs ; $AC - exit stairs
-        .word ENEMY_COLLIDE_collect_small_heart ; $B0
-        .word FIXED_no_behavior ; $B4
-        .word FIXED_no_behavior ; $B8
-        .word FIXED_no_behavior ; $BC
-        .word FIXED_no_behavior ; $C0
-        .word FIXED_no_behavior ; $C4
-        .word FIXED_no_behavior ; $C8
-        .word ENEMY_COLLIDE_collect_heart_container ; $CC - heart container
+        .word ENEMY_COLLIDE_descend_stairs              ; $AC - exit stairs
+        .word FIXED_no_behavior                         ; $B0 - UNUSED
+        .word FIXED_no_behavior                         ; $B4
+        .word FIXED_no_behavior                         ; $B8
+        .word FIXED_no_behavior                         ; $BC
+        .word FIXED_no_behavior                         ; $C0
+        .word FIXED_no_behavior                         ; $C4
+        .word FIXED_no_behavior                         ; $C8
+        .word FIXED_no_behavior                         ; $CC - UNUSED
         ; safety: fill out the rest of the table
         .repeat 12
         .word FIXED_no_behavior
