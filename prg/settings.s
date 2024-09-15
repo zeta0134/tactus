@@ -23,38 +23,12 @@ setting_personal_color_index_pigment: .res 1
 ; and they are not large
 ; TODO okay that is a lie, can we move these to a data segment?
 
-; basically anything except black and the darkest shades, to guarantee that the player
-; is mostly visible on top of any valid floor tile in the game
-player_colors_face_clothing_lut:
-    .byte $30, $10, $00 ; (0) greyscale light(ish) shades
-    .byte $31, $21, $11 ; (3) very blue
-    .byte $32, $22, $12 ; (6)
-    .byte $33, $23, $13 ; (9)
-    .byte $34, $24, $14 ; (12) quite pink
-    .byte $35, $25, $15 ; (15) plausibly human skin tones start
-    .byte $36, $26, $16 ; (18)
-    .byte $37, $27, $17 ; (21)
-    .byte $38, $28, $18 ; (24) plausibly human skin tones end
-    .byte $39, $29, $19 ; (27) rather green
-    .byte $3A, $2A, $1A ; (30)
-    .byte $3B, $2B, $1B ; (33) 
-    .byte $3C, $2C, $1C ; (36) gosh, it's blue
-
-; the accessory layer gets basically the full range of colors
 player_colors_shoes_accessories_lut:
-    .byte $30, $10, $00, $0F ; (0) greyscale shades, including actually black this time
-    .byte $31, $21, $11, $01 ; (4) very blue
-    .byte $32, $22, $12, $02 ; (8)
-    .byte $33, $23, $13, $03 ; (12)
-    .byte $34, $24, $14, $04 ; (16) quite pink
-    .byte $35, $25, $15, $05 ; (20)
-    .byte $36, $26, $16, $06 ; (24)
-    .byte $37, $27, $17, $07 ; (28)
-    .byte $38, $28, $18, $08 ; (32)
-    .byte $39, $29, $19, $09 ; (36) rather green
-    .byte $3A, $2A, $1A, $0A ; (40)
-    .byte $3B, $2B, $1B, $0B ; (44)
-    .byte $3C, $2C, $1C, $0C ; (48) gosh, it's blue
+    .byte $0F, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C ;  (-)  (0)
+player_colors_face_clothing_lut:
+    .byte $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $00 ;  (0) (13)
+    .byte $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $10 ; (13) (26)
+    .byte $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30 ; (26) (39)
 
 ; From this original set:
 ;    .byte 0, 10, 19, 21 ; orig: $0f,$12,$26,$37  ; Peony
@@ -62,9 +36,13 @@ player_colors_shoes_accessories_lut:
 ;    .byte 0, 23, 10, 20 ; orig: $0f,$05,$23,$16  ; Petunia
 ;    .byte 0, 26, 22, 15 ; orig: $0f,$16,$27,$35  ; Protea
 ; Indexing into the above tables as appropriate, we obtain:
-palette_preset_lut_phones:  .byte 10, 50, 23, 26
-palette_preset_lut_pajamas: .byte 19, 36, 10, 22
-palette_preset_lut_pigment: .byte 21, 22, 20, 15
+palette_preset_lut_phones:  .byte 14, 24,  5, 18
+palette_preset_lut_pajamas: .byte 18, 37, 15, 19
+palette_preset_lut_pigment: .byte 32, 19,  5, 30
+
+;palette_preset_lut_phones:  .byte 10, 50, 23, 26
+;palette_preset_lut_pajamas: .byte 19, 36, 10, 22
+;palette_preset_lut_pigment: .byte 21, 22, 20, 15
 
     .segment "CODE_1"
 

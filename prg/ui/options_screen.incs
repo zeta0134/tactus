@@ -15,9 +15,9 @@ options_ui_layout:
         widget_text_options disco_floor_str,    disco_types,          setting_disco_floor,    4, 16
         widget_text_label player_options_str, 2, 18
         widget_text_options player_palette_preset_str, player_palette_preset_types, setting_player_palette_preset, 4, 20
-        widget_numeric_slider player_palette_outfit_str, 16, 38, setting_personal_color_index_pajamas, 4, 22
-        widget_numeric_slider player_palette_shoes_str,  16, 51, setting_personal_color_index_phones,  4, 23
-        widget_numeric_slider player_palette_face_str,   16, 38, setting_personal_color_index_pigment, 4, 24
+        widget_numeric_slider player_palette_outfit_str, 16, 39, setting_personal_color_index_pajamas, 4, 22
+        widget_numeric_slider player_palette_shoes_str,  16, 52, setting_personal_color_index_phones,  4, 23
+        widget_numeric_slider player_palette_face_str,   16, 39, setting_personal_color_index_pigment, 4, 24
         widget_text_button back_to_title_str, return_to_title, 9, 26
         widget_options_battlefield
         widget_controller apply_fancy_color_shenanigans
