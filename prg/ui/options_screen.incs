@@ -28,7 +28,7 @@ options_ui_layout:
 
 ; Used for manual tweaking of the values
 PRESET_FIELD_INDEX = 6
-PRESET_PERSONALIZED_VALUE = 4
+PRESET_PERSONALIZED_VALUE = 5
 
 game_options_str:   .asciiz "GAMEPLAY OPTIONS"
 game_mode_str:      .asciiz "Rhythm "
@@ -57,17 +57,19 @@ disco_option_4_str: .asciiz "JUST GROOVEMENT"
 disco_option_5_str: .asciiz "NO MOTION"
 
 player_palette_preset_types:
-        .byte 5 ; selectable length of option set
+        .byte 6 ; selectable length of option set
         .addr player_palette_preset_option_0_str
         .addr player_palette_preset_option_1_str
         .addr player_palette_preset_option_2_str
         .addr player_palette_preset_option_3_str
+        .addr player_palette_preset_option_4_str
         .addr player_palette_preset_option_custom_str
 
 player_palette_preset_option_0_str:      .asciiz "PEONY"
 player_palette_preset_option_1_str:      .asciiz "PERIWINKLE"
 player_palette_preset_option_2_str:      .asciiz "PETUNIA"
 player_palette_preset_option_3_str:      .asciiz "PROTEA"
+player_palette_preset_option_4_str:      .asciiz "PASSION"
 player_palette_preset_option_custom_str: .asciiz "PERSONALIZED"
 
 game_mode_types:

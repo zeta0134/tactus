@@ -3,7 +3,6 @@
     .segment "RAM"
 
 setting_disco_floor: .res 1
-setting_player_palette: .res 1
 setting_game_mode: .res 1
 
 ; the actual colors that will be drawn
@@ -36,9 +35,9 @@ player_colors_face_clothing_lut:
 ;    .byte 0, 23, 10, 20 ; orig: $0f,$05,$23,$16  ; Petunia
 ;    .byte 0, 26, 22, 15 ; orig: $0f,$16,$27,$35  ; Protea
 ; Indexing into the above tables as appropriate, we obtain:
-palette_preset_lut_phones:  .byte 14, 24,  5, 18
-palette_preset_lut_pajamas: .byte 18, 37, 15, 19
-palette_preset_lut_pigment: .byte 32, 19,  5, 30
+palette_preset_lut_pajamas: .byte 18, 37, 15, 19, 13
+palette_preset_lut_phones:  .byte 14, 24,  5, 18, 17
+palette_preset_lut_pigment: .byte 32, 19,  5, 30, 31
 
 ;palette_preset_lut_phones:  .byte 10, 50, 23, 26
 ;palette_preset_lut_pajamas: .byte 19, 36, 10, 22
@@ -54,8 +53,6 @@ palette_preset_lut_pigment: .byte 32, 19,  5, 30
     lda #DISCO_FLOOR_SOLID_FROZEN_SQUARES
     sta setting_disco_floor
 
-    lda #0
-    sta setting_player_palette ; OLD, going away!
     lda #GAME_MODE_STANDARD
     sta setting_game_mode
 

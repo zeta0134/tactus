@@ -270,15 +270,11 @@ sprite_failed:
 ; Called once every frame
 .proc FAR_draw_player
         ; Based on the player's chosen sprite index, update their base sprite colors
-        lda setting_player_palette
-        asl
-        asl
-        tax
-        lda player_palettes+1, x
+        lda setting_personal_color_phones
         sta ObjPaletteBuffer+1
-        lda player_palettes+2, x
+        lda setting_personal_color_pajamas
         sta ObjPaletteBuffer+2
-        lda player_palettes+3, x
+        lda setting_personal_color_pigment
         sta ObjPaletteBuffer+3
 
         ; For now, always lerp the player's current position to their target position
