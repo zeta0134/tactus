@@ -26,10 +26,10 @@ chr_tile_offset EQUIPMENT_ARMOR_2,       2, 4
 chr_tile_offset EQUIPMENT_ARMOR_3,       4, 4
 chr_tile_offset EQUIPMENT_ARMOR_4,       6, 4
 
-chr_tile_offset EQUIPMENT_ACCESSORY_1, 0, 6
-chr_tile_offset EQUIPMENT_ACCESSORY_2, 2, 6
-chr_tile_offset EQUIPMENT_ACCESSORY_3, 4, 6
-chr_tile_offset EQUIPMENT_ACCESSORY_4, 6, 6
+chr_tile_offset EQUIPMENT_ACCESSORY_CHAIN_LINK, 0, 6
+chr_tile_offset EQUIPMENT_ACCESSORY_2,          2, 6
+chr_tile_offset EQUIPMENT_ACCESSORY_3,          4, 6
+chr_tile_offset EQUIPMENT_ACCESSORY_4,          6, 6
 
 chr_tile_offset EQUIPMENT_GO_GO_BOOTS, 0, 8
 chr_tile_offset EQUIPMENT_BOOTS_2, 2, 8

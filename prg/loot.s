@@ -301,13 +301,6 @@ combo_offset_lut:
 ;                    TREASURE TABLES
 ; ========================================================
 
-; 10 copies mostly so the RNG doesn't freak out and loop 255 times
-test_specific_item_table:
-    .byte 10
-    .repeat 10
-    .byte ITEM_SMALL_FRIES
-    .endrepeat
-
 ; heavily weighted towards L1 weapons, but occasionally has some L2 and other interesting stuff
 common_treasure_table:
     .byte 27
@@ -336,8 +329,8 @@ common_treasure_table:
     .byte ITEM_TEMPORARY_HEART
     .byte ITEM_HEART_ARMOR
     .byte ITEM_HEART_ARMOR
-    .byte ITEM_SHIELD
-    .byte ITEM_SHIELD
+    .byte ITEM_CHAIN_LINK
+    .byte ITEM_CHAIN_LINK
 
 ; heavily weighted towards L2 items, some L3 items too
 rare_treasure_table:
@@ -389,12 +382,28 @@ consumable_treasure_table:
     .byte ITEM_HEART_ARMOR
 
 common_chest_treasure_table:
-    .byte 8
+    .byte 24
     .byte ITEM_BASIC_TORCH ; TODO: this ought to move to the "helpful" chest
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
     .byte ITEM_SMALL_FRIES
     .byte ITEM_MEDIUM_FRIES
+    .byte ITEM_MEDIUM_FRIES
+    .byte ITEM_MEDIUM_FRIES
+    .byte ITEM_HEART_ARMOR
+    .byte ITEM_HEART_ARMOR
     .byte ITEM_HEART_ARMOR
     .byte ITEM_TEMPORARY_HEART
+    .byte ITEM_TEMPORARY_HEART
+    .byte ITEM_TEMPORARY_HEART
+    .byte ITEM_GOLD_SACK
+    .byte ITEM_GOLD_SACK
+    .byte ITEM_GOLD_SACK
+    .byte ITEM_GOLD_SACK
+    .byte ITEM_GOLD_SACK
+    .byte ITEM_GOLD_SACK
     .byte ITEM_GOLD_SACK
     .byte ITEM_GOLD_SACK
     .byte ITEM_GOLD_SACK

@@ -53,6 +53,7 @@ item_table:
         .word temporary_heart
         .word heart_armor
         .word defensive_shield
+        .word chain_link
         ; safety
         .repeat 128
         .word no_item
@@ -450,6 +451,7 @@ heart_armor:
         .addr give_heart_armor                ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
 
+; TODO: this really needs to be directional, and much stronger
 defensive_shield:
         .byte SLOT_ARMOR                        ; SlotId
         .byte SPRITE_TILE_SHIELD                ; WorldSpriteTile
@@ -462,8 +464,25 @@ defensive_shield:
         .byte WEAPON_DAGGER                     ; WeaponShape (unused)
         .addr no_effect                         ; DamageFunc
         .addr no_effect                         ; TorchlightFunc
-        .addr give_heart_armor                  ; UseFunc
-        .addr flat_1                            ; DmgReductionFunc
+        .addr do_nothing                        ; UseFunc
+        .addr flat_2                            ; DmgReductionFunc
+
+; This item has a rather custom effect, so we'll check for
+; it manually in the one spot where it would apply
+chain_link:
+        .byte SLOT_ACCESSORY                    ; SlotId
+        .byte SPRITE_TILE_CHAIN_LINK            ; WorldSpriteTile
+        .byte SPRITE_PAL_GREY                   ; WorldSpriteAttr
+        .byte EQUIPMENT_ACCESSORY_CHAIN_LINK    ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS)   ; HudBgAttr (unused)
+        .byte 0                                 ; HudSpriteTile (unused)
+        .byte 0                                 ; HudSpriteAttr (unused)
+        .word 150                               ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr no_effect                         ; DamageFunc        
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
 
         .segment "CODE_0"
 

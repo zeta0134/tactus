@@ -52,6 +52,7 @@ ITEM_HEART_CONTAINER = 23
 ITEM_TEMPORARY_HEART = 24
 ITEM_HEART_ARMOR     = 25
 ITEM_SHIELD          = 26
+ITEM_CHAIN_LINK      = 27
 
 ; utilities for drawing items
 .global FAR_apply_item_world_metasprite

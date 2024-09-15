@@ -1179,7 +1179,17 @@ done:
 .endproc
 
 .proc update_chain_and_combo
+ChainGraceThreshold := R0
         perform_zpcm_inc
+        lda #1
+        sta ChainGraceThreshold
+        ; If the player has a chain effecting item equipped, increase their chain threshold accordingly
+        lda PlayerEquipmentAccessory
+        cmp #ITEM_CHAIN_LINK
+        bne chain_threshold_finalized
+        lda #3
+        sta ChainGraceThreshold
+chain_threshold_finalized:
         ; Based on the player's accumulated combo, manipulate their chain here
         lda PlayerCombo
         beq check_chain_over
@@ -1191,7 +1201,7 @@ done:
 check_chain_over:
         ; If the player is below the grace threshold, continue the chain
         lda PlayerChainGrace
-        cmp #1
+        cmp ChainGraceThreshold
         bcs chain_over
         ; continue the grace period
         inc PlayerChainGrace

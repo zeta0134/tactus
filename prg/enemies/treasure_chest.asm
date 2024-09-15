@@ -28,7 +28,8 @@ spawn_treasure:
         perform_zpcm_inc
         ; determine which weapon category to spawn
         jsr next_gameplay_rand
-        bmi spawn_item
+        and #%00000001
+        bne spawn_item
 spawn_nav:
         near_call ENEMY_ATTACK_spawn_nav_item
         rts
@@ -80,21 +81,27 @@ ItemId := R18
 
         ; the real loot table
         st16 LootTablePtr, common_chest_treasure_table
-        ; zeta needs to obtain a specific item for testing
-        ;st16 LootTablePtr, test_specific_item_table
-
         far_call FAR_roll_gameplay_loot
+        ; zeta needs to obtain a specific item for testing
+        ;lda #ITEM_CHAIN_LINK
+        ;sta ItemId
+
 
         ; Sanity check: is the player currently carrying equipment matching this loot?
         ; If so, revert to a gold sack instead
         lda ItemId
-        ; Note: this is a temp function, so only check relevant slots for now. This is
-        ; getting massively overhauled later.
         cmp PlayerEquipmentWeapon
         beq reject_item
         cmp PlayerEquipmentTorch
         beq reject_item
-
+        cmp PlayerEquipmentArmor
+        beq reject_item
+        cmp PlayerEquipmentBoots
+        beq reject_item
+        cmp PlayerEquipmentAccessory
+        beq reject_item
+        cmp PlayerEquipmentSpell
+        beq reject_item
 accept_item:
         ldx AttackSquare
         lda ItemId
