@@ -258,15 +258,11 @@ sprite_failed:
 ; So things other than main gameplay can do this, mostly for
 ; the title screen and eventual save screen, etc etc
 .proc FAR_apply_player_palette
-        lda setting_player_palette
-        asl
-        asl
-        tax
-        lda player_palettes+1, x
+        lda setting_personal_color_phones
         sta ObjPaletteBuffer+1
-        lda player_palettes+2, x
+        lda setting_personal_color_pajamas
         sta ObjPaletteBuffer+2
-        lda player_palettes+3, x
+        lda setting_personal_color_pigment
         sta ObjPaletteBuffer+3
         rts
 .endproc

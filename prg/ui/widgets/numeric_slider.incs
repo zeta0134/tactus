@@ -22,7 +22,7 @@ widget_data_target_low := widgets_data6
 widget_data_target_high := widgets_data7
 
 widget_metasprite_index := widgets_data2
-;widget_label_string_high := widgets_data3
+widget_displayed_value := widgets_data3
 
 NametableAddr := T0
 AttributeAddr := T2
@@ -133,6 +133,7 @@ CurrentWidgetIndex := R20
 widget_tile_x := widgets_data0
 widget_tile_y := widgets_data1
 widget_metasprite_index := widgets_data2
+widget_displayed_value := widgets_data3
 widget_tile_width := widgets_data4
 widget_range_max := widgets_data5
 widget_data_target_low := widgets_data6
@@ -211,20 +212,31 @@ widget_data_target_high := widgets_data7
         ldy widget_metasprite_index, x
         sta sprite_table + MetaSpriteState::PositionX, y
 
+        ; finally, remember that we displayed this value, so we can update ourselves
+        ; accordingly if it changes underneath us
+        ldx CurrentWidgetIndex
+        ldy #0
+        lda (DataValuePtr), y ; data
+        sta widget_displayed_value, x
+
         ; whew!
         rts
 .endproc
 
 .proc widget_numeric_slider_update
+DataValuePtr := R0
 CurrentWidgetIndex := R20
+widget_displayed_value := widgets_data3
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
         ; if we aren't even hovered, no change
         ldy CurrentWidgetIndex
         lda widgets_state_flags, y
         and #WIDGET_STATE_HOVER
         bne check_for_forward_input
-        rts
+        jmp nothing_to_do
 check_for_forward_input:
-        lda #(KEY_RIGHT | KEY_A)
+        lda #(KEY_RIGHT)
         bit ButtonsDown
         beq check_for_reverse_input
         jsr increase_slider_position
@@ -236,6 +248,19 @@ check_for_reverse_input:
         jsr decrease_slider_position
         jmp redraw_self
 nothing_to_do:
+        ; if we have changed value since our last update, we still need
+        ; to redraw ourselves
+        ldx CurrentWidgetIndex
+        lda widget_data_target_low, x
+        sta DataValuePtr+0
+        lda widget_data_target_high, x
+        sta DataValuePtr+1
+        ; setup for the mult
+        ldy #0
+        lda (DataValuePtr), y ; data
+        cmp widget_displayed_value, x
+        bne redraw_self
+        ; otherwise we're done
         rts
 redraw_self:
         jsr apply_ui_slider_position

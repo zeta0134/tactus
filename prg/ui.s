@@ -48,7 +48,7 @@ widgets_data5: .res ::MAX_WIDGETS
 widgets_data6: .res ::MAX_WIDGETS
 widgets_data7: .res ::MAX_WIDGETS
 ; not part of the widget definition, can be used as scratch space
-;widgets_data8: .res ::MAX_WIDGETS
+widgets_data8: .res ::MAX_WIDGETS
 ;widgets_data9: .res ::MAX_WIDGETS
 ;widgets_data10: .res ::MAX_WIDGETS
 

@@ -14,13 +14,18 @@ options_ui_layout:
         widget_text_options game_mode_str,      game_mode_types,      setting_game_mode,      4, 15
         widget_text_options disco_floor_str,    disco_types,          setting_disco_floor,    4, 16
         widget_text_label player_options_str, 2, 18
-        widget_text_options player_palette_preset_str, player_palette_preset_types, setting_player_palette, 4, 20
-        widget_numeric_slider player_palette_outfit_str, 12, 32, setting_personal_color_1, 4, 22
-        widget_numeric_slider player_palette_shoes_str,  12, 32, setting_personal_color_2, 4, 23
-        widget_numeric_slider player_palette_face_str,   12, 32, setting_personal_color_3, 4, 24
+        widget_text_options player_palette_preset_str, player_palette_preset_types, setting_player_palette_preset, 4, 20
+        widget_numeric_slider player_palette_outfit_str, 16, 38, setting_personal_color_index_pajamas, 4, 22
+        widget_numeric_slider player_palette_shoes_str,  16, 51, setting_personal_color_index_phones,  4, 23
+        widget_numeric_slider player_palette_face_str,   16, 38, setting_personal_color_index_pigment, 4, 24
         widget_text_button back_to_title_str, return_to_title, 9, 26
         widget_options_battlefield
+        widget_controller apply_fancy_color_shenanigans
         .addr $0000 ; end of list
+
+; Used for manual tweaking of the values
+PRESET_FIELD_INDEX = 6
+PRESET_PERSONALIZED_VALUE = 4
 
 game_options_str:   .asciiz "GAMEPLAY OPTIONS"
 game_mode_str:      .asciiz "Rhythm "
@@ -29,7 +34,7 @@ player_options_str: .asciiz "PLAYER PALETTE"
 player_palette_preset_str: .asciiz "Preset  "
 player_palette_outfit_str: .asciiz "Pajamas "
 player_palette_shoes_str:  .asciiz "Phones  "
-player_palette_face_str:   .asciiz "Phace   "
+player_palette_face_str:   .asciiz "Pigment "
 back_to_title_str:  .asciiz "RETURN TO TITLE"
 
 disco_types:
@@ -49,7 +54,7 @@ disco_option_4_str: .asciiz "JUST GROOVEMENT"
 disco_option_5_str: .asciiz "NO MOTION"
 
 player_palette_preset_types:
-        .byte 4 ; selectable length of option set
+        .byte 5 ; selectable length of option set
         .addr player_palette_preset_option_0_str
         .addr player_palette_preset_option_1_str
         .addr player_palette_preset_option_2_str
@@ -119,6 +124,7 @@ bg_loop:
         and ButtonsDown
         beq stay_here
         jsr return_to_title
+        rts
 stay_here:
         rts
 .endproc
@@ -464,3 +470,86 @@ advance:
         rts
 .endproc
 
+.proc apply_fancy_color_shenanigans
+        ; When left/right are pressed, if we are currently on the Preset
+        ; field, apply the preset colors to the sliders. If we're currently
+        ; on any of the other fields, apply the slider values to the preset instead.
+        lda #(KEY_RIGHT | KEY_LEFT)
+        bit ButtonsDown
+        bne perform_shenanigans
+        rts
+
+perform_shenanigans:
+        ldx #PRESET_FIELD_INDEX
+        lda widgets_state_flags, x
+        and #WIDGET_STATE_HOVER
+        bne preset_is_hovered
+preset_is_not_hovered:
+        jsr sync_sliders_to_preset
+        jsr update_player_color_values
+        rts
+preset_is_hovered:
+        jsr sync_preset_to_sliders
+        jsr update_player_color_values
+        rts
+.endproc
+
+.proc sync_preset_to_sliders
+        ; If the preset value is anything other than "Personalized", then
+        ; read the preset and apply the colors to the sliders
+        ldx setting_player_palette_preset
+        cpx #PRESET_PERSONALIZED_VALUE
+        beq change_nothing
+
+        ldy palette_preset_lut_phones, x
+        sty setting_personal_color_index_phones
+        ldy palette_preset_lut_pajamas, x
+        sty setting_personal_color_index_pajamas
+        ldy palette_preset_lut_pigment, x
+        sty setting_personal_color_index_pigment
+
+change_nothing:
+        rts
+.endproc
+
+.proc sync_sliders_to_preset
+        ; If the sliders don't currently equal the preset value, switch
+        ; the preset value to "Personalized"
+        ldx setting_player_palette_preset
+        cpx #PRESET_PERSONALIZED_VALUE ; if it's already there, then there's nothing to do
+        beq change_nothing
+
+        lda palette_preset_lut_phones, x
+        cmp setting_personal_color_index_phones
+        bne perform_sync
+        lda palette_preset_lut_pajamas, x
+        cmp setting_personal_color_index_pajamas
+        bne perform_sync
+        lda palette_preset_lut_pigment, x
+        cmp setting_personal_color_index_pigment
+        bne perform_sync
+change_nothing:
+        rts
+perform_sync:
+        lda #PRESET_PERSONALIZED_VALUE
+        sta setting_player_palette_preset
+        rts
+.endproc
+
+.proc update_player_color_values
+        ; Read the color index values, work out the PPU values from the global LUT,
+        ; and load those colors into the player sprite for preview
+        ldy setting_personal_color_index_phones
+        lda player_colors_shoes_accessories_lut, y
+        sta setting_personal_color_phones
+
+        ldy setting_personal_color_index_pajamas
+        lda player_colors_face_clothing_lut, y
+        sta setting_personal_color_pajamas
+
+        ldy setting_personal_color_index_pigment
+        lda player_colors_face_clothing_lut, y
+        sta setting_personal_color_pigment
+
+        rts
+.endproc

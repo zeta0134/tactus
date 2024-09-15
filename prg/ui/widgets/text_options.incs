@@ -52,13 +52,17 @@ widget_data_target_high := widgets_data7
 .endproc
 
 .proc widget_text_options_update
+DataValuePtr := R0
 CurrentWidgetIndex := R20
+widget_data_target_low := widgets_data6
+widget_data_target_high := widgets_data7
+widget_displayed_value := widgets_data8
         ; if we aren't even hovered, no change
         ldy CurrentWidgetIndex
         lda widgets_state_flags, y
         and #WIDGET_STATE_HOVER
         bne check_for_forward_input
-        rts
+        jmp nothing_to_do
 check_for_forward_input:
         lda #(KEY_RIGHT | KEY_A)
         bit ButtonsDown
@@ -72,6 +76,19 @@ check_for_reverse_input:
         jsr cycle_to_previous_option
         jmp redraw_self
 nothing_to_do:
+        ; if we have changed value since our last update, we still need
+        ; to redraw ourselves
+        ldx CurrentWidgetIndex
+        lda widget_data_target_low, x
+        sta DataValuePtr+0
+        lda widget_data_target_high, x
+        sta DataValuePtr+1
+        ; setup for the mult
+        ldy #0
+        lda (DataValuePtr), y ; data
+        cmp widget_displayed_value, x
+        bne redraw_self
+        ; otherwise we're done
         rts
 redraw_self:
         jsr _draw_widget_label
@@ -199,6 +216,7 @@ widget_options_table_low := widgets_data4
 widget_options_table_high := widgets_data5
 widget_data_target_low := widgets_data6
 widget_data_target_high := widgets_data7
+widget_displayed_value := widgets_data8
         perform_zpcm_inc
 
         ; first, we need to skip over the label portion, so work that out
@@ -222,18 +240,19 @@ widget_data_target_high := widgets_data7
         far_call FAR_nametable_from_coordinates
         perform_zpcm_inc
         ; Now pick out the appropriate entry from the options table
-        ldy CurrentWidgetIndex
-        lda widget_options_table_low, y
+        ldx CurrentWidgetIndex
+        lda widget_options_table_low, x
         sta OptionsTablePtr+0
-        lda widget_options_table_high, y
+        lda widget_options_table_high, x
         sta OptionsTablePtr+1
-        lda widget_data_target_low, y
+        lda widget_data_target_low, x
         sta DataValuePtr+0
-        lda widget_data_target_high, y
+        lda widget_data_target_high, x
         sta DataValuePtr+1
 
         ldy #0
         lda (DataValuePtr), y
+        sta widget_displayed_value, x ; preserve, to show that we've now drawn this
         ; sanity check: have we somehow exceeded the bounds of the table?
         cmp (OptionsTablePtr), y
         bcs option_out_of_range
