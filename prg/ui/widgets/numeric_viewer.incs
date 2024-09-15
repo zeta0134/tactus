@@ -1,0 +1,139 @@
+; Given a position and a data target, displays one byte of data
+; in base 10. Mostly meant as a helper widget next to other controls
+.macro widget_numeric_viewer data_target, tile_x, tile_y
+    .addr widget_numeric_viewer_init
+    .byte tile_x, tile_y
+    .addr data_target
+    .byte 0, 0, 0, 0
+.endmacro
+
+.proc widget_numeric_viewer_init
+CurrentWidgetIndex := R20
+        jsr _draw_number_here
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_numeric_viewer_update
+        rts
+.endproc
+
+.proc widget_numeric_viewer_update
+DataValuePtr := R0
+CurrentWidgetIndex := R20
+; rename the data labels to something more readable
+widget_data_target_low := widgets_data2
+widget_data_target_high := widgets_data3
+widget_displayed_value := widgets_data4
+
+        ; if we have changed value since our last update, we still need
+        ; to redraw ourselves
+        ldx CurrentWidgetIndex
+        lda widget_data_target_low, x
+        sta DataValuePtr+0
+        lda widget_data_target_high, x
+        sta DataValuePtr+1
+        ; setup for the mult
+        ldy #0
+        lda (DataValuePtr), y ; data
+        cmp widget_displayed_value, x
+        bne redraw_self
+        ; otherwise we're done
+        rts
+redraw_self:
+        jsr _draw_number_here
+        rts
+.endproc
+
+.proc _draw_number_here
+DataValuePtr := R0
+HundredsDisplay := R2
+TensDisplay := R3
+OnesDisplay := R4
+CurrentWidgetIndex := R20
+
+; rename the data labels to something more readable
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_data_target_low := widgets_data2
+widget_data_target_high := widgets_data3
+widget_displayed_value := widgets_data4
+
+; arguments to string drawing functions
+NumberWord := T0
+OnesDigit := T2
+TensDigit := T3
+HundredsDigit := T4
+ThousandsDigit := T5
+TenThousandsDigit := T6
+
+NametableAddr := T0
+AttributeAddr := T2
+TileX := T4
+TileY := T5
+    
+    ldx CurrentWidgetIndex
+    lda widget_data_target_low, x
+    sta DataValuePtr+0
+    lda widget_data_target_high, x
+    sta DataValuePtr+1
+    ; setup for the mult
+    ldy #0
+    lda (DataValuePtr), y ; data
+    sta widget_displayed_value, x
+    sta NumberWord+0
+    lda #0
+    sta NumberWord+1
+    far_call FAR_base_10
+    ; stash result, we only care about the top 3 numerals
+    clc
+    lda HundredsDigit
+    adc #'0'
+    sta HundredsDisplay
+    clc
+    lda TensDigit
+    adc #'0'
+    sta TensDisplay
+    clc
+    lda OnesDigit
+    adc #'0'
+    sta OnesDisplay
+
+    ; deal with leading spaces
+    lda HundredsDigit
+    bne done_with_leading_spaces
+    lda #' '
+    sta HundredsDisplay
+    lda TensDigit
+    bne done_with_leading_spaces
+    lda #' '
+    sta TensDisplay
+done_with_leading_spaces:
+
+    ; setup the nametable pointers for our location
+    ldy CurrentWidgetIndex
+    lda widget_tile_x, y
+    sta TileX
+    lda widget_tile_y, y
+    sta TileY
+    st16 NametableAddr, $5000
+    st16 AttributeAddr, $5800
+    far_call FAR_nametable_from_coordinates
+
+    ; actually perform the draw
+    ldy #0
+    lda HundredsDisplay
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | PAL_BLUE)
+    sta (AttributeAddr), y
+    ldy #1
+    lda TensDisplay
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | PAL_BLUE)
+    sta (AttributeAddr), y
+    ldy #2
+    lda OnesDisplay
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | PAL_BLUE)
+    sta (AttributeAddr), y
+
+    rts
+.endproc

@@ -27,7 +27,7 @@
 
         .segment "PRGRAM"
 
-MAX_WIDGETS = 16 ; just how many do we need!?
+MAX_WIDGETS = 24 ; just how many do we need!? (more than expected!)
 
 ; This is sortof like a baby finite state machine with extra
 ; UI information dangling off the side, mostly to help the
@@ -60,6 +60,7 @@ LastBeat: .res 1
 
         .include "ui/widgets/cursors.incs"
         .include "ui/widgets/numeric_slider.incs"
+        .include "ui/widgets/numeric_viewer.incs"
         .include "ui/widgets/text_label.incs"
         .include "ui/widgets/text_options.incs"
         .include "ui/widgets/text_button.incs"
