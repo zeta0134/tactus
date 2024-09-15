@@ -83,7 +83,7 @@ ItemId := R18
         st16 LootTablePtr, common_chest_treasure_table
         far_call FAR_roll_gameplay_loot
         ; zeta needs to obtain a specific item for testing
-        ;lda #ITEM_CHAIN_LINK
+        ;lda #ITEM_ALOHA_TSHIRT_1
         ;sta ItemId
 
 

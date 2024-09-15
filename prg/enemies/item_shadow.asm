@@ -71,7 +71,7 @@ CurrentTile := R15
         ldx CurrentTile
         lda tile_flags, x
         and #ITEM_FOR_PURCHASE
-        beq skip_cost_drawing
+        jeq skip_cost_drawing
 
         ; Lookup the item properties from the table and nab the purchase price
         access_data_bank #<.bank(item_table)
@@ -93,6 +93,21 @@ CurrentTile := R15
         sta ItemCost+1
 
         restore_previous_bank
+
+        ; If the player is carrying an Aloha T-Shirt, penalize them by **doubling** the list
+        ; price for all items
+        lda PlayerEquipmentArmor
+        cmp #ITEM_ALOHA_TSHIRT_1
+        beq doubled_price
+        cmp #ITEM_ALOHA_TSHIRT_2
+        beq doubled_price
+        cmp #ITEM_ALOHA_TSHIRT_3
+        beq doubled_price
+        jmp normal_price
+doubled_price:
+        asl ItemCost+0
+        rol ItemCost+1
+normal_price:
 
         ; if the player can afford this item, draw it in white. otherwise, draw it in red
 
@@ -212,6 +227,21 @@ try_item_collection:
         sta ItemCost+1
 
         restore_previous_bank
+
+        ; If the player is carrying an Aloha T-Shirt, penalize them by **doubling** the list
+        ; price for all items
+        lda PlayerEquipmentArmor
+        cmp #ITEM_ALOHA_TSHIRT_1
+        beq doubled_price
+        cmp #ITEM_ALOHA_TSHIRT_2
+        beq doubled_price
+        cmp #ITEM_ALOHA_TSHIRT_3
+        beq doubled_price
+        jmp normal_price
+doubled_price:
+        asl ItemCost+0
+        rol ItemCost+1
+normal_price:
 
         ; if this is not an item for purchase, then perform the collection right away
         ldx TargetSquare

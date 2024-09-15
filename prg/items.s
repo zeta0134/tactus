@@ -54,6 +54,9 @@ item_table:
         .word heart_armor
         .word defensive_shield
         .word chain_link
+        .word aloha_tshirt_1
+        .word aloha_tshirt_2
+        .word aloha_tshirt_3
         ; safety
         .repeat 128
         .word no_item
@@ -483,6 +486,51 @@ chain_link:
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+
+aloha_tshirt_1:
+        .byte SLOT_ARMOR                        ; SlotId
+        .byte SPRITE_TILE_ALOHA_TSHIRT_TEXT     ; WorldSpriteTile
+        .byte SPRITE_PAL_GREY                   ; WorldSpriteAttr
+        .byte EQUIPMENT_ARMOR_TSHIRT_TEXT       ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS)   ; HudBgAttr (unused)
+        .byte 0                                 ; HudSpriteTile (unused)
+        .byte 0                                 ; HudSpriteAttr (unused)
+        .word 99                                ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr no_effect                         ; DamageFunc        
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr flat_1                            ; DmgReductionFunc
+
+aloha_tshirt_2:
+        .byte SLOT_ARMOR                        ; SlotId
+        .byte SPRITE_TILE_ALOHA_TSHIRT_FLORAL   ; WorldSpriteTile
+        .byte SPRITE_PAL_RED                    ; WorldSpriteAttr
+        .byte EQUIPMENT_ARMOR_TSHIRT_FLORAL     ; HudBgTile (unused)
+        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)    ; HudBgAttr (unused)
+        .byte 0                                 ; HudSpriteTile (unused)
+        .byte 0                                 ; HudSpriteAttr (unused)
+        .word 99                                ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr no_effect                         ; DamageFunc        
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr flat_1                            ; DmgReductionFunc
+
+aloha_tshirt_3:
+        .byte SLOT_ARMOR                        ; SlotId
+        .byte SPRITE_TILE_ALOHA_TSHIRT_SKULL    ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
+        .byte EQUIPMENT_ARMOR_TSHIRT_SKULL      ; HudBgTile (unused)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                                 ; HudSpriteTile (unused)
+        .byte 0                                 ; HudSpriteAttr (unused)
+        .word 99                                ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr no_effect                         ; DamageFunc        
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr flat_1                            ; DmgReductionFunc
 
         .segment "CODE_0"
 

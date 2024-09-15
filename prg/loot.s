@@ -303,7 +303,13 @@ combo_offset_lut:
 
 ; heavily weighted towards L1 weapons, but occasionally has some L2 and other interesting stuff
 common_treasure_table:
-    .byte 27
+    ; Sometimes we need the shop to carry three specific items. Here's how to do that:
+    .byte 3
+    .byte ITEM_ALOHA_TSHIRT_1
+    .byte ITEM_ALOHA_TSHIRT_2
+    .byte ITEM_ALOHA_TSHIRT_3
+
+    .byte 30
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L1
@@ -331,6 +337,9 @@ common_treasure_table:
     .byte ITEM_HEART_ARMOR
     .byte ITEM_CHAIN_LINK
     .byte ITEM_CHAIN_LINK
+    .byte ITEM_ALOHA_TSHIRT_1
+    .byte ITEM_ALOHA_TSHIRT_2
+    .byte ITEM_ALOHA_TSHIRT_3
 
 ; heavily weighted towards L2 items, some L3 items too
 rare_treasure_table:
@@ -382,7 +391,7 @@ consumable_treasure_table:
     .byte ITEM_HEART_ARMOR
 
 common_chest_treasure_table:
-    .byte 24
+    .byte 27
     .byte ITEM_BASIC_TORCH ; TODO: this ought to move to the "helpful" chest
     .byte ITEM_BASIC_TORCH
     .byte ITEM_BASIC_TORCH
@@ -398,6 +407,9 @@ common_chest_treasure_table:
     .byte ITEM_TEMPORARY_HEART
     .byte ITEM_TEMPORARY_HEART
     .byte ITEM_TEMPORARY_HEART
+    .byte ITEM_ALOHA_TSHIRT_1
+    .byte ITEM_ALOHA_TSHIRT_2
+    .byte ITEM_ALOHA_TSHIRT_3
     .byte ITEM_GOLD_SACK
     .byte ITEM_GOLD_SACK
     .byte ITEM_GOLD_SACK
