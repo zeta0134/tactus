@@ -90,7 +90,10 @@ options_obj_palette:
         .incbin "../art/options_sprite_palette.pal"
 
 .proc options_controller_init
+MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
+widget_color_top_metasprite_index := widgets_data0
+widget_color_bottom_metasprite_index := widgets_data1
         ; Play the options track on the options screen
         lda #TRACK_OPTIONS
         ldy #TRACK_VARIANT_NORMAL
@@ -116,6 +119,42 @@ bg_loop:
         cpy #16
         bne bg_loop
 
+        ; Allocate two delightful sprites for the color slider area
+        far_call FAR_find_unused_sprite
+        lda MetaSpriteIndex
+        ldy CurrentWidgetIndex
+        sta widget_color_top_metasprite_index, y
+        ; And set their properties
+        ldy CurrentWidgetIndex
+        ldx widget_color_top_metasprite_index, y
+        lda #(SPRITE_ACTIVE | SPRITE_PAL_0)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+        lda #222
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda #168
+        sta sprite_table + MetaSpriteState::PositionY, x
+        lda #<SPRITE_TILE_PLAIN_SQUARES_LEFT
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+        far_call FAR_find_unused_sprite
+        lda MetaSpriteIndex
+        ldy CurrentWidgetIndex
+        sta widget_color_bottom_metasprite_index, y
+        ; And set their properties
+        ldy CurrentWidgetIndex
+        ldx widget_color_bottom_metasprite_index, y
+        lda #(SPRITE_ACTIVE | SPRITE_PAL_0)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+        lda #222
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda #184
+        sta sprite_table + MetaSpriteState::PositionY, x
+        lda #<SPRITE_TILE_PLAIN_SQUARES_RIGHT
+        sta sprite_table + MetaSpriteState::TileIndex, x
 
         ldy CurrentWidgetIndex
         set_widget_state_y options_controller_update
