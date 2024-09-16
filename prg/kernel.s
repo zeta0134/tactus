@@ -701,10 +701,6 @@ continue_waiting:
         jsr poll_input
 
         perform_zpcm_inc
-        jsr update_beat_counters
-        perform_zpcm_inc
-
-        perform_zpcm_inc
         far_call FAR_queue_hud
         perform_zpcm_inc
 
@@ -728,6 +724,10 @@ continue_waiting:
         perform_zpcm_inc
 
         jsr update_screen_shake
+        perform_zpcm_inc
+
+        perform_zpcm_inc
+        jsr update_beat_counters
         perform_zpcm_inc
 
         jsr wait_for_next_vblank
@@ -1148,10 +1148,6 @@ continue_waiting:
 .proc every_gameloop
         jsr poll_input
 
-        perform_zpcm_inc
-        jsr update_beat_counters
-        perform_zpcm_inc
-
         far_call FAR_update_palette_cycler
 
         perform_zpcm_inc
@@ -1202,6 +1198,11 @@ right_nametable:
         sta LeftNametableAttr
         sta RightNametableAttr
 done_with_nametables:
+
+        perform_zpcm_inc
+        jsr update_beat_counters
+        perform_zpcm_inc
+
         jsr wait_for_next_vblank
         rts
 .endproc
