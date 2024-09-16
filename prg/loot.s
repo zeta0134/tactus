@@ -304,10 +304,10 @@ combo_offset_lut:
 ; heavily weighted towards L1 weapons, but occasionally has some L2 and other interesting stuff
 common_treasure_table:
     ; Sometimes we need the shop to carry three specific items. Here's how to do that:
-    .byte 3
-    .byte ITEM_ALOHA_TSHIRT_1
-    .byte ITEM_ALOHA_TSHIRT_2
-    .byte ITEM_ALOHA_TSHIRT_3
+    ;.byte 3
+    ;.byte ITEM_ALOHA_TSHIRT_1
+    ;.byte ITEM_ALOHA_TSHIRT_2
+    ;.byte ITEM_ALOHA_TSHIRT_3
 
     .byte 30
     .byte ITEM_BROADSWORD_L1
