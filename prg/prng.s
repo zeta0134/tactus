@@ -104,6 +104,7 @@ run_seed_valid:
 ; $C5 is chosen
 
 .proc next_run_rand
+	perform_zpcm_inc
 	; rotate the middle bytes left
 	ldy run_seed+2 ; will move to run_seed+3 at the end
 	lda run_seed+1
@@ -154,6 +155,7 @@ run_seed_valid:
 .endproc
 
 .proc next_floor_rand
+	perform_zpcm_inc
 	; rotate the middle bytes left
 	ldy floor_seed+2 ; will move to floor_seed+3 at the end
 	lda floor_seed+1
@@ -204,6 +206,7 @@ run_seed_valid:
 .endproc
 
 .proc next_room_rand
+	perform_zpcm_inc
 	; rotate the middle bytes left
 	ldy room_seed+2 ; will move to room_seed+3 at the end
 	lda room_seed+1

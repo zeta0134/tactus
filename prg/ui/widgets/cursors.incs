@@ -504,6 +504,7 @@ widget_sprite_position_high_y := widgets_data5
 .proc clear_hover_states
         ldy #0
 loop:
+        perform_zpcm_inc
         lda widgets_state_flags, y
         and #($FF - WIDGET_STATE_HOVER)
         sta widgets_state_flags, y

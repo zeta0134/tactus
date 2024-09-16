@@ -1,4 +1,5 @@
     .include "math_util.inc"
+    .include "zpcm.inc"
 
     .zeropage
 prodlo: .res 1
@@ -23,6 +24,7 @@ mul8_multiply:
     sty factor2
     lda #0
 .repeat 8, i
+    perform_zpcm_inc
     .if i > 0
         ror prodlo
     .endif
@@ -56,6 +58,7 @@ L2:
    SEC
 L3:
    ROL dividend+0
+   perform_zpcm_inc
    DEX
    BNE L1
    RTS

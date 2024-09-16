@@ -408,6 +408,7 @@ done:
 .proc ENEMY_ATTACK_cleanup_own_wrench
 TargetIndex := R0
 AttackSquare := R3
+        perform_zpcm_inc
         ; Look for wrenches in the four cardinally adjacent directions
         ; that WE could plausibly have thrown. (don't erase some other mole's wrench!)
         ; This means the wrench's travel direction needs to be directly away from us
@@ -435,6 +436,7 @@ AttackSquare := R3
         sta TargetIndex
         jsr draw_active_tile
 not_our_wrench_n:
+        perform_zpcm_inc
 
         ; East!
         clc
@@ -459,6 +461,7 @@ not_our_wrench_n:
         sta TargetIndex
         jsr draw_active_tile
 not_our_wrench_e:
+        perform_zpcm_inc
 
         ; South!
         clc
@@ -483,6 +486,7 @@ not_our_wrench_e:
         sta TargetIndex
         jsr draw_active_tile
 not_our_wrench_s:
+        perform_zpcm_inc
         
         ; West!
         sec
@@ -507,6 +511,7 @@ not_our_wrench_s:
         sta TargetIndex
         jsr draw_active_tile
 not_our_wrench_w:
+        perform_zpcm_inc
         
         ; Whew!
         rts

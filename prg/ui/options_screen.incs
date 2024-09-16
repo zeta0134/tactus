@@ -96,6 +96,7 @@ MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
 widget_color_top_metasprite_index := widgets_data0
 widget_color_bottom_metasprite_index := widgets_data1
+        perform_zpcm_inc
         ; Play the options track on the options screen
         lda #TRACK_OPTIONS
         ldy #TRACK_VARIANT_NORMAL
@@ -199,6 +200,7 @@ widget_last_beat := widgets_data0
 widget_player_sprite_index := widgets_data1
 widget_disco_state := widgets_data2
 widget_disco_active_setting := widgets_data3
+        perform_zpcm_inc
 
         ldx CurrentWidgetIndex
         lda #OPTIONS_DISCO_STATE_APPEARING
@@ -229,6 +231,7 @@ widget_disco_active_setting := widgets_data3
 
         ldx #0
 top_wall_loop:
+        perform_zpcm_inc
         lda #TILE_WALL
         sta battlefield, x
         lda #<BG_TILE_MAP_TILES_0231 ; cave wall, lower midsection
@@ -244,6 +247,7 @@ top_wall_loop:
         bne top_wall_loop
 
 bottom_wall_loop:
+        perform_zpcm_inc
         lda #TILE_WALL
         sta battlefield, x
         lda #<BG_TILE_MAP_TILES_0247 ; cave wall, front midsection
@@ -259,6 +263,7 @@ bottom_wall_loop:
         bne bottom_wall_loop
 
 disco_floor_top:
+        perform_zpcm_inc
         lda #TILE_DISCO_FLOOR
         sta battlefield, x
         lda #<BG_TILE_DISCO_FLOOR_TILES_0002 ; disco floor with upper dashed lines
@@ -274,6 +279,7 @@ disco_floor_top:
         bne disco_floor_top
 
 disco_floor_mid:
+        perform_zpcm_inc
         lda #TILE_DISCO_FLOOR
         sta battlefield, x
         lda #<BG_TILE_DISCO_FLOOR_TILES_0000 ; disco floor, plain
@@ -289,6 +295,7 @@ disco_floor_mid:
         bne disco_floor_mid
 
 disco_floor_bottom:
+        perform_zpcm_inc
         lda #TILE_DISCO_FLOOR
         sta battlefield, x
         lda #<BG_TILE_DISCO_FLOOR_TILES_0018 ; disco floor with lower dashed lines
@@ -322,6 +329,8 @@ disco_floor_bottom:
         sta tile_patterns, x
         lda #(>BG_TILE_MUSHROOM_IDLE | PAL_BLUE)
         sta tile_attributes, x
+
+        perform_zpcm_inc
 
         ldx #(4 * BATTLEFIELD_WIDTH + 9)
         lda #TILE_WALL
@@ -362,9 +371,12 @@ disco_floor_bottom:
         sta tile_patterns, x
         sta tile_detail, x
 
+        perform_zpcm_inc
+
         ldy CurrentWidgetIndex
         set_widget_state_y options_battlefield_draw
 
+        perform_zpcm_inc
         rts
 .endproc
 

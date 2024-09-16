@@ -248,9 +248,11 @@ spore_offsets:
 TargetIndex := R0
 ConsiderationIndex := R10
 AttackSquare := R3
+        perform_zpcm_inc
         lda #0
         sta ConsiderationIndex
 loop:
+        perform_zpcm_inc
         clc
         lda AttackSquare
         ldy ConsiderationIndex
@@ -272,6 +274,7 @@ not_a_spore:
         lda ConsiderationIndex
         cmp #8
         bne loop
+        perform_zpcm_inc
         rts
 .endproc
 

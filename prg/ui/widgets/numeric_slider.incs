@@ -26,6 +26,7 @@ widget_displayed_value := widgets_data3
 
 NametableAddr := T0
 AttributeAddr := T2
+        perform_zpcm_inc
 
         ; set our cursor position based on the leftmost tile position
         ldy CurrentWidgetIndex
@@ -80,6 +81,7 @@ AttributeAddr := T2
 
         ; draw all of those segments
 mid_segment_loop:
+        perform_zpcm_inc
         lda #2
         sta (NametableAddr), y
         lda #(CHR_BANK_FONT_MARSHMALLOW | PAL_BLUE)
@@ -111,6 +113,8 @@ done_with_mid_segments:
         lda #<SPRITE_TILE_UI_SLIDER
         sta sprite_table + MetaSpriteState::TileIndex, x
 
+        perform_zpcm_inc
+
         ; Position the sprite properly
         jsr apply_ui_slider_position
 
@@ -118,6 +122,7 @@ done_with_mid_segments:
         ldy CurrentWidgetIndex
         set_widget_state_y widget_numeric_slider_update
 
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -138,6 +143,8 @@ widget_tile_width := widgets_data4
 widget_range_max := widgets_data5
 widget_data_target_low := widgets_data6
 widget_data_target_high := widgets_data7
+
+        perform_zpcm_inc
         ; Work out the Y position first, as it's reasonably straightforard
         ; TODO: apply camera offset here?
 
@@ -174,6 +181,8 @@ widget_data_target_high := widgets_data7
         sec
         sbc MinPixelX
         sta WidthInPixels
+
+        perform_zpcm_inc
 
         ; Now we need to solve for:
         ;

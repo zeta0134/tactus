@@ -921,6 +921,7 @@ done:
 
 ; frame number goes in x
 .proc jump_to_frame
+        perform_zpcm_inc
         ; GAME SPECIFIC: when loading new frames, re-index into the song data. This is
         ; what actually implements music variant switching at pattern boundaries.
 
@@ -939,6 +940,8 @@ done:
         iny
         lda (bhop_ptr), y
         sta song_ptr+1
+
+        perform_zpcm_inc
 
         ; load the frame pointer list from the song data; we're going to rewrite
         ; frame_ptr here anyway, so use it as temp storage
@@ -965,6 +968,7 @@ done:
         iny
         lda (bhop_ptr), y
         sta frame_ptr+1
+        perform_zpcm_inc
         rts
 .endproc
 

@@ -69,7 +69,7 @@ NametableAddr := T0
 AttributeAddr := T2
 TileX := T4
 TileY := T5
-    
+    perform_zpcm_inc
     ldx CurrentWidgetIndex
     lda widget_data_target_low, x
     sta DataValuePtr+0
@@ -97,6 +97,8 @@ TileY := T5
     adc #'0'
     sta OnesDisplay
 
+    perform_zpcm_inc
+
     ; deal with leading spaces
     lda HundredsDigit
     bne done_with_leading_spaces
@@ -107,6 +109,7 @@ TileY := T5
     lda #' '
     sta TensDisplay
 done_with_leading_spaces:
+    perform_zpcm_inc
 
     ; setup the nametable pointers for our location
     ldy CurrentWidgetIndex
@@ -135,5 +138,6 @@ done_with_leading_spaces:
     lda #(CHR_BANK_FONT_MARSHMALLOW | PAL_BLUE)
     sta (AttributeAddr), y
 
+    perform_zpcm_inc
     rts
 .endproc

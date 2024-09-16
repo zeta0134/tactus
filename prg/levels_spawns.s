@@ -417,6 +417,7 @@ RngResult := R17
 RngRange := R18
 ; used by spawn_pack
 PackSize := R19
+        perform_zpcm_inc
         access_data_bank #<.bank(spawn_pool_data)
 
         ; for now, fix these in place
@@ -436,10 +437,12 @@ PackSize := R19
 
         ; basically, keep spawning until we hit our population cap
 loop:
+        perform_zpcm_inc
         lda AccumulatedPopulation
         cmp PopulationLimit
         bcc continue_spawning
         restore_previous_bank
+        perform_zpcm_inc
         rts ; all done
 continue_spawning:
         ; pick a random entity from the spawn pool
