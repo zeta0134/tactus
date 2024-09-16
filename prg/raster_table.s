@@ -701,8 +701,13 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         ror                     ; 2 - %L....... C:H
         ror                     ; 2 - %HL......
         and #%11000000          ; 2 (safety)
-        ora #SPRITE_REGION_BASE ; 2 (later: replace with HUD sprite base!)
+        ora #CHR_BANK_ZONES     ; 2 (later: replace with HUD sprite base!)
         sta MAP_CHR_0_LO        ; 4
+
+        ; NEW STUFF
+        and #%11000000          ; 2
+        ora #CHR_BANK_HUD       ; 2 (also used to draw background tiles for 3 visible slivers!)
+        sta MAP_CHR_1_LO        ; 4
 
         ; ppu dot here: 117
 
@@ -711,7 +716,7 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         jsr delay_12
         jsr delay_12
         jsr delay_12
-        .repeat 5 ; 10
+        .repeat 1 ; 10
         nop
         .endrepeat
 

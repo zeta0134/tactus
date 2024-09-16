@@ -584,7 +584,7 @@ MINIMAP_BASE = (ROW_1+23)
 chr_tile_offset BOSS_ROOM, 0, 1
 chr_tile_offset DOOR_ROOM, 0, 2
 chr_tile_offset SHOP_ROOM, 0, 3
-chr_tile_offset WARP_ROOM, 0, 4
+chr_tile_offset WARP_ROOM, 2, 7
 
 chr_tile_offset BOSS_ROOM_CURRENT, 14, 5
 chr_tile_offset DOOR_ROOM_CURRENT, 15, 5
@@ -1209,60 +1209,68 @@ Numeral := R0
         lsr
         lsr
         lsr
-        ora #$F0
+        and #$0F
+        ora #$40
         sta Numeral
         ldx #2
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda initial_run_seed+0
-        ora #$F0
+        and #$0F
+        ora #$40
         sta Numeral
         ldx #3
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         lda initial_run_seed+1
         lsr
         lsr
         lsr
         lsr
-        ora #$F0
+        and #$0F
+        ora #$40
         sta Numeral
         ldx #4
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda initial_run_seed+1
-        ora #$F0
+        and #$0F
+        ora #$40
         sta Numeral
         ldx #5
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         lda initial_run_seed+2
         lsr
         lsr
         lsr
         lsr
-        ora #$F0
+        and #$0F
+        ora #$40
         sta Numeral
         ldx #6
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda initial_run_seed+2
-        ora #$F0
+        and #$0F
+        ora #$40
         sta Numeral
         ldx #7
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         lda initial_run_seed+3
         lsr
         lsr
         lsr
         lsr
-        ora #$F0
+        and #$0F
+        ora #$40
         sta Numeral
         ldx #8
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda initial_run_seed+3
-        ora #$F0
+        and #$0F
+        ora #$40
         sta Numeral
         ldx #9
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         perform_zpcm_inc
         rts

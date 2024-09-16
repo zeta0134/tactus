@@ -44,7 +44,7 @@ Length := R0
         set_ppuaddr #$2000
 loop:
         perform_zpcm_inc
-        lda #$80 ; static tile 0
+        lda #$00 ; static tile 0
         sta PPUDATA
         dec16 Length
         lda Length

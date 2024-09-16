@@ -147,6 +147,8 @@ all_frames:
         rainbow_set_upper_bg_chr PlayfieldBgHighBank
         rainbow_set_upper_obj_chr PlayfieldObjHighBank, #SPRITE_REGION_BASE
 
+        
+
         ; re-enable rendering (the IRQ may have disabled it, if it ran)
         ; note: sans backgrounds! we'll turn those on with a raster effect later
         lda #(OBJ_ON | BG_OFF)
