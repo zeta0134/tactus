@@ -12,10 +12,21 @@
 .if ::BHOP_VRC6_ENABLED
     cpx #VRC6_SAWTOOTH_INDEX
     bne not_saw
+
     ; do saw here
+    lda system_type
+    cmp #SYSTEM_TYPE_PAL
+    beq pal_saw
+ntsc_saw:    
     lda vrc6_sawtooth_period_low, y
     sta target_low
     lda vrc6_sawtooth_period_high, y
+    sta target_high
+    rts
+pal_saw:
+    lda rainbow_pal_sawtooth_period_low, y
+    sta target_low
+    lda rainbow_pal_sawtooth_period_high, y
     sta target_high
     rts
 
@@ -28,9 +39,19 @@ not_vrc6_pulse_1:
     bne not_vrc6
 is_vrc6_pulse:
     ; do vrc6 pulse here
+    lda system_type
+    cmp #SYSTEM_TYPE_PAL
+    beq pal_vrc6_pulse
+ntsc_vrc6_pulse:
     lda vrc6_pulse_period_low, y
     sta target_low
     lda vrc6_pulse_period_high, y
+    sta target_high
+    rts
+pal_vrc6_pulse:
+    lda rainbow_pal_pulse_period_low, y
+    sta target_low
+    lda rainbow_pal_pulse_period_high, y
     sta target_high
     rts
 
@@ -38,10 +59,19 @@ not_vrc6:
 .endif
     
     ; if we don't hit a special case, fall through to typical 2A03
+    lda system_type
+    cmp #SYSTEM_TYPE_PAL
+    beq pal_2a03
 ntsc_2a03:
     lda ntsc_period_low, y
     sta target_low
     lda ntsc_period_high, y
+    sta target_high
+    rts
+pal_2a03:
+    lda pal_period_low, y
+    sta target_low
+    lda pal_period_high, y
     sta target_high
 .endscope
 .endmacro
