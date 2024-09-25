@@ -491,7 +491,7 @@ last_command:
 
 silence:
         lda #0
-        far_call_nmi bhop_unmute_channel
+        near_call bhop_unmute_channel
 done:
         rts
 .endproc
@@ -526,7 +526,7 @@ last_command:
 
 silence:
         lda #1
-        far_call_nmi bhop_unmute_channel
+        near_call bhop_unmute_channel
 done:
         rts
 .endproc
@@ -561,7 +561,7 @@ last_command:
 
 silence:
         lda #2
-        far_call_nmi bhop_unmute_channel
+        near_call bhop_unmute_channel
 done:
         rts
 .endproc
@@ -596,7 +596,7 @@ last_command:
 
 silence:
         lda #3
-        far_call_nmi bhop_unmute_channel
+        near_call bhop_unmute_channel
 done:
         rts
 .endproc

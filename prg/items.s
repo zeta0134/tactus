@@ -277,7 +277,7 @@ basic_torch:
         .byte SPRITE_TILE_BASIC_TORCH           ; WorldSpriteTile
         .byte SPRITE_PAL_GREY                   ; WorldSpriteAttr
         .byte EQUIPMENT_BASIC_TORCH             ; HudBgTile
-        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS)   ; HudBgAttr
         .byte 0                                 ; HudSpriteTile
         .byte 0                                 ; HudSpriteAttr
         .word 50                                ; ShopCost

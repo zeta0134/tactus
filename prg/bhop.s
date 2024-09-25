@@ -5,6 +5,7 @@
 
 ; game specific
 .include "far_call.inc"
+.include "pal.inc"
 .include "zpcm.inc"
 
 .scope BHOP
@@ -630,15 +631,6 @@ done_with_sequence:
 
 .include "bhop/util.asm"
 .include "bhop/2a03_noise.asm"
-.if ::BHOP_ZSAW_ENABLED
-.include "bhop/2a03_zsaw.asm"
-.endif
-.if ::BHOP_MMC5_ENABLED
-.include "bhop/mmc5.asm"
-.endif
-.if ::BHOP_VRC6_ENABLED
-.include "bhop/vrc6.asm"
-.endif
 
 .proc bhop_set_module_bank
 .if ::BHOP_PATTERN_BANKING
@@ -863,7 +855,7 @@ effect_init_loop:
         .endif
 
         .if ::BHOP_ZPCM_ENABLED
-        far_call zpcm_enable
+        near_call zpcm_enable
         .endif
 
         ; finally, enable all channels except DMC
@@ -872,7 +864,7 @@ effect_init_loop:
 
         ; enable any expansion audio chips here, if they can be disabled
         .if ::BHOP_VRC6_ENABLED
-        far_call bhop_vrc6_init
+        near_call bhop_vrc6_init
         .endif
 
         ; finally it is safe to permit the play routine to run
@@ -888,12 +880,24 @@ effect_init_loop:
 
 ; speed goes in x
 .proc set_speed
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq pal_speed
+ntsc_speed:
         st16 tempo_cmp, $0000
-loop:
+ntsc_loop:
         clc
         add16 tempo_cmp, #150
         dex
-        bne loop
+        bne ntsc_loop
+        rts
+pal_speed:
+        st16 tempo_cmp, $0000
+pal_loop:
+        clc
+        add16 tempo_cmp, #125
+        dex
+        bne pal_loop
         rts
 .endproc
 
@@ -1431,7 +1435,7 @@ preserve_release_delay:
         sta channel_status, x
         cpx #DPCM_INDEX
         bne skip_sample_trigger
-        jsr trigger_sample
+        far_call_nmi trigger_sample
 skip_sample_trigger:
         ; reset the instrument envelopes to the beginning
         jsr reset_instrument ; clobbers a, y
@@ -2030,7 +2034,63 @@ release_sequence SEQUENCE_DUTY, duty_sequence_ptr_low, duty_sequence_ptr_high, d
         rts
 .endproc
 
-.proc tick_registers
+.proc bhop_play
+        ; if we are initializing a song, bail! lag is better than a crash
+        lda bhop_init_active
+        beq safe_to_continue
+        rts
+safe_to_continue:
+
+.if ::BHOP_PATTERN_BANKING
+        lda module_bank
+        sta current_music_bank
+        jsr BHOP_PATTERN_SWITCH_ROUTINE
+.endif
+        perform_zpcm_inc
+        jsr tick_frame_counter
+        perform_zpcm_inc
+        jsr tick_envelopes_and_effects
+        perform_zpcm_inc
+        far_call_nmi FAR_tick_registers
+        perform_zpcm_inc
+        ; :D
+        rts
+.endproc
+
+.segment BHOP_PLAYER_2_SEGMENT
+
+; channel index in A
+.proc bhop_mute_channel
+        tax
+        lda #(CHANNEL_SUPPRESSED)
+        ora channel_status, x
+        sta channel_status, x
+        ; if this is a pulse channel, make sure our next update
+        ; after we un-mute writes a new frequency value
+check_pulse_1:
+        cpx #0
+        bne check_pulse_2
+        lda #$FF
+        sta shadow_pulse1_freq_hi
+check_pulse_2:
+        cpx #1
+        bne done
+        lda #$FF
+        sta shadow_pulse2_freq_hi
+done:
+        rts
+.endproc
+
+; channel index in A
+.proc bhop_unmute_channel
+        tax
+        lda #($FF - CHANNEL_SUPPRESSED)
+        and channel_status, x
+        sta channel_status, x
+        rts
+.endproc
+
+.proc FAR_tick_registers
 tick_pulse1:
         lda #CHANNEL_SUPPRESSED
         bit channel_status + PULSE_1_INDEX
@@ -2613,6 +2673,7 @@ done:
 .endif
 
 ; resets the retrigger logic upon a new DPCM sample note
+; TODO: make this inline?
 .proc trigger_sample
         perform_zpcm_inc
         .if ::BHOP_ZPCM_ENABLED
@@ -2649,59 +2710,15 @@ reset_counter:
         rts
 .endproc
 
-.proc bhop_play
-        ; if we are initializing a song, bail! lag is better than a crash
-        lda bhop_init_active
-        beq safe_to_continue
-        rts
-safe_to_continue:
-
-.if ::BHOP_PATTERN_BANKING
-        lda module_bank
-        sta current_music_bank
-        jsr BHOP_PATTERN_SWITCH_ROUTINE
+.if ::BHOP_VRC6_ENABLED
+.include "bhop/vrc6.asm"
 .endif
-        perform_zpcm_inc
-        jsr tick_frame_counter
-        perform_zpcm_inc
-        jsr tick_envelopes_and_effects
-        perform_zpcm_inc
-        jsr tick_registers
-        perform_zpcm_inc
-        ; :D
-        rts
-.endproc
-
-; channel index in A
-.proc bhop_mute_channel
-        tax
-        lda #(CHANNEL_SUPPRESSED)
-        ora channel_status, x
-        sta channel_status, x
-        ; if this is a pulse channel, make sure our next update
-        ; after we un-mute writes a new frequency value
-check_pulse_1:
-        cpx #0
-        bne check_pulse_2
-        lda #$FF
-        sta shadow_pulse1_freq_hi
-check_pulse_2:
-        cpx #1
-        bne done
-        lda #$FF
-        sta shadow_pulse2_freq_hi
-done:
-        rts
-.endproc
-
-; channel index in A
-.proc bhop_unmute_channel
-        tax
-        lda #($FF - CHANNEL_SUPPRESSED)
-        and channel_status, x
-        sta channel_status, x
-        rts
-.endproc
+.if ::BHOP_ZSAW_ENABLED
+.include "bhop/2a03_zsaw.asm"
+.endif
+.if ::BHOP_MMC5_ENABLED
+.include "bhop/mmc5.asm"
+.endif
 
 volume_table:
         .byte $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0, $0
@@ -2722,5 +2739,4 @@ volume_table:
         .byte $0, $1, $2, $3, $4, $5, $6, $7, $8, $9, $A, $B, $C, $D, $E, $F
 
 .endscope
-
 

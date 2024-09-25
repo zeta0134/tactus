@@ -21,8 +21,8 @@
 
         .include "../build/rooms/Grasslands_Round.incs"
         .include "../build/rooms/Shop_Standard.incs"        
-        .include "../build/rooms/HubWarpChamber.incs"
         .include "../build/rooms/Blocking_Chamber.incs"
+        .include "../build/rooms/HubWarpChamber.incs"
 
         .segment "LEVEL_DATA_ROOMS_2"
 

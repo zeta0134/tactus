@@ -157,7 +157,7 @@ HeartCount := R2
 
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
-        lda #ITEM_FLAIL_L2
+        lda #ITEM_SPEAR_L2
         sta PlayerEquipmentWeapon
         lda #ITEM_LARGE_TORCH
         sta PlayerEquipmentTorch
@@ -187,16 +187,6 @@ HeartCount := R2
         lda #HEART_TYPE_TEMPORARY
         sta NewHeartType
         near_call FAR_add_heart
-
-        ; Some glass hearts, yes yes!
-;        lda #3
-;        sta HeartCount
-;heart_loop:
-;        lda #HEART_TYPE_GLASS
-;        sta NewHeartType
-;        near_call FAR_add_heart
-;        dec HeartCount
-;        bne heart_loop
 
         ; Heal the player to full! (regular hearts start empty)
         lda #255

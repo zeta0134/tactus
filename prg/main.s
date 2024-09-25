@@ -8,6 +8,7 @@
         .include "main.inc"
         .include "memory_util.inc"
         .include "nes.inc"
+        .include "pal.inc"
         .include "palette.inc"
         .include "ppu.inc"
         .include "prng.inc"
@@ -34,6 +35,8 @@ start:
         st16 R0, ($6000) ; PRG RAM from 0x6000 - 0x7FFF
         st16 R2, ($2000)
         jsr clear_memory
+
+        jsr detect_system_type
 
         jsr init_far_calls
 
