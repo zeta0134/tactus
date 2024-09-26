@@ -2,6 +2,7 @@
 
         .include "kernel.inc"
         .include "nes.inc"
+        .include "pal.inc"
         .include "palette.inc"
         .include "rainbow.inc"
         .include "raster_table.inc"
@@ -35,7 +36,8 @@ RasterEffectFinalizerIndex: .res 1
 ; shouldn't clobber R0-R31
 RasterScratch: .res 8
 
-delay_table_addr: .res 2
+delay_table_addr_ntsc: .res 2
+delay_table_addr_pal: .res 2
 delay_routine_addr: .res 2
 
 HudBgActual: .res 1
@@ -65,7 +67,7 @@ RasterPlaybackSpeedLow: .res 1
         .include "raster/screen_slide.incs"
         .include "raster/underwater.incs"
 
-        .segment "CODE_0"
+        .segment "CODE_1"
 
 ; this is the one we should probably split into tables, if we
 ; find ourselves needing more than 64 effects. but for now
@@ -131,10 +133,14 @@ scroll_y_wraparound_lut:
         sta RasterPlaybackSpeedLow
         sta RasterEffectFractionalFrame
 
-        lda #<inverted_delay_table
-        sta delay_table_addr+0
-        lda #>inverted_delay_table
-        sta delay_table_addr+1
+        lda #<inverted_delay_table_ntsc
+        sta delay_table_addr_ntsc+0
+        lda #>inverted_delay_table_ntsc
+        sta delay_table_addr_ntsc+1
+        lda #<inverted_delay_table_pal
+        sta delay_table_addr_pal+0
+        lda #>inverted_delay_table_pal
+        sta delay_table_addr_pal+1
         ; for initial safety, fill out the IRQ table with valid IRQ vectors
         ; none of the real vectors are truly problematic if called at a bad time (they'll exit eventually)
         ; but $0000 is unfortunate!
@@ -251,8 +257,17 @@ ScanlineCount := RasterScratch+6
         lda (TableScanlineCmpPtr), y
         sta MAP_PPU_IRQ_LATCH    ; select the scanline on which it will fire (probably not 0)
         ; Here we enable IRQs (hopefully we are still in vblank at this point)
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq pal_offset
+nstc_offset:
         lda #32
         sta MAP_PPU_IRQ_OFFSET
+        jmp done_with_offset
+pal_offset:
+        lda #20
+        sta MAP_PPU_IRQ_OFFSET
+done_with_offset:
         lda #$FF ; "any value"
         sta MAP_PPU_IRQ_ENABLE
         cli
@@ -359,8 +374,19 @@ finalizer_table:
         sta table_ppuscroll_y, y
         lda #180
         sta table_scanline_compare, y
-        lda #>irq_hud_palette_swap
+
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq use_pal_routine
+use_ntsc_routine:
+        lda #>irq_hud_palette_swap_ntsc
         sta table_irq_high, y
+        jmp done_picking_routine
+use_pal_routine:
+        lda #>irq_hud_palette_swap_pal
+        sta table_irq_high, y
+done_picking_routine:
+
         ; ppumask bit isn't used
 
         ; do this during NMI, so we don't get a race condition and flickery beat transitions
@@ -507,13 +533,13 @@ finalizer_table:
 .endproc
 
 .align 256 
-.proc irq_hud_palette_swap
+.proc irq_hud_palette_swap_ntsc
         perform_zpcm_inc ; 6
         ; very quickly read the delay jitter register
         pha                    ; 3
         lda MAP_PPU_IRQ_M2_CNT ; 4
         asl                    ; 2
-        sta delay_table_addr+0 ; 3
+        sta delay_table_addr_ntsc+0 ; 3
         ; finish preserving other registers
         txa ; 2
         pha ; 3
@@ -521,10 +547,10 @@ finalizer_table:
         pha ; 3
         ; load up the delay pointer and jump there (somewhat inefficiently)
         ldy #0 ; 2
-        lda (delay_table_addr), y ; 5
+        lda (delay_table_addr_ntsc), y ; 5
         sta delay_routine_addr+0  ; 3
         iny                       ; 2
-        lda (delay_table_addr), y ; 5
+        lda (delay_table_addr_ntsc), y ; 5
         sta delay_routine_addr+1  ; 3
         jmp (delay_routine_addr)  ; 5 + 3 + [inverse of measured IRQ jitter, range: 10 - 0]
 return_from_delay:
@@ -754,6 +780,270 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         rti
 .endproc
 
+.align 256 
+.proc irq_hud_palette_swap_pal
+        perform_zpcm_inc ; 6
+        ; very quickly read the delay jitter register
+        pha                    ; 3
+        lda MAP_PPU_IRQ_M2_CNT ; 4
+        asl                    ; 2
+        sta delay_table_addr_pal+0 ; 3
+        ; finish preserving other registers
+        txa ; 2
+        pha ; 3
+        tya ; 2
+        pha ; 3
+        ; load up the delay pointer and jump there (somewhat inefficiently)
+        ldy #0 ; 2
+        lda (delay_table_addr_pal), y ; 5
+        sta delay_routine_addr+0  ; 3
+        iny                       ; 2
+        lda (delay_table_addr_pal), y ; 5
+        sta delay_routine_addr+1  ; 3
+        jmp (delay_routine_addr)  ; 5 + 3 + [inverse of measured IRQ jitter, range: 10 - 0]
+return_from_delay:
+        ; worst case for the above takes 73 cycles
+        ; if we trigger the interrupt on PPU dot 4, then at this exact moment we are at:
+
+        ; ppu dot here: 223
+
+        ; setup to disable rendering and switch palette memory to #$3F00
+        lda PPUSTATUS ; 4, ensure w=0
+        lda #$3F      ; 2 - PPUADDR
+        ldx #$00      ; 2
+        ldy #$00      ; 2 - PPUMASK
+
+        ; ppu dot here: 253
+        ; target dot: 311, 20 cycles
+        ;perform_zpcm_inc ; 6
+        ;jsr delay_12     ; 12
+        ;nop              ; 2
+
+        ; ppu dot here: 313
+
+        sty PPUMASK ; 4, disable rendering, write lands on 322 at the earliest, 334 at the latest (due to DPCM jitter)
+        sta PPUADDR ; 4, w=0
+        stx PPUADDR ; 4, w=1, set palette address to #$3F00 (no visible change)
+
+        ; ppu dot here: 8
+        perform_zpcm_inc
+        nop
+
+        ; ppu dot here: 44
+        ; wait until hblank (248)
+
+        ; Fix the nametable mappings for the HUD: all in bank 0
+        lda #0            ; 2
+        sta MAP_NT_A_BANK ; 4
+        sta MAP_NT_B_BANK ; 4
+        sta MAP_NT_C_BANK ; 4
+        sta MAP_NT_D_BANK ; 4
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT) ; 2
+        sta MAP_NT_A_CONTROL ; 4
+        sta MAP_NT_B_CONTROL ; 4
+        sta MAP_NT_C_CONTROL ; 4
+        sta MAP_NT_D_CONTROL ; 4
+
+        ; prep the first round of palette updates
+        lda HudPaletteBuffer+0 ; 4
+        ldx HudPaletteBuffer+1 ; 4
+        ldy HudPaletteBuffer+2 ; 4
+
+        ; delay: 68 cycles
+
+        ; NTSC: was 24 cycles
+        ; PAL: should be 20 cycles (-4 for nicer alignment)
+        jsr delay_12
+        .repeat 4
+        nop
+        .endrepeat
+
+        ; ppu dot here: 248
+
+        ; write the palette entries for BG0 0-3
+        sta PPUDATA ; 4
+        stx PPUDATA ; 4
+        sty PPUDATA ; 4
+        lda HudPaletteBuffer+3 ; 4
+        sta PPUDATA ; 4
+
+        ; ppu dot here: 308
+
+        ; prep the second round of palette updates
+        lda HudPaletteBuffer+4 ; 4
+        ldx HudPaletteBuffer+5 ; 4
+        ldy HudPaletteBuffer+6 ; 4
+
+        ; ppu dot here: 3
+
+        ; wait until hblank (248)
+        ; NTSC: was 82
+        ; PAL: should be 75
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        php ; 3
+        plp ; 4
+        .repeat 4
+        nop
+        .endrepeat
+
+        ; ppu dot here: 249
+        ; write the palette entries for BG1 0-3
+        sta PPUDATA ; 4
+        stx PPUDATA ; 4
+        sty PPUDATA ; 4
+        lda HudPaletteBuffer+7 ; 4
+        sta PPUDATA ; 4
+
+        ; ppu dot here: 309
+
+        ; prep the third round of palette updates
+        lda HudPaletteBuffer+8  ; 4
+        ldx HudPaletteBuffer+9  ; 4
+        ldy HudPaletteBuffer+10 ; 4
+
+        ; ppu dot here: 4
+
+        ; wait until hblank (248)
+
+        ; NTSC: was 82
+        ; PAL: should be 75
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        php ; 3
+        plp ; 4
+        .repeat 4
+        nop
+        .endrepeat
+
+        ; ppu dot here: 250
+        ; write the palette entries for BG2 0-3
+        sta PPUDATA ; 4
+        stx PPUDATA ; 4
+        sty PPUDATA ; 4
+        lda HudPaletteBuffer+11 ; 4
+        sta PPUDATA ; 4
+
+        ; ppu dot here: 310
+
+        ; prep the third round of palette updates
+        lda HudPaletteBuffer+12  ; 4
+        ldx HudPaletteBuffer+13  ; 4
+        ldy HudPaletteBuffer+14  ; 4
+
+        ; ppu dot here: 5
+
+        ; wait until hblank (248)
+        ; NTSC: was 81
+        ; PAL: should be 74
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        jsr delay_12
+        nop ; 2
+
+        ; ppu dot here: 248
+        ; write the palette entries for BG3 0-3
+        sta PPUDATA ; 4
+        stx PPUDATA ; 4
+        sty PPUDATA ; 4
+        lda HudPaletteBuffer+15 ; 4
+        sta PPUDATA ; 4
+
+        ; ppu dot here: 308
+
+        ; At this point the BG palette is written; for now we will stop here.
+        ; We are parked on #$3F10, which mirrors BG0.0, so we can set up to re-enable rendering
+
+        ; Draw the left-side nametable, starting at the top of the HUD graphics
+HUD_SCROLL_X = 0
+;HUD_SCROLL_Y = 182
+
+;HUD_SCROLL_Y = 175 ; does not cause jitter (does cause a visible glitch)
+HUD_SCROLL_Y = 176 ; the value I want, but this causes jitter
+;HUD_SCROLL_Y = 177 ; causes neither jitter nor a visible glitch
+
+HUD_NAMETABLE = 0
+HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
+        lda #HUD_NAMETABLE  ; 2
+        sta $2006           ; 4
+        lda #HUD_SCROLL_Y   ; 2
+        sta $2005           ; 4
+        lda #HUD_SCROLL_X   ; 2
+        sta $2005           ; 4
+        lda #HUD_FUNNY_2006 ; 2
+        sta $2006           ; 4
+
+        ; ppu dot here: 39
+
+        ; since we have time to kill, we might as well compute the musical beat and set
+        ; the new animation frame right here
+
+        ; new cost: 26
+        lda HudBgActual         ; 4
+        sta MAP_BG_EXT_BANK     ; 4
+        lda HudObjActual        ; 4 - %......HL
+        ror                     ; 2 - %.......H C:L
+        ror                     ; 2 - %L....... C:H
+        ror                     ; 2 - %HL......
+        and #%11000000          ; 2 (safety)
+        ora #CHR_BANK_ZONES     ; 2 (later: replace with HUD sprite base!)
+        sta MAP_CHR_0_LO        ; 4
+
+        ; NEW STUFF
+        and #%11000000          ; 2
+        ora #CHR_BANK_HUD       ; 2 (also used to draw background tiles for 3 visible slivers!)
+        sta MAP_CHR_1_LO        ; 4
+
+        ; ppu dot here: 117
+
+        ; now we simply wait for hblank (256), then re-enable backgrounds:
+        lda #BG_ON ; 2
+        ; NTSC: was 38
+        ; PAL: should be 31
+        jsr delay_20
+        php ; 3
+        plp ; 4
+        nop ; 2
+        nop ; 2
+
+        ; ppu dot here: 261
+        sta PPUMASK ; 4
+
+        ; and again, wait another *entire* scanline, so that we can re-enable
+        ; sprites (since this scanline will have corrupted sprite evalutation)
+        lda #(BG_ON | OBJ_ON) ; 2
+
+        ; ppu dot here: 279
+        ; NTSC: was 106
+        ; PAL: should be 99
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        jsr delay_12
+        php ; 3
+        plp ; 4
+
+        ; ppu dot here: 256
+        sta PPUMASK
+
+        ; END timing sensitive code
+        ; cleanup and we're done!
+        sta MAP_PPU_IRQ_DISABLE
+
+        ; restore registers and return
+        pla
+        tay
+        pla
+        tax
+        pla
+        perform_zpcm_inc
+        rti
+.endproc
+
 .proc delay_12 ; 6
         rts    ; 6
 .endproc
@@ -768,162 +1058,224 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
 ; to erase can only feasibly span from 1-10 cycles. we could save ~6 cycles by having
 ; a shorter live section of the table, and using smaller delay amounts
 .align 256
-inverted_delay_table:
-        .addr inv_delay_10 ; 7 cycles for the IRQ service routine
-        .addr inv_delay_10
-        .addr inv_delay_10
-        .addr inv_delay_10
-        .addr inv_delay_10
-        .addr inv_delay_10
-        .addr inv_delay_10
+inverted_delay_table_ntsc:
+        .addr inv_delay_10_ntsc ; 7 cycles for the IRQ service routine
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc ; 3 cycles for the JMP abs
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc ; 6 cycles for inc $4011
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc ; 3 cycles to PHA
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc ; 4 cycles to LDA MAP_PPU_IRQ_M2_CNT
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc
+        .addr inv_delay_10_ntsc ; READ OCCURS HERE ?
+        .addr inv_delay_10_ntsc ; first real entry in the table
+        .addr inv_delay_9_ntsc
+        .addr inv_delay_8_ntsc
+        .addr inv_delay_7_ntsc
+        .addr inv_delay_6_ntsc
+        .addr inv_delay_5_ntsc
+        .addr inv_delay_4_ntsc
+        .addr inv_delay_3_ntsc
+        .addr inv_delay_2_ntsc
+        .addr inv_delay_0_ntsc ; we can't encode a delay amount of 1 cycle, but that's okay
 
-        .addr inv_delay_10 ; 6 cycles for inc $4011
-        .addr inv_delay_10
-        .addr inv_delay_10
-        .addr inv_delay_10
-        .addr inv_delay_10
-        .addr inv_delay_10
-
-        .addr inv_delay_10 ; 3 cycles to PHA
-        .addr inv_delay_10
-        .addr inv_delay_10
-
-        .addr inv_delay_10 ; 4 cycles to LDA MAP_PPU_IRQ_M2_CNT
-        .addr inv_delay_10
-        .addr inv_delay_10
-        .addr inv_delay_10 ; READ OCCURS HERE
-
-        .addr inv_delay_10 ; first real entry in the table
-        .addr inv_delay_9
-        .addr inv_delay_8
-        .addr inv_delay_7
-        .addr inv_delay_6
-        .addr inv_delay_5
-        .addr inv_delay_4
-        .addr inv_delay_3
-        .addr inv_delay_2
-        .addr inv_delay_0 ; we can't encode a delay amount of 1 cycle, but that's okay
-
-        .repeat (128-7-6-3-4-10); fill out the rest of the table for safety
-        .addr inv_delay_0
+        .repeat (128-7-3-6-3-4-10); fill out the rest of the table for safety
+        .addr inv_delay_0_ntsc
         .endrepeat
 
 
 ; various delay amounts, used in the inverted delay table
 ; not espeically optimal in terms of code size, but at
 ; the very least, chosen to avoid clobbering any state
-.proc inv_delay_0
-        jmp irq_hud_palette_swap::return_from_delay
+.proc inv_delay_0_ntsc
+        jmp irq_hud_palette_swap_ntsc::return_from_delay
 .endproc
 
-.proc inv_delay_2
+.proc inv_delay_2_ntsc
         nop ; 2
-        jmp irq_hud_palette_swap::return_from_delay
+        jmp irq_hud_palette_swap_ntsc::return_from_delay
 .endproc
 
-.proc inv_delay_3
+.proc inv_delay_3_ntsc
         jmp target ; 3
 target:
-        jmp irq_hud_palette_swap::return_from_delay
+        jmp irq_hud_palette_swap_ntsc::return_from_delay
 .endproc
 
-.proc inv_delay_4
+.proc inv_delay_4_ntsc
         .repeat 2
         nop ; 4
         .endrepeat
-        jmp irq_hud_palette_swap::return_from_delay
+        jmp irq_hud_palette_swap_ntsc::return_from_delay
 .endproc
 
-.proc inv_delay_5
+.proc inv_delay_5_ntsc
         nop        ; 2
         jmp target ; 3
 target:
-        jmp irq_hud_palette_swap::return_from_delay
+        jmp irq_hud_palette_swap_ntsc::return_from_delay
 .endproc
 
-.proc inv_delay_6
+.proc inv_delay_6_ntsc
         .repeat 3
         nop ; 6
         .endrepeat
-        jmp irq_hud_palette_swap::return_from_delay
+        jmp irq_hud_palette_swap_ntsc::return_from_delay
 .endproc
 
-.proc inv_delay_7
+.proc inv_delay_7_ntsc
         php ; 3
         plp ; 4
-        jmp irq_hud_palette_swap::return_from_delay
+        jmp irq_hud_palette_swap_ntsc::return_from_delay
 .endproc
 
-.proc inv_delay_8
+.proc inv_delay_8_ntsc
         .repeat 4
         nop ; 8
         .endrepeat
-        jmp irq_hud_palette_swap::return_from_delay
+        jmp irq_hud_palette_swap_ntsc::return_from_delay
 .endproc
 
-.proc inv_delay_9
+.proc inv_delay_9_ntsc
         nop ; 2
         php ; 3
         plp ; 4
-        jmp irq_hud_palette_swap::return_from_delay
+        jmp irq_hud_palette_swap_ntsc::return_from_delay
 .endproc
 
 
-.proc inv_delay_10
+.proc inv_delay_10_ntsc
         .repeat 5
         nop ; 10
         .endrepeat
-        jmp irq_hud_palette_swap::return_from_delay
+        jmp irq_hud_palette_swap_ntsc::return_from_delay
 .endproc
 
-.proc inv_delay_11
-        nop ; 2
-        nop ; 2
-        php ; 3
-        plp ; 4
-        jmp irq_hud_palette_swap::return_from_delay
-.endproc
+; optimization note: once we're sure this is working properly, the jitter we need
+; to erase can only feasibly span from 1-10 cycles. we could save ~6 cycles by having
+; a shorter live section of the table, and using smaller delay amounts
+.align 256
+inverted_delay_table_pal:
+        ; $00
+        .addr inv_delay_10_pal ; 7 cycles for the IRQ service routine
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal ; 3 cycles for the JMP abs
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal ; 6 cycles for inc $4011
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal
+        ; $10
+        .addr inv_delay_10_pal ; 3 cycles to PHA
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal ; 4 cycles to LDA MAP_PPU_IRQ_M2_CNT
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal
+        .addr inv_delay_10_pal ; READ OCCURS HERE ?
+        .addr inv_delay_10_pal ; first real entry in the table
+        .addr inv_delay_9_pal
+        .addr inv_delay_8_pal
+        .addr inv_delay_7_pal
+        .addr inv_delay_6_pal
+        .addr inv_delay_5_pal
+        .addr inv_delay_4_pal
+        .addr inv_delay_3_pal
+        .addr inv_delay_2_pal
+        .addr inv_delay_0_pal ; we can't encode a delay amount of 1 cycle, but that's okay
 
-.proc inv_delay_12
-        .repeat 6
-        nop ; 12
+        .repeat (128-7-3-6-3-4-10); fill out the rest of the table for safety
+        .addr inv_delay_0_pal
         .endrepeat
-        jmp irq_hud_palette_swap::return_from_delay
+
+
+; various delay amounts, used in the inverted delay table
+; not espeically optimal in terms of code size, but at
+; the very least, chosen to avoid clobbering any state
+.proc inv_delay_0_pal
+        jmp irq_hud_palette_swap_pal::return_from_delay
 .endproc
 
-.proc inv_delay_13
+.proc inv_delay_2_pal
         nop ; 2
-        nop ; 2
-        nop ; 2
-        php ; 3
-        plp ; 4
-        jmp irq_hud_palette_swap::return_from_delay
+        jmp irq_hud_palette_swap_pal::return_from_delay
 .endproc
 
-.proc inv_delay_14
-        php ; 3
-        plp ; 4
-        php ; 3
-        plp ; 4
-        jmp irq_hud_palette_swap::return_from_delay
+.proc inv_delay_3_pal
+        jmp target ; 3
+target:
+        jmp irq_hud_palette_swap_pal::return_from_delay
 .endproc
 
-.proc inv_delay_15
-        .repeat 4 ; 8
-        nop
+.proc inv_delay_4_pal
+        .repeat 2
+        nop ; 4
         .endrepeat
-        php ; 3
-        plp ; 4
-        jmp irq_hud_palette_swap::return_from_delay
+        jmp irq_hud_palette_swap_pal::return_from_delay
 .endproc
 
-.proc inv_delay_16
+.proc inv_delay_5_pal
+        nop        ; 2
+        jmp target ; 3
+target:
+        jmp irq_hud_palette_swap_pal::return_from_delay
+.endproc
+
+.proc inv_delay_6_pal
+        .repeat 3
+        nop ; 6
+        .endrepeat
+        jmp irq_hud_palette_swap_pal::return_from_delay
+.endproc
+
+.proc inv_delay_7_pal
+        php ; 3
+        plp ; 4
+        jmp irq_hud_palette_swap_pal::return_from_delay
+.endproc
+
+.proc inv_delay_8_pal
+        .repeat 4
+        nop ; 8
+        .endrepeat
+        jmp irq_hud_palette_swap_pal::return_from_delay
+.endproc
+
+.proc inv_delay_9_pal
         nop ; 2
         php ; 3
         plp ; 4
-        php ; 3
-        plp ; 4
-        jmp irq_hud_palette_swap::return_from_delay
+        jmp irq_hud_palette_swap_pal::return_from_delay
+.endproc
+
+
+.proc inv_delay_10_pal
+        .repeat 5
+        nop ; 10
+        .endrepeat
+        jmp irq_hud_palette_swap_pal::return_from_delay
 .endproc
 
 .align 256
