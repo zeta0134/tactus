@@ -1,5 +1,3 @@
-.include "midi.inc"
-
 ; === Register bitmasks, for manual writing ===
 
 PULSE_DLV = $0

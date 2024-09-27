@@ -6,12 +6,16 @@
         .include "debug.inc"
         .include "beat_tracker.inc"
         .include "far_call.inc"
+        .include "pal.inc"
         .include "rainbow.inc"
         .include "slowam.inc"
         .include "sound.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
+
+        .import sfx_data_ntsc
+        .import sfx_data_pal
 
         .segment "RAM"
 Pulse1RowCounter: .res 1
@@ -292,7 +296,18 @@ invalid_variant:
 .proc play_sfx_pulse1
 SfxPtr := R0
         perform_zpcm_inc
-        access_data_bank #<.bank(sfx_data)
+
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq use_pal_sfx
+use_ntsc_sfx:
+        access_data_bank #<.bank(sfx_data_ntsc)
+        jmp done_picking_sfx_bank
+use_pal_sfx:
+        access_data_bank #<.bank(sfx_data_pal)
+        jmp done_picking_sfx_bank
+done_picking_sfx_bank:
+
         lda SfxPtr
         sta Pulse1SfxPtr
         lda SfxPtr+1
@@ -313,7 +328,18 @@ SfxPtr := R0
 .proc play_sfx_pulse2
 SfxPtr := R0
         perform_zpcm_inc
-        access_data_bank #<.bank(sfx_data)
+
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq use_pal_sfx
+use_ntsc_sfx:
+        access_data_bank #<.bank(sfx_data_ntsc)
+        jmp done_picking_sfx_bank
+use_pal_sfx:
+        access_data_bank #<.bank(sfx_data_pal)
+        jmp done_picking_sfx_bank
+done_picking_sfx_bank:
+
         lda SfxPtr
         sta Pulse2SfxPtr
         lda SfxPtr+1
@@ -334,7 +360,18 @@ SfxPtr := R0
 .proc play_sfx_triangle
 SfxPtr := R0
         perform_zpcm_inc
-        access_data_bank #<.bank(sfx_data)
+
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq use_pal_sfx
+use_ntsc_sfx:
+        access_data_bank #<.bank(sfx_data_ntsc)
+        jmp done_picking_sfx_bank
+use_pal_sfx:
+        access_data_bank #<.bank(sfx_data_pal)
+        jmp done_picking_sfx_bank
+done_picking_sfx_bank:
+
         lda SfxPtr
         sta TriangleSfxPtr
         lda SfxPtr+1
@@ -355,7 +392,18 @@ SfxPtr := R0
 .proc play_sfx_noise
 SfxPtr := R0
         perform_zpcm_inc
-        access_data_bank #<.bank(sfx_data)
+
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq use_pal_sfx
+use_ntsc_sfx:
+        access_data_bank #<.bank(sfx_data_ntsc)
+        jmp done_picking_sfx_bank
+use_pal_sfx:
+        access_data_bank #<.bank(sfx_data_pal)
+        jmp done_picking_sfx_bank
+done_picking_sfx_bank:
+
         lda SfxPtr
         sta NoiseSfxPtr
         lda SfxPtr+1
@@ -428,7 +476,17 @@ SfxPtr := R0
 
         perform_zpcm_inc
 
-        access_data_bank_nmi #<.bank(sfx_data)
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq use_pal_sfx
+use_ntsc_sfx:
+        access_data_bank #<.bank(sfx_data_ntsc)
+        jmp done_picking_sfx_bank
+use_pal_sfx:
+        access_data_bank #<.bank(sfx_data_pal)
+        jmp done_picking_sfx_bank
+done_picking_sfx_bank:
+
         near_call update_sfx
         restore_previous_bank_nmi
 
@@ -613,9 +671,3 @@ done:
         perform_zpcm_inc
         rts
 .endproc
-
-
-.segment "DATA_1"
-
-sfx_data:
-        .include "sfx.incs"

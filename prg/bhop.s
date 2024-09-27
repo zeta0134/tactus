@@ -883,6 +883,8 @@ effect_init_loop:
         lda system_type
         cmp #SYSTEM_TYPE_PAL
         beq pal_speed
+        cmp #SYSTEM_TYPE_DENDY
+        beq pal_speed
 ntsc_speed:
         st16 tempo_cmp, $0000
 ntsc_loop:
