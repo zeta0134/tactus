@@ -7,6 +7,7 @@ system_type: .res 1
 
     .segment "PRGFIXED_E000"
 
+.align 32
 .proc detect_system_type
         ;;; the "nice" thing is that I'm using the PPU power-on wait to detect the video system-
         ;; A,X,Y are all 0 at entry

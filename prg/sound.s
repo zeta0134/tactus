@@ -480,10 +480,10 @@ done_picking_sfx_bank:
         cmp #SYSTEM_TYPE_PAL
         beq use_pal_sfx
 use_ntsc_sfx:
-        access_data_bank #<.bank(sfx_data_ntsc)
+        access_data_bank_nmi #<.bank(sfx_data_ntsc)
         jmp done_picking_sfx_bank
 use_pal_sfx:
-        access_data_bank #<.bank(sfx_data_pal)
+        access_data_bank_nmi #<.bank(sfx_data_pal)
         jmp done_picking_sfx_bank
 done_picking_sfx_bank:
 

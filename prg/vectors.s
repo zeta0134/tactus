@@ -28,6 +28,7 @@
 .macro spinwait_for_vblank
 .scope
 loop:
+        nop
         bit PPUSTATUS
         bpl loop
 .endscope
