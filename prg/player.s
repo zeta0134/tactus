@@ -165,17 +165,19 @@ HeartCount := R2
         sta PlayerEquipmentArmor
         lda #ITEM_NONE
         sta PlayerEquipmentBoots
+        lda #ITEM_CHAIN_LINK
         sta PlayerEquipmentAccessory
+        lda #ITEM_NONE
         sta PlayerEquipmentBombs
         sta PlayerEquipmentSpell
 
         near_call FAR_initialize_hearts_for_game
         
         ; All the heart types, yes!
-        lda #HEART_TYPE_REGULAR
+        lda #HEART_TYPE_REGULAR_ARMORED
         sta NewHeartType
         near_call FAR_add_heart
-        lda #HEART_TYPE_REGULAR
+        lda #HEART_TYPE_REGULAR_ARMORED
         sta NewHeartType
         near_call FAR_add_heart
         lda #HEART_TYPE_REGULAR
