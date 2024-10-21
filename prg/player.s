@@ -2,6 +2,9 @@
 
         .include "../build/tile_defs.inc"
 
+        .include "constants.inc"
+        .include "balance.inc"
+
         .include "battlefield.inc"
         .include "debug.inc"
         .include "enemies.inc"
@@ -198,12 +201,15 @@ HeartCount := R2
         st16 PlayerGold, 150
 .else
         ; The player should start with a standard L1-DAGGER
-        lda #ITEM_DAGGER_L1
+        lda #PLAYER_NORMAL_WEAPON
         sta PlayerEquipmentWeapon
-        lda #ITEM_NONE
+        lda #PLAYER_NORMAL_LIGHT
         sta PlayerEquipmentTorch
+        lda #PLAYER_NORMAL_ARMOR
         sta PlayerEquipmentArmor
+        lda #PLAYER_NORMAL_BOOTS
         sta PlayerEquipmentBoots
+        lda #PLAYER_NORMAL_ACCESSORY
         sta PlayerEquipmentAccessory
         sta PlayerEquipmentBombs
         sta PlayerEquipmentSpell

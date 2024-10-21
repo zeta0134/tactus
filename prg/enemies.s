@@ -2,6 +2,9 @@
 
         .include "../build/tile_defs.inc"
 
+        .include "constants.inc"
+        .include "balance.inc"
+
         .include "battlefield.inc"
         .include "branch_util.inc"
         .include "coins.inc"
@@ -28,6 +31,7 @@
         .include "word_util.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
+
 
 .zeropage
 DestPtr: .res 2

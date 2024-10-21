@@ -73,7 +73,3 @@ ITEM_ALOHA_TSHIRT_3  = 30
 .global FAR_roll_shop_loot
 .global FAR_roll_gameplay_loot
 
-; torchlight provided by the player alone, so they aren't
-; completely blind if they haven't found a light emitting
-; item in the early game
-PLAYER_BASE_TORCHLIGHT = 5

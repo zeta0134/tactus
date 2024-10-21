@@ -1,3 +1,5 @@
+        .include "constants.inc"
+
         .include "hearts.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"

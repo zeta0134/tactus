@@ -1,6 +1,10 @@
         .include "items.inc"
 
         .include "../build/tile_defs.inc"
+        
+        .include "constants.inc"
+        .include "balance.inc"
+
         .include "far_call.inc"
         .include "hearts.inc"
         .include "hud.inc"

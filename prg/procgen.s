@@ -2,6 +2,9 @@
 
         .include "../build/tile_defs.inc"
 
+        .include "constants.inc"
+        .include "balance.inc"
+
         .include "battlefield.inc"
         .include "chr.inc"
         .include "debug.inc"
