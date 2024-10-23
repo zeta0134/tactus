@@ -2,7 +2,7 @@
 
         .include "../build/tile_defs.inc"
 
-        .include "constants.inc"
+        .include "_globals.inc"
 
         .include "bhop/bhop.inc"
         .include "battlefield.inc"

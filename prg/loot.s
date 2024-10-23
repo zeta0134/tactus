@@ -1,5 +1,7 @@
     .macpack longbranch
 
+    .include "_globals.inc"
+
     .include "battlefield.inc"
     .include "coins.inc"
     .include "enemies.inc"

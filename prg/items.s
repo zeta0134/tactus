@@ -2,8 +2,7 @@
 
         .include "../build/tile_defs.inc"
         
-        .include "constants.inc"
-        .include "balance.inc"
+        .include "_globals.inc"
 
         .include "far_call.inc"
         .include "hearts.inc"

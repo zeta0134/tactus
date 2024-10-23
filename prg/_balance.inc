@@ -45,7 +45,41 @@ PLAYER_BASE_TORCHLIGHT = 5
 ; ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓█▓▒░             ░▒▓█▓▒░ 
 ; ░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓████████▓▒░▒▓███████▓▒░  
 
+; (general note: "radius" here means manhattan distance)
 
+BIRB_BASIC_HP          = 1
+BIRB_BASIC_LOOT        = basic_loot_table
+
+BIRB_INTERMEDIATE_HP   = 2
+BIRB_INTERMEDIATE_LOOT = intermediate_loot_table
+
+BIRB_ADVANCED_HP       = 4
+BIRB_ADVANCED_LOOT     = advanced_loot_table
+
+
+; Below this distance, spiders will prefer to move directly towards the player
+SPIDER_TARGET_RADIUS = 16
+
+; Below this distance, zombies will prefer to move directly towards the player
+ZOMBIE_TARGET_RADIUS = 16
+
+ZOMBIE_BASIC_HP         = 2
+ZOMBIE_BASIC_IDLE_DELAY = 3
+ZOMBIE_BASIC_LOOT        = basic_loot_table
+
+ZOMBIE_INTERMEDIATE_HP         = 4
+ZOMBIE_INTERMEDIATE_IDLE_DELAY = 2
+ZOMBIE_INTERMEDIATE_LOOT = intermediate_loot_table
+
+ZOMBIE_ADVANCED_HP             = 6
+ZOMBIE_ADVANCED_IDLE_DELAY     = 1
+ZOMBIE_ADVANCED_LOOT     = advanced_loot_table
+
+; Below this distance, moles will not rise out of the ground
+; (intentionally very small, mostly to prevent the player from being able to
+; stand on a mole hole *while* a mole is rising, which would deal way too much
+; damage AND look weird)
+MOLE_SUPPRESSION_RADIUS = 2
 
 ; ░▒▓█▓▒░▒▓████████▓▒░▒▓████████▓▒░▒▓██████████████▓▒░ ░▒▓███████▓▒░ 
 ; ░▒▓█▓▒░  ░▒▓█▓▒░   ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        

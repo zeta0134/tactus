@@ -80,16 +80,6 @@ TILE_EXIT_STAIRS = ($AC | %00)
 .global FAR_player_collides_with_tile
 .global FAR_suspend_entire_room
 
-; Below this distance, mobs will prefer to move directly towards the player
-SPIDER_TARGET_RADIUS = 16
-ZOMBIE_TARGET_RADIUS = 16
-
-; Below this distance, moles will not rise out of the ground
-; (intentionally very small, mostly to prevent the player from being able to
-; stand on a mole hole *while* a mole is rising, which would deal way too much
-; damage AND look weird)
-MOLE_SUPPRESSION_RADIUS = 2
-
 FLAG_MOVED_THIS_FRAME = %10000000
 
 ; level gen needs to see these for shop loot purposes

@@ -255,18 +255,18 @@ EnemyHealth := R11
         cmp #%11
         beq advanced_hp
 basic_hp:
-        set_loot_table basic_loot_table
-        lda #1
+        set_loot_table BIRB_BASIC_LOOT
+        lda #BIRB_BASIC_HP
         sta EnemyHealth
         jmp done
 intermediate_hp:
-        set_loot_table intermediate_loot_table
-        lda #2
+        set_loot_table BIRB_INTERMEDIATE_LOOT
+        lda #BIRB_INTERMEDIATE_HP
         sta EnemyHealth        
         jmp done
 advanced_hp:
-        set_loot_table advanced_loot_table
-        lda #4
+        set_loot_table BIRB_ADVANCED_LOOT
+        lda #BIRB_ADVANCED_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_direct_attack_with_hp
@@ -284,18 +284,18 @@ EnemyHealth := R11
         cmp #%11
         beq advanced_hp
 basic_hp:
-        set_loot_table basic_loot_table
-        lda #1
+        set_loot_table BIRB_BASIC_LOOT
+        lda #BIRB_BASIC_HP
         sta EnemyHealth
         jmp done
 intermediate_hp:
-        set_loot_table intermediate_loot_table
-        lda #2
+        set_loot_table BIRB_INTERMEDIATE_LOOT
+        lda #BIRB_INTERMEDIATE_HP
         sta EnemyHealth
         jmp done
 advanced_hp:
-        set_loot_table advanced_loot_table
-        lda #4
+        set_loot_table BIRB_ADVANCED_LOOT
+        lda #BIRB_ADVANCED_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_indirect_attack_with_hp

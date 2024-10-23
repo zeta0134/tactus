@@ -1,4 +1,4 @@
-        .include "constants.inc"
+        .include "_globals.inc"
 
         .include "hearts.inc"
         .include "zeropage.inc"

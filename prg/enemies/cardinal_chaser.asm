@@ -153,15 +153,15 @@ CurrentTile := R15
         cmp #%11
         beq advanced
 basic:
-        lda #3
+        lda #ZOMBIE_BASIC_IDLE_DELAY
         sta IdleDelay
         jmp done
 intermediate:
-        lda #2
+        lda #ZOMBIE_INTERMEDIATE_IDLE_DELAY
         sta IdleDelay
         jmp done
 advanced:
-        lda #1
+        lda #ZOMBIE_ADVANCED_IDLE_DELAY
         sta IdleDelay
 done:
         perform_zpcm_inc
@@ -274,18 +274,18 @@ EnemyHealth := R11
         cmp #%11
         beq advanced_hp
 basic_hp:
-        set_loot_table basic_loot_table
-        lda #2
+        set_loot_table ZOMBIE_BASIC_LOOT
+        lda #ZOMBIE_BASIC_HP
         sta EnemyHealth
         jmp done
 intermediate_hp:
-        set_loot_table intermediate_loot_table
-        lda #4
+        set_loot_table ZOMBIE_INTERMEDIATE_LOOT
+        lda #ZOMBIE_INTERMEDIATE_HP
         sta EnemyHealth
         jmp done
 advanced_hp:
-        set_loot_table advanced_loot_table
-        lda #6
+        set_loot_table ZOMBIE_ADVANCED_LOOT
+        lda #ZOMBIE_ADVANCED_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_direct_attack_with_hp
@@ -303,18 +303,18 @@ EnemyHealth := R11
         cmp #%11
         beq advanced_hp
 basic_hp:
-        set_loot_table basic_loot_table
-        lda #2
+        set_loot_table ZOMBIE_BASIC_LOOT
+        lda #ZOMBIE_BASIC_HP
         sta EnemyHealth
         jmp done
 intermediate_hp:
-        set_loot_table intermediate_loot_table
-        lda #4
+        set_loot_table ZOMBIE_INTERMEDIATE_LOOT
+        lda #ZOMBIE_INTERMEDIATE_HP
         sta EnemyHealth
         jmp done
 advanced_hp:
-        set_loot_table advanced_loot_table
-        lda #6
+        set_loot_table ZOMBIE_ADVANCED_LOOT
+        lda #ZOMBIE_ADVANCED_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_indirect_attack_with_hp

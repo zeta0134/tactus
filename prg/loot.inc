@@ -22,11 +22,6 @@
 .global FAR_draw_prices
 .global FAR_reset_price_tracker
 
-.global tiny_loot_table
-.global basic_loot_table
-.global intermediate_loot_table
-.global advanced_loot_table
-
 .global test_treasure_table
 .global test_specific_item_table
 
