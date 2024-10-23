@@ -20,11 +20,11 @@ CurrentTile := R15
         cmp #%01
         beq advanced
 basic:
-        lda #2
+        lda #MOLE_BASIC_POPUP_DELAY
         sta IdleDelay
         jmp done
 advanced:
-        lda #0 ; pop up quickly
+        lda #MOLE_ADVANCED_POPUP_DELAY
         sta IdleDelay
 done:
 
@@ -189,11 +189,11 @@ CurrentTile := R15
         cmp #%01
         beq advanced
 basic:
-        lda #2
+        lda #MOLE_BASIC_VANISH_DELAY
         sta IdleDelay
         jmp done
 advanced:
-        lda #1 ; return underground quickly
+        lda #MOLE_ADVANCED_VANISH_DELAY
         sta IdleDelay
 done:
 
@@ -330,12 +330,12 @@ EnemyHealth := R11
         beq advanced_hp
 basic_hp:
         set_loot_table intermediate_loot_table
-        lda #2
+        lda #MOLE_BASIC_HP
         sta EnemyHealth
         jmp done
 advanced_hp:
         set_loot_table advanced_loot_table
-        lda #6
+        lda #MOLE_ADVANCED_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_direct_attack_with_hp
@@ -361,12 +361,12 @@ EnemyHealth := R11
         beq advanced_hp
 basic_hp:
         set_loot_table intermediate_loot_table
-        lda #2
+        lda #MOLE_BASIC_HP
         sta EnemyHealth
         jmp done
 advanced_hp:
         set_loot_table advanced_loot_table
-        lda #6
+        lda #MOLE_ADVANCED_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_direct_attack_with_hp
@@ -391,12 +391,12 @@ allow_attack:
         beq advanced_hp
 basic_hp:
         set_loot_table intermediate_loot_table
-        lda #2
+        lda #MOLE_BASIC_HP
         sta EnemyHealth
         jmp done
 advanced_hp:
         set_loot_table advanced_loot_table
-        lda #6
+        lda #MOLE_ADVANCED_HP
         sta EnemyHealth
 done:
         lda AttackSquare
@@ -529,7 +529,7 @@ TileId := R1
 TargetSquare := R13
         ; projectiles do 2 dmg
         ; ... TODO: move these into a global constants file, for easier balancing
-        lda #4
+        lda #MOLE_WRENCH_DMG
         sta DamageAmount
         far_call FAR_damage_player
 

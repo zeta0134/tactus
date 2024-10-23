@@ -154,15 +154,15 @@ CurrentTile := R15
         cmp #%11
         beq advanced
 basic:
-        lda #3
+        lda #SPIDER_BASIC_IDLE_DELAY
         sta IdleDelay
         jmp done
 intermediate:
-        lda #2
+        lda #SPIDER_INTERMEDIATE_IDLE_DELAY
         sta IdleDelay
         jmp done
 advanced:
-        lda #1
+        lda #SPIDER_ADVANCED_IDLE_DELAY
         sta IdleDelay
 done:
 
@@ -280,18 +280,18 @@ EnemyHealth := R11
         cmp #%11
         beq advanced_hp
 basic_hp:
-        set_loot_table basic_loot_table
-        lda #2
+        set_loot_table SPIDER_BASIC_LOOT
+        lda #SPIDER_BASIC_HP
         sta EnemyHealth
         jmp done
 intermediate_hp:
-        set_loot_table intermediate_loot_table
-        lda #4
+        set_loot_table SPIDER_INTERMEDIATE_LOOT
+        lda #SPIDER_INTERMEDIATE_HP
         sta EnemyHealth
         jmp done
 advanced_hp:
-        set_loot_table advanced_loot_table
-        lda #6
+        set_loot_table SPIDER_ADVANCED_LOOT
+        lda #SPIDER_ADVANCED_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_direct_attack_with_hp
@@ -309,18 +309,18 @@ EnemyHealth := R11
         cmp #%11
         beq advanced_hp
 basic_hp:
-        set_loot_table basic_loot_table
-        lda #2
+        set_loot_table SPIDER_BASIC_LOOT
+        lda #SPIDER_BASIC_HP
         sta EnemyHealth
         jmp done
 intermediate_hp:
-        set_loot_table intermediate_loot_table
-        lda #4
+        set_loot_table SPIDER_INTERMEDIATE_LOOT
+        lda #SPIDER_INTERMEDIATE_HP
         sta EnemyHealth
         jmp done
 advanced_hp:
-        set_loot_table advanced_loot_table
-        lda #6
+        set_loot_table SPIDER_ADVANCED_LOOT
+        lda #SPIDER_ADVANCED_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_indirect_attack_with_hp

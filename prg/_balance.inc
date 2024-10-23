@@ -47,6 +47,10 @@ PLAYER_BASE_TORCHLIGHT = 5
 
 ; (general note: "radius" here means manhattan distance)
 
+; used by basic player collision routines, represents
+; basically a "weak" attack. 4 HP == 1 Heart
+DEFAULT_DMG       = 4
+
 BIRB_BASIC_HP          = 1
 BIRB_BASIC_LOOT        = basic_loot_table
 
@@ -60,26 +64,72 @@ BIRB_ADVANCED_LOOT     = advanced_loot_table
 ; Below this distance, spiders will prefer to move directly towards the player
 SPIDER_TARGET_RADIUS = 16
 
-; Below this distance, zombies will prefer to move directly towards the player
-ZOMBIE_TARGET_RADIUS = 16
+SPIDER_BASIC_HP                = 2
+SPIDER_BASIC_IDLE_DELAY        = 3
+SPIDER_BASIC_LOOT              = basic_loot_table
 
-ZOMBIE_BASIC_HP         = 2
-ZOMBIE_BASIC_IDLE_DELAY = 3
-ZOMBIE_BASIC_LOOT        = basic_loot_table
+SPIDER_INTERMEDIATE_HP         = 4
+SPIDER_INTERMEDIATE_IDLE_DELAY = 2
+SPIDER_INTERMEDIATE_LOOT       = intermediate_loot_table
+
+SPIDER_ADVANCED_HP             = 6
+SPIDER_ADVANCED_IDLE_DELAY     = 1
+SPIDER_ADVANCED_LOOT           = advanced_loot_table
+
+; Below this distance, zombies will prefer to move directly towards the player
+ZOMBIE_TARGET_RADIUS           = 16
+
+ZOMBIE_BASIC_HP                = 2
+ZOMBIE_BASIC_IDLE_DELAY        = 3
+ZOMBIE_BASIC_LOOT              = basic_loot_table
 
 ZOMBIE_INTERMEDIATE_HP         = 4
 ZOMBIE_INTERMEDIATE_IDLE_DELAY = 2
-ZOMBIE_INTERMEDIATE_LOOT = intermediate_loot_table
+ZOMBIE_INTERMEDIATE_LOOT       = intermediate_loot_table
 
 ZOMBIE_ADVANCED_HP             = 6
 ZOMBIE_ADVANCED_IDLE_DELAY     = 1
-ZOMBIE_ADVANCED_LOOT     = advanced_loot_table
+ZOMBIE_ADVANCED_LOOT           = advanced_loot_table
 
 ; Below this distance, moles will not rise out of the ground
 ; (intentionally very small, mostly to prevent the player from being able to
 ; stand on a mole hole *while* a mole is rising, which would deal way too much
 ; damage AND look weird)
-MOLE_SUPPRESSION_RADIUS = 2
+MOLE_SUPPRESSION_RADIUS    = 2
+
+MOLE_BASIC_POPUP_DELAY     = 2
+MOLE_BASIC_VANISH_DELAY    = 2
+MOLE_BASIC_HP              = 2
+
+MOLE_ADVANCED_POPUP_DELAY  = 0
+MOLE_ADVANCED_VANISH_DELAY = 1
+MOLE_ADVANCED_HP           = 6
+
+MOLE_WRENCH_DMG = 4
+
+; Note: these attack on cardinals
+MUSHROOM_BASIC_BEATS        = 4
+MUSHROOM_BASIC_HP           = 2
+MUSHROOM_BASIC_LOOT         = basic_loot_table
+
+; Note: these attack in all 8 directions
+MUSHROOM_INTERMEDIATE_BEATS = 3
+MUSHROOM_INTERMEDIATE_HP    = 4
+MUSHROOM_INTERMEDIATE_LOOT  = intermediate_loot_table
+
+MUSHROOM_ADVANCED_BEATS     = 2
+MUSHROOM_ADVANCED_HP        = 6
+MUSHROOM_ADVANCED_LOOT      = advanced_loot_table
+
+MUSHROOM_WEIRD_BEATS        = 5
+MUSHROOM_WEIRD_HP           = 4
+MUSHROOM_WEIRD_LOOT         = advanced_loot_table
+
+MUSHROOM_SPORE_DMG          = 4
+
+; All slime types are defeated in one hit
+; and share a loot table.
+SLIME_LOOT_TABLE = tiny_loot_table
 
 ; ░▒▓█▓▒░▒▓████████▓▒░▒▓████████▓▒░▒▓██████████████▓▒░ ░▒▓███████▓▒░ 
 ; ░▒▓█▓▒░  ░▒▓█▓▒░   ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        

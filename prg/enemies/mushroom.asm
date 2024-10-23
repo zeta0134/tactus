@@ -17,19 +17,19 @@ CurrentTile := R15
         cmp #%10
         beq advanced
 basic:
-        lda #3
+        lda #(MUSHROOM_BASIC_BEATS-1)
         sta IdleDelay
         jmp done_picking_idle_duration
 intermediate:
-        lda #3
+        lda #(MUSHROOM_INTERMEDIATE_BEATS-1)
         sta IdleDelay
         jmp done_picking_idle_duration
 advanced:
-        lda #2
+        lda #(MUSHROOM_ADVANCED_BEATS-1)
         sta IdleDelay
         jmp done_picking_idle_duration
 weird:
-        lda #4
+        lda #(MUSHROOM_WEIRD_BEATS-1)
         sta IdleDelay
 done_picking_idle_duration:
 
@@ -199,23 +199,23 @@ EnemyHealth := R11
         cmp #%10
         beq advanced_hp
 basic_hp:
-        set_loot_table basic_loot_table
-        lda #2
+        set_loot_table MUSHROOM_BASIC_LOOT
+        lda #MUSHROOM_BASIC_HP
         sta EnemyHealth
         jmp done
 intermediate_hp:
-        set_loot_table intermediate_loot_table
-        lda #4
+        set_loot_table MUSHROOM_INTERMEDIATE_LOOT
+        lda #MUSHROOM_INTERMEDIATE_HP
         sta EnemyHealth
         jmp done
 advanced_hp:
-        set_loot_table advanced_loot_table
-        lda #6
+        set_loot_table MUSHROOM_ADVANCED_LOOT
+        lda #MUSHROOM_ADVANCED_HP
         sta EnemyHealth
         jmp done
 weird_hp:
-        set_loot_table advanced_loot_table
-        lda #4
+        set_loot_table MUSHROOM_WEIRD_LOOT
+        lda #MUSHROOM_WEIRD_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_direct_attack_with_hp
@@ -295,14 +295,13 @@ CurrentTile := R15
 .proc ENEMY_COLLIDE_hazard_damages_player
 DamageAmount := R0
         ; hazards to 2 dmg to the player (for now)
-        lda #4
+        lda #MUSHROOM_SPORE_DMG
         sta DamageAmount
         far_call FAR_damage_player
 
-        ; unlike regular enemies, hazards don't disappear.
-
-        ; TODO: if there should be a hazard-specific damage sprite / overlay thing,
-        ; this is where we would spawn that
+        ; hazards don't disappear when they "collide." They
+        ; will clean themselves up automatically, usually
+        ; on the next beat
 
         rts
 .endproc

@@ -281,7 +281,7 @@ EffectiveAttackSquare := R10
         ; spawn LOOT upon defeat. Slimes always use the tiny loot table,
         ; regardless of their "difficulty" (which really just affects their
         ; movement pattern)
-        set_loot_table tiny_loot_table
+        set_loot_table SLIME_LOOT_TABLE
         roll_loot_at OriginalAttackSquare
 
         ; Play an appropriately crunchy death sound
