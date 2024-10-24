@@ -4,6 +4,8 @@
 
     .include "../build/tile_defs.inc"
 
+    .include "_globals.inc"
+
     .include "battlefield.inc"
     .include "debug.inc"
     .include "enemies.inc"

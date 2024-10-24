@@ -147,11 +147,11 @@ CurrentTile := R15
         bail_if_already_moved
 
         ; Determine how many beats we should remain idle, based on difficulty
-        lda battlefield, x
-        and #%00000011
-        cmp #%10
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_YELLOW
         beq intermediate
-        cmp #%11
+        cmp #PAL_RED
         beq advanced
 basic:
         lda #SPIDER_BASIC_IDLE_DELAY
@@ -225,7 +225,7 @@ make_target_dangerous:
 return_to_idle_without_moving:
         ; Turn ourselves back into an idle pose
         ldx CurrentTile
-        draw_at_x_keeppal TILE_SPIDER_BASE, BG_TILE_SPIDER
+        draw_at_x_keeppal TILE_SPIDER, BG_TILE_SPIDER
         ; Zero out our delay counter, so we start fresh
         lda #0
         sta tile_data, x
@@ -236,7 +236,7 @@ proceed_with_jump:
         ldx CurrentTile
         ldy ValidDestination
         ; Draw ourselves at the target (keep our color palette)
-        draw_at_y_with_pal_x TILE_SPIDER_BASE, BG_TILE_SPIDER
+        draw_at_y_with_pal_x TILE_SPIDER, BG_TILE_SPIDER
 
         ; Fix our counter at the destination tile so we start fresh
         lda #0
@@ -273,11 +273,11 @@ proceed_with_jump:
 AttackSquare := R3
 EnemyHealth := R11
         ldx AttackSquare
-        lda battlefield, x
-        and #%00000011
-        cmp #%10
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_YELLOW
         beq intermediate_hp
-        cmp #%11
+        cmp #PAL_RED
         beq advanced_hp
 basic_hp:
         set_loot_table SPIDER_BASIC_LOOT
@@ -302,11 +302,11 @@ done:
 EffectiveAttackSquare := R10 
 EnemyHealth := R11
         ldx EffectiveAttackSquare
-        lda battlefield, x
-        and #%00000011
-        cmp #%10
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_YELLOW
         beq intermediate_hp
-        cmp #%11
+        cmp #PAL_RED
         beq advanced_hp
 basic_hp:
         set_loot_table SPIDER_BASIC_LOOT

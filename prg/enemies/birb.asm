@@ -39,7 +39,7 @@ do_not_charge:
 face_to_the_right:
         ; Turn to face the player. That's cute, and certainly not creepy at all!
         ldx CurrentTile
-        draw_at_x_keeppal TILE_BIRB_RIGHT_BASE, BG_TILE_BIRB_IDLE_RIGHT
+        draw_at_x_keeppal TILE_BIRB_RIGHT, BG_TILE_BIRB_IDLE_RIGHT
 
         ; And all done
 all_done:
@@ -82,7 +82,7 @@ do_not_charge:
 face_to_the_left:
         ; Turn to face the player. That's cute, and certainly not creepy at all!
         ldx CurrentTile
-        draw_at_x_keeppal TILE_BIRB_LEFT_BASE, BG_TILE_BIRB_IDLE_LEFT
+        draw_at_x_keeppal TILE_BIRB_LEFT, BG_TILE_BIRB_IDLE_LEFT
 
         ; And all done
 all_done:
@@ -129,7 +129,7 @@ return_to_idle_without_moving:
 
         ; Turn ourselves back into an idle pose
         ldx CurrentTile
-        draw_at_x_keeppal TILE_BIRB_RIGHT_BASE, BG_TILE_BIRB_IDLE_RIGHT
+        draw_at_x_keeppal TILE_BIRB_RIGHT, BG_TILE_BIRB_IDLE_RIGHT
 
         ; And all done
         rts
@@ -204,7 +204,7 @@ return_to_idle_without_moving:
 
         ; Turn ourselves back into an idle pose
         ldx CurrentTile
-        draw_at_x_keeppal TILE_BIRB_LEFT_BASE, BG_TILE_BIRB_IDLE_LEFT
+        draw_at_x_keeppal TILE_BIRB_LEFT, BG_TILE_BIRB_IDLE_LEFT
 
         ; And all done
         rts
@@ -248,11 +248,11 @@ proceed_with_jump:
 AttackSquare := R3
 EnemyHealth := R11
         ldx AttackSquare
-        lda battlefield, x
-        and #%00000011
-        cmp #%01
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_BLUE
         beq intermediate_hp
-        cmp #%11
+        cmp #PAL_RED
         beq advanced_hp
 basic_hp:
         set_loot_table BIRB_BASIC_LOOT
@@ -277,11 +277,11 @@ done:
 EffectiveAttackSquare := R10 
 EnemyHealth := R11
         ldx EffectiveAttackSquare
-        lda battlefield, x
-        and #%00000011
-        cmp #%01
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_BLUE
         beq intermediate_hp
-        cmp #%11
+        cmp #PAL_RED
         beq advanced_hp
 basic_hp:
         set_loot_table BIRB_BASIC_LOOT

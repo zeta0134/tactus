@@ -6,13 +6,14 @@
 CurrentTile := R15
         inc enemies_active
         ldx CurrentTile
-        lda battlefield, x
-        and #%00000011
-        cmp #%10
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_YELLOW
         beq intermediate
-        cmp #%11
+        cmp #PAL_RED
         beq advanced
-        ; Basic slimes have no update behavior; they are stationary
+        ; Blue slimes have no update behavior; they are stationary
+        ; TODO: what should "world" slimes do?
         rts
 intermediate:
         near_call ENEMY_UPDATE_update_intermediate_slime
@@ -75,7 +76,7 @@ proceed_with_jump:
         ldx CurrentTile
         ldy TargetTile
         ; Draw ourselves at the target (keep our color palette)
-        draw_at_y_with_pal_x TILE_SLIME_BASE, BG_TILE_SLIME_IDLE
+        draw_at_y_with_pal_x TILE_SLIME, BG_TILE_SLIME_IDLE
 
         ; Set up our attributes for the next jump
         lda tile_data, x
@@ -182,7 +183,7 @@ proceed_with_jump:
         ldx CurrentTile
         ldy TargetTile
         ; Draw ourselves at the target (keep our color palette)
-        draw_at_y_with_pal_x TILE_SLIME_BASE, BG_TILE_SLIME_IDLE
+        draw_at_y_with_pal_x TILE_SLIME, BG_TILE_SLIME_IDLE
 
         ; Set up our attributes for the next jump
         lda tile_data, x

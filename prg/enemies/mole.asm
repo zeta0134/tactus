@@ -15,9 +15,9 @@ CurrentTile := R15
         inc enemies_active
 
         ; Determine how many beats we should remain idle, based on difficulty
-        lda battlefield, x
-        and #%00000011
-        cmp #%01
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_BLUE
         beq advanced
 basic:
         lda #MOLE_BASIC_POPUP_DELAY
@@ -184,9 +184,9 @@ CurrentTile := R15
         bail_if_already_moved
 
         ; Determine how many beats we should remain idle, based on difficulty
-        lda battlefield, x
-        and #%00000011
-        cmp #%01
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_BLUE
         beq advanced
 basic:
         lda #MOLE_BASIC_VANISH_DELAY
@@ -203,7 +203,7 @@ done:
 
         ; Switch back into our hole pose
         ldx CurrentTile
-        draw_at_x_keeppal TILE_MOLE_HOLE_BASE, BG_TILE_MOLE_HOLE
+        draw_at_x_keeppal TILE_MOLE_HOLE, BG_TILE_MOLE_HOLE
 
         ; Again reset our delay counter
         lda #0
@@ -324,9 +324,9 @@ despawn_old_wrench:
 AttackSquare := R3
 EnemyHealth := R11
         ldx AttackSquare
-        lda battlefield, x
-        and #%00000011
-        cmp #%01
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_BLUE
         beq advanced_hp
 basic_hp:
         set_loot_table intermediate_loot_table
@@ -342,7 +342,6 @@ done:
         ; did we die? if so, cleanup the result of our attack
         ldx AttackSquare
         lda battlefield, x
-        and #%11111100
         cmp #TILE_MOLE_IDLE
         beq not_dead
         jsr ENEMY_ATTACK_cleanup_own_wrench
@@ -355,9 +354,9 @@ not_dead:
 AttackSquare := R3
 EnemyHealth := R11
         ldx AttackSquare
-        lda battlefield, x
-        and #%00000011
-        cmp #%01
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_BLUE
         beq advanced_hp
 basic_hp:
         set_loot_table intermediate_loot_table
@@ -385,9 +384,9 @@ EnemyHealth := R11
         rts
 allow_attack:
         ldx AttackSquare
-        lda battlefield, x
-        and #%00000011
-        cmp #%01
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_BLUE
         beq advanced_hp
 basic_hp:
         set_loot_table intermediate_loot_table
@@ -422,7 +421,6 @@ AttackSquare := R3
         ; is this a spore tile? don't erase just anything
         lda battlefield, x
         ; Is this a wrench?
-        and #%11111100
         cmp #TILE_WRENCH_PROJECTILE
         bne not_our_wrench_n
         ; Is this OUR wrench?
@@ -447,7 +445,6 @@ not_our_wrench_n:
         ; is this a spore tile? don't erase just anything
         lda battlefield, x
         ; Is this a wrench?
-        and #%11111100
         cmp #TILE_WRENCH_PROJECTILE
         bne not_our_wrench_e
         ; Is this OUR wrench?
@@ -471,8 +468,7 @@ not_our_wrench_e:
         tax
         ; is this a spore tile? don't erase just anything
         lda battlefield, x
-        ; Is this a wrench?
-        and #%11111100
+        ; Is this a wrench?        
         cmp #TILE_WRENCH_PROJECTILE
         bne not_our_wrench_s
         ; Is this OUR wrench?
@@ -497,7 +493,6 @@ not_our_wrench_s:
         ; is this a spore tile? don't erase just anything
         lda battlefield, x
         ; Is this a wrench?
-        and #%11111100
         cmp #TILE_WRENCH_PROJECTILE
         bne not_our_wrench_w
         ; Is this OUR wrench?

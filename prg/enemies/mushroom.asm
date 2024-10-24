@@ -8,13 +8,13 @@ CurrentTile := R15
         ldx CurrentTile
 
         ; Determine how many beats we should remain idle, based on type
-        lda battlefield, x
-        and #%00000011
-        cmp #%00
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_WORLD
         beq weird
-        cmp #%01
+        cmp #PAL_BLUE
         beq intermediate
-        cmp #%10
+        cmp #PAL_YELLOW
         beq advanced
 basic:
         lda #(MUSHROOM_BASIC_BEATS-1)
@@ -42,15 +42,15 @@ done_picking_idle_duration:
         cmp IdleDelay
         beq perform_anticipation
 continue_idling:
-        draw_at_x_keeppal TILE_MUSHROOM_BASE, BG_TILE_MUSHROOM_IDLE
+        draw_at_x_keeppal TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE
         rts
 
 perform_anticipation:
-        draw_at_x_keeppal TILE_MUSHROOM_BASE, BG_TILE_MUSHROOM_ANTICIPATE
+        draw_at_x_keeppal TILE_MUSHROOM, BG_TILE_MUSHROOM_ANTICIPATE
         rts
 
 perform_attack:
-        draw_at_x_keeppal TILE_MUSHROOM_BASE, BG_TILE_MUSHROOM_ATTACK
+        draw_at_x_keeppal TILE_MUSHROOM, BG_TILE_MUSHROOM_ATTACK
         lda #0
         sta tile_data, x
 
@@ -101,9 +101,9 @@ perform_attack:
 
         ; everything except the basic variety also spawns diagonals, so check for that here
         ldx CurrentTile
-        lda battlefield, x
-        and #%00000011
-        cmp #%11
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_RED
         beq skip_spawning_diagonal_spores
 
         lda #DUST_DIRECTION_NW
@@ -190,13 +190,13 @@ proceed_to_spawn:
 AttackSquare := R3
 EnemyHealth := R11
         ldx AttackSquare
-        lda battlefield, x
-        and #%00000011
-        cmp #%00
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_WORLD
         beq weird_hp
-        cmp #%01
+        cmp #PAL_BLUE
         beq intermediate_hp
-        cmp #%10
+        cmp #PAL_YELLOW
         beq advanced_hp
 basic_hp:
         set_loot_table MUSHROOM_BASIC_LOOT
@@ -222,8 +222,7 @@ done:
         ; did we die? if so, cleanup the result of our attack
         ldx AttackSquare
         lda battlefield, x
-        and #%11111100
-        cmp #TILE_MUSHROOM_BASE
+        cmp #TILE_MUSHROOM
         beq not_dead
         jsr ENEMY_ATTACK_cleanup_own_spores
 not_dead:
