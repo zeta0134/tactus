@@ -45,50 +45,62 @@ PLAYER_BASE_TORCHLIGHT = 5
 ; ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓█▓▒░             ░▒▓█▓▒░ 
 ; ░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░▒▓████████▓▒░▒▓███████▓▒░  
 
+; Default-ish enemy HP health pools. I'm not sure if I'm
+; really going to stick to this tiered L1-L3+Weird approach,
+; but it models the current system and this makes those levers
+; easier to mess around with.
+
+; Notably: Slimes do not have HP. They always die in 1 "hit"
+
+ONE_HIT_HP      = 1
+BASIC_HP        = 1
+INTERMEDIATE_HP = 2
+ADVANCED_HP     = 3
+
 ; (general note: "radius" here means manhattan distance)
 
 ; used by basic player collision routines, represents
 ; basically a "weak" attack. 4 HP == 1 Heart
 DEFAULT_DMG       = 4
 
-BIRB_BASIC_HP          = 1
+BIRB_BASIC_HP          = ONE_HIT_HP
 BIRB_BASIC_LOOT        = basic_loot_table
 
-BIRB_INTERMEDIATE_HP   = 2
+BIRB_INTERMEDIATE_HP   = BASIC_HP
 BIRB_INTERMEDIATE_LOOT = intermediate_loot_table
 
-BIRB_ADVANCED_HP       = 4
+BIRB_ADVANCED_HP       = INTERMEDIATE_HP
 BIRB_ADVANCED_LOOT     = advanced_loot_table
 
 
 ; Below this distance, spiders will prefer to move directly towards the player
 SPIDER_TARGET_RADIUS = 16
 
-SPIDER_BASIC_HP                = 2
 SPIDER_BASIC_IDLE_DELAY        = 3
+SPIDER_BASIC_HP                = BASIC_HP
 SPIDER_BASIC_LOOT              = basic_loot_table
 
-SPIDER_INTERMEDIATE_HP         = 4
 SPIDER_INTERMEDIATE_IDLE_DELAY = 2
+SPIDER_INTERMEDIATE_HP         = INTERMEDIATE_HP
 SPIDER_INTERMEDIATE_LOOT       = intermediate_loot_table
 
-SPIDER_ADVANCED_HP             = 6
 SPIDER_ADVANCED_IDLE_DELAY     = 1
+SPIDER_ADVANCED_HP             = ADVANCED_HP
 SPIDER_ADVANCED_LOOT           = advanced_loot_table
 
 ; Below this distance, zombies will prefer to move directly towards the player
 ZOMBIE_TARGET_RADIUS           = 16
 
-ZOMBIE_BASIC_HP                = 2
 ZOMBIE_BASIC_IDLE_DELAY        = 3
+ZOMBIE_BASIC_HP                = BASIC_HP
 ZOMBIE_BASIC_LOOT              = basic_loot_table
 
-ZOMBIE_INTERMEDIATE_HP         = 4
 ZOMBIE_INTERMEDIATE_IDLE_DELAY = 2
+ZOMBIE_INTERMEDIATE_HP         = INTERMEDIATE_HP
 ZOMBIE_INTERMEDIATE_LOOT       = intermediate_loot_table
 
-ZOMBIE_ADVANCED_HP             = 6
 ZOMBIE_ADVANCED_IDLE_DELAY     = 1
+ZOMBIE_ADVANCED_HP             = ADVANCED_HP
 ZOMBIE_ADVANCED_LOOT           = advanced_loot_table
 
 ; Below this distance, moles will not rise out of the ground
@@ -99,30 +111,30 @@ MOLE_SUPPRESSION_RADIUS    = 2
 
 MOLE_BASIC_POPUP_DELAY     = 2
 MOLE_BASIC_VANISH_DELAY    = 2
-MOLE_BASIC_HP              = 2
+MOLE_BASIC_HP              = BASIC_HP
 
 MOLE_ADVANCED_POPUP_DELAY  = 0
 MOLE_ADVANCED_VANISH_DELAY = 1
-MOLE_ADVANCED_HP           = 6
+MOLE_ADVANCED_HP           = ADVANCED_HP
 
 MOLE_WRENCH_DMG = 4
 
 ; Note: these attack on cardinals
 MUSHROOM_BASIC_BEATS        = 4
-MUSHROOM_BASIC_HP           = 2
+MUSHROOM_BASIC_HP           = BASIC_HP
 MUSHROOM_BASIC_LOOT         = basic_loot_table
 
 ; Note: these attack in all 8 directions
 MUSHROOM_INTERMEDIATE_BEATS = 3
-MUSHROOM_INTERMEDIATE_HP    = 4
+MUSHROOM_INTERMEDIATE_HP    = INTERMEDIATE_HP
 MUSHROOM_INTERMEDIATE_LOOT  = intermediate_loot_table
 
 MUSHROOM_ADVANCED_BEATS     = 2
-MUSHROOM_ADVANCED_HP        = 6
+MUSHROOM_ADVANCED_HP        = ADVANCED_HP
 MUSHROOM_ADVANCED_LOOT      = advanced_loot_table
 
 MUSHROOM_WEIRD_BEATS        = 5
-MUSHROOM_WEIRD_HP           = 4
+MUSHROOM_WEIRD_HP           = INTERMEDIATE_HP
 MUSHROOM_WEIRD_LOOT         = advanced_loot_table
 
 MUSHROOM_SPORE_DMG          = 4
