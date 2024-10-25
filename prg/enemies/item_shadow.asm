@@ -115,10 +115,10 @@ normal_price:
         jcc thats_too_expensive ; Can't afford it. Sorry!
 
 sell_it_to_meeeeeee:
-        lda #(PAL_BLUE | CHR_BANK_000_SHIFTED_NUMERALS)
+        lda #(PAL_WATER | CHR_BANK_000_SHIFTED_NUMERALS)
         jmp queue_cost
 thats_too_expensive:
-        lda #(PAL_RED | CHR_BANK_000_SHIFTED_NUMERALS)
+        lda #(PAL_FIRE | CHR_BANK_000_SHIFTED_NUMERALS)
 queue_cost:
         sta PriceColor
         far_call FAR_queue_price_tile_here
@@ -317,7 +317,7 @@ revert_to_disco_tile:
         sta battlefield, x
         lda #<BG_TILE_FLOOR
         sta tile_patterns, x
-        lda #(>BG_TILE_FLOOR | PAL_WORLD)
+        lda #(>BG_TILE_FLOOR | PAL_EARTH)
         sta tile_attributes, x
         lda #0
         sta tile_data, x

@@ -1,7 +1,5 @@
 
 
-; TODO: not this!
-; Every entity has an ID, and in this game it also doubles as their starting tile in CHR space.
 TILE_SMOKE_PUFF = $00
 TILE_SLIME = $04
 TILE_SPIDER = $08
@@ -21,18 +19,18 @@ TILE_MUSHROOM = $3C
 TILE_ONE_BEAT_HAZARD = $40
 
 ; Non-enemies, mostly level geometry
-TILE_DISCO_FLOOR    = $84 ; why are these still different?
+TILE_DISCO_FLOOR    = $84
 TILE_SEMISAFE_FLOOR = $88
 TILE_WALL           = $8C
 
 ; Treasure drops
-TILE_ITEM_SHADOW = ($90 | %00)
-TILE_TREASURE_CHEST = ($98 | %10)
-TILE_BIG_KEY = ($9C | %01)
+TILE_ITEM_SHADOW = $90
+TILE_TREASURE_CHEST = $98
+TILE_BIG_KEY = $9C
 
 ; Interactable blocks
-TILE_EXIT_BLOCK = ($A8 | %01)
-TILE_EXIT_STAIRS = ($AC | %00)
+TILE_EXIT_BLOCK = $A8
+TILE_EXIT_STAIRS = $AC
 
 ; Actually in the fixed page
 .global draw_active_tile

@@ -250,9 +250,9 @@ EnemyHealth := R11
         ldx AttackSquare
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_BLUE
+        cmp #PAL_WATER
         beq intermediate_hp
-        cmp #PAL_RED
+        cmp #PAL_FIRE
         beq advanced_hp
 basic_hp:
         set_loot_table BIRB_BASIC_LOOT
@@ -279,9 +279,9 @@ EnemyHealth := R11
         ldx EffectiveAttackSquare
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_BLUE
+        cmp #PAL_WATER
         beq intermediate_hp
-        cmp #PAL_RED
+        cmp #PAL_FIRE
         beq advanced_hp
 basic_hp:
         set_loot_table BIRB_BASIC_LOOT

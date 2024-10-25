@@ -1638,7 +1638,7 @@ perform_chest_spawning:
         sta EntityId
         lda #<BG_TILE_TREASURE_CHEST
         sta EntityPattern
-        lda #(>BG_TILE_TREASURE_CHEST | PAL_YELLOW)
+        lda #(>BG_TILE_TREASURE_CHEST | PAL_AIR)
         sta EntityAttribute
         jsr spawn_entity
 
@@ -1810,7 +1810,7 @@ EntityAttribute := R3
         sta EntityId
         lda #<BG_TILE_EXIT_BLOCK
         sta EntityPattern
-        lda #(>BG_TILE_EXIT_BLOCK | PAL_BLUE)
+        lda #(>BG_TILE_EXIT_BLOCK | PAL_WATER)
         sta EntityAttribute
         jsr spawn_entity
         rts

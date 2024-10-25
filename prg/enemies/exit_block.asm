@@ -18,7 +18,8 @@ AttackLanded := R7
         ; Replace the exit block with the stairs down
         ldx AttackSquare
         stx TargetIndex
-        draw_at_x_withpal TILE_EXIT_STAIRS, BG_TILE_EXIT_STAIRS, PAL_WORLD
+        ; TODO: should this keep the color it was previously?
+        draw_at_x_withpal TILE_EXIT_STAIRS, BG_TILE_EXIT_STAIRS, PAL_EARTH
 
         lda #0
         sta tile_data, x

@@ -45,7 +45,7 @@ AttackSquare := R3
         ; Super easy: replace the chest with a big key tile
         ldx AttackSquare
         stx TargetIndex
-        draw_at_x_withpal TILE_BIG_KEY, BG_TILE_BIG_KEY, PAL_BLUE
+        draw_at_x_withpal TILE_BIG_KEY, BG_TILE_BIG_KEY, PAL_WATER
 
         lda #0
         sta tile_data, x
@@ -70,7 +70,7 @@ ItemId := R18
         ; Mostly easy: replace the chest with an item shadow
         ldx AttackSquare
         stx TargetIndex        
-        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_WORLD
+        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_EARTH
 
         lda #0
         sta tile_flags, x
@@ -144,7 +144,7 @@ converge:
         ; Mostly easy: replace the chest with an item shadow
         ldx AttackSquare
         stx TargetIndex        
-        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_WORLD
+        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_EARTH
 
         lda #0
         sta tile_flags, x
@@ -177,7 +177,7 @@ TargetSquare := R13
         ; Now, draw a basic floor tile here, which will be underneath the player
         ldx TargetSquare
         stx TargetIndex
-        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_WORLD
+        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_EARTH
 
         lda #0
         sta tile_data, x

@@ -148,9 +148,9 @@ CurrentTile := R15
         ; Determine how many beats we should remain idle, based on difficulty
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_YELLOW
+        cmp #PAL_AIR
         beq intermediate
-        cmp #PAL_RED
+        cmp #PAL_FIRE
         beq advanced
 basic:
         lda #ZOMBIE_BASIC_IDLE_DELAY
@@ -269,9 +269,9 @@ EnemyHealth := R11
         ldx AttackSquare
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_YELLOW
+        cmp #PAL_AIR
         beq intermediate_hp
-        cmp #PAL_RED
+        cmp #PAL_FIRE
         beq advanced_hp
 basic_hp:
         set_loot_table ZOMBIE_BASIC_LOOT
@@ -298,9 +298,9 @@ EnemyHealth := R11
         ldx EffectiveAttackSquare
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_YELLOW
+        cmp #PAL_AIR
         beq intermediate_hp
-        cmp #PAL_RED
+        cmp #PAL_FIRE
         beq advanced_hp
 basic_hp:
         set_loot_table ZOMBIE_BASIC_LOOT

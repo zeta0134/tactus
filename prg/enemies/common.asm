@@ -558,7 +558,7 @@ TargetSquare := R13
         sta battlefield, x
         lda #<BG_TILE_FLOOR
         sta tile_patterns, x
-        lda #(>BG_TILE_FLOOR | PAL_WORLD)
+        lda #(>BG_TILE_FLOOR | PAL_EARTH)
         sta tile_attributes, x
         lda #0
         sta tile_data, x

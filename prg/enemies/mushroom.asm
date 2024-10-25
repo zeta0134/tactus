@@ -10,11 +10,11 @@ CurrentTile := R15
         ; Determine how many beats we should remain idle, based on type
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_WORLD
+        cmp #PAL_EARTH
         beq weird
-        cmp #PAL_BLUE
+        cmp #PAL_WATER
         beq intermediate
-        cmp #PAL_YELLOW
+        cmp #PAL_AIR
         beq advanced
 basic:
         lda #(MUSHROOM_BASIC_BEATS-1)
@@ -103,7 +103,7 @@ perform_attack:
         ldx CurrentTile
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_RED
+        cmp #PAL_FIRE
         beq skip_spawning_diagonal_spores
 
         lda #DUST_DIRECTION_NW
@@ -192,11 +192,11 @@ EnemyHealth := R11
         ldx AttackSquare
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_WORLD
+        cmp #PAL_EARTH
         beq weird_hp
-        cmp #PAL_BLUE
+        cmp #PAL_WATER
         beq intermediate_hp
-        cmp #PAL_YELLOW
+        cmp #PAL_AIR
         beq advanced_hp
 basic_hp:
         set_loot_table MUSHROOM_BASIC_LOOT
@@ -285,7 +285,7 @@ CurrentTile := R15
 
         ; it's been one beat! stop being a one beat hazard, thx.
         ldx CurrentTile
-        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_WORLD
+        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_EARTH
         near_call ENEMY_UPDATE_draw_disco_tile
         rts
 .endproc

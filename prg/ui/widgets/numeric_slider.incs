@@ -66,7 +66,7 @@ AttributeAddr := T2
         ; okay, now draw the left edge of the slider bar
         lda #1
         sta (NametableAddr), y
-        lda #(CHR_BANK_FONT_MARSHMALLOW | PAL_BLUE)
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
         sta (AttributeAddr), y
         iny
 
@@ -84,7 +84,7 @@ mid_segment_loop:
         perform_zpcm_inc
         lda #2
         sta (NametableAddr), y
-        lda #(CHR_BANK_FONT_MARSHMALLOW | PAL_BLUE)
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
         sta (AttributeAddr), y
         iny
         dex
@@ -94,7 +94,7 @@ done_with_mid_segments:
         ; finally, draw the last segment
         lda #3
         sta (NametableAddr), y
-        lda #(CHR_BANK_FONT_MARSHMALLOW | PAL_BLUE)
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
         sta (AttributeAddr), y
 
         ; now that we're done with the label, we can repurpose its pointer

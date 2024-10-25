@@ -8,9 +8,9 @@ CurrentTile := R15
         ldx CurrentTile
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_YELLOW
+        cmp #PAL_AIR
         beq intermediate
-        cmp #PAL_RED
+        cmp #PAL_FIRE
         beq advanced
         ; Blue slimes have no update behavior; they are stationary
         ; TODO: what should "world" slimes do?
