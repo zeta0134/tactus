@@ -81,7 +81,7 @@ hud_hub_pal:
 
 .macro zone_banner_pos tile_x, tile_y
         .byte ((tile_y*16)+tile_x)
-        .byte (HUD_WORLD_PAL | CHR_BANK_ZONES)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ZONES)
 .endmacro
 
 ; for bank switching
