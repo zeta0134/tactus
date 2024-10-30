@@ -67,6 +67,9 @@
 
         .segment "DATA_3"
 
+hud_base_pal:
+        .incbin "../art/hud_base.pal"
+
 hud_grasslands_pal:
         .incbin "../art/zone_1_banner.pal"
 
@@ -632,13 +635,22 @@ HudPalPtr := R0
         sta HudPalPtr+1
 
         ldy #0
-hud_bg_loop:
+hud_base_loop:
         perform_zpcm_inc
-        lda (HudPalPtr), y
+        lda hud_base_pal, y
         sta HudPaletteBuffer, y
         iny
         cpy #16
-        bne hud_bg_loop
+        bne hud_base_loop
+
+        ldy #0
+hud_zone_loop:
+        perform_zpcm_inc
+        lda (HudPalPtr), y
+        sta HudPaletteBuffer+16, y
+        iny
+        cpy #16
+        bne hud_zone_loop
 
         restore_previous_bank
         perform_zpcm_inc
