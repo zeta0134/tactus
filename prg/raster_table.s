@@ -692,6 +692,32 @@ return_from_delay:
 
         ; ppu dot here: 308
 
+        ; prep the fourth round of palette updates
+        lda HudPaletteBuffer+16  ; 4
+        ldx HudPaletteBuffer+17  ; 4
+        ldy HudPaletteBuffer+18  ; 4
+
+        ; ppu dot here: 3
+
+        ; wait until hblank (251)
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        jsr delay_12
+        .repeat 5 ; (10)
+        nop
+        .endrepeat
+
+        ; ppu dot here: 249
+        ; write the palette entries for OBJ0 0-3
+        sta PPUDATA ; 4
+        stx PPUDATA ; 4
+        sty PPUDATA ; 4
+        lda HudPaletteBuffer+19 ; 4
+        sta PPUDATA ; 4
+
+        ; ppu dot here: 309
+
         ; At this point the BG palette is written; for now we will stop here.
         ; We are parked on #$3F10, which mirrors BG0.0, so we can set up to re-enable rendering
 
@@ -950,6 +976,35 @@ return_from_delay:
         stx PPUDATA ; 4
         sty PPUDATA ; 4
         lda HudPaletteBuffer+15 ; 4
+        sta PPUDATA ; 4
+
+        ; ppu dot here: 308
+
+        ; prep the fourth round of palette updates
+        lda HudPaletteBuffer+16  ; 4
+        ldx HudPaletteBuffer+17  ; 4
+        ldy HudPaletteBuffer+18  ; 4
+
+        ; ppu dot here: 3
+
+        ; wait until hblank (248)
+        ; NTSC: was 81
+        ; PAL: should be 74
+        jsr delay_20
+        jsr delay_20
+        jsr delay_20
+        php ; 3
+        plp ; 4
+        .repeat 4 ; 8
+        nop
+        .endrepeat
+
+        ; ppu dot here: 248
+        ; write the palette entries for BG3 0-3
+        sta PPUDATA ; 4
+        stx PPUDATA ; 4
+        sty PPUDATA ; 4
+        lda HudPaletteBuffer+19 ; 4
         sta PPUDATA ; 4
 
         ; ppu dot here: 308
