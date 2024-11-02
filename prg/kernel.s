@@ -124,7 +124,8 @@ continue_waiting:
 .proc init_engine
         near_call FAR_init_settings
 
-        far_call FAR_disable_all_oam_entries
+        far_call FAR_disable_all_oam_entries_playfield
+        far_call FAR_disable_all_oam_entries_hud
 
         ; NORMAL: start on the title screen
         ; TODO: add the boxgirl productions logo, and any other "first run" screens here
@@ -183,6 +184,10 @@ LayoutPtr := R0
         sta LeftNametableAttr
         sta RightNametableAttr
 
+        ; make sure to clear any leftover HUD sprites, if we are entering
+        ; from the game world
+        far_call FAR_disable_all_oam_entries_hud
+
         ; the UI subsystem may override this, but this'll be a sane starting set for testing
         far_call FAR_initialize_title_palettes
         far_call FAR_initialize_sprites
@@ -223,6 +228,7 @@ LayoutPtr := R0
         rts
 .endproc
 
+; TODO: remove this entirely, make it a UI subscreen instead
 .proc game_end_screen_prep
         lda #0
         sta tempo_adjustment
@@ -250,6 +256,10 @@ LayoutPtr := R0
         lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG)
         sta LeftNametableAttr
         sta RightNametableAttr
+
+        ; make sure to clear any leftover HUD sprites, if we are entering
+        ; from the game world
+        far_call FAR_disable_all_oam_entries_hud
 
         ; Jank: actually apply those right now, since the endscreen drawing routines
         ; expect to be able to use PPUDATA for some reason
@@ -1151,8 +1161,6 @@ continue_waiting:
         far_call FAR_update_palette_cycler
 
         perform_zpcm_inc
-        far_call FAR_queue_hud
-        perform_zpcm_inc
         far_call FAR_determine_player_intent
         far_call FAR_draw_player
         perform_zpcm_inc
@@ -1160,6 +1168,10 @@ continue_waiting:
         debug_color (TINT_G | TINT_B | LIGHTGRAY)
         far_call FAR_draw_sprites
         debug_color LIGHTGRAY
+
+        perform_zpcm_inc
+        far_call FAR_queue_hud
+        perform_zpcm_inc
 
         debug_color (TINT_R | TINT_G | LIGHTGRAY)
         far_call FAR_update_torchlight

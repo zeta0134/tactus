@@ -753,7 +753,7 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         ror                     ; 2 - %L....... C:H
         ror                     ; 2 - %HL......
         and #%11000000          ; 2 (safety)
-        ora #CHR_BANK_ZONES     ; 2 (later: replace with HUD sprite base!)
+        ora #CHR_BANK_ZONES_OBJ ; 2 (later: replace with HUD sprite base!)
         sta MAP_CHR_0_LO        ; 4
 
         ; NEW STUFF
@@ -1044,7 +1044,7 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         ror                     ; 2 - %L....... C:H
         ror                     ; 2 - %HL......
         and #%11000000          ; 2 (safety)
-        ora #CHR_BANK_ZONES     ; 2 (later: replace with HUD sprite base!)
+        ora #CHR_BANK_ZONES_OBJ ; 2 (later: replace with HUD sprite base!)
         sta MAP_CHR_0_LO        ; 4
 
         ; NEW STUFF

@@ -1,6 +1,9 @@
+    .include "../build/tile_defs.inc"
+
+    .include "_globals.inc"
+
     .include "battlefield.inc"
     .include "coins.inc"
-    .include "../build/tile_defs.inc"
     .include "player.inc"
     .include "sprites.inc"
     .include "slowam.inc"

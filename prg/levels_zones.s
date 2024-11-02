@@ -4,6 +4,8 @@
 
         .include "../build/tile_defs.inc"
 
+        .include "_globals.inc"
+
         .include "bhop/bhop.inc"
         .include "battlefield.inc"
         .include "enemies.inc"
@@ -16,7 +18,9 @@
         .include "prng.inc"
         .include "procgen.inc"
         .include "rainbow.inc"
+        .include "slowam.inc"
         .include "sound.inc"
+        .include "sprites.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
 
@@ -110,6 +114,78 @@ zone_blocking_mazes:
 ;   ##    ##  ##    ##  ##     ## ##    ## ##    ## ##       ##     ## ##   ### ##     ## ##    ## 
 ;    ######   ##     ## ##     ##  ######   ######  ######## ##     ## ##    ## ########   ######  
 
+zone_grasslands_banner_1_1:
+        ; 8x16 sprite tiles
+        .byte $00, $02
+        .byte $A0, $A2
+        ; 8x16 sprite attributes
+        .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
+        .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
+        ; 8x8 bg tiles
+        .byte $00, $01
+        .byte $10, $11
+        .byte $A0, $A1
+        .byte $B0, $B1
+        ; 8x8 bg attributes
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+
+zone_grasslands_banner_1_2:
+        ; 8x16 sprite tiles
+        .byte $20, $22
+        .byte $A0, $A2
+        ; 8x16 sprite attributes
+        .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
+        .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
+        ; 8x8 bg tiles
+        .byte $20, $21
+        .byte $30, $31
+        .byte $A0, $A1
+        .byte $B0, $B1
+        ; 8x8 bg attributes
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+
+zone_grasslands_banner_1_3:
+        ; 8x16 sprite tiles
+        .byte $40, $42
+        .byte $A0, $A2
+        ; 8x16 sprite attributes
+        .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
+        .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
+        ; 8x8 bg tiles
+        .byte $40, $41
+        .byte $50, $51
+        .byte $A0, $A1
+        .byte $B0, $B1
+        ; 8x8 bg attributes
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+
+zone_grasslands_banner_1_4:
+        ; 8x16 sprite tiles
+        .byte $60, $62
+        .byte $A0, $A2
+        ; 8x16 sprite attributes
+        .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
+        .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
+        ; 8x8 bg tiles
+        .byte $60, $61
+        .byte $70, $71
+        .byte $A0, $A1
+        .byte $B0, $B1
+        ; 8x8 bg attributes
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
+
 zone_grasslands_floor_1:
         .addr spawn_pool_generic ; Spawn Pool
         .addr spawnset_a53_z1_f1 ; Challenge Set
@@ -120,8 +196,7 @@ zone_grasslands_floor_1:
         .addr zone_grasslands_floor_1_exits ; Exit List
         .byte TRACK_BOUNCY          ; Music Track
         .byte 0                     ; Added Tempo
-        zone_banner_pos 0, 0        ; HudHeader
-        zone_banner_pos 0, 5        ; HudBanner
+        .word zone_grasslands_banner_1_1 ; HudBanner
         .addr hud_grasslands_pal
         .addr common_treasure_table     ; ShopLootPtr0
         .addr common_treasure_table     ; ShopLootPtr1
@@ -136,7 +211,6 @@ zone_grasslands_floor_1:
         .addr test_structure_set_small ;ExteriorStructureSmallSet
         .byte 3                        ;ExteriorStructureSmallMaxMax
 
-
 zone_grasslands_floor_2:
         .addr spawn_pool_generic ; Spawn Pool
         .addr spawnset_a53_z1_f2 ; Challenge Set
@@ -147,8 +221,7 @@ zone_grasslands_floor_2:
         .addr zone_grasslands_floor_2_exits ; Exit List
         .byte TRACK_BOUNCY          ; Music Track
         .byte 5   ; Added Tempo
-        zone_banner_pos 0, 1        ; HudHeader
-        zone_banner_pos 0, 5        ; HudBanner
+        .word zone_grasslands_banner_1_2 ; HudBanner
         .addr hud_grasslands_pal
         .addr rare_treasure_table       ; ShopLootPtr0
         .addr rare_treasure_table       ; ShopLootPtr1
@@ -173,8 +246,7 @@ zone_grasslands_floor_3:
         .addr zone_grasslands_floor_3_exits ; Exit List
         .byte TRACK_BOUNCY          ; Music Track
         .byte 10   ; Added Tempo
-        zone_banner_pos 0, 2        ; HudHeader
-        zone_banner_pos 0, 5        ; HudBanner
+        .word zone_grasslands_banner_1_3 ; HudBanner
         .addr hud_grasslands_pal
         .addr rare_treasure_table       ; ShopLootPtr0
         .addr rare_treasure_table       ; ShopLootPtr1
@@ -199,8 +271,7 @@ zone_grasslands_floor_4:
         .addr zone_grasslands_floor_4_exits ; Exit List
         .byte TRACK_BOUNCY          ; Music Track
         .byte 15   ; Added Tempo
-        zone_banner_pos 0, 3        ; HudHeader
-        zone_banner_pos 0, 5        ; HudBanner
+        .word zone_grasslands_banner_1_4 ; HudBanner
         .addr hud_grasslands_pal
         .addr rare_treasure_table       ; ShopLootPtr0
         .addr rare_treasure_table       ; ShopLootPtr1
@@ -268,6 +339,24 @@ zone_grasslands_floor_234_mazes:
 ;  ##     ## ##     ## ##     ## 
 ;  ##     ##  #######  ########  
 
+zone_hub_banner:
+        ; 8x16 sprite tiles
+        .byte $1C, $1E
+        .byte $BC, $BE
+        ; 8x16 sprite attributes
+        .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
+        .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
+        ; 8x8 bg tiles
+        .byte $0E, $0F
+        .byte $1E, $1F
+        .byte $AE, $AF
+        .byte $BE, $BF
+        ; 8x8 bg attributes
+        .byte (HUD_RED_PAL | CHR_BANK_ZONES), (HUD_RED_PAL | CHR_BANK_ZONES)
+        .byte (HUD_RED_PAL | CHR_BANK_ZONES), (HUD_RED_PAL | CHR_BANK_ZONES)
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ZONES), (HUD_YELLOW_PAL | CHR_BANK_ZONES)
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ZONES), (HUD_YELLOW_PAL | CHR_BANK_ZONES)
+
 zone_hub_world:
         .addr spawn_pool_generic   ; Spawn Pool (unused)
         .addr spawnset_a53_z1_f1   ; Challenge Set (unused)
@@ -278,8 +367,7 @@ zone_hub_world:
         .addr zone_hub_exits       ; Exit List
         .byte TRACK_OPTIONS        ; Music Track
         .byte 0   ; Added Tempo
-        zone_banner_pos 14, 0        ; HudHeader
-        zone_banner_pos 14, 5        ; HudBanner
+        .word zone_hub_banner ; HudBanner
         .addr hud_hub_pal
         .addr rare_treasure_table       ; ShopLootPtr0 (unused)
         .addr rare_treasure_table       ; ShopLootPtr1
@@ -327,8 +415,7 @@ zone_beach_floor_1:
         .addr zone_beach_floor_1_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
         .byte 0   ; Added Tempo
-        zone_banner_pos 2, 0        ; HudHeader
-        zone_banner_pos 2, 5        ; HudBanner
+        .word zone_grasslands_banner_1_1 ; HudBanner
         .addr hud_beach_pal
         .addr common_treasure_table     ; ShopLootPtr0
         .addr common_treasure_table     ; ShopLootPtr1
@@ -353,8 +440,7 @@ zone_beach_floor_2:
         .addr zone_beach_floor_2_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
         .byte 5   ; Added Tempo
-        zone_banner_pos 2, 1        ; HudHeader
-        zone_banner_pos 2, 5        ; HudBanner
+        .word zone_grasslands_banner_1_1 ; HudBanner
         .addr hud_beach_pal
         .addr rare_treasure_table       ; ShopLootPtr0
         .addr rare_treasure_table       ; ShopLootPtr1
@@ -379,8 +465,7 @@ zone_beach_floor_3:
         .addr zone_beach_floor_3_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
         .byte 10   ; Added Tempo
-        zone_banner_pos 2, 2        ; HudHeader
-        zone_banner_pos 2, 5        ; HudBanner
+        .word zone_grasslands_banner_1_1 ; HudBanner
         .addr hud_beach_pal
         .addr rare_treasure_table       ; ShopLootPtr0
         .addr rare_treasure_table       ; ShopLootPtr1
@@ -405,8 +490,7 @@ zone_beach_floor_4:
         .addr zone_beach_floor_4_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
         .byte 15   ; Added Tempo
-        zone_banner_pos 2, 3        ; HudHeader
-        zone_banner_pos 2, 5        ; HudBanner
+        .word zone_grasslands_banner_1_1 ; HudBanner
         .addr hud_beach_pal
         .addr rare_treasure_table       ; ShopLootPtr0
         .addr rare_treasure_table       ; ShopLootPtr1
@@ -457,8 +541,7 @@ zone_grasslands_floor_2_but_fast:
         .addr zone_debug_exits   ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
         .byte 80   ; Added Tempo
-        zone_banner_pos 14, 1       ; DebugHeader
-        zone_banner_pos 14, 5       ; DebugBanner
+        .word zone_grasslands_banner_1_1 ; HudBanner
         .addr hud_grasslands_pal
         .addr rare_treasure_table       ; ShopLootPtr0
         .addr rare_treasure_table       ; ShopLootPtr1
@@ -586,34 +669,197 @@ LootTableIndex := R2
         rts
 .endproc
 
-.proc FAR_current_zone_header_tile
-DrawTile := R0
-DrawAttr := R1
+.proc FAR_draw_banner_for_current_zone
+NametableAddr := R0
+AttributeAddr := R2
+SpritePosX := R4
+SpritePosY := R5
+BannerDefPtr := R6
+SpritePtr := R8
         access_data_bank #<.bank(all_zones_data_page)
 
-        ldy #ZoneDefinition::HudHeader
+        ldy #ZoneDefinition::HudBannerDef
         lda (PlayerZonePtr), y
-        sta DrawTile
+        sta BannerDefPtr+0
         iny
         lda (PlayerZonePtr), y
-        sta DrawAttr
+        sta BannerDefPtr+1
 
-        restore_previous_bank
-        perform_zpcm_inc
-        rts
-.endproc
+        ; Nametable Tiles
 
-.proc FAR_current_zone_banner_tile
-DrawTile := R0
-DrawAttr := R1
-        access_data_bank #<.bank(all_zones_data_page)
+        ldy #HudBannerDef::BgTileIds + 0
+        lda (BannerDefPtr), y
+        ldy #$00
+        sta (NametableAddr), y
 
-        ldy #ZoneDefinition::HudBanner
-        lda (PlayerZonePtr), y
-        sta DrawTile
-        iny
-        lda (PlayerZonePtr), y
-        sta DrawAttr
+        ldy #HudBannerDef::BgTileIds + 1
+        lda (BannerDefPtr), y
+        ldy #$01
+        sta (NametableAddr), y
+
+        ldy #HudBannerDef::BgTileIds + 2
+        lda (BannerDefPtr), y
+        ldy #$20
+        sta (NametableAddr), y
+
+        ldy #HudBannerDef::BgTileIds + 3
+        lda (BannerDefPtr), y
+        ldy #$21
+        sta (NametableAddr), y
+
+        ldy #HudBannerDef::BgTileIds + 4
+        lda (BannerDefPtr), y
+        ldy #$40
+        sta (NametableAddr), y
+
+        ldy #HudBannerDef::BgTileIds + 5
+        lda (BannerDefPtr), y
+        ldy #$41
+        sta (NametableAddr), y
+
+        ldy #HudBannerDef::BgTileIds + 6
+        lda (BannerDefPtr), y
+        ldy #$60
+        sta (NametableAddr), y
+
+        ldy #HudBannerDef::BgTileIds + 7
+        lda (BannerDefPtr), y
+        ldy #$61
+        sta (NametableAddr), y
+
+        ; Attribute Definitions
+
+        ldy #HudBannerDef::BgTileAttrs + 0
+        lda (BannerDefPtr), y
+        ldy #$00
+        sta (AttributeAddr), y
+
+        ldy #HudBannerDef::BgTileAttrs + 1
+        lda (BannerDefPtr), y
+        ldy #$01
+        sta (AttributeAddr), y
+
+        ldy #HudBannerDef::BgTileAttrs + 2
+        lda (BannerDefPtr), y
+        ldy #$20
+        sta (AttributeAddr), y
+
+        ldy #HudBannerDef::BgTileAttrs + 3
+        lda (BannerDefPtr), y
+        ldy #$21
+        sta (AttributeAddr), y
+
+        ldy #HudBannerDef::BgTileAttrs + 4
+        lda (BannerDefPtr), y
+        ldy #$40
+        sta (AttributeAddr), y
+
+        ldy #HudBannerDef::BgTileAttrs + 5
+        lda (BannerDefPtr), y
+        ldy #$41
+        sta (AttributeAddr), y
+
+        ldy #HudBannerDef::BgTileAttrs + 6
+        lda (BannerDefPtr), y
+        ldy #$60
+        sta (AttributeAddr), y
+
+        ldy #HudBannerDef::BgTileAttrs + 7
+        lda (BannerDefPtr), y
+        ldy #$61
+        sta (AttributeAddr), y
+
+        ; Sprite: Top-Left
+        ldy #BANNER_FIRST_OAM_INDEX+0
+        lda sprite_ptr_lut_low, y
+        sta SpritePtr+0
+        lda sprite_ptr_lut_high, y
+        sta SpritePtr+1
+        lda SpritePosX
+        ldy #SelfModifiedSprite::PosX
+        sta (SpritePtr), y
+        lda SpritePosY
+        ldy #SelfModifiedSprite::PosY
+        sta (SpritePtr), y
+        ldy #HudBannerDef::SpriteTileIds + 0
+        lda (BannerDefPtr), y
+        ldy #SelfModifiedSprite::TileId
+        sta (SpritePtr), y
+        ldy #HudBannerDef::SpriteAttrs + 0
+        lda (BannerDefPtr), y
+        ldy #SelfModifiedSprite::Attributes
+        sta (SpritePtr), y
+
+        ; Sprite: Top-Right
+        ldy #BANNER_FIRST_OAM_INDEX+1
+        lda sprite_ptr_lut_low, y
+        sta SpritePtr+0
+        lda sprite_ptr_lut_high, y
+        sta SpritePtr+1
+        lda SpritePosX
+        clc
+        adc #8
+        ldy #SelfModifiedSprite::PosX
+        sta (SpritePtr), y
+        lda SpritePosY
+        ldy #SelfModifiedSprite::PosY
+        sta (SpritePtr), y
+        ldy #HudBannerDef::SpriteTileIds + 1
+        lda (BannerDefPtr), y
+        ldy #SelfModifiedSprite::TileId
+        sta (SpritePtr), y
+        ldy #HudBannerDef::SpriteAttrs + 1
+        lda (BannerDefPtr), y
+        ldy #SelfModifiedSprite::Attributes
+        sta (SpritePtr), y
+
+        ; Sprite: Bottom-Left
+        ldy #BANNER_FIRST_OAM_INDEX+2
+        lda sprite_ptr_lut_low, y
+        sta SpritePtr+0
+        lda sprite_ptr_lut_high, y
+        sta SpritePtr+1
+        lda SpritePosX
+        ldy #SelfModifiedSprite::PosX
+        sta (SpritePtr), y
+        lda SpritePosY
+        clc
+        adc #16
+        ldy #SelfModifiedSprite::PosY
+        sta (SpritePtr), y
+        ldy #HudBannerDef::SpriteTileIds + 2
+        lda (BannerDefPtr), y
+        ldy #SelfModifiedSprite::TileId
+        sta (SpritePtr), y
+        ldy #HudBannerDef::SpriteAttrs + 2
+        lda (BannerDefPtr), y
+        ldy #SelfModifiedSprite::Attributes
+        sta (SpritePtr), y
+
+        ; Sprite: Bottom-Right
+        ldy #BANNER_FIRST_OAM_INDEX+3
+        lda sprite_ptr_lut_low, y
+        sta SpritePtr+0
+        lda sprite_ptr_lut_high, y
+        sta SpritePtr+1
+        lda SpritePosX
+        clc
+        adc #8
+        ldy #SelfModifiedSprite::PosX
+        sta (SpritePtr), y
+        lda SpritePosY
+        clc
+        adc #16
+        ldy #SelfModifiedSprite::PosY
+        sta (SpritePtr), y
+        ldy #HudBannerDef::SpriteTileIds + 3
+        lda (BannerDefPtr), y
+        ldy #SelfModifiedSprite::TileId
+        sta (SpritePtr), y
+        ldy #HudBannerDef::SpriteAttrs + 3
+        lda (BannerDefPtr), y
+        ldy #SelfModifiedSprite::Attributes
+        sta (SpritePtr), y
 
         restore_previous_bank
         perform_zpcm_inc

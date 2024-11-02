@@ -106,6 +106,13 @@
 ;     ZONES
 ; ===============
 
+.struct HudBannerDef
+        SpriteTileIds .byte 4
+        SpriteAttrs .byte 4
+        BgTileIds .byte 8
+        BgTileAttrs .byte 8
+.endstruct
+
 .struct ZoneDefinition
         GeneralSpawnPool .addr
         ChallengeSpawnSet .addr
@@ -119,8 +126,7 @@
         MusicTrack .byte
         AddedTempo .byte
 
-        HudHeader .word
-        HudBanner .word
+        HudBannerDef .word
         HudPal .word
 
         ; Each individual index in a shop gets one of these
@@ -137,7 +143,6 @@
         ExteriorStructureLargeMaxMax .byte
         ExteriorStructureSmallSet .word
         ExteriorStructureSmallMaxMax .byte
-
 .endstruct
 
 .global all_zones_data_page
@@ -154,8 +159,7 @@
 .global FAR_setup_spawn_set_for_current_zone
 .global FAR_setup_spawn_pool_for_current_zone
 .global FAR_setup_shop_loot_ptrs_for_current_zone
-.global FAR_current_zone_header_tile
-.global FAR_current_zone_banner_tile
+.global FAR_draw_banner_for_current_zone
 .global FAR_load_hud_palette_for_current_zone
 .global FAR_play_music_for_current_room
 .global FAR_load_exit_pointer_from_current_zone

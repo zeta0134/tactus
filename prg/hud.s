@@ -20,6 +20,7 @@
         .include "prng.inc"
         .include "procgen.inc"
         .include "rainbow.inc"
+        .include "slowam.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "text_util.inc"
@@ -794,8 +795,11 @@ done:
 .endproc
 
 .proc draw_current_zone
-DrawTile := R0
-DrawAttr := R1
+NametableAddr := R0
+AttributeAddr := R2
+SpritePosX := R4
+SpritePosY := R5
+SpritePtr := R8
         lda PlayerZonePtr+0
         cmp ZonePtrCurrent+0
         bne proceed_to_draw
@@ -813,54 +817,69 @@ proceed_to_draw:
         ; load in the proper palette for this banner (and the rest of the hud)
         far_call FAR_load_hud_palette_for_current_zone
 
-        ; first draw the top banner
-        far_call FAR_current_zone_header_tile
+        ; actually draw the banner
+        lda #<(HUD_TILE_BASE + ROW_1 + 20)
+        sta NametableAddr+0
+        lda #>(HUD_TILE_BASE + ROW_1 + 20)
+        sta NametableAddr+1
 
-        ldx #20
-        draw_tile_at_x ROW_1, DrawTile, DrawAttr
-        inc DrawTile
-        inx
-        draw_tile_at_x ROW_1, DrawTile, DrawAttr
+        lda #<(HUD_TILE_BASE + ROW_1 + 20 + HUD_ATTR_OFFSET)
+        sta AttributeAddr+0
+        lda #>(HUD_TILE_BASE + ROW_1 + 20 + HUD_ATTR_OFFSET)
+        sta AttributeAddr+1
 
-        perform_zpcm_inc
+        lda #(20 * 8)
+        sta SpritePosX
+        lda #<((HUD_TILE_BASE + ROW_1) / 32 * 8) + 10
+        sta SpritePosY
+
+        far_call FAR_draw_banner_for_current_zone
+
+        ;ldx #20
+        ;draw_tile_at_x ROW_1, DrawTile, DrawAttr
+        ;inc DrawTile
+        ;inx
+        ;draw_tile_at_x ROW_1, DrawTile, DrawAttr
+;
+        ;perform_zpcm_inc
 
         ; now proceed with the lower half of the banner; this may not be
         ; near the header, as we usually try to only update the name/number
         ; for efficiency reasons between floors
-        far_call FAR_current_zone_banner_tile
+        ;far_call FAR_current_zone_banner_tile
 
-        ldx #20
-        draw_tile_at_x ROW_2, DrawTile, DrawAttr
-        inc DrawTile
-        inx
-        draw_tile_at_x ROW_2, DrawTile, DrawAttr
+        ;ldx #20
+        ;draw_tile_at_x ROW_2, DrawTile, DrawAttr
+        ;inc DrawTile
+        ;inx
+        ;draw_tile_at_x ROW_2, DrawTile, DrawAttr
 
-        clc
-        lda DrawTile
-        adc #15
-        sta DrawTile
+        ;clc
+        ;lda DrawTile
+        ;adc #15
+        ;sta DrawTile
 
-        ldx #20
-        draw_tile_at_x ROW_3, DrawTile, DrawAttr
-        inc DrawTile
-        inx
-        draw_tile_at_x ROW_3, DrawTile, DrawAttr
+        ;ldx #20
+        ;draw_tile_at_x ROW_3, DrawTile, DrawAttr
+        ;inc DrawTile
+        ;inx
+        ;draw_tile_at_x ROW_3, DrawTile, DrawAttr
 
-        perform_zpcm_inc
+        ;perform_zpcm_inc
 
-        clc
-        lda DrawTile
-        adc #15
-        sta DrawTile
+        ;clc
+        ;lda DrawTile
+        ;adc #15
+        ;sta DrawTile
 
-        ldx #20
-        draw_tile_at_x ROW_4, DrawTile, DrawAttr
-        inc DrawTile
-        inx
-        draw_tile_at_x ROW_4, DrawTile, DrawAttr
+        ;ldx #20
+        ;draw_tile_at_x ROW_4, DrawTile, DrawAttr
+        ;inc DrawTile
+        ;inx
+        ;draw_tile_at_x ROW_4, DrawTile, DrawAttr
 
         ; and that should be it!
-        perform_zpcm_inc
+        ;perform_zpcm_inc
 
         rts
 .endproc

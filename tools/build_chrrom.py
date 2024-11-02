@@ -64,7 +64,20 @@ def convert_to_chr(image):
     chr_bytes = chr_bytes + tile
   return chr_bytes
 
-def convert_to_raw_chr(image):
+# The input is assumed to be in standard 8x8, top to bottom, left to right
+# Output is reordered for the zigzag pattern required by 8x16 sprites
+def reorder_tiles_as_large_sprites(tiles, tile_width=16):
+  reordered_tiles = []
+  tile_height = len(tiles) / tile_width
+  assert (tile_height % 2 == 0), f"weird dimensions during large sprite reorder: {len(tiles)}, {tile_height}"
+  for large_sprite_row in range(0, math.floor(tile_height / 2)):
+    starting_row_index = large_sprite_row * tile_width * 2
+    for x in range(0, tile_width):
+      reordered_tiles.append(tiles[starting_row_index + x])
+      reordered_tiles.append(tiles[starting_row_index + tile_width + x])
+  return reordered_tiles
+
+def convert_to_raw_chr(image, is_obj=False):
   chr_tiles = []
   for tile_y in range(0, math.floor(image.height / 8)):
     for tile_x in range(0, 16):
@@ -73,6 +86,8 @@ def convert_to_raw_chr(image):
       right = left + 8
       bottom = top + 8
       chr_tiles.append(hardware_tile_to_bitplane(image.crop((left, top, right, bottom)).getdata()))
+  if is_obj:
+    chr_tiles = reorder_tiles_as_large_sprites(chr_tiles)
   chr_bytes = []
   for tile in chr_tiles:
     chr_bytes = chr_bytes + tile
@@ -183,7 +198,8 @@ def read_png_chr(filename):
   assert im.getpalette() != None, "Non-paletted tile found! This is unsupported: " + filename
   assert im.width in [128], "PNG CHR files must be 128 pixels wide! Bailing. " + filename
   assert im.height in [128,512], "PNG CHR files must be 128 or 16384 pixels tall! Bailing. " + filename
-  return convert_to_raw_chr(im)
+  is_obj = "_obj" in str(filename)
+  return convert_to_raw_chr(im, is_obj=is_obj)
 
 def background_tile_base_address(tile_id):
   # location of the top-left tile, within the 0th lighting page,

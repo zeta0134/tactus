@@ -1,4 +1,3 @@
-MAX_METASPRITES = 16
 SHADOW_OAM = $0200
 OAM_Y_POS = 0
 OAM_TILE = 1
@@ -35,16 +34,5 @@ SPRITE_FLOAT       = %10000000
 .global FAR_age_sprites
 .global FAR_find_unused_sprite
 .global FAR_despawn_unimportant_sprites
-.global FAR_disable_all_oam_entries
-
-SPRITE_PAL_0 = %00
-SPRITE_PAL_1 = %01
-SPRITE_PAL_2 = %10
-SPRITE_PAL_3 = %11
-
-SPRITE_PAL_PLAYER = %00
-SPRITE_PAL_GREY   = %01
-SPRITE_PAL_RED    = %10
-SPRITE_PAL_PURPLE = %11
-
-SPRITE_PAL_MASK = %11
+.global FAR_disable_all_oam_entries_playfield
+.global FAR_disable_all_oam_entries_hud

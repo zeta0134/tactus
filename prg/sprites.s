@@ -1,5 +1,7 @@
         .setcpu "6502"
 
+        .include "_globals.inc"
+
         .include "beat_tracker.inc"
         .include "far_call.inc"
         .include "hud.inc"
@@ -60,17 +62,89 @@ done:
         rts
 .endproc
 
-.proc FAR_disable_all_oam_entries
+.proc FAR_disable_all_oam_entries_playfield
         lda #$F8
         perform_zpcm_inc
-        .repeat 4, z
-        .repeat 4, j
-        .repeat 4, i
-        sta SPRITE_TRANSFER_BASE + (20 * i) + (83 * (j + (z * 4))) + SelfModifiedSprite::PosY
-        .endrepeat
-        .endrepeat
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (0 + (0 * 4))) + SelfModifiedSprite::PosY ; 0 
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (0 + (0 * 4))) + SelfModifiedSprite::PosY ; 1
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (0 + (0 * 4))) + SelfModifiedSprite::PosY ; 2
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (0 + (0 * 4))) + SelfModifiedSprite::PosY ; 3
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (1 + (0 * 4))) + SelfModifiedSprite::PosY ; 4
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (1 + (0 * 4))) + SelfModifiedSprite::PosY ; 5
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (1 + (0 * 4))) + SelfModifiedSprite::PosY ; 6
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (1 + (0 * 4))) + SelfModifiedSprite::PosY ; 7
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (2 + (0 * 4))) + SelfModifiedSprite::PosY ; 8
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (2 + (0 * 4))) + SelfModifiedSprite::PosY ; 9
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (2 + (0 * 4))) + SelfModifiedSprite::PosY ; 10
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (2 + (0 * 4))) + SelfModifiedSprite::PosY ; 11
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (3 + (0 * 4))) + SelfModifiedSprite::PosY ; 12
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (3 + (0 * 4))) + SelfModifiedSprite::PosY ; 13
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (3 + (0 * 4))) + SelfModifiedSprite::PosY ; 14
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (3 + (0 * 4))) + SelfModifiedSprite::PosY ; 15
         perform_zpcm_inc
-        .endrepeat
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (0 + (1 * 4))) + SelfModifiedSprite::PosY ; 16
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (0 + (1 * 4))) + SelfModifiedSprite::PosY ; 17
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (0 + (1 * 4))) + SelfModifiedSprite::PosY ; 18
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (0 + (1 * 4))) + SelfModifiedSprite::PosY ; 19
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (1 + (1 * 4))) + SelfModifiedSprite::PosY ; 20
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (1 + (1 * 4))) + SelfModifiedSprite::PosY ; 21
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (1 + (1 * 4))) + SelfModifiedSprite::PosY ; 22
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (1 + (1 * 4))) + SelfModifiedSprite::PosY ; 23
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (2 + (1 * 4))) + SelfModifiedSprite::PosY ; 24
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (2 + (1 * 4))) + SelfModifiedSprite::PosY ; 25
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (2 + (1 * 4))) + SelfModifiedSprite::PosY ; 26
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (2 + (1 * 4))) + SelfModifiedSprite::PosY ; 27
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (3 + (1 * 4))) + SelfModifiedSprite::PosY ; 28
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (3 + (1 * 4))) + SelfModifiedSprite::PosY ; 29
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (3 + (1 * 4))) + SelfModifiedSprite::PosY ; 30
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (3 + (1 * 4))) + SelfModifiedSprite::PosY ; 31
+        perform_zpcm_inc
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (0 + (2 * 4))) + SelfModifiedSprite::PosY ; 32
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (0 + (2 * 4))) + SelfModifiedSprite::PosY ; 33
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (0 + (2 * 4))) + SelfModifiedSprite::PosY ; 34
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (0 + (2 * 4))) + SelfModifiedSprite::PosY ; 35
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (1 + (2 * 4))) + SelfModifiedSprite::PosY ; 36
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (1 + (2 * 4))) + SelfModifiedSprite::PosY ; 37
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (1 + (2 * 4))) + SelfModifiedSprite::PosY ; 38
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (1 + (2 * 4))) + SelfModifiedSprite::PosY ; 39
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (2 + (2 * 4))) + SelfModifiedSprite::PosY ; 40
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (2 + (2 * 4))) + SelfModifiedSprite::PosY ; 41
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (2 + (2 * 4))) + SelfModifiedSprite::PosY ; 42
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (2 + (2 * 4))) + SelfModifiedSprite::PosY ; 43
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (3 + (2 * 4))) + SelfModifiedSprite::PosY ; 44
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (3 + (2 * 4))) + SelfModifiedSprite::PosY ; 45
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (3 + (2 * 4))) + SelfModifiedSprite::PosY ; 46
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (3 + (2 * 4))) + SelfModifiedSprite::PosY ; 47
+        perform_zpcm_inc
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (0 + (3 * 4))) + SelfModifiedSprite::PosY ; 48
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (0 + (3 * 4))) + SelfModifiedSprite::PosY ; 49
+
+        ; HUD
+
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (3 + (3 * 4))) + SelfModifiedSprite::PosY ; 60
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (3 + (3 * 4))) + SelfModifiedSprite::PosY ; 61
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (3 + (3 * 4))) + SelfModifiedSprite::PosY ; 62
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (3 + (3 * 4))) + SelfModifiedSprite::PosY ; 63
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc FAR_disable_all_oam_entries_hud
+        lda #$F8
+        perform_zpcm_inc
+        ; PLAYFIELD
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (0 + (3 * 4))) + SelfModifiedSprite::PosY ; 50
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (0 + (3 * 4))) + SelfModifiedSprite::PosY ; 51
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (1 + (3 * 4))) + SelfModifiedSprite::PosY ; 52
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (1 + (3 * 4))) + SelfModifiedSprite::PosY ; 53
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (1 + (3 * 4))) + SelfModifiedSprite::PosY ; 54
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (1 + (3 * 4))) + SelfModifiedSprite::PosY ; 55
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (2 + (3 * 4))) + SelfModifiedSprite::PosY ; 56
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (2 + (3 * 4))) + SelfModifiedSprite::PosY ; 57
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (2 + (3 * 4))) + SelfModifiedSprite::PosY ; 58
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (2 + (3 * 4))) + SelfModifiedSprite::PosY ; 59
+        ; FREE PARKING
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -250,7 +324,7 @@ done:
 .proc FAR_draw_sprites
 MetaSpriteIndex := R0
 CurrentOamIndex := R1
-        near_call FAR_disable_all_oam_entries
+        near_call FAR_disable_all_oam_entries_playfield
         lda #0
         sta MetaSpriteIndex
         lda starting_oam_index
