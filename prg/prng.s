@@ -10,12 +10,17 @@ run_seed: .res 4
 floor_seed: .res 4
 room_seed: .res 4
 
+	.segment "RNGRAM"
+prng_table: .res 256
+
 	.segment "RAM"
 
 ; For preserving this to display at various points. Once the run gets going,
 ; the real run seed is of course advanced repeatedly. For debugging purposes,
 ; it can be handy to know this seed to reproduce glitch setups.
 initial_run_seed: .res 4
+prng_generation_index: .res 1
+prng_entity_start_index: .res 1
 
         .segment "PRGFIXED_E000"
 
@@ -239,5 +244,13 @@ run_seed_valid:
 	sty room_seed+3 ; finish rotating byte 2 into 3
 	sta room_seed+0
 	perform_zpcm_inc
+	rts
+.endproc
+
+.proc advance_prng_table
+	jsr next_gameplay_rand
+	ldy prng_generation_index
+	sta prng_table, y
+	inc prng_generation_index
 	rts
 .endproc

@@ -13,6 +13,24 @@
 .globalzp run_seed, floor_seed, room_seed
 .global initial_run_seed
 
+.global prng_table
+.global prng_entity_start_index
+.global advance_prng_table
+
+; Clobbers X, Result in A
+.macro prng_from_table_x
+    inc prng_entity_start_index
+    ldx prng_entity_start_index
+    lda prng_table, x
+.endmacro
+
+; Clobbers Y, Result in A
+.macro prng_from_table_y
+    inc prng_entity_start_index
+    ldy prng_entity_start_index
+    lda prng_table, y
+.endmacro
+
 ; a rather inefficient but convenient macro to produce a random number
 ; between 0 and N-1. mostly meant for use during level generation where
 ; performance isn't a massive concern and we need to roll from odd-sized
@@ -44,3 +62,4 @@ divide_loop:
     perform_zpcm_inc
 .endscope
 .endmacro
+

@@ -1055,6 +1055,14 @@ cooldown_is_fine:
         debug_color (TINT_R | TINT_G | LIGHTGRAY)
         far_call FAR_draw_torchlight
         debug_color LIGHTGRAY
+        ; Take the opportunity here to advance the cached PRNG function
+        debug_color (TINT_R | TINT_B | LIGHTGRAY)
+        jsr advance_prng_table
+        jsr advance_prng_table
+        jsr advance_prng_table
+        jsr advance_prng_table
+        debug_color LIGHTGRAY
+
         jsr every_gameloop
         rts
 player_input_forces_a_beat:
@@ -1111,6 +1119,13 @@ continue_waiting:
         debug_color (TINT_R | TINT_G | LIGHTGRAY)
         far_call FAR_draw_torchlight
         debug_color LIGHTGRAY
+        ; Take the opportunity here to advance the cached PRNG function
+        debug_color (TINT_R | TINT_B | LIGHTGRAY)
+        jsr advance_prng_table
+        jsr advance_prng_table
+        jsr advance_prng_table
+        jsr advance_prng_table
+        debug_color LIGHTGRAY
 
         jsr every_gameloop
         rts
@@ -1149,6 +1164,13 @@ continue_waiting:
         debug_color LIGHTGRAY
         debug_color (TINT_R | TINT_G | LIGHTGRAY)
         far_call FAR_draw_torchlight
+        debug_color LIGHTGRAY
+        ; Take the opportunity here to advance the cached PRNG function
+        debug_color (TINT_R | TINT_B | LIGHTGRAY)
+        jsr advance_prng_table
+        jsr advance_prng_table
+        jsr advance_prng_table
+        jsr advance_prng_table
         debug_color LIGHTGRAY
 
         jsr every_gameloop

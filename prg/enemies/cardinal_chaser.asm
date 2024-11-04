@@ -58,7 +58,7 @@ CurrentTile := R15
         ; (the 2 upper bits are sufficient for a larger/smaller
         ; check, the lower 6 bits can be ignored. don't waste cycles
         ; zeroing them out)
-        jsr next_gameplay_rand
+        prng_from_table_y
         lsr
         ror candidate_weights+0
         lsr
@@ -97,9 +97,9 @@ CurrentTile := R15
         jsr _setup_cardinal_targets_common
 
         ; We'll use some random bytes to unbias the target directions
-        jsr next_gameplay_rand
+        prng_from_table_y
         sta RandomScratch0
-        jsr next_gameplay_rand
+        prng_from_table_y
         sta RandomScratch1
 
         ; For the weights, work out the manhattan distance for each potential
