@@ -295,7 +295,6 @@ _expected_spell_tileid .set $00
         _expected_spell_tileid .set _expected_spell_tileid + $04
 .endmacro
 
-tile_collide TILE_SMOKE_PUFF, FIXED_no_behavior
 tile_suspend TILE_SMOKE_PUFF, ENEMY_UTIL_draw_cleared_disco_tile
 tile_explode TILE_SMOKE_PUFF, FIXED_no_behavior
 tile_spell   TILE_SMOKE_PUFF, FIXED_no_behavior
@@ -391,6 +390,53 @@ tile_attack $A4,                    FIXED_no_behavior,                        FI
 tile_attack TILE_EXIT_BLOCK,        ENEMY_ATTACK_attack_exit_block,           FIXED_no_behavior
 tile_attack TILE_EXIT_STAIRS,       FIXED_no_behavior,                        FIXED_no_behavior
 
+tile_collide TILE_SMOKE_PUFF,        FIXED_no_behavior
+tile_collide TILE_SLIME,             ENEMY_COLLIDE_basic_enemy_attacks_player
+tile_collide TILE_SPIDER,            ENEMY_COLLIDE_basic_enemy_attacks_player
+tile_collide TILE_SPIDER_ANTICIPATE, ENEMY_COLLIDE_basic_enemy_attacks_player
+tile_collide TILE_ZOMBIE,            ENEMY_COLLIDE_basic_enemy_attacks_player
+tile_collide TILE_ZOMBIE_ANTICIPATE, ENEMY_COLLIDE_basic_enemy_attacks_player
+tile_collide TILE_BIRB_LEFT,         ENEMY_COLLIDE_basic_enemy_attacks_player
+tile_collide TILE_BIRB_RIGHT,        ENEMY_COLLIDE_basic_enemy_attacks_player
+tile_collide TILE_BIRB_LEFT_FLYING,  ENEMY_COLLIDE_basic_enemy_attacks_player
+tile_collide TILE_BIRB_RIGHT_FLYING, ENEMY_COLLIDE_basic_enemy_attacks_player
+tile_collide TILE_MOLE_HOLE,         FIXED_no_behavior
+tile_collide TILE_MOLE_THROWING,     ENEMY_COLLIDE_basic_enemy_attacks_player
+tile_collide TILE_MOLE_IDLE,         ENEMY_COLLIDE_basic_enemy_attacks_player
+tile_collide TILE_WRENCH_PROJECTILE, ENEMY_COLLIDE_projectile_attacks_player
+tile_collide TILE_CHALLENGE_SPIKES,  ENEMY_COLLIDE_challenge_spike_solid_test
+tile_collide TILE_MUSHROOM,          ENEMY_COLLIDE_basic_enemy_attacks_player
+tile_collide TILE_ONE_BEAT_HAZARD,   ENEMY_COLLIDE_hazard_damages_player
+tile_collide $44,                    FIXED_no_behavior
+tile_collide $48,                    FIXED_no_behavior
+tile_collide $4C,                    FIXED_no_behavior
+tile_collide $50,                    FIXED_no_behavior
+tile_collide $54,                    FIXED_no_behavior
+tile_collide $58,                    FIXED_no_behavior
+tile_collide $5C,                    FIXED_no_behavior
+tile_collide $60,                    FIXED_no_behavior
+tile_collide $64,                    FIXED_no_behavior
+tile_collide $68,                    FIXED_no_behavior
+tile_collide $6C,                    FIXED_no_behavior
+tile_collide $70,                    FIXED_no_behavior
+tile_collide $74,                    FIXED_no_behavior
+tile_collide $78,                    FIXED_no_behavior
+tile_collide $7C,                    FIXED_no_behavior
+tile_collide $80,                    FIXED_no_behavior
+tile_collide TILE_DISCO_FLOOR,       FIXED_no_behavior
+tile_collide TILE_SEMISAFE_FLOOR,    ENEMY_COLLIDE_semisolid_attacks_player
+tile_collide TILE_WALL,              ENEMY_COLLIDE_solid_tile_forbids_movement
+tile_collide TILE_ITEM_SHADOW,       ENEMY_COLLIDE_collect_item
+tile_collide $94,                    FIXED_no_behavior
+tile_collide TILE_TREASURE_CHEST,    ENEMY_COLLIDE_solid_tile_forbids_movement
+tile_collide TILE_BIG_KEY,           ENEMY_COLLIDE_collect_key
+tile_collide $A0,                    FIXED_no_behavior
+tile_collide $A4,                    FIXED_no_behavior
+tile_collide TILE_EXIT_BLOCK,        ENEMY_COLLIDE_solid_tile_forbids_movement
+tile_collide TILE_EXIT_STAIRS,       ENEMY_COLLIDE_descend_stairs
+
+
+
 .segment "ENEMY_UPDATE"
 
 static_behaviors:
@@ -481,49 +527,10 @@ TargetCol := R15
 .segment "ENEMY_COLLIDE"
 
 bonk_behaviors:
-        .word FIXED_no_behavior ; standing in a smoke puff is fine
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player
-        .word FIXED_no_behavior ; mole holes, when unoccupied, do no damage
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player  ; moles when bonked, mostly with the flail/boots, *do* do damage
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player
-        .word ENEMY_COLLIDE_projectile_attacks_player   ; projectiles do damage, but also need to erase themselves
-        .word ENEMY_COLLIDE_challenge_spike_solid_test
-        .word ENEMY_COLLIDE_basic_enemy_attacks_player  ; $3C - mushroom
-        .word ENEMY_COLLIDE_hazard_damages_player       ; $40 one beat hazards just do damage
-        .repeat 15
-        .word FIXED_no_behavior
-        .endrepeat
-        .word FIXED_no_behavior                         ; $80 - UNUSED
-        .word FIXED_no_behavior                         ; $84 - disco floor
-        .word ENEMY_COLLIDE_semisolid_attacks_player    ; $88 - semisafe floor
-        .word ENEMY_COLLIDE_solid_tile_forbids_movement ; $8C - wall face
-        .word ENEMY_COLLIDE_collect_item                ; $90 - item shadow
-        .word FIXED_no_behavior                         ; $94 - UNUSED
-        .word ENEMY_COLLIDE_solid_tile_forbids_movement ; $98 - treasure chest
-        .word ENEMY_COLLIDE_collect_key                 ; $9C - big key
-        .word FIXED_no_behavior                         ; $A0 - UNUSED
-        .word FIXED_no_behavior                         ; $A4 - UNUSED
-        .word ENEMY_COLLIDE_solid_tile_forbids_movement ; $A8 - exit block
-        .word ENEMY_COLLIDE_descend_stairs              ; $AC - exit stairs
-        .word FIXED_no_behavior                         ; $B0 - UNUSED
-        .word FIXED_no_behavior                         ; $B4
-        .word FIXED_no_behavior                         ; $B8
-        .word FIXED_no_behavior                         ; $BC
-        .word FIXED_no_behavior                         ; $C0
-        .word FIXED_no_behavior                         ; $C4
-        .word FIXED_no_behavior                         ; $C8
-        .word FIXED_no_behavior                         ; $CC - UNUSED
+        .word enemy_collide_table
         ; safety: fill out the rest of the table
-        .repeat 12
-        .word FIXED_no_behavior
+        .repeat ($100 - TILE_LAST_ID / 4)
+        .word FIXED_crash_handler
         .endrepeat
 
 .proc FAR_player_collides_with_tile
