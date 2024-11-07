@@ -27,10 +27,6 @@ TILE_BIG_KEY           = 22   ; = $9C
 TILE_EXIT_BLOCK        = 23   ; = $A8
 TILE_EXIT_STAIRS       = 24   ; = $AC
 
-; Used to fill out the rest of the behavioral tables for safety. Should
-; always be the final ID + 1
-TILE_LAST_EXPECTED_ID  = 25 
-
 ; Actually in the fixed page
 .global draw_active_tile
 .global tile_index_to_row_lut, tile_index_to_col_lut
