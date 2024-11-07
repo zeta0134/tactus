@@ -260,7 +260,7 @@ loop:
         tax
         ; is this a spore tile? don't erase just anything
         lda battlefield, x
-        cmp #TILE_ONE_BEAT_HAZARD ; TODO: is this check specific enough?
+        cmp #TILE_ONE_BEAT_HAZARD
         bne not_a_spore
         lda tile_index_to_row_lut, x
         sta DiscoRow

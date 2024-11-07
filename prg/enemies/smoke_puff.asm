@@ -34,16 +34,11 @@ TargetCol := R15
         ldx AttackSquare
         lda tile_data, x
         sta EffectiveAttackSquare
-        ; the top 6 bits index into the behavior table, which is a list of **words**
-        ; so we want it to end up like this: %0bbbbbb0
         ldx EffectiveAttackSquare
-        lda battlefield, x
-        lsr
-        and #%01111110
-        tax
-        lda indirect_attack_behaviors, x
-        sta DestPtr
-        lda indirect_attack_behaviors+1, x
+        ldy battlefield, x
+        lda indirect_attack_behaviors_low, y
+        sta DestPtr+0
+        lda indirect_attack_behaviors_high, y
         sta DestPtr+1
         jsr __trampoline
 

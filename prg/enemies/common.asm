@@ -64,9 +64,7 @@ semisafe_failure:
 ; Draw a given entity/tile into the battlefield at position X. Preserves the original
 ; palette at this location
 .macro draw_at_x_keeppal entity_type, tile_id
-        lda battlefield, x
-        and #%00000011
-        ora #entity_type
+        lda #entity_type
         sta battlefield, x
         lda #<tile_id
         sta tile_patterns, x
@@ -89,9 +87,7 @@ semisafe_failure:
 .endmacro
 
 .macro draw_at_y_with_pal_x entity_type, tile_id
-        lda battlefield, x
-        and #%00000011
-        ora #entity_type
+        lda #entity_type
         sta battlefield, y
         lda #<tile_id
         sta tile_patterns, y
@@ -315,7 +311,6 @@ loop:
         perform_zpcm_inc
         ; is this a poof?
         lda battlefield, x
-        and #%11111100
         cmp #TILE_SMOKE_PUFF
         bne not_our_puff
         ; is this OUR poof?
@@ -656,7 +651,6 @@ check_floor:
         sta TempIndex
         ldx TempIndex
         lda battlefield, x
-        and #%11111100 ; we only care about the index, not the color
         cmp #TILE_DISCO_FLOOR
         beq is_valid_space
         ; no good; this is not a floor tile. We cannot spawn anything here,

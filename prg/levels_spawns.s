@@ -104,7 +104,6 @@ done:
 .proc single_disco_tile
         ldx SpawnedEntityIndex
         lda battlefield, x
-        and #%11111100 ; we only care about the index, not the color
         cmp #TILE_DISCO_FLOOR
         beq is_valid_space
         ; no good; this is not a floor tile. We cannot spawn anything here,
@@ -120,7 +119,6 @@ is_valid_space:
         ; our location
         ldx SpawnedEntityIndex
         lda battlefield, x
-        and #%11111100 ; we only care about the index, not the color
         cmp #TILE_DISCO_FLOOR
         jne invalid_space
         ; the row above us
@@ -129,7 +127,6 @@ is_valid_space:
         sbc #(BATTLEFIELD_WIDTH+0)
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
         ; the row below us
@@ -137,8 +134,7 @@ is_valid_space:
         clc
         adc #(BATTLEFIELD_WIDTH+0)
         tax
-        lda battlefield, x
-        and #%11111100
+        lda battlefield, x        
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
         ; the spaces to either side
@@ -147,7 +143,6 @@ is_valid_space:
         adc #1
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
         lda SpawnedEntityIndex
@@ -155,7 +150,6 @@ is_valid_space:
         sbc #1
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
 valid_space:
@@ -170,7 +164,6 @@ invalid_space:
         ; our location
         ldx SpawnedEntityIndex
         lda battlefield, x
-        and #%11111100 ; we only care about the index, not the color
         cmp #TILE_DISCO_FLOOR
         jne invalid_space
         ; the row above us
@@ -179,7 +172,6 @@ invalid_space:
         sbc #(BATTLEFIELD_WIDTH+1)
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         jne invalid_space
         lda SpawnedEntityIndex
@@ -187,7 +179,6 @@ invalid_space:
         sbc #(BATTLEFIELD_WIDTH+0)
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
         lda SpawnedEntityIndex
@@ -195,7 +186,6 @@ invalid_space:
         sbc #(BATTLEFIELD_WIDTH-1)
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
         ; the row below us
@@ -204,7 +194,6 @@ invalid_space:
         adc #(BATTLEFIELD_WIDTH-1)
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
         lda SpawnedEntityIndex
@@ -212,7 +201,6 @@ invalid_space:
         adc #(BATTLEFIELD_WIDTH+0)
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
         lda SpawnedEntityIndex
@@ -220,7 +208,6 @@ invalid_space:
         adc #(BATTLEFIELD_WIDTH+1)
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
         ; the spaces to either side
@@ -229,7 +216,6 @@ invalid_space:
         adc #1
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
         lda SpawnedEntityIndex
@@ -237,7 +223,6 @@ invalid_space:
         sbc #1
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
 valid_space:
@@ -253,7 +238,6 @@ invalid_space:
         ; our location
         ldx SpawnedEntityIndex
         lda battlefield, x
-        and #%11111100 ; we only care about the index, not the color
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
         ; the space to our right
@@ -262,7 +246,6 @@ invalid_space:
         adc #1
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
 valid_space:
@@ -278,7 +261,6 @@ invalid_space:
         ; our location
         ldx SpawnedEntityIndex
         lda battlefield, x
-        and #%11111100 ; we only care about the index, not the color
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
         ; the space to our right
@@ -287,7 +269,6 @@ invalid_space:
         adc #1
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
         ; the row below us
@@ -296,7 +277,6 @@ invalid_space:
         adc #(BATTLEFIELD_WIDTH+0)
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
         lda SpawnedEntityIndex
@@ -304,7 +284,6 @@ invalid_space:
         adc #(BATTLEFIELD_WIDTH+1)
         tax
         lda battlefield, x
-        and #%11111100
         cmp #TILE_DISCO_FLOOR
         bne invalid_space
 valid_space:

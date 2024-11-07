@@ -1735,7 +1735,6 @@ check_floor:
         sta TempIndex
         ldx TempIndex
         lda battlefield, x
-        and #%11111100 ; we only care about the index, not the color
         cmp #TILE_DISCO_FLOOR
         beq is_valid_space
         ; no good; this is not a floor tile. We cannot spawn anything here,

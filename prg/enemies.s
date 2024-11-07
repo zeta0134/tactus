@@ -261,38 +261,38 @@ _expected_spell_tileid .set $00
 .macro tile_update TILE_ID, update_func
         .assert _expected_update_tileid = TILE_ID, error, .sprintf("during tile_update for %s, expected $%02x, got instead $%02x", .string(TILE_ID), _expected_update_tileid, TILE_ID)
         enemy_update_table_push_back update_func
-        _expected_update_tileid .set _expected_update_tileid + $04
+        _expected_update_tileid .set _expected_update_tileid + $01
 .endmacro
 
 .macro tile_attack TILE_ID, direct_attack_func, indirect_attack_func
         .assert _expected_attack_tileid = TILE_ID, error, .sprintf("during tile_attack for %s, expected $%02x, got instead $%02x", .string(TILE_ID), _expected_update_tileid, TILE_ID)
         enemy_direct_attack_table_push_back direct_attack_func
         enemy_indirect_attack_table_push_back indirect_attack_func
-        _expected_attack_tileid .set _expected_attack_tileid + $04
+        _expected_attack_tileid .set _expected_attack_tileid + $01
 .endmacro
 
 .macro tile_collide TILE_ID, collide_func
         .assert _expected_collide_tileid = TILE_ID, error, .sprintf("during tile_collide for %s, expected $%02x, got instead $%02x", .string(TILE_ID), _expected_update_tileid, TILE_ID)
         enemy_collide_table_push_back collide_func
-        _expected_collide_tileid .set _expected_collide_tileid + $04
+        _expected_collide_tileid .set _expected_collide_tileid + $01
 .endmacro
 
 .macro tile_suspend TILE_ID, suspend_func
         .assert _expected_suspend_tileid = TILE_ID, error, .sprintf("during tile_suspend for %s, expected $%02x, got instead $%02x", .string(TILE_ID), _expected_update_tileid, TILE_ID)
         enemy_suspend_table_push_back suspend_func
-        _expected_suspend_tileid .set _expected_suspend_tileid + $04
+        _expected_suspend_tileid .set _expected_suspend_tileid + $01
 .endmacro
 
 .macro tile_explode TILE_ID, explode_func
         .assert _expected_explode_tileid = TILE_ID, error, .sprintf("during tile_explode for %s, expected $%02x, got instead $%02x", .string(TILE_ID), _expected_update_tileid, TILE_ID)
         enemy_explode_table_push_back explode_func
-        _expected_explode_tileid .set _expected_explode_tileid + $04
+        _expected_explode_tileid .set _expected_explode_tileid + $01
 .endmacro
 
 .macro tile_spell TILE_ID, spellcast_func
         .assert _expected_spell_tileid = TILE_ID, error, .sprintf("during tile_spell for %s, expected $%02x, got instead $%02x", .string(TILE_ID), _expected_update_tileid, TILE_ID)
         enemy_spell_table_push_back spellcast_func
-        _expected_spell_tileid .set _expected_spell_tileid + $04
+        _expected_spell_tileid .set _expected_spell_tileid + $01
 .endmacro
 
 tile_explode TILE_SMOKE_PUFF, FIXED_no_behavior
@@ -315,31 +315,12 @@ tile_update TILE_WRENCH_PROJECTILE, ENEMY_UPDATE_update_wrench_projectile
 tile_update TILE_CHALLENGE_SPIKES,  ENEMY_UPDATE_update_challenge_spike
 tile_update TILE_MUSHROOM,          ENEMY_UPDATE_update_mushroom
 tile_update TILE_ONE_BEAT_HAZARD,   ENEMY_UPDATE_update_one_beat_hazard
-tile_update $44,                    FIXED_no_behavior
-tile_update $48,                    FIXED_no_behavior
-tile_update $4C,                    FIXED_no_behavior
-tile_update $50,                    FIXED_no_behavior
-tile_update $54,                    FIXED_no_behavior
-tile_update $58,                    FIXED_no_behavior
-tile_update $5C,                    FIXED_no_behavior
-tile_update $60,                    FIXED_no_behavior
-tile_update $64,                    FIXED_no_behavior
-tile_update $68,                    FIXED_no_behavior
-tile_update $6C,                    FIXED_no_behavior
-tile_update $70,                    FIXED_no_behavior
-tile_update $74,                    FIXED_no_behavior
-tile_update $78,                    FIXED_no_behavior
-tile_update $7C,                    FIXED_no_behavior
-tile_update $80,                    FIXED_no_behavior
 tile_update TILE_DISCO_FLOOR,       ENEMY_UPDATE_draw_disco_tile
 tile_update TILE_SEMISAFE_FLOOR,    ENEMY_UPDATE_update_semisafe_tile
 tile_update TILE_WALL,              FIXED_no_behavior
 tile_update TILE_ITEM_SHADOW,       ENEMY_UPDATE_update_item_shadow
-tile_update $94,                    FIXED_no_behavior
 tile_update TILE_TREASURE_CHEST,    FIXED_no_behavior
 tile_update TILE_BIG_KEY,           FIXED_no_behavior
-tile_update $A0,                    FIXED_no_behavior
-tile_update $A4,                    FIXED_no_behavior
 tile_update TILE_EXIT_BLOCK,        FIXED_no_behavior
 tile_update TILE_EXIT_STAIRS,       FIXED_no_behavior
 
@@ -361,31 +342,12 @@ tile_attack TILE_WRENCH_PROJECTILE, FIXED_no_behavior,                        FI
 tile_attack TILE_CHALLENGE_SPIKES,  FIXED_no_behavior,                        FIXED_no_behavior
 tile_attack TILE_MUSHROOM,          ENEMY_ATTACK_direct_attack_mushroom,      FIXED_no_behavior
 tile_attack TILE_ONE_BEAT_HAZARD,   FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $44,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $48,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $4C,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $50,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $54,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $58,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $5C,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $60,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $64,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $68,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $6C,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $70,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $74,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $78,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $7C,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $80,                    FIXED_no_behavior,                        FIXED_no_behavior
 tile_attack TILE_DISCO_FLOOR,       FIXED_no_behavior,                        FIXED_no_behavior
 tile_attack TILE_SEMISAFE_FLOOR,    FIXED_no_behavior,                        FIXED_no_behavior
 tile_attack TILE_WALL,              FIXED_no_behavior,                        FIXED_no_behavior
 tile_attack TILE_ITEM_SHADOW,       FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $94,                    FIXED_no_behavior,                        FIXED_no_behavior
 tile_attack TILE_TREASURE_CHEST,    ENEMY_ATTACK_attack_treasure_chest,       FIXED_no_behavior
 tile_attack TILE_BIG_KEY,           FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $A0,                    FIXED_no_behavior,                        FIXED_no_behavior
-tile_attack $A4,                    FIXED_no_behavior,                        FIXED_no_behavior
 tile_attack TILE_EXIT_BLOCK,        ENEMY_ATTACK_attack_exit_block,           FIXED_no_behavior
 tile_attack TILE_EXIT_STAIRS,       FIXED_no_behavior,                        FIXED_no_behavior
 
@@ -406,31 +368,12 @@ tile_collide TILE_WRENCH_PROJECTILE, ENEMY_COLLIDE_projectile_attacks_player
 tile_collide TILE_CHALLENGE_SPIKES,  ENEMY_COLLIDE_challenge_spike_solid_test
 tile_collide TILE_MUSHROOM,          ENEMY_COLLIDE_basic_enemy_attacks_player
 tile_collide TILE_ONE_BEAT_HAZARD,   ENEMY_COLLIDE_hazard_damages_player
-tile_collide $44,                    FIXED_no_behavior
-tile_collide $48,                    FIXED_no_behavior
-tile_collide $4C,                    FIXED_no_behavior
-tile_collide $50,                    FIXED_no_behavior
-tile_collide $54,                    FIXED_no_behavior
-tile_collide $58,                    FIXED_no_behavior
-tile_collide $5C,                    FIXED_no_behavior
-tile_collide $60,                    FIXED_no_behavior
-tile_collide $64,                    FIXED_no_behavior
-tile_collide $68,                    FIXED_no_behavior
-tile_collide $6C,                    FIXED_no_behavior
-tile_collide $70,                    FIXED_no_behavior
-tile_collide $74,                    FIXED_no_behavior
-tile_collide $78,                    FIXED_no_behavior
-tile_collide $7C,                    FIXED_no_behavior
-tile_collide $80,                    FIXED_no_behavior
 tile_collide TILE_DISCO_FLOOR,       FIXED_no_behavior
 tile_collide TILE_SEMISAFE_FLOOR,    ENEMY_COLLIDE_semisolid_attacks_player
 tile_collide TILE_WALL,              ENEMY_COLLIDE_solid_tile_forbids_movement
 tile_collide TILE_ITEM_SHADOW,       ENEMY_COLLIDE_collect_item
-tile_collide $94,                    FIXED_no_behavior
 tile_collide TILE_TREASURE_CHEST,    ENEMY_COLLIDE_solid_tile_forbids_movement
 tile_collide TILE_BIG_KEY,           ENEMY_COLLIDE_collect_key
-tile_collide $A0,                    FIXED_no_behavior
-tile_collide $A4,                    FIXED_no_behavior
 tile_collide TILE_EXIT_BLOCK,        ENEMY_COLLIDE_solid_tile_forbids_movement
 tile_collide TILE_EXIT_STAIRS,       ENEMY_COLLIDE_descend_stairs
 
@@ -451,41 +394,27 @@ tile_suspend TILE_WRENCH_PROJECTILE, ENEMY_UTIL_draw_cleared_disco_tile
 tile_suspend TILE_CHALLENGE_SPIKES,  FIXED_no_behavior
 tile_suspend TILE_MUSHROOM,          FIXED_no_behavior
 tile_suspend TILE_ONE_BEAT_HAZARD,   FIXED_no_behavior
-tile_suspend $44,                    FIXED_no_behavior
-tile_suspend $48,                    FIXED_no_behavior
-tile_suspend $4C,                    FIXED_no_behavior
-tile_suspend $50,                    FIXED_no_behavior
-tile_suspend $54,                    FIXED_no_behavior
-tile_suspend $58,                    FIXED_no_behavior
-tile_suspend $5C,                    FIXED_no_behavior
-tile_suspend $60,                    FIXED_no_behavior
-tile_suspend $64,                    FIXED_no_behavior
-tile_suspend $68,                    FIXED_no_behavior
-tile_suspend $6C,                    FIXED_no_behavior
-tile_suspend $70,                    FIXED_no_behavior
-tile_suspend $74,                    FIXED_no_behavior
-tile_suspend $78,                    FIXED_no_behavior
-tile_suspend $7C,                    FIXED_no_behavior
-tile_suspend $80,                    FIXED_no_behavior
 tile_suspend TILE_DISCO_FLOOR,       ENEMY_UTIL_draw_cleared_disco_tile
 tile_suspend TILE_SEMISAFE_FLOOR,    FIXED_no_behavior
 tile_suspend TILE_WALL,              FIXED_no_behavior
 tile_suspend TILE_ITEM_SHADOW,       ENEMY_UTIL_suspend_item_shadow
-tile_suspend $94,                    FIXED_no_behavior
 tile_suspend TILE_TREASURE_CHEST,    FIXED_no_behavior
 tile_suspend TILE_BIG_KEY,           FIXED_no_behavior
-tile_suspend $A0,                    FIXED_no_behavior
-tile_suspend $A4,                    FIXED_no_behavior
 tile_suspend TILE_EXIT_BLOCK,        FIXED_no_behavior
 tile_suspend TILE_EXIT_STAIRS,       FIXED_no_behavior
 
 .segment "ENEMY_UPDATE"
 
-static_behaviors:
-        .word enemy_update_table
-        ; safety: fill out the rest of the table
-        .repeat ($100 - TILE_LAST_ID / 4)
-        .word FIXED_crash_handler
+static_behaviors_low:
+        .lobytes enemy_update_table
+        .repeat ($100 - TILE_LAST_EXPECTED_ID / 4)
+        .byte <FIXED_crash_handler
+        .endrepeat
+
+static_behaviors_high:
+        .hibytes enemy_update_table
+        .repeat ($100 - TILE_LAST_EXPECTED_ID / 4)
+        .byte >FIXED_crash_handler
         .endrepeat
 
 ; Note: parameters are intentionally backloaded, to allow the behavior functions to use R0+
@@ -499,15 +428,10 @@ StartingTile := R15
 loop:
         perform_zpcm_inc
         ldx StartingTile
-        lda battlefield, x
-        ; the top 6 bits index into the behavior table, which is a list of **words**
-        ; so we want it to end up like this: %0bbbbbb0
-        lsr
-        and #%01111110
-        tax
-        lda static_behaviors, x
-        sta DestPtr
-        lda static_behaviors+1, x
+        ldy battlefield, x
+        lda static_behaviors_low, y
+        sta DestPtr+0
+        lda static_behaviors_high, y
         sta DestPtr+1
         jsr __trampoline
         inc StartingTile
@@ -518,18 +442,28 @@ loop:
 
 .segment "ENEMY_ATTACK"
 
-direct_attack_behaviors:
-        .word enemy_direct_attack_table
-        ; safety: fill out the rest of the table
-        .repeat ($100 - TILE_LAST_ID / 4)
-        .word FIXED_crash_handler
+direct_attack_behaviors_low:
+        .lobytes enemy_direct_attack_table
+        .repeat ($100 - TILE_LAST_EXPECTED_ID / 4)
+        .byte <FIXED_crash_handler
         .endrepeat
 
-indirect_attack_behaviors:
-        .word enemy_indirect_attack_table
-        ; safety: fill out the rest of the table
-        .repeat ($100 - TILE_LAST_ID / 4)
-        .word FIXED_crash_handler
+direct_attack_behaviors_high:
+        .hibytes enemy_direct_attack_table
+        .repeat ($100 - TILE_LAST_EXPECTED_ID / 4)
+        .byte >FIXED_crash_handler
+        .endrepeat
+
+indirect_attack_behaviors_low:
+        .lobytes enemy_indirect_attack_table
+        .repeat ($100 - TILE_LAST_EXPECTED_ID / 4)
+        .byte <FIXED_crash_handler
+        .endrepeat
+
+indirect_attack_behaviors_high:
+        .hibytes enemy_indirect_attack_table
+        .repeat ($100 - TILE_LAST_EXPECTED_ID / 4)
+        .byte >FIXED_crash_handler
         .endrepeat
 
 .proc FAR_attack_enemy_tile
@@ -549,15 +483,10 @@ TargetCol := R15
         perform_zpcm_inc
 
         ldx AttackSquare
-        lda battlefield, x
-        ; the top 6 bits index into the behavior table, which is a list of **words**
-        ; so we want it to end up like this: %0bbbbbb0
-        lsr
-        and #%01111110
-        tax
-        lda direct_attack_behaviors, x
-        sta DestPtr
-        lda direct_attack_behaviors+1, x
+        ldy battlefield, x
+        lda direct_attack_behaviors_low, y
+        sta DestPtr+0
+        lda direct_attack_behaviors_high, y
         sta DestPtr+1
         jsr __trampoline
 
@@ -568,11 +497,16 @@ TargetCol := R15
 
 .segment "ENEMY_COLLIDE"
 
-bonk_behaviors:
-        .word enemy_collide_table
-        ; safety: fill out the rest of the table
-        .repeat ($100 - TILE_LAST_ID / 4)
-        .word FIXED_crash_handler
+bonk_behaviors_low:
+        .lobytes enemy_collide_table
+        .repeat ($100 - TILE_LAST_EXPECTED_ID / 4)
+        .byte <FIXED_crash_handler
+        .endrepeat
+
+bonk_behaviors_high:
+        .hibytes enemy_collide_table
+        .repeat ($100 - TILE_LAST_EXPECTED_ID / 4)
+        .byte >FIXED_crash_handler
         .endrepeat
 
 .proc FAR_player_collides_with_tile
@@ -582,16 +516,11 @@ TargetSquare := R13
 ; regardless, this is where we want to go on this frame. What happens when we land?
 TargetRow := R14
 TargetCol := R15
-        ; the top 6 bits index into the behavior table, which is a list of **words**
-        ; so we want it to end up like this: %0bbbbbb0
         ldx TargetSquare
-        lda battlefield, x
-        lsr
-        and #%01111110
-        tax
-        lda bonk_behaviors, x
-        sta DestPtr
-        lda bonk_behaviors+1, x
+        ldy battlefield, x
+        lda bonk_behaviors_low, y
+        sta DestPtr+0
+        lda bonk_behaviors_high, y
         sta DestPtr+1
         perform_zpcm_inc
         jsr __trampoline
@@ -603,11 +532,16 @@ TargetCol := R15
 
 ; called just before suspending the map, typically because the player
 ; is moving to an adjacent room. handles all sorts of fun jank
-suspend_behaviors:
-        .word enemy_suspend_table
-        ; safety: fill out the rest of the table
-        .repeat ($100 - TILE_LAST_ID / 4)
-        .word FIXED_crash_handler
+suspend_behaviors_low:
+        .lobytes enemy_suspend_table
+        .repeat ($100 - TILE_LAST_EXPECTED_ID / 4)
+        .byte <FIXED_crash_handler
+        .endrepeat
+
+suspend_behaviors_high:
+        .hibytes enemy_suspend_table
+        .repeat ($100 - TILE_LAST_EXPECTED_ID / 4)
+        .byte >FIXED_crash_handler
         .endrepeat
 
 ; Note: parameters are intentionally backloaded, to allow the behavior functions to use R0+
@@ -619,15 +553,10 @@ CurrentSquare := R15
 loop:
         perform_zpcm_inc
         ldx CurrentSquare
-        lda battlefield, x
-        ; the top 6 bits index into the behavior table, which is a list of **words**
-        ; so we want it to end up like this: %0bbbbbb0
-        lsr
-        and #%01111110
-        tax
-        lda suspend_behaviors, x
-        sta DestPtr
-        lda suspend_behaviors+1, x
+        ldy battlefield, x
+        lda suspend_behaviors_low, y
+        sta DestPtr+0
+        lda suspend_behaviors_high, y
         sta DestPtr+1
         jsr __trampoline
         inc CurrentSquare
