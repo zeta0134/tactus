@@ -295,7 +295,6 @@ _expected_spell_tileid .set $00
         _expected_spell_tileid .set _expected_spell_tileid + $04
 .endmacro
 
-tile_suspend TILE_SMOKE_PUFF, ENEMY_UTIL_draw_cleared_disco_tile
 tile_explode TILE_SMOKE_PUFF, FIXED_no_behavior
 tile_spell   TILE_SMOKE_PUFF, FIXED_no_behavior
         
@@ -435,7 +434,50 @@ tile_collide $A4,                    FIXED_no_behavior
 tile_collide TILE_EXIT_BLOCK,        ENEMY_COLLIDE_solid_tile_forbids_movement
 tile_collide TILE_EXIT_STAIRS,       ENEMY_COLLIDE_descend_stairs
 
-
+tile_suspend TILE_SMOKE_PUFF,        ENEMY_UTIL_draw_cleared_disco_tile
+tile_suspend TILE_SLIME,             ENEMY_UTIL_move_away_from_map_edge
+tile_suspend TILE_SPIDER,            ENEMY_UTIL_move_away_from_map_edge
+tile_suspend TILE_SPIDER_ANTICIPATE, ENEMY_UTIL_move_away_from_map_edge
+tile_suspend TILE_ZOMBIE,            ENEMY_UTIL_move_away_from_map_edge
+tile_suspend TILE_ZOMBIE_ANTICIPATE, ENEMY_UTIL_move_away_from_map_edge
+tile_suspend TILE_BIRB_LEFT,         ENEMY_UTIL_move_away_from_map_edge
+tile_suspend TILE_BIRB_RIGHT,        ENEMY_UTIL_move_away_from_map_edge
+tile_suspend TILE_BIRB_LEFT_FLYING,  ENEMY_UTIL_move_away_from_map_edge
+tile_suspend TILE_BIRB_RIGHT_FLYING, ENEMY_UTIL_move_away_from_map_edge
+tile_suspend TILE_MOLE_HOLE,         FIXED_no_behavior
+tile_suspend TILE_MOLE_THROWING,     FIXED_no_behavior
+tile_suspend TILE_MOLE_IDLE,         FIXED_no_behavior
+tile_suspend TILE_WRENCH_PROJECTILE, ENEMY_UTIL_draw_cleared_disco_tile
+tile_suspend TILE_CHALLENGE_SPIKES,  FIXED_no_behavior
+tile_suspend TILE_MUSHROOM,          FIXED_no_behavior
+tile_suspend TILE_ONE_BEAT_HAZARD,   FIXED_no_behavior
+tile_suspend $44,                    FIXED_no_behavior
+tile_suspend $48,                    FIXED_no_behavior
+tile_suspend $4C,                    FIXED_no_behavior
+tile_suspend $50,                    FIXED_no_behavior
+tile_suspend $54,                    FIXED_no_behavior
+tile_suspend $58,                    FIXED_no_behavior
+tile_suspend $5C,                    FIXED_no_behavior
+tile_suspend $60,                    FIXED_no_behavior
+tile_suspend $64,                    FIXED_no_behavior
+tile_suspend $68,                    FIXED_no_behavior
+tile_suspend $6C,                    FIXED_no_behavior
+tile_suspend $70,                    FIXED_no_behavior
+tile_suspend $74,                    FIXED_no_behavior
+tile_suspend $78,                    FIXED_no_behavior
+tile_suspend $7C,                    FIXED_no_behavior
+tile_suspend $80,                    FIXED_no_behavior
+tile_suspend TILE_DISCO_FLOOR,       ENEMY_UTIL_draw_cleared_disco_tile
+tile_suspend TILE_SEMISAFE_FLOOR,    FIXED_no_behavior
+tile_suspend TILE_WALL,              FIXED_no_behavior
+tile_suspend TILE_ITEM_SHADOW,       ENEMY_UTIL_suspend_item_shadow
+tile_suspend $94,                    FIXED_no_behavior
+tile_suspend TILE_TREASURE_CHEST,    FIXED_no_behavior
+tile_suspend TILE_BIG_KEY,           FIXED_no_behavior
+tile_suspend $A0,                    FIXED_no_behavior
+tile_suspend $A4,                    FIXED_no_behavior
+tile_suspend TILE_EXIT_BLOCK,        FIXED_no_behavior
+tile_suspend TILE_EXIT_STAIRS,       FIXED_no_behavior
 
 .segment "ENEMY_UPDATE"
 
@@ -562,39 +604,10 @@ TargetCol := R15
 ; called just before suspending the map, typically because the player
 ; is moving to an adjacent room. handles all sorts of fun jank
 suspend_behaviors:
-        .word ENEMY_UTIL_draw_cleared_disco_tile  ; smoke puff
-        .word ENEMY_UTIL_move_away_from_map_edge  ; slime
-        .word ENEMY_UTIL_move_away_from_map_edge  ; spider
-        .word ENEMY_UTIL_move_away_from_map_edge  ; spider (anticipating)
-        .word ENEMY_UTIL_move_away_from_map_edge  ; zombie
-        .word ENEMY_UTIL_move_away_from_map_edge  ; zombie (anticipating)
-        .word ENEMY_UTIL_move_away_from_map_edge  ; birb (left)
-        .word ENEMY_UTIL_move_away_from_map_edge  ; birb (right)
-        .word ENEMY_UTIL_move_away_from_map_edge  ; birb (flying, left)
-        .word ENEMY_UTIL_move_away_from_map_edge  ; birb (flying, right)
-        .word FIXED_no_behavior              ; mole hole
-        .word FIXED_no_behavior              ; mole throwing
-        .word FIXED_no_behavior              ; mole idle
-        .word ENEMY_UTIL_draw_cleared_disco_tile  ; wrench
-        .word FIXED_no_behavior              ; challenge spike
-        .word FIXED_no_behavior              ; mushroom
-        .word FIXED_no_behavior              ; one beat hazard
-        .repeat 15
-        .word FIXED_no_behavior ; unimplemented
-        .endrepeat
-        .word FIXED_no_behavior               ; $80 - UNUSED
-        .word ENEMY_UTIL_draw_cleared_disco_tile   ; $84 - disco floor
-        .word FIXED_no_behavior               ; $88 - semisafe floor
-        .word FIXED_no_behavior               ; $8C - wall
-        .word ENEMY_UTIL_suspend_item_shadow       ; $90 - item shadow
-        .word FIXED_no_behavior               ; $94 - UNUSED
-        .word FIXED_no_behavior               ; $98 - treasure chest
-        .word FIXED_no_behavior               ; $9C - big key
-        .word FIXED_no_behavior               ; $A0 - gold sack
-        .word FIXED_no_behavior               ; $A4 - UNUSED
+        .word enemy_suspend_table
         ; safety: fill out the rest of the table
-        .repeat 22
-        .word FIXED_no_behavior
+        .repeat ($100 - TILE_LAST_ID / 4)
+        .word FIXED_crash_handler
         .endrepeat
 
 ; Note: parameters are intentionally backloaded, to allow the behavior functions to use R0+
