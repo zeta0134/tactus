@@ -226,8 +226,6 @@ tile_index_to_col_lut:
 .include "enemies/smoke_puff.asm"
 .include "enemies/treasure_chest.asm"
 
-.segment "ENEMY_UPDATE"
-
 .macro define_array name
     .macro .ident(.concat(.string(name), "_push_back")) value
         .local temp
@@ -253,32 +251,50 @@ define_array enemy_suspend_table
 define_array enemy_explode_table
 define_array enemy_spell_table
 
+_expected_update_tileid .set $00
+_expected_attack_tileid .set $00
+_expected_collide_tileid .set $00
+_expected_suspend_tileid .set $00
+_expected_explode_tileid .set $00
+_expected_spell_tileid .set $00
+
 .macro tile_update TILE_ID, update_func
+        .assert _expected_update_tileid = TILE_ID, error, .sprintf("during tile_update for %s, expected $%02x, got instead $%02x", .string(TILE_ID), _expected_update_tileid, TILE_ID)
         enemy_update_table_push_back update_func
+        _expected_update_tileid .set _expected_update_tileid + $04
 .endmacro
 
 .macro tile_attack TILE_ID, direct_attack_func, indirect_attack_func
+        .assert _expected_attack_tileid = TILE_ID, error, .sprintf("during tile_attack for %s, expected $%02x, got instead $%02x", .string(TILE_ID), _expected_update_tileid, TILE_ID)
         enemy_direct_attack_table_push_back direct_attack_func
         enemy_indirect_attack_table_push_back indirect_attack_func
+        _expected_attack_tileid .set _expected_attack_tileid + $04
 .endmacro
 
 .macro tile_collide TILE_ID, collide_func
+        .assert _expected_collide_tileid = TILE_ID, error, .sprintf("during tile_collide for %s, expected $%02x, got instead $%02x", .string(TILE_ID), _expected_update_tileid, TILE_ID)
         enemy_collide_table_push_back collide_func
+        _expected_collide_tileid .set _expected_collide_tileid + $04
 .endmacro
 
 .macro tile_suspend TILE_ID, suspend_func
+        .assert _expected_suspend_tileid = TILE_ID, error, .sprintf("during tile_suspend for %s, expected $%02x, got instead $%02x", .string(TILE_ID), _expected_update_tileid, TILE_ID)
         enemy_suspend_table_push_back suspend_func
+        _expected_suspend_tileid .set _expected_suspend_tileid + $04
 .endmacro
 
 .macro tile_explode TILE_ID, explode_func
+        .assert _expected_explode_tileid = TILE_ID, error, .sprintf("during tile_explode for %s, expected $%02x, got instead $%02x", .string(TILE_ID), _expected_update_tileid, TILE_ID)
         enemy_explode_table_push_back explode_func
+        _expected_explode_tileid .set _expected_explode_tileid + $04
 .endmacro
 
 .macro tile_spell TILE_ID, spellcast_func
+        .assert _expected_spell_tileid = TILE_ID, error, .sprintf("during tile_spell for %s, expected $%02x, got instead $%02x", .string(TILE_ID), _expected_update_tileid, TILE_ID)
         enemy_spell_table_push_back spellcast_func
+        _expected_spell_tileid .set _expected_spell_tileid + $04
 .endmacro
 
-tile_attack  TILE_SMOKE_PUFF, ENEMY_ATTACK_direct_attack_puff, FIXED_no_behavior
 tile_collide TILE_SMOKE_PUFF, FIXED_no_behavior
 tile_suspend TILE_SMOKE_PUFF, ENEMY_UTIL_draw_cleared_disco_tile
 tile_explode TILE_SMOKE_PUFF, FIXED_no_behavior
@@ -317,17 +333,65 @@ tile_update $74,                    FIXED_no_behavior
 tile_update $78,                    FIXED_no_behavior
 tile_update $7C,                    FIXED_no_behavior
 tile_update $80,                    FIXED_no_behavior
-tile_update TILE_DISCO_FLOOR,       ENEMY_UPDATE_draw_disco_tile           ; $84 - disco floor
-tile_update TILE_SEMISAFE_FLOOR,    ENEMY_UPDATE_update_semisafe_tile      ; $88 - semisafe floor
-tile_update TILE_WALL,              FIXED_no_behavior               ; $8C - wall
-tile_update TILE_ITEM_SHADOW,       ENEMY_UPDATE_update_item_shadow        ; $90 - item shadow
-tile_update $94,                    FIXED_no_behavior               ; $94 - UNUSED
-tile_update TILE_TREASURE_CHEST,    FIXED_no_behavior               ; $98 - treasure chest
-tile_update TILE_BIG_KEY,           FIXED_no_behavior               ; $9C - big key
-tile_update $A0,                    FIXED_no_behavior               ; $A0 - gold sack
-tile_update $A4,                    FIXED_no_behavior               ; $A4 - UNUSED
-tile_update TILE_EXIT_BLOCK,        FIXED_no_behavior               ; $A4 - UNUSED
-tile_update TILE_EXIT_STAIRS,       FIXED_no_behavior               ; $A4 - UNUSED
+tile_update TILE_DISCO_FLOOR,       ENEMY_UPDATE_draw_disco_tile
+tile_update TILE_SEMISAFE_FLOOR,    ENEMY_UPDATE_update_semisafe_tile
+tile_update TILE_WALL,              FIXED_no_behavior
+tile_update TILE_ITEM_SHADOW,       ENEMY_UPDATE_update_item_shadow
+tile_update $94,                    FIXED_no_behavior
+tile_update TILE_TREASURE_CHEST,    FIXED_no_behavior
+tile_update TILE_BIG_KEY,           FIXED_no_behavior
+tile_update $A0,                    FIXED_no_behavior
+tile_update $A4,                    FIXED_no_behavior
+tile_update TILE_EXIT_BLOCK,        FIXED_no_behavior
+tile_update TILE_EXIT_STAIRS,       FIXED_no_behavior
+
+
+tile_attack TILE_SMOKE_PUFF,        ENEMY_ATTACK_direct_attack_puff,          FIXED_no_behavior
+tile_attack TILE_SLIME,             ENEMY_ATTACK_direct_attack_slime,         ENEMY_ATTACK_indirect_attack_slime
+tile_attack TILE_SPIDER,            ENEMY_ATTACK_direct_attack_spider,        ENEMY_ATTACK_indirect_attack_spider
+tile_attack TILE_SPIDER_ANTICIPATE, ENEMY_ATTACK_direct_attack_spider,        ENEMY_ATTACK_indirect_attack_spider
+tile_attack TILE_ZOMBIE,            ENEMY_ATTACK_direct_attack_zombie,        ENEMY_ATTACK_indirect_attack_zombie
+tile_attack TILE_ZOMBIE_ANTICIPATE, ENEMY_ATTACK_direct_attack_zombie,        ENEMY_ATTACK_indirect_attack_zombie
+tile_attack TILE_BIRB_LEFT,         ENEMY_ATTACK_direct_attack_birb,          ENEMY_ATTACK_indirect_attack_birb
+tile_attack TILE_BIRB_RIGHT,        ENEMY_ATTACK_direct_attack_birb,          ENEMY_ATTACK_indirect_attack_birb
+tile_attack TILE_BIRB_LEFT_FLYING,  ENEMY_ATTACK_direct_attack_birb,          ENEMY_ATTACK_indirect_attack_birb
+tile_attack TILE_BIRB_RIGHT_FLYING, ENEMY_ATTACK_direct_attack_birb,          ENEMY_ATTACK_indirect_attack_birb
+tile_attack TILE_MOLE_HOLE,         ENEMY_ATTACK_direct_attack_mole_hole,     FIXED_no_behavior
+tile_attack TILE_MOLE_THROWING,     ENEMY_ATTACK_direct_attack_mole_throwing, FIXED_no_behavior
+tile_attack TILE_MOLE_IDLE,         ENEMY_ATTACK_direct_attack_mole_idle,     FIXED_no_behavior
+tile_attack TILE_WRENCH_PROJECTILE, FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack TILE_CHALLENGE_SPIKES,  FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack TILE_MUSHROOM,          ENEMY_ATTACK_direct_attack_mushroom,      FIXED_no_behavior
+tile_attack TILE_ONE_BEAT_HAZARD,   FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $44,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $48,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $4C,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $50,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $54,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $58,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $5C,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $60,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $64,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $68,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $6C,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $70,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $74,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $78,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $7C,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $80,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack TILE_DISCO_FLOOR,       FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack TILE_SEMISAFE_FLOOR,    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack TILE_WALL,              FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack TILE_ITEM_SHADOW,       FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $94,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack TILE_TREASURE_CHEST,    ENEMY_ATTACK_attack_treasure_chest,       FIXED_no_behavior
+tile_attack TILE_BIG_KEY,           FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $A0,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack $A4,                    FIXED_no_behavior,                        FIXED_no_behavior
+tile_attack TILE_EXIT_BLOCK,        ENEMY_ATTACK_attack_exit_block,           FIXED_no_behavior
+tile_attack TILE_EXIT_STAIRS,       FIXED_no_behavior,                        FIXED_no_behavior
+
+.segment "ENEMY_UPDATE"
 
 static_behaviors:
         .word enemy_update_table
@@ -367,69 +431,17 @@ loop:
 .segment "ENEMY_ATTACK"
 
 direct_attack_behaviors:
-        ; enemies
-        .word ENEMY_ATTACK_direct_attack_puff
-        .word ENEMY_ATTACK_direct_attack_slime
-        .word ENEMY_ATTACK_direct_attack_spider
-        .word ENEMY_ATTACK_direct_attack_spider
-        .word ENEMY_ATTACK_direct_attack_zombie
-        .word ENEMY_ATTACK_direct_attack_zombie
-        .word ENEMY_ATTACK_direct_attack_birb
-        .word ENEMY_ATTACK_direct_attack_birb
-        .word ENEMY_ATTACK_direct_attack_birb
-        .word ENEMY_ATTACK_direct_attack_birb
-        .word ENEMY_ATTACK_direct_attack_mole_hole
-        .word ENEMY_ATTACK_direct_attack_mole_throwing
-        .word ENEMY_ATTACK_direct_attack_mole_idle
-        .word FIXED_no_behavior ; wrench projectile
-        .word FIXED_no_behavior ; challenge spike
-        .word ENEMY_ATTACK_direct_attack_mushroom
-        .word FIXED_no_behavior ; one beat hazard
-        .repeat 15
-        .word FIXED_no_behavior
-        .endrepeat
-        ; floors, statics, and technical tiles
-        .word FIXED_no_behavior ; $80 - UNUSED
-        .word FIXED_no_behavior ; $84 - disco floor
-        .word FIXED_no_behavior ; $88 - semisafe floor
-        .word FIXED_no_behavior ; $8C - wall face
-        .word FIXED_no_behavior ; $90 - item shadow
-        .word FIXED_no_behavior ; $94 - UNUSED
-        .word ENEMY_ATTACK_attack_treasure_chest ; $98 - treasure chest
-        .word FIXED_no_behavior ; $9C - big key
-        .word FIXED_no_behavior ; $A0 - gold sack
-        .word FIXED_no_behavior ; $A4 - UNUSED
-        .word ENEMY_ATTACK_attack_exit_block ; $A8 - exit block
-        .word FIXED_no_behavior ; $AC - exit stairs
+        .word enemy_direct_attack_table
         ; safety: fill out the rest of the table
-        .repeat 23
-        .word FIXED_no_behavior
+        .repeat ($100 - TILE_LAST_ID / 4)
+        .word FIXED_crash_handler
         .endrepeat
 
 indirect_attack_behaviors:
-        .word FIXED_no_behavior ; smoke puff can't attack itself
-        .word ENEMY_ATTACK_indirect_attack_slime
-        .word ENEMY_ATTACK_indirect_attack_spider
-        .word ENEMY_ATTACK_indirect_attack_spider
-        .word ENEMY_ATTACK_indirect_attack_zombie
-        .word ENEMY_ATTACK_indirect_attack_zombie
-        .word ENEMY_ATTACK_indirect_attack_birb
-        .word ENEMY_ATTACK_indirect_attack_birb
-        .word ENEMY_ATTACK_indirect_attack_birb
-        .word ENEMY_ATTACK_indirect_attack_birb
-        .word FIXED_no_behavior ; moles - do not move, and therefore will never be indirectly attacked
-        .word FIXED_no_behavior
-        .word FIXED_no_behavior
-        .word FIXED_no_behavior ; wrench projectile
-        .word FIXED_no_behavior ; challenge spike
-        .word FIXED_no_behavior ; mushrooms - do not move
-        .word FIXED_no_behavior ; one beat hazard
-        .repeat 15
-        .word FIXED_no_behavior
-        .endrepeat
+        .word enemy_indirect_attack_table
         ; safety: fill out the rest of the table
-        .repeat 32
-        .word FIXED_no_behavior
+        .repeat ($100 - TILE_LAST_ID / 4)
+        .word FIXED_crash_handler
         .endrepeat
 
 .proc FAR_attack_enemy_tile
