@@ -32,6 +32,8 @@ TILE_BIG_KEY = $9C
 TILE_EXIT_BLOCK = $A8
 TILE_EXIT_STAIRS = $AC
 
+TILE_LAST_ID = $AC
+
 ; Actually in the fixed page
 .global draw_active_tile
 .global tile_index_to_row_lut, tile_index_to_col_lut

@@ -198,6 +198,12 @@ tile_index_to_col_lut:
         rts
 .endproc
 
+.proc FIXED_crash_handler
+        ; also does nothing, but we can break on this in Mesen
+        ; todo: a real crash handler?
+        rts
+.endproc
+
 .proc __trampoline
         perform_zpcm_inc
         jmp (DestPtr)
@@ -222,40 +228,112 @@ tile_index_to_col_lut:
 
 .segment "ENEMY_UPDATE"
 
+.macro define_array name
+    .macro .ident(.concat(.string(name), "_push_back")) value
+        .local temp
+        .define temp name
+        .undefine name
+        .ifblank temp
+            .define name value
+        .else
+            .define name temp, value
+        .endif
+        .undefine temp
+    end_mac
+
+    .define name
+.endmacro
+.define end_mac .endmacro
+
+define_array enemy_update_table
+define_array enemy_direct_attack_table
+define_array enemy_indirect_attack_table
+define_array enemy_collide_table
+define_array enemy_suspend_table
+define_array enemy_explode_table
+define_array enemy_spell_table
+
+.macro tile_update TILE_ID, update_func
+        enemy_update_table_push_back update_func
+.endmacro
+
+.macro tile_attack TILE_ID, direct_attack_func, indirect_attack_func
+        enemy_direct_attack_table_push_back direct_attack_func
+        enemy_indirect_attack_table_push_back indirect_attack_func
+.endmacro
+
+.macro tile_collide TILE_ID, collide_func
+        enemy_collide_table_push_back collide_func
+.endmacro
+
+.macro tile_suspend TILE_ID, suspend_func
+        enemy_suspend_table_push_back suspend_func
+.endmacro
+
+.macro tile_explode TILE_ID, explode_func
+        enemy_explode_table_push_back explode_func
+.endmacro
+
+.macro tile_spell TILE_ID, spellcast_func
+        enemy_spell_table_push_back spellcast_func
+.endmacro
+
+tile_attack  TILE_SMOKE_PUFF, ENEMY_ATTACK_direct_attack_puff, FIXED_no_behavior
+tile_collide TILE_SMOKE_PUFF, FIXED_no_behavior
+tile_suspend TILE_SMOKE_PUFF, ENEMY_UTIL_draw_cleared_disco_tile
+tile_explode TILE_SMOKE_PUFF, FIXED_no_behavior
+tile_spell   TILE_SMOKE_PUFF, FIXED_no_behavior
+        
+tile_update TILE_SMOKE_PUFF,        ENEMY_UPDATE_update_smoke_puff
+tile_update TILE_SLIME,             ENEMY_UPDATE_update_slime
+tile_update TILE_SPIDER,            ENEMY_UPDATE_update_spider_base
+tile_update TILE_SPIDER_ANTICIPATE, ENEMY_UPDATE_update_spider_anticipate
+tile_update TILE_ZOMBIE,            ENEMY_UPDATE_update_zombie_base
+tile_update TILE_ZOMBIE_ANTICIPATE, ENEMY_UPDATE_update_zombie_anticipate
+tile_update TILE_BIRB_LEFT,         ENEMY_UPDATE_update_birb_left
+tile_update TILE_BIRB_RIGHT,        ENEMY_UPDATE_update_birb_right
+tile_update TILE_BIRB_LEFT_FLYING,  ENEMY_UPDATE_update_birb_flying_left
+tile_update TILE_BIRB_RIGHT_FLYING, ENEMY_UPDATE_update_birb_flying_right
+tile_update TILE_MOLE_HOLE,         ENEMY_UPDATE_update_mole_hole
+tile_update TILE_MOLE_THROWING,     ENEMY_UPDATE_update_mole_throwing
+tile_update TILE_MOLE_IDLE,         ENEMY_UPDATE_update_mole_idle
+tile_update TILE_WRENCH_PROJECTILE, ENEMY_UPDATE_update_wrench_projectile
+tile_update TILE_CHALLENGE_SPIKES,  ENEMY_UPDATE_update_challenge_spike
+tile_update TILE_MUSHROOM,          ENEMY_UPDATE_update_mushroom
+tile_update TILE_ONE_BEAT_HAZARD,   ENEMY_UPDATE_update_one_beat_hazard
+tile_update $44,                    FIXED_no_behavior
+tile_update $48,                    FIXED_no_behavior
+tile_update $4C,                    FIXED_no_behavior
+tile_update $50,                    FIXED_no_behavior
+tile_update $54,                    FIXED_no_behavior
+tile_update $58,                    FIXED_no_behavior
+tile_update $5C,                    FIXED_no_behavior
+tile_update $60,                    FIXED_no_behavior
+tile_update $64,                    FIXED_no_behavior
+tile_update $68,                    FIXED_no_behavior
+tile_update $6C,                    FIXED_no_behavior
+tile_update $70,                    FIXED_no_behavior
+tile_update $74,                    FIXED_no_behavior
+tile_update $78,                    FIXED_no_behavior
+tile_update $7C,                    FIXED_no_behavior
+tile_update $80,                    FIXED_no_behavior
+tile_update TILE_DISCO_FLOOR,       ENEMY_UPDATE_draw_disco_tile           ; $84 - disco floor
+tile_update TILE_SEMISAFE_FLOOR,    ENEMY_UPDATE_update_semisafe_tile      ; $88 - semisafe floor
+tile_update TILE_WALL,              FIXED_no_behavior               ; $8C - wall
+tile_update TILE_ITEM_SHADOW,       ENEMY_UPDATE_update_item_shadow        ; $90 - item shadow
+tile_update $94,                    FIXED_no_behavior               ; $94 - UNUSED
+tile_update TILE_TREASURE_CHEST,    FIXED_no_behavior               ; $98 - treasure chest
+tile_update TILE_BIG_KEY,           FIXED_no_behavior               ; $9C - big key
+tile_update $A0,                    FIXED_no_behavior               ; $A0 - gold sack
+tile_update $A4,                    FIXED_no_behavior               ; $A4 - UNUSED
+tile_update TILE_EXIT_BLOCK,        FIXED_no_behavior               ; $A4 - UNUSED
+tile_update TILE_EXIT_STAIRS,       FIXED_no_behavior               ; $A4 - UNUSED
+
 static_behaviors:
-        .word ENEMY_UPDATE_update_smoke_puff         ; $00
-        .word ENEMY_UPDATE_update_slime              ; $04
-        .word ENEMY_UPDATE_update_spider_base        ; $08
-        .word ENEMY_UPDATE_update_spider_anticipate  ; $0C
-        .word ENEMY_UPDATE_update_zombie_base        ; $10
-        .word ENEMY_UPDATE_update_zombie_anticipate  ; $14
-        .word ENEMY_UPDATE_update_birb_left          ; $18
-        .word ENEMY_UPDATE_update_birb_right         ; $1C
-        .word ENEMY_UPDATE_update_birb_flying_left   ; $20
-        .word ENEMY_UPDATE_update_birb_flying_right  ; $24
-        .word ENEMY_UPDATE_update_mole_hole          ; $28
-        .word ENEMY_UPDATE_update_mole_throwing      ; $2C
-        .word ENEMY_UPDATE_update_mole_idle          ; $30
-        .word ENEMY_UPDATE_update_wrench_projectile  ; $34
-        .word ENEMY_UPDATE_update_challenge_spike    ; $38
-        .word ENEMY_UPDATE_update_mushroom           ; $3C
-        .word ENEMY_UPDATE_update_one_beat_hazard    ; $40
-        .repeat 15
-        .word FIXED_no_behavior ; unimplemented
-        .endrepeat
-        .word FIXED_no_behavior               ; $80 - UNUSED
-        .word ENEMY_UPDATE_draw_disco_tile           ; $84 - disco floor
-        .word ENEMY_UPDATE_update_semisafe_tile      ; $88 - semisafe floor
-        .word FIXED_no_behavior               ; $8C - wall
-        .word ENEMY_UPDATE_update_item_shadow        ; $90 - item shadow
-        .word FIXED_no_behavior               ; $94 - UNUSED
-        .word FIXED_no_behavior               ; $98 - treasure chest
-        .word FIXED_no_behavior               ; $9C - big key
-        .word FIXED_no_behavior               ; $A0 - gold sack
-        .word FIXED_no_behavior               ; $A4 - UNUSED
+        .word enemy_update_table
         ; safety: fill out the rest of the table
-        .repeat 22
-        .word FIXED_no_behavior
+        .repeat ($100 - TILE_LAST_ID / 4)
+        .word FIXED_crash_handler
         .endrepeat
 
 ; Note: parameters are intentionally backloaded, to allow the behavior functions to use R0+
