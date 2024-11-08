@@ -1,5 +1,6 @@
         .include "../build/tile_defs.inc"
 
+        .include "dialog.inc"
         .include "kernel.inc"
         .include "nes.inc"
         .include "pal.inc"
@@ -47,6 +48,9 @@ LeftNametableBank: .res 1
 RightNametableBank: .res 1
 LeftNametableAttr: .res 1
 RightNametableAttr: .res 1
+
+HudNametable: .res 1
+HudAttr: .res 1
 
         .segment "PRGRAM"
 
@@ -366,8 +370,15 @@ finalizer_table:
         rts
 .endproc
 
-; Note: Y still holds the final entry in the table
 .proc finalizer_hud
+        lda DialogHeight
+        beq finalizer_hud_alone
+        jmp finalizer_hud_with_dialog
+        ; bye!
+.endproc
+
+; Note: Y still holds the final entry in the table
+.proc finalizer_hud_alone
         lda #0
         sta table_ppuscroll_x, y
         lda #176
@@ -395,7 +406,114 @@ done_picking_routine:
         lda HudObjHighBank
         sta HudObjActual
 
+        lda #0
+        sta HudNametable
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta HudAttr
+
+        ; We don't use any splits after this, but we're going to have the palette swap
+        ; set them up anyway, so make sure our last split is unreachable / no effect
+        iny
+        jsr finalizer_none
+
         perform_zpcm_inc
+        rts
+.endproc
+
+; Note: Y still holds the final entry in the table
+.proc finalizer_hud_with_dialog
+TargetY := RasterScratch+0
+        lda #180
+        sec
+        sbc DialogHeight
+        sta TargetY
+        jsr remove_entries_after_target_y
+        ; setup the palette swap on this scanline
+        lda #0
+        sta table_ppuscroll_x, y
+        lda #176
+        sta table_ppuscroll_y, y
+        lda TargetY
+        sta table_scanline_compare, y
+
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq use_pal_routine
+use_ntsc_routine:
+        lda #>irq_hud_palette_swap_ntsc
+        sta table_irq_high, y
+        jmp done_picking_routine
+use_pal_routine:
+        lda #>irq_hud_palette_swap_pal
+        sta table_irq_high, y
+done_picking_routine:
+
+        ; TODO: how do we set the scroll to the other nametable?
+        ; TODO: how do we set it BACK when it's time to draw the real hud?
+        
+        ; ppumask bit isn't used
+
+        ; do this during NMI, so we don't get a race condition and flickery beat transitions
+        lda HudBgHighBank
+        sta HudBgActual
+        lda HudObjHighBank
+        sta HudObjActual
+
+        lda #1
+        sta HudNametable
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG_AT)
+        sta HudAttr
+
+        ; Now, when rendering is re-enabled the scanline counter starts at 0 again
+        ; so our first split to re-enable the HUD needs to come after DialogHeight
+        ; scanlines have been drawn. do that here
+        iny
+        lda DialogHeight
+        sta table_scanline_compare, y
+        lda #0
+        sta table_ppuscroll_x, y
+        lda #177
+        sta table_ppuscroll_y, y
+        lda #((((177 & $F8) << 2) | (0 >> 3)) & $FF)
+        sta table_ppuaddr_second, y
+        lda #>full_scroll_and_ppumask_irq
+        sta table_irq_high, y
+        ; We're still on the dialog nametable, so have ppumask disable backgrounds for one scanline
+        lda #(OBJ_ON)
+        sta table_ppumask, y
+
+        ; The last split in the table needs to fix the nametable and enable bg rendering, so
+        ; the HUD graphics can display properly. This is always +1 from the previous split
+        iny
+        lda DialogHeight
+        clc
+        adc #1
+        sta table_scanline_compare, y
+        lda #>dialog_to_hud_finalizer_irq
+        sta table_irq_high, y
+        ; the final split doesn't use any of the other settings, and disables IRQ, so
+        ; we should be finished. yay?
+
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc remove_entries_after_target_y
+TargetY := RasterScratch+0
+        ; Y holds what would be our target scanline
+        ; if the previous   
+loop:
+        ; if at any point Y becomes 0, we are done
+        cpy #0
+        beq done
+        ; if the scanline above us is LESS than TargetY, we are done
+        lda table_ppuscroll_y - 1, y
+        cmp TargetY
+        bcc done
+        ; otherwise, delete this scanline and keep searching
+        dey
+        jmp loop
+done:
         rts
 .endproc
 
@@ -584,13 +702,13 @@ return_from_delay:
         ; ppu dot here: 44
         ; wait until hblank (248)
 
-        ; Fix the nametable mappings for the HUD: all in bank 0
-        lda #0            ; 2
+        ; Fix the nametable mappings for the HUD
+        lda HudNametable  ; 3
         sta MAP_NT_A_BANK ; 4
         sta MAP_NT_B_BANK ; 4
         sta MAP_NT_C_BANK ; 4
         sta MAP_NT_D_BANK ; 4
-        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT) ; 2
+        lda HudAttr ; 3
         sta MAP_NT_A_CONTROL ; 4
         sta MAP_NT_B_CONTROL ; 4
         sta MAP_NT_C_CONTROL ; 4
@@ -603,7 +721,7 @@ return_from_delay:
 
         ; delay: 68 cycles
         jsr delay_12
-        .repeat 6
+        .repeat 5
         nop
         .endrepeat
 
@@ -794,7 +912,15 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
 
         ; END timing sensitive code
         ; cleanup and we're done!
-        sta MAP_PPU_IRQ_DISABLE
+
+        ;acknowledge the IRQ and set up for the next one (12)
+        ldx RasterTableIndex
+        lda table_scanline_compare+1, x
+        sta MAP_PPU_IRQ_LATCH         ; (set new cmp value)
+        lda MAP_PPU_IRQ_STATUS        ; (acknowledge)
+        lda table_irq_high+1, x     
+        sta self_modifying_irq+2    
+        inc RasterTableIndex
 
         ; restore registers and return
         pla
@@ -859,12 +985,12 @@ return_from_delay:
         ; wait until hblank (248)
 
         ; Fix the nametable mappings for the HUD: all in bank 0
-        lda #0            ; 2
+        lda HudNametable  ; 3
         sta MAP_NT_A_BANK ; 4
         sta MAP_NT_B_BANK ; 4
         sta MAP_NT_C_BANK ; 4
         sta MAP_NT_D_BANK ; 4
-        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT) ; 2
+        lda HudAttr ; 3
         sta MAP_NT_A_CONTROL ; 4
         sta MAP_NT_B_CONTROL ; 4
         sta MAP_NT_C_CONTROL ; 4
@@ -880,7 +1006,7 @@ return_from_delay:
         ; NTSC: was 24 cycles
         ; PAL: should be 20 cycles (-4 for nicer alignment)
         jsr delay_12
-        .repeat 4
+        .repeat 3
         nop
         .endrepeat
 
@@ -1087,7 +1213,15 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
 
         ; END timing sensitive code
         ; cleanup and we're done!
-        sta MAP_PPU_IRQ_DISABLE
+
+        ;acknowledge the IRQ and set up for the next one (12)
+        ldx RasterTableIndex
+        lda table_scanline_compare+1, x ; 4
+        sta MAP_PPU_IRQ_LATCH         ; 4 (set new cmp value)
+        lda MAP_PPU_IRQ_STATUS        ; 4 (acknowledge)
+        lda table_irq_high+1, x     ; 4
+        sta self_modifying_irq+2    ; 3
+        inc RasterTableIndex
 
         ; restore registers and return
         pla
@@ -1096,6 +1230,38 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         tax
         pla
         perform_zpcm_inc
+        rti
+.endproc
+
+.align 256 
+.proc dialog_to_hud_finalizer_irq
+        perform_zpcm_inc ; (6)
+        ; register preservation to zeropage (6)
+        sta IrqPreserveA ; 3
+        stx IrqPreserveX ; 3
+
+        ; fix the nametables to point back to the HUD region
+        lda #0  ; 2
+        sta MAP_NT_A_BANK ; 4
+        sta MAP_NT_B_BANK ; 4
+        sta MAP_NT_C_BANK ; 4
+        sta MAP_NT_D_BANK ; 4
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT) ; 2
+        sta MAP_NT_A_CONTROL ; 4
+        sta MAP_NT_B_CONTROL ; 4
+        sta MAP_NT_C_CONTROL ; 4
+        sta MAP_NT_D_CONTROL ; 4
+
+        ; turn backgrounds back on
+        lda #(BG_ON | OBJ_ON)
+        sta PPUMASK
+
+        ; this is always the last split, so disable IRQs entirely
+        sta MAP_PPU_IRQ_DISABLE
+
+        lda IrqPreserveA ; 3
+        ldx IrqPreserveX ; 3
+        perform_zpcm_inc ; (6)
         rti
 .endproc
 
