@@ -17,14 +17,17 @@
 
 DialogState: .res 2
 DialogHeight: .res 1
-
-
+DialogOpenClosePos: .res 1
 
         .segment "CODE_0"
 
 FONT_BANK = CHR_BANK_FONT_MARSHMALLOW
 DIALOG_NAMETABLE_BASE = $56C0
 DIALOG_ATTRIBUTE_BASE = $5EC0
+
+DIALOG_EASING_LENGTH = 16
+dialog_easing_lut:
+    .byte 0,9,16,22,26,30,32,34,35,35,35,35,34,33,33,32
 
 .proc init_dialog
         lda #0
@@ -62,24 +65,53 @@ loop:
 .endproc
 
 .proc state_wait_for_activation
-
-        ; For now, a very simple hack to force the dialog box open and closed,
-        ; so we can test the raster setup and get this thing displayed
+        ; For now, a very simple hack to force the dialog box open
 check_a_button:
         lda #(KEY_A)
         bit ButtonsDown
-        beq check_b_button
-        lda #20
-        sta DialogHeight
+        beq done
+        lda #0
+        sta DialogOpenClosePos
+        st16 DialogState, state_open_dialog_animation
+done:
         rts
+.endproc
 
+.proc state_open_dialog_animation
+        inc DialogOpenClosePos
+        ldx DialogOpenClosePos
+        lda dialog_easing_lut, x
+        sta DialogHeight
+        cpx #(DIALOG_EASING_LENGTH-1)
+        bne continue_opening
+        ; TODO: whatever mode was requested
+        st16 DialogState, state_wait_for_deactivation
+continue_opening:
+        rts
+.endproc
+
+.proc state_wait_for_deactivation
+        ; For now, a very simple hack to force the dialog box closed again
 check_b_button:
         lda #(KEY_B)
         bit ButtonsDown
         beq done
-        lda #0
-        sta DialogHeight
+        lda #(DIALOG_EASING_LENGTH-1)
+        sta DialogOpenClosePos
+        st16 DialogState, state_close_dialog_animation
 done:
         rts
+.endproc
 
+.proc state_close_dialog_animation
+        dec DialogOpenClosePos
+        ldx DialogOpenClosePos
+        lda dialog_easing_lut, x
+        sta DialogHeight
+        cpx #0
+        bne continue_closing
+        ; TODO: whatever mode was requested
+        st16 DialogState, state_wait_for_activation
+continue_closing:
+        rts
 .endproc
