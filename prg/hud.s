@@ -9,6 +9,7 @@
         .include "charmap.inc"
         .include "chr.inc"
         .include "debug.inc"
+        .include "dialog.inc"
         .include "far_call.inc"
         .include "hearts.inc"
         .include "hud.inc"
@@ -146,6 +147,9 @@ weapon_palette_table:
         jsr draw_static_hud_elements
         mov16 DisplayedGold, PlayerGold
         jsr draw_coin_counter
+
+        jsr init_dialog
+
         st16 HudState, hud_state_update
         rts
 .endproc
@@ -166,6 +170,8 @@ weapon_palette_table:
         .if ::DEBUG_MODE
         jsr draw_run_seed
         .endif
+        perform_zpcm_inc
+        jsr update_dialog
         perform_zpcm_inc
         rts
 .endproc
