@@ -507,7 +507,7 @@ loop:
         cpy #0
         beq done
         ; if the scanline above us is LESS than TargetY, we are done
-        lda table_ppuscroll_y - 1, y
+        lda table_scanline_compare - 1, y
         cmp TargetY
         bcc done
         ; otherwise, delete this scanline and keep searching

@@ -5,6 +5,7 @@
         .include "_globals.inc"
 
         .include "far_call.inc"
+        .include "hud.inc"
         .include "input.inc"
         .include "nes.inc"
         .include "rainbow.inc"
@@ -13,21 +14,46 @@
         .include "word_util.inc"
         .include "zeropage.inc"
 
-        .segment "PRGRAM"
-
-DialogState: .res 2
-DialogHeight: .res 1
-DialogOpenClosePos: .res 1
-
-        .segment "CODE_0"
-
 FONT_BANK = CHR_BANK_FONT_MARSHMALLOW
 DIALOG_NAMETABLE_BASE = $56C0
 DIALOG_ATTRIBUTE_BASE = $5EC0
 
-DIALOG_EASING_LENGTH = 16
+D_NEWLINE = $80
+D_WAIT    = $81
+D_CLEAR   = $82
+D_CLOSE   = $83
+D_ATTR    = $84
+
+        .zeropage
+DialogStringCurrentPtr: .res 2
+DialogNametablePtr: .res 2
+DialogAttrPtr: .res 2
+
+        .segment "PRGRAM"
+DialogState: .res 2
+DialogHeight: .res 1
+DialogOpenClosePos: .res 1
+DialogCurrentAttr: .res 1
+
+; Will be set by calling code, sortof
+DialogStringPtr: .res 2
+DialogStringBank: .res 2
+
+
+        .segment "TEXT_STRINGS"
+
+hello_dialog:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL), "DIALOG TEST", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL), "Hello World!", D_WAIT, D_CLEAR
+        .byte "This dialog box has", D_NEWLINE
+        .byte "multiple pages of text.", D_WAIT, D_CLOSE
+
+        .segment "CODE_0"
+
+DIALOG_EASING_LENGTH = 8
 dialog_easing_lut:
-    .byte 0,9,16,22,26,30,32,34,35,35,35,35,34,33,33,32
+        .byte 0, 10, 16, 20, 22, 22, 21, 20
 
 .proc init_dialog
         lda #0
@@ -57,7 +83,7 @@ dialog_easing_lut:
 loop:
         lda #FONT_BANK
         sta DIALOG_ATTRIBUTE_BASE, y
-        lda #'-' ; for great testing
+        lda #0
         sta DIALOG_NAMETABLE_BASE, y
         iny
         bne loop
@@ -70,6 +96,16 @@ check_a_button:
         lda #(KEY_A)
         bit ButtonsDown
         beq done
+
+        jsr clear_entire_dialog_area
+        lda #FONT_BANK
+        sta DialogCurrentAttr
+
+        ; FOR GREAT TESTING!
+        st16 DialogStringPtr, hello_dialog
+        lda #<.bank(hello_dialog)
+        sta DialogStringBank
+
         lda #0
         sta DialogOpenClosePos
         st16 DialogState, state_open_dialog_animation
@@ -85,21 +121,8 @@ done:
         cpx #(DIALOG_EASING_LENGTH-1)
         bne continue_opening
         ; TODO: whatever mode was requested
-        st16 DialogState, state_wait_for_deactivation
+        st16 DialogState, state_init_text_display
 continue_opening:
-        rts
-.endproc
-
-.proc state_wait_for_deactivation
-        ; For now, a very simple hack to force the dialog box closed again
-check_b_button:
-        lda #(KEY_B)
-        bit ButtonsDown
-        beq done
-        lda #(DIALOG_EASING_LENGTH-1)
-        sta DialogOpenClosePos
-        st16 DialogState, state_close_dialog_animation
-done:
         rts
 .endproc
 
@@ -113,5 +136,136 @@ done:
         ; TODO: whatever mode was requested
         st16 DialogState, state_wait_for_activation
 continue_closing:
+        rts
+.endproc
+
+.proc state_init_text_display
+        lda DialogStringPtr+0
+        sta DialogStringCurrentPtr+0
+        lda DialogStringPtr+1
+        sta DialogStringCurrentPtr+1
+
+        st16 DialogNametablePtr, (DIALOG_NAMETABLE_BASE+2)
+        st16 DialogAttrPtr, (DIALOG_ATTRIBUTE_BASE+2)
+
+        st16 DialogState, state_run_text_display
+        rts
+.endproc
+
+.proc __cmd_trampoline
+CommandPtr := R0
+        jmp (CommandPtr)
+.endproc
+
+.proc state_run_text_display
+CommandPtr := R0
+        access_data_bank DialogStringBank
+
+        ; TODO: wait time between characters?
+
+        ldy #0
+        lda (DialogStringCurrentPtr), y
+        bpl draw_single_character
+        asl
+        tax
+        lda dialog_command_lut+0, x
+        sta CommandPtr+0
+        lda dialog_command_lut+1, x
+        sta CommandPtr+1
+        jsr __cmd_trampoline
+        restore_previous_bank
+        rts
+draw_single_character:
+        sta (DialogNametablePtr), y
+        lda DialogCurrentAttr ; TODO: commands to set text color/font?
+        sta (DialogAttrPtr), y
+        inc16 DialogNametablePtr
+        inc16 DialogAttrPtr
+        ; onward!
+        inc16 DialogStringCurrentPtr
+        restore_previous_bank
+        rts
+.endproc
+
+dialog_command_lut:
+        .word dialog_cmd_newline; D_NEWLINE = $80
+        .word dialog_cmd_wait  ; D_WAIT    = $81
+        .word dialog_cmd_clear ; D_CLEAR   = $82
+        .word dialog_cmd_close ; D_CLOSE   = $83
+        .word dialog_cmd_attr  ; D_ATTR    = $84
+        ; TODO: safety? bah!
+
+.proc dialog_cmd_newline
+        ; clear out the low 5 bits to reset to 0, then add 32, then add 2
+        lda DialogNametablePtr+0
+        and #%11100000
+        clc
+        adc #34
+        sta DialogNametablePtr+0
+        ; that might have carried
+        lda DialogNametablePtr+1
+        adc #0
+        sta DialogNametablePtr+1
+
+        ; Same deal for the attribute pointer
+        lda DialogAttrPtr+0
+        and #%11100000
+        clc
+        adc #34
+        sta DialogAttrPtr+0
+        ; that might have carried
+        lda DialogAttrPtr+1
+        adc #0
+        sta DialogAttrPtr+1
+
+        ; onward
+        inc16 DialogStringCurrentPtr
+        rts
+.endproc
+
+.proc dialog_cmd_clear
+        ; oh, this is probably overkill. we might need to not do this
+        ; once we are drawing borders, etc?
+        jsr clear_entire_dialog_area
+        st16 DialogNametablePtr, (DIALOG_NAMETABLE_BASE+2)
+        st16 DialogAttrPtr, (DIALOG_ATTRIBUTE_BASE+2)
+        ; onward
+        inc16 DialogStringCurrentPtr
+        rts
+.endproc
+
+.proc dialog_cmd_wait
+        ; FOR NOW, use A to advance.
+        ; TODO: hook this up to the actual in-game actions... however those
+        ; are going to work. (that might still be A/B to advance, just don't do it here!)
+
+check_a_button:
+        lda #(KEY_A)
+        bit ButtonsDown
+        beq done
+
+        ; Conditionally, onward!
+        inc16 DialogStringCurrentPtr
+done:
+        rts
+.endproc
+
+.proc dialog_cmd_close
+        st16 DialogState, state_close_dialog_animation
+        ; Do not advance, there is no more data to process.
+        ; If we somehow process this command again, we might softlock the dialog system,
+        ; but we won't crash the rest of the game. Good enough?
+        rts
+.endproc
+
+.proc dialog_cmd_attr
+        ; onward!
+        inc16 DialogStringCurrentPtr
+        ; read and apply
+        ldy #0
+        lda (DialogStringCurrentPtr), y
+        sta DialogCurrentAttr
+        ; onward properly!
+        inc16 DialogStringCurrentPtr
         rts
 .endproc
