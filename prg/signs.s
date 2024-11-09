@@ -83,7 +83,7 @@ sign_multiline_test:
         .byte "Ph'nglui mglw'nafh ", D_ATTR, (FONT_BANK | HUD_TEXT_PAL), "Cthulhu", D_NEWLINE
         .byte D_ATTR, (FONT_BANK | HUD_RED_PAL)
         .byte "R'lyeh wgah'nagl fhtagn.", D_NEWLINE
-        .byte "Hrii naflShub-Niggurath", D_WAIT, D_CLEAR
+        .byte "Nyarlathotep throd f'ghft", D_WAIT, D_CLEAR
         ;     0123456789012345678901234567 ; 28-char width
         .byte "ftaghu sgn'wahl, shugg", D_NEWLINE
         .byte "hlirgh h'shagg ", D_ATTR, (FONT_BANK | HUD_PURPLE_PAL), "Yoggoth", D_NEWLINE

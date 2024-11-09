@@ -8,6 +8,7 @@
         .include "hud.inc"
         .include "input.inc"
         .include "nes.inc"
+        .include "palette.inc"
         .include "rainbow.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -68,6 +69,7 @@ dialog_easing_lut:
 
 DIALOG_ADVANCE_INDICATOR = $E0
 DIALOG_CLOSE_INDICATOR = $E1
+DIALOG_BOTTOM_BORDER = $E2
 DIALOG_WAIT_INDICATOR_LENGTH = 17
 DIALOG_WAIT_COOLDOWN = 8
 
@@ -84,7 +86,6 @@ dialog_wait_indicator_lut:
 .endproc
 
 .proc update_dialog
-        ;jsr debug_passive_dialog
         jmp (DialogState)
         rts
 .endproc
@@ -95,80 +96,36 @@ dialog_wait_indicator_lut:
         rts
 .endproc
 
-.proc debug_active_dialog
-        ; Use buttons to manually activate the dialog subsystem. Runs alongside every
-        ; state, just like game logic will eventually.
-
-check_a_button:
-        lda #(KEY_A)
-        bit ButtonsDown
-        beq check_b_button
-
-        st16 DialogActiveStringPtr, hello_dialog
-        lda #<.bank(hello_dialog)
-        sta DialogActiveStringBank
-
-        lda #1
-        sta DialogInitiateActiveMode
-
-check_b_button:
-        lda #(KEY_B)
-        bit ButtonsDown
-        beq done
-
-        lda #1
-        sta DialogDismissActiveMode
-
-done:
-        rts
-.endproc
-
-.proc debug_passive_dialog
-        ; Use buttons to manually activate the dialog subsystem. Runs alongside every
-        ; state, just like game logic will eventually.
-
-check_a_button:
-        lda #(KEY_A)
-        bit ButtonsDown
-        beq check_b_button
-
-        st16 DialogPassiveStringPtr, hello_dialog
-        lda #<.bank(hello_dialog)
-        sta DialogPassiveStringBank
-
-        lda #1
-        sta DialogInitiatePassiveMode
-
-check_b_button:
-        lda #(KEY_B)
-        bit ButtonsDown
-        beq done
-
-        lda #1
-        sta DialogDismissPassiveMode
-
-done:
-        rts
-.endproc
-
 ; run once during initial init, this will
 ; ensure the entire text area is clear of artifacts
 ; from other non-gameplay modes
 .proc clear_entire_dialog_area
-        ; the bottom 8 rows of this nametable are ours to play with.
-        ; we don't need all of these, but initialize them all anyway
+        ; clear the first 3 rows to actually blank
         ldy #0
-loop:
+text_loop:
         lda #FONT_BANK
         sta DIALOG_ATTRIBUTE_BASE, y
         lda #0
         sta DIALOG_NAMETABLE_BASE, y
         iny
-        bne loop
+        cpy #96
+        bne text_loop
+border_loop:
+        lda #(FONT_BANK | HUD_TEXT_PAL)
+        sta DIALOG_ATTRIBUTE_BASE, y
+        lda #DIALOG_BOTTOM_BORDER
+        sta DIALOG_NAMETABLE_BASE, y
+        iny
+        cpy #128
+        bne border_loop
         rts
 .endproc
 
 .proc state_wait_for_activation
+        lda #$0F
+        sta staging_palette+16+4
+        sta staging_palette+16+8
+        sta staging_palette+16+12
 
 check_for_active:
         lda DialogInitiateActiveMode
@@ -237,6 +194,9 @@ done:
 .endproc
 
 .proc state_open_dialog_animation
+        lda #$2D
+        sta staging_palette+16+8
+
         inc DialogOpenClosePos
         ldx DialogOpenClosePos
         lda dialog_easing_lut, x
