@@ -476,7 +476,7 @@
  </group>
  <group id="57" name="Shop - North" class="overlay">
   <properties>
-   <property name="adjacent_challenge" type="bool" value="true"/>
+   <property name="adjacent_challenge" type="bool" value="false"/>
    <property name="adjacent_exterior" type="bool" value="false"/>
    <property name="adjacent_interior" type="bool" value="false"/>
    <property name="adjacent_shop" type="bool" value="true"/>

@@ -14,16 +14,6 @@
         .include "word_util.inc"
         .include "zeropage.inc"
 
-FONT_BANK = CHR_BANK_FONT_MARSHMALLOW
-DIALOG_NAMETABLE_BASE = $56C0
-DIALOG_ATTRIBUTE_BASE = $5EC0
-
-D_NEWLINE = $80
-D_WAIT    = $81
-D_CLEAR   = $82
-D_CLOSE   = $83
-D_ATTR    = $84
-
         .zeropage
 DialogStringCurrentPtr: .res 2
 DialogNametablePtr: .res 2
@@ -39,7 +29,6 @@ DialogCurrentAttr: .res 1
 DialogStringPtr: .res 2
 DialogStringBank: .res 2
 
-
         .segment "TEXT_STRINGS"
 
 hello_dialog:
@@ -51,9 +40,19 @@ hello_dialog:
 
         .segment "CODE_0"
 
-DIALOG_EASING_LENGTH = 8
+DIALOG_EASING_LENGTH = 12
 dialog_easing_lut:
-        .byte 0, 10, 16, 20, 22, 22, 21, 20
+        .byte 0,10,17,23,27,29,30,31,30,30,29,28
+
+DIALOG_ADVANCE_INDICATOR = $E0
+DIALOG_CLOSE_INDICATOR = $E1
+DIALOG_WAIT_INDICATOR_LENGTH = 17
+DIALOG_WAIT_COOLDOWN = 8
+
+dialog_wait_indicator_lut:
+        .byte $F0,$F1,$F2,$F3,$F4,$F5,$F6,$F7
+        .byte $F8,$F9,$FA,$FB,$FC,$FD,$FE,$FF
+        .byte $EF
 
 .proc init_dialog
         lda #0
@@ -158,11 +157,20 @@ CommandPtr := R0
 .endproc
 
 .proc state_run_text_display
-CommandPtr := R0
         access_data_bank DialogStringBank
 
         ; TODO: wait time between characters?
 
+        ; For now: double speed!
+        jsr process_one_character
+        jsr process_one_character
+        
+        restore_previous_bank
+        rts
+.endproc
+
+.proc process_one_character
+CommandPtr := R0
         ldy #0
         lda (DialogStringCurrentPtr), y
         bpl draw_single_character
@@ -173,7 +181,6 @@ CommandPtr := R0
         lda dialog_command_lut+1, x
         sta CommandPtr+1
         jsr __cmd_trampoline
-        restore_previous_bank
         rts
 draw_single_character:
         sta (DialogNametablePtr), y
@@ -183,7 +190,6 @@ draw_single_character:
         inc16 DialogAttrPtr
         ; onward!
         inc16 DialogStringCurrentPtr
-        restore_previous_bank
         rts
 .endproc
 
@@ -244,9 +250,38 @@ check_a_button:
         bit ButtonsDown
         beq done
 
+        ; Clear the waiting icon
+        lda #0
+        ldy #0
+        sta (DialogNametablePtr), y
+
         ; Conditionally, onward!
         inc16 DialogStringCurrentPtr
+        rts
 done:
+
+        ; Draw the waiting icon!
+        ; First, check to see if the next byte is close, so we can pick the right one
+        ldy #1
+        lda (DialogStringCurrentPtr), y
+        cmp #D_CLOSE
+        beq close_indicator
+advance_indicator:
+        lda #DIALOG_ADVANCE_INDICATOR
+        ldy #0
+        sta (DialogNametablePtr), y
+        lda #FONT_BANK | HUD_PURPLE_PAL
+        sta (DialogAttrPtr), y
+        jmp done_with_indicator
+close_indicator:
+        lda #DIALOG_CLOSE_INDICATOR
+        ldy #0
+        sta (DialogNametablePtr), y
+        lda #FONT_BANK | HUD_PURPLE_PAL
+        ldy #0
+        sta (DialogAttrPtr), y
+done_with_indicator:
+
         rts
 .endproc
 

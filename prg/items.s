@@ -4,6 +4,7 @@
         
         .include "_globals.inc"
 
+        .include "dialog.inc"
         .include "far_call.inc"
         .include "hearts.inc"
         .include "hud.inc"
@@ -25,6 +26,226 @@
 ; dance around scratch byte allocation
 ItemPtr: .res 2
 ItemFuncPtr: .res 2
+
+        .segment "TEXT_STRINGS"
+
+no_item_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "NO ITEM", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Huh? You shouldn't be", D_NEWLINE
+        .byte "reading this!", D_WAIT, D_CLOSE
+
+dagger_lv1_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "DAGGER", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "...kinda crummy!", D_WAIT, D_CLOSE
+
+broadsword_lv1_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "BROADSWORD", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Hits 3 squares in front.", D_WAIT, D_CLOSE
+
+broadsword_lv2_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "BROADSWORD - L2", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Hits 3 squares in front.", D_WAIT, D_CLOSE
+
+broadsword_lv3_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "BROADSWORD - L3", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Hits 3 squares in front.", D_WAIT, D_CLOSE
+
+longsword_lv1_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "LONGSWORD", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Hits 2 squares ahead.", D_WAIT, D_CLOSE
+
+longsword_lv2_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "LONGSWORD - L2", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Hits 2 squares ahead.", D_WAIT, D_CLOSE
+
+longsword_lv3_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "LONGSWORD - L3", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Hits 2 squares ahead.", D_WAIT, D_CLOSE
+
+spear_lv1_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "SPEAR", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Strike one foe up to", D_NEWLINE
+        .byte "2 squares ahead.", D_WAIT, D_CLOSE
+
+spear_lv2_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "SPEAR - L2", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Strike one foe up to", D_NEWLINE
+        .byte "2 squares ahead.", D_WAIT, D_CLOSE
+
+spear_lv3_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "SPEAR - L3", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Strike one foe up to", D_NEWLINE
+        .byte "2 squares ahead.", D_WAIT, D_CLOSE
+
+flail_lv1_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "FLAIL", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Strike adjacent foes", D_NEWLINE
+        .byte "while moving.", D_WAIT, D_CLOSE
+
+flail_lv2_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "FLAIL - L2", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Strike adjacent foes", D_NEWLINE
+        .byte "while moving.", D_WAIT, D_CLOSE
+
+flail_lv3_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "FLAIL - L3", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Strike adjacent foes", D_NEWLINE
+        .byte "while moving.", D_WAIT, D_CLOSE
+
+basic_torch_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "TORCH", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "+1 Lighting Radius", D_WAIT, D_CLOSE
+
+large_torch_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "BIG OL' TORCH", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "+4 Lighting Radius", D_WAIT, D_CLOSE
+
+; Consumables don't display text in-game, but we might want
+; to make a sortof in-game glossary, and that's where these
+; could be used. Might as well populate them while we're on
+; a roll with the things.
+compass_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "COMPASS", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Locate special chambers.", D_WAIT, D_CLOSE
+
+map_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "DUNGEON MAP", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Fully reveal the current", D_NEWLINE
+        .byte "floor.", D_WAIT, D_CLOSE
+
+small_fries_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "SMALL FRIES", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "+4 HP. Quite Salty.", D_WAIT, D_CLOSE
+
+medium_fries_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "MEDIUM FRIES", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "+8 HP. Best with ketchup.", D_WAIT, D_CLOSE
+
+large_fries_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "LARGE FRIES", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Heals all HP! Satiating.", D_WAIT, D_CLOSE
+
+go_go_boots_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "GO GO BOOTS", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Tap twice, move twice.", D_WAIT, D_CLOSE
+
+gold_sack_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "GOLD SACK", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "One can never have too", D_NEWLINE
+        .byte "much treasure!", D_WAIT, D_CLOSE
+
+heart_container_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "HEART CONTAINER", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "+4 Maximum HP", D_WAIT, D_CLOSE
+
+temporary_heart_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "BONUS HEART", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "+4 Temporary HP", D_WAIT, D_CLOSE
+
+heart_armor_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "HEART ARMOR", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Reduce incoming damage to", D_NEWLINE
+        .byte "this heart.", D_WAIT, D_CLOSE
+
+defensive_shield_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "DEFENSIVE SHIELD", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "-2 Incoming Damage.", D_WAIT, D_CLOSE
+
+chain_link_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "CHAIN LINK", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "+2 Chain Duration.", D_WAIT, D_CLOSE
+
+aloha_tshirt_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "ALOHA T-SHIRT", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "-1 Incoming Damage.", D_NEWLINE
+        .byte "Tourists charged double!", D_WAIT, D_CLOSE
 
         .segment "DATA_0"
 

@@ -366,10 +366,10 @@ LayoutPtr := R0
         ; Initially the game enables just the HUD and nothing else. Game logic
         ; will shift these around as necessary.
 
-        ;set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, #0
+        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, #0
         ; For debugging lag, let's turn on an expensive underwater-y distortion
         ; Later, let's have rooms specify this, kay? it's irritating to change the build just to see it
-        set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #0
+        ;set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #0
 
         set_raster_playback_speed #1, #0
         ; Enable NMI first (but not rendering)
@@ -685,9 +685,9 @@ setup_default_transition:
         ; a laggy beat_frame_1 seems to briefly render the wrong nametable at
         ; fast tempo. Investigate!
 
-        ;set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, #0
+        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, #0
         ; For great debugging!
-        set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #0
+        ;set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #0
 
         set_raster_playback_speed #1, #0
         lda #0
