@@ -1,4 +1,5 @@
         .include "../build/tile_defs.inc"
+        .include "_globals.inc"
 
         .include "dialog.inc"
         .include "kernel.inc"

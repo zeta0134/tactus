@@ -43,8 +43,3 @@ chr_tile_offset EQUIPMENT_SPELL_3, 4, 12
 chr_tile_offset EQUIPMENT_ITEM_1, 4, 14
 chr_tile_offset EQUIPMENT_ITEM_2, 6, 14
 chr_tile_offset EQUIPMENT_ITEM_3, 8, 14
-
-HUD_YELLOW_PAL  = %00000000
-HUD_TEXT_PAL    = %01000000
-HUD_RED_PAL     = %10000000
-HUD_PURPLE_PAL  = %11000000

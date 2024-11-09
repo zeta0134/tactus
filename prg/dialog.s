@@ -1,9 +1,7 @@
-        .include "dialog.inc"
-
-        .include "../build/tile_defs.inc"
-        
+        .include "../build/tile_defs.inc"        
         .include "_globals.inc"
 
+        .include "dialog.inc"
         .include "far_call.inc"
         .include "hud.inc"
         .include "input.inc"

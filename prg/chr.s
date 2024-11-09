@@ -135,7 +135,7 @@ st16 Length, $0400
         ldy #0
 loop:
         perform_zpcm_inc
-        lda #CHR_BANK_OLD_CHRRAM
+        lda #CHR_BANK_TITLE
         sta (DestAddrLeft), y
         sta (DestAddrRight), y
         dec16 Length
