@@ -399,7 +399,8 @@ use_pal_routine:
         sta table_irq_high, y
 done_picking_routine:
 
-        ; ppumask bit isn't used
+        lda #(BG_ON | OBJ_ON)
+        sta table_ppumask, y
 
         ; do this during NMI, so we don't get a race condition and flickery beat transitions
         lda HudBgHighBank
@@ -449,10 +450,10 @@ use_pal_routine:
         sta table_irq_high, y
 done_picking_routine:
 
-        ; TODO: how do we set the scroll to the other nametable?
-        ; TODO: how do we set it BACK when it's time to draw the real hud?
-        
-        ; ppumask bit isn't used
+        ; no sprites over the dialog region
+        ; (we turn them on manually later with a different finalizer)
+        lda #(BG_ON)
+        sta table_ppumask, y
 
         ; do this during NMI, so we don't get a race condition and flickery beat transitions
         lda HudBgHighBank
@@ -896,17 +897,26 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
 
         ; and again, wait another *entire* scanline, so that we can re-enable
         ; sprites (since this scanline will have corrupted sprite evalutation)
-        lda #(BG_ON | OBJ_ON) ; 2
+        ldx RasterTableIndex ; 3
+        lda table_ppumask, x ; 4
 
         ; ppu dot here: 279
         jsr delay_20
         jsr delay_20
         jsr delay_20
         jsr delay_20
-        jsr delay_20
-        nop
-        nop
-        nop
+
+        ; new: 21
+        jsr delay_12
+        php ; 3
+        plp ; 4
+        nop ; 2
+
+        ; previously: 26
+        ;jsr delay_20
+        ;nop
+        ;nop
+        ;nop
 
         ; ppu dot here: 256
         sta PPUMASK
@@ -1196,18 +1206,19 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
 
         ; and again, wait another *entire* scanline, so that we can re-enable
         ; sprites (since this scanline will have corrupted sprite evalutation)
-        lda #(BG_ON | OBJ_ON) ; 2
+        ldx RasterTableIndex ; 3
+        lda table_ppumask, x ; 4
 
         ; ppu dot here: 279
         ; NTSC: was 106
+
         ; PAL: should be 99
         jsr delay_20
         jsr delay_20
         jsr delay_20
         jsr delay_20
         jsr delay_12
-        php ; 3
-        plp ; 4
+        nop
 
         ; ppu dot here: 256
         sta PPUMASK
