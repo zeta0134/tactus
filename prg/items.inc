@@ -12,6 +12,8 @@
     TorchlightFunc .addr
     UseFunc .addr
     DmgReductionFunc .addr
+    DescriptionStringPtr .addr
+    DescriptionStringBank .byte
 .endstruct
 
 SLOT_WEAPON     = 0
@@ -28,6 +30,7 @@ SLOT_CONSUMABLE = 7
 ; utilities for drawing items
 .global FAR_apply_item_world_metasprite
 .global FAR_apply_item_hud_metasprite
+.global FAR_display_item_description
 
 ; utilities for working out the (generic) effects of most items
 ; (some unique item effects are not covered here)

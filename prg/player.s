@@ -5,6 +5,7 @@
         .include "_globals.inc"
 
         .include "battlefield.inc"
+        .include "dialog.inc"
         .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
@@ -96,6 +97,9 @@ PlayerIsPaused: .res 1
 PlayerIntendsToWait: .res 1
 PlayerIntendsToBomb: .res 1
 PlayerIntendsToCast: .res 1
+
+PlayerActiveDialogSquare: .res 1
+PlayerPassiveDialogSquare: .res 1
 
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
@@ -685,6 +689,8 @@ arrived_at_target:
 .proc FAR_update_player
 TorchlightTotal := R0
 
+PlayerSquare := R2
+
 TargetRow := R14
 TargetCol := R15
         ; First up, default the player's animation cel to either standing or, if it's been a really long
@@ -820,6 +826,40 @@ no_darkness:
         sta PlayerIntendsToBomb
         sta PlayerIntendsToCast
         sta PlayerIntendsToWait
+
+        ; If necessary, cleanup dialog states through movement
+        jsr cleanup_dialog_state
+
+        rts
+.endproc
+
+.proc cleanup_dialog_state
+PlayerSquare := R2
+        ldx PlayerRow
+        lda player_tile_index_table, x ; Row * Width
+        clc
+        adc PlayerCol                  ; ... + Col
+        sta PlayerSquare
+
+        lda PlayerActiveDialogSquare
+        beq done_with_active_dialog
+        cmp PlayerSquare
+        beq done_with_active_dialog
+        lda #1
+        sta DialogDismissActiveMode
+        lda #0
+        sta PlayerActiveDialogSquare
+done_with_active_dialog:
+
+        lda PlayerPassiveDialogSquare
+        beq done_with_passive_dialog
+        cmp PlayerSquare
+        beq done_with_passive_dialog
+        lda #1
+        sta DialogDismissPassiveMode
+        lda #0
+        sta PlayerPassiveDialogSquare
+done_with_passive_dialog:
 
         rts
 .endproc

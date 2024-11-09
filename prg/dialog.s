@@ -69,7 +69,7 @@ dialog_easing_lut:
 DIALOG_ADVANCE_INDICATOR = $E0
 DIALOG_CLOSE_INDICATOR = $E1
 DIALOG_WAIT_INDICATOR_LENGTH = 17
-DIALOG_WAIT_COOLDOWN = 14
+DIALOG_WAIT_COOLDOWN = 8
 
 dialog_wait_indicator_lut:
         .byte $F0,$F1,$F2,$F3,$F4,$F5,$F6,$F7
@@ -84,7 +84,7 @@ dialog_wait_indicator_lut:
 .endproc
 
 .proc update_dialog
-        jsr debug_passive_dialog
+        ;jsr debug_passive_dialog
         jmp (DialogState)
         rts
 .endproc
@@ -181,6 +181,9 @@ check_for_active:
         sta DialogCurrentModeActive
         lda #0
         sta DialogCurrentModePassive
+        ; don't dismiss the thing we're just activating on the same frame!
+        lda #0
+        sta DialogDismissActiveMode 
         ; Copy the string properties to set up the draw
         lda DialogActiveStringPtr+0
         sta DialogStringCurrentPtr+0
@@ -207,6 +210,10 @@ check_for_passive:
         sta DialogCurrentModePassive
         lda #0
         sta DialogCurrentModeActive
+        lda #0
+        ; don't dismiss the thing we're just activating on the same frame!
+        lda #0
+        sta DialogDismissPassiveMode
         ; Copy the string properties to set up the draw
         lda DialogPassiveStringPtr+0
         sta DialogStringCurrentPtr+0

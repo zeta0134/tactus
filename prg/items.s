@@ -289,7 +289,7 @@ item_table:
 no_item:
         .byte SLOT_WEAPON                     ; SlotId (irrelevant)
         .byte SPRITE_TILE_MENU_CURSOR_SPIN    ; WorldSpriteTile (obviously broken)
-        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
+        .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr
         .byte 0                               ; HudSpriteTile
@@ -300,11 +300,13 @@ no_item:
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr no_item_description             ; DescriptionStringPtr
+        .byte <.bank(no_item_description)      ; DescriptionStringBank
 
 dagger_lvl_1:
         .byte SLOT_WEAPON                     ; SlotId
         .byte SPRITE_TILE_DAGGER              ; WorldSpriteTile
-        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
+        .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_DAGGER         ; HudBgTile
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr
         .byte 0                               ; HudSpriteTile
@@ -315,111 +317,127 @@ dagger_lvl_1:
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr dagger_lv1_description          ; DescriptionStringPtr
+        .byte <.bank(dagger_lv1_description)   ; DescriptionStringBank
 
 broadsword_lvl_1:
-        .byte SLOT_WEAPON                     ; SlotId
-        .byte SPRITE_TILE_BROADSWORD          ; WorldSpriteTile
+        .byte SLOT_WEAPON                       ; SlotId
+        .byte SPRITE_TILE_BROADSWORD            ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_BROADSWORD     ; HudBgTile
+        .byte EQUIPMENT_WEAPON_BROADSWORD       ; HudBgTile
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr
-        .byte 0                               ; HudSpriteTile
-        .byte 0                               ; HudSpriteAttr
-        .word 75                              ; ShopCost
-        .byte WEAPON_BROADSWORD               ; WeaponShape
-        .addr flat_1                          ; DamageFunc
-        .addr no_effect                       ; TorchlightFunc
-        .addr do_nothing                      ; UseFunc
-        .addr no_effect                       ; DmgReductionFunc
+        .byte 0                                 ; HudSpriteTile
+        .byte 0                                 ; HudSpriteAttr
+        .word 75                                ; ShopCost
+        .byte WEAPON_BROADSWORD                 ; WeaponShape
+        .addr flat_1                            ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr broadsword_lv1_description        ; DescriptionStringPtr
+        .byte <.bank(broadsword_lv1_description) ; DescriptionStringBank
 
 broadsword_lvl_2:
-        .byte SLOT_WEAPON                     ; SlotId
-        .byte SPRITE_TILE_BROADSWORD          ; WorldSpriteTile
-        .byte SPRITE_PAL_RED                  ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_BROADSWORD     ; HudBgTile
-        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)  ; HudBgAttr
-        .byte 0                               ; HudSpriteTile
-        .byte 0                               ; HudSpriteAttr
-        .word 250                             ; ShopCost
-        .byte WEAPON_BROADSWORD               ; WeaponShape
-        .addr flat_2                          ; DamageFunc
-        .addr no_effect                       ; TorchlightFunc
-        .addr do_nothing                      ; UseFunc
-        .addr no_effect                       ; DmgReductionFunc
+        .byte SLOT_WEAPON                       ; SlotId
+        .byte SPRITE_TILE_BROADSWORD            ; WorldSpriteTile
+        .byte SPRITE_PAL_RED                    ; WorldSpriteAttr
+        .byte EQUIPMENT_WEAPON_BROADSWORD       ; HudBgTile
+        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)    ; HudBgAttr
+        .byte 0                                 ; HudSpriteTile
+        .byte 0                                 ; HudSpriteAttr
+        .word 250                               ; ShopCost
+        .byte WEAPON_BROADSWORD                 ; WeaponShape
+        .addr flat_2                            ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr broadsword_lv2_description        ; DescriptionStringPtr
+        .byte <.bank(broadsword_lv2_description) ; DescriptionStringBank
 
 broadsword_lvl_3:
-        .byte SLOT_WEAPON                      ; SlotId
-        .byte SPRITE_TILE_BROADSWORD           ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE                ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_BROADSWORD      ; HudBgTile
+        .byte SLOT_WEAPON                       ; SlotId
+        .byte SPRITE_TILE_BROADSWORD            ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
+        .byte EQUIPMENT_WEAPON_BROADSWORD       ; HudBgTile
         .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
-        .byte 0                                ; HudSpriteTile
-        .byte 0                                ; HudSpriteAttr
-        .word 1000                             ; ShopCost
-        .byte WEAPON_BROADSWORD                ; WeaponShape
-        .addr flat_3                           ; DamageFunc
-        .addr no_effect                        ; TorchlightFunc
-        .addr do_nothing                       ; UseFunc
-        .addr no_effect                        ; DmgReductionFunc
+        .byte 0                                 ; HudSpriteTile
+        .byte 0                                 ; HudSpriteAttr
+        .word 1000                              ; ShopCost
+        .byte WEAPON_BROADSWORD                 ; WeaponShape
+        .addr flat_3                            ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr broadsword_lv3_description        ; DescriptionStringPtr
+        .byte <.bank(broadsword_lv3_description) ; DescriptionStringBank
 
 longsword_lvl_1:
-        .byte SLOT_WEAPON                     ; SlotId
-        .byte SPRITE_TILE_LONGSWORD           ; WorldSpriteTile
+        .byte SLOT_WEAPON                       ; SlotId
+        .byte SPRITE_TILE_LONGSWORD             ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_LONGSWORD      ; HudBgTile
+        .byte EQUIPMENT_WEAPON_LONGSWORD        ; HudBgTile
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr
-        .byte 0                               ; HudSpriteTile
-        .byte 0                               ; HudSpriteAttr
-        .word 75                              ; ShopCost
-        .byte WEAPON_LONGSWORD                ; WeaponShape
-        .addr flat_1                          ; DamageFunc
-        .addr no_effect                       ; TorchlightFunc
-        .addr do_nothing                      ; UseFunc
-        .addr no_effect                       ; DmgReductionFunc
+        .byte 0                                 ; HudSpriteTile
+        .byte 0                                 ; HudSpriteAttr
+        .word 75                                ; ShopCost
+        .byte WEAPON_LONGSWORD                  ; WeaponShape
+        .addr flat_1                            ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr longsword_lv1_description         ; DescriptionStringPtr
+        .byte <.bank(longsword_lv1_description)  ; DescriptionStringBank
 
 longsword_lvl_2:
-        .byte SLOT_WEAPON                     ; SlotId
-        .byte SPRITE_TILE_LONGSWORD           ; WorldSpriteTile
-        .byte SPRITE_PAL_RED                  ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_LONGSWORD      ; HudBgTile
-        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)  ; HudBgAttr
-        .byte 0                               ; HudSpriteTile
-        .byte 0                               ; HudSpriteAttr
-        .word 250                             ; ShopCost
-        .byte WEAPON_LONGSWORD                ; WeaponShape
-        .addr flat_2                          ; DamageFunc
-        .addr no_effect                       ; TorchlightFunc
-        .addr do_nothing                      ; UseFunc
-        .addr no_effect                       ; DmgReductionFunc
-
-longsword_lvl_3:
         .byte SLOT_WEAPON                      ; SlotId
         .byte SPRITE_TILE_LONGSWORD            ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE                ; WorldSpriteAttr
+        .byte SPRITE_PAL_RED                   ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_LONGSWORD       ; HudBgTile
-        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)   ; HudBgAttr
         .byte 0                                ; HudSpriteTile
         .byte 0                                ; HudSpriteAttr
-        .word 1000                             ; ShopCost
+        .word 250                              ; ShopCost
         .byte WEAPON_LONGSWORD                 ; WeaponShape
-        .addr flat_3                           ; DamageFunc
+        .addr flat_2                           ; DamageFunc
         .addr no_effect                        ; TorchlightFunc
         .addr do_nothing                       ; UseFunc
         .addr no_effect                        ; DmgReductionFunc
+        .addr longsword_lv2_description        ; DescriptionStringPtr
+        .byte <.bank(longsword_lv2_description) ; DescriptionStringBank
+
+longsword_lvl_3:
+        .byte SLOT_WEAPON                       ; SlotId
+        .byte SPRITE_TILE_LONGSWORD             ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
+        .byte EQUIPMENT_WEAPON_LONGSWORD        ; HudBgTile
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+        .byte 0                                 ; HudSpriteTile
+        .byte 0                                 ; HudSpriteAttr
+        .word 1000                              ; ShopCost
+        .byte WEAPON_LONGSWORD                  ; WeaponShape
+        .addr flat_3                            ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr longsword_lv3_description         ; DescriptionStringPtr
+        .byte <.bank(longsword_lv3_description)  ; DescriptionStringBank
 
 spear_lvl_1:
-        .byte SLOT_WEAPON                     ; SlotId
-        .byte SPRITE_TILE_SPEAR               ; WorldSpriteTile
+        .byte SLOT_WEAPON                       ; SlotId
+        .byte SPRITE_TILE_SPEAR                 ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_SPEAR          ; HudBgTile
+        .byte EQUIPMENT_WEAPON_SPEAR            ; HudBgTile
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr
-        .byte 0                               ; HudSpriteTile
-        .byte 0                               ; HudSpriteAttr
-        .word 50                              ; ShopCost
-        .byte WEAPON_SPEAR                    ; WeaponShape
-        .addr flat_1                          ; DamageFunc
-        .addr no_effect                       ; TorchlightFunc
-        .addr do_nothing                      ; UseFunc
-        .addr no_effect                       ; DmgReductionFunc
+        .byte 0                                 ; HudSpriteTile
+        .byte 0                                 ; HudSpriteAttr
+        .word 50                                ; ShopCost
+        .byte WEAPON_SPEAR                      ; WeaponShape
+        .addr flat_1                            ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr spear_lv1_description             ; DescriptionStringPtr
+        .byte <.bank(spear_lv1_description)      ; DescriptionStringBank
 
 spear_lvl_2:
         .byte SLOT_WEAPON                     ; SlotId
@@ -435,36 +453,42 @@ spear_lvl_2:
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr spear_lv2_description           ; DescriptionStringPtr
+        .byte <.bank(spear_lv2_description)    ; DescriptionStringBank
 
 spear_lvl_3:
-        .byte SLOT_WEAPON                      ; SlotId
-        .byte SPRITE_TILE_SPEAR                ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE                ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_SPEAR           ; HudBgTile
+        .byte SLOT_WEAPON                       ; SlotId
+        .byte SPRITE_TILE_SPEAR                 ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
+        .byte EQUIPMENT_WEAPON_SPEAR            ; HudBgTile
         .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
-        .byte 0                                ; HudSpriteTile
-        .byte 0                                ; HudSpriteAttr
-        .word 750                              ; ShopCost
-        .byte WEAPON_SPEAR                     ; WeaponShape
-        .addr flat_3                           ; DamageFunc
-        .addr no_effect                        ; TorchlightFunc
-        .addr do_nothing                       ; UseFunc
-        .addr no_effect                        ; DmgReductionFunc
+        .byte 0                                 ; HudSpriteTile
+        .byte 0                                 ; HudSpriteAttr
+        .word 750                               ; ShopCost
+        .byte WEAPON_SPEAR                      ; WeaponShape
+        .addr flat_3                            ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr spear_lv3_description             ; DescriptionStringPtr
+        .byte <.bank(spear_lv3_description)      ; DescriptionStringBank
 
 flail_lvl_1:
-        .byte SLOT_WEAPON                     ; SlotId
-        .byte SPRITE_TILE_FLAIL               ; WorldSpriteTile
+        .byte SLOT_WEAPON                       ; SlotId
+        .byte SPRITE_TILE_FLAIL                 ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_FLAIL          ; HudBgTile
+        .byte EQUIPMENT_WEAPON_FLAIL            ; HudBgTile
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr
-        .byte 0                               ; HudSpriteTile
-        .byte 0                               ; HudSpriteAttr
-        .word 100                             ; ShopCost
-        .byte WEAPON_FLAIL                    ; WeaponShape
-        .addr flat_1                          ; DamageFunc
-        .addr no_effect                       ; TorchlightFunc
-        .addr do_nothing                      ; UseFunc
-        .addr no_effect                       ; DmgReductionFunc
+        .byte 0                                 ; HudSpriteTile
+        .byte 0                                 ; HudSpriteAttr
+        .word 100                               ; ShopCost
+        .byte WEAPON_FLAIL                      ; WeaponShape
+        .addr flat_1                            ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr flail_lv1_description             ; DescriptionStringPtr
+        .byte <.bank(flail_lv1_description)      ; DescriptionStringBank
 
 flail_lvl_2:
         .byte SLOT_WEAPON                     ; SlotId
@@ -480,28 +504,32 @@ flail_lvl_2:
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr flail_lv2_description           ; DescriptionStringPtr
+        .byte <.bank(flail_lv2_description)    ; DescriptionStringBank
 
 flail_lvl_3:
-        .byte SLOT_WEAPON                      ; SlotId
-        .byte SPRITE_TILE_FLAIL                ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE                ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_FLAIL           ; HudBgTile
+        .byte SLOT_WEAPON                       ; SlotId
+        .byte SPRITE_TILE_FLAIL                 ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
+        .byte EQUIPMENT_WEAPON_FLAIL            ; HudBgTile
         .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
-        .byte 0                                ; HudSpriteTile
-        .byte 0                                ; HudSpriteAttr
-        .word 1250                             ; ShopCost
-        .byte WEAPON_FLAIL                     ; WeaponShape
-        .addr flat_3                           ; DamageFunc
-        .addr no_effect                        ; TorchlightFunc
-        .addr do_nothing                       ; UseFunc
-        .addr no_effect                        ; DmgReductionFunc
+        .byte 0                                 ; HudSpriteTile
+        .byte 0                                 ; HudSpriteAttr
+        .word 1250                              ; ShopCost
+        .byte WEAPON_FLAIL                      ; WeaponShape
+        .addr flat_3                            ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr flail_lv3_description             ; DescriptionStringPtr
+        .byte <.bank(flail_lv3_description)      ; DescriptionStringBank
 
 basic_torch:
         .byte SLOT_TORCH                        ; SlotId
         .byte SPRITE_TILE_BASIC_TORCH           ; WorldSpriteTile
-        .byte SPRITE_PAL_YELLOW                   ; WorldSpriteAttr
+        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_BASIC_TORCH             ; HudBgTile
-        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS)   ; HudBgAttr
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr
         .byte 0                                 ; HudSpriteTile
         .byte 0                                 ; HudSpriteAttr
         .word 50                                ; ShopCost
@@ -510,6 +538,8 @@ basic_torch:
         .addr flat_8                            ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr basic_torch_description           ; DescriptionStringPtr
+        .byte <.bank(basic_torch_description)    ; DescriptionStringBank
 
 large_torch:
         .byte SLOT_TORCH                        ; SlotId
@@ -525,6 +555,8 @@ large_torch:
         .addr flat_15                           ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr large_torch_description           ; DescriptionStringPtr
+        .byte <.bank(large_torch_description)    ; DescriptionStringBank
 
 compass:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -540,11 +572,13 @@ compass:
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr reveal_special_rooms            ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr compass_description             ; DescriptionStringPtr
+        .byte <.bank(compass_description)      ; DescriptionStringBank
 
 map:
         .byte SLOT_CONSUMABLE                 ; SlotId
         .byte SPRITE_TILE_MAP                 ; WorldSpriteTile
-        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
+        .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
         .byte 0                               ; HudSpriteTile (unused)
@@ -555,11 +589,13 @@ map:
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr reveal_all_rooms                ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr map_description                 ; DescriptionStringPtr
+        .byte <.bank(map_description)          ; DescriptionStringBank
 
 small_fries:
         .byte SLOT_CONSUMABLE                 ; SlotId
         .byte SPRITE_TILE_SMALL_FRIES         ; WorldSpriteTile
-        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
+        .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
         .byte 0                               ; HudSpriteTile (unused)
@@ -570,11 +606,13 @@ small_fries:
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr heal_4_hp                       ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr small_fries_description         ; DescriptionStringPtr
+        .byte <.bank(small_fries_description)  ; DescriptionStringBank
 
 medium_fries:
         .byte SLOT_CONSUMABLE                 ; SlotId
         .byte SPRITE_TILE_MEDIUM_FRIES        ; WorldSpriteTile
-        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
+        .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
         .byte 0                               ; HudSpriteTile (unused)
@@ -585,11 +623,13 @@ medium_fries:
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr heal_8_hp                       ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr medium_fries_description        ; DescriptionStringPtr
+        .byte <.bank(medium_fries_description) ; DescriptionStringBank
 
 large_fries:
         .byte SLOT_CONSUMABLE                 ; SlotId
         .byte SPRITE_TILE_LARGE_FRIES         ; WorldSpriteTile
-        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
+        .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
         .byte 0                               ; HudSpriteTile (unused)
@@ -600,13 +640,15 @@ large_fries:
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr heal_all_hp                     ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr large_fries_description         ; DescriptionStringPtr
+        .byte <.bank(large_fries_description)  ; DescriptionStringBank
 
 ; Note: as an item with a custom effect, these are just special-case checked
 ; in the player movement code
 go_go_boots:
         .byte SLOT_BOOTS                      ; SlotId
         .byte SPRITE_TILE_GO_GO_BOOTS         ; WorldSpriteTile
-        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
+        .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_GO_GO_BOOTS           ; HudBgTile
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr
         .byte 0                               ; HudSpriteTile
@@ -617,11 +659,13 @@ go_go_boots:
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr go_go_boots_description         ; DescriptionStringPtr
+        .byte <.bank(go_go_boots_description)  ; DescriptionStringBank
 
 gold_sack:
         .byte SLOT_CONSUMABLE                 ; SlotId
         .byte SPRITE_TILE_GOLD_SACK           ; WorldSpriteTile
-        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
+        .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
         .byte 0                               ; HudSpriteTile (unused)
@@ -632,36 +676,42 @@ gold_sack:
         .addr no_effect                       ; TorchlightFunc
         .addr give_100_gold                   ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr gold_sack_description           ; DescriptionStringPtr
+        .byte <.bank(gold_sack_description)    ; DescriptionStringBank
 
 heart_container:
-        .byte SLOT_CONSUMABLE                 ; SlotId
-        .byte SPRITE_TILE_HEART_CONTAINER     ; WorldSpriteTile
-        .byte SPRITE_PAL_RED                  ; WorldSpriteAttr
-        .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
-        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
-        .byte 0                               ; HudSpriteTile (unused)
-        .byte 0                               ; HudSpriteAttr (unused)
-        .word 250                             ; ShopCost
-        .byte WEAPON_DAGGER                   ; WeaponShape (unused)
-        .addr no_effect                       ; DamageFunc
-        .addr no_effect                       ; TorchlightFunc
-        .addr give_heart_container            ; UseFunc
-        .addr no_effect                       ; DmgReductionFunc
+        .byte SLOT_CONSUMABLE                    ; SlotId
+        .byte SPRITE_TILE_HEART_CONTAINER        ; WorldSpriteTile
+        .byte SPRITE_PAL_RED                     ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                     ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS)    ; HudBgAttr (unused)
+        .byte 0                                  ; HudSpriteTile (unused)
+        .byte 0                                  ; HudSpriteAttr (unused)
+        .word 250                                ; ShopCost
+        .byte WEAPON_DAGGER                      ; WeaponShape (unused)
+        .addr no_effect                          ; DamageFunc
+        .addr no_effect                          ; TorchlightFunc
+        .addr give_heart_container               ; UseFunc
+        .addr no_effect                          ; DmgReductionFunc
+        .addr heart_container_description        ; DescriptionStringPtr
+        .byte <.bank(heart_container_description) ; DescriptionStringBank
 
 temporary_heart:
-        .byte SLOT_CONSUMABLE                 ; SlotId
-        .byte SPRITE_TILE_HEART_CONTAINER     ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE               ; WorldSpriteAttr
-        .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
-        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
-        .byte 0                               ; HudSpriteTile (unused)
-        .byte 0                               ; HudSpriteAttr (unused)
-        .word 50                              ; ShopCost
-        .byte WEAPON_DAGGER                   ; WeaponShape (unused)
-        .addr no_effect                       ; DamageFunc
-        .addr no_effect                       ; TorchlightFunc
-        .addr give_temporary_heart            ; UseFunc
-        .addr no_effect                       ; DmgReductionFunc
+        .byte SLOT_CONSUMABLE                    ; SlotId
+        .byte SPRITE_TILE_HEART_CONTAINER        ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                  ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                     ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS)    ; HudBgAttr (unused)
+        .byte 0                                  ; HudSpriteTile (unused)
+        .byte 0                                  ; HudSpriteAttr (unused)
+        .word 50                                 ; ShopCost
+        .byte WEAPON_DAGGER                      ; WeaponShape (unused)
+        .addr no_effect                          ; DamageFunc
+        .addr no_effect                          ; TorchlightFunc
+        .addr give_temporary_heart               ; UseFunc
+        .addr no_effect                          ; DmgReductionFunc
+        .addr temporary_heart_description        ; DescriptionStringPtr
+        .byte <.bank(temporary_heart_description) ; DescriptionStringBank
 
 heart_armor:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -677,31 +727,35 @@ heart_armor:
         .addr no_effect                       ; TorchlightFunc
         .addr give_heart_armor                ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr heart_armor_description         ; DescriptionStringPtr
+        .byte <.bank(heart_armor_description)  ; DescriptionStringBank
 
 ; TODO: this really needs to be directional, and much stronger
 defensive_shield:
-        .byte SLOT_ARMOR                        ; SlotId
-        .byte SPRITE_TILE_SHIELD                ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
-        .byte EQUIPMENT_ARMOR_SHIELD            ; HudBgTile (unused)
-        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
-        .byte 0                                 ; HudSpriteTile (unused)
-        .byte 0                                 ; HudSpriteAttr (unused)
-        .word 500                               ; ShopCost
-        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
-        .addr no_effect                         ; DamageFunc
-        .addr no_effect                         ; TorchlightFunc
-        .addr do_nothing                        ; UseFunc
-        .addr flat_2                            ; DmgReductionFunc
+        .byte SLOT_ARMOR                           ; SlotId
+        .byte SPRITE_TILE_SHIELD                   ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                    ; WorldSpriteAttr
+        .byte EQUIPMENT_ARMOR_SHIELD               ; HudBgTile (unused)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS)    ; HudBgAttr (unused)
+        .byte 0                                    ; HudSpriteTile (unused)
+        .byte 0                                    ; HudSpriteAttr (unused)
+        .word 500                                  ; ShopCost
+        .byte WEAPON_DAGGER                        ; WeaponShape (unused)
+        .addr no_effect                            ; DamageFunc
+        .addr no_effect                            ; TorchlightFunc
+        .addr do_nothing                           ; UseFunc
+        .addr flat_2                               ; DmgReductionFunc
+        .addr defensive_shield_description         ; DescriptionStringPtr
+        .byte <.bank(defensive_shield_description) ; DescriptionStringBank
 
 ; This item has a rather custom effect, so we'll check for
 ; it manually in the one spot where it would apply
 chain_link:
         .byte SLOT_ACCESSORY                    ; SlotId
         .byte SPRITE_TILE_CHAIN_LINK            ; WorldSpriteTile
-        .byte SPRITE_PAL_YELLOW                   ; WorldSpriteAttr
+        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_ACCESSORY_CHAIN_LINK    ; HudBgTile (unused)
-        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS)   ; HudBgAttr (unused)
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
         .byte 0                                 ; HudSpriteTile (unused)
         .byte 0                                 ; HudSpriteAttr (unused)
         .word 150                               ; ShopCost
@@ -710,13 +764,15 @@ chain_link:
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr chain_link_description            ; DescriptionStringPtr
+        .byte <.bank(chain_link_description)    ; DescriptionStringBank
 
 aloha_tshirt_1:
         .byte SLOT_ARMOR                        ; SlotId
         .byte SPRITE_TILE_ALOHA_TSHIRT_TEXT     ; WorldSpriteTile
-        .byte SPRITE_PAL_YELLOW                   ; WorldSpriteAttr
+        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_ARMOR_TSHIRT_TEXT       ; HudBgTile (unused)
-        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS)   ; HudBgAttr (unused)
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
         .byte 0                                 ; HudSpriteTile (unused)
         .byte 0                                 ; HudSpriteAttr (unused)
         .word 99                                ; ShopCost
@@ -725,6 +781,8 @@ aloha_tshirt_1:
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr flat_1                            ; DmgReductionFunc
+        .addr aloha_tshirt_description          ; DescriptionStringPtr
+        .byte <.bank(aloha_tshirt_description)  ; DescriptionStringBank
 
 aloha_tshirt_2:
         .byte SLOT_ARMOR                        ; SlotId
@@ -740,6 +798,8 @@ aloha_tshirt_2:
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr flat_1                            ; DmgReductionFunc
+        .addr aloha_tshirt_description          ; DescriptionStringPtr
+        .byte <.bank(aloha_tshirt_description)  ; DescriptionStringBank
 
 aloha_tshirt_3:
         .byte SLOT_ARMOR                        ; SlotId
@@ -755,6 +815,8 @@ aloha_tshirt_3:
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr flat_1                            ; DmgReductionFunc
+        .addr aloha_tshirt_description          ; DescriptionStringPtr
+        .byte <.bank(aloha_tshirt_description)  ; DescriptionStringBank
 
         .segment "CODE_0"
 
@@ -1394,5 +1456,41 @@ DmgReductionTotal := R0
 
         restore_previous_bank
         lda DmgReductionTotal
+        rts
+.endproc
+
+; Item index in A
+.proc FAR_display_item_description
+        perform_zpcm_inc
+
+        asl
+        tay
+
+        access_data_bank #<.bank(item_table)
+        
+        lda item_table+0, y
+        sta ItemPtr+0
+        lda item_table+1, y
+        sta ItemPtr+1
+
+        ldy #ItemDef::SlotId
+        lda (ItemPtr), y
+        cmp #SLOT_CONSUMABLE
+        beq done_with_display
+
+        ldy #ItemDef::DescriptionStringPtr
+        lda (ItemPtr), y
+        sta DialogPassiveStringPtr+0
+        iny
+        lda (ItemPtr), y
+        sta DialogPassiveStringPtr+1
+        ldy #ItemDef::DescriptionStringBank
+        lda (ItemPtr), y
+        sta DialogPassiveStringBank
+        lda #1
+        sta DialogInitiatePassiveMode
+
+done_with_display:
+        restore_previous_bank
         rts
 .endproc

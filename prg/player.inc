@@ -50,5 +50,8 @@
 .global PlayerIntendsToPause
 .global PlayerIsPaused
 
+.global PlayerPassiveDialogSquare
+.global PlayerActiveDialogSquare
+
 MAX_HEARTS = 5
 MAX_GOLD = 9999

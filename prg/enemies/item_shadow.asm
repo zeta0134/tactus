@@ -292,8 +292,19 @@ item_is_free:
         lda #0
         sta sprite_table + MetaSpriteState::BehaviorFlags, y
 
+        ; run the display logic for the item we just collected, popping up a tooltip with its
+        ; description, etc. this may do nothing depending on player settings.
+        ldx TargetSquare
+        lda tile_data, x
+        far_call FAR_display_item_description
+
+        ; flag the player's active position for later dismissal
+        lda TargetSquare
+        sta PlayerPassiveDialogSquare   
+
         ; before we write the old item back, sanity check: is it nothing?
         ; if so, we should revert to a disco tile
+        ldx TargetSquare
         lda OldItem
         beq revert_to_disco_tile
         sta tile_data, x
