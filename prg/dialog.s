@@ -276,6 +276,18 @@ CommandPtr := R0
 .endproc
 
 .proc state_run_text_display
+        ; early-out: if an activation for passive mode arrives
+        ; and we are currently in passive mode,
+        ; bail right away!
+        lda DialogCurrentModePassive
+        beq no_bail
+        lda DialogInitiatePassiveMode
+        beq no_bail
+
+        st16 DialogState, state_wait_for_activation
+        rts
+
+no_bail:
         access_data_bank DialogStringCurrentBank
 
         ; TODO: wait time between characters?
@@ -390,7 +402,7 @@ perform_passive_mode_checks:
         ; while the first is still displayed), cancel immediately. (don't consume the flag though!)
         lda DialogInitiatePassiveMode
         beq no_passive_cancel
-        jmp close_early
+        jmp close_instantly
 no_passive_cancel:
 
         ; if the player has "dismissed" the mode, start the timer!
@@ -416,6 +428,11 @@ close_early:
         ; immediately execute a close dialog command
         jsr dialog_cmd_close
         ; This will cease all remaining dialog processing on its own.
+        rts
+
+close_instantly:
+        ; immediately revert to the *opening* state. right now! do not delay!
+        st16 DialogState, state_wait_for_activation
         rts
 
 active_waiting:
