@@ -47,6 +47,10 @@ DialogDismissActiveMode: .res 1
 DialogActiveStringPtr: .res 2
 DialogActiveStringBank: .res 1
 
+TimerActive: .res 1
+TimerIndex: .res 1
+TimerDelay: .res 1
+
         .segment "TEXT_STRINGS"
 
 hello_dialog:
@@ -65,7 +69,7 @@ dialog_easing_lut:
 DIALOG_ADVANCE_INDICATOR = $E0
 DIALOG_CLOSE_INDICATOR = $E1
 DIALOG_WAIT_INDICATOR_LENGTH = 17
-DIALOG_WAIT_COOLDOWN = 8
+DIALOG_WAIT_COOLDOWN = 14
 
 dialog_wait_indicator_lut:
         .byte $F0,$F1,$F2,$F3,$F4,$F5,$F6,$F7
@@ -80,7 +84,7 @@ dialog_wait_indicator_lut:
 .endproc
 
 .proc update_dialog
-        jsr debug_active_dialog
+        jsr debug_passive_dialog
         jmp (DialogState)
         rts
 .endproc
@@ -212,6 +216,9 @@ check_for_passive:
         sta DialogStringCurrentBank
         ; Clear out the dialog in prep for the opening animation
         jsr clear_entire_dialog_area
+        ; Initialize some extra state for passive mode
+        lda #0
+        sta TimerActive
         ; Now switch our mode into the opening animation
         lda #0
         sta DialogOpenClosePos
@@ -363,17 +370,30 @@ no_active_advance:
 
         ; if the player has "dismissed" the mode, cancel!
         lda DialogDismissActiveMode
-        beq no_manual_dismiss
+        beq no_active_dismiss
         lda #0
         sta DialogDismissActiveMode ; consume the flag
         jmp close_early
-no_manual_dismiss:
-        jmp continue_waiting
+no_active_dismiss:
+        jmp active_waiting
 
 perform_passive_mode_checks:
-        ; TODO
-        jmp continue_waiting
 
+        ; If another activation has come in (the player may have moved onto a second item
+        ; while the first is still displayed), cancel immediately. (don't consume the flag though!)
+        lda DialogInitiatePassiveMode
+        beq no_passive_cancel
+        jmp close_early
+no_passive_cancel:
+
+        ; if the player has "dismissed" the mode, start the timer!
+        lda DialogDismissPassiveMode
+        beq no_passive_dismiss
+        lda #0
+        sta DialogDismissPassiveMode ; consume the flag
+        jmp start_timer
+no_passive_dismiss:
+        jmp passive_waiting
 
 advance:
         ; Clear the waiting icon
@@ -391,8 +411,7 @@ close_early:
         ; This will cease all remaining dialog processing on its own.
         rts
 
-continue_waiting:
-
+active_waiting:
         ; Draw the waiting icon!
         ; First, check to see if the next byte is close, so we can pick the right one
         ldy #1
@@ -414,7 +433,51 @@ close_indicator:
         ldy #0
         sta (DialogAttrPtr), y
 done_with_indicator:
+        rts
 
+passive_waiting:
+        lda TimerActive
+        bne run_timer
+        ; do absolutely nothing!
+        rts
+run_timer:
+        ; Draw the timer!
+        ldx TimerIndex
+        lda dialog_wait_indicator_lut, x
+        ldy #0
+        sta (DialogNametablePtr), y
+        lda #FONT_BANK | HUD_PURPLE_PAL
+        sta (DialogAttrPtr), y
+        ; Advance the timer!
+        lda TimerDelay
+        beq clock_timer
+        dec TimerDelay
+        rts
+clock_timer:
+        lda #DIALOG_WAIT_COOLDOWN
+        sta TimerDelay
+        inc TimerIndex
+        lda TimerIndex
+        cmp #DIALOG_WAIT_INDICATOR_LENGTH
+        bne done_with_timer
+        ; The timer has expired! Advance!
+        lda #0
+        sta TimerActive
+        jmp advance
+done_with_timer:
+        rts
+
+start_timer:
+        ; if the timer is already active, don't start it again!
+        lda TimerActive
+        bne run_timer
+
+        lda #0
+        sta TimerIndex
+        lda #1
+        sta TimerActive
+        lda #DIALOG_WAIT_COOLDOWN
+        sta TimerDelay
         rts
 .endproc
 
