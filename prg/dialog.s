@@ -7,11 +7,13 @@
         .include "input.inc"
         .include "nes.inc"
         .include "palette.inc"
+        .include "prng.inc"
         .include "rainbow.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
         .zeropage
 DialogStringCurrentPtr: .res 2
@@ -46,6 +48,8 @@ DialogDismissActiveMode: .res 1
 DialogActiveStringPtr: .res 2
 DialogActiveStringBank: .res 1
 
+DialogChirpTimer: .res 1
+
 TimerActive: .res 1
 TimerIndex: .res 1
 TimerDelay: .res 1
@@ -71,6 +75,8 @@ DIALOG_BOTTOM_BORDER = $E2
 DIALOG_WAIT_INDICATOR_LENGTH = 17
 DIALOG_WAIT_COOLDOWN = 8
 
+DIALOG_CHIRP_COOLDOWN = 5
+
 dialog_wait_indicator_lut:
         .byte $F0,$F1,$F2,$F3,$F4,$F5,$F6,$F7
         .byte $F8,$F9,$FA,$FB,$FC,$FD,$FE,$FF
@@ -79,6 +85,7 @@ dialog_wait_indicator_lut:
 .proc init_dialog
         lda #0
         sta DialogHeight
+        sta DialogChirpTimer
         st16 DialogState, state_init_dialog
         rts
 .endproc
@@ -151,6 +158,10 @@ check_for_active:
         ; Now switch our mode into the opening animation
         lda #0
         sta DialogOpenClosePos
+        ; Play an opening sfx, as this is an "interaction" with some in-game object
+        st16 R0, sfx_dialog_advance
+        jsr play_sfx_pulse2
+
         st16 DialogState, state_open_dialog_animation
         rts
 
@@ -192,6 +203,9 @@ done:
 .endproc
 
 .proc state_open_dialog_animation
+        lda #0
+        sta DialogChirpTimer
+
         lda #$2D
         sta staging_palette+16+8
 
@@ -273,6 +287,11 @@ CommandPtr := R0
         rts
 draw_single_character:
         sta (DialogNametablePtr), y
+        cmp #' '
+        beq no_chirp
+        jsr dialog_play_chirp
+no_chirp:
+        ldy #0
         lda DialogCurrentAttr ; TODO: commands to set text color/font?
         sta (DialogAttrPtr), y
         inc16 DialogNametablePtr
@@ -330,7 +349,9 @@ dialog_command_lut:
 .endproc
 
 .proc dialog_cmd_wait
-        
+        lda #0
+        sta DialogChirpTimer
+
 perform_active_mode_checks:
         lda DialogCurrentModeActive
         beq perform_passive_mode_checks
@@ -342,6 +363,19 @@ perform_active_mode_checks:
         beq no_active_advance
         lda #0
         sta DialogInitiateActiveMode ; consume the flag
+
+        ; peek ahead: is this a close?
+        ldy #1
+        lda (DialogStringCurrentPtr), y
+        cmp #D_CLOSE
+        bne play_advance_sfx
+play_close_sfx:
+        st16 R0, sfx_dialog_close
+        jsr play_sfx_pulse2
+        jmp advance
+play_advance_sfx:
+        st16 R0, sfx_dialog_advance
+        jsr play_sfx_pulse2
         jmp advance
 no_active_advance:
 
@@ -350,6 +384,8 @@ no_active_advance:
         beq no_active_dismiss
         lda #0
         sta DialogDismissActiveMode ; consume the flag
+        st16 R0, sfx_dialog_close
+        jsr play_sfx_pulse2
         jmp close_early
 no_active_dismiss:
         jmp active_waiting
@@ -480,5 +516,50 @@ start_timer:
         sta DialogCurrentAttr
         ; onward properly!
         inc16 DialogStringCurrentPtr
+        rts
+.endproc
+
+chirps_lut:
+        .word sfx_dialog_text_variant_1
+        .word sfx_dialog_text_variant_2
+        .word sfx_dialog_text_variant_3
+        .word sfx_dialog_text_variant_1
+        .word sfx_dialog_text_variant_2
+        .word sfx_dialog_text_variant_3
+        .word sfx_dialog_text_variant_1
+        .word sfx_dialog_text_variant_2
+        .word sfx_dialog_text_variant_3
+        .word sfx_dialog_text_variant_1
+        .word sfx_dialog_text_variant_2
+        .word sfx_dialog_text_variant_3
+        .word sfx_dialog_text_variant_1
+        .word sfx_dialog_text_variant_2
+        .word sfx_dialog_text_variant_3
+
+.proc dialog_play_chirp
+SfxPtr := R0
+        ; if we're not in active mode, don't chirp at all
+        ; (for passive dialog it interferes with coin collection)
+        lda DialogCurrentModeActive
+        beq no_chirp
+
+        lda DialogChirpTimer
+        beq play_chirp
+        dec DialogChirpTimer
+no_chirp:
+        rts
+play_chirp:
+        lda #DIALOG_CHIRP_COOLDOWN
+        sta DialogChirpTimer
+
+        in_range_smol next_gameplay_rand, #15
+        asl
+        tax
+        lda chirps_lut+0, x
+        sta SfxPtr+0
+        lda chirps_lut+1, x
+        sta SfxPtr+1
+        jsr play_sfx_pulse1
+
         rts
 .endproc

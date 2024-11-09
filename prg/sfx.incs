@@ -427,4 +427,45 @@ sfx_pause:
         pulse_init       PITCH_A5,   $2,      $3,          1
         pulse_cont_duty              $2,      $0,          0
 
-        
+sfx_dialog_text_variant_1:
+        ; Length in rows
+        .byte 3
+        ;                    pitch, duty,  volume,                               length
+        pulse_init_sweep  PITCH_E3,   $2,      $4, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),  0
+        pulse_cont_duty               $2,      $7,                                    0
+        pulse_cont_duty               $2,      $2,                                    0
+
+sfx_dialog_text_variant_2:
+        ; Length in rows
+        .byte 3
+        ;                    pitch, duty,  volume,                               length
+        pulse_init_sweep  PITCH_C3,   $2,      $4, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),  0
+        pulse_cont_duty               $2,      $7,                                    0
+        pulse_cont_duty               $2,      $2,                                    0
+
+sfx_dialog_text_variant_3:
+        ; Length in rows
+        .byte 3
+        ;                    pitch, duty,  volume,                               length
+        pulse_init_sweep  PITCH_D3,   $2,      $4, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),  0
+        pulse_cont_duty               $2,      $7,                                    0
+        pulse_cont_duty               $2,      $2,                                    0
+
+sfx_dialog_advance:
+        ; Length in rows
+        .byte 4
+        ;                pitch,    duty,  volume,     length
+        pulse_init       PITCH_C5,   $1,      $C,          1
+        pulse_init       PITCH_G5,   $1,      $C,          1
+        pulse_init       PITCH_C5,   $1,      $6,          1
+        pulse_init       PITCH_G5,   $1,      $6,          1
+
+sfx_dialog_close:
+        ; Length in rows
+        .byte 5
+        ;                pitch,    duty,  volume,     length
+        pulse_init       PITCH_C5,   $1,      $9,          1
+        pulse_init       PITCH_A4,   $1,      $8,          1
+        pulse_init       PITCH_F4,   $1,      $7,          1
+        pulse_init       PITCH_A4,   $1,      $4,          1
+        pulse_init       PITCH_F4,   $1,      $3,          1

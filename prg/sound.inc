@@ -40,6 +40,12 @@
 
 .global sfx_pause
 
+.global sfx_dialog_text_variant_1
+.global sfx_dialog_text_variant_2
+.global sfx_dialog_text_variant_3
+.global sfx_dialog_advance
+.global sfx_dialog_close
+
 .macro play_dpcm sample_addr, length
 .scope
 SampleAddr := R0
