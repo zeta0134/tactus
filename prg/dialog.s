@@ -25,9 +25,27 @@ DialogHeight: .res 1
 DialogOpenClosePos: .res 1
 DialogCurrentAttr: .res 1
 
-; Will be set by calling code, sortof
-DialogStringPtr: .res 2
-DialogStringBank: .res 2
+DialogStringCurrentBank: .res 1
+DialogCurrentModeActive: .res 1
+DialogCurrentModePassive: .res 1
+
+; For in-game descriptions of pickups. Held open until
+; the dismiss event is received, then automatically closes
+; on a timer. Player options can tweak this behavior, including
+; disabling these kinds of popups entirely.
+DialogInitiatePassiveMode: .res 1
+DialogDismissPassiveMode: .res 1
+DialogPassiveStringPtr: .res 2
+DialogPassiveStringBank: .res 1
+
+; For NPCs, signs, and other in-game activations. Advanced by
+; game logic. Can (usually) be dismissed early, which closes
+; the dialog immediately without processing (or displaying)
+; the remainder of its text.
+DialogInitiateActiveMode: .res 1
+DialogDismissActiveMode: .res 1
+DialogActiveStringPtr: .res 2
+DialogActiveStringBank: .res 1
 
         .segment "TEXT_STRINGS"
 
@@ -62,6 +80,7 @@ dialog_wait_indicator_lut:
 .endproc
 
 .proc update_dialog
+        jsr debug_active_dialog
         jmp (DialogState)
         rts
 .endproc
@@ -69,6 +88,62 @@ dialog_wait_indicator_lut:
 .proc state_init_dialog
         jsr clear_entire_dialog_area
         st16 DialogState, state_wait_for_activation
+        rts
+.endproc
+
+.proc debug_active_dialog
+        ; Use buttons to manually activate the dialog subsystem. Runs alongside every
+        ; state, just like game logic will eventually.
+
+check_a_button:
+        lda #(KEY_A)
+        bit ButtonsDown
+        beq check_b_button
+
+        st16 DialogActiveStringPtr, hello_dialog
+        lda #<.bank(hello_dialog)
+        sta DialogActiveStringBank
+
+        lda #1
+        sta DialogInitiateActiveMode
+
+check_b_button:
+        lda #(KEY_B)
+        bit ButtonsDown
+        beq done
+
+        lda #1
+        sta DialogDismissActiveMode
+
+done:
+        rts
+.endproc
+
+.proc debug_passive_dialog
+        ; Use buttons to manually activate the dialog subsystem. Runs alongside every
+        ; state, just like game logic will eventually.
+
+check_a_button:
+        lda #(KEY_A)
+        bit ButtonsDown
+        beq check_b_button
+
+        st16 DialogPassiveStringPtr, hello_dialog
+        lda #<.bank(hello_dialog)
+        sta DialogPassiveStringBank
+
+        lda #1
+        sta DialogInitiatePassiveMode
+
+check_b_button:
+        lda #(KEY_B)
+        bit ButtonsDown
+        beq done
+
+        lda #1
+        sta DialogDismissPassiveMode
+
+done:
         rts
 .endproc
 
@@ -90,24 +165,59 @@ loop:
 .endproc
 
 .proc state_wait_for_activation
-        ; For now, a very simple hack to force the dialog box open
-check_a_button:
-        lda #(KEY_A)
-        bit ButtonsDown
-        beq done
 
+check_for_active:
+        lda DialogInitiateActiveMode
+        beq check_for_passive
+
+        ; Consume the request to enter active mode
+        lda #0
+        sta DialogInitiateActiveMode
+        lda #1
+        sta DialogCurrentModeActive
+        lda #0
+        sta DialogCurrentModePassive
+        ; Copy the string properties to set up the draw
+        lda DialogActiveStringPtr+0
+        sta DialogStringCurrentPtr+0
+        lda DialogActiveStringPtr+1
+        sta DialogStringCurrentPtr+1
+        lda DialogActiveStringBank
+        sta DialogStringCurrentBank
+        ; Clear out the dialog in prep for the opening animation
         jsr clear_entire_dialog_area
-        lda #FONT_BANK
-        sta DialogCurrentAttr
-
-        ; FOR GREAT TESTING!
-        st16 DialogStringPtr, hello_dialog
-        lda #<.bank(hello_dialog)
-        sta DialogStringBank
-
+        ; Now switch our mode into the opening animation
         lda #0
         sta DialogOpenClosePos
         st16 DialogState, state_open_dialog_animation
+        rts
+
+check_for_passive:
+        lda DialogInitiatePassiveMode
+        beq done
+
+        ; Consume the request to enter passove mode
+        lda #0
+        sta DialogInitiatePassiveMode
+        lda #1
+        sta DialogCurrentModePassive
+        lda #0
+        sta DialogCurrentModeActive
+        ; Copy the string properties to set up the draw
+        lda DialogPassiveStringPtr+0
+        sta DialogStringCurrentPtr+0
+        lda DialogPassiveStringPtr+1
+        sta DialogStringCurrentPtr+1
+        lda DialogPassiveStringBank
+        sta DialogStringCurrentBank
+        ; Clear out the dialog in prep for the opening animation
+        jsr clear_entire_dialog_area
+        ; Now switch our mode into the opening animation
+        lda #0
+        sta DialogOpenClosePos
+        st16 DialogState, state_open_dialog_animation
+        rts
+
 done:
         rts
 .endproc
@@ -139,11 +249,6 @@ continue_closing:
 .endproc
 
 .proc state_init_text_display
-        lda DialogStringPtr+0
-        sta DialogStringCurrentPtr+0
-        lda DialogStringPtr+1
-        sta DialogStringCurrentPtr+1
-
         st16 DialogNametablePtr, (DIALOG_NAMETABLE_BASE+2)
         st16 DialogAttrPtr, (DIALOG_ATTRIBUTE_BASE+2)
 
@@ -157,7 +262,7 @@ CommandPtr := R0
 .endproc
 
 .proc state_run_text_display
-        access_data_bank DialogStringBank
+        access_data_bank DialogStringCurrentBank
 
         ; TODO: wait time between characters?
 
@@ -241,15 +346,36 @@ dialog_command_lut:
 .endproc
 
 .proc dialog_cmd_wait
-        ; FOR NOW, use A to advance.
-        ; TODO: hook this up to the actual in-game actions... however those
-        ; are going to work. (that might still be A/B to advance, just don't do it here!)
+        
+perform_active_mode_checks:
+        lda DialogCurrentModeActive
+        beq perform_passive_mode_checks
 
-check_a_button:
-        lda #(KEY_A)
-        bit ButtonsDown
-        beq done
+        ; TODO: what if the underlying string changes?
 
+        ; if the player has "initiated" the mode again, advance!
+        lda DialogInitiateActiveMode
+        beq no_active_advance
+        lda #0
+        sta DialogInitiateActiveMode ; consume the flag
+        jmp advance
+no_active_advance:
+
+        ; if the player has "dismissed" the mode, cancel!
+        lda DialogDismissActiveMode
+        beq no_manual_dismiss
+        lda #0
+        sta DialogDismissActiveMode ; consume the flag
+        jmp close_early
+no_manual_dismiss:
+        jmp continue_waiting
+
+perform_passive_mode_checks:
+        ; TODO
+        jmp continue_waiting
+
+
+advance:
         ; Clear the waiting icon
         lda #0
         ldy #0
@@ -258,7 +384,14 @@ check_a_button:
         ; Conditionally, onward!
         inc16 DialogStringCurrentPtr
         rts
-done:
+
+close_early:
+        ; immediately execute a close dialog command
+        jsr dialog_cmd_close
+        ; This will cease all remaining dialog processing on its own.
+        rts
+
+continue_waiting:
 
         ; Draw the waiting icon!
         ; First, check to see if the next byte is close, so we can pick the right one
