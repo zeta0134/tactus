@@ -104,6 +104,12 @@ no_detail:
         beq no_exit_flag
         near_call FAR_process_exit_data
 no_exit_flag:
+        ldy CurrentTileId
+        lda (FlagsPtr), y
+        and #TILE_FLAG_SIGN
+        beq no_sign_flag
+        near_call FAR_process_sign_data
+no_sign_flag:
         inc CurrentTileId
         lda CurrentTileId
         cmp #::BATTLEFIELD_SIZE
@@ -777,6 +783,12 @@ no_detail:
         beq no_exit_flag
         near_call FAR_process_exit_data
 no_exit_flag:
+        ldy #0
+        lda (OverlayPtr), y
+        and #TILE_FLAG_SIGN
+        beq no_sign_flag
+        near_call FAR_process_sign_data
+no_sign_flag:
         inc16 OverlayPtr
         jmp loop
 
@@ -1012,6 +1024,31 @@ ScratchPal := R14
         and #%11000000
         ora #>BG_TILE_EXIT_STAIRS
         sta tile_attributes, y
+
+        rts
+.endproc
+
+.proc FAR_process_sign_data
+; in-use by the battlefield routine, don't clobber these
+RoomPtr := R0
+TileIdPtr := R2
+TileAddrPtr := R4
+BehaviorIdPtr := R6
+FlagsPtr := R8
+CurrentTileId := R10
+; scratch for this routine
+DetailTablePtr := R12
+ScratchPal := R14
+        ; the desired sign ID ends up in tile behavior in this case
+        ldy CurrentTileId
+        lda battlefield, y
+        sta tile_data, y
+
+        ; now we hardcode the sign behavior, and we're all set
+        ; TODO: can we also do this for exits? it would trivially unlock
+        ; alternate patterns as map data
+        lda #TILE_SIGN
+        sta battlefield, y
 
         rts
 .endproc

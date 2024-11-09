@@ -22,3 +22,5 @@ D_CLEAR   = $82
 D_CLOSE   = $83
 D_ATTR    = $84
 
+
+D_DQ = $22

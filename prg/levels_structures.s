@@ -152,6 +152,12 @@ no_detail:
         perform_zpcm_inc
         near_call FAR_process_exit_data
 no_exit_flag:
+        ldy #0
+        lda (OverlayPtr), y
+        and #TILE_FLAG_SIGN
+        beq no_sign_flag
+        near_call FAR_process_sign_data
+no_sign_flag:
         inc16 OverlayPtr
         jmp loop
 done:

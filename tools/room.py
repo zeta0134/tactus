@@ -238,6 +238,8 @@ def tile_id_bytes(tiles):
             raw_bytes.append(f"<BG_TILE_DISCO_FLOOR_TILES_{tile.tiled_index:04}")
         elif tile.type == "map":
             raw_bytes.append(f"<BG_TILE_MAP_TILES_{tile.tiled_index:04}")
+        elif tile.type == "sign":
+            raw_bytes.append(f"<BG_TILE_MAP_TILES_{tile.tiled_index:04}")
         elif tile.type == "detail":
             raw_bytes.append(f"<{tile.string_properties.get('detail')}")
         elif tile.type == "blank":
@@ -258,6 +260,8 @@ def tile_attr_bytes(tiles):
         if tile.type == "floor":
             raw_bytes.append(f">(BG_TILE_DISCO_FLOOR_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
         elif tile.type == "map":
+            raw_bytes.append(f">(BG_TILE_MAP_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
+        elif tile.type == "sign":
             raw_bytes.append(f">(BG_TILE_MAP_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
         elif tile.type == "detail":
             raw_bytes.append(f"${palette_index:02X}")
@@ -295,6 +299,8 @@ def behavior_flag_bytes(tiles):
         raw_bytes.append(f"TILE_FLAG_DETAIL")
     elif tile.type == "exit":
         raw_bytes.append(f"TILE_FLAG_EXIT")
+    elif tile.type == "sign":
+        raw_bytes.append(f"TILE_FLAG_SIGN")
     else:
         raw_bytes.append("$00")
   return raw_bytes

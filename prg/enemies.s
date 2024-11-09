@@ -24,6 +24,7 @@
         .include "procgen.inc"
         .include "rainbow.inc"
         .include "settings.inc"
+        .include "signs.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "weapons.inc"
@@ -221,8 +222,9 @@ tile_index_to_col_lut:
 .include "enemies/item_shadow.asm"
 .include "enemies/mole.asm"
 .include "enemies/mushroom.asm"
-.include "enemies/slimes.asm"
 .include "enemies/semisafe_tile.asm"
+.include "enemies/sign.asm"
+.include "enemies/slimes.asm"
 .include "enemies/smoke_puff.asm"
 .include "enemies/treasure_chest.asm"
 
@@ -421,6 +423,11 @@ tile_update  TILE_EXIT_STAIRS, FIXED_no_behavior
 tile_attack  TILE_EXIT_STAIRS, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_EXIT_STAIRS, ENEMY_COLLIDE_descend_stairs
 tile_suspend TILE_EXIT_STAIRS, FIXED_no_behavior
+
+tile_update  TILE_SIGN, FIXED_no_behavior
+tile_attack  TILE_SIGN, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_SIGN, ENEMY_COLLIDE_player_reads_sign
+tile_suspend TILE_SIGN, FIXED_no_behavior
 
 .segment "ENEMY_UPDATE"
 

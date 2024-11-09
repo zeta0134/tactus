@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="MapTiles" tilewidth="16" tileheight="16" tilecount="256" columns="16">
+<tileset version="1.10" tiledversion="1.11.0" name="MapTiles" tilewidth="16" tileheight="16" tilecount="256" columns="16">
  <image source="tilesets/map_tiles_tiled.png" width="256" height="256"/>
  <tile id="0" type="map"/>
  <tile id="1" type="map"/>
@@ -14,9 +14,21 @@
  <tile id="10" type="map"/>
  <tile id="11" type="map"/>
  <tile id="12" type="map"/>
- <tile id="13" type="map"/>
- <tile id="14" type="map"/>
- <tile id="15" type="map"/>
+ <tile id="13" type="sign">
+  <properties>
+   <property name="behavior" value="SIGN_SHOP"/>
+  </properties>
+ </tile>
+ <tile id="14" type="sign">
+  <properties>
+   <property name="behavior" value="SIGN_SHOP"/>
+  </properties>
+ </tile>
+ <tile id="15" type="sign">
+  <properties>
+   <property name="behavior" value="SIGN_SHOP"/>
+  </properties>
+ </tile>
  <tile id="16" type="map"/>
  <tile id="17" type="map"/>
  <tile id="18" type="map"/>
@@ -30,7 +42,11 @@
  <tile id="26" type="map"/>
  <tile id="27" type="map"/>
  <tile id="28" type="map"/>
- <tile id="29" type="map"/>
+ <tile id="29" type="sign">
+  <properties>
+   <property name="behavior" value="SIGN_PLACEHOLDER"/>
+  </properties>
+ </tile>
  <tile id="30" type="map">
   <properties>
    <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>

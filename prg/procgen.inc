@@ -3,6 +3,7 @@
 .global FAR_generate_rooms_for_floor
 .global FAR_roll_for_detail
 .global FAR_process_exit_data
+.global FAR_process_sign_data
 
 .global FAR_load_current_room
 .global FAR_update_room_state
@@ -62,6 +63,7 @@ ROOM_EXIT_FLAG_WEST     = %00001000 ; Waffles
 
 TILE_FLAG_DETAIL = %10000000
 TILE_FLAG_EXIT   = %01000000
+TILE_FLAG_SIGN   = %00100000
 
 DETAIL_SPARSE_GRASS            = 0
 DETAIL_SPARSE_SHROOMS          = 2
