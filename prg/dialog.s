@@ -75,6 +75,8 @@ DIALOG_BOTTOM_BORDER = $E2
 DIALOG_WAIT_INDICATOR_LENGTH = 17
 DIALOG_WAIT_COOLDOWN = 8
 
+DIALOG_WAIT_INDICATOR_OFFSET = 30
+
 DIALOG_CHIRP_COOLDOWN = 5
 
 dialog_wait_indicator_lut:
@@ -463,9 +465,9 @@ run_timer:
         ldx TimerIndex
         lda dialog_wait_indicator_lut, x
         ldy #0
-        sta (DialogNametablePtr), y
+        sta DIALOG_NAMETABLE_BASE + DIALOG_WAIT_INDICATOR_OFFSET
         lda #FONT_BANK | HUD_PURPLE_PAL
-        sta (DialogAttrPtr), y
+        sta DIALOG_ATTRIBUTE_BASE + DIALOG_WAIT_INDICATOR_OFFSET
         ; Advance the timer!
         lda TimerDelay
         beq clock_timer
