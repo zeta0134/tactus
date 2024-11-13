@@ -159,6 +159,18 @@ LayoutPtr := R0
         rts
 .endproc
 
+.proc file_select_prep
+LayoutPtr := R0
+        ; setup the UI subsystem with the options screen layout
+        st16 LayoutPtr, file_select_ui_layout
+        far_call FAR_initialize_widgets
+
+        ; the rest of UI subsystem prep is shared, so do that now
+        st16 GameMode, initialize_ui_subsystem
+
+        rts
+.endproc
+
 .proc initialize_ui_subsystem
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00

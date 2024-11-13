@@ -17,6 +17,19 @@ no_carry:
 .endscope
 .endmacro
 
+.macro inc32 addr
+.scope
+        inc addr
+        bne no_carry
+        inc addr+1
+        bne no_carry
+        inc addr+2
+        bne no_carry
+        inc addr+3
+no_carry:
+.endscope
+.endmacro
+
 .macro dec16 addr
 .scope
         bit addr 

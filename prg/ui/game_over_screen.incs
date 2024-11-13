@@ -1,0 +1,29 @@
+; ======================================================================
+;                         Layouts and Widgets
+; ======================================================================
+
+game_over_screen_ui_layout:
+        widget_controller game_over_controller_init
+        widget_cursor
+        widget_text_button empty_string, game_over_str, 12, 10        
+        .addr $0000 ; end of list
+
+game_over_str:   .asciiz "GAME OVER (WIP)"
+
+.proc game_over_controller_init
+CurrentWidgetIndex := R20
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y file_select_controller_update
+        rts
+.endproc
+
+.proc game_over_controller_update
+        lda #(KEY_A | KEY_B | KEY_START)
+        and ButtonsDown
+        beq stay_here
+        jsr return_to_title
+        rts
+stay_here:
+        rts
+.endproc

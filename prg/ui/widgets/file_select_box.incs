@@ -1,0 +1,267 @@
+.macro widget_file_select_box file_index, tile_x, tile_y
+    .addr widget_file_select_box_init
+    .byte tile_x, tile_y
+    .addr file_index
+    .byte 0, 0, 0, 0
+.endmacro
+
+CORNER_TL_LIGHT   = $0E
+CORNER_TR_LIGHT   = $0F
+CORNER_BL_LIGHT   = $1E
+CORNER_BR_LIGHT   = $1F
+EDGE_LEFT_LIGHT   = $0C
+EDGE_RIGHT_LIGHT  = $1C
+EDGE_TOP_LIGHT    = $0D
+EDGE_BOTTOM_LIGHT = $1D
+
+CORNER_TL_DARK = $0A
+CORNER_TR_DARK = $0B
+CORNER_BL_DARK = $1A
+CORNER_BR_DARK = $1B
+EDGE_LEFT_DARK   = $0C
+EDGE_RIGHT_DARK  = $1C
+EDGE_TOP_DARK    = $0D
+EDGE_BOTTOM_DARK = $1D
+
+TOP_SHADOW_DARK = $14
+TOP_SHADOW_LIGHT = $15
+BOTTOM_SHADOW_DARK = $16
+BOTTOM_SHADOW_LIGHT = $17
+
+RIGHT_EDGE_SHADOW_DARK = $04
+RIGHT_EDGE_SHADOW_LIGHT = $05
+BOTTOM_EDGE_SHADOW_DARK = $12
+BOTTOM_EDGE_SHADOW_LIGHT = $13
+
+SHADOW_CORNER_LIGHT = $11
+SHADOW_CORNER_DARK = $10
+
+.proc compute_top_left_corner_addr
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+NametableAddr := R4
+AttributeAddr := R6
+    ; compute starting address for the top-left corner
+    lda Top
+    sta NametableAddr+0
+    lda #0
+    sta NametableAddr+1
+    .repeat 5
+    asl NametableAddr+0
+    rol NametableAddr+1
+    .endrepeat
+    lda Left
+    clc
+    adc NametableAddr+0
+    sta NametableAddr+0
+    lda #$50
+    adc NametableAddr+1
+    sta NametableAddr+1
+    lda NametableAddr+0
+    sta AttributeAddr+0
+    lda NametableAddr+1
+    clc
+    adc #$08
+    sta AttributeAddr+1
+    rts
+.endproc
+
+.proc draw_box_outline_light
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+NametableAddr := R4
+AttributeAddr := R6
+RowCounter := R8
+    jsr compute_top_left_corner_addr
+
+    ; top row
+    ldy #0
+    lda #CORNER_TL_LIGHT
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    sta (AttributeAddr), y
+    iny
+top_col_loop:
+    lda #EDGE_TOP_LIGHT
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    sta (AttributeAddr), y
+    iny
+    cpy Width
+    bne top_col_loop
+    lda #CORNER_TR_LIGHT
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    sta (AttributeAddr), y
+    iny
+    ; for the shadow we need to know what's underneath us
+    lda (NametableAddr), y
+    cmp #DARK_SQUARE_TILE
+    beq dark_top_shadow
+light_top_shadow:
+    lda #TOP_SHADOW_LIGHT
+    jmp done_picking_top_shadow
+dark_top_shadow:
+    lda #TOP_SHADOW_DARK
+done_picking_top_shadow:
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    sta (AttributeAddr), y
+
+    ; middle rows
+    lda Height
+    sec
+    sbc #2
+    sta RowCounter
+middle_row_loop:
+    add16b NametableAddr, #32
+    add16b AttributeAddr, #32
+    ldy #0
+    lda #EDGE_LEFT_LIGHT
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    sta (AttributeAddr), y
+    ldy Width
+    lda #EDGE_RIGHT_LIGHT
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    sta (AttributeAddr), y
+    iny
+    lda (NametableAddr), y
+    cmp #DARK_SQUARE_TILE
+    beq dark_side_shadow
+light_side_shadow:
+    lda #RIGHT_EDGE_SHADOW_LIGHT
+    jmp done_picking_side_shadow
+dark_side_shadow:
+    lda #RIGHT_EDGE_SHADOW_DARK
+done_picking_side_shadow:
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    sta (AttributeAddr), y
+    dec RowCounter
+    bne middle_row_loop
+
+    add16b NametableAddr, #32
+    add16b AttributeAddr, #32
+
+    ; bottom row
+    ldy #0
+    lda #CORNER_BL_LIGHT
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    sta (AttributeAddr), y
+    iny
+bottom_col_loop:
+    lda #EDGE_BOTTOM_LIGHT
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    sta (AttributeAddr), y
+    iny
+    cpy Width
+    bne bottom_col_loop
+    lda #CORNER_BR_LIGHT
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    sta (AttributeAddr), y
+    iny
+    ; for the shadow we need to know what's underneath us
+    lda (NametableAddr), y
+    cmp #DARK_SQUARE_TILE
+    beq b_dark_side_shadow
+b_light_side_shadow:
+    lda #RIGHT_EDGE_SHADOW_LIGHT
+    jmp b_done_picking_side_shadow
+b_dark_side_shadow:
+    lda #RIGHT_EDGE_SHADOW_DARK
+b_done_picking_side_shadow:
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    sta (AttributeAddr), y
+
+    add16b NametableAddr, #32
+    add16b AttributeAddr, #32
+
+    ; bottom shadow, which is significantly more involved T_T
+    ldy #0
+    lda (NametableAddr), y
+    cmp #DARK_SQUARE_TILE
+    beq bottom_dark_shadow
+bottom_light_shadow:
+    lda #BOTTOM_SHADOW_LIGHT
+    jmp done_picking_bottom_shadow
+bottom_dark_shadow:
+    lda #BOTTOM_SHADOW_DARK
+done_picking_bottom_shadow:
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    sta (AttributeAddr), y
+shadow_loop:
+    iny ; increment at the _top_ of the loop, since we want to extend 1 past the edge this time
+    lda (NametableAddr), y
+    cmp #DARK_SQUARE_TILE
+    beq bottom_edge_dark_shadow
+bottom_edge_light_shadow:
+    lda #BOTTOM_EDGE_SHADOW_LIGHT
+    jmp done_picking_bottom_edge_shadow
+bottom_edge_dark_shadow:
+    lda #BOTTOM_EDGE_SHADOW_DARK
+done_picking_bottom_edge_shadow:
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    sta (AttributeAddr), y
+    cpy Width
+    bne shadow_loop
+    ; finally, the bottom-right corner
+    iny
+    lda (NametableAddr), y
+    cmp #DARK_SQUARE_TILE
+    beq bottom_corner_dark_shadow
+bottom_corner_light_shadow:
+    lda #SHADOW_CORNER_LIGHT
+    jmp done_picking_bottom_corner_shadow
+bottom_corner_dark_shadow:
+    lda #SHADOW_CORNER_DARK
+done_picking_bottom_corner_shadow:
+    sta (NametableAddr), y
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    sta (AttributeAddr), y
+
+    rts
+.endproc
+
+.proc widget_file_select_box_init
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+
+CurrentWidgetIndex := R20
+        
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+
+        ldx CurrentWidgetIndex
+        lda widget_tile_x, x
+        sta Left
+        lda widget_tile_y, x
+        sta Top
+        lda #21
+        sta Width
+        lda #4
+        sta Height
+        jsr draw_box_outline_light
+
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_file_select_box_update
+        rts
+.endproc
+
+.proc widget_file_select_box_update
+    rts
+.endproc

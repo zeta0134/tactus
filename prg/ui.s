@@ -61,6 +61,7 @@ LastBeat: .res 1
         .segment "CODE_B"
 
         .include "ui/widgets/cursors.incs"
+        .include "ui/widgets/file_select_box.incs"
         .include "ui/widgets/numeric_slider.incs"
         .include "ui/widgets/numeric_viewer.incs"
         .include "ui/widgets/text_label.incs"
@@ -72,6 +73,8 @@ empty_string: .asciiz ""
 
         .include "ui/title_screen.incs"
         .include "ui/options_screen.incs"
+        .include "ui/file_select_screen.incs"
+        .include "ui/game_over_screen.incs"
 
 ; ======================================================================
 ;                         Kernel Functions
@@ -202,6 +205,34 @@ done:
 ; ======================================================================
 ; Utility functions common to many widgets, various odds and ends, etc
 ; ======================================================================
+
+; Teleports to various game modes, including other UI subscreens
+.proc go_to_file_select
+        st16 R0, sfx_teleport
+        jsr play_sfx_pulse2
+
+        st16 FadeToGameMode, file_select_prep
+        st16 GameMode, fade_to_game_mode
+        rts
+.endproc
+
+.proc go_to_options
+        st16 R0, sfx_teleport
+        jsr play_sfx_pulse2
+
+        st16 FadeToGameMode, options_prep
+        st16 GameMode, fade_to_game_mode
+        rts
+.endproc
+
+.proc go_to_gameplay
+        st16 R0, sfx_teleport
+        jsr play_sfx_pulse2
+
+        st16 FadeToGameMode, game_prep
+        st16 GameMode, fade_to_game_mode
+        rts
+.endproc
 
 .proc widget_no_behavior
         ; exactly that. used by all static elements that are done with initial setup

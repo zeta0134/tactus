@@ -5,8 +5,7 @@
 title_ui_layout:
         widget_controller title_controller_init
         widget_player_cursor
-        widget_text_button empty_string, go_to_gameplay, 12, 10
-        widget_text_button empty_string, go_to_options, 12, 13
+        widget_text_button empty_string, go_to_file_select, 12, 10
         .addr $0000 ; end of list
 
 ; ======================================================================
@@ -50,23 +49,5 @@ CurrentWidgetIndex := R20
         jsr next_run_rand
         jsr next_gameplay_rand
 
-        rts
-.endproc
-
-.proc go_to_options
-        st16 R0, sfx_teleport
-        jsr play_sfx_pulse2
-
-        st16 FadeToGameMode, options_prep
-        st16 GameMode, fade_to_game_mode
-        rts
-.endproc
-
-.proc go_to_gameplay
-        st16 R0, sfx_teleport
-        jsr play_sfx_pulse2
-
-        st16 FadeToGameMode, game_prep
-        st16 GameMode, fade_to_game_mode
         rts
 .endproc
