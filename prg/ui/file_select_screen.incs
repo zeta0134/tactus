@@ -5,12 +5,12 @@
 file_select_ui_layout:
         widget_controller file_select_controller_init
         widget_cursor
-        widget_text_label file_select_str, 8, 2
-        widget_file_select_box 0, 5, 4
-        widget_file_select_box 1, 5, 10
-        widget_file_select_box 2, 5, 16
-        widget_text_button erase_file_str, widget_no_behavior, 8, 22
-        widget_text_button copy_file_str, widget_no_behavior, 8, 23
+        widget_text_label file_select_str, 10, 3
+        widget_file_select_box 0, 4, 6
+        widget_file_select_box 1, 4, 11
+        widget_file_select_box 2, 4, 16
+        widget_text_button erase_file_str, widget_no_behavior, 10, 22
+        widget_text_button copy_file_str, widget_no_behavior, 10, 24
         .addr $0000 ; end of list
 
 file_select_str:   .asciiz "FILE SELECT"
@@ -62,6 +62,11 @@ tile_converge:
 .endproc
 
 .proc file_select_controller_init
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+
 CurrentWidgetIndex := R20
 
         perform_zpcm_inc
@@ -81,6 +86,30 @@ CurrentWidgetIndex := R20
 
         ; draw an initial checkerboard background (no nametable for now)
         jsr draw_checkerboard_base
+        ; draw boxes for the "File Select" top thing, and the "erase/copy" options down below
+        lda #8
+        sta Left
+        lda #2
+        sta Top
+        lda #14
+        sta Width
+        lda #3
+        sta Height
+        jsr draw_box_outline_dark
+        jsr draw_box_fill
+
+        lda #8
+        sta Left
+        lda #21
+        sta Top
+        lda #14
+        sta Width
+        lda #5
+        sta Height
+        jsr draw_box_outline_dark
+        jsr draw_box_fill
+
+
 
         ; Get the file select palettes loaded in
         ldy #0

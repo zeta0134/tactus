@@ -69,6 +69,26 @@ AttributeAddr := R6
 .endproc
 
 .proc draw_box_outline_light
+ShadowAttr := R9
+BoxOutlineAttr := R10
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    sta ShadowAttr
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    sta BoxOutlineAttr
+    jmp _draw_box_outline_common
+.endproc
+
+.proc draw_box_outline_dark
+ShadowAttr := R9
+BoxOutlineAttr := R10
+    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    sta ShadowAttr
+    lda #(CHR_BANK_FONT_MARSHMALLOW_DARK | UI_PAL_BG1)
+    sta BoxOutlineAttr
+    jmp _draw_box_outline_common
+.endproc
+
+.proc _draw_box_outline_common
 Top := R0
 Left := R1
 Width := R2
@@ -76,26 +96,28 @@ Height := R3
 NametableAddr := R4
 AttributeAddr := R6
 RowCounter := R8
+ShadowAttr := R9
+BoxOutlineAttr := R10
     jsr compute_top_left_corner_addr
 
     ; top row
     ldy #0
     lda #CORNER_TL_LIGHT
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    lda BoxOutlineAttr
     sta (AttributeAddr), y
     iny
 top_col_loop:
     lda #EDGE_TOP_LIGHT
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    lda BoxOutlineAttr
     sta (AttributeAddr), y
     iny
     cpy Width
     bne top_col_loop
     lda #CORNER_TR_LIGHT
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    lda BoxOutlineAttr
     sta (AttributeAddr), y
     iny
     ; for the shadow we need to know what's underneath us
@@ -109,7 +131,7 @@ dark_top_shadow:
     lda #TOP_SHADOW_DARK
 done_picking_top_shadow:
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    lda ShadowAttr
     sta (AttributeAddr), y
 
     ; middle rows
@@ -123,12 +145,12 @@ middle_row_loop:
     ldy #0
     lda #EDGE_LEFT_LIGHT
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    lda BoxOutlineAttr
     sta (AttributeAddr), y
     ldy Width
     lda #EDGE_RIGHT_LIGHT
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    lda BoxOutlineAttr
     sta (AttributeAddr), y
     iny
     lda (NametableAddr), y
@@ -141,7 +163,7 @@ dark_side_shadow:
     lda #RIGHT_EDGE_SHADOW_DARK
 done_picking_side_shadow:
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    lda ShadowAttr
     sta (AttributeAddr), y
     dec RowCounter
     bne middle_row_loop
@@ -153,20 +175,20 @@ done_picking_side_shadow:
     ldy #0
     lda #CORNER_BL_LIGHT
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    lda BoxOutlineAttr
     sta (AttributeAddr), y
     iny
 bottom_col_loop:
     lda #EDGE_BOTTOM_LIGHT
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    lda BoxOutlineAttr
     sta (AttributeAddr), y
     iny
     cpy Width
     bne bottom_col_loop
     lda #CORNER_BR_LIGHT
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    lda BoxOutlineAttr
     sta (AttributeAddr), y
     iny
     ; for the shadow we need to know what's underneath us
@@ -180,7 +202,7 @@ b_dark_side_shadow:
     lda #RIGHT_EDGE_SHADOW_DARK
 b_done_picking_side_shadow:
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    lda ShadowAttr
     sta (AttributeAddr), y
 
     add16b NametableAddr, #32
@@ -198,7 +220,7 @@ bottom_dark_shadow:
     lda #BOTTOM_SHADOW_DARK
 done_picking_bottom_shadow:
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    lda ShadowAttr
     sta (AttributeAddr), y
 shadow_loop:
     iny ; increment at the _top_ of the loop, since we want to extend 1 past the edge this time
@@ -212,7 +234,7 @@ bottom_edge_dark_shadow:
     lda #BOTTOM_EDGE_SHADOW_DARK
 done_picking_bottom_edge_shadow:
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    lda ShadowAttr
     sta (AttributeAddr), y
     cpy Width
     bne shadow_loop
@@ -228,9 +250,46 @@ bottom_corner_dark_shadow:
     lda #SHADOW_CORNER_DARK
 done_picking_bottom_corner_shadow:
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+    lda ShadowAttr
     sta (AttributeAddr), y
 
+    rts
+.endproc
+
+.proc draw_box_fill
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+NametableAddr := R4
+AttributeAddr := R6
+RowCounter := R8
+    jsr compute_top_left_corner_addr
+    add16b NametableAddr, #32
+    add16b AttributeAddr, #32
+
+    ; loop over every middle row
+    lda Height
+    sec
+    sbc #2
+    sta RowCounter
+row_loop:
+    ; loop over every column in the middle row
+    ldy #1
+col_loop:
+    ; set that tile to blank
+    lda #0
+    sta (NametableAddr), y
+    lda #CHR_BANK_FONT_MARSHMALLOW ; palette doesn't matter here
+    sta (AttributeAddr), y
+    iny
+    cpy Width
+    bne col_loop
+    ; move to the next row and repeat
+    add16b NametableAddr, #32
+    add16b AttributeAddr, #32
+    dec RowCounter
+    bne row_loop
     rts
 .endproc
 
@@ -250,11 +309,12 @@ widget_tile_y := widgets_data1
         sta Left
         lda widget_tile_y, x
         sta Top
-        lda #21
+        lda #23
         sta Width
         lda #4
         sta Height
-        jsr draw_box_outline_light
+        jsr draw_box_outline_dark
+        jsr draw_box_fill
 
 
         ldy CurrentWidgetIndex
@@ -265,3 +325,4 @@ widget_tile_y := widgets_data1
 .proc widget_file_select_box_update
     rts
 .endproc
+
