@@ -76,7 +76,7 @@ CurrentWidgetIndex := R20
         ldy #TRACK_VARIANT_NORMAL
         jsr play_track
 
-        ; the options screen DOES use extended attributes, so set that up
+        ; this screen DOES use extended attributes, so set that up
         lda #0
         sta LeftNametableBank
         sta RightNametableBank
@@ -95,8 +95,9 @@ CurrentWidgetIndex := R20
         sta Width
         lda #3
         sta Height
-        jsr draw_box_outline_dark
+        jsr draw_box_outline_light
         jsr draw_box_fill
+        jsr draw_box_shadow
 
         lda #8
         sta Left
@@ -106,10 +107,9 @@ CurrentWidgetIndex := R20
         sta Width
         lda #5
         sta Height
-        jsr draw_box_outline_dark
+        jsr draw_box_outline_light
         jsr draw_box_fill
-
-
+        jsr draw_box_shadow
 
         ; Get the file select palettes loaded in
         ldy #0

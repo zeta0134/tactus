@@ -119,20 +119,6 @@ top_col_loop:
     sta (NametableAddr), y
     lda BoxOutlineAttr
     sta (AttributeAddr), y
-    iny
-    ; for the shadow we need to know what's underneath us
-    lda (NametableAddr), y
-    cmp #DARK_SQUARE_TILE
-    beq dark_top_shadow
-light_top_shadow:
-    lda #TOP_SHADOW_LIGHT
-    jmp done_picking_top_shadow
-dark_top_shadow:
-    lda #TOP_SHADOW_DARK
-done_picking_top_shadow:
-    sta (NametableAddr), y
-    lda ShadowAttr
-    sta (AttributeAddr), y
 
     ; middle rows
     lda Height
@@ -151,19 +137,6 @@ middle_row_loop:
     lda #EDGE_RIGHT_LIGHT
     sta (NametableAddr), y
     lda BoxOutlineAttr
-    sta (AttributeAddr), y
-    iny
-    lda (NametableAddr), y
-    cmp #DARK_SQUARE_TILE
-    beq dark_side_shadow
-light_side_shadow:
-    lda #RIGHT_EDGE_SHADOW_LIGHT
-    jmp done_picking_side_shadow
-dark_side_shadow:
-    lda #RIGHT_EDGE_SHADOW_DARK
-done_picking_side_shadow:
-    sta (NametableAddr), y
-    lda ShadowAttr
     sta (AttributeAddr), y
     dec RowCounter
     bne middle_row_loop
@@ -190,20 +163,62 @@ bottom_col_loop:
     sta (NametableAddr), y
     lda BoxOutlineAttr
     sta (AttributeAddr), y
+
+    rts
+.endproc
+
+.proc draw_box_shadow
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+NametableAddr := R4
+AttributeAddr := R6
+RowCounter := R8
+ShadowAttr := R9
+BoxOutlineAttr := R10
+    jsr compute_top_left_corner_addr   
+    ; top row
+    ldy Width
     iny
     ; for the shadow we need to know what's underneath us
     lda (NametableAddr), y
     cmp #DARK_SQUARE_TILE
-    beq b_dark_side_shadow
-b_light_side_shadow:
-    lda #RIGHT_EDGE_SHADOW_LIGHT
-    jmp b_done_picking_side_shadow
-b_dark_side_shadow:
-    lda #RIGHT_EDGE_SHADOW_DARK
-b_done_picking_side_shadow:
+    beq dark_top_shadow
+light_top_shadow:
+    lda #TOP_SHADOW_LIGHT
+    jmp done_picking_top_shadow
+dark_top_shadow:
+    lda #TOP_SHADOW_DARK
+done_picking_top_shadow:
     sta (NametableAddr), y
     lda ShadowAttr
     sta (AttributeAddr), y
+
+    ; middle (and bottom) rows
+    lda Height
+    sec
+    sbc #1
+    sta RowCounter
+middle_row_loop:
+    add16b NametableAddr, #32
+    add16b AttributeAddr, #32
+    ldy Width
+    iny
+    lda (NametableAddr), y
+    cmp #DARK_SQUARE_TILE
+    beq dark_side_shadow
+light_side_shadow:
+    lda #RIGHT_EDGE_SHADOW_LIGHT
+    jmp done_picking_side_shadow
+dark_side_shadow:
+    lda #RIGHT_EDGE_SHADOW_DARK
+done_picking_side_shadow:
+    sta (NametableAddr), y
+    lda ShadowAttr
+    sta (AttributeAddr), y
+    dec RowCounter
+    bne middle_row_loop
 
     add16b NametableAddr, #32
     add16b AttributeAddr, #32
@@ -303,11 +318,13 @@ CurrentWidgetIndex := R20
         
 widget_tile_x := widgets_data0
 widget_tile_y := widgets_data1
+widget_file_index := widgets_data2
+widget_current_hover_state := widgets_data3
 
-        ldx CurrentWidgetIndex
-        lda widget_tile_x, x
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
         sta Left
-        lda widget_tile_y, x
+        lda widget_tile_y, y
         sta Top
         lda #23
         sta Width
@@ -315,14 +332,133 @@ widget_tile_y := widgets_data1
         sta Height
         jsr draw_box_outline_dark
         jsr draw_box_fill
+        jsr draw_box_shadow
 
+        ; set our cursor position based on the leftmost tile position
+        ; TODO: offset this as required!
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        asl ; x2
+        asl ; x4
+        asl ; x8
+        clc
+        adc #0
+        sta widgets_cursor_pos_x, y
+        lda widget_tile_y, y
+        asl ; x2
+        asl ; x4
+        asl ; x8
+        clc
+        adc #4
+        sta widgets_cursor_pos_y, y
+
+        ; flag this widget as active for cursor navigation purposes
+        ldy CurrentWidgetIndex
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+
+        ; we just drew ourselves in unhovered mode, so set that flag
+        lda #0
+        sta widget_current_hover_state, y
 
         ldy CurrentWidgetIndex
         set_widget_state_y widget_file_select_box_update
         rts
 .endproc
 
+.proc redraw_border_if_needed
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+
+CurrentWidgetIndex := R20
+
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_file_index := widgets_data2
+widget_current_hover_state := widgets_data3
+    
+    ; are we currently hovered?
+    ldy CurrentWidgetIndex
+    lda widgets_state_flags, y
+    and #WIDGET_STATE_HOVER
+    bne we_are_hovered
+we_are_not_hovered:
+    ; are we currently drawn as hovered?
+    lda widget_current_hover_state, y
+    beq nothing_to_do
+    ; draw ourselves unhovered!
+    ldy CurrentWidgetIndex
+    lda widget_tile_x, y
+    sta Left
+    lda widget_tile_y, y
+    sta Top
+    lda #23
+    sta Width
+    lda #4
+    sta Height
+    jsr draw_box_outline_dark
+    jsr draw_box_fill
+    ; and set accordingly
+    ldy CurrentWidgetIndex
+    lda #0
+    sta widget_current_hover_state, y
+    rts
+we_are_hovered:
+    ; same deal but the other way around
+    lda widget_current_hover_state, y
+    bne nothing_to_do
+    ; draw ourselves hovered!
+    ldy CurrentWidgetIndex
+    lda widget_tile_x, y
+    sta Left
+    lda widget_tile_y, y
+    sta Top
+    lda #23
+    sta Width
+    lda #4
+    sta Height
+    jsr draw_box_outline_light
+    jsr draw_box_fill
+    ; and set accordingly
+    ldy CurrentWidgetIndex
+    lda #1
+    sta widget_current_hover_state, y
+    rts
+nothing_to_do:
+    rts
+.endproc
+
 .proc widget_file_select_box_update
+CurrentWidgetIndex := R20
+
+; rename the data labels to something more readable
+widget_action_func_low := widgets_data4
+widget_action_func_high := widgets_data5
+        jsr redraw_border_if_needed
+
+        ; if we aren't even hovered, do nothing
+        ldy CurrentWidgetIndex
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_HOVER
+        bne check_for_action_input
+        rts
+check_for_action_input:
+        lda #(KEY_A | KEY_START)
+        and ButtonsDown
+        beq do_nothing
+
+        ; FOR NOW, simply switch to the name entry screen
+        ; Later, we'll need this logic:
+        ; If this is a NEW file, initialize it and switch to the name entry screen
+        ; If this is an existing file, switch instead to the File Details screen
+        jsr go_to_name_entry
+
+do_nothing:
+        rts
+
     rts
 .endproc
 

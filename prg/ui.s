@@ -75,6 +75,8 @@ empty_string: .asciiz ""
         .include "ui/options_screen.incs"
         .include "ui/file_select_screen.incs"
         .include "ui/game_over_screen.incs"
+        .include "ui/name_entry_screen.incs"
+        .include "ui/file_details_screen.incs"
 
 ; ======================================================================
 ;                         Kernel Functions
@@ -230,6 +232,24 @@ done:
         jsr play_sfx_pulse2
 
         st16 FadeToGameMode, game_prep
+        st16 GameMode, fade_to_game_mode
+        rts
+.endproc
+
+.proc go_to_name_entry
+        st16 R0, sfx_teleport
+        jsr play_sfx_pulse2
+
+        st16 FadeToGameMode, name_entry_prep
+        st16 GameMode, fade_to_game_mode
+        rts
+.endproc
+
+.proc go_to_file_details
+        st16 R0, sfx_teleport
+        jsr play_sfx_pulse2
+
+        st16 FadeToGameMode, file_details_prep
         st16 GameMode, fade_to_game_mode
         rts
 .endproc

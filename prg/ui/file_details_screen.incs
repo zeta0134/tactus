@@ -1,0 +1,23 @@
+; ======================================================================
+;                         Layouts and Widgets
+; ======================================================================
+
+file_details_ui_layout:
+        widget_controller file_details_controller_init
+        widget_cursor
+        widget_text_button empty_string, file_details_str, 12, 10        
+        .addr $0000 ; end of list
+
+file_details_str:   .asciiz "FILE DETAILS SCREEN (WIP)"
+
+.proc file_details_controller_init
+CurrentWidgetIndex := R20
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y file_details_controller_update
+        rts
+.endproc
+
+.proc file_details_controller_update
+        rts
+.endproc
