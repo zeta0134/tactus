@@ -18,6 +18,7 @@
         .include "procgen.inc"
         .include "rainbow.inc"
         .include "raster_table.inc"
+        .include "saves.inc"
         .include "settings.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -64,6 +65,7 @@ LastBeat: .res 1
         .include "ui/widgets/file_select_box.incs"
         .include "ui/widgets/numeric_slider.incs"
         .include "ui/widgets/numeric_viewer.incs"
+        .include "ui/widgets/string_entry.incs"
         .include "ui/widgets/text_label.incs"
         .include "ui/widgets/text_options.incs"
         .include "ui/widgets/text_button.incs"
@@ -189,7 +191,9 @@ loop:
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda widgets_onupdate_high, y
-        beq widget_inactive ; if the high byte is 0, this widget doesn't exist
+        ; if the high byte is 0, this widget doesn't exist
+        ; (widget code really shouldn't live in zeropage)
+        beq widget_inactive
         sta WidgetUpdatePtr+1
         lda widgets_onupdate_low, y
         sta WidgetUpdatePtr+0

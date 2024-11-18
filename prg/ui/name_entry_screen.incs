@@ -4,13 +4,41 @@
 
 name_entry_ui_layout:
         widget_controller name_entry_controller_init
-        widget_cursor
-        widget_text_button name_entry_str, widget_no_behavior, 12, 10        
+        widget_text_label name_entry_str, 11, 3
+        widget_string_entry english_page_table, (current_save + SaveFile::PlayerName)
         .addr $0000 ; end of list
 
-name_entry_str:   .asciiz "NAME ENTRY (WIP)"
+name_entry_str:   .asciiz "NAME ENTRY"
+
+english_upper_str: .asciiz "UPPER"
+letter_grid_english_upper:
+        .byte 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'
+        .byte 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'
+        .byte 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X'
+        .byte 'Y', 'Z', ' ', '0', '1', '2', '3', '4'
+        .byte '.', ',', '-', '5', '6', '7', '8', '9'
+        .byte '+', '_', '/', '^', '&', '*', '(', ')'
+
+english_lower_str: .asciiz "lower"
+letter_grid_english_lower:
+        .byte 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'
+        .byte 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'
+        .byte 'q', 'r', 's', 't', 'u', 'v', 'w', 'x'
+        .byte 'y', 'z', '?', '!', '@', '#', '$', '%'
+        .byte '`', '~', '*', '=', '\', '|', '[', ']'
+        .byte '<', '>', '{', '}', $3B, ':', $22, $27
+
+english_page_table:
+        .addr english_upper_str, letter_grid_english_upper
+        .addr english_lower_str, letter_grid_english_lower
+        .addr $0000
 
 .proc name_entry_controller_init
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+
 CurrentWidgetIndex := R20
         perform_zpcm_inc
 
@@ -27,6 +55,34 @@ CurrentWidgetIndex := R20
         lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
         sta LeftNametableAttr
         sta RightNametableAttr
+
+        ; draw an initial checkerboard background (no nametable for now)
+        jsr draw_checkerboard_base
+        ; Draw a big ol' box to house the name picker
+        lda #3
+        sta Left
+        lda #6
+        sta Top
+        lda #25
+        sta Width
+        lda #20
+        sta Height
+        jsr draw_box_outline_light
+        jsr draw_box_fill
+        jsr draw_box_shadow
+        ; And a smaller box up top for the title / instruction
+        lda #8
+        sta Left
+        lda #2
+        sta Top
+        lda #15
+        sta Width
+        lda #3
+        sta Height
+        jsr draw_box_outline_light
+        jsr draw_box_fill
+        jsr draw_box_shadow
+
 
         ; Get the file select palettes loaded in
         ldy #0
