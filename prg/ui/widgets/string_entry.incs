@@ -7,6 +7,9 @@
         .byte 0, 0, 0, 0
 .endmacro
 
+TARGET_STRING_TOP_TILE  = 9
+TARGET_STRING_LEFT_TILE = 8
+
 NAME_ENTRY_LEFT_TILE = 5
 NAME_ENTRY_TOP_TILE  = 13
 
@@ -227,22 +230,6 @@ page_in_range:
         rts
 .endproc
 
-.proc draw_current_string
-        ; do just that. we should have a fancy flashing cursor at the end? (yes!)
-.endproc
-
-.proc add_to_string
-        ; First, check the string length. If it's already 15 or higher, buzz and fail.
-        ; Add this glyph to the end of the pointed-at string, followed by a $0 byte
-        ; draw the string again
-.endproc
-
-.proc delete_from_string
-        ; First, check the string length. If it is already 0, buzz and fail.
-        ; Remove the glyph at the end of the pointed-at string, replacing it with a $0 byte
-        ; draw the string again
-.endproc
-
 .proc draw_current_page
 PagePtr := R0
 PageTablePtr := R2
@@ -270,6 +257,194 @@ widget_current_page := widgets_data4
         lda (PageTablePtr), y
         sta PagePtr+1
         jsr draw_letter_grid
+        rts
+.endproc
+
+NAME_ENTRY_UNDERLINE_TILE = $E4
+NAME_ENTRY_TEXT_CURSOR    = $E3
+NAME_ENTRY_END_CURSOR     = $E1
+
+.proc draw_string_ui
+
+NametableAddr := T0
+AttributeAddr := T2
+        ; TODO: a little icon on the left side?
+
+        st16 NametableAddr, ($5000 + ((TARGET_STRING_TOP_TILE + 1) * 32) + TARGET_STRING_LEFT_TILE)
+        st16 AttributeAddr, ($5800 + ((TARGET_STRING_TOP_TILE + 1) * 32) + TARGET_STRING_LEFT_TILE)
+
+        ldy #0
+loop:
+        lda #NAME_ENTRY_UNDERLINE_TILE
+        sta (NametableAddr), y
+        lda #CHR_BANK_FONT_MARSHMALLOW
+        sta (AttributeAddr), y
+        iny
+        cpy #15
+        bne loop
+
+        rts
+.endproc
+
+.proc draw_target_string
+; FIXED_draw_string
+NametableAddr := T0
+AttributeAddr := T2
+StringPtr := T4
+TileBase := T6
+PaletteIndex := T7
+
+CurrentWidgetIndex := R20
+
+widget_target_string_low := widgets_data2
+widget_target_string_high := widgets_data3
+        
+        st16 NametableAddr, ($5000 + (TARGET_STRING_TOP_TILE * 32) + TARGET_STRING_LEFT_TILE)
+        st16 AttributeAddr, ($5800 + (TARGET_STRING_TOP_TILE * 32) + TARGET_STRING_LEFT_TILE)
+
+        ldy CurrentWidgetIndex
+        lda widget_target_string_low, y
+        sta StringPtr+0
+        lda widget_target_string_high, y
+        sta StringPtr+1
+
+        lda #CHR_BANK_FONT_MARSHMALLOW
+        sta TileBase
+        lda #UI_PAL_BG1
+        sta PaletteIndex
+        jsr FIXED_draw_string
+        ; at this point, the nametable/attribute pointers are still set
+        ; and Y is pointing to the character after the string.
+        ; are we at the end of the string?
+        cpy #15
+        beq draw_end_cursor
+        ; draw the text editing cursor
+        lda #NAME_ENTRY_TEXT_CURSOR
+        sta (NametableAddr), y
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+        sta (AttributeAddr), y
+        iny
+        cpy #15
+        beq done
+        ; clear out any text following this point
+padding_loop:
+        lda #0
+        sta (NametableAddr), y
+        iny
+        cpy #15
+        bne padding_loop
+        rts
+
+draw_end_cursor:
+        lda #NAME_ENTRY_END_CURSOR
+        sta (NametableAddr), y
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+        sta (AttributeAddr), y
+done:
+        rts
+.endproc
+
+.proc add_to_string
+StringPtr := T0
+Length := T2
+
+PagePtr := R0
+PageTablePtr := R2
+
+CurrentWidgetIndex := R20
+
+widget_page_table_low := widgets_data0
+widget_page_table_high := widgets_data1
+widget_target_string_low := widgets_data2
+widget_target_string_high := widgets_data3
+widget_current_page := widgets_data4
+widget_grid_pos_x   := widgets_data5
+widget_grid_pos_y   := widgets_data6   
+
+        ; First, check the string length. If it's already 15 or higher, buzz and fail.
+        ldy CurrentWidgetIndex
+        lda widget_target_string_low, y
+        sta StringPtr+0
+        lda widget_target_string_high, y
+        sta StringPtr+1
+        jsr FIXED_strlen
+        lda Length
+        cmp #15
+        bcs fail_to_add
+        ; Add the pointed-to glyph to the end of the pointed-at string, followed by a $0 byte
+        ;; First, load in the active page table
+        ldy CurrentWidgetIndex
+        lda widget_page_table_low, y
+        sta PageTablePtr+0
+        lda widget_page_table_high, y
+        sta PageTablePtr+1
+        lda widget_current_page, y
+        asl ; each entry is two pointers == 4 bytes
+        asl
+        clc
+        adc #2 ; grab the second pointer, to the actual letter grid
+        tay
+        lda (PageTablePtr), y
+        sta PagePtr+0
+        iny
+        lda (PageTablePtr), y
+        sta PagePtr+1
+        ;; now using the current grid coordinates, work out which byte to copy into
+        ;; the destination string
+        ldy CurrentWidgetIndex
+        lda widget_grid_pos_y, y
+        asl
+        asl
+        asl ; x8
+        clc
+        adc widget_grid_pos_x, y
+        tay
+        ;; grab the new glyph byte, and store it at "Length" which we computed before
+        lda (PagePtr), y
+        ldy Length
+        sta (StringPtr), y
+        ; follow this up with a $0 byte in the original string, to ensure it remains null-terminated
+        iny
+        lda #0
+        sta (StringPtr), y
+        ; finally, draw the string again
+        jsr draw_target_string
+        ; TODO: successful character boop?
+        rts
+fail_to_add:
+        ; TODO: error buzz?
+        rts
+.endproc
+
+.proc delete_from_string
+StringPtr := T0
+Length := T2
+
+CurrentWidgetIndex := R20
+
+widget_target_string_low := widgets_data2
+widget_target_string_high := widgets_data3
+
+        ; First, check the string length. If it is already 0, buzz and fail.
+        ldy CurrentWidgetIndex
+        lda widget_target_string_low, y
+        sta StringPtr+0
+        lda widget_target_string_high, y
+        sta StringPtr+1
+        jsr FIXED_strlen
+        lda Length
+        beq fail_to_add
+        ; Remove the glyph at the end of the pointed-at string, replacing it with a $0 byte
+        lda #0
+        ldy Length
+        dey
+        sta (StringPtr), y
+        ; finally, draw the string again
+        jsr draw_target_string
+        ; TODO: successful character boop?
+        rts
+fail_to_add:
+        ; TODO: error buzz?
         rts
 .endproc
 
@@ -368,6 +543,51 @@ cancel_move:
         rts
 .endproc
 
+.proc jump_to_confirm
+CurrentWidgetIndex := R20
+widget_grid_pos_x   := widgets_data5
+widget_grid_pos_y   := widgets_data6  
+        ldy CurrentWidgetIndex
+        lda #8
+        sta widget_grid_pos_x, y
+        lda #2
+        sta widget_grid_pos_y, y
+        jsr draw_current_page
+        jsr draw_controls
+        rts
+.endproc
+
+.proc perform_action_at_cursor
+CurrentWidgetIndex := R20
+widget_grid_pos_x   := widgets_data5
+widget_grid_pos_y   := widgets_data6
+        
+        ldy CurrentWidgetIndex
+        lda widget_grid_pos_x, y
+        cmp #8
+        bcs check_buttons
+        jsr add_to_string
+        rts
+check_buttons:
+        lda widget_grid_pos_y, y
+        beq perform_page_advance
+        cmp #1
+        beq perform_deletion
+        jsr accept_string
+        rts
+perform_page_advance:
+        jsr advance_page
+        rts
+perform_deletion:
+        jsr delete_from_string
+        rts
+.endproc
+
+.proc accept_string
+        ; TODO!!
+        rts
+.endproc
+
 .proc widget_string_entry_init
 CurrentWidgetIndex := R20
 
@@ -381,7 +601,7 @@ widget_grid_pos_y   := widgets_data6
 
 
         ldy CurrentWidgetIndex
-        lda #1
+        lda #0
         sta widget_current_page, y
         lda #0
         sta widget_grid_pos_x, y
@@ -389,6 +609,8 @@ widget_grid_pos_y   := widgets_data6
 
         jsr draw_current_page
         jsr draw_controls
+        jsr draw_string_ui
+        jsr draw_target_string
 
         ldy CurrentWidgetIndex
         set_widget_state_y widget_string_entry_update
@@ -425,11 +647,35 @@ check_down:
         jsr move_cursor_down
 down_not_pressed:
 
+check_a:
+        lda #(KEY_A)
+        bit ButtonsDown
+        beq a_not_pressed
+        jsr perform_action_at_cursor
+a_not_pressed:
+
+check_b:
+        lda #(KEY_B)
+        bit ButtonsDown
+        beq b_not_pressed
+        jsr delete_from_string
+b_not_pressed:
+
+check_start:
+        lda #(KEY_START)
+        bit ButtonsDown
+        beq start_not_pressed
+        jsr jump_to_confirm
+start_not_pressed:
+
 check_select:
         lda #(KEY_SELECT)
         bit ButtonsDown
         beq select_not_pressed
         jsr advance_page
 select_not_pressed:
+
+        ; TODO: update the fancy cursor box thing here!
+
         rts
 .endproc
