@@ -328,14 +328,14 @@ widget_target_string_high := widgets_data3
         lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
         sta (AttributeAddr), y
         iny
-        cpy #15
+        cpy #16
         beq done
         ; clear out any text following this point
 padding_loop:
         lda #0
         sta (NametableAddr), y
         iny
-        cpy #15
+        cpy #16
         bne padding_loop
         rts
 
