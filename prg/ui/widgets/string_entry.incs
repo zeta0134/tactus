@@ -5,6 +5,10 @@
         .addr page_table
         .addr destination_str
         .byte 0, 0, 0, 0
+        ; the string entry thing comes with its own cursor
+        .addr widget_string_entry_cursor_init
+        .byte 0, 0, 0, 0
+        .byte 0, 0, 0, 0
 .endmacro
 
 TARGET_STRING_TOP_TILE  = 9
@@ -676,6 +680,255 @@ check_select:
 select_not_pressed:
 
         ; TODO: update the fancy cursor box thing here!
+
+        rts
+.endproc
+
+STRING_ENTRY_LEFT_OAM_INDEX = PAUSE_INDICATOR_OAM_INDEX
+STRING_ENTRY_RIGHT_OAM_INDEX = PAUSE_INDICATOR_OAM_INDEX+1
+
+.proc compute_grid_left_pos
+PreviousWidgetIndex := R19
+previous_widget_grid_pos_x   := widgets_data5
+previous_widget_grid_pos_y   := widgets_data6
+        ldy PreviousWidgetIndex
+        lda previous_widget_grid_pos_x, y
+        asl ; x2
+        clc
+        adc #NAME_ENTRY_LEFT_TILE ; +leftbase
+        asl
+        asl
+        asl ; x8
+        pha
+        lda previous_widget_grid_pos_x, y
+        cmp #8
+        bne regular_offset
+button_offset:
+        pla
+        clc
+        adc #3
+        rts
+regular_offset:
+        pla
+        sec
+        sbc #5
+        rts
+.endproc
+
+.proc compute_grid_right_pos
+PreviousWidgetIndex := R19
+previous_widget_grid_pos_x   := widgets_data5
+previous_widget_grid_pos_y   := widgets_data6
+        jsr compute_grid_left_pos
+        pha
+        lda previous_widget_grid_pos_x, y
+        cmp #8
+        bne regular_offset
+button_offset:
+        pla
+        clc
+        adc #49
+        rts
+regular_offset:
+        pla
+        clc
+        adc #9
+        rts
+.endproc
+
+.proc compute_grid_top_pos
+PreviousWidgetIndex := R19
+previous_widget_grid_pos_x   := widgets_data5
+previous_widget_grid_pos_y   := widgets_data6
+
+        ldy PreviousWidgetIndex
+        lda previous_widget_grid_pos_y, y
+        asl ; x2
+        clc
+        adc #NAME_ENTRY_TOP_TILE ; +topbase
+        asl
+        asl
+        asl ; x8
+        ; TODO: total sprite offset to the left
+        rts
+.endproc
+
+.proc widget_string_entry_cursor_init
+PreviousWidgetIndex := R19
+CurrentWidgetIndex := R20
+
+previous_widget_grid_pos_x   := widgets_data5
+previous_widget_grid_pos_y   := widgets_data6
+
+widget_left_pos_x_pixel      := widgets_data0
+widget_left_pos_x_subpixel   := widgets_data1
+widget_left_pos_y_pixel      := widgets_data2
+widget_left_pos_y_subpixel   := widgets_data3
+widget_right_pos_x_pixel     := widgets_data4
+widget_right_pos_x_subpixel  := widgets_data5
+widget_right_pos_y_pixel     := widgets_data6
+widget_right_pos_y_subpixel  := widgets_data7
+
+        ldy CurrentWidgetIndex
+        lda #0
+        sta widget_left_pos_x_subpixel, y
+        sta widget_left_pos_y_subpixel, y
+        sta widget_right_pos_x_subpixel, y
+        sta widget_right_pos_y_subpixel, y
+        ldy CurrentWidgetIndex
+        dey
+        sty PreviousWidgetIndex
+
+        jsr compute_grid_left_pos
+        ldy CurrentWidgetIndex
+        sta widget_left_pos_x_pixel, y
+        jsr compute_grid_right_pos
+        ldy CurrentWidgetIndex
+        sta widget_right_pos_x_pixel, y
+
+        jsr compute_grid_top_pos
+        ldy CurrentWidgetIndex
+        sta widget_left_pos_y_pixel, y
+        sta widget_right_pos_y_pixel, y
+
+        jsr draw_name_entry_cursor
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_string_entry_cursor_update
+        rts
+.endproc
+
+.proc widget_string_entry_cursor_update
+PreviousWidgetIndex := R19
+
+; lerp coordinate
+CurrentPos := R2
+TargetPos := R4
+Distance := R6
+
+CurrentWidgetIndex := R20
+
+previous_widget_grid_pos_x   := widgets_data5
+previous_widget_grid_pos_y   := widgets_data6
+
+widget_left_pos_x_pixel      := widgets_data0
+widget_left_pos_x_subpixel   := widgets_data1
+widget_left_pos_y_pixel      := widgets_data2
+widget_left_pos_y_subpixel   := widgets_data3
+widget_right_pos_x_pixel     := widgets_data4
+widget_right_pos_x_subpixel  := widgets_data5
+widget_right_pos_y_pixel     := widgets_data6
+widget_right_pos_y_subpixel  := widgets_data7
+
+        ldy CurrentWidgetIndex
+        dey
+        sty PreviousWidgetIndex
+        
+        ; left cursor, X lerp
+        jsr compute_grid_left_pos
+        sta TargetPos+1
+        lda #0
+        sta TargetPos+0
+        ldy CurrentWidgetIndex
+        lda widget_left_pos_x_pixel, y
+        sta CurrentPos+1
+        lda widget_left_pos_x_subpixel, y
+        sta CurrentPos+0
+        jsr lerp_coordinate
+        ldy CurrentWidgetIndex
+        lda CurrentPos+1
+        sta widget_left_pos_x_pixel, y
+        lda CurrentPos+0
+        sta widget_left_pos_x_subpixel, y
+
+        ; right cursor, X lerp
+        jsr compute_grid_right_pos
+        sta TargetPos+1
+        lda #0
+        sta TargetPos+0
+        ldy CurrentWidgetIndex
+        lda widget_right_pos_x_pixel, y
+        sta CurrentPos+1
+        lda widget_right_pos_x_subpixel, y
+        sta CurrentPos+0
+        jsr lerp_coordinate
+        ldy CurrentWidgetIndex
+        lda CurrentPos+1
+        sta widget_right_pos_x_pixel, y
+        lda CurrentPos+0
+        sta widget_right_pos_x_subpixel, y
+
+        ; both cursor halves, Y lerp
+        jsr compute_grid_top_pos
+        sta TargetPos+1
+        lda #0
+        sta TargetPos+0
+        ldy CurrentWidgetIndex
+        lda widget_left_pos_y_pixel, y
+        sta CurrentPos+1
+        lda widget_left_pos_y_subpixel, y
+        sta CurrentPos+0
+        jsr lerp_coordinate
+        ldy CurrentWidgetIndex
+        lda CurrentPos+1
+        sta widget_left_pos_y_pixel, y
+        sta widget_right_pos_y_pixel, y
+        lda CurrentPos+0
+        sta widget_left_pos_y_subpixel, y
+        sta widget_right_pos_y_subpixel, y
+
+        jsr draw_name_entry_cursor
+        rts
+.endproc
+
+.proc draw_name_entry_cursor
+SpritePtr := R0
+CurrentWidgetIndex := R20
+
+widget_left_pos_x_pixel      := widgets_data0
+widget_left_pos_y_pixel      := widgets_data2
+widget_right_pos_x_pixel     := widgets_data4
+widget_right_pos_y_pixel     := widgets_data6
+
+        ldx CurrentWidgetIndex ; Y is busy doing sprite things
+
+        ldy #STRING_ENTRY_LEFT_OAM_INDEX
+        lda sprite_ptr_lut_low, y
+        sta SpritePtr+0
+        lda sprite_ptr_lut_high, y
+        sta SpritePtr+1
+
+        lda #SPRITE_TILE_MENU_CURSOR_SQUARE + 0
+        ldy #SelfModifiedSprite::TileId
+        sta (SpritePtr), y
+        lda #SPRITE_PAL_0
+        ldy #SelfModifiedSprite::Attributes
+        sta (SpritePtr), y
+        lda widget_left_pos_x_pixel, x
+        ldy #SelfModifiedSprite::PosX
+        sta (SpritePtr), y
+        lda widget_left_pos_y_pixel, x
+        ldy #SelfModifiedSprite::PosY
+        sta (SpritePtr), y
+
+        ldy #STRING_ENTRY_RIGHT_OAM_INDEX
+        lda sprite_ptr_lut_low, y
+        sta SpritePtr+0
+        lda sprite_ptr_lut_high, y
+        sta SpritePtr+1
+
+        lda #SPRITE_TILE_MENU_CURSOR_SQUARE + 2
+        ldy #SelfModifiedSprite::TileId
+        sta (SpritePtr), y
+        lda #SPRITE_PAL_0
+        ldy #SelfModifiedSprite::Attributes
+        sta (SpritePtr), y
+        lda widget_right_pos_x_pixel, x
+        ldy #SelfModifiedSprite::PosX
+        sta (SpritePtr), y
+        lda widget_right_pos_y_pixel, x
+        ldy #SelfModifiedSprite::PosY
+        sta (SpritePtr), y
 
         rts
 .endproc

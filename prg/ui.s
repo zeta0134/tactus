@@ -21,6 +21,7 @@
         .include "saves.inc"
         .include "settings.inc"
         .include "sound.inc"
+        .include "slowam.inc"
         .include "sprites.inc"
         .include "text_util.inc"
         .include "ui.inc"
