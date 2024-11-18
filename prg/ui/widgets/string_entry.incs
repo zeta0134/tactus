@@ -1,10 +1,10 @@
 ; These are fixed on the screen, and I'm not going to waste effort
 ; trying to make them relocatable. Deal.
 .macro widget_string_entry page_table, destination_str
-    .addr widget_string_entry_init
-    .addr page_table
-    .addr destination_str
-    .byte 0, 0, 0, 0
+        .addr widget_string_entry_init
+        .addr page_table
+        .addr destination_str
+        .byte 0, 0, 0, 0
 .endmacro
 
 NAME_ENTRY_LEFT_TILE = 5
@@ -12,8 +12,8 @@ NAME_ENTRY_TOP_TILE  = 13
 
 BUTTONS_LEFT_TILE = 22
 PAGE_NAME_ROW = 13
-DEL_ROW       = 14
-CONFIRM_ROW   = 15
+DEL_ROW       = 15
+CONFIRM_ROW   = 17
 
 .proc draw_letter_grid
 PagePtr := R0
@@ -24,49 +24,43 @@ ColCounter := R7
 TOP_LEFT_NAMETABLE  = $5000 + (NAME_ENTRY_TOP_TILE * 32) + NAME_ENTRY_LEFT_TILE
 TOP_LEFT_ATTRIBUTE = TOP_LEFT_NAMETABLE + $800
 
-    st16 NametableAddr, TOP_LEFT_NAMETABLE
-    st16 AttributeAddr, TOP_LEFT_ATTRIBUTE
-    lda #0
-    sta RowCounter
+        st16 NametableAddr, TOP_LEFT_NAMETABLE
+        st16 AttributeAddr, TOP_LEFT_ATTRIBUTE
+        lda #0
+        sta RowCounter
 row_loop:
-    lda #0
-    sta ColCounter
+        lda #0
+        sta ColCounter
 col_loop:
-    ldy ColCounter
-    lda (PagePtr), y
-    pha
-    lda ColCounter
-    asl
-    tay
-    pla
-    sta (NametableAddr), y
-    lda #CHR_BANK_FONT_MARSHMALLOW
-    sta (AttributeAddr), y
-    inc ColCounter
-    lda ColCounter
-    cmp #8
-    bne col_loop
-    add16b NametableAddr, #64
-    add16b AttributeAddr, #64
-    add16b PagePtr, #8
-    inc RowCounter
-    lda RowCounter
-    cmp #6
-    bne row_loop
+        ldy ColCounter
+        lda (PagePtr), y
+        pha
+        lda ColCounter
+        asl
+        tay
+        pla
+        sta (NametableAddr), y
+        lda #CHR_BANK_FONT_MARSHMALLOW
+        sta (AttributeAddr), y
+        inc ColCounter
+        lda ColCounter
+        cmp #8
+        bne col_loop
+        add16b NametableAddr, #64
+        add16b AttributeAddr, #64
+        add16b PagePtr, #8
+        inc RowCounter
+        lda RowCounter
+        cmp #6
+        bne row_loop
 
-    rts
+        rts
 .endproc
 
 string_entry_del_str: .asciiz "Delete"
 string_entry_accept_str: .asciiz "Accept"
 
 .proc draw_controls
-    ; TODO: draw in this order:
-    ; current page name
-    ; DEL
-    ; CONFIRM
-    ; ... somewhere
-
 ; FIXED_draw_string
 NametableAddr := T0
 AttributeAddr := T2
@@ -78,64 +72,106 @@ PageTablePtr := R2
 
 CurrentWidgetIndex := R20
 
-    widget_page_table_low := widgets_data0
-    widget_page_table_high := widgets_data1
-    widget_target_string_low := widgets_data2
-    widget_target_string_high := widgets_data3
-    widget_current_page := widgets_data4
+widget_page_table_low := widgets_data0
+widget_page_table_high := widgets_data1
+widget_target_string_low := widgets_data2
+widget_target_string_high := widgets_data3
+widget_current_page := widgets_data4
 
-    ; Draw the current page
-    ldy CurrentWidgetIndex
-    lda widget_current_page, y
-    lda widget_page_table_low, y
-    sta PageTablePtr+0
-    lda widget_page_table_high, y
-    sta PageTablePtr+1
-    lda widget_current_page, y
-    asl ; each entry is two pointers == 4 bytes
-    asl
-    tay
-    lda (PageTablePtr), y
-    sta StringPtr+0
-    iny
-    lda (PageTablePtr), y
-    sta StringPtr+1
-    
-    st16 NametableAddr, ($5000 + (PAGE_NAME_ROW * 32) + BUTTONS_LEFT_TILE)
-    st16 AttributeAddr, ($5800 + (PAGE_NAME_ROW * 32) + BUTTONS_LEFT_TILE)
-    lda #CHR_BANK_FONT_MARSHMALLOW
-    sta TileBase
-    lda #0
-    sta PaletteIndex
-    jsr FIXED_draw_string
+        ; Common setup for all string drawing to follow
+        lda #CHR_BANK_FONT_MARSHMALLOW
+        sta TileBase
+        lda #0
+        sta PaletteIndex
 
-
-    rts
-
+        ; Draw the current page name
+        ldy CurrentWidgetIndex
+        lda widget_current_page, y
+        lda widget_page_table_low, y
+        sta PageTablePtr+0
+        lda widget_page_table_high, y
+        sta PageTablePtr+1
+        lda widget_current_page, y
+        asl ; each entry is two pointers == 4 bytes
+        asl
+        tay
+        lda (PageTablePtr), y
+        sta StringPtr+0
+        iny
+        lda (PageTablePtr), y
+        sta StringPtr+1
+        st16 NametableAddr, ($5000 + (PAGE_NAME_ROW * 32) + BUTTONS_LEFT_TILE)
+        st16 AttributeAddr, ($5800 + (PAGE_NAME_ROW * 32) + BUTTONS_LEFT_TILE)
+        jsr FIXED_draw_string
+        ; Draw the delete and cancel buttons, which are fixed strings
+        st16 StringPtr, string_entry_del_str
+        st16 NametableAddr, ($5000 + (DEL_ROW * 32) + BUTTONS_LEFT_TILE)
+        st16 AttributeAddr, ($5800 + (DEL_ROW * 32) + BUTTONS_LEFT_TILE)
+        jsr FIXED_draw_string
+        st16 StringPtr, string_entry_accept_str
+        st16 NametableAddr, ($5000 + (CONFIRM_ROW * 32) + BUTTONS_LEFT_TILE)
+        st16 AttributeAddr, ($5800 + (CONFIRM_ROW * 32) + BUTTONS_LEFT_TILE)
+        jsr FIXED_draw_string
+        rts
 .endproc
 
 .proc advance_page
-    ; Increment the page number
-    ; Read the new entry from the page table
-    ; If it is $0000, reset the page number to 0
-    ; draw the letter grid and refresh the controls
-    ; (hook this up to SELECT)
+PagePtr := R0
+PageTablePtr := R2
+
+CurrentWidgetIndex := R20
+
+widget_page_table_low := widgets_data0
+widget_page_table_high := widgets_data1
+widget_target_string_low := widgets_data2
+widget_target_string_high := widgets_data3
+widget_current_page := widgets_data4
+
+        ldy CurrentWidgetIndex
+        ; Increment the page number
+        lda widget_current_page, y
+        clc
+        adc #1
+        sta widget_current_page, y
+        ; Read the new entry from the page table
+        lda widget_page_table_low, y
+        sta PageTablePtr+0
+        lda widget_page_table_high, y
+        sta PageTablePtr+1
+        lda widget_current_page, y
+        asl ; each entry is two pointers == 4 bytes
+        asl
+        tay
+        ; If it is $0000, reset the page number to 0
+        lda (PageTablePtr), y
+        iny
+        ora (PageTablePtr), y
+        bne page_in_range
+        lda #0
+        ldy CurrentWidgetIndex
+        sta widget_current_page, y
+page_in_range:
+        ; draw the letter grid and refresh the controls
+        jsr draw_current_page
+        jsr draw_controls
+        ; (hook this up to SELECT)
+        rts
 .endproc
 
 .proc draw_current_string
-    ; do just that. we should have a fancy flashing cursor at the end? (yes!)
+        ; do just that. we should have a fancy flashing cursor at the end? (yes!)
 .endproc
 
 .proc add_to_string
-    ; First, check the string length. If it's already 15 or higher, buzz and fail.
-    ; Add this glyph to the end of the pointed-at string, followed by a $0 byte
-    ; draw the string again
+        ; First, check the string length. If it's already 15 or higher, buzz and fail.
+        ; Add this glyph to the end of the pointed-at string, followed by a $0 byte
+        ; draw the string again
 .endproc
 
 .proc delete_from_string
-    ; First, check the string length. If it is already 0, buzz and fail.
-    ; Remove the glyph at the end of the pointed-at string, replacing it with a $0 byte
-    ; draw the string again
+        ; First, check the string length. If it is already 0, buzz and fail.
+        ; Remove the glyph at the end of the pointed-at string, replacing it with a $0 byte
+        ; draw the string again
 .endproc
 
 .proc draw_current_page
@@ -144,29 +180,28 @@ PageTablePtr := R2
 
 CurrentWidgetIndex := R20
 
-    widget_page_table_low := widgets_data0
-    widget_page_table_high := widgets_data1
-    widget_current_page := widgets_data4
+widget_page_table_low := widgets_data0
+widget_page_table_high := widgets_data1
+widget_current_page := widgets_data4
 
-    ldy CurrentWidgetIndex
-    lda widget_current_page, y
-    lda widget_page_table_low, y
-    sta PageTablePtr+0
-    lda widget_page_table_high, y
-    sta PageTablePtr+1
-    lda widget_current_page, y
-    asl ; each entry is two pointers == 4 bytes
-    asl
-    clc
-    adc #2 ; grab the second pointer, to the actual letter grid
-    tay
-    lda (PageTablePtr), y
-    sta PagePtr+0
-    iny
-    lda (PageTablePtr), y
-    sta PagePtr+1
-    jsr draw_letter_grid
-    rts
+        ldy CurrentWidgetIndex
+        lda widget_page_table_low, y
+        sta PageTablePtr+0
+        lda widget_page_table_high, y
+        sta PageTablePtr+1
+        lda widget_current_page, y
+        asl ; each entry is two pointers == 4 bytes
+        asl
+        clc
+        adc #2 ; grab the second pointer, to the actual letter grid
+        tay
+        lda (PageTablePtr), y
+        sta PagePtr+0
+        iny
+        lda (PageTablePtr), y
+        sta PagePtr+1
+        jsr draw_letter_grid
+        rts
 .endproc
 
 .proc widget_string_entry_init
@@ -178,19 +213,23 @@ CurrentWidgetIndex := R20
 
 CurrentWidgetIndex := R20
 
-    ldy CurrentWidgetIndex
-    lda #1
-    sta widget_current_page, y
+        ldy CurrentWidgetIndex
+        lda #1
+        sta widget_current_page, y
 
-    jsr draw_current_page
-    jsr draw_controls
+        jsr draw_current_page
+        jsr draw_controls
 
-    ldy CurrentWidgetIndex
-    set_widget_state_y widget_string_entry_update
-    rts
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_string_entry_update
+        rts
 .endproc
 
 .proc widget_string_entry_update
-    ; TODO: all of this!
-    rts
+        lda #(KEY_SELECT)
+        bit ButtonsDown
+        beq done
+        jsr advance_page
+done:
+        rts
 .endproc
