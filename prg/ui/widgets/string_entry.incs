@@ -413,7 +413,8 @@ widget_grid_pos_y   := widgets_data6
         sta (StringPtr), y
         ; finally, draw the string again
         jsr draw_target_string
-        ; TODO: successful character boop?
+        st16 R0, sfx_select_cursor
+        jsr play_sfx_pulse1
         rts
 fail_to_add:
         ; TODO: error buzz?
@@ -445,7 +446,8 @@ widget_target_string_high := widgets_data3
         sta (StringPtr), y
         ; finally, draw the string again
         jsr draw_target_string
-        ; TODO: successful character boop?
+        st16 R0, sfx_select_cursor
+        jsr play_sfx_pulse1
         rts
 fail_to_add:
         ; TODO: error buzz?
@@ -477,6 +479,8 @@ widget_grid_pos_y   := widgets_data6
 position_is_fine:
         jsr draw_current_page
         jsr draw_controls
+        st16 R0, sfx_move_cursor
+        jsr play_sfx_pulse2
 cancel_move:
         rts
 .endproc
@@ -495,6 +499,8 @@ widget_grid_pos_y   := widgets_data6
         sta widget_grid_pos_x, y
         jsr draw_current_page
         jsr draw_controls
+        st16 R0, sfx_move_cursor
+        jsr play_sfx_pulse2
 cancel_move:
         rts
 .endproc
@@ -513,6 +519,8 @@ widget_grid_pos_y   := widgets_data6
         sta widget_grid_pos_y, y
         jsr draw_current_page
         jsr draw_controls
+        st16 R0, sfx_move_cursor
+        jsr play_sfx_pulse2
 cancel_move:
         rts
 .endproc
@@ -543,6 +551,8 @@ allow_move:
         sta widget_grid_pos_y, y
         jsr draw_current_page
         jsr draw_controls
+        st16 R0, sfx_move_cursor
+        jsr play_sfx_pulse2
 cancel_move:
         rts
 .endproc
