@@ -45,6 +45,7 @@
 .global sfx_dialog_text_variant_3
 .global sfx_dialog_advance
 .global sfx_dialog_close
+.global sfx_cursor_fail
 
 .macro play_dpcm sample_addr, length
 .scope

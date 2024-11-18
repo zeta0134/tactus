@@ -230,7 +230,8 @@ page_in_range:
         ; draw the letter grid and refresh the controls
         jsr draw_current_page
         jsr draw_controls
-        ; (hook this up to SELECT)
+        st16 R0, sfx_dialog_advance
+        jsr play_sfx_pulse2
         rts
 .endproc
 
@@ -417,7 +418,8 @@ widget_grid_pos_y   := widgets_data6
         jsr play_sfx_pulse1
         rts
 fail_to_add:
-        ; TODO: error buzz?
+        st16 R0, sfx_cursor_fail
+        jsr play_sfx_pulse1
         rts
 .endproc
 
@@ -450,7 +452,8 @@ widget_target_string_high := widgets_data3
         jsr play_sfx_pulse1
         rts
 fail_to_add:
-        ; TODO: error buzz?
+        st16 R0, sfx_cursor_fail
+        jsr play_sfx_pulse1
         rts
 .endproc
 
