@@ -24,6 +24,13 @@ ColCounter := R7
 TOP_LEFT_NAMETABLE  = $5000 + (NAME_ENTRY_TOP_TILE * 32) + NAME_ENTRY_LEFT_TILE
 TOP_LEFT_ATTRIBUTE = TOP_LEFT_NAMETABLE + $800
 
+CurrentWidgetIndex := R20
+
+widget_grid_pos_x   := widgets_data5
+widget_grid_pos_y   := widgets_data6
+
+        ldx CurrentWidgetIndex
+
         st16 NametableAddr, TOP_LEFT_NAMETABLE
         st16 AttributeAddr, TOP_LEFT_ATTRIBUTE
         lda #0
@@ -40,7 +47,18 @@ col_loop:
         tay
         pla
         sta (NametableAddr), y
-        lda #CHR_BANK_FONT_MARSHMALLOW
+        lda ColCounter
+        cmp widget_grid_pos_x, x
+        bne no_highlight
+        lda RowCounter
+        cmp widget_grid_pos_y, x
+        bne no_highlight
+highlight:
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+        jmp highlight_converge
+no_highlight:
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+highlight_converge:
         sta (AttributeAddr), y
         inc ColCounter
         lda ColCounter
@@ -77,14 +95,31 @@ widget_page_table_high := widgets_data1
 widget_target_string_low := widgets_data2
 widget_target_string_high := widgets_data3
 widget_current_page := widgets_data4
+widget_grid_pos_x   := widgets_data5
+widget_grid_pos_y   := widgets_data6
 
         ; Common setup for all string drawing to follow
         lda #CHR_BANK_FONT_MARSHMALLOW
         sta TileBase
-        lda #0
-        sta PaletteIndex
 
         ; Draw the current page name
+
+        ; If we are at the cursor position, then highlight this string
+        ldy CurrentWidgetIndex
+        lda widget_grid_pos_x, y
+        cmp #8
+        bne no_highlight_page_name
+        lda widget_grid_pos_y, y
+        cmp #0
+        bne no_highlight_page_name
+highlight_page_name:
+        lda #UI_PAL_BG1
+        jmp page_name_highlight_converge
+no_highlight_page_name:
+        lda #UI_PAL_BG0
+page_name_highlight_converge:
+        sta PaletteIndex
+
         ldy CurrentWidgetIndex
         lda widget_current_page, y
         lda widget_page_table_low, y
@@ -103,11 +138,45 @@ widget_current_page := widgets_data4
         st16 NametableAddr, ($5000 + (PAGE_NAME_ROW * 32) + BUTTONS_LEFT_TILE)
         st16 AttributeAddr, ($5800 + (PAGE_NAME_ROW * 32) + BUTTONS_LEFT_TILE)
         jsr FIXED_draw_string
-        ; Draw the delete and cancel buttons, which are fixed strings
+        ; Draw the delete string
+
+        ; If we are at the cursor position, then highlight this string
+        ldy CurrentWidgetIndex
+        lda widget_grid_pos_x, y
+        cmp #8
+        bne no_highlight_delete
+        lda widget_grid_pos_y, y
+        cmp #1
+        bne no_highlight_delete
+highlight_delete:
+        lda #UI_PAL_BG1
+        jmp delete_highlight_converge
+no_highlight_delete:
+        lda #UI_PAL_BG0
+delete_highlight_converge:
+        sta PaletteIndex
+
         st16 StringPtr, string_entry_del_str
         st16 NametableAddr, ($5000 + (DEL_ROW * 32) + BUTTONS_LEFT_TILE)
         st16 AttributeAddr, ($5800 + (DEL_ROW * 32) + BUTTONS_LEFT_TILE)
         jsr FIXED_draw_string
+
+        ; If we are at the cursor position, then highlight this string
+        ldy CurrentWidgetIndex
+        lda widget_grid_pos_x, y
+        cmp #8
+        bne no_highlight_accept
+        lda widget_grid_pos_y, y
+        cmp #2
+        bne no_highlight_accept
+highlight_accept:
+        lda #UI_PAL_BG1
+        jmp accept_highlight_converge
+no_highlight_accept:
+        lda #UI_PAL_BG0
+accept_highlight_converge:
+        sta PaletteIndex
+
         st16 StringPtr, string_entry_accept_str
         st16 NametableAddr, ($5000 + (CONFIRM_ROW * 32) + BUTTONS_LEFT_TILE)
         st16 AttributeAddr, ($5800 + (CONFIRM_ROW * 32) + BUTTONS_LEFT_TILE)
@@ -204,18 +273,119 @@ widget_current_page := widgets_data4
         rts
 .endproc
 
-.proc widget_string_entry_init
-    widget_page_table_low := widgets_data0
-    widget_page_table_high := widgets_data1
-    widget_target_string_low := widgets_data2
-    widget_target_string_high := widgets_data3
-    widget_current_page := widgets_data4
-
+.proc move_cursor_right
 CurrentWidgetIndex := R20
+
+widget_grid_pos_x   := widgets_data5
+widget_grid_pos_y   := widgets_data6        
+
+        ldy CurrentWidgetIndex
+        lda widget_grid_pos_x, y
+        cmp #8
+        beq cancel_move
+        clc
+        adc #1
+        sta widget_grid_pos_x, y
+        cmp #8
+        bne position_is_fine
+        ; if we are further down than the "accept" button,
+        ; move up to that spot
+        lda widget_grid_pos_y, y
+        cmp #2
+        bcc position_is_fine
+        lda #2
+        sta widget_grid_pos_y, y
+position_is_fine:
+        jsr draw_current_page
+        jsr draw_controls
+cancel_move:
+        rts
+.endproc
+
+.proc move_cursor_left
+CurrentWidgetIndex := R20
+
+widget_grid_pos_x   := widgets_data5
+widget_grid_pos_y   := widgets_data6        
+
+        ldy CurrentWidgetIndex
+        lda widget_grid_pos_x, y
+        beq cancel_move
+        sec
+        sbc #1
+        sta widget_grid_pos_x, y
+        jsr draw_current_page
+        jsr draw_controls
+cancel_move:
+        rts
+.endproc
+
+.proc move_cursor_up
+CurrentWidgetIndex := R20
+
+widget_grid_pos_x   := widgets_data5
+widget_grid_pos_y   := widgets_data6        
+
+        ldy CurrentWidgetIndex
+        lda widget_grid_pos_y, y
+        beq cancel_move
+        sec
+        sbc #1
+        sta widget_grid_pos_y, y
+        jsr draw_current_page
+        jsr draw_controls
+cancel_move:
+        rts
+.endproc
+
+.proc move_cursor_down
+CurrentWidgetIndex := R20
+
+widget_grid_pos_x   := widgets_data5
+widget_grid_pos_y   := widgets_data6        
+
+        ldy CurrentWidgetIndex
+        ; always cancel if we are on the bottom row
+        lda widget_grid_pos_y, y
+        cmp #5
+        beq cancel_move
+        ; if we are on the rightmost column...
+        lda widget_grid_pos_x, y
+        cmp #8
+        bne allow_move
+        ; then only allow up to the lowest button...
+        lda widget_grid_pos_y, y
+        cmp #2
+        beq cancel_move
+allow_move:
+        lda widget_grid_pos_y, y
+        clc
+        adc #1
+        sta widget_grid_pos_y, y
+        jsr draw_current_page
+        jsr draw_controls
+cancel_move:
+        rts
+.endproc
+
+.proc widget_string_entry_init
+CurrentWidgetIndex := R20
+
+widget_page_table_low := widgets_data0
+widget_page_table_high := widgets_data1
+widget_target_string_low := widgets_data2
+widget_target_string_high := widgets_data3
+widget_current_page := widgets_data4
+widget_grid_pos_x   := widgets_data5
+widget_grid_pos_y   := widgets_data6
+
 
         ldy CurrentWidgetIndex
         lda #1
         sta widget_current_page, y
+        lda #0
+        sta widget_grid_pos_x, y
+        sta widget_grid_pos_y, y
 
         jsr draw_current_page
         jsr draw_controls
@@ -226,10 +396,40 @@ CurrentWidgetIndex := R20
 .endproc
 
 .proc widget_string_entry_update
+
+check_left:
+        lda #(KEY_LEFT)
+        bit ButtonsDown
+        beq left_not_pressed
+        jsr move_cursor_left
+left_not_pressed:
+
+check_right:
+        lda #(KEY_RIGHT)
+        bit ButtonsDown
+        beq right_not_pressed
+        jsr move_cursor_right
+right_not_pressed:
+
+check_up:
+        lda #(KEY_UP)
+        bit ButtonsDown
+        beq up_not_pressed
+        jsr move_cursor_up
+up_not_pressed:
+
+check_down:
+        lda #(KEY_DOWN)
+        bit ButtonsDown
+        beq down_not_pressed
+        jsr move_cursor_down
+down_not_pressed:
+
+check_select:
         lda #(KEY_SELECT)
         bit ButtonsDown
-        beq done
+        beq select_not_pressed
         jsr advance_page
-done:
+select_not_pressed:
         rts
 .endproc
