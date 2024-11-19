@@ -32,11 +32,17 @@ persisted_block_5: .res .sizeof(SaveBlock)
     .segment "CODE_1"
 
 .define SavePersistencePtrs persisted_block_0, persisted_block_1, persisted_block_2, persisted_block_3, persisted_block_4, persisted_block_5
+PERSISTENCE_TABLE_LENGTH = 6
 
 persistence_table_low: .lobytes SavePersistencePtrs
 persistence_table_high: .hibytes SavePersistencePtrs
-persistence_table_banks: .bankbytes SavePersistencePtrs
-PERSISTENCE_TABLE_LENGTH = 6
+persistence_table_banks: ; .bankbytes SavePersistencePtrs well no, we can't do this actually
+    .byte <.bank(persisted_block_0)
+    .byte <.bank(persisted_block_1)
+    .byte <.bank(persisted_block_2)
+    .byte <.bank(persisted_block_3)
+    .byte <.bank(persisted_block_4)
+    .byte <.bank(persisted_block_5)
 
 ; An extremely simple checksum: just sum all of the
 ; bytes in this memory area and return the 16bit result.
@@ -138,6 +144,7 @@ ComputedNonce := R4
     rts
 .endproc
 
+; Note: Clobbers BlockPtr! (!)
 .proc is_valid_block
 BlockPtr := R0
 FilePtr := R0
@@ -203,28 +210,25 @@ TempPtr := R10
     ; File and Block ptrs both use R0, so fix that up
     mov16 TempPtr, BlockPtr
     mov16 FilePtr, TempPtr
-    add16w TempPtr, #SaveBlock::SaveSlot1
+    add16w FilePtr, #SaveBlock::SaveSlot1
     jsr is_valid_file
     cmp #FILE_INVALID
     beq block_invalid
     mov16 FilePtr, TempPtr
-    add16w TempPtr, #SaveBlock::SaveSlot2
+    add16w FilePtr, #SaveBlock::SaveSlot2
     jsr is_valid_file
     cmp #FILE_INVALID
     beq block_invalid
     mov16 FilePtr, TempPtr
-    add16w TempPtr, #SaveBlock::SaveSlot3
+    add16w FilePtr, #SaveBlock::SaveSlot3
     jsr is_valid_file
     cmp #FILE_INVALID
     beq block_invalid
     ; restore the block ptr to be nice to the caller
     mov16 BlockPtr, TempPtr
-    
-
     ; If we get here, this is a valid block. Yay!
     lda #BLOCK_VALID
     rts
-
 block_invalid:
     lda #BLOCK_INVALID
     rts
