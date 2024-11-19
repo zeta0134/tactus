@@ -1,8 +1,8 @@
 .macro widget_file_select_box file_index, tile_x, tile_y
-    .addr widget_file_select_box_init
-    .byte tile_x, tile_y
-    .addr file_index
-    .byte 0, 0, 0, 0
+        .addr widget_file_select_box_init
+        .byte tile_x, tile_y
+        .addr file_index
+        .byte 0, 0, 0, 0
 .endmacro
 
 CORNER_TL_LIGHT   = $0E
@@ -43,49 +43,49 @@ Width := R2
 Height := R3
 NametableAddr := R4
 AttributeAddr := R6
-    ; compute starting address for the top-left corner
-    lda Top
-    sta NametableAddr+0
-    lda #0
-    sta NametableAddr+1
-    .repeat 5
-    asl NametableAddr+0
-    rol NametableAddr+1
-    .endrepeat
-    lda Left
-    clc
-    adc NametableAddr+0
-    sta NametableAddr+0
-    lda #$50
-    adc NametableAddr+1
-    sta NametableAddr+1
-    lda NametableAddr+0
-    sta AttributeAddr+0
-    lda NametableAddr+1
-    clc
-    adc #$08
-    sta AttributeAddr+1
-    rts
+        ; compute starting address for the top-left corner
+        lda Top
+        sta NametableAddr+0
+        lda #0
+        sta NametableAddr+1
+        .repeat 5
+        asl NametableAddr+0
+        rol NametableAddr+1
+        .endrepeat
+        lda Left
+        clc
+        adc NametableAddr+0
+        sta NametableAddr+0
+        lda #$50
+        adc NametableAddr+1
+        sta NametableAddr+1
+        lda NametableAddr+0
+        sta AttributeAddr+0
+        lda NametableAddr+1
+        clc
+        adc #$08
+        sta AttributeAddr+1
+        rts
 .endproc
 
 .proc draw_box_outline_light
 ShadowAttr := R9
 BoxOutlineAttr := R10
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
-    sta ShadowAttr
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
-    sta BoxOutlineAttr
-    jmp _draw_box_outline_common
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+        sta ShadowAttr
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+        sta BoxOutlineAttr
+        jmp _draw_box_outline_common
 .endproc
 
 .proc draw_box_outline_dark
 ShadowAttr := R9
 BoxOutlineAttr := R10
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
-    sta ShadowAttr
-    lda #(CHR_BANK_FONT_MARSHMALLOW_DARK | UI_PAL_BG1)
-    sta BoxOutlineAttr
-    jmp _draw_box_outline_common
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+        sta ShadowAttr
+        lda #(CHR_BANK_FONT_MARSHMALLOW_DARK | UI_PAL_BG1)
+        sta BoxOutlineAttr
+        jmp _draw_box_outline_common
 .endproc
 
 .proc _draw_box_outline_common
@@ -98,73 +98,73 @@ AttributeAddr := R6
 RowCounter := R8
 ShadowAttr := R9
 BoxOutlineAttr := R10
-    jsr compute_top_left_corner_addr
+        jsr compute_top_left_corner_addr
 
-    ; top row
-    ldy #0
-    lda #CORNER_TL_LIGHT
-    sta (NametableAddr), y
-    lda BoxOutlineAttr
-    sta (AttributeAddr), y
-    iny
+        ; top row
+        ldy #0
+        lda #CORNER_TL_LIGHT
+        sta (NametableAddr), y
+        lda BoxOutlineAttr
+        sta (AttributeAddr), y
+        iny
 top_col_loop:
-    lda #EDGE_TOP_LIGHT
-    sta (NametableAddr), y
-    lda BoxOutlineAttr
-    sta (AttributeAddr), y
-    iny
-    cpy Width
-    bne top_col_loop
-    lda #CORNER_TR_LIGHT
-    sta (NametableAddr), y
-    lda BoxOutlineAttr
-    sta (AttributeAddr), y
+        lda #EDGE_TOP_LIGHT
+        sta (NametableAddr), y
+        lda BoxOutlineAttr
+        sta (AttributeAddr), y
+        iny
+        cpy Width
+        bne top_col_loop
+        lda #CORNER_TR_LIGHT
+        sta (NametableAddr), y
+        lda BoxOutlineAttr
+        sta (AttributeAddr), y
 
-    ; middle rows
-    lda Height
-    sec
-    sbc #2
-    sta RowCounter
+        ; middle rows
+        lda Height
+        sec
+        sbc #2
+        sta RowCounter
 middle_row_loop:
-    add16b NametableAddr, #32
-    add16b AttributeAddr, #32
-    ldy #0
-    lda #EDGE_LEFT_LIGHT
-    sta (NametableAddr), y
-    lda BoxOutlineAttr
-    sta (AttributeAddr), y
-    ldy Width
-    lda #EDGE_RIGHT_LIGHT
-    sta (NametableAddr), y
-    lda BoxOutlineAttr
-    sta (AttributeAddr), y
-    dec RowCounter
-    bne middle_row_loop
+        add16b NametableAddr, #32
+        add16b AttributeAddr, #32
+        ldy #0
+        lda #EDGE_LEFT_LIGHT
+        sta (NametableAddr), y
+        lda BoxOutlineAttr
+        sta (AttributeAddr), y
+        ldy Width
+        lda #EDGE_RIGHT_LIGHT
+        sta (NametableAddr), y
+        lda BoxOutlineAttr
+        sta (AttributeAddr), y
+        dec RowCounter
+        bne middle_row_loop
 
-    add16b NametableAddr, #32
-    add16b AttributeAddr, #32
+        add16b NametableAddr, #32
+        add16b AttributeAddr, #32
 
-    ; bottom row
-    ldy #0
-    lda #CORNER_BL_LIGHT
-    sta (NametableAddr), y
-    lda BoxOutlineAttr
-    sta (AttributeAddr), y
-    iny
+        ; bottom row
+        ldy #0
+        lda #CORNER_BL_LIGHT
+        sta (NametableAddr), y
+        lda BoxOutlineAttr
+        sta (AttributeAddr), y
+        iny
 bottom_col_loop:
-    lda #EDGE_BOTTOM_LIGHT
-    sta (NametableAddr), y
-    lda BoxOutlineAttr
-    sta (AttributeAddr), y
-    iny
-    cpy Width
-    bne bottom_col_loop
-    lda #CORNER_BR_LIGHT
-    sta (NametableAddr), y
-    lda BoxOutlineAttr
-    sta (AttributeAddr), y
+        lda #EDGE_BOTTOM_LIGHT
+        sta (NametableAddr), y
+        lda BoxOutlineAttr
+        sta (AttributeAddr), y
+        iny
+        cpy Width
+        bne bottom_col_loop
+        lda #CORNER_BR_LIGHT
+        sta (NametableAddr), y
+        lda BoxOutlineAttr
+        sta (AttributeAddr), y
 
-    rts
+        rts
 .endproc
 
 .proc draw_box_shadow
@@ -177,98 +177,98 @@ AttributeAddr := R6
 RowCounter := R8
 ShadowAttr := R9
 BoxOutlineAttr := R10
-    jsr compute_top_left_corner_addr   
-    ; top row
-    ldy Width
-    iny
-    ; for the shadow we need to know what's underneath us
-    lda (NametableAddr), y
-    cmp #DARK_SQUARE_TILE
-    beq dark_top_shadow
+        jsr compute_top_left_corner_addr   
+        ; top row
+        ldy Width
+        iny
+        ; for the shadow we need to know what's underneath us
+        lda (NametableAddr), y
+        cmp #DARK_SQUARE_TILE
+        beq dark_top_shadow
 light_top_shadow:
-    lda #TOP_SHADOW_LIGHT
-    jmp done_picking_top_shadow
+        lda #TOP_SHADOW_LIGHT
+        jmp done_picking_top_shadow
 dark_top_shadow:
-    lda #TOP_SHADOW_DARK
+        lda #TOP_SHADOW_DARK
 done_picking_top_shadow:
-    sta (NametableAddr), y
-    lda ShadowAttr
-    sta (AttributeAddr), y
+        sta (NametableAddr), y
+        lda ShadowAttr
+        sta (AttributeAddr), y
 
-    ; middle (and bottom) rows
-    lda Height
-    sec
-    sbc #1
-    sta RowCounter
+        ; middle (and bottom) rows
+        lda Height
+        sec
+        sbc #1
+        sta RowCounter
 middle_row_loop:
-    add16b NametableAddr, #32
-    add16b AttributeAddr, #32
-    ldy Width
-    iny
-    lda (NametableAddr), y
-    cmp #DARK_SQUARE_TILE
-    beq dark_side_shadow
+        add16b NametableAddr, #32
+        add16b AttributeAddr, #32
+        ldy Width
+        iny
+        lda (NametableAddr), y
+        cmp #DARK_SQUARE_TILE
+        beq dark_side_shadow
 light_side_shadow:
-    lda #RIGHT_EDGE_SHADOW_LIGHT
-    jmp done_picking_side_shadow
+        lda #RIGHT_EDGE_SHADOW_LIGHT
+        jmp done_picking_side_shadow
 dark_side_shadow:
-    lda #RIGHT_EDGE_SHADOW_DARK
+        lda #RIGHT_EDGE_SHADOW_DARK
 done_picking_side_shadow:
-    sta (NametableAddr), y
-    lda ShadowAttr
-    sta (AttributeAddr), y
-    dec RowCounter
-    bne middle_row_loop
+        sta (NametableAddr), y
+        lda ShadowAttr
+        sta (AttributeAddr), y
+        dec RowCounter
+        bne middle_row_loop
 
-    add16b NametableAddr, #32
-    add16b AttributeAddr, #32
+        add16b NametableAddr, #32
+        add16b AttributeAddr, #32
 
-    ; bottom shadow, which is significantly more involved T_T
-    ldy #0
-    lda (NametableAddr), y
-    cmp #DARK_SQUARE_TILE
-    beq bottom_dark_shadow
+        ; bottom shadow, which is significantly more involved T_T
+        ldy #0
+        lda (NametableAddr), y
+        cmp #DARK_SQUARE_TILE
+        beq bottom_dark_shadow
 bottom_light_shadow:
-    lda #BOTTOM_SHADOW_LIGHT
-    jmp done_picking_bottom_shadow
+        lda #BOTTOM_SHADOW_LIGHT
+        jmp done_picking_bottom_shadow
 bottom_dark_shadow:
-    lda #BOTTOM_SHADOW_DARK
+        lda #BOTTOM_SHADOW_DARK
 done_picking_bottom_shadow:
-    sta (NametableAddr), y
-    lda ShadowAttr
-    sta (AttributeAddr), y
+        sta (NametableAddr), y
+        lda ShadowAttr
+        sta (AttributeAddr), y
 shadow_loop:
-    iny ; increment at the _top_ of the loop, since we want to extend 1 past the edge this time
-    lda (NametableAddr), y
-    cmp #DARK_SQUARE_TILE
-    beq bottom_edge_dark_shadow
+        iny ; increment at the _top_ of the loop, since we want to extend 1 past the edge this time
+        lda (NametableAddr), y
+        cmp #DARK_SQUARE_TILE
+        beq bottom_edge_dark_shadow
 bottom_edge_light_shadow:
-    lda #BOTTOM_EDGE_SHADOW_LIGHT
-    jmp done_picking_bottom_edge_shadow
+        lda #BOTTOM_EDGE_SHADOW_LIGHT
+        jmp done_picking_bottom_edge_shadow
 bottom_edge_dark_shadow:
-    lda #BOTTOM_EDGE_SHADOW_DARK
+        lda #BOTTOM_EDGE_SHADOW_DARK
 done_picking_bottom_edge_shadow:
-    sta (NametableAddr), y
-    lda ShadowAttr
-    sta (AttributeAddr), y
-    cpy Width
-    bne shadow_loop
-    ; finally, the bottom-right corner
-    iny
-    lda (NametableAddr), y
-    cmp #DARK_SQUARE_TILE
-    beq bottom_corner_dark_shadow
+        sta (NametableAddr), y
+        lda ShadowAttr
+        sta (AttributeAddr), y
+        cpy Width
+        bne shadow_loop
+        ; finally, the bottom-right corner
+        iny
+        lda (NametableAddr), y
+        cmp #DARK_SQUARE_TILE
+        beq bottom_corner_dark_shadow
 bottom_corner_light_shadow:
-    lda #SHADOW_CORNER_LIGHT
-    jmp done_picking_bottom_corner_shadow
+        lda #SHADOW_CORNER_LIGHT
+        jmp done_picking_bottom_corner_shadow
 bottom_corner_dark_shadow:
-    lda #SHADOW_CORNER_DARK
+        lda #SHADOW_CORNER_DARK
 done_picking_bottom_corner_shadow:
-    sta (NametableAddr), y
-    lda ShadowAttr
-    sta (AttributeAddr), y
+        sta (NametableAddr), y
+        lda ShadowAttr
+        sta (AttributeAddr), y
 
-    rts
+        rts
 .endproc
 
 .proc draw_box_fill
@@ -279,33 +279,116 @@ Height := R3
 NametableAddr := R4
 AttributeAddr := R6
 RowCounter := R8
-    jsr compute_top_left_corner_addr
-    add16b NametableAddr, #32
-    add16b AttributeAddr, #32
+        jsr compute_top_left_corner_addr
+        add16b NametableAddr, #32
+        add16b AttributeAddr, #32
 
-    ; loop over every middle row
-    lda Height
-    sec
-    sbc #2
-    sta RowCounter
+        ; loop over every middle row
+        lda Height
+        sec
+        sbc #2
+        sta RowCounter
 row_loop:
-    ; loop over every column in the middle row
-    ldy #1
+        ; loop over every column in the middle row
+        ldy #1
 col_loop:
-    ; set that tile to blank
-    lda #0
-    sta (NametableAddr), y
-    lda #CHR_BANK_FONT_MARSHMALLOW ; palette doesn't matter here
-    sta (AttributeAddr), y
-    iny
-    cpy Width
-    bne col_loop
-    ; move to the next row and repeat
-    add16b NametableAddr, #32
-    add16b AttributeAddr, #32
-    dec RowCounter
-    bne row_loop
-    rts
+        ; set that tile to blank
+        lda #0
+        sta (NametableAddr), y
+        lda #CHR_BANK_FONT_MARSHMALLOW ; palette doesn't matter here
+        sta (AttributeAddr), y
+        iny
+        cpy Width
+        bne col_loop
+        ; move to the next row and repeat
+        add16b NametableAddr, #32
+        add16b AttributeAddr, #32
+        dec RowCounter
+        bne row_loop
+        rts
+.endproc
+
+; file index in A
+.proc prepare_file_pointer
+FilePtr := R0
+        cmp #0
+        beq file_0
+        cmp #1
+        beq file_1
+        cmp #2    
+        beq file_2
+        ; PANIC! (we should crash)
+        ; instead, fall through to file 0
+file_0:
+        st16 FilePtr, (current_block + SaveBlock::SaveSlot1)
+        rts
+file_1:
+        st16 FilePtr, (current_block + SaveBlock::SaveSlot2)
+        rts
+file_2:
+        st16 FilePtr, (current_block + SaveBlock::SaveSlot3)
+        rts
+.endproc
+
+new_file_str: .asciiz "NEW FILE"
+
+.proc draw_file_contents
+; FIXED_draw_string
+NametableAddr := T0
+AttributeAddr := T2
+TileX := T4
+TileY := T5
+StringPtr := T4
+TileBase := T6
+PaletteIndex := T7
+
+FilePtr := R0
+CurrentWidgetIndex := R20
+    
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_file_index := widgets_data2
+
+        st16 NametableAddr, $5000
+        st16 AttributeAddr, $5800
+
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        clc
+        adc #4
+        sta TileX
+        lda widget_tile_y, y
+        clc
+        adc #1
+        sta TileY
+        far_call FAR_nametable_from_coordinates
+
+        ldy CurrentWidgetIndex
+        lda widget_file_index, y
+        jsr prepare_file_pointer
+        far_call FAR_is_new_file
+        cmp #FILE_NEW
+        beq draw_new_file
+
+draw_existing_file:
+        mov16 StringPtr, FilePtr
+        add16w StringPtr, #SaveFile::PlayerName
+        lda #CHR_BANK_FONT_MARSHMALLOW
+        sta TileBase
+        lda #UI_PAL_BG1
+        sta PaletteIndex
+        jsr FIXED_draw_string
+        ; TODO: any other fun status things we want to show in the second row
+        rts
+
+draw_new_file:
+        st16 StringPtr, new_file_str
+        lda #CHR_BANK_FONT_MARSHMALLOW
+        sta TileBase
+        lda #UI_PAL_BG1
+        sta PaletteIndex
+        jsr FIXED_draw_string
+        rts
 .endproc
 
 .proc widget_file_select_box_init
@@ -362,6 +445,9 @@ widget_current_hover_state := widgets_data3
         lda #0
         sta widget_current_hover_state, y
 
+        ; populate this box's contents
+        jsr draw_file_contents
+
         ldy CurrentWidgetIndex
         set_widget_state_y widget_file_select_box_update
         rts
@@ -380,63 +466,63 @@ widget_tile_y := widgets_data1
 widget_file_index := widgets_data2
 widget_current_hover_state := widgets_data3
     
-    ; are we currently hovered?
-    ldy CurrentWidgetIndex
-    lda widgets_state_flags, y
-    and #WIDGET_STATE_HOVER
-    bne we_are_hovered
+        ; are we currently hovered?
+        ldy CurrentWidgetIndex
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_HOVER
+        bne we_are_hovered
 we_are_not_hovered:
-    ; are we currently drawn as hovered?
-    lda widget_current_hover_state, y
-    beq nothing_to_do
-    ; draw ourselves unhovered!
-    ldy CurrentWidgetIndex
-    lda widget_tile_x, y
-    sta Left
-    lda widget_tile_y, y
-    sta Top
-    lda #23
-    sta Width
-    lda #4
-    sta Height
-    jsr draw_box_outline_dark
-    jsr draw_box_fill
-    ; and set accordingly
-    ldy CurrentWidgetIndex
-    lda #0
-    sta widget_current_hover_state, y
-    rts
+        ; are we currently drawn as hovered?
+        lda widget_current_hover_state, y
+        beq nothing_to_do
+        ; draw ourselves unhovered!
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        sta Left
+        lda widget_tile_y, y
+        sta Top
+        lda #23
+        sta Width
+        lda #4
+        sta Height
+        jsr draw_box_outline_dark
+        ; and set accordingly
+        ldy CurrentWidgetIndex
+        lda #0
+        sta widget_current_hover_state, y
+        rts
 we_are_hovered:
-    ; same deal but the other way around
-    lda widget_current_hover_state, y
-    bne nothing_to_do
-    ; draw ourselves hovered!
-    ldy CurrentWidgetIndex
-    lda widget_tile_x, y
-    sta Left
-    lda widget_tile_y, y
-    sta Top
-    lda #23
-    sta Width
-    lda #4
-    sta Height
-    jsr draw_box_outline_light
-    jsr draw_box_fill
-    ; and set accordingly
-    ldy CurrentWidgetIndex
-    lda #1
-    sta widget_current_hover_state, y
-    rts
+        ; same deal but the other way around
+        lda widget_current_hover_state, y
+        bne nothing_to_do
+        ; draw ourselves hovered!
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        sta Left
+        lda widget_tile_y, y
+        sta Top
+        lda #23
+        sta Width
+        lda #4
+        sta Height
+        jsr draw_box_outline_light
+        ; and set accordingly
+        ldy CurrentWidgetIndex
+        lda #1
+        sta widget_current_hover_state, y
+        rts
 nothing_to_do:
-    rts
+        rts
 .endproc
 
 .proc widget_file_select_box_update
 CurrentWidgetIndex := R20
 
 ; rename the data labels to something more readable
+widget_file_index := widgets_data2
 widget_action_func_low := widgets_data4
 widget_action_func_high := widgets_data5
+
         jsr redraw_border_if_needed
 
         ; if we aren't even hovered, do nothing
@@ -450,11 +536,28 @@ check_for_action_input:
         and ButtonsDown
         beq do_nothing
 
-        ; FOR NOW, simply switch to the name entry screen
-        ; Later, we'll need this logic:
-        ; If this is a NEW file, initialize it and switch to the name entry screen
-        ; If this is an existing file, switch instead to the File Details screen
+        ldy CurrentWidgetIndex
+        lda widget_file_index, y
+        jsr prepare_file_pointer
+        far_call FAR_is_new_file
+        cmp #FILE_NEW
+        beq open_new_file
+open_existing_file:
+        ; FOR NOW, go to name entry anyway.
+        ; Later, this should skip name entry and
+        ; instead land on the "file details" screen
+        ldy CurrentWidgetIndex
+        lda widget_file_index, y
+        far_call FAR_load_file
         jsr go_to_name_entry
+        rts
+
+open_new_file:
+        ldy CurrentWidgetIndex
+        lda widget_file_index, y
+        far_call FAR_load_file
+        jsr go_to_name_entry
+        rts
 
 do_nothing:
         rts

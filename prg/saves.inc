@@ -90,7 +90,7 @@ BLOCK_INVALID = 1
 
 .global FAR_load_file   ; from index in A, sets current_save_slot
 .global FAR_save_file   ; to index in A, sets current_save_slot
-.global FAR_is_new_file ; index in A
+.global FAR_is_new_file ; FilePtr in R0
 .global FAR_save_current_file ; index in current_save_slot
 .global FAR_update_last_accessed_file ; persists current_save_slot to active block (written on next save)
 .global FAR_init_save_subsystem  ; call once during engine init. (call again to fully reload, this will overwrite any unsaved data!)

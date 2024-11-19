@@ -601,7 +601,34 @@ perform_deletion:
 .endproc
 
 .proc accept_string
-        ; TODO!!
+StringPtr := T0
+Length := T2
+
+CurrentWidgetIndex := R20
+
+widget_target_string_low := widgets_data2
+widget_target_string_high := widgets_data3
+        ; Sanity check: is this string nonempty?
+        ; If so, buzz and fail!
+        ldy CurrentWidgetIndex
+        lda widget_target_string_low, y
+        sta StringPtr+0
+        lda widget_target_string_high, y
+        sta StringPtr+1
+        jsr FIXED_strlen
+        lda Length
+        beq buzz_and_fail
+        ; Otherwise, go ahead and save this file, then
+        ; return (for now!) to the File Select screen
+        far_call FAR_save_current_file
+        jsr go_to_file_select
+        rts
+
+buzz_and_fail:
+        st16 R0, sfx_too_poor_pulse1
+        jsr play_sfx_pulse1
+        st16 R0, sfx_too_poor_pulse2
+        jsr play_sfx_pulse2
         rts
 .endproc
 
