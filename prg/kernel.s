@@ -28,6 +28,7 @@
         .include "ppu.inc"
         .include "rainbow.inc"
         .include "raster_table.inc"
+        .include "saves.inc"
         .include "settings.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -126,6 +127,8 @@ continue_waiting:
 
         far_call FAR_disable_all_oam_entries_playfield
         far_call FAR_disable_all_oam_entries_hud
+
+        near_call FAR_init_save_subsystem
 
         ; NORMAL: start on the title screen
         ; TODO: add the boxgirl productions logo, and any other "first run" screens here

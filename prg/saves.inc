@@ -80,3 +80,9 @@ BLOCK_INVALID = 1
 ; to an empty block if no valid block is found.
 .global current_block
 
+.global FAR_load_file
+.global FAR_save_file
+.global FAR_save_current_file
+.global FAR_update_last_accessed_file
+.global FAR_init_save_subsystem
+

@@ -598,5 +598,116 @@ generate_fresh_block:
     rts
 .endproc
 
+; file index in A
+.proc FAR_load_file
+DestFile := R0
+SourceFile := R2
+    cmp #0
+    beq load_file_0
+    cmp #1
+    beq load_file_1
+    cmp #2
+    beq load_file_2
+    ; PANIC! WHAT DO!?!? Erm... we should crash on purpose, but let's fall through
+    ; to loading file 0 as a default. that's less incorrect, I guess?
+load_file_0:
+    sta current_save_slot
+    st16 SourceFile, (current_block + SaveBlock::SaveSlot1)
+    jmp file_load_converge
+load_file_1:
+    sta current_save_slot
+    st16 SourceFile, (current_block + SaveBlock::SaveSlot2)
+    jmp file_load_converge
+load_file_2:
+    sta current_save_slot
+    st16 SourceFile, (current_block + SaveBlock::SaveSlot3)
+file_load_converge:
+    st16 DestFile, current_save
 
+    ; individual files are smaller than 256 bytes, so we can use
+    ; a simple loop here to load the contents
+    ldy #0
+file_load_loop:
+    lda (SourceFile), y
+    sta (DestFile), y
+    iny
+    cpy #.sizeof(SaveFile)
+    bne file_load_loop
 
+    rts
+.endproc
+
+; file index in A
+.proc FAR_save_file
+DestFile := R0
+SourceFile := R2
+    ; it's the same thing but in the other direction now
+    cmp #0
+    beq save_file_0
+    cmp #1
+    beq save_file_1
+    cmp #2
+    beq save_file_2
+    ; PANIC! WHAT DO!?!? Erm... ... in this case, NOTHING.
+    ; (Please do not save over existing files when a glitch
+    ; breaks the destination. For heck's sake.)
+    rts
+save_file_0:
+    sta current_save_slot
+    st16 DestFile, (current_block + SaveBlock::SaveSlot1)
+    jmp file_save_converge
+save_file_1:
+    sta current_save_slot
+    st16 DestFile, (current_block + SaveBlock::SaveSlot2)
+    jmp file_save_converge
+save_file_2:
+    sta current_save_slot
+    st16 DestFile, (current_block + SaveBlock::SaveSlot3)
+file_save_converge:
+    st16 SourceFile, current_save
+
+    ; individual files are smaller than 256 bytes, so we can use
+    ; a simple loop here to write the contents
+    ldy #0
+file_save_loop:
+    lda (SourceFile), y
+    sta (DestFile), y
+    iny
+    cpy #.sizeof(SaveFile)
+    bne file_save_loop
+
+    ; Having just saved the file, now persist the block
+    jsr persist_block_to_storage
+
+    rts
+.endproc
+
+; convenience helper, which we'll call any time main gameplay
+; needs to persist something to the player's save file. this is
+; the usual pattern for file saving, the other functions are mainly
+; used during init and during file manipulation operations on the
+; main menu.
+.proc FAR_save_current_file
+    lda current_save_slot
+    near_call FAR_update_last_accessed_file
+    lda current_save_slot
+    near_call FAR_save_file
+    rts
+.endproc
+
+; file index in A
+.proc FAR_update_last_accessed_file
+    sta current_block + SaveBlock::LastUsedSlot
+    rts
+.endproc
+
+; loads the last saved block, if present, and the
+; last accessed file from that block. call this before
+; rendering anything that depends on the save file being
+; valid; this includes the title screen and logo sequence!
+.proc FAR_init_save_subsystem
+    jsr retrieve_block_from_storage
+    lda current_block + SaveBlock::LastUsedSlot
+    near_call FAR_load_file
+    rts
+.endproc

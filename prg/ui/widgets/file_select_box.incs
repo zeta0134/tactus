@@ -349,7 +349,7 @@ widget_current_hover_state := widgets_data3
         asl ; x4
         asl ; x8
         clc
-        adc #4
+        adc #8
         sta widgets_cursor_pos_y, y
 
         ; flag this widget as active for cursor navigation purposes
