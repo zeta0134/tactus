@@ -97,7 +97,7 @@ player_name_is_safe:
     rts
 .endproc
 
-.proc is_new_file
+.proc FAR_is_new_file
 SaveFilePtr := R0
     ; very trivial: is the player name an empty string? that is, does it contain
     ; all zeroes? if so, this is a new file!

@@ -8,22 +8,30 @@ TACTUS_SAVE_VERSION_NUMBER = 1
 ; bears weight in a typical save file.
 ; Options, events, progress, if the save file
 ; select screen affects it at all, it goes here.
+
+; Note on padding: try to use Reserved space before
+; changing the size of this struct. Every size change
+; requires us to bump the save file version, which
+; makes old testers lose their save files.
 .struct SaveFile
     ; PLAYER PERSONALIZATION PRIMITIVES
     PlayerName .byte 16      ; this might be too long in practice? depends on where we use it I guess.
+    ; GAME STATE
+    EnemiesEncounteredFlags .byte 32
+    ItemsDiscoveredFlags .byte 32
+    ; PLAYER PERSONALIZATION PREFERENCES
     PlayerPalettePreset .byte
     PlayerPalettePhones .byte
     PlayerPalettePajamas .byte
     PlayerPalettePigment .byte
-
+    PlayerReserved .byte 4 ; pad out to 8 bytes total
     ; OPTIONS
     OptionDiscoFloor .byte
     OptionRhythmMode .byte
-
-    ; GAME STATE
-    EnemiesEncounteredFlags .byte 32
-    ItemsDiscoveredFlags .byte 32
-.endstruct
+    OptionsReserved .byte 14 ; pad out to 16 bytes total
+    ; FUTURE
+    GeneralReserved .byte 24
+.endstruct ; total size should be 128 bytes
 
 PLAYER_NAME_FIELD_LENGTH = 16
 PLAYER_NAME_MAX_LENGTH = 15
@@ -80,9 +88,9 @@ BLOCK_INVALID = 1
 ; to an empty block if no valid block is found.
 .global current_block
 
-.global FAR_load_file
-.global FAR_save_file
-.global FAR_save_current_file
-.global FAR_update_last_accessed_file
-.global FAR_init_save_subsystem
-
+.global FAR_load_file   ; from index in A, sets current_save_slot
+.global FAR_save_file   ; to index in A, sets current_save_slot
+.global FAR_is_new_file ; index in A
+.global FAR_save_current_file ; index in current_save_slot
+.global FAR_update_last_accessed_file ; persists current_save_slot to active block (written on next save)
+.global FAR_init_save_subsystem  ; call once during engine init. (call again to fully reload, this will overwrite any unsaved data!)
