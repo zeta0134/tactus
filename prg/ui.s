@@ -259,6 +259,15 @@ done:
         rts
 .endproc
 
+.proc return_to_title
+        st16 R0, sfx_teleport
+        jsr play_sfx_pulse1
+
+        st16 FadeToGameMode, title_prep
+        st16 GameMode, fade_to_game_mode
+        rts
+.endproc
+
 .proc widget_no_behavior
         ; exactly that. used by all static elements that are done with initial setup
         ; (we don't clean these up because we might need other widgets to manipulate

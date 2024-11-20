@@ -549,7 +549,7 @@ open_existing_file:
         ldy CurrentWidgetIndex
         lda widget_file_index, y
         far_call FAR_load_file
-        jsr go_to_name_entry
+        jsr go_to_file_details
         rts
 
 open_new_file:

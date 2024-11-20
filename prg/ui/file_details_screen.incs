@@ -5,19 +5,190 @@
 file_details_ui_layout:
         widget_controller file_details_controller_init
         widget_cursor
-        widget_text_button empty_string, file_details_str, 12, 10        
+        widget_text_label file_details_str, 5, 3
+        widget_text_label {current_save + SaveFile::PlayerName}, 13, 3
+        widget_text_button start_game_str, go_to_gameplay, 7, 7
+        widget_text_button options_str, go_to_options, 7, 11
         .addr $0000 ; end of list
 
-file_details_str:   .asciiz "FILE DETAILS SCREEN (WIP)"
+FILE_DETAILS_CURSOR_INDEX = 1
+FILE_DETAILS_START_INDEX = 4
+FILE_DETAILS_OPTIONS_INDEX = 5
+
+file_details_str:   .asciiz "Welcome " ; shouldn't this be the player name?
+start_game_str: .asciiz " GET GROOVIN'"
+options_str: .asciiz " OPTIONS"
 
 .proc file_details_controller_init
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+
 CurrentWidgetIndex := R20
 
+widget_last_cursor_pos := widgets_data0
+
+        ; Play the ... I dunno, the OPTIONS track on the name entry screen, for now.
+        ; TODO: a file select theme? or we just use options for this whole set
+        lda #TRACK_OPTIONS
+        ldy #TRACK_VARIANT_NORMAL
+        jsr play_track
+
+        ; this screen DOES use extended attributes, so set that up
+        lda #0
+        sta LeftNametableBank
+        sta RightNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta LeftNametableAttr
+        sta RightNametableAttr
+
+        ; draw an initial checkerboard background (no nametable for now)
+        jsr draw_checkerboard_base
+
+        jsr file_details_draw_buttons
+
+        ; Draw a small box up top for the title / player name
+        lda #3
+        sta Left
+        lda #2
+        sta Top
+        lda #25
+        sta Width
+        lda #3
+        sta Height
+        jsr draw_box_outline_light
+        jsr draw_box_fill
+        jsr draw_box_shadow
+
+        ; Get the file select palettes loaded in
+        ldy #0
+bg_loop:
+        perform_zpcm_inc
+        ; TODO: use file select palette here!
+        lda options_battlefield_bg_palette, y
+        sta BgPaletteBuffer, y
+        lda options_obj_palette, y
+        sta ObjPaletteBuffer, y
+        iny
+        cpy #16
+        bne bg_loop
+
         ldy CurrentWidgetIndex
+        lda #$FF
+        sta widget_last_cursor_pos, y
+
         set_widget_state_y file_details_controller_update
         rts
 .endproc
 
+.proc file_details_draw_buttons
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+        ; Draw Nice, Big Buttons for the various things the player can do on this screen
+        lda #5
+        sta Left
+        lda #6
+        sta Top
+        lda #18
+        sta Width
+        lda #3
+        sta Height
+        jsr draw_box_outline_dark
+        jsr draw_box_fill
+        jsr draw_box_shadow
+
+        lda #10
+        sta Top
+        jsr draw_box_outline_dark
+        jsr draw_box_fill
+        jsr draw_box_shadow
+        rts  
+.endproc
+
+.proc file_details_draw_dark_outlines
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+        ; Draw Nice, Big Buttons for the various things the player can do on this screen
+        lda #5
+        sta Left
+        lda #6
+        sta Top
+        lda #18
+        sta Width
+        lda #3
+        sta Height
+        jsr draw_box_outline_dark
+
+        lda #10
+        sta Top
+        jsr draw_box_outline_dark
+        rts
+.endproc
+
+.proc file_details_draw_selected_outline
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+
+CursorCurrentHighlight := R12
+
+        lda #5
+        sta Left
+        lda #18
+        sta Width
+        lda #3
+        sta Height
+
+        ; here we diverge based on which button the cursor is
+        ; currently highlighting
+
+        lda CursorCurrentHighlight
+        cmp #FILE_DETAILS_START_INDEX
+        beq start_index
+        cmp #FILE_DETAILS_OPTIONS_INDEX
+        beq options_index
+        ; weird?
+        rts
+
+start_index:
+        lda #6
+        sta Top
+        jmp perform_draw
+options_index:
+        lda #10
+        sta Top
+        jmp perform_draw
+        
+perform_draw:
+        jsr draw_box_outline_light
+        rts
+.endproc
+
 .proc file_details_controller_update
+CursorCurrentHighlight := R12
+CurrentWidgetIndex := R20
+
+widget_last_cursor_pos := widgets_data0
+
+widget_cursor_nav_index := widgets_data1
+
+
+        ldy #FILE_DETAILS_CURSOR_INDEX ; cursor index for this screen
+        lda widget_cursor_nav_index, y
+        sta CursorCurrentHighlight
+        ldy CurrentWidgetIndex
+        cmp widget_last_cursor_pos, y
+        beq done
+        sta widget_last_cursor_pos, y
+
+        jsr file_details_draw_dark_outlines
+        jsr file_details_draw_selected_outline
+done:
         rts
 .endproc
