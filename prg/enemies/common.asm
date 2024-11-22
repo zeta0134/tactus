@@ -210,6 +210,8 @@ sprite_failed:
 .endproc
 
         .segment "ENEMY_COLLIDE"
+; TODO: make this pick one of 8 directions based on relative tile position to the player,
+; then pick/flip/rotate the sprite accordingly
 .proc ENEMY_COLLIDE_spawn_damage_sprite_here
 MetaSpriteIndex := R0
 PuffSquare := R12
@@ -299,7 +301,118 @@ TargetSquare := R13
 sprite_failed:
         rts
 .endproc
-        .segment "ENEMY_COLLIDE"
+
+.proc ENEMY_COLLIDE_set_damage_direction_from_puff_tile
+MetaSpriteIndex := R0
+PuffSquare := R12
+TargetSquare := R13
+
+DIRECTION_NORTH = 1
+DIRECTION_EAST  = 2
+DIRECTION_SOUTH = 3
+DIRECTION_WEST  = 4
+DIRECTION_NORTHEAST = 5
+DIRECTION_SOUTHEAST = 6
+DIRECTION_NORTHWEST = 7
+DIRECTION_SOUTHWEST = 8
+
+check_ns:
+        lda PlayerRow
+        ldx PuffSquare
+        sec
+        sbc tile_index_to_row_lut, x
+        beq check_ew
+        bcs handle_north
+        bcc handle_south
+
+check_ew:
+        lda PlayerCol
+        ldx PuffSquare
+        sec
+        sbc tile_index_to_col_lut, x
+        beq handle_default
+        bcs handle_west
+        bcc handle_east
+
+handle_default:
+        ; somehow we are on top of the player's position. maybe we are
+        ; a hazard? use "south" as a reasonable default here, it'll bounce
+        ; kinda "up" suggesting a floor hit.
+        lda #DIRECTION_SOUTH
+        sta PlayerIncomingDamageDirection
+        rts
+
+handle_north:
+        ; check for diagonals here
+        lda PlayerCol
+        ldx PuffSquare
+        sec
+        sbc tile_index_to_col_lut, x
+        beq plain_north
+        bcs handle_northwest
+        bcc handle_northeast
+
+handle_south:
+        ; check for diagonals here
+        lda PlayerCol
+        ldx PuffSquare
+        sec
+        sbc tile_index_to_col_lut, x
+        beq plain_south
+        bcs handle_southwest
+        bcc handle_southeast
+
+handle_east:
+        lda PlayerRow
+        ldx PuffSquare
+        sec
+        sbc tile_index_to_row_lut, x
+        beq plain_east
+        bcs handle_northeast
+        bcc handle_southeast
+
+handle_west:
+        lda PlayerRow
+        ldx PuffSquare
+        sec
+        sbc tile_index_to_row_lut, x
+        beq plain_west
+        bcs handle_northwest
+        bcc handle_southwest
+
+plain_north:
+        lda #DIRECTION_NORTH
+        sta PlayerIncomingDamageDirection
+        rts
+plain_south:
+        lda #DIRECTION_SOUTH
+        sta PlayerIncomingDamageDirection
+        rts
+plain_east:
+        lda #DIRECTION_EAST
+        sta PlayerIncomingDamageDirection
+        rts
+plain_west:
+        lda #DIRECTION_WEST
+        sta PlayerIncomingDamageDirection
+        rts
+handle_northeast:
+        lda #DIRECTION_NORTHEAST
+        sta PlayerIncomingDamageDirection
+        rts
+handle_northwest:
+        lda #DIRECTION_NORTHWEST
+        sta PlayerIncomingDamageDirection
+        rts
+handle_southeast:
+        lda #DIRECTION_SOUTHEAST
+        sta PlayerIncomingDamageDirection
+        rts
+handle_southwest:
+        lda #DIRECTION_SOUTHWEST
+        sta PlayerIncomingDamageDirection
+        rts
+.endproc
 
 .proc ENEMY_COLLIDE_find_puff_tile
 PuffSquare := R12
@@ -562,6 +675,9 @@ TargetSquare := R13
         
         ; Since we just damaged the player, spawn a hit sprite
         near_call ENEMY_COLLIDE_spawn_damage_sprite_here
+        ; Also, set the player's incoming damage direction, which is based
+        ; on the puff tile we just returned to
+        near_call ENEMY_COLLIDE_set_damage_direction_from_puff_tile
 
         rts
 no_puff_found:
@@ -570,6 +686,11 @@ no_puff_found:
         ; we should try to at least separate it from the player. (If this also fails the
         ; player will soft lock and die very quickly.)
         near_call ENEMY_COLLIDE_forbid_player_movement
+        ; We're not real sure what to do about the player's damage direction, so default
+        ; it to "SOUTH" here, arbitrarily. This will bounce them "up", sortof.
+        lda #3
+        sta PlayerIncomingDamageDirection
+
         rts
 .endproc
 

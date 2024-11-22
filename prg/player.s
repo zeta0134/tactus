@@ -103,11 +103,17 @@ PlayerPassiveDialogSquare: .res 1
 
 PlayerTookDamageThisBeat: .res 1
 PlayerDamageAnimCounter: .res 1
+PlayerIncomingDamageDirection: .res 1
 
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
 DIRECTION_SOUTH = 3
 DIRECTION_WEST  = 4
+
+DIRECTION_NORTHEAST = 5
+DIRECTION_SOUTHEAST = 6
+DIRECTION_NORTHWEST = 7
+DIRECTION_SOUTHWEST = 8
 
 .segment "PRGFIXED_E000"
 
@@ -120,13 +126,50 @@ player_tile_index_table:
 
 .segment "CODE_4"
 
-; 4 bytes each, mostly so we can use NEXXT to design the things
-player_palettes:
-        .incbin "art/player_palettes_1.pal"
-
 JUMP_HEIGHT_END = 5
 jump_height_table:
         .byte 10, 14, 11, 7, 2, 0
+
+damage_table_north_x:
+damage_table_south_x:
+damage_table_east_y:
+damage_table_west_y:
+        .repeat 32
+        .byte 0
+        .endrepeat
+damage_table_west_x:
+damage_table_northwest_x:
+damage_table_southwest_x:
+damage_table_north_y:
+damage_table_northeast_y:
+damage_table_northwest_y:
+        .byte 4, 3, <-4, <-3, 3, 2, <-3, <-2
+        .byte 2, 1, <-2, <-1, 1, 1, <-1, <-1
+        .repeat 16
+        .byte 0
+        .endrepeat
+damage_table_east_x:
+damage_table_northeast_x:
+damage_table_southeast_x:
+damage_table_south_y:
+damage_table_southeast_y:
+damage_table_southwest_y:
+        .byte <-4, <-3, 4, 3, <-3, <-2, 3, 2
+        .byte <-2, <-1, 2, 1, <-1, <-1, 1, 1
+        .repeat 16
+        .byte 0
+        .endrepeat
+
+damage_offsets_by_direction_lut:
+        .addr damage_table_south_x, damage_table_south_y ; position 0 is unused, default to "south" if we get here
+        .addr damage_table_north_x, damage_table_north_y
+        .addr damage_table_east_x, damage_table_east_y
+        .addr damage_table_south_x, damage_table_south_y
+        .addr damage_table_west_x, damage_table_west_y
+        .addr damage_table_northeast_x, damage_table_northeast_y
+        .addr damage_table_southeast_x, damage_table_southeast_y
+        .addr damage_table_northwest_x, damage_table_northwest_y
+        .addr damage_table_southwest_x, damage_table_southwest_y
 
 .proc FAR_init_player
 NewHeartType := R0
@@ -271,7 +314,7 @@ sprite_failed:
         rts
 .endproc
 
-DAMAGE_ANIM_MAX = 64
+DAMAGE_ANIM_MAX = 32
 
 NORMAL_PAL    = 0
 DMG_LIGHT_PAL = 1
@@ -285,7 +328,7 @@ damage_flash_lut:
         .endrepeat
         ; now flash the player's normal palette with their dark palette
         ; for the remainder of this beat
-        .repeat 32-3
+        .repeat 16-3
         .byte NORMAL_PAL
         .byte DMG_DARK_PAL
         .endrepeat
@@ -333,6 +376,9 @@ light_palette:
 
 ; Called once every frame
 .proc FAR_draw_player
+DamageOffsetPtrX := R0
+DamageOffsetPtrY := R2
+
         ; Based on the player's chosen sprite index, update their base sprite colors
         near_call FAR_apply_player_palette
 
@@ -355,6 +401,32 @@ light_palette:
         beq done_with_height
         inc PlayerJumpHeightPos
 done_with_height:
+        ; If we took damage this beat, apply that offset here
+        lda PlayerTookDamageThisBeat
+        beq done_with_damage_offset
+        lda PlayerIncomingDamageDirection
+        asl
+        asl ; x4
+        tay
+        lda damage_offsets_by_direction_lut+0, y
+        sta DamageOffsetPtrX+0
+        lda damage_offsets_by_direction_lut+1, y
+        sta DamageOffsetPtrX+1
+        lda damage_offsets_by_direction_lut+2, y
+        sta DamageOffsetPtrY+0
+        lda damage_offsets_by_direction_lut+3, y
+        sta DamageOffsetPtrY+1
+        ldy PlayerDamageAnimCounter
+        lda sprite_table + MetaSpriteState::PositionX, x
+        clc
+        adc (DamageOffsetPtrX), y
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda sprite_table + MetaSpriteState::PositionY, x
+        clc
+        adc (DamageOffsetPtrY), y
+        sta sprite_table + MetaSpriteState::PositionY, x
+done_with_damage_offset:
+
         ; Update the damage status every frame
         lda PlayerTookDamageThisBeat
         beq done_with_damage
