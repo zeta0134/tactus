@@ -1,4 +1,3 @@
-        .setcpu "6502"
 
         .include "../build/tile_defs.inc"
 
@@ -21,6 +20,7 @@
         .include "procgen.inc"
         .include "rainbow.inc"
         .include "raster_table.inc"
+        .include "saves.inc"
         .include "settings.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -267,11 +267,11 @@ sprite_failed:
 ; So things other than main gameplay can do this, mostly for
 ; the title screen and eventual save screen, etc etc
 .proc FAR_apply_player_palette
-        lda setting_personal_color_phones
+        lda player_ingame_palette_phones
         sta ObjPaletteBuffer+1
-        lda setting_personal_color_pajamas
+        lda player_ingame_palette_pajamas
         sta ObjPaletteBuffer+2
-        lda setting_personal_color_pigment
+        lda player_ingame_palette_pigment
         sta ObjPaletteBuffer+3
         rts
 .endproc
@@ -279,12 +279,7 @@ sprite_failed:
 ; Called once every frame
 .proc FAR_draw_player
         ; Based on the player's chosen sprite index, update their base sprite colors
-        lda setting_personal_color_phones
-        sta ObjPaletteBuffer+1
-        lda setting_personal_color_pajamas
-        sta ObjPaletteBuffer+2
-        lda setting_personal_color_pigment
-        sta ObjPaletteBuffer+3
+        near_call FAR_apply_player_palette
 
         ; For now, always lerp the player's current position to their target position
         jsr lerp_player_to_target_coordinates

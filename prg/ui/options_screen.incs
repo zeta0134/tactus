@@ -11,16 +11,16 @@ options_ui_layout:
         widget_controller options_controller_init
         widget_cursor
         widget_text_label game_options_str, 2, 13
-        widget_text_options game_mode_str,      game_mode_types,      setting_game_mode,      4, 15
-        widget_text_options disco_floor_str,    disco_types,          setting_disco_floor,    4, 16
+        widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode},      4, 15
+        widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor},    4, 16
         widget_text_label player_options_str, 2, 18
-        widget_text_options player_palette_preset_str, player_palette_preset_types, setting_player_palette_preset, 4, 20
-        widget_numeric_slider player_palette_outfit_str, 15, 39, setting_personal_color_index_pajamas, 4, 22
-        widget_numeric_viewer setting_personal_color_index_pajamas, 11, 22
-        widget_numeric_slider player_palette_shoes_str,  15, 52, setting_personal_color_index_phones,  4, 23
-        widget_numeric_viewer setting_personal_color_index_phones,  11, 23
-        widget_numeric_slider player_palette_face_str,   15, 39, setting_personal_color_index_pigment, 4, 24
-        widget_numeric_viewer setting_personal_color_index_pigment, 11, 24
+        widget_text_options player_palette_preset_str, player_palette_preset_types, {current_save + SaveFile::PlayerPalettePreset}, 4, 20
+        widget_numeric_slider player_palette_outfit_str, 15, 39, {current_save + SaveFile::PlayerPalettePajamasIndex}, 4, 22
+        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePajamasIndex}, 11, 22
+        widget_numeric_slider player_palette_shoes_str,  15, 52, {current_save + SaveFile::PlayerPalettePhonesIndex},  4, 23
+        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePhonesIndex},  11, 23
+        widget_numeric_slider player_palette_face_str,   15, 39, {current_save + SaveFile::PlayerPalettePigmentIndex}, 4, 24
+        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePigmentIndex}, 11, 24
         widget_text_button save_options_str, save_and_return_to_file_details, 9, 26
         widget_options_battlefield
         widget_controller apply_fancy_color_shenanigans
@@ -28,7 +28,7 @@ options_ui_layout:
 
 ; Used for manual tweaking of the values
 PRESET_FIELD_INDEX = 6
-PRESET_PERSONALIZED_VALUE = 5
+PRESET_PERSONALIZED_VALUE = 0
 
 game_options_str:   .asciiz "GAMEPLAY OPTIONS"
 game_mode_str:      .asciiz "Rhythm "
@@ -58,19 +58,19 @@ disco_option_5_str: .asciiz "NO MOTION"
 
 player_palette_preset_types:
         .byte 6 ; selectable length of option set
-        .addr player_palette_preset_option_0_str
+        .addr player_palette_preset_option_custom_str
         .addr player_palette_preset_option_1_str
         .addr player_palette_preset_option_2_str
         .addr player_palette_preset_option_3_str
         .addr player_palette_preset_option_4_str
-        .addr player_palette_preset_option_custom_str
+        .addr player_palette_preset_option_5_str
 
-player_palette_preset_option_0_str:      .asciiz "PEONY"
-player_palette_preset_option_1_str:      .asciiz "PERIWINKLE"
-player_palette_preset_option_2_str:      .asciiz "PETUNIA"
-player_palette_preset_option_3_str:      .asciiz "PROTEA"
-player_palette_preset_option_4_str:      .asciiz "PASSION"
 player_palette_preset_option_custom_str: .asciiz "PERSONALIZED"
+player_palette_preset_option_1_str:      .asciiz "PEONY"
+player_palette_preset_option_2_str:      .asciiz "PERIWINKLE"
+player_palette_preset_option_3_str:      .asciiz "PETUNIA"
+player_palette_preset_option_4_str:      .asciiz "PROTEA"
+player_palette_preset_option_5_str:      .asciiz "PASSION"
 
 game_mode_types:
         .byte 3 ; length of option set
@@ -179,7 +179,7 @@ stay_here:
         jsr play_sfx_pulse1
 
         far_call FAR_save_current_file
-        jsr go_to_file_select
+        jsr go_to_file_details
         rts
 .endproc
 
@@ -205,7 +205,7 @@ widget_disco_active_setting := widgets_data3
         ldx CurrentWidgetIndex
         lda #OPTIONS_DISCO_STATE_APPEARING
         sta widget_disco_state, x
-        lda setting_disco_floor
+        lda current_save + SaveFile::OptionDiscoFloor
         sta widget_disco_active_setting, x
 
         far_call FAR_find_unused_sprite
@@ -412,7 +412,7 @@ widget_disco_active_setting := widgets_data3
 
         ; check to see if we need to switch sub-states due to a setting change
         ldx CurrentWidgetIndex
-        lda setting_disco_floor
+        lda current_save + SaveFile::OptionDiscoFloor
         cmp widget_disco_active_setting, x
         beq no_change_needed
         ; if we are currently appearing, we are fine to proceed (this will update the setting)
@@ -432,7 +432,7 @@ no_change_needed:
         cmp #OPTIONS_DISCO_STATE_DISAPPEARING
         beq disco_tiles_disappearing_state
 disco_tiles_appearing_state:
-        lda setting_disco_floor
+        lda current_save + SaveFile::OptionDiscoFloor
         sta widget_disco_active_setting, x
         lda #0
         sta current_clear_status
@@ -457,11 +457,11 @@ disco_tiles_disappearing_state:
 converge:
         
         ; now, preserve the real setting and temporarily load the state-specific one
-        lda setting_disco_floor
+        lda current_save + SaveFile::OptionDiscoFloor
         pha
         ldx CurrentWidgetIndex
         lda widget_disco_active_setting, x
-        sta setting_disco_floor
+        sta current_save + SaveFile::OptionDiscoFloor
 
         lda CurrentBeat
         sta CurrentBeatCounter
@@ -492,7 +492,7 @@ converge:
 
         ; un-clobber the disco setting that we preserved
         pla
-        sta setting_disco_floor
+        sta current_save + SaveFile::OptionDiscoFloor
 
         ; and we... should be set?
 
@@ -553,16 +553,16 @@ preset_is_hovered:
 .proc sync_preset_to_sliders
         ; If the preset value is anything other than "Personalized", then
         ; read the preset and apply the colors to the sliders
-        ldx setting_player_palette_preset
+        ldx current_save + SaveFile::PlayerPalettePreset
         cpx #PRESET_PERSONALIZED_VALUE
         beq change_nothing
 
         ldy palette_preset_lut_phones, x
-        sty setting_personal_color_index_phones
+        sty current_save + SaveFile::PlayerPalettePhonesIndex
         ldy palette_preset_lut_pajamas, x
-        sty setting_personal_color_index_pajamas
+        sty current_save + SaveFile::PlayerPalettePajamasIndex
         ldy palette_preset_lut_pigment, x
-        sty setting_personal_color_index_pigment
+        sty current_save + SaveFile::PlayerPalettePigmentIndex
 
 change_nothing:
         rts
@@ -571,41 +571,31 @@ change_nothing:
 .proc sync_sliders_to_preset
         ; If the sliders don't currently equal the preset value, switch
         ; the preset value to "Personalized"
-        ldx setting_player_palette_preset
+        ldx current_save + SaveFile::PlayerPalettePreset
         cpx #PRESET_PERSONALIZED_VALUE ; if it's already there, then there's nothing to do
         beq change_nothing
 
         lda palette_preset_lut_phones, x
-        cmp setting_personal_color_index_phones
+        cmp current_save + SaveFile::PlayerPalettePhonesIndex
         bne perform_sync
         lda palette_preset_lut_pajamas, x
-        cmp setting_personal_color_index_pajamas
+        cmp current_save + SaveFile::PlayerPalettePajamasIndex
         bne perform_sync
         lda palette_preset_lut_pigment, x
-        cmp setting_personal_color_index_pigment
+        cmp current_save + SaveFile::PlayerPalettePigmentIndex
         bne perform_sync
 change_nothing:
         rts
 perform_sync:
         lda #PRESET_PERSONALIZED_VALUE
-        sta setting_player_palette_preset
+        sta current_save + SaveFile::PlayerPalettePreset
         rts
 .endproc
 
 .proc update_player_color_values
         ; Read the color index values, work out the PPU values from the global LUT,
         ; and load those colors into the player sprite for preview
-        ldy setting_personal_color_index_phones
-        lda player_colors_shoes_accessories_lut, y
-        sta setting_personal_color_phones
-
-        ldy setting_personal_color_index_pajamas
-        lda player_colors_face_clothing_lut, y
-        sta setting_personal_color_pajamas
-
-        ldy setting_personal_color_index_pigment
-        lda player_colors_face_clothing_lut, y
-        sta setting_personal_color_pigment
+        far_call FAR_compute_player_colors
 
         rts
 .endproc

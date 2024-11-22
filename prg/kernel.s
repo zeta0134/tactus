@@ -123,12 +123,11 @@ continue_waiting:
 ; === Game Mode Functions Follow ===
 
 .proc init_engine
-        near_call FAR_init_settings
-
         far_call FAR_disable_all_oam_entries_playfield
         far_call FAR_disable_all_oam_entries_hud
 
         near_call FAR_init_save_subsystem
+        near_call FAR_compute_player_colors
 
         ; NORMAL: start on the title screen
         ; TODO: add the boxgirl productions logo, and any other "first run" screens here
@@ -1033,7 +1032,7 @@ room_cleared:
         st16 GameMode, wait_for_the_next_cleared_room_beat
         rts
 room_not_cleared:
-        lda setting_game_mode
+        lda current_save + SaveFile::OptionRhythmMode
         cmp #GAME_MODE_PATIENT
         beq patient_mode
 standard_mode:

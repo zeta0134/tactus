@@ -240,7 +240,7 @@ TileAttrHigh := R17
         sta TileIdLow
 
         ; run the selection logic based on the player's preference
-        ldx setting_disco_floor
+        ldx current_save + SaveFile::OptionDiscoFloor
         lda disco_behavior_lut_low, x
         sta TargetFuncPtr+0
         lda disco_behavior_lut_high, x
@@ -281,7 +281,7 @@ TileAttrHigh := R17
         sta TileIdLow
 
         ; run the selection logic based on the player's preference
-        ldx setting_disco_floor
+        ldx current_save + SaveFile::OptionDiscoFloor
         lda disco_behavior_lut_low, x
         sta TargetFuncPtr+0
         lda disco_behavior_lut_high, x

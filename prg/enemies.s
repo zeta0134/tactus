@@ -23,6 +23,7 @@
         .include "prng.inc"
         .include "procgen.inc"
         .include "rainbow.inc"
+        .include "saves.inc"
         .include "settings.inc"
         .include "signs.inc"
         .include "sound.inc"

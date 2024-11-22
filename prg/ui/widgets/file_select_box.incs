@@ -556,6 +556,7 @@ open_new_file:
         ldy CurrentWidgetIndex
         lda widget_file_index, y
         far_call FAR_load_file
+        far_call FAR_init_file_options
         jsr go_to_name_entry
         rts
 

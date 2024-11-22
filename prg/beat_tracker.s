@@ -1,5 +1,6 @@
     .include "bhop/bhop.inc"
     .include "beat_tracker.inc"
+    .include "saves.inc"
     .include "settings.inc"
     .include "zeropage.inc"
     .include "zpcm.inc"
@@ -55,7 +56,7 @@ beat_frame_pacing:
 ; the longest by far
 
 .proc update_beat_tracker
-    lda setting_game_mode
+    lda current_save + SaveFile::OptionRhythmMode
     cmp #GAME_MODE_DOUBLETIME
     beq doubletime_mode
 standard_mode:

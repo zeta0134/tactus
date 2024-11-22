@@ -1,5 +1,9 @@
     .macpack longbranch
 
+    .include "../build/tile_defs.inc"
+
+    .include "_globals.inc"
+
     .include "saves.inc"
 
     .include "far_call.inc"
@@ -236,7 +240,7 @@ block_invalid:
 
 .proc create_new_file
 FilePtr := R0
-    ; Valid new files are easy, just zero them out entirely. This will
+    ; Valid new files are mostly easy, just zero them out entirely. This will
     ; set the player name to all zeroes, which denotes the file as "new"
     ; in the UI and such
     lda #0
@@ -246,6 +250,15 @@ loop:
     iny
     cpy #.sizeof(SaveFile)
     bne loop
+
+    ; A few settings do need more explicit values though: we must default
+    ; the player palette to something other than "personalized", otherwise
+    ; we'll get grey title screen art. Here we choose a fixed value, any 
+    ; fancy randomization happens during file creation.
+    lda #EMPTY_FILE_DEFAULT_PALETTE
+    ldy #SaveFile::PlayerPalettePreset
+    sta (FilePtr), y
+
     rts
 .endproc
 

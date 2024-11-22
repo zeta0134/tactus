@@ -146,7 +146,7 @@ TargetFuncPtr := R0
         perform_zpcm_inc
         ; run the disco selection logic based on the player's preference
         ; (DiscoTile==SmokePuffTile, and DiscoRow==SmokePuffRow, so that setup is done by this point)
-        ldx setting_disco_floor
+        ldx current_save + SaveFile::OptionDiscoFloor
         lda disco_behavior_lut_low, x
         sta TargetFuncPtr+0
         lda disco_behavior_lut_high, x

@@ -21,9 +21,9 @@ TACTUS_SAVE_VERSION_NUMBER = 1
     ItemsDiscoveredFlags .byte 32
     ; PLAYER PERSONALIZATION PREFERENCES
     PlayerPalettePreset .byte
-    PlayerPalettePhones .byte
-    PlayerPalettePajamas .byte
-    PlayerPalettePigment .byte
+    PlayerPalettePhonesIndex .byte
+    PlayerPalettePajamasIndex .byte
+    PlayerPalettePigmentIndex .byte
     PlayerReserved .byte 4 ; pad out to 8 bytes total
     ; OPTIONS
     OptionDiscoFloor .byte
