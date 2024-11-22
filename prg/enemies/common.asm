@@ -210,19 +210,40 @@ sprite_failed:
 .endproc
 
         .segment "ENEMY_COLLIDE"
-; TODO: make this pick one of 8 directions based on relative tile position to the player,
-; then pick/flip/rotate the sprite accordingly
+
+; TODO: the underneath-the-enemy thing should really have lower priority
+damage_properties_by_direction:
+        .byte 0 ; default, unused
+        .byte SPRITE_HORIZ_FLIP ; north
+        .byte 0 ; east
+        .byte 0 ; south
+        .byte SPRITE_HORIZ_FLIP ; west
+        .byte 0 ; northeast
+        .byte 0 ; southeast
+        .byte SPRITE_HORIZ_FLIP ; northwest
+        .byte SPRITE_HORIZ_FLIP ; southwest
+
+
 .proc ENEMY_COLLIDE_spawn_damage_sprite_here
 MetaSpriteIndex := R0
+
+PuffPosX := R1
+PuffPosY := R2
+
 PuffSquare := R12
 TargetSquare := R13
+
         far_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
         cpx #$FF
-        beq sprite_failed
+        jeq sprite_failed
 
-        ; Damage is red
-        lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_RISE | SPRITE_PAL_2)
+        ; Slashes are yellowish
+        lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_PAL_1)
+        ; Choose direction and other properties based on the puff direction
+        ; we may have computed earlier
+        ldy PlayerIncomingDamageDirection
+        ora damage_properties_by_direction, y
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
         lda #$FF
         sta sprite_table + MetaSpriteState::LifetimeBeats, x
@@ -262,6 +283,8 @@ TargetSquare := R13
         .endrepeat
         clc
         adc #BATTLEFIELD_OFFSET_X
+        ; store this off for use later
+        sta PuffPosX
         clc
         adc DamageSpriteCoordX
         sta DamageSpriteCoordX
@@ -276,6 +299,8 @@ TargetSquare := R13
         .endrepeat
         clc
         adc #BATTLEFIELD_OFFSET_Y
+        ; store this off for use later
+        sta PuffPosY
         clc
         adc DamageSpriteCoordY
         sta DamageSpriteCoordY
@@ -298,12 +323,45 @@ TargetSquare := R13
         lda #<SPRITE_TILE_DAMAGE_PLAYER
         sta sprite_table + MetaSpriteState::TileIndex, x
 
+        ; Now spawn a second sprite, directly under the puff spot, to
+        ; indicate that this particular spot is where the damage came
+        ; from. This will be a flashing indicator, so it should be
+        ; perfectly aligned with the background square. It also should
+        ; appear "underneath" this enemy, so it will use bgPriority, etc.
+        
+        ; (we may want separate versions for some enemies if this conflicts
+        ; with their artistic use of BG0.0? and I'm not sure what to do about
+        ; water enemies, which might need a totally separate concept here)
+
+        far_call FAR_find_unused_sprite
+        ldx MetaSpriteIndex
+        cpx #$FF
+        beq sprite_failed
+
+        ; The position is our puff coordinates that we computed earlier
+        lda PuffPosX
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda PuffPosY
+        ; aaaand random offset to counter "sprites are offset from the battlefield for depth"
+        ; since this is ON the battlefield
+        clc
+        adc #1
+        sta sprite_table + MetaSpriteState::PositionY, x
+        ; The attributes are static: the flashing tile ID, in bright pink,
+        ; with bgPriority and one-beat flags
+        lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_PAL_2 | SPRITE_BG_PRIORITY)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+        lda #<SPRITE_TILE_DAMAGE_FLASHING_SQUARE
+        sta sprite_table + MetaSpriteState::TileIndex, x
+        ; and... that's it?
+
 sprite_failed:
         rts
 .endproc
 
 .proc ENEMY_COLLIDE_set_damage_direction_from_puff_tile
-MetaSpriteIndex := R0
 PuffSquare := R12
 TargetSquare := R13
 
@@ -673,11 +731,11 @@ TargetSquare := R13
         sta tile_flags, x
         jsr draw_active_tile
         
-        ; Since we just damaged the player, spawn a hit sprite
-        near_call ENEMY_COLLIDE_spawn_damage_sprite_here
-        ; Also, set the player's incoming damage direction, which is based
+        ; Set the player's incoming damage direction, which is based
         ; on the puff tile we just returned to
         near_call ENEMY_COLLIDE_set_damage_direction_from_puff_tile
+        ; Since we just damaged the player, spawn a hit sprite
+        near_call ENEMY_COLLIDE_spawn_damage_sprite_here
 
         rts
 no_puff_found:
@@ -686,10 +744,6 @@ no_puff_found:
         ; we should try to at least separate it from the player. (If this also fails the
         ; player will soft lock and die very quickly.)
         near_call ENEMY_COLLIDE_forbid_player_movement
-        ; We're not real sure what to do about the player's damage direction, so default
-        ; it to "SOUTH" here, arbitrarily. This will bounce them "up", sortof.
-        lda #3
-        sta PlayerIncomingDamageDirection
 
         rts
 .endproc

@@ -346,11 +346,10 @@ damage_flash_lut:
 ; So things other than main gameplay can do this, mostly for
 ; the title screen and eventual save screen, etc etc
 .proc FAR_apply_player_palette
-        lda #1
-        sta ObjPaletteDirty
-
         lda PlayerTookDamageThisBeat
         beq normal_palette
+        lda #1
+        sta ObjPaletteDirty
         ldx PlayerDamageAnimCounter
         lda damage_flash_lut, x
         cmp #DMG_DARK_PAL
@@ -840,6 +839,11 @@ TargetCol := R15
         sta PlayerDamageAnimCounter
         ; If no damage direction is set, default to a kinda random-circle-y lookin' thing.
         sta PlayerIncomingDamageDirection
+
+        ; Every beat we'll by default be in our generic palette. We need to recover from whatever
+        ; the previous beat's effect was doing, so flag that here.
+        lda #1
+        sta ObjPaletteDirty
 
         ; First up, default the player's animation cel to either standing or, if it's been a really long
         ; time since we got a player input AND the room is clear, the idle pose for flavor
