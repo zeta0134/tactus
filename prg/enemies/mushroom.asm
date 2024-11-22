@@ -297,6 +297,12 @@ DamageAmount := R0
         lda #MUSHROOM_SPORE_DMG
         sta DamageAmount
         far_call FAR_damage_player
+        
+        ; YOU WERE HERE
+        ; TODO: have the spore work out the direction to damage the player, so the
+        ; knockback goes away from the mushroom. (Read the tile we chose; there's
+        ; a whole equivalence class due to the disco floor thing, and I'm too tired
+        ; to think it out right now.)
 
         ; hazards don't disappear when they "collide." They
         ; will clean themselves up automatically, usually

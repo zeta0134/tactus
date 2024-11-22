@@ -143,8 +143,7 @@ damage_table_southwest_x:
 damage_table_north_y:
 damage_table_northeast_y:
 damage_table_northwest_y:
-        .byte 4, 3, <-4, <-3, 3, 2, <-3, <-2
-        .byte 2, 1, <-2, <-1, 1, 1, <-1, <-1
+        .byte 4, 3, <-4, <-3, 3, 2, <-3, <-2, 2, 1, <-2, <-1, 1, 1, <-1, <-1
         .repeat 16
         .byte 0
         .endrepeat
@@ -154,14 +153,25 @@ damage_table_southeast_x:
 damage_table_south_y:
 damage_table_southeast_y:
 damage_table_southwest_y:
-        .byte <-4, <-3, 4, 3, <-3, <-2, 3, 2
-        .byte <-2, <-1, 2, 1, <-1, <-1, 1, 1
+        .byte <-4, <-3, 4, 3, <-3, <-2, 3, 2, <-2, <-1, 2, 1, <-1, <-1, 1, 1
+        .repeat 16
+        .byte 0
+        .endrepeat
+
+damage_table_generic_x:
+        ;       N       SE    W         NE        S     NW        E     SW
+        .byte   0,   0, 4, 3, <-3, <-2,   3,   2, 0, 0, <-2, <-1, 1, 1, <-1, <-1
+        .repeat 16
+        .byte 0
+        .endrepeat
+damage_table_generic_y:
+        .byte <-4, <-3, 4, 3,   0,   0, <-3, <-2, 2, 1, <-2, <-2, 0, 0,   1,   1
         .repeat 16
         .byte 0
         .endrepeat
 
 damage_offsets_by_direction_lut:
-        .addr damage_table_south_x, damage_table_south_y ; position 0 is unused, default to "south" if we get here
+        .addr damage_table_generic_x, damage_table_generic_y
         .addr damage_table_north_x, damage_table_north_y
         .addr damage_table_east_x, damage_table_east_y
         .addr damage_table_south_x, damage_table_south_y
@@ -314,7 +324,7 @@ sprite_failed:
         rts
 .endproc
 
-DAMAGE_ANIM_MAX = 32
+DAMAGE_ANIM_MAX = 30
 
 NORMAL_PAL    = 0
 DMG_LIGHT_PAL = 1
@@ -828,6 +838,8 @@ TargetCol := R15
         lda #0
         sta PlayerTookDamageThisBeat
         sta PlayerDamageAnimCounter
+        ; If no damage direction is set, default to a kinda random-circle-y lookin' thing.
+        sta PlayerIncomingDamageDirection
 
         ; First up, default the player's animation cel to either standing or, if it's been a really long
         ; time since we got a player input AND the room is clear, the idle pose for flavor
