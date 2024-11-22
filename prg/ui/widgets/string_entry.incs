@@ -619,9 +619,10 @@ widget_target_string_high := widgets_data3
         lda Length
         beq buzz_and_fail
         ; Otherwise, go ahead and save this file, then
-        ; return (for now!) to the File Select screen
+        ; go to the options screen to allow the player
+        ; to personalize their preferences
         far_call FAR_save_current_file
-        jsr go_to_file_select
+        jsr go_to_options
         rts
 
 buzz_and_fail:
