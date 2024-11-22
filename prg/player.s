@@ -101,6 +101,9 @@ PlayerIntendsToCast: .res 1
 PlayerActiveDialogSquare: .res 1
 PlayerPassiveDialogSquare: .res 1
 
+PlayerTookDamageThisBeat: .res 1
+PlayerDamageAnimCounter: .res 1
+
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
 DIRECTION_SOUTH = 3
@@ -257,6 +260,10 @@ heart_loop:
         sta PlayerIntendsToPause
         sta PlayerNextDirection
 
+        lda #0
+        sta PlayerTookDamageThisBeat
+        sta PlayerDamageAnimCounter
+
         rts
 
 sprite_failed:
@@ -264,14 +271,62 @@ sprite_failed:
         rts
 .endproc
 
+DAMAGE_ANIM_MAX = 64
+
+NORMAL_PAL    = 0
+DMG_LIGHT_PAL = 1
+DMG_DARK_PAL  = 2
+
+damage_flash_lut:
+        ; three quick flashes
+        .repeat 3
+        .byte DMG_LIGHT_PAL
+        .byte DMG_DARK_PAL
+        .endrepeat
+        ; now flash the player's normal palette with their dark palette
+        ; for the remainder of this beat
+        .repeat 32-3
+        .byte NORMAL_PAL
+        .byte DMG_DARK_PAL
+        .endrepeat
+
 ; So things other than main gameplay can do this, mostly for
 ; the title screen and eventual save screen, etc etc
 .proc FAR_apply_player_palette
+        lda #1
+        sta ObjPaletteDirty
+
+        lda PlayerTookDamageThisBeat
+        beq normal_palette
+        ldx PlayerDamageAnimCounter
+        lda damage_flash_lut, x
+        cmp #DMG_DARK_PAL
+        beq dark_palette
+        cmp #DMG_LIGHT_PAL
+        beq light_palette
+        ; fall through to normal pal
+normal_palette:
         lda player_ingame_palette_phones
         sta ObjPaletteBuffer+1
         lda player_ingame_palette_pajamas
         sta ObjPaletteBuffer+2
         lda player_ingame_palette_pigment
+        sta ObjPaletteBuffer+3
+        rts
+dark_palette:
+        lda player_damage_dark_palette_phones
+        sta ObjPaletteBuffer+1
+        lda player_damage_dark_palette_pajamas
+        sta ObjPaletteBuffer+2
+        lda player_damage_dark_palette_pigment
+        sta ObjPaletteBuffer+3
+        rts
+light_palette:
+        lda player_damage_light_palette_phones
+        sta ObjPaletteBuffer+1
+        lda player_damage_light_palette_pajamas
+        sta ObjPaletteBuffer+2
+        lda player_damage_light_palette_pigment
         sta ObjPaletteBuffer+3
         rts
 .endproc
@@ -297,9 +352,18 @@ sprite_failed:
         ; Update the jump height position every frame
         lda PlayerJumpHeightPos
         cmp #JUMP_HEIGHT_END
-        beq done
+        beq done_with_height
         inc PlayerJumpHeightPos
-done:
+done_with_height:
+        ; Update the damage status every frame
+        lda PlayerTookDamageThisBeat
+        beq done_with_damage
+        lda PlayerDamageAnimCounter
+        cmp #DAMAGE_ANIM_MAX
+        bcs done_with_damage
+        inc PlayerDamageAnimCounter
+done_with_damage:
+
         perform_zpcm_inc
         rts
 .endproc
@@ -688,6 +752,11 @@ PlayerSquare := R2
 
 TargetRow := R14
 TargetCol := R15
+        
+        lda #0
+        sta PlayerTookDamageThisBeat
+        sta PlayerDamageAnimCounter
+
         ; First up, default the player's animation cel to either standing or, if it's been a really long
         ; time since we got a player input AND the room is clear, the idle pose for flavor
         ldx PlayerRoomIndex
@@ -1602,15 +1671,19 @@ damage_amount_okay:
         sta PlayerChain
         sta PlayerChainGrace
 
-        ; apply the damage coloration no matter what pose we're in
-        ldx PlayerSpriteIndex
-        lda sprite_table + MetaSpriteState::BehaviorFlags, x
-        and #($FF - SPRITE_PAL_MASK)
-        ora #SPRITE_PAL_2
-        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        ; yup, we got hit. X_X
+        ; setup the juice portion of the animation, these flags and timers
+        ; will drive a lot of that.
+        lda #1
+        sta PlayerTookDamageThisBeat
+        lda #0
+        sta PlayerDamageAnimCounter
+
+        ; TODO: work out the *direction* from which we got hit somehow!
 
         ; If we are in our idle pose, switch to damage. (Let any other
         ; animation override the damage state though, as it's more important)
+        ldx PlayerSpriteIndex
         lda sprite_table + MetaSpriteState::TileIndex, x
         cmp #<SPRITE_TILE_PLAYER
         beq apply_damage_animation
