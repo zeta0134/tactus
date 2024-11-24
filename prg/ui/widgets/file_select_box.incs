@@ -536,29 +536,7 @@ check_for_action_input:
         and ButtonsDown
         beq do_nothing
 
-        ldy CurrentWidgetIndex
-        lda widget_file_index, y
-        jsr prepare_file_pointer
-        far_call FAR_is_new_file
-        cmp #FILE_NEW
-        beq open_new_file
-open_existing_file:
-        ; FOR NOW, go to name entry anyway.
-        ; Later, this should skip name entry and
-        ; instead land on the "file details" screen
-        ldy CurrentWidgetIndex
-        lda widget_file_index, y
-        far_call FAR_load_file
-        jsr go_to_file_details
-        rts
-
-open_new_file:
-        ldy CurrentWidgetIndex
-        lda widget_file_index, y
-        far_call FAR_load_file
-        far_call FAR_init_file_options
-        jsr go_to_name_entry
-        rts
+        jsr with_file_perform_action
 
 do_nothing:
         rts
@@ -566,3 +544,13 @@ do_nothing:
     rts
 .endproc
 
+.proc widget_file_select_box_refresh
+CurrentWidgetIndex := R20
+
+        ; populate this box's contents
+        jsr draw_file_contents
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y widget_file_select_box_update
+        rts
+.endproc

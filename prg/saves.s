@@ -238,7 +238,7 @@ block_invalid:
     rts
 .endproc
 
-.proc create_new_file
+.proc FAR_create_new_file
 FilePtr := R0
     ; Valid new files are mostly easy, just zero them out entirely. This will
     ; set the player name to all zeroes, which denotes the file as "new"
@@ -285,13 +285,13 @@ ComputedSum := R4
     ; First initialize all 3 save files to valid contents
     mov16 FilePtr, BlockPtr
     add16w FilePtr, #SaveBlock::SaveSlot1
-    jsr create_new_file
+    near_call FAR_create_new_file
     mov16 FilePtr, BlockPtr
     add16w FilePtr, #SaveBlock::SaveSlot2
-    jsr create_new_file
+    near_call FAR_create_new_file
     mov16 FilePtr, BlockPtr
     add16w FilePtr, #SaveBlock::SaveSlot3
-    jsr create_new_file
+    near_call FAR_create_new_file
 
     ; All new blocks need a nonce (and we'll refresh this on every save)
     jsr compute_nonce
@@ -524,7 +524,7 @@ return_results:
     rts
 .endproc
 
-.proc persist_block_to_storage
+.proc FAR_persist_block_to_storage
 BlockPtr := R0
 SourcePtr := R2
 DataLength := R4
@@ -694,7 +694,7 @@ file_save_loop:
     bne file_save_loop
 
     ; Having just saved the file, now persist the block
-    jsr persist_block_to_storage
+    near_call FAR_persist_block_to_storage
 
     rts
 .endproc

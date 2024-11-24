@@ -9,16 +9,40 @@ file_select_ui_layout:
         widget_file_select_box 0, 4, 6
         widget_file_select_box 1, 4, 11
         widget_file_select_box 2, 4, 16
-        widget_text_button erase_file_str, widget_no_behavior, 10, 22
+        widget_text_button erase_file_str, enter_erase_mode, 10, 22
         widget_text_button copy_file_str, widget_no_behavior, 10, 24
         .addr $0000 ; end of list
 
-file_select_str:   .asciiz "FILE SELECT"
+; Because on this screen we need to reach in and manipulate... everything
+FILE_SELECT_CONTROLLER_INDEX = 0
+FILE_SELECT_CURSOR_INDEX = 1
+FILE_SELECT_TITLE_INDEX  = 2
+FILE_SELECT_FILE_1_INDEX = 3
+FILE_SELECT_FILE_2_INDEX = 4
+FILE_SELECT_FILE_3_INDEX = 5
+FILE_SELECT_ERASE_BUTTON_INDEX = 6
+FILE_SELECT_COPY_BUTTON_INDEX = 7
+
+; these all go in the top bar to indicate mode
+file_select_str:     .asciiz "FILE SELECT "
+erase_which_str:     .asciiz "ERASE WHICH?"
+erase_confirm_str:   .asciiz "REALLY !?   "
+copy_source_str:     .asciiz "COPY WHICH? "
+copy_dest_str:       .asciiz "WHERE TO?   "
+copy_confirm_str:    .asciiz "OVERWRITE?  "
+
 erase_file_str: .asciiz "ERASE FILE"
 copy_file_str: .asciiz "COPY FILE"
 
 DARK_SQUARE_TILE = $06
 LIGHT_SQUARE_TILE = $07
+
+FILE_SELECT_MODE_NORMAL        = 0
+FILE_SELECT_MODE_ERASE         = 1
+FILE_SELECT_MODE_ERASE_CONFIRM = 2
+FILE_SELECT_MODE_COPY_SOURCE   = 3
+FILE_SELECT_MODE_COPY_DEST     = 4
+FILE_SELECT_MODE_COPY_CONFIRM  = 5
 
 .proc draw_checkerboard_base
 NametableAddr := R0
@@ -68,6 +92,7 @@ Width := R2
 Height := R3
 
 CurrentWidgetIndex := R20
+widget_file_select_mode := widgets_data0
 
         perform_zpcm_inc
         ; Play the ... I dunno, the OPTIONS track on the file select screen, for now.
@@ -87,11 +112,11 @@ CurrentWidgetIndex := R20
         ; draw an initial checkerboard background (no nametable for now)
         jsr draw_checkerboard_base
         ; draw boxes for the "File Select" top thing, and the "erase/copy" options down below
-        lda #8
+        lda #7
         sta Left
         lda #2
         sta Top
-        lda #14
+        lda #17
         sta Width
         lda #3
         sta Height
@@ -124,8 +149,9 @@ bg_loop:
         cpy #16
         bne bg_loop
 
-
         ldy CurrentWidgetIndex
+        lda #FILE_SELECT_MODE_NORMAL
+        sta widget_file_select_mode, y
         set_widget_state_y file_select_controller_update
         rts
 .endproc
@@ -134,8 +160,272 @@ bg_loop:
         lda #KEY_B
         and ButtonsDown
         beq stay_here
-        jsr return_to_title
-        rts
+        ; What we do very much depends on our current state
+        jsr file_select_b_button_dispatch
 stay_here:
         rts
 .endproc
+
+file_cancel_dispatch_table:
+        .addr return_to_title      ; FILE_SELECT_MODE_NORMAL
+        .addr enter_normal_mode    ; FILE_SELECT_MODE_ERASE
+        .addr enter_erase_mode     ; FILE_SELECT_MODE_ERASE_CONFIRM
+        .addr enter_normal_mode    ; FILE_SELECT_MODE_COPY_SOURCE
+        .addr enter_copy_mode      ; FILE_SELECT_MODE_COPY_DEST
+        .addr enter_copy_dest_mode ; FILE_SELECT_MODE_COPY_CONFIRM
+
+.proc file_select_b_button_dispatch
+DispatchPtr := R0
+widget_file_select_mode := widgets_data0
+        ldy #FILE_SELECT_CONTROLLER_INDEX
+        lda widget_file_select_mode, y
+        asl
+        tay
+        lda file_cancel_dispatch_table+0, y
+        sta DispatchPtr+0
+        lda file_cancel_dispatch_table+1, y
+        sta DispatchPtr+1
+        jmp (DispatchPtr)
+.endproc
+
+; These are the routines actually run when files are clicked, including a dispatch based on mode.
+; Some of these repoint the cursor and/or disable nav to certain elements. Upon entry, A is the
+; chosen file index. (If needed, this can be re-read with CurrentWidgetIndex in R20)
+
+file_action_dispatch_table:
+        .addr with_file_open           ; FILE_SELECT_MODE_NORMAL
+        .addr enter_erase_confirm_mode ; FILE_SELECT_MODE_ERASE
+        .addr with_file_erase          ; FILE_SELECT_MODE_ERASE_CONFIRM
+        .addr widget_no_behavior ; FILE_SELECT_MODE_COPY_SOURCE
+        .addr widget_no_behavior ; FILE_SELECT_MODE_COPY_DEST
+        .addr widget_no_behavior ; FILE_SELECT_MODE_COPY_CONFIRM
+
+.proc with_file_perform_action
+DispatchPtr := R0
+widget_file_select_mode := widgets_data0
+        ldy #FILE_SELECT_CONTROLLER_INDEX
+        lda widget_file_select_mode, y
+        asl
+        tay
+        lda file_action_dispatch_table+0, y
+        sta DispatchPtr+0
+        lda file_action_dispatch_table+1, y
+        sta DispatchPtr+1
+        jmp (DispatchPtr)
+.endproc
+
+; Immediately open the selected file. No fuss.
+.proc with_file_open
+WidgetIndexUnderCursor := R20
+widget_file_index := widgets_data2
+
+        ldy WidgetIndexUnderCursor
+        lda widget_file_index, y
+        jsr prepare_file_pointer
+        far_call FAR_is_new_file
+        cmp #FILE_NEW
+        beq open_new_file
+open_existing_file:
+        ; FOR NOW, go to name entry anyway.
+        ; Later, this should skip name entry and
+        ; instead land on the "file details" screen
+        ldy WidgetIndexUnderCursor
+        lda widget_file_index, y
+        far_call FAR_load_file
+        jsr go_to_file_details
+        rts
+
+open_new_file:
+        ldy WidgetIndexUnderCursor
+        lda widget_file_index, y
+        far_call FAR_load_file
+        far_call FAR_init_file_options
+        jsr go_to_name_entry
+        rts
+.endproc
+
+; Actually perform erasure. Enter normal mode.
+.proc with_file_erase
+WidgetIndexUnderCursor := R20
+widget_file_index := widgets_data2
+        
+        ; To "erase" a file we're really just creating a new one,
+        ; so do that
+        ldy WidgetIndexUnderCursor
+        lda widget_file_index, y
+        jsr prepare_file_pointer
+        far_call FAR_create_new_file
+        ; Persist those changes!
+        far_call FAR_persist_block_to_storage
+        ; This has invalidated the displayed contents of this file
+        ; block, so have it refresh its contents accordingly
+        ldy WidgetIndexUnderCursor
+        set_widget_state_y widget_file_select_box_refresh
+        ; TODO: play a suitable "file erased" SFX, maybe shake the screen, I dunno
+        ; Move back to normal mode!
+        jsr enter_normal_mode
+
+        rts
+.endproc
+
+.proc enter_normal_mode
+widget_file_select_mode := widgets_data0
+widget_text_string_low := widgets_data2
+widget_text_string_high := widgets_data3
+
+        ldy #FILE_SELECT_CONTROLLER_INDEX
+        lda #FILE_SELECT_MODE_NORMAL
+        sta widget_file_select_mode, y
+
+        ; Draw the normal message up top
+        ldy #FILE_SELECT_TITLE_INDEX
+        lda #<file_select_str
+        sta widget_text_string_low, y
+        lda #>file_select_str
+        sta widget_text_string_high, y
+        set_widget_state_y widget_text_label_init
+
+        ; Re-enable all nav buttons (incl. file boxes!)
+        ldy #FILE_SELECT_ERASE_BUTTON_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_COPY_BUTTON_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+
+        ldy #FILE_SELECT_FILE_1_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_2_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_3_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+
+
+
+        ; Restore the palette to its usual state
+        rts
+.endproc
+
+; Various utilities used by the above states
+.proc enter_erase_mode
+widget_file_select_mode := widgets_data0
+widget_text_string_low := widgets_data2
+widget_text_string_high := widgets_data3
+        
+        ldy #FILE_SELECT_CONTROLLER_INDEX
+        lda #FILE_SELECT_MODE_ERASE
+        sta widget_file_select_mode, y
+
+        ; Draw the erase which message up top
+        ldy #FILE_SELECT_TITLE_INDEX
+        lda #<erase_which_str
+        sta widget_text_string_low, y
+        lda #>erase_which_str
+        sta widget_text_string_high, y
+        set_widget_state_y widget_text_label_init
+
+        ; Disable navigation for the two mode buttons
+        ldy #FILE_SELECT_ERASE_BUTTON_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_COPY_BUTTON_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+
+        ; Enable nav for all 3 boxes
+        ldy #FILE_SELECT_FILE_1_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_2_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_3_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+
+        ; If we're pointing to the erase button, move the cursor. (Otherwise leave it alone)
+        ; ...Handled automatically by cursor update!
+
+        ; Update the palette to **scary red** to make it clear we're in the danger zone
+        ; TODO!
+
+        rts
+.endproc
+
+.proc enter_erase_confirm_mode
+WidgetIndexUnderCursor := R20
+
+widget_file_select_mode := widgets_data0
+widget_text_string_low := widgets_data2
+widget_text_string_high := widgets_data3
+        ldy #FILE_SELECT_CONTROLLER_INDEX
+        lda #FILE_SELECT_MODE_ERASE_CONFIRM
+        sta widget_file_select_mode, y
+
+        ; Draw the erase confirm message up top
+        ldy #FILE_SELECT_TITLE_INDEX
+        lda #<erase_confirm_str
+        sta widget_text_string_low, y
+        lda #>erase_confirm_str
+        sta widget_text_string_high, y
+        set_widget_state_y widget_text_label_init
+
+        ; Disable nav for every box other than the one we're pointing to
+        ; the lazy way: disable all 3
+        ldy #FILE_SELECT_FILE_1_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_2_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_3_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+        ; ... and now re-enable the one we're pointing to
+        ldy WidgetIndexUnderCursor
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+
+        ; TODO: Maybe play a "warning siren" signal of sorts, since we're about to
+        ; kill this file dead
+
+        rts
+.endproc
+
+.proc enter_copy_mode
+        ; Draw the copy which message up top
+        ; Disable navigation for the two mode buttons
+        ; Move the cursor to file slot 1
+        rts
+.endproc
+
+.proc enter_copy_dest_mode
+        ; Draw the copy to message up top
+        ; Enable nav for all 3 boxes but don't move the cursor (undoes "confirm" mode if we back out)
+        rts
+.endproc
+
+.proc enter_copy_confirm_mode
+        ; Draw the overwrite message up top
+        ; disable nav for everything that isn't the thing we're pointed at
+        rts
+.endproc
+
+
