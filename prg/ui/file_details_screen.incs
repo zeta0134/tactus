@@ -178,7 +178,6 @@ widget_last_cursor_pos := widgets_data0
 
 widget_cursor_nav_index := widgets_data1
 
-
         ldy #FILE_DETAILS_CURSOR_INDEX ; cursor index for this screen
         lda widget_cursor_nav_index, y
         sta CursorCurrentHighlight
@@ -190,5 +189,14 @@ widget_cursor_nav_index := widgets_data1
         jsr file_details_draw_dark_outlines
         jsr file_details_draw_selected_outline
 done:
+
+        ; If the B button is pressed, we should return to File Select
+        lda #KEY_B
+        and ButtonsDown
+        beq stay_here
+        ; What we do very much depends on our current state
+        jsr go_to_file_select
+stay_here:
+
         rts
 .endproc

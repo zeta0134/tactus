@@ -359,6 +359,62 @@ widget_copy_source_index := widgets_data1
         rts
 .endproc
 
+.proc _enable_copy_erase_buttons
+        ldy #FILE_SELECT_ERASE_BUTTON_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_COPY_BUTTON_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+        rts
+.endproc
+
+.proc _enable_all_file_boxes
+        ldy #FILE_SELECT_FILE_1_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_2_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_3_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+        rts
+.endproc
+
+.proc _disable_copy_erase_buttons
+        ldy #FILE_SELECT_ERASE_BUTTON_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_COPY_BUTTON_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+        rts
+.endproc
+
+.proc _disable_all_file_boxes
+        ldy #FILE_SELECT_FILE_1_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_2_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_3_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+        rts
+.endproc
+
 .proc enter_normal_mode
 widget_file_select_mode := widgets_data0
 widget_text_string_low := widgets_data2
@@ -377,27 +433,8 @@ widget_text_string_high := widgets_data3
         set_widget_state_y widget_text_label_init
 
         ; Re-enable all nav buttons (incl. file boxes!)
-        ldy #FILE_SELECT_ERASE_BUTTON_INDEX
-        lda widgets_state_flags, y
-        ora #WIDGET_STATE_NAVIGABLE
-        sta widgets_state_flags, y
-        ldy #FILE_SELECT_COPY_BUTTON_INDEX
-        lda widgets_state_flags, y
-        ora #WIDGET_STATE_NAVIGABLE
-        sta widgets_state_flags, y
-
-        ldy #FILE_SELECT_FILE_1_INDEX
-        lda widgets_state_flags, y
-        ora #WIDGET_STATE_NAVIGABLE
-        sta widgets_state_flags, y
-        ldy #FILE_SELECT_FILE_2_INDEX
-        lda widgets_state_flags, y
-        ora #WIDGET_STATE_NAVIGABLE
-        sta widgets_state_flags, y
-        ldy #FILE_SELECT_FILE_3_INDEX
-        lda widgets_state_flags, y
-        ora #WIDGET_STATE_NAVIGABLE
-        sta widgets_state_flags, y
+        jsr _enable_copy_erase_buttons
+        jsr _enable_all_file_boxes
 
         ; Restore the palette to its usual state
         rts
@@ -422,28 +459,10 @@ widget_text_string_high := widgets_data3
         set_widget_state_y widget_text_label_init
 
         ; Disable navigation for the two mode buttons
-        ldy #FILE_SELECT_ERASE_BUTTON_INDEX
-        lda widgets_state_flags, y
-        and #($FF-WIDGET_STATE_NAVIGABLE)
-        sta widgets_state_flags, y
-        ldy #FILE_SELECT_COPY_BUTTON_INDEX
-        lda widgets_state_flags, y
-        and #($FF-WIDGET_STATE_NAVIGABLE)
-        sta widgets_state_flags, y
+        jsr _disable_copy_erase_buttons
 
         ; Enable nav for all 3 boxes
-        ldy #FILE_SELECT_FILE_1_INDEX
-        lda widgets_state_flags, y
-        ora #WIDGET_STATE_NAVIGABLE
-        sta widgets_state_flags, y
-        ldy #FILE_SELECT_FILE_2_INDEX
-        lda widgets_state_flags, y
-        ora #WIDGET_STATE_NAVIGABLE
-        sta widgets_state_flags, y
-        ldy #FILE_SELECT_FILE_3_INDEX
-        lda widgets_state_flags, y
-        ora #WIDGET_STATE_NAVIGABLE
-        sta widgets_state_flags, y
+        jsr _enable_all_file_boxes
 
         ; If we're pointing to the erase button, move the cursor. (Otherwise leave it alone)
         ; ...Handled automatically by cursor update!
@@ -474,18 +493,7 @@ widget_text_string_high := widgets_data3
 
         ; Disable nav for every box other than the one we're pointing to
         ; the lazy way: disable all 3
-        ldy #FILE_SELECT_FILE_1_INDEX
-        lda widgets_state_flags, y
-        and #($FF-WIDGET_STATE_NAVIGABLE)
-        sta widgets_state_flags, y
-        ldy #FILE_SELECT_FILE_2_INDEX
-        lda widgets_state_flags, y
-        and #($FF-WIDGET_STATE_NAVIGABLE)
-        sta widgets_state_flags, y
-        ldy #FILE_SELECT_FILE_3_INDEX
-        lda widgets_state_flags, y
-        and #($FF-WIDGET_STATE_NAVIGABLE)
-        sta widgets_state_flags, y
+        jsr _disable_all_file_boxes
         ; ... and now re-enable the one we're pointing to
         ldy WidgetIndexUnderCursor
         lda widgets_state_flags, y
@@ -518,14 +526,11 @@ widget_text_string_high := widgets_data3
         set_widget_state_y widget_text_label_init
 
         ; Disable navigation for the two mode buttons
-        ldy #FILE_SELECT_ERASE_BUTTON_INDEX
-        lda widgets_state_flags, y
-        and #($FF-WIDGET_STATE_NAVIGABLE)
-        sta widgets_state_flags, y
-        ldy #FILE_SELECT_COPY_BUTTON_INDEX
-        lda widgets_state_flags, y
-        and #($FF-WIDGET_STATE_NAVIGABLE)
-        sta widgets_state_flags, y
+        jsr _disable_copy_erase_buttons
+
+        ; Enable navigation for all 3 boxes (this will undo selective navigation
+        ; during copy dest mode, if canceled)
+        jsr _enable_all_file_boxes
 
         rts
 .endproc
@@ -554,18 +559,7 @@ widget_copy_source_index := widgets_data1
         set_widget_state_y widget_text_label_init
 
         ; Enable nav for all 3 boxes 
-        ldy #FILE_SELECT_FILE_1_INDEX
-        lda widgets_state_flags, y
-        ora #WIDGET_STATE_NAVIGABLE
-        sta widgets_state_flags, y
-        ldy #FILE_SELECT_FILE_2_INDEX
-        lda widgets_state_flags, y
-        ora #WIDGET_STATE_NAVIGABLE
-        sta widgets_state_flags, y
-        ldy #FILE_SELECT_FILE_3_INDEX
-        lda widgets_state_flags, y
-        ora #WIDGET_STATE_NAVIGABLE
-        sta widgets_state_flags, y
+        jsr _enable_all_file_boxes
         ; ...and disable nav for the copy source, which should move the cursor to the first
         ; of the other slots that are available
         ldy #FILE_SELECT_CONTROLLER_INDEX
@@ -606,18 +600,7 @@ widget_copy_source_index := widgets_data1
         set_widget_state_y widget_text_label_init
 
         ; disable nav for everything that isn't the thing we're pointed at
-        ldy #FILE_SELECT_FILE_1_INDEX
-        lda widgets_state_flags, y
-        and #($FF-WIDGET_STATE_NAVIGABLE)
-        sta widgets_state_flags, y
-        ldy #FILE_SELECT_FILE_2_INDEX
-        lda widgets_state_flags, y
-        and #($FF-WIDGET_STATE_NAVIGABLE)
-        sta widgets_state_flags, y
-        ldy #FILE_SELECT_FILE_3_INDEX
-        lda widgets_state_flags, y
-        and #($FF-WIDGET_STATE_NAVIGABLE)
-        sta widgets_state_flags, y
+        jsr _disable_all_file_boxes
         ; ... and now re-enable the one we're pointing to
         ldy WidgetIndexUnderCursor
         lda widgets_state_flags, y
