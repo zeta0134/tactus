@@ -540,12 +540,30 @@ check_for_action_input:
 
 do_nothing:
         rts
-
-    rts
 .endproc
 
 .proc widget_file_select_box_refresh
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+
 CurrentWidgetIndex := R20
+
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+
+        ; clear this box's contents
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        sta Left
+        lda widget_tile_y, y
+        sta Top
+        lda #23
+        sta Width
+        lda #4
+        sta Height
+        jsr draw_box_fill
 
         ; populate this box's contents
         jsr draw_file_contents

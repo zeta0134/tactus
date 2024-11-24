@@ -10,7 +10,7 @@ file_select_ui_layout:
         widget_file_select_box 1, 4, 11
         widget_file_select_box 2, 4, 16
         widget_text_button erase_file_str, enter_erase_mode, 10, 22
-        widget_text_button copy_file_str, widget_no_behavior, 10, 24
+        widget_text_button copy_file_str, enter_copy_mode, 10, 24
         .addr $0000 ; end of list
 
 ; Because on this screen we need to reach in and manipulate... everything
@@ -196,9 +196,9 @@ file_action_dispatch_table:
         .addr with_file_open           ; FILE_SELECT_MODE_NORMAL
         .addr enter_erase_confirm_mode ; FILE_SELECT_MODE_ERASE
         .addr with_file_erase          ; FILE_SELECT_MODE_ERASE_CONFIRM
-        .addr widget_no_behavior ; FILE_SELECT_MODE_COPY_SOURCE
-        .addr widget_no_behavior ; FILE_SELECT_MODE_COPY_DEST
-        .addr widget_no_behavior ; FILE_SELECT_MODE_COPY_CONFIRM
+        .addr with_file_set_copy_dest  ; FILE_SELECT_MODE_COPY_SOURCE
+        .addr with_file_try_copy       ; FILE_SELECT_MODE_COPY_DEST
+        .addr with_file_perform_copy   ; FILE_SELECT_MODE_COPY_CONFIRM
 
 .proc with_file_perform_action
 DispatchPtr := R0
@@ -268,6 +268,97 @@ widget_file_index := widgets_data2
         rts
 .endproc
 
+.proc with_file_set_copy_dest
+WidgetIndexUnderCursor := R20
+
+widget_file_index := widgets_data2
+
+widget_copy_source_index := widgets_data1
+
+        ; if the source selected is a new file. let's check for that
+        ldy WidgetIndexUnderCursor
+        lda widget_file_index, y
+        jsr prepare_file_pointer
+        far_call FAR_is_new_file
+        cmp #FILE_NEW
+        bne perform_copy_source_select
+        ; Fail (and stay in this mode). Play a buzzer SFX to indicate sadness!
+        st16 R0, sfx_cursor_fail
+        jsr play_sfx_pulse1
+        rts
+
+perform_copy_source_select:
+        ; Remember THIS index as our copy source, we'll need it to actually perform the copy later
+        ldy WidgetIndexUnderCursor
+        lda widget_file_index, y
+        ldy #FILE_SELECT_CONTROLLER_INDEX
+        sta widget_copy_source_index, y
+        jsr enter_copy_dest_mode
+        rts
+.endproc
+
+.proc with_file_try_copy
+WidgetIndexUnderCursor := R20
+
+widget_file_index := widgets_data2
+
+widget_copy_source_index := widgets_data1
+
+        ; First a sanity check: we can't copy a file into the same slot. If the user
+        ; tries to request this, audibly laugh at them and do nothing
+        ldy #FILE_SELECT_CONTROLLER_INDEX
+        lda widget_copy_source_index, y
+        ldy WidgetIndexUnderCursor
+        cmp widget_file_index, y
+        bne copy_dest_is_valid
+        st16 R0, sfx_cursor_fail
+        jsr play_sfx_pulse1
+        rts
+
+copy_dest_is_valid:
+
+        ; Now check to see if this is a new slot. If it is, we can perform the copy
+        ; right away
+        ldy WidgetIndexUnderCursor
+        lda widget_file_index, y
+        jsr prepare_file_pointer
+        far_call FAR_is_new_file
+        cmp #FILE_NEW
+        beq dest_slot_is_new_file
+dest_slot_is_existing_file:
+        ; There is another file here already, so enter the warning stage to give
+        ; the user one last chance to back out
+        jsr enter_copy_confirm_mode
+        rts
+dest_slot_is_new_file:
+        jsr with_file_perform_copy
+        rts
+.endproc
+
+.proc with_file_perform_copy
+WidgetIndexUnderCursor := R20
+
+widget_file_index := widgets_data2
+
+widget_copy_source_index := widgets_data1
+
+        ; This is simple enough: load the file from the source index
+        ldy #FILE_SELECT_CONTROLLER_INDEX
+        lda widget_copy_source_index, y
+        far_call FAR_load_file
+        ; Then save it over the destination index
+        ldy WidgetIndexUnderCursor
+        lda widget_file_index, y
+        far_call FAR_save_file
+        ; Similar to erasures, this invalidates the displayed contents of the
+        ; destination widget, so refresh that here
+        ldy WidgetIndexUnderCursor
+        set_widget_state_y widget_file_select_box_refresh
+        ; Move back to normal mode!
+        jsr enter_normal_mode
+        rts
+.endproc
+
 .proc enter_normal_mode
 widget_file_select_mode := widgets_data0
 widget_text_string_low := widgets_data2
@@ -307,8 +398,6 @@ widget_text_string_high := widgets_data3
         lda widgets_state_flags, y
         ora #WIDGET_STATE_NAVIGABLE
         sta widgets_state_flags, y
-
-
 
         ; Restore the palette to its usual state
         rts
@@ -410,21 +499,134 @@ widget_text_string_high := widgets_data3
 .endproc
 
 .proc enter_copy_mode
+WidgetIndexUnderCursor := R20
+
+widget_file_select_mode := widgets_data0
+widget_text_string_low := widgets_data2
+widget_text_string_high := widgets_data3
+
+        ldy #FILE_SELECT_CONTROLLER_INDEX
+        lda #FILE_SELECT_MODE_COPY_SOURCE
+        sta widget_file_select_mode, y
+
         ; Draw the copy which message up top
+        ldy #FILE_SELECT_TITLE_INDEX
+        lda #<copy_source_str
+        sta widget_text_string_low, y
+        lda #>copy_source_str
+        sta widget_text_string_high, y
+        set_widget_state_y widget_text_label_init
+
         ; Disable navigation for the two mode buttons
-        ; Move the cursor to file slot 1
+        ldy #FILE_SELECT_ERASE_BUTTON_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_COPY_BUTTON_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+
         rts
 .endproc
 
 .proc enter_copy_dest_mode
+WidgetIndexUnderCursor := R20
+
+widget_file_select_mode := widgets_data0
+widget_text_string_low := widgets_data2
+widget_text_string_high := widgets_data3
+
+widget_file_index := widgets_data2
+
+widget_copy_source_index := widgets_data1
+
+        ldy #FILE_SELECT_CONTROLLER_INDEX
+        lda #FILE_SELECT_MODE_COPY_DEST
+        sta widget_file_select_mode, y
+
         ; Draw the copy to message up top
-        ; Enable nav for all 3 boxes but don't move the cursor (undoes "confirm" mode if we back out)
+        ldy #FILE_SELECT_TITLE_INDEX
+        lda #<copy_dest_str
+        sta widget_text_string_low, y
+        lda #>copy_dest_str
+        sta widget_text_string_high, y
+        set_widget_state_y widget_text_label_init
+
+        ; Enable nav for all 3 boxes 
+        ldy #FILE_SELECT_FILE_1_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_2_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_3_INDEX
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+        ; ...and disable nav for the copy source, which should move the cursor to the first
+        ; of the other slots that are available
+        ldy #FILE_SELECT_CONTROLLER_INDEX
+        lda widget_copy_source_index, y
+        clc
+        adc #FILE_SELECT_FILE_1_INDEX
+        tay
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+
         rts
 .endproc
 
 .proc enter_copy_confirm_mode
+WidgetIndexUnderCursor := R20
+
+widget_file_select_mode := widgets_data0
+widget_text_string_low := widgets_data2
+widget_text_string_high := widgets_data3
+
+widget_copy_source_index := widgets_data1
+
+        ; At this point validation has already been performed (this isn't a new file
+        ; and we aren't trying to copy onto ourselves) so just perform the switch
+        ; somewhat blindly
+
+        ldy #FILE_SELECT_CONTROLLER_INDEX
+        lda #FILE_SELECT_MODE_COPY_DEST
+        sta widget_file_select_mode, y
+
         ; Draw the overwrite message up top
+        ldy #FILE_SELECT_TITLE_INDEX
+        lda #<copy_confirm_str
+        sta widget_text_string_low, y
+        lda #>copy_confirm_str
+        sta widget_text_string_high, y
+        set_widget_state_y widget_text_label_init
+
         ; disable nav for everything that isn't the thing we're pointed at
+        ldy #FILE_SELECT_FILE_1_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_2_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+        ldy #FILE_SELECT_FILE_3_INDEX
+        lda widgets_state_flags, y
+        and #($FF-WIDGET_STATE_NAVIGABLE)
+        sta widgets_state_flags, y
+        ; ... and now re-enable the one we're pointing to
+        ldy WidgetIndexUnderCursor
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+
+        ; TODO: play a siren - warning effect here!
+        ; TODO: should we switch to red-danger palette as well?
+
         rts
 .endproc
 
