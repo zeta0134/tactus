@@ -2,11 +2,15 @@
 ;                         Layouts and Widgets
 ; ======================================================================
 
+.segment "DATA_UI_LAYOUTS"
+
 title_ui_layout:
         widget_controller title_controller_init
         widget_player_cursor
         widget_text_button empty_string, go_to_file_select, 12, 10
         .addr $0000 ; end of list
+
+.segment "CODE_UI_WIDGETS"
 
 ; ======================================================================
 ;                       Screen Specific Logic

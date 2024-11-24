@@ -2,6 +2,8 @@
 ;                         Layouts and Widgets
 ; ======================================================================
 
+.segment "DATA_UI_LAYOUTS"
+
 file_select_ui_layout:
         widget_controller file_select_controller_init
         widget_cursor
@@ -43,6 +45,8 @@ FILE_SELECT_MODE_ERASE_CONFIRM = 2
 FILE_SELECT_MODE_COPY_SOURCE   = 3
 FILE_SELECT_MODE_COPY_DEST     = 4
 FILE_SELECT_MODE_COPY_CONFIRM  = 5
+
+.segment "CODE_UI_WIDGETS"
 
 .proc draw_checkerboard_base
 NametableAddr := R0

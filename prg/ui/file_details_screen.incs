@@ -2,6 +2,8 @@
 ;                         Layouts and Widgets
 ; ======================================================================
 
+.segment "DATA_UI_LAYOUTS"
+
 file_details_ui_layout:
         widget_controller file_details_controller_init
         widget_cursor
@@ -18,6 +20,8 @@ FILE_DETAILS_OPTIONS_INDEX = 5
 file_details_str:   .asciiz "Welcome " ; shouldn't this be the player name?
 start_game_str: .asciiz " GET GROOVIN'"
 options_str: .asciiz " OPTIONS"
+
+.segment "CODE_UI_WIDGETS"
 
 .proc file_details_controller_init
 Top := R0

@@ -2,6 +2,8 @@
 ;                         Layouts and Widgets
 ; ======================================================================
 
+.segment "DATA_UI_LAYOUTS"
+
 name_entry_ui_layout:
         widget_controller name_entry_controller_init
         widget_text_label name_entry_str, 11, 3
@@ -32,6 +34,8 @@ english_page_table:
         .addr english_upper_str, letter_grid_english_upper
         .addr english_lower_str, letter_grid_english_lower
         .addr $0000
+
+.segment "CODE_UI_WIDGETS"
 
 .proc name_entry_controller_init
 Top := R0

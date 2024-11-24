@@ -60,7 +60,11 @@ widgets_data8: .res ::MAX_WIDGETS
 ; beat counting effects
 LastBeat: .res 1
 
-        .segment "CODE_B"
+
+        .segment "DATA_UI_LAYOUTS"
+ui_data_bank:
+        ; Also sortof our "default UI code" for the moment
+        .segment "CODE_UI_WIDGETS"
 
         .include "ui/widgets/cursors.incs"
         .include "ui/widgets/file_select_box.incs"
@@ -81,6 +85,8 @@ empty_string: .asciiz ""
         .include "ui/name_entry_screen.incs"
         .include "ui/file_details_screen.incs"
 
+        .segment "CODE_UI_WIDGETS"
+
 ; ======================================================================
 ;                         Kernel Functions
 ;       (called at regular intervals to drive the UI subsystems)
@@ -93,6 +99,8 @@ empty_string: .asciiz ""
 .proc FAR_initialize_widgets
 WidgetListPtr := R0
 PtrStash := R2
+        access_data_bank #<.bank(ui_data_bank)
+
         perform_zpcm_inc
         ; firstly, for sanity, completely zero out all of widget memory
         ; absolutely no holding onto previous state from other runs
@@ -172,6 +180,7 @@ widget_loop:
         jmp widget_loop
 done:
         perform_zpcm_inc
+        restore_previous_bank
         rts
 .endproc
 
@@ -186,6 +195,8 @@ WidgetUpdatePtr := R18
 ; widget logic can use the low end without conflict
 WidgetUpdatePtr := R18
 CurrentWidgetIndex := R20
+        access_data_bank #<.bank(ui_data_bank)
+
         lda #0
         sta CurrentWidgetIndex
 loop:
@@ -206,6 +217,8 @@ widget_inactive:
         beq done
         jmp loop
 done:
+
+        restore_previous_bank
         rts
 .endproc
 

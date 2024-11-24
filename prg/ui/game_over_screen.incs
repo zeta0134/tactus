@@ -2,6 +2,8 @@
 ;                         Layouts and Widgets
 ; ======================================================================
 
+.segment "DATA_UI_LAYOUTS"
+
 game_over_screen_ui_layout:
         widget_controller game_over_controller_init
         widget_cursor
@@ -10,11 +12,13 @@ game_over_screen_ui_layout:
 
 game_over_str:   .asciiz "GAME OVER (WIP)"
 
+.segment "CODE_UI_WIDGETS"
+
 .proc game_over_controller_init
 CurrentWidgetIndex := R20
 
         ldy CurrentWidgetIndex
-        set_widget_state_y file_select_controller_update
+        set_widget_state_y game_over_controller_update
         rts
 .endproc
 

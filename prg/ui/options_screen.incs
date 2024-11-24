@@ -2,10 +2,13 @@
 ;                         Layouts and Widgets
 ; ======================================================================
 
+
 .macro widget_options_battlefield
     .addr options_battlefield_init
     .byte 0, 0, 0, 0, 0, 0, 0, 0
 .endmacro
+
+.segment "DATA_UI_LAYOUTS"
 
 options_ui_layout:
         widget_controller options_controller_init
@@ -82,14 +85,16 @@ game_mode_standard_str:   .asciiz "STANDARD"
 game_mode_patient_str:    .asciiz "PATIENT"
 game_mode_doubletime_str: .asciiz "DOUBLETIME"
 
-; ======================================================================
-;                       Screen Specific Logic
-; ======================================================================
-
 options_battlefield_bg_palette:
         .incbin "../art/dank_cave.pal"
 options_obj_palette:
         .incbin "../art/options_sprite_palette.pal"
+
+; ======================================================================
+;                       Screen Specific Logic
+; ======================================================================
+
+.segment "CODE_UI_WIDGETS"
 
 .proc options_controller_init
 MetaSpriteIndex := R0
