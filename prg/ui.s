@@ -328,10 +328,51 @@ PaletteIndex := T7
         sta StringPtr+1
         lda #CHR_BANK_FONT_MARSHMALLOW
         sta TileBase
-        lda #0 ; sure, why not
+        lda #0
         sta PaletteIndex
         jsr FIXED_draw_string
 
         rts
 .endproc
 
+.proc _draw_widget_label_pal
+CurrentWidgetIndex := R20
+
+; rename the data labels to something more readable
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_text_string_low := widgets_data2
+widget_text_string_high := widgets_data3
+widget_text_pal_index := widgets_data7
+
+; arguments to string drawing functions
+NametableAddr := T0
+AttributeAddr := T2
+TileX := T4
+TileY := T5
+StringPtr := T4
+TileBase := T6
+PaletteIndex := T7
+        perform_zpcm_inc
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        sta TileX
+        lda widget_tile_y, y
+        sta TileY
+        st16 NametableAddr, $5000
+        st16 AttributeAddr, $5800
+        far_call FAR_nametable_from_coordinates
+        perform_zpcm_inc
+        ldy CurrentWidgetIndex
+        lda widget_text_string_low, y
+        sta StringPtr+0
+        lda widget_text_string_high, y
+        sta StringPtr+1
+        lda #CHR_BANK_FONT_MARSHMALLOW
+        sta TileBase
+        lda widget_text_pal_index, y
+        sta PaletteIndex
+        jsr FIXED_draw_string
+
+        rts
+.endproc

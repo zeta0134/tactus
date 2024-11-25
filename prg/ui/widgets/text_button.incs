@@ -3,7 +3,15 @@
     .byte tile_x, tile_y
     .addr text_string
     .addr action_func_ptr
-    .byte 0, 0
+    .byte 0, UI_PAL_BG0
+.endmacro
+
+.macro widget_text_button_attr text_string, action_func_ptr, tile_x, tile_y, text_attr
+    .addr widget_text_button_init
+    .byte tile_x, tile_y
+    .addr text_string
+    .addr action_func_ptr
+    .byte 0, text_attr
 .endmacro
 
 .segment "CODE_UI_WIDGETS"
@@ -40,7 +48,7 @@ widget_label_string_high := widgets_data3
         sta widgets_state_flags, y
 
         ; draw the initial label and options for this widget
-        jsr _draw_widget_label
+        jsr _draw_widget_label_pal
 
         ; now switch to the update function
         ldy CurrentWidgetIndex

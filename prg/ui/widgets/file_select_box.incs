@@ -407,6 +407,8 @@ draw_existing_file:
         sta ObjPaletteBuffer+2, x
         lda player_ingame_palette_pigment
         sta ObjPaletteBuffer+3, x
+        lda #1
+        sta ObjPaletteDirty
         ; Now move the sprite into position
         ldy CurrentWidgetIndex
         lda widgets_cursor_pos_y, y
