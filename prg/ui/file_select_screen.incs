@@ -195,6 +195,39 @@ widget_file_select_mode := widgets_data0
         ldy CurrentWidgetIndex
         lda #FILE_SELECT_MODE_NORMAL
         sta widget_file_select_mode, y
+        set_widget_state_y file_select_controller_default_cursor
+        rts
+.endproc
+
+.proc file_select_controller_default_cursor
+CurrentWidgetIndex := R20
+
+widget_cursor_nav_index := widgets_data1
+widget_sprite_position_low_x := widgets_data2
+widget_sprite_position_low_y := widgets_data3
+widget_sprite_position_high_x := widgets_data4
+widget_sprite_position_high_y := widgets_data5
+
+        ; Now that we've initialized all widgets, detect the location of the
+        ; last-used file and move the cursor there
+        lda current_block + SaveBlock::LastUsedSlot
+        clc
+        adc #FILE_SELECT_FILE_1_INDEX
+        ldy #FILE_SELECT_CURSOR_INDEX
+        sta widget_cursor_nav_index, y
+
+        ; same as snap to position, just without the hardcoded indexes
+        tax
+        lda widgets_cursor_pos_x, x
+        sta widget_sprite_position_high_x, y
+        lda widgets_cursor_pos_y, x
+        sta widget_sprite_position_high_y, y
+        ldy CurrentWidgetIndex
+        lda #0
+        sta widget_sprite_position_low_x, y
+        sta widget_sprite_position_low_y, y
+
+        ldy CurrentWidgetIndex
         set_widget_state_y file_select_controller_update
         rts
 .endproc
@@ -286,6 +319,9 @@ open_existing_file:
         lda widget_file_index, y
         far_call FAR_load_file
         far_call FAR_compute_player_colors
+        ldy WidgetIndexUnderCursor
+        lda widget_file_index, y
+        far_call FAR_update_last_accessed_file
         jsr go_to_file_details
         rts
 
@@ -295,6 +331,9 @@ open_new_file:
         far_call FAR_load_file
         far_call FAR_init_file_options
         far_call FAR_compute_player_colors
+        ldy WidgetIndexUnderCursor
+        lda widget_file_index, y
+        far_call FAR_update_last_accessed_file
         jsr go_to_name_entry
         rts
 .endproc
