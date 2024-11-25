@@ -1,5 +1,6 @@
 .global FAR_init_file_options
 .global FAR_compute_player_colors
+.global FAR_compute_colors_for_save_slot
 
 ; the LUT those sliders index into:
 .global palette_preset_lut_phones

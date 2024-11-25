@@ -70,7 +70,7 @@ widget_action_func_high := widgets_data5
         bne check_for_action_input
         rts
 check_for_action_input:
-        lda #(KEY_A | KEY_START)
+        lda #(KEY_A)
         and ButtonsDown
         beq do_nothing
 

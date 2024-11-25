@@ -52,7 +52,7 @@ palette_preset_lut_pigment: .byte 0, 32, 19,  5, 30, 31
 ;palette_preset_lut_pajamas: .byte 19, 36, 10, 22
 ;palette_preset_lut_pigment: .byte 21, 22, 20, 15
 
-    .segment "CODE_1"
+    .segment "CODE_2"
 
 player_colors_shoes_accessories_lut:
     .byte $0F, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C ;  (-)  (0)
@@ -159,6 +159,101 @@ use_custom_palette:
     jsr _set_pajamas_color
     ldy current_save + SaveFile::PlayerPalettePigmentIndex
     jsr _set_pigment_color
+    rts
+.endproc
+
+.proc _compute_file_1_colors
+    lda current_block + SaveBlock::SaveSlot1 + SaveFile::PlayerPalettePreset
+    cmp #PLAYER_PALETTE_PERSONALIZED
+    beq use_custom_palette
+
+use_preset_palette:
+    ldx current_block + SaveBlock::SaveSlot1 + SaveFile::PlayerPalettePreset
+    ldy palette_preset_lut_phones, x
+    jsr _set_phones_color
+    ldy palette_preset_lut_pajamas, x
+    jsr _set_pajamas_color
+    ldy palette_preset_lut_pigment, x
+    jsr _set_pigment_color
+    rts
+
+use_custom_palette:
+    ldy current_block + SaveBlock::SaveSlot1 + SaveFile::PlayerPalettePhonesIndex
+    jsr _set_phones_color
+    ldy current_block + SaveBlock::SaveSlot1 + SaveFile::PlayerPalettePajamasIndex
+    jsr _set_pajamas_color
+    ldy current_block + SaveBlock::SaveSlot1 + SaveFile::PlayerPalettePigmentIndex
+    jsr _set_pigment_color
+    rts
+.endproc
+
+.proc _compute_file_2_colors
+    lda current_block + SaveBlock::SaveSlot2 + SaveFile::PlayerPalettePreset
+    cmp #PLAYER_PALETTE_PERSONALIZED
+    beq use_custom_palette
+
+use_preset_palette:
+    ldx current_block + SaveBlock::SaveSlot2 + SaveFile::PlayerPalettePreset
+    ldy palette_preset_lut_phones, x
+    jsr _set_phones_color
+    ldy palette_preset_lut_pajamas, x
+    jsr _set_pajamas_color
+    ldy palette_preset_lut_pigment, x
+    jsr _set_pigment_color
+    rts
+
+use_custom_palette:
+    ldy current_block + SaveBlock::SaveSlot2 + SaveFile::PlayerPalettePhonesIndex
+    jsr _set_phones_color
+    ldy current_block + SaveBlock::SaveSlot2 + SaveFile::PlayerPalettePajamasIndex
+    jsr _set_pajamas_color
+    ldy current_block + SaveBlock::SaveSlot2 + SaveFile::PlayerPalettePigmentIndex
+    jsr _set_pigment_color
+    rts
+.endproc
+
+.proc _compute_file_3_colors
+    lda current_block + SaveBlock::SaveSlot3 + SaveFile::PlayerPalettePreset
+    cmp #PLAYER_PALETTE_PERSONALIZED
+    beq use_custom_palette
+
+use_preset_palette:
+    ldx current_block + SaveBlock::SaveSlot3 + SaveFile::PlayerPalettePreset
+    ldy palette_preset_lut_phones, x
+    jsr _set_phones_color
+    ldy palette_preset_lut_pajamas, x
+    jsr _set_pajamas_color
+    ldy palette_preset_lut_pigment, x
+    jsr _set_pigment_color
+    rts
+
+use_custom_palette:
+    ldy current_block + SaveBlock::SaveSlot3 + SaveFile::PlayerPalettePhonesIndex
+    jsr _set_phones_color
+    ldy current_block + SaveBlock::SaveSlot3 + SaveFile::PlayerPalettePajamasIndex
+    jsr _set_pajamas_color
+    ldy current_block + SaveBlock::SaveSlot3 + SaveFile::PlayerPalettePigmentIndex
+    jsr _set_pigment_color
+    rts
+.endproc
+
+; save slot in A
+.proc FAR_compute_colors_for_save_slot
+    cmp #0
+    beq compute_file_1
+    cmp #1
+    beq compute_file_2
+    cmp #2
+    beq compute_file_3
+    ; should not be reachable
+compute_file_1:
+    jsr _compute_file_1_colors
+    rts
+compute_file_2:
+    jsr _compute_file_2_colors
+    rts
+compute_file_3:
+    jsr _compute_file_3_colors
     rts
 .endproc
 

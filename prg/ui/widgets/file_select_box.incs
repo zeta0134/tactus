@@ -36,6 +36,10 @@ BOTTOM_EDGE_SHADOW_LIGHT = $13
 SHADOW_CORNER_LIGHT = $11
 SHADOW_CORNER_DARK = $10
 
+.segment "DATA_UI_LAYOUTS"
+
+new_file_str: .asciiz "- NEW FILE -"
+
 .segment "CODE_UI_WIDGETS"
 
 .proc compute_top_left_corner_addr
@@ -332,7 +336,10 @@ file_2:
         rts
 .endproc
 
-new_file_str: .asciiz "NEW FILE"
+player_palette_offset_by_file_id:
+        .byte 0, 8, 12
+player_palette_by_file_id:
+        .byte SPRITE_PAL_0, SPRITE_PAL_2, SPRITE_PAL_3
 
 .proc draw_file_contents
 ; FIXED_draw_string
@@ -350,6 +357,7 @@ CurrentWidgetIndex := R20
 widget_tile_x := widgets_data0
 widget_tile_y := widgets_data1
 widget_file_index := widgets_data2
+widget_sprite_index := widgets_data4
 
         st16 NametableAddr, $5000
         st16 AttributeAddr, $5800
@@ -357,7 +365,7 @@ widget_file_index := widgets_data2
         ldy CurrentWidgetIndex
         lda widget_tile_x, y
         clc
-        adc #4
+        adc #6
         sta TileX
         lda widget_tile_y, y
         clc
@@ -381,6 +389,30 @@ draw_existing_file:
         sta PaletteIndex
         jsr FIXED_draw_string
         ; TODO: any other fun status things we want to show in the second row
+
+        ; This file exists! Oh boy. Let's work out the colors then
+        ldy CurrentWidgetIndex
+        lda widget_file_index, y
+        far_call FAR_compute_colors_for_save_slot
+        ; use our file index as an offset into the palette data
+        ldy CurrentWidgetIndex
+        lda widget_file_index, y
+        tax
+        lda player_palette_offset_by_file_id, x
+        tax
+        ; and transfer!
+        lda player_ingame_palette_phones
+        sta ObjPaletteBuffer+1, x
+        lda player_ingame_palette_pajamas
+        sta ObjPaletteBuffer+2, x
+        lda player_ingame_palette_pigment
+        sta ObjPaletteBuffer+3, x
+        ; Now move the sprite into position
+        ldy CurrentWidgetIndex
+        lda widgets_cursor_pos_y, y
+        ldx widget_sprite_index, y
+        sta sprite_table + MetaSpriteState::PositionY, x
+
         rts
 
 draw_new_file:
@@ -390,10 +422,19 @@ draw_new_file:
         lda #UI_PAL_BG1
         sta PaletteIndex
         jsr FIXED_draw_string
+
+        ; new files won't display a player sprite, so just move it offscreen
+        ldy CurrentWidgetIndex
+        ldx widget_sprite_index, y
+        lda #$F0
+        sta sprite_table + MetaSpriteState::PositionY, x
+
         rts
 .endproc
 
 .proc widget_file_select_box_init
+MetaSpriteIndex := R0
+
 Top := R0
 Left := R1
 Width := R2
@@ -405,6 +446,7 @@ widget_tile_x := widgets_data0
 widget_tile_y := widgets_data1
 widget_file_index := widgets_data2
 widget_current_hover_state := widgets_data3
+widget_sprite_index := widgets_data4
 
         ldy CurrentWidgetIndex
         lda widget_tile_x, y
@@ -447,7 +489,30 @@ widget_current_hover_state := widgets_data3
         lda #0
         sta widget_current_hover_state, y
 
-        ; populate this box's contents
+        ; spawn in a sprite!
+        far_call FAR_find_unused_sprite
+        lda MetaSpriteIndex
+        ldy CurrentWidgetIndex
+        sta widget_sprite_index, y
+
+
+        ldx widget_sprite_index, y
+        lda #(SPRITE_ACTIVE | SPRITE_HORIZ_FLIP | SPRITE_PAL_1)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+        ; Use the cursor position but +16
+        lda widgets_cursor_pos_x, y
+        clc
+        adc #24
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda #$F0 ; offscreen for now 
+        sta sprite_table + MetaSpriteState::PositionY, x
+        lda #<SPRITE_TILE_PLAYER
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+        ; populate this box's contents (which manipulates that sprite
+        ; up there)
         jsr draw_file_contents
 
         ldy CurrentWidgetIndex
@@ -467,6 +532,7 @@ widget_tile_x := widgets_data0
 widget_tile_y := widgets_data1
 widget_file_index := widgets_data2
 widget_current_hover_state := widgets_data3
+widget_sprite_index := widgets_data4
     
         ; are we currently hovered?
         ldy CurrentWidgetIndex
@@ -492,6 +558,11 @@ we_are_not_hovered:
         ldy CurrentWidgetIndex
         lda #0
         sta widget_current_hover_state, y
+
+        lda #(SPRITE_ACTIVE | SPRITE_HORIZ_FLIP | SPRITE_PAL_1) ; use the cursor palette
+        ldx widget_sprite_index, y
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+
         rts
 we_are_hovered:
         ; same deal but the other way around
@@ -512,6 +583,13 @@ we_are_hovered:
         ldy CurrentWidgetIndex
         lda #1
         sta widget_current_hover_state, y
+
+        lda #(SPRITE_ACTIVE | SPRITE_HORIZ_FLIP)
+        ldx widget_file_index, y
+        ora player_palette_by_file_id, x ; use the real sprite palette
+        ldx widget_sprite_index, y
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+
         rts
 nothing_to_do:
         rts
@@ -522,8 +600,6 @@ CurrentWidgetIndex := R20
 
 ; rename the data labels to something more readable
 widget_file_index := widgets_data2
-widget_action_func_low := widgets_data4
-widget_action_func_high := widgets_data5
 
         jsr redraw_border_if_needed
 

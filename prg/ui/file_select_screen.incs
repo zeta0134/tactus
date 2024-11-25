@@ -98,11 +98,17 @@ bg_loop:
         perform_zpcm_inc
         lda checkerboard_ui_palette_normal, y
         sta BgPaletteBuffer, y
-        lda options_obj_palette, y
-        sta ObjPaletteBuffer, y
         iny
         cpy #16
         bne bg_loop
+
+        lda options_obj_palette+5
+        sta ObjPaletteBuffer+5
+        lda options_obj_palette+6
+        sta ObjPaletteBuffer+6
+        lda options_obj_palette+7
+        sta ObjPaletteBuffer+7
+
         lda #1
         sta BgPaletteDirty
         sta ObjPaletteDirty
@@ -116,11 +122,17 @@ bg_loop:
         perform_zpcm_inc
         lda checkerboard_ui_palette_danger, y
         sta BgPaletteBuffer, y
-        lda options_obj_palette, y
-        sta ObjPaletteBuffer, y
         iny
         cpy #16
         bne bg_loop
+
+        lda options_obj_palette+5
+        sta ObjPaletteBuffer+5
+        lda options_obj_palette+6
+        sta ObjPaletteBuffer+6
+        lda options_obj_palette+7
+        sta ObjPaletteBuffer+7
+        
         lda #1
         sta BgPaletteDirty
         sta ObjPaletteDirty
@@ -273,6 +285,7 @@ open_existing_file:
         ldy WidgetIndexUnderCursor
         lda widget_file_index, y
         far_call FAR_load_file
+        far_call FAR_compute_player_colors
         jsr go_to_file_details
         rts
 
@@ -281,6 +294,7 @@ open_new_file:
         lda widget_file_index, y
         far_call FAR_load_file
         far_call FAR_init_file_options
+        far_call FAR_compute_player_colors
         jsr go_to_name_entry
         rts
 .endproc
@@ -300,8 +314,10 @@ widget_copy_source_index := widgets_data1
         cmp #FILE_NEW
         bne perform_erase_confirm
         ; Fail (and stay in this mode). Play a buzzer SFX to indicate sadness!
-        st16 R0, sfx_cursor_fail
+        st16 R0, sfx_too_poor_pulse1
         jsr play_sfx_pulse1
+        st16 R0, sfx_too_poor_pulse2
+        jsr play_sfx_pulse2
         rts
 
 perform_erase_confirm:
@@ -357,8 +373,10 @@ widget_copy_source_index := widgets_data1
         cmp #FILE_NEW
         bne perform_copy_source_select
         ; Fail (and stay in this mode). Play a buzzer SFX to indicate sadness!
-        st16 R0, sfx_cursor_fail
+        st16 R0, sfx_too_poor_pulse1
         jsr play_sfx_pulse1
+        st16 R0, sfx_too_poor_pulse2
+        jsr play_sfx_pulse2
         rts
 
 perform_copy_source_select:
@@ -384,13 +402,17 @@ widget_copy_source_index := widgets_data1
 
         ; First a sanity check: we can't copy a file into the same slot. If the user
         ; tries to request this, audibly laugh at them and do nothing
+        ; (this shouldn't be reachable anyway, we disable selecting the same slot
+        ; during copy dest, but it's better to be safe)
         ldy #FILE_SELECT_CONTROLLER_INDEX
         lda widget_copy_source_index, y
         ldy WidgetIndexUnderCursor
         cmp widget_file_index, y
         bne copy_dest_is_valid
-        st16 R0, sfx_cursor_fail
+        st16 R0, sfx_too_poor_pulse1
         jsr play_sfx_pulse1
+        st16 R0, sfx_too_poor_pulse2
+        jsr play_sfx_pulse2
         rts
 
 copy_dest_is_valid:

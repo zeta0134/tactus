@@ -34,6 +34,8 @@ title_ui_layout:
         ; The title screen should apply the last player palette that was
         ; used, for consistency (and so we don't have a "preferred" skin tone)
         far_call FAR_apply_player_palette
+        lda #1
+        sta ObjPaletteDirty
 
         ; Play the title track on the title screen
         lda #TRACK_TITLE
@@ -53,5 +55,11 @@ CurrentWidgetIndex := R20
         jsr next_run_rand
         jsr next_gameplay_rand
 
+        lda #KEY_START
+        and ButtonsDown
+        beq stay_here
+        jsr go_to_file_select
+
+stay_here:
         rts
 .endproc

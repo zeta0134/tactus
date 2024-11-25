@@ -127,7 +127,7 @@ continue_waiting:
         far_call FAR_disable_all_oam_entries_hud
 
         near_call FAR_init_save_subsystem
-        near_call FAR_compute_player_colors
+        far_call FAR_compute_player_colors
 
         ; NORMAL: start on the title screen
         ; TODO: add the boxgirl productions logo, and any other "first run" screens here
