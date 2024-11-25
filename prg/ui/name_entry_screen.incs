@@ -61,7 +61,7 @@ CurrentWidgetIndex := R20
         sta RightNametableAttr
 
         ; draw an initial checkerboard background (no nametable for now)
-        jsr draw_checkerboard_base
+        far_call FAR_draw_checkerboard_base
         ; Draw a big ol' box to house the name picker
         lda #3
         sta Left

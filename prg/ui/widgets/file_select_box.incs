@@ -36,6 +36,8 @@ BOTTOM_EDGE_SHADOW_LIGHT = $13
 SHADOW_CORNER_LIGHT = $11
 SHADOW_CORNER_DARK = $10
 
+.segment "CODE_UI_WIDGETS"
+
 .proc compute_top_left_corner_addr
 Top := R0
 Left := R1
@@ -71,9 +73,9 @@ AttributeAddr := R6
 .proc draw_box_outline_light
 ShadowAttr := R9
 BoxOutlineAttr := R10
-        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG3)
         sta ShadowAttr
-        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG2)
         sta BoxOutlineAttr
         jmp _draw_box_outline_common
 .endproc
@@ -81,9 +83,9 @@ BoxOutlineAttr := R10
 .proc draw_box_outline_dark
 ShadowAttr := R9
 BoxOutlineAttr := R10
-        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG3)
         sta ShadowAttr
-        lda #(CHR_BANK_FONT_MARSHMALLOW_DARK | UI_PAL_BG1)
+        lda #(CHR_BANK_FONT_MARSHMALLOW_DARK | UI_PAL_BG2)
         sta BoxOutlineAttr
         jmp _draw_box_outline_common
 .endproc

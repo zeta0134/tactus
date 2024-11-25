@@ -6,6 +6,8 @@
     .addr data_target
 .endmacro
 
+.segment "CODE_UI_WIDGETS"
+
 .proc widget_text_options_init
 CurrentWidgetIndex := R20
 

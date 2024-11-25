@@ -122,6 +122,15 @@ player_title_colors_accessories_lut:
     clc
     adc #NEW_FILE_PALETTE_MIN
     sta current_save + SaveFile::PlayerPalettePreset
+    ; Use this to initialize the personalized sliders, just to avoid some dumb
+    ; problems with defaults when these disagree
+    ldx current_save + SaveFile::PlayerPalettePreset
+    lda palette_preset_lut_phones, x 
+    sta current_save + SaveFile::PlayerPalettePhonesIndex
+    lda palette_preset_lut_pajamas, x 
+    sta current_save + SaveFile::PlayerPalettePajamasIndex
+    lda palette_preset_lut_pigment, x 
+    sta current_save + SaveFile::PlayerPalettePigmentIndex
 
     near_call FAR_compute_player_colors
 

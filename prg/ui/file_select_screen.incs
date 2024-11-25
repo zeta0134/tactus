@@ -46,9 +46,9 @@ FILE_SELECT_MODE_COPY_SOURCE   = 3
 FILE_SELECT_MODE_COPY_DEST     = 4
 FILE_SELECT_MODE_COPY_CONFIRM  = 5
 
-.segment "CODE_UI_WIDGETS"
+.segment "CODE_UI_UTIL"
 
-.proc draw_checkerboard_base
+.proc FAR_draw_checkerboard_base
 NametableAddr := R0
 AttributeAddr := R2
 CheckTracker := R4
@@ -74,7 +74,7 @@ dark_square:
         lda #DARK_SQUARE_TILE
 tile_converge:
         sta (NametableAddr), y
-        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG3)
         sta (AttributeAddr), y
         iny
         cpy #32
@@ -88,6 +88,8 @@ tile_converge:
         bne row_loop
         rts
 .endproc
+
+.segment "CODE_UI_WIDGETS"
 
 .proc file_select_controller_init
 Top := R0
@@ -114,7 +116,7 @@ widget_file_select_mode := widgets_data0
         sta RightNametableAttr
 
         ; draw an initial checkerboard background (no nametable for now)
-        jsr draw_checkerboard_base
+        far_call FAR_draw_checkerboard_base
         ; draw boxes for the "File Select" top thing, and the "erase/copy" options down below
         lda #7
         sta Left
@@ -144,8 +146,7 @@ widget_file_select_mode := widgets_data0
         ldy #0
 bg_loop:
         perform_zpcm_inc
-        ; TODO: use file select palette here!
-        lda options_battlefield_bg_palette, y
+        lda checkerboard_ui_palette_normal, y
         sta BgPaletteBuffer, y
         lda options_obj_palette, y
         sta ObjPaletteBuffer, y
@@ -198,7 +199,7 @@ widget_file_select_mode := widgets_data0
 
 file_action_dispatch_table:
         .addr with_file_open           ; FILE_SELECT_MODE_NORMAL
-        .addr enter_erase_confirm_mode ; FILE_SELECT_MODE_ERASE
+        .addr with_file_try_erase      ; FILE_SELECT_MODE_ERASE
         .addr with_file_erase          ; FILE_SELECT_MODE_ERASE_CONFIRM
         .addr with_file_set_copy_dest  ; FILE_SELECT_MODE_COPY_SOURCE
         .addr with_file_try_copy       ; FILE_SELECT_MODE_COPY_DEST
@@ -245,6 +246,30 @@ open_new_file:
         far_call FAR_load_file
         far_call FAR_init_file_options
         jsr go_to_name_entry
+        rts
+.endproc
+
+.proc with_file_try_erase
+WidgetIndexUnderCursor := R20
+
+widget_file_index := widgets_data2
+
+widget_copy_source_index := widgets_data1
+
+        ; if the source selected is a new file. let's check for that
+        ldy WidgetIndexUnderCursor
+        lda widget_file_index, y
+        jsr prepare_file_pointer
+        far_call FAR_is_new_file
+        cmp #FILE_NEW
+        bne perform_erase_confirm
+        ; Fail (and stay in this mode). Play a buzzer SFX to indicate sadness!
+        st16 R0, sfx_cursor_fail
+        jsr play_sfx_pulse1
+        rts
+
+perform_erase_confirm:
+        jsr enter_erase_confirm_mode
         rts
 .endproc
 

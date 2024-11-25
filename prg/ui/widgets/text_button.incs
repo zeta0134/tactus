@@ -6,6 +6,8 @@
     .byte 0, 0
 .endmacro
 
+.segment "CODE_UI_WIDGETS"
+
 .proc widget_text_button_init
 CurrentWidgetIndex := R20
 

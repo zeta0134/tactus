@@ -63,6 +63,10 @@ LastBeat: .res 1
 
         .segment "DATA_UI_LAYOUTS"
 ui_data_bank:
+
+checkerboard_ui_palette_normal:
+        .incbin "art/ui_bg_palette.pal"
+
         ; Also sortof our "default UI code" for the moment
         .segment "CODE_UI_WIDGETS"
 

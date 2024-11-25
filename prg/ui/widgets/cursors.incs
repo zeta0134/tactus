@@ -8,6 +8,153 @@
     .byte 0, 0, 0, 0, 0, 0, 0, 0
 .endmacro
 
+.segment "DATA_UI_LAYOUTS"
+
+JUMP_HEIGHT_END = 5
+jump_height_table:
+        .byte 14, 14, 11, 7, 2, 0
+
+.segment "CODE_UI_UTIL"
+
+.proc FAR_count_beats
+CurrentWidgetIndex := R20
+
+widget_sprite_index := widgets_data0
+widget_sprite_position_high_x := widgets_data4
+widget_sprite_position_high_y := widgets_data5
+widget_beats_at_this_location := widgets_data6
+        lda CurrentBeat
+        cmp LastBeat
+        bne process_next_beat
+        rts
+process_next_beat:
+        sta LastBeat
+        ldy CurrentWidgetIndex
+        lda widget_beats_at_this_location, y
+        clc
+        adc #1
+        beq counter_maxed
+        sta widget_beats_at_this_location, y
+counter_maxed:
+        rts
+.endproc
+
+; result placed in R0
+; returns #$FF on failure
+.proc FAR_find_first_active_widget
+TargetWidgetIndex := R0
+        ldy #0
+loop:
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_NAVIGABLE
+        bne found_one
+        iny
+        cmp #::MAX_WIDGETS
+        bne loop
+did_not_find_one:
+        lda #$FF
+        sta TargetWidgetIndex
+        rts
+found_one:
+        tya
+        sta TargetWidgetIndex
+        rts
+.endproc
+
+; for right now, widgets are in a simple linked list, and
+; we traverse the items in that list in order. we might expand
+; on this later, but we're thinking this will serve our needs
+; for a good long while
+.proc FAR_move_to_next_active_widget
+TargetWidgetIndex := R0
+CurrentWidgetIndex := R20
+widget_beats_at_this_location := widgets_data6
+widget_frames_at_this_location := widgets_data7
+        ; starting at our position +1, scan forward for an active widget
+        ldy TargetWidgetIndex
+        iny
+        cpy #::MAX_WIDGETS   ; safety: if we run off the end of the list, bail
+        beq did_not_find_one
+loop:
+        perform_zpcm_inc
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_NAVIGABLE
+        bne found_one
+        iny
+        cpy #::MAX_WIDGETS
+        bne loop
+did_not_find_one:
+        ; leave the target unchanged!
+        rts
+found_one:
+        tya
+        sta TargetWidgetIndex
+        ; reset our "frames at this location" counter to 0
+        ; (the player cursor relies on this for jump height shenanigans)
+        ldy CurrentWidgetIndex
+        lda #0
+        sta widget_beats_at_this_location, y
+        sta widget_frames_at_this_location, y
+
+        ; preserve?
+        lda R0
+        pha
+        st16 R0, sfx_move_cursor
+        jsr play_sfx_pulse2
+        pla
+        sta R0
+
+        perform_zpcm_inc
+
+        rts
+.endproc
+
+.proc FAR_move_to_previous_active_widget
+TargetWidgetIndex := R0
+CurrentWidgetIndex := R20
+widget_beats_at_this_location := widgets_data6
+widget_frames_at_this_location := widgets_data7
+        ; starting at our position -1, scan forward for an active widget
+        ldy TargetWidgetIndex
+        beq did_not_find_one
+        dey
+loop:
+        perform_zpcm_inc
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_NAVIGABLE
+        bne found_one
+        cpy #0
+        beq did_not_find_one
+        dey
+        bne loop
+did_not_find_one:
+        ; leave the target unchanged!
+        rts
+found_one:
+        tya
+        sta TargetWidgetIndex
+        ; reset our "frames at this location" counter to 0
+        ; (the player cursor relies on this for jump height shenanigans)
+        ldy CurrentWidgetIndex
+        lda #0
+        sta widget_beats_at_this_location, y
+        sta widget_frames_at_this_location, y
+
+        ; preserve
+        lda R0
+        pha
+        st16 R0, sfx_move_cursor
+        jsr play_sfx_pulse2
+        pla
+        sta R0
+
+        perform_zpcm_inc
+
+        rts
+.endproc
+
+.segment "CODE_UI_WIDGETS"
+
 .proc widget_cursor_init
 MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
@@ -88,7 +235,7 @@ continue_considering:
         bne target_valid
 find_new_widget:
         perform_zpcm_inc
-        jsr find_first_active_widget
+        far_call FAR_find_first_active_widget
         ldy CurrentWidgetIndex
         lda TargetWidgetIndex
         sta widget_cursor_nav_index, y
@@ -117,14 +264,14 @@ target_valid:
         bne handle_move_up
         jmp update_at_active_position
 handle_move_down:
-        jsr move_to_next_active_widget
+        far_call FAR_move_to_next_active_widget
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda TargetWidgetIndex
         sta widget_cursor_nav_index, y
         jmp update_at_active_position
 handle_move_up:
-        jsr move_to_previous_active_widget
+        far_call FAR_move_to_previous_active_widget
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda TargetWidgetIndex
@@ -203,11 +350,6 @@ widget_frames_at_this_location := widgets_data7
         rts
 .endproc
 
-JUMP_HEIGHT_END = 5
-jump_height_table:
-        .byte 14, 14, 11, 7, 2, 0
-        ;.byte 20, 28, 22, 14, 4, 0
-
 .proc widget_player_cursor_update
 HeightOffsetScratch := R0
 
@@ -250,7 +392,7 @@ no_adjustment:
 
         perform_zpcm_inc
 
-        jsr count_beats ; preserves X
+        far_call FAR_count_beats ; preserves X
         ; if we've been at this position for long enough, switch to the idle fidget
         ldy CurrentWidgetIndex
         lda widget_beats_at_this_location, y
@@ -263,144 +405,6 @@ use_regular_pose:
 use_idle_pose:
         lda #<SPRITE_TILE_PLAYER_IDLE
         sta sprite_table + MetaSpriteState::TileIndex, x
-        rts
-.endproc
-
-
-.proc count_beats
-CurrentWidgetIndex := R20
-
-widget_sprite_index := widgets_data0
-widget_sprite_position_high_x := widgets_data4
-widget_sprite_position_high_y := widgets_data5
-widget_beats_at_this_location := widgets_data6
-        lda CurrentBeat
-        cmp LastBeat
-        bne process_next_beat
-        rts
-process_next_beat:
-        sta LastBeat
-        ldy CurrentWidgetIndex
-        lda widget_beats_at_this_location, y
-        clc
-        adc #1
-        beq counter_maxed
-        sta widget_beats_at_this_location, y
-counter_maxed:
-        rts
-.endproc
-
-; result placed in R0
-; returns #$FF on failure
-.proc find_first_active_widget
-TargetWidgetIndex := R0
-        ldy #0
-loop:
-        lda widgets_state_flags, y
-        and #WIDGET_STATE_NAVIGABLE
-        bne found_one
-        iny
-        cmp #::MAX_WIDGETS
-        bne loop
-did_not_find_one:
-        lda #$FF
-        sta TargetWidgetIndex
-        rts
-found_one:
-        tya
-        sta TargetWidgetIndex
-        rts
-.endproc
-
-; for right now, widgets are in a simple linked list, and
-; we traverse the items in that list in order. we might expand
-; on this later, but we're thinking this will serve our needs
-; for a good long while
-.proc move_to_next_active_widget
-TargetWidgetIndex := R0
-CurrentWidgetIndex := R20
-widget_beats_at_this_location := widgets_data6
-widget_frames_at_this_location := widgets_data7
-        ; starting at our position +1, scan forward for an active widget
-        ldy TargetWidgetIndex
-        iny
-        cpy #::MAX_WIDGETS   ; safety: if we run off the end of the list, bail
-        beq did_not_find_one
-loop:
-        perform_zpcm_inc
-        lda widgets_state_flags, y
-        and #WIDGET_STATE_NAVIGABLE
-        bne found_one
-        iny
-        cpy #::MAX_WIDGETS
-        bne loop
-did_not_find_one:
-        ; leave the target unchanged!
-        rts
-found_one:
-        tya
-        sta TargetWidgetIndex
-        ; reset our "frames at this location" counter to 0
-        ; (the player cursor relies on this for jump height shenanigans)
-        ldy CurrentWidgetIndex
-        lda #0
-        sta widget_beats_at_this_location, y
-        sta widget_frames_at_this_location, y
-
-        ; preserve?
-        lda R0
-        pha
-        st16 R0, sfx_move_cursor
-        jsr play_sfx_pulse2
-        pla
-        sta R0
-
-        perform_zpcm_inc
-
-        rts
-.endproc
-
-.proc move_to_previous_active_widget
-TargetWidgetIndex := R0
-CurrentWidgetIndex := R20
-widget_beats_at_this_location := widgets_data6
-widget_frames_at_this_location := widgets_data7
-        ; starting at our position -1, scan forward for an active widget
-        ldy TargetWidgetIndex
-        beq did_not_find_one
-        dey
-loop:
-        perform_zpcm_inc
-        lda widgets_state_flags, y
-        and #WIDGET_STATE_NAVIGABLE
-        bne found_one
-        cpy #0
-        beq did_not_find_one
-        dey
-        bne loop
-did_not_find_one:
-        ; leave the target unchanged!
-        rts
-found_one:
-        tya
-        sta TargetWidgetIndex
-        ; reset our "frames at this location" counter to 0
-        ; (the player cursor relies on this for jump height shenanigans)
-        ldy CurrentWidgetIndex
-        lda #0
-        sta widget_beats_at_this_location, y
-        sta widget_frames_at_this_location, y
-
-        ; preserve
-        lda R0
-        pha
-        st16 R0, sfx_move_cursor
-        jsr play_sfx_pulse2
-        pla
-        sta R0
-
-        perform_zpcm_inc
-
         rts
 .endproc
 

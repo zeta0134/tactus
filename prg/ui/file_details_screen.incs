@@ -48,7 +48,7 @@ widget_last_cursor_pos := widgets_data0
         sta RightNametableAttr
 
         ; draw an initial checkerboard background (no nametable for now)
-        jsr draw_checkerboard_base
+        far_call FAR_draw_checkerboard_base
 
         jsr file_details_draw_buttons
 

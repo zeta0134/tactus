@@ -133,6 +133,8 @@ border_loop:
         sta staging_palette+16+4
         sta staging_palette+16+8
         sta staging_palette+16+12
+        sta ObjPaletteBuffer+8
+        sta BgPaletteBuffer+8
 
 check_for_active:
         lda DialogInitiateActiveMode
@@ -210,6 +212,8 @@ done:
 
         lda #$2D
         sta staging_palette+16+8
+        sta ObjPaletteBuffer+8
+        sta BgPaletteBuffer+8
 
         inc DialogOpenClosePos
         ldx DialogOpenClosePos

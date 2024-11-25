@@ -6,6 +6,7 @@
     .addr data_target
 .endmacro
 
+.segment "CODE_UI_WIDGETS"
 
 .proc widget_numeric_slider_init
 MetaSpriteIndex := R0

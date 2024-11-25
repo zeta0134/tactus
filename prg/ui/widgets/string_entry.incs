@@ -11,6 +11,8 @@
         .byte 0, 0, 0, 0
 .endmacro
 
+.segment "CODE_UI_WIDGETS"
+
 TARGET_STRING_TOP_TILE  = 9
 TARGET_STRING_LEFT_TILE = 8
 

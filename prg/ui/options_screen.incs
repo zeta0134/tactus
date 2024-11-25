@@ -32,6 +32,9 @@ options_ui_layout:
 ; Used for manual tweaking of the values
 PRESET_FIELD_INDEX = 6
 PRESET_PERSONALIZED_VALUE = 0
+PALETTE_SLIDER_INDEX_1 = 7
+PALETTE_SLIDER_INDEX_2 = 9
+PALETTE_SLIDER_INDEX_3 = 11
 
 game_options_str:   .asciiz "GAMEPLAY OPTIONS"
 game_mode_str:      .asciiz "Rhythm "
@@ -545,7 +548,22 @@ perform_shenanigans:
         lda widgets_state_flags, x
         and #WIDGET_STATE_HOVER
         bne preset_is_hovered
-preset_is_not_hovered:
+        ldx #PALETTE_SLIDER_INDEX_1
+        lda widgets_state_flags, x
+        and #WIDGET_STATE_HOVER
+        bne slider_is_hovered
+        ldx #PALETTE_SLIDER_INDEX_2
+        lda widgets_state_flags, x
+        and #WIDGET_STATE_HOVER
+        bne slider_is_hovered
+        ldx #PALETTE_SLIDER_INDEX_3
+        lda widgets_state_flags, x
+        and #WIDGET_STATE_HOVER
+        bne slider_is_hovered
+        ; nothing is hovered! apply no shenanigans
+        rts
+        
+slider_is_hovered:
         jsr sync_sliders_to_preset
         jsr update_player_color_values
         rts
