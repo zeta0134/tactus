@@ -11,8 +11,8 @@ file_select_ui_layout:
         widget_file_select_box 0, 4, 6
         widget_file_select_box 1, 4, 11
         widget_file_select_box 2, 4, 16
-        widget_text_button erase_file_str, enter_erase_mode, 10, 22
-        widget_text_button copy_file_str, enter_copy_mode, 10, 24
+        widget_text_button erase_file_str, play_sfx_and_enter_erase_mode, 10, 22
+        widget_text_button copy_file_str, play_sfx_and_enter_copy_mode, 10, 24
         .addr $0000 ; end of list
 
 ; Because on this screen we need to reach in and manipulate... everything
@@ -208,6 +208,16 @@ file_cancel_dispatch_table:
 .proc file_select_b_button_dispatch
 DispatchPtr := R0
 widget_file_select_mode := widgets_data0
+        ; For everything except return to title, play a cancel sfx
+        ; (return to title plays teleport SFX instead)
+        ldy #FILE_SELECT_CONTROLLER_INDEX
+        lda widget_file_select_mode, y
+        beq done_with_sfx
+
+        st16 R0, sfx_dialog_close
+        jsr play_sfx_pulse1
+
+done_with_sfx:
         ldy #FILE_SELECT_CONTROLLER_INDEX
         lda widget_file_select_mode, y
         asl
@@ -295,6 +305,9 @@ widget_copy_source_index := widgets_data1
         rts
 
 perform_erase_confirm:
+        st16 R0, sfx_dialog_advance
+        jsr play_sfx_pulse1
+
         jsr enter_erase_confirm_mode
         rts
 .endproc
@@ -316,7 +329,13 @@ widget_file_index := widgets_data2
         ; block, so have it refresh its contents accordingly
         ldy WidgetIndexUnderCursor
         set_widget_state_y widget_file_select_box_refresh
-        ; TODO: play a suitable "file erased" SFX, maybe shake the screen, I dunno
+        ; play a suitable "file erased" SFX, which is also the death sound
+        st16 R0, sfx_death_spin_pulse
+        jsr play_sfx_pulse1
+        st16 R0, sfx_death_spin_pulse
+        jsr play_sfx_pulse1
+        st16 R0, sfx_death_spin_tri
+        jsr play_sfx_triangle
         ; Move back to normal mode!
         jsr enter_normal_mode
 
@@ -348,6 +367,10 @@ perform_copy_source_select:
         lda widget_file_index, y
         ldy #FILE_SELECT_CONTROLLER_INDEX
         sta widget_copy_source_index, y
+        ; Play an advance SFX
+        st16 R0, sfx_dialog_advance
+        jsr play_sfx_pulse1
+
         jsr enter_copy_dest_mode
         rts
 .endproc
@@ -371,7 +394,6 @@ widget_copy_source_index := widgets_data1
         rts
 
 copy_dest_is_valid:
-
         ; Now check to see if this is a new slot. If it is, we can perform the copy
         ; right away
         ldy WidgetIndexUnderCursor
@@ -409,6 +431,11 @@ widget_copy_source_index := widgets_data1
         ; destination widget, so refresh that here
         ldy WidgetIndexUnderCursor
         set_widget_state_y widget_file_select_box_refresh
+
+        ; Play some sort of chime for a successful copy. I dunno, pause?
+        st16 R0, sfx_pause
+        jsr play_sfx_pulse1
+
         ; Move back to normal mode!
         jsr enter_normal_mode
         rts
@@ -496,6 +523,12 @@ widget_text_string_high := widgets_data3
         rts
 .endproc
 
+.proc play_sfx_and_enter_erase_mode
+        st16 R0, sfx_dialog_advance
+        jsr play_sfx_pulse1
+        jmp enter_erase_mode
+.endproc
+
 ; Various utilities used by the above states
 .proc enter_erase_mode
 widget_file_select_mode := widgets_data0
@@ -563,6 +596,12 @@ widget_text_string_high := widgets_data3
         jsr apply_danger_ui_palette
 
         rts
+.endproc
+
+.proc play_sfx_and_enter_copy_mode
+        st16 R0, sfx_dialog_advance
+        jsr play_sfx_pulse1
+        jmp enter_copy_mode
 .endproc
 
 .proc enter_copy_mode
