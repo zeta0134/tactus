@@ -49,6 +49,7 @@ Width := R2
 Height := R3
 NametableAddr := R4
 AttributeAddr := R6
+        perform_zpcm_inc
         ; compute starting address for the top-left corner
         lda Top
         sta NametableAddr+0
@@ -71,6 +72,7 @@ AttributeAddr := R6
         clc
         adc #$08
         sta AttributeAddr+1
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -114,6 +116,7 @@ BoxOutlineAttr := R10
         sta (AttributeAddr), y
         iny
 top_col_loop:
+        perform_zpcm_inc
         lda #EDGE_TOP_LIGHT
         sta (NametableAddr), y
         lda BoxOutlineAttr
@@ -132,6 +135,7 @@ top_col_loop:
         sbc #2
         sta RowCounter
 middle_row_loop:
+        perform_zpcm_inc
         add16b NametableAddr, #32
         add16b AttributeAddr, #32
         ldy #0
@@ -158,6 +162,7 @@ middle_row_loop:
         sta (AttributeAddr), y
         iny
 bottom_col_loop:
+        perform_zpcm_inc
         lda #EDGE_BOTTOM_LIGHT
         sta (NametableAddr), y
         lda BoxOutlineAttr
@@ -170,6 +175,7 @@ bottom_col_loop:
         lda BoxOutlineAttr
         sta (AttributeAddr), y
 
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -207,6 +213,7 @@ done_picking_top_shadow:
         sbc #1
         sta RowCounter
 middle_row_loop:
+        perform_zpcm_inc
         add16b NametableAddr, #32
         add16b AttributeAddr, #32
         ldy Width
@@ -244,6 +251,7 @@ done_picking_bottom_shadow:
         lda ShadowAttr
         sta (AttributeAddr), y
 shadow_loop:
+        perform_zpcm_inc
         iny ; increment at the _top_ of the loop, since we want to extend 1 past the edge this time
         lda (NametableAddr), y
         cmp #DARK_SQUARE_TILE
@@ -273,6 +281,7 @@ done_picking_bottom_corner_shadow:
         sta (NametableAddr), y
         lda ShadowAttr
         sta (AttributeAddr), y
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -298,6 +307,7 @@ row_loop:
         ; loop over every column in the middle row
         ldy #1
 col_loop:
+        perform_zpcm_inc
         ; set that tile to blank
         lda #0
         sta (NametableAddr), y
@@ -373,6 +383,8 @@ widget_sprite_index := widgets_data4
         sta TileY
         far_call FAR_nametable_from_coordinates
 
+        perform_zpcm_inc
+
         ldy CurrentWidgetIndex
         lda widget_file_index, y
         jsr prepare_file_pointer
@@ -414,6 +426,7 @@ draw_existing_file:
         lda widgets_cursor_pos_y, y
         ldx widget_sprite_index, y
         sta sprite_table + MetaSpriteState::PositionY, x
+        perform_zpcm_inc
 
         rts
 
@@ -430,6 +443,7 @@ draw_new_file:
         ldx widget_sprite_index, y
         lda #$F0
         sta sprite_table + MetaSpriteState::PositionY, x
+        perform_zpcm_inc
 
         rts
 .endproc

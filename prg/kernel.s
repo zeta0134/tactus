@@ -826,6 +826,7 @@ continue_waiting:
         ; - Resolve the player's action
         debug_color (TINT_B | LIGHTGRAY)
         far_call FAR_update_player
+        perform_zpcm_inc
         far_call FAR_update_room_state
         debug_color LIGHTGRAY
 

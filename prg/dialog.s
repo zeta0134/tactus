@@ -94,7 +94,6 @@ dialog_wait_indicator_lut:
 
 .proc update_dialog
         jmp (DialogState)
-        rts
 .endproc
 
 .proc state_init_dialog
@@ -110,6 +109,7 @@ dialog_wait_indicator_lut:
         ; clear the first 3 rows to actually blank
         ldy #0
 text_loop:
+        perform_zpcm_inc
         lda #FONT_BANK
         sta DIALOG_ATTRIBUTE_BASE, y
         lda #0
@@ -118,6 +118,7 @@ text_loop:
         cpy #96
         bne text_loop
 border_loop:
+        perform_zpcm_inc
         lda #(FONT_BANK | HUD_TEXT_PAL)
         sta DIALOG_ATTRIBUTE_BASE, y
         lda #DIALOG_BOTTOM_BORDER
@@ -135,6 +136,8 @@ border_loop:
         sta staging_palette+16+12
         sta ObjPaletteBuffer+8
         sta BgPaletteBuffer+8
+
+        perform_zpcm_inc
 
 check_for_active:
         lda DialogInitiateActiveMode
@@ -167,6 +170,7 @@ check_for_active:
         jsr play_sfx_pulse2
 
         st16 DialogState, state_open_dialog_animation
+        perform_zpcm_inc
         rts
 
 check_for_passive:
@@ -200,9 +204,11 @@ check_for_passive:
         lda #0
         sta DialogOpenClosePos
         st16 DialogState, state_open_dialog_animation
+        perform_zpcm_inc
         rts
 
 done:
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -224,6 +230,7 @@ done:
         ; TODO: whatever mode was requested
         st16 DialogState, state_init_text_display
 continue_opening:
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -237,6 +244,7 @@ continue_opening:
         ; TODO: whatever mode was requested
         st16 DialogState, state_wait_for_activation
 continue_closing:
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -245,6 +253,7 @@ continue_closing:
         st16 DialogAttrPtr, (DIALOG_ATTRIBUTE_BASE+2)
 
         st16 DialogState, state_run_text_display
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -263,6 +272,7 @@ CommandPtr := R0
         beq no_bail
 
         st16 DialogState, state_wait_for_activation
+        perform_zpcm_inc
         rts
 
 no_bail:
@@ -275,6 +285,7 @@ no_bail:
         jsr process_one_character
         
         restore_previous_bank
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -292,6 +303,7 @@ CommandPtr := R0
         jsr __cmd_trampoline
         rts
 draw_single_character:
+        perform_zpcm_inc
         sta (DialogNametablePtr), y
         cmp #' '
         beq no_chirp
@@ -304,6 +316,7 @@ no_chirp:
         inc16 DialogAttrPtr
         ; onward!
         inc16 DialogStringCurrentPtr
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -316,6 +329,7 @@ dialog_command_lut:
         ; TODO: safety? bah!
 
 .proc dialog_cmd_newline
+        perform_zpcm_inc
         ; clear out the low 5 bits to reset to 0, then add 32, then add 2
         lda DialogNametablePtr+0
         and #%11100000
@@ -340,10 +354,12 @@ dialog_command_lut:
 
         ; onward
         inc16 DialogStringCurrentPtr
+        perform_zpcm_inc
         rts
 .endproc
 
 .proc dialog_cmd_clear
+        perform_zpcm_inc
         ; oh, this is probably overkill. we might need to not do this
         ; once we are drawing borders, etc?
         jsr clear_entire_dialog_area
@@ -351,10 +367,12 @@ dialog_command_lut:
         st16 DialogAttrPtr, (DIALOG_ATTRIBUTE_BASE+2)
         ; onward
         inc16 DialogStringCurrentPtr
+        perform_zpcm_inc
         rts
 .endproc
 
 .proc dialog_cmd_wait
+        perform_zpcm_inc
         lda #0
         sta DialogChirpTimer
 
@@ -506,6 +524,7 @@ start_timer:
 .endproc
 
 .proc dialog_cmd_close
+        perform_zpcm_inc
         st16 DialogState, state_close_dialog_animation
         ; Do not advance, there is no more data to process.
         ; If we somehow process this command again, we might softlock the dialog system,
@@ -522,6 +541,7 @@ start_timer:
         sta DialogCurrentAttr
         ; onward properly!
         inc16 DialogStringCurrentPtr
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -567,5 +587,6 @@ play_chirp:
         sta SfxPtr+1
         jsr play_sfx_pulse1
 
+        perform_zpcm_inc
         rts
 .endproc

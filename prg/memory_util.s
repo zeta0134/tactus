@@ -17,7 +17,6 @@ Length := R2
         ; decrement once to start, since we exit when the counter reaches -1
         dec16 Length
 loop:
-        perform_zpcm_inc
         lda #0
         sta (MemoryAddress),y
         inc16 MemoryAddress

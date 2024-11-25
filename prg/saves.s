@@ -11,6 +11,7 @@
     .include "rainbow.inc"
     .include "word_util.inc"
     .include "zeropage.inc"
+    .include "zpcm.inc"
 
     .zeropage
 
@@ -58,6 +59,7 @@ DataPtr := R0
 Length := R2
 ComputedSum := R4
 TempPtr := R8
+    perform_zpcm_inc
     lda DataPtr+0
     sta TempPtr+0
     lda DataPtr+1
@@ -66,6 +68,7 @@ TempPtr := R8
     sty ComputedSum+0
     sty ComputedSum+1
 loop:
+    perform_zpcm_inc
     clc
     lda (TempPtr), y
     adc ComputedSum+0
@@ -92,6 +95,7 @@ SaveFilePtr := R0
     ldx #0
     ldy #SaveFile::PlayerName
 player_name_loop:
+    perform_zpcm_inc
     lda (SaveFilePtr), y
     beq player_name_is_safe
     inx
@@ -115,6 +119,7 @@ SaveFilePtr := R0
     ldx #0
     ldy #SaveFile::PlayerName
 player_name_loop:
+    perform_zpcm_inc
     lda (SaveFilePtr), y
     bne player_name_is_set
     inx
@@ -158,6 +163,7 @@ ChecksumLength := R2
 ComputedSum := R4
 
 TempPtr := R10
+    perform_zpcm_inc
     ; Do some basic checks first, these are faster to compute
 
     ; Save blocks have a hardcoded version. For now, we only support loading
@@ -178,6 +184,8 @@ TempPtr := R10
     cmp #3
     jcs block_invalid
 
+    perform_zpcm_inc
+
     ; The nonce for a given save block should never be
     ; entirely zero filled. We reject this state during nonce
     ; generation, and it almost certainly indicates an empty or
@@ -194,6 +202,8 @@ TempPtr := R10
     iny
     ora (TempPtr), y  ; at least 1 bit in Nonce should have been OR'd in by this point
     jeq block_invalid
+
+    perform_zpcm_inc
 
     ; Ensure the checksum of the entire block is valid
     st16 ChecksumLength, (.sizeof(SaveBlock)-2) ; don't include the checksum bytes
@@ -246,6 +256,7 @@ FilePtr := R0
     lda #0
     ldy #0
 loop:
+    perform_zpcm_inc
     sta (FilePtr), y
     iny
     cpy #.sizeof(SaveFile)
@@ -280,6 +291,8 @@ ChecksumDataPtr := R0
 ChecksumLength := R2
 ComputedSum := R4
 
+    perform_zpcm_inc
+
     mov16 BlockPtr, IncomingBlockPtr
 
     ; First initialize all 3 save files to valid contents
@@ -310,6 +323,8 @@ ComputedSum := R4
     iny
     lda ComputedNonce+3
     sta (TempPtr), y
+
+    perform_zpcm_inc
     
     ; Use the most recent version number for new blocks
     mov16 TempPtr, BlockPtr
@@ -362,6 +377,7 @@ FoundGeneration := R15
     lda #$FF
     sta FoundIndex
 loop:
+    perform_zpcm_inc
     ldx CandidateIndex
     lda persistence_table_low, x
     sta BlockPtr+0
@@ -380,6 +396,7 @@ loop:
     lda FoundIndex
     cmp #$FF
     beq its_a_keeper
+    perform_zpcm_inc
     ; otherwise, compare this block's generation with the one we already
     ; found, and keep this block only if it's a newer (higher) generation
     ldy #3
@@ -422,6 +439,7 @@ block_invalid:
     lda CandidateIndex
     cmp #PERSISTENCE_TABLE_LENGTH
     jne loop
+    perform_zpcm_inc
     ; now that all 6 slots have been examined, did we find something?
     lda FoundIndex
     cmp #$FF
@@ -463,6 +481,7 @@ FoundGeneration := R15
     sta CandidateIndex
     sta FoundIndex
 loop:
+    perform_zpcm_inc
     ldx CandidateIndex
     lda persistence_table_low, x
     sta BlockPtr+0
@@ -478,6 +497,7 @@ loop:
     ; Otherwise, compare this block's generational index
     ; to the one we found already, and keep it if it is lower
     add16w BlockPtr, #SaveBlock::GenerationalIndex
+    perform_zpcm_inc
     ldy #3
     lda (BlockPtr), y
     cmp FoundGeneration+3
@@ -514,6 +534,7 @@ block_invalid:
     jmp return_results
 
 return_results:
+    perform_zpcm_inc
     ldx FoundIndex
     lda persistence_table_low, x
     sta BlockPtr+0
@@ -536,6 +557,7 @@ ComputedNonce := R4
 ChecksumDataPtr := R0
 ChecksumLength := R2
 ComputedSum := R4
+    perform_zpcm_inc
     ; first, and always, increment the generational index
     inc32 current_block + SaveBlock::GenerationalIndex
     ; compute and store a new nonce
@@ -564,6 +586,7 @@ ComputedSum := R4
     st16 DataLength, .sizeof(SaveBlock)
     ldy #0
 block_storage_loop:
+    perform_zpcm_inc
     lda (SourcePtr), y
     sta (BlockPtr), y
     inc16 SourcePtr
@@ -582,6 +605,7 @@ BlockPtr := R0
 DestPtr := R2
 DataLength := R4
 BlockBank := R12
+    perform_zpcm_inc
     ; try to find a candidate block to load from storage. this may fail!
     jsr find_candidate_block_to_load
     ; did it fail?
@@ -594,6 +618,7 @@ BlockBank := R12
     st16 DataLength, .sizeof(SaveBlock)
     ldy #0
 block_retrieval_loop:
+    perform_zpcm_inc
     lda (BlockPtr), y
     sta (DestPtr), y
     inc16 BlockPtr
@@ -645,6 +670,7 @@ file_load_converge:
     ; a simple loop here to load the contents
     ldy #0
 file_load_loop:
+    perform_zpcm_inc
     lda (SourceFile), y
     sta (DestFile), y
     iny
@@ -687,6 +713,7 @@ file_save_converge:
     ; a simple loop here to write the contents
     ldy #0
 file_save_loop:
+    perform_zpcm_inc
     lda (SourceFile), y
     sta (DestFile), y
     iny

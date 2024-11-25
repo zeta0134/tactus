@@ -257,5 +257,6 @@ OffsetScratch := T6
         adc OffsetScratch+1
         sta AttributeAddr+1
 
+        perform_zpcm_inc
         rts
 .endproc

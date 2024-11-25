@@ -1259,21 +1259,26 @@ pickup_consumable_item:
         iny
         lda (ItemPtr), y
         sta ItemFuncPtr+1
+        perform_zpcm_inc
         jsr __item_logic_trampoline
         ; The return value in A indicates if the consumable item was consumed successfully
         beq successful_consumable_item
 failed_consumable_item:
+        perform_zpcm_inc
         ; Put the consumable item back in the square (the calling function can use this
         ; state as an error check)
         lda NewItem
         sta OutputOldItem
         restore_previous_bank
+        perform_zpcm_inc
         rts
 successful_consumable_item:
+        perform_zpcm_inc
         ; Clear out the old item slot; we "consumed" the new item and left nothing behind
         lda #0
         sta OutputOldItem
         restore_previous_bank
+        perform_zpcm_inc
         rts
 .endproc
 

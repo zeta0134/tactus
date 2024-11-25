@@ -676,6 +676,7 @@ SpritePosX := R4
 SpritePosY := R5
 BannerDefPtr := R6
 SpritePtr := R8
+        perform_zpcm_inc
         access_data_bank #<.bank(all_zones_data_page)
 
         ldy #ZoneDefinition::HudBannerDef
@@ -686,6 +687,7 @@ SpritePtr := R8
         sta BannerDefPtr+1
 
         ; Nametable Tiles
+        perform_zpcm_inc
 
         ldy #HudBannerDef::BgTileIds + 0
         lda (BannerDefPtr), y
@@ -706,6 +708,8 @@ SpritePtr := R8
         lda (BannerDefPtr), y
         ldy #$21
         sta (NametableAddr), y
+
+        perform_zpcm_inc
 
         ldy #HudBannerDef::BgTileIds + 4
         lda (BannerDefPtr), y
@@ -728,6 +732,7 @@ SpritePtr := R8
         sta (NametableAddr), y
 
         ; Attribute Definitions
+        perform_zpcm_inc
 
         ldy #HudBannerDef::BgTileAttrs + 0
         lda (BannerDefPtr), y
@@ -748,6 +753,8 @@ SpritePtr := R8
         lda (BannerDefPtr), y
         ldy #$21
         sta (AttributeAddr), y
+
+        perform_zpcm_inc
 
         ldy #HudBannerDef::BgTileAttrs + 4
         lda (BannerDefPtr), y
@@ -770,6 +777,7 @@ SpritePtr := R8
         sta (AttributeAddr), y
 
         ; Sprite: Top-Left
+        perform_zpcm_inc
         ldy #BANNER_FIRST_OAM_INDEX+0
         lda sprite_ptr_lut_low, y
         sta SpritePtr+0
@@ -791,6 +799,7 @@ SpritePtr := R8
         sta (SpritePtr), y
 
         ; Sprite: Top-Right
+        perform_zpcm_inc
         ldy #BANNER_FIRST_OAM_INDEX+1
         lda sprite_ptr_lut_low, y
         sta SpritePtr+0
@@ -814,6 +823,7 @@ SpritePtr := R8
         sta (SpritePtr), y
 
         ; Sprite: Bottom-Left
+        perform_zpcm_inc
         ldy #BANNER_FIRST_OAM_INDEX+2
         lda sprite_ptr_lut_low, y
         sta SpritePtr+0
@@ -837,6 +847,7 @@ SpritePtr := R8
         sta (SpritePtr), y
 
         ; Sprite: Bottom-Right
+        perform_zpcm_inc
         ldy #BANNER_FIRST_OAM_INDEX+3
         lda sprite_ptr_lut_low, y
         sta SpritePtr+0

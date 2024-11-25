@@ -1614,6 +1614,7 @@ done_with_torchlight:
 EntityId := R1
 EntityPattern := R2
 EntityAttribute := R3
+        perform_zpcm_inc
         ; safety: if we are currently paused, don't process any of this
         lda PlayerIsPaused
         beq not_paused

@@ -138,6 +138,7 @@ player_title_colors_accessories_lut:
 .endproc
 
 .proc FAR_compute_player_colors
+    perform_zpcm_inc
     lda current_save + SaveFile::PlayerPalettePreset
     cmp #PLAYER_PALETTE_PERSONALIZED
     beq use_custom_palette
@@ -150,6 +151,7 @@ use_preset_palette:
     jsr _set_pajamas_color
     ldy palette_preset_lut_pigment, x
     jsr _set_pigment_color
+    perform_zpcm_inc
     rts
 
 use_custom_palette:
@@ -159,10 +161,12 @@ use_custom_palette:
     jsr _set_pajamas_color
     ldy current_save + SaveFile::PlayerPalettePigmentIndex
     jsr _set_pigment_color
+    perform_zpcm_inc
     rts
 .endproc
 
 .proc _compute_file_1_colors
+    perform_zpcm_inc
     lda current_block + SaveBlock::SaveSlot1 + SaveFile::PlayerPalettePreset
     cmp #PLAYER_PALETTE_PERSONALIZED
     beq use_custom_palette
@@ -175,6 +179,7 @@ use_preset_palette:
     jsr _set_pajamas_color
     ldy palette_preset_lut_pigment, x
     jsr _set_pigment_color
+    perform_zpcm_inc
     rts
 
 use_custom_palette:
@@ -184,10 +189,12 @@ use_custom_palette:
     jsr _set_pajamas_color
     ldy current_block + SaveBlock::SaveSlot1 + SaveFile::PlayerPalettePigmentIndex
     jsr _set_pigment_color
+    perform_zpcm_inc
     rts
 .endproc
 
 .proc _compute_file_2_colors
+    perform_zpcm_inc
     lda current_block + SaveBlock::SaveSlot2 + SaveFile::PlayerPalettePreset
     cmp #PLAYER_PALETTE_PERSONALIZED
     beq use_custom_palette
@@ -200,6 +207,7 @@ use_preset_palette:
     jsr _set_pajamas_color
     ldy palette_preset_lut_pigment, x
     jsr _set_pigment_color
+    perform_zpcm_inc
     rts
 
 use_custom_palette:
@@ -209,10 +217,12 @@ use_custom_palette:
     jsr _set_pajamas_color
     ldy current_block + SaveBlock::SaveSlot2 + SaveFile::PlayerPalettePigmentIndex
     jsr _set_pigment_color
+    perform_zpcm_inc
     rts
 .endproc
 
 .proc _compute_file_3_colors
+    perform_zpcm_inc
     lda current_block + SaveBlock::SaveSlot3 + SaveFile::PlayerPalettePreset
     cmp #PLAYER_PALETTE_PERSONALIZED
     beq use_custom_palette
@@ -225,6 +235,7 @@ use_preset_palette:
     jsr _set_pajamas_color
     ldy palette_preset_lut_pigment, x
     jsr _set_pigment_color
+    perform_zpcm_inc
     rts
 
 use_custom_palette:
@@ -234,6 +245,7 @@ use_custom_palette:
     jsr _set_pajamas_color
     ldy current_block + SaveBlock::SaveSlot3 + SaveFile::PlayerPalettePigmentIndex
     jsr _set_pigment_color
+    perform_zpcm_inc
     rts
 .endproc
 
@@ -259,6 +271,7 @@ compute_file_3:
 
 ; LUT index in Y
 .proc _set_phones_color
+    perform_zpcm_inc
     ; normal colors for gameplay sprites
     lda player_colors_shoes_accessories_lut, y
     sta player_ingame_palette_phones
@@ -282,12 +295,13 @@ compute_file_3:
     tay
     lda player_title_colors_accessories_lut, y
     sta player_title_palette_phones_light
-
+    perform_zpcm_inc
     rts
 .endproc
 
 ; LUT index in Y
 .proc _set_pajamas_color
+    perform_zpcm_inc
     ; normal colors for gameplay sprites
     lda player_colors_face_clothing_lut, y
     sta player_ingame_palette_pajamas
@@ -311,12 +325,13 @@ compute_file_3:
     tay
     lda player_title_colors_clothing_lut, y
     sta player_title_palette_pajamas_light
-
+    perform_zpcm_inc
     rts
 .endproc
 
 ; LUT index in Y
 .proc _set_pigment_color
+    perform_zpcm_inc
     ; normal colors for gameplay sprites
     lda player_colors_face_clothing_lut, y
     sta player_ingame_palette_pigment
@@ -335,6 +350,6 @@ compute_file_3:
     lda player_title_colors_face_lut, y
     sta player_title_palette_pajamas_medium
     ; face ramp doesn't have a light shade, it's used for the whites of eyes instead
-
+    perform_zpcm_inc
     rts
 .endproc

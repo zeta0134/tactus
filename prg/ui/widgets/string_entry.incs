@@ -48,6 +48,7 @@ row_loop:
         lda #0
         sta ColCounter
 col_loop:
+        perform_zpcm_inc
         ldy ColCounter
         lda (PagePtr), y
         pha
@@ -80,7 +81,7 @@ highlight_converge:
         lda RowCounter
         cmp #6
         bne row_loop
-
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -275,6 +276,7 @@ NAME_ENTRY_END_CURSOR     = $E1
 
 NametableAddr := T0
 AttributeAddr := T2
+        perform_zpcm_inc
         ; TODO: a little icon on the left side?
 
         st16 NametableAddr, ($5000 + ((TARGET_STRING_TOP_TILE + 1) * 32) + TARGET_STRING_LEFT_TILE)
@@ -282,6 +284,7 @@ AttributeAddr := T2
 
         ldy #0
 loop:
+        perform_zpcm_inc
         lda #NAME_ENTRY_UNDERLINE_TILE
         sta (NametableAddr), y
         lda #CHR_BANK_FONT_MARSHMALLOW
@@ -290,6 +293,7 @@ loop:
         cpy #15
         bne loop
 
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -866,6 +870,8 @@ widget_right_pos_y_subpixel  := widgets_data7
         ldy CurrentWidgetIndex
         dey
         sty PreviousWidgetIndex
+
+        perform_zpcm_inc
         
         ; left cursor, X lerp
         jsr compute_grid_left_pos
@@ -878,6 +884,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         lda widget_left_pos_x_subpixel, y
         sta CurrentPos+0
         jsr lerp_coordinate
+        perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda CurrentPos+1
         sta widget_left_pos_x_pixel, y
@@ -895,6 +902,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         lda widget_right_pos_x_subpixel, y
         sta CurrentPos+0
         jsr lerp_coordinate
+        perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda CurrentPos+1
         sta widget_right_pos_x_pixel, y
@@ -912,6 +920,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         lda widget_left_pos_y_subpixel, y
         sta CurrentPos+0
         jsr lerp_coordinate
+        perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda CurrentPos+1
         sta widget_left_pos_y_pixel, y
@@ -919,6 +928,8 @@ widget_right_pos_y_subpixel  := widgets_data7
         lda CurrentPos+0
         sta widget_left_pos_y_subpixel, y
         sta widget_right_pos_y_subpixel, y
+
+        perform_zpcm_inc
 
         jsr draw_name_entry_cursor
         rts
@@ -933,6 +944,7 @@ widget_left_pos_y_pixel      := widgets_data2
 widget_right_pos_x_pixel     := widgets_data4
 widget_right_pos_y_pixel     := widgets_data6
 
+        perform_zpcm_inc
         ldx CurrentWidgetIndex ; Y is busy doing sprite things
 
         ldy #STRING_ENTRY_LEFT_OAM_INDEX
@@ -954,6 +966,8 @@ widget_right_pos_y_pixel     := widgets_data6
         ldy #SelfModifiedSprite::PosY
         sta (SpritePtr), y
 
+        perform_zpcm_inc
+
         ldy #STRING_ENTRY_RIGHT_OAM_INDEX
         lda sprite_ptr_lut_low, y
         sta SpritePtr+0
@@ -973,5 +987,6 @@ widget_right_pos_y_pixel     := widgets_data6
         ldy #SelfModifiedSprite::PosY
         sta (SpritePtr), y
 
+        perform_zpcm_inc
         rts
 .endproc
