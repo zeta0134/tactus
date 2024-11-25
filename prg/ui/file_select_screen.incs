@@ -555,8 +555,10 @@ widget_text_string_high := widgets_data3
         ora #WIDGET_STATE_NAVIGABLE
         sta widgets_state_flags, y
 
-        ; TODO: Maybe play a "warning siren" signal of sorts, since we're about to
-        ; kill this file dead
+        st16 R0, sfx_siren_pulse_1
+        jsr play_sfx_pulse1
+        st16 R0, sfx_siren_pulse_2
+        jsr play_sfx_pulse2
 
         jsr apply_danger_ui_palette
 
@@ -668,8 +670,10 @@ widget_copy_source_index := widgets_data1
         ora #WIDGET_STATE_NAVIGABLE
         sta widgets_state_flags, y
 
-        ; TODO: play a siren - warning effect here!
-        ; TODO: should we switch to red-danger palette as well?
+        st16 R0, sfx_siren_pulse_1
+        jsr play_sfx_pulse1
+        st16 R0, sfx_siren_pulse_2
+        jsr play_sfx_pulse2
 
         jsr apply_danger_ui_palette
 

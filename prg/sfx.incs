@@ -474,3 +474,23 @@ sfx_cursor_fail:
         .byte 1 ; length of this sfx in rows
         ;                            pitch, duty, decay,                    sweep, length
         pulse_init_sweep_decay    PITCH_A2,   $2,    $2, (S_PERIOD_0 | S_SHIFT_3),      4
+
+sfx_siren_pulse_1:
+        .byte 6 ; length of this sfx in rows
+        ;                    pitch, duty, volume,                            sweep, length
+        pulse_init_sweep  PITCH_E3,   $2,     $F, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      6
+        pulse_init_sweep  PITCH_E4,   $2,     $E, (S_PERIOD_0 | S_SHIFT_4)        ,      6
+        pulse_init_sweep  PITCH_E3,   $2,     $9, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      6
+        pulse_init_sweep  PITCH_E4,   $2,     $8, (S_PERIOD_0 | S_SHIFT_4)        ,      6
+        pulse_init_sweep  PITCH_E3,   $2,     $4, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      6
+        pulse_init_sweep  PITCH_E4,   $2,     $3, (S_PERIOD_0 | S_SHIFT_4)        ,      6
+
+sfx_siren_pulse_2:
+        .byte 6 ; length of this sfx in rows
+        ;                    pitch, duty, volume,                            sweep, length
+        pulse_init_sweep  PITCH_C3,   $2,     $F, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      6
+        pulse_init_sweep  PITCH_C4,   $2,     $E, (S_PERIOD_0 | S_SHIFT_4)        ,      6
+        pulse_init_sweep  PITCH_C3,   $2,     $9, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      6
+        pulse_init_sweep  PITCH_C4,   $2,     $8, (S_PERIOD_0 | S_SHIFT_4)        ,      6
+        pulse_init_sweep  PITCH_C3,   $2,     $4, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      6
+        pulse_init_sweep  PITCH_C4,   $2,     $3, (S_PERIOD_0 | S_SHIFT_4)        ,      6

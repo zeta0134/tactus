@@ -47,6 +47,9 @@
 .global sfx_dialog_close
 .global sfx_cursor_fail
 
+.global sfx_siren_pulse_1
+.global sfx_siren_pulse_2
+
 .macro play_dpcm sample_addr, length
 .scope
 SampleAddr := R0
