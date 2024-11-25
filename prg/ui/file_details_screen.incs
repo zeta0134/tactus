@@ -66,17 +66,7 @@ widget_last_cursor_pos := widgets_data0
         jsr draw_box_shadow
 
         ; Get the file select palettes loaded in
-        ldy #0
-bg_loop:
-        perform_zpcm_inc
-        ; TODO: use file select palette here!
-        lda options_battlefield_bg_palette, y
-        sta BgPaletteBuffer, y
-        lda options_obj_palette, y
-        sta ObjPaletteBuffer, y
-        iny
-        cpy #16
-        bne bg_loop
+        jsr apply_standard_ui_palette
 
         ldy CurrentWidgetIndex
         lda #$FF
