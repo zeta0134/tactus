@@ -91,6 +91,42 @@ tile_converge:
 
 .segment "CODE_UI_WIDGETS"
 
+.proc apply_standard_ui_palette
+        ; Get the file select palettes loaded in
+        ldy #0
+bg_loop:
+        perform_zpcm_inc
+        lda checkerboard_ui_palette_normal, y
+        sta BgPaletteBuffer, y
+        lda options_obj_palette, y
+        sta ObjPaletteBuffer, y
+        iny
+        cpy #16
+        bne bg_loop
+        lda #1
+        sta BgPaletteDirty
+        sta ObjPaletteDirty
+        rts
+.endproc
+
+.proc apply_danger_ui_palette
+        ; Get the file select palettes loaded in
+        ldy #0
+bg_loop:
+        perform_zpcm_inc
+        lda checkerboard_ui_palette_danger, y
+        sta BgPaletteBuffer, y
+        lda options_obj_palette, y
+        sta ObjPaletteBuffer, y
+        iny
+        cpy #16
+        bne bg_loop
+        lda #1
+        sta BgPaletteDirty
+        sta ObjPaletteDirty
+        rts
+.endproc
+
 .proc file_select_controller_init
 Top := R0
 Left := R1
@@ -142,17 +178,7 @@ widget_file_select_mode := widgets_data0
         jsr draw_box_fill
         jsr draw_box_shadow
 
-        ; Get the file select palettes loaded in
-        ldy #0
-bg_loop:
-        perform_zpcm_inc
-        lda checkerboard_ui_palette_normal, y
-        sta BgPaletteBuffer, y
-        lda options_obj_palette, y
-        sta ObjPaletteBuffer, y
-        iny
-        cpy #16
-        bne bg_loop
+        jsr apply_standard_ui_palette
 
         ldy CurrentWidgetIndex
         lda #FILE_SELECT_MODE_NORMAL
@@ -465,7 +491,8 @@ widget_text_string_high := widgets_data3
         jsr _enable_copy_erase_buttons
         jsr _enable_all_file_boxes
 
-        ; Restore the palette to its usual state
+        jsr apply_standard_ui_palette
+
         rts
 .endproc
 
@@ -496,8 +523,7 @@ widget_text_string_high := widgets_data3
         ; If we're pointing to the erase button, move the cursor. (Otherwise leave it alone)
         ; ...Handled automatically by cursor update!
 
-        ; Update the palette to **scary red** to make it clear we're in the danger zone
-        ; TODO!
+        jsr apply_danger_ui_palette
 
         rts
 .endproc
@@ -532,6 +558,8 @@ widget_text_string_high := widgets_data3
         ; TODO: Maybe play a "warning siren" signal of sorts, since we're about to
         ; kill this file dead
 
+        jsr apply_danger_ui_palette
+
         rts
 .endproc
 
@@ -560,6 +588,8 @@ widget_text_string_high := widgets_data3
         ; Enable navigation for all 3 boxes (this will undo selective navigation
         ; during copy dest mode, if canceled)
         jsr _enable_all_file_boxes
+
+        jsr apply_standard_ui_palette
 
         rts
 .endproc
@@ -600,6 +630,8 @@ widget_copy_source_index := widgets_data1
         and #($FF-WIDGET_STATE_NAVIGABLE)
         sta widgets_state_flags, y
 
+        jsr apply_standard_ui_palette
+
         rts
 .endproc
 
@@ -617,7 +649,7 @@ widget_copy_source_index := widgets_data1
         ; somewhat blindly
 
         ldy #FILE_SELECT_CONTROLLER_INDEX
-        lda #FILE_SELECT_MODE_COPY_DEST
+        lda #FILE_SELECT_MODE_COPY_CONFIRM
         sta widget_file_select_mode, y
 
         ; Draw the overwrite message up top
@@ -638,6 +670,8 @@ widget_copy_source_index := widgets_data1
 
         ; TODO: play a siren - warning effect here!
         ; TODO: should we switch to red-danger palette as well?
+
+        jsr apply_danger_ui_palette
 
         rts
 .endproc

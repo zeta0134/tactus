@@ -66,6 +66,8 @@ ui_data_bank:
 
 checkerboard_ui_palette_normal:
         .incbin "art/ui_bg_palette.pal"
+checkerboard_ui_palette_danger:
+        .incbin "art/ui_danger_palette.pal"
 
         ; Also sortof our "default UI code" for the moment
         .segment "CODE_UI_WIDGETS"
