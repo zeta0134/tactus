@@ -19,6 +19,8 @@
 current_save: .res .sizeof(SaveFile)
 current_save_slot: .res 1
 
+flags_scratch: .res 1
+
     .segment "PRGRAM"
 current_block: .res .sizeof(SaveBlock)
 
@@ -33,6 +35,72 @@ persisted_block_4: .res .sizeof(SaveBlock)
     .segment "LEVEL_RAM_2"
 persisted_block_2: .res .sizeof(SaveBlock)
 persisted_block_5: .res .sizeof(SaveBlock)
+
+    .segment "PRGFIXED_E000"
+
+flag_bits_lut:
+    .byte %00000001
+    .byte %00000010
+    .byte %00000100
+    .byte %00001000
+    .byte %00010000
+    .byte %00100000
+    .byte %01000000
+    .byte %10000000
+
+.proc check_flag
+FlagsPtr := R0
+    pha
+    lsr
+    lsr
+    lsr
+    tay
+    lda (FlagsPtr), y
+    sta flags_scratch
+    pla
+    and #%111
+    tax
+    lda flag_bits_lut, x
+    and flags_scratch
+    rts
+.endproc
+
+.proc set_flag
+FlagsPtr := R0
+    pha
+    lsr
+    lsr
+    lsr
+    tay
+    lda (FlagsPtr), y
+    sta flags_scratch
+    pla
+    and #%111
+    tax
+    lda flag_bits_lut, x
+    ora flags_scratch
+    sta (FlagsPtr), y
+    rts
+.endproc
+
+.proc clear_flag
+FlagsPtr := R0
+    pha
+    lsr
+    lsr
+    lsr
+    tay
+    lda (FlagsPtr), y
+    sta flags_scratch
+    pla
+    and #%111
+    tax
+    lda flag_bits_lut, x
+    eor #$FF
+    and flags_scratch
+    sta (FlagsPtr), y
+    rts
+.endproc
 
     .segment "CODE_1"
 

@@ -96,3 +96,28 @@ BLOCK_INVALID = 1
 .global FAR_init_save_subsystem  ; call once during engine init. (call again to fully reload, this will overwrite any unsaved data!)
 .global FAR_create_new_file ; FilePtr in R0
 .global FAR_persist_block_to_storage
+
+; Helpful macros for dealing with event flags
+.macro check_flag base_addr, flag_number
+    lda base_addr + (flag_number >> 3)
+    and #(1 << (flag_number & 7))
+.endmacro
+
+.macro set_flag base_addr, flag_number
+    lda base_addr + (flag_number >> 3)
+    ora #(1 << (flag_number & 7))
+    sta base_addr + (flag_number >> 3)
+.endmacro
+
+.macro clear_flag base_addr, flag_number
+    lda base_addr + (flag_number >> 3)
+    and #($FF-(1 << (flag_number & 7)))
+    sta base_addr + (flag_number >> 3)
+.endmacro
+
+; Subroutines for doing the same thing.
+; ptr in R0
+; flag number in A, clobbers X, Y
+.global FIXED_check_flag
+.global FIXED_set_flag
+.global FIXED_clear_flag
