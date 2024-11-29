@@ -290,6 +290,7 @@ item_table:
         .word aloha_tshirt_2
         .word aloha_tshirt_3
         .word bomb_standard
+        .word bomb_standard_one_pack
         .word bomb_standard_three_pack
         ; safety
         .repeat 128
@@ -830,39 +831,56 @@ aloha_tshirt_3:
 
 bomb_standard:
         .byte SLOT_ITEM                         ; SlotId
+        .byte SPRITE_TILE_MENU_CURSOR_SPIN      ; WorldSpriteTile (unused)
+        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
+        .byte EQUIPMENT_BOMB_STANDARD           ; HudBgTile
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+        .byte 0                                 ; HudSpriteTile (unused)
+        .byte 0                                 ; HudSpriteAttr (unused)
+        .word 0                                 ; ShopCost (unused)
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr no_effect                         ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr bombs_description                 ; DescriptionStringPtr
+        .byte <.bank(bombs_description)         ; DescriptionStringBank
+
+bomb_standard_one_pack:
+        .byte SLOT_CONSUMABLE                   ; SlotId
         .byte SPRITE_TILE_ITEM_BOMB_SINGLE      ; WorldSpriteTile
         .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
-        .byte EQUIPMENT_BOMB_STANDARD           ; HudBgTile (unused)
+        .byte EQUIPMENT_WEAPON_DAGGER           ; HudBgTile (unused)
         .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
         .byte 0                                 ; HudSpriteTile (unused)
         .byte 0                                 ; HudSpriteAttr (unused)
         .word 25                                ; ShopCost
         .byte WEAPON_DAGGER                     ; WeaponShape (unused)
-        .addr flat_1                            ; DamageFunc (used as bomb count)
+        .addr no_effect                         ; DamageFunc
         .addr no_effect                         ; TorchlightFunc
-        .addr do_nothing                        ; UseFunc
+        .addr award_1_standard_bomb             ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr bombs_description                 ; DescriptionStringPtr
         .byte <.bank(bombs_description)         ; DescriptionStringBank
 
 bomb_standard_three_pack:
-        .byte SLOT_ITEM                         ; SlotId
+        .byte SLOT_CONSUMABLE                   ; SlotId
         .byte SPRITE_TILE_ITEM_BOMB_TRIO        ; WorldSpriteTile
         .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
-        .byte EQUIPMENT_BOMB_STANDARD           ; HudBgTile (unused)
+        .byte EQUIPMENT_WEAPON_DAGGER           ; HudBgTile (unused)
         .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
         .byte 0                                 ; HudSpriteTile (unused)
         .byte 0                                 ; HudSpriteAttr (unused)
         .word 75                                ; ShopCost
         .byte WEAPON_DAGGER                     ; WeaponShape (unused)
-        .addr flat_3                            ; DamageFunc (used as bomb count)
+        .addr no_effect                         ; DamageFunc
         .addr no_effect                         ; TorchlightFunc
-        .addr do_nothing                        ; UseFunc
+        .addr award_3_standard_bombs            ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr bombs_description                 ; DescriptionStringPtr
         .byte <.bank(bombs_description)         ; DescriptionStringBank
 
-        .segment "CODE_0"
+        .segment "CODE_ITEMS"
 
 ; Flat value functions. If these seem remarkably inefficient, that's because they are
 
@@ -1541,5 +1559,55 @@ DmgReductionTotal := R0
 
 done_with_display:
         restore_previous_bank
+        rts
+.endproc
+
+.proc award_1_standard_bomb
+        lda PlayerEquipmentBombs
+        cmp #ITEM_BOMB_STANDARD
+        beq not_newly_acquired
+
+        lda #0
+        sta PlayerBombCount
+        lda #ITEM_BOMB_STANDARD
+        sta PlayerEquipmentBombs
+        near_call FAR_display_item_description
+
+not_newly_acquired:
+        lda PlayerBombCount
+        clc
+        adc #1 ; The only byte in this whole function that is different
+        cmp #99
+        bcc max_not_exceeded
+max_exceeded:
+        lda #99
+max_not_exceeded:
+        sta PlayerBombCount
+        lda #0 ; return success
+        rts
+.endproc
+
+.proc award_3_standard_bombs
+        lda PlayerEquipmentBombs
+        cmp #ITEM_BOMB_STANDARD
+        beq not_newly_acquired
+
+        lda #0
+        sta PlayerBombCount
+        lda #ITEM_BOMB_STANDARD
+        sta PlayerEquipmentBombs
+        near_call FAR_display_item_description
+
+not_newly_acquired:
+        lda PlayerBombCount
+        clc
+        adc #3 ; The only byte in this whole function that is different
+        cmp #99
+        bcc max_not_exceeded
+max_exceeded:
+        lda #99
+max_not_exceeded:
+        sta PlayerBombCount
+        lda #0 ; return success
         rts
 .endproc
