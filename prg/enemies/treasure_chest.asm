@@ -80,11 +80,11 @@ ItemId := R18
         ; roll, so use that RNG and the appropriate table
 
         ; the real loot table
-        st16 LootTablePtr, common_chest_treasure_table
-        far_call FAR_roll_gameplay_loot
+        ;st16 LootTablePtr, common_chest_treasure_table
+        ;far_call FAR_roll_gameplay_loot
         ; zeta needs to obtain a specific item for testing
-        ;lda #ITEM_ALOHA_TSHIRT_1
-        ;sta ItemId
+        lda #ITEM_BOMB_STANDARD
+        sta ItemId
 
 
         ; Sanity check: is the player currently carrying equipment matching this loot?

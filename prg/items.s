@@ -247,6 +247,14 @@ aloha_tshirt_description:
         .byte "-1 Incoming Damage.", D_NEWLINE
         .byte "Tourists charged double!", D_WAIT, D_CLOSE
 
+bombs_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "BOMBS", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Explodes in a 3x3 area!", D_NEWLINE
+        .byte "B to hold, + to throw", D_WAIT, D_CLOSE
+
         .segment "DATA_0"
 
 item_table:
@@ -281,6 +289,8 @@ item_table:
         .word aloha_tshirt_1
         .word aloha_tshirt_2
         .word aloha_tshirt_3
+        .word bomb_standard
+        .word bomb_standard_three_pack
         ; safety
         .repeat 128
         .word no_item
@@ -817,6 +827,40 @@ aloha_tshirt_3:
         .addr flat_1                            ; DmgReductionFunc
         .addr aloha_tshirt_description          ; DescriptionStringPtr
         .byte <.bank(aloha_tshirt_description)  ; DescriptionStringBank
+
+bomb_standard:
+        .byte SLOT_ITEM                         ; SlotId
+        .byte SPRITE_TILE_ITEM_BOMB_SINGLE      ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
+        .byte EQUIPMENT_BOMB_STANDARD           ; HudBgTile (unused)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                                 ; HudSpriteTile (unused)
+        .byte 0                                 ; HudSpriteAttr (unused)
+        .word 25                                ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr flat_1                            ; DamageFunc (used as bomb count)
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr bombs_description                 ; DescriptionStringPtr
+        .byte <.bank(bombs_description)         ; DescriptionStringBank
+
+bomb_standard_three_pack:
+        .byte SLOT_ITEM                         ; SlotId
+        .byte SPRITE_TILE_ITEM_BOMB_TRIO        ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
+        .byte EQUIPMENT_BOMB_STANDARD           ; HudBgTile (unused)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                                 ; HudSpriteTile (unused)
+        .byte 0                                 ; HudSpriteAttr (unused)
+        .word 75                                ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr flat_3                            ; DamageFunc (used as bomb count)
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr bombs_description                 ; DescriptionStringPtr
+        .byte <.bank(bombs_description)         ; DescriptionStringBank
 
         .segment "CODE_0"
 

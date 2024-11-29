@@ -40,6 +40,6 @@ chr_tile_offset EQUIPMENT_SPELL_1, 0, 12
 chr_tile_offset EQUIPMENT_SPELL_2, 2, 12
 chr_tile_offset EQUIPMENT_SPELL_3, 4, 12
 
-chr_tile_offset EQUIPMENT_ITEM_1, 4, 14
+chr_tile_offset EQUIPMENT_BOMB_STANDARD, 4, 14
 chr_tile_offset EQUIPMENT_ITEM_2, 6, 14
 chr_tile_offset EQUIPMENT_ITEM_3, 8, 14

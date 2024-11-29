@@ -270,6 +270,7 @@ HeartCount := R2
         sta PlayerEquipmentBoots
         lda #PLAYER_NORMAL_ACCESSORY
         sta PlayerEquipmentAccessory
+        lda #ITEM_NONE
         sta PlayerEquipmentBombs
         sta PlayerEquipmentSpell
 
@@ -279,6 +280,9 @@ HeartCount := R2
 
         lda #3
         sta HeartCount
+
+        lda #0
+        sta PlayerBombCount
 heart_loop:
         lda #HEART_TYPE_REGULAR
         sta NewHeartType
@@ -292,6 +296,9 @@ heart_loop:
         near_call FAR_receive_healing
 
         st16 PlayerGold, 0
+
+        lda #0
+        sta PlayerBombCount
 .endif
 
         lda #0

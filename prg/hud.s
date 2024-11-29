@@ -50,6 +50,7 @@ BootsDisplayCurrent: .res 1
 AccessoryDisplayCurrent: .res 1
 SpellDisplayCurrent: .res 1
 ItemDisplayCurrent: .res 1
+ItemCountCurrent: .res 1
 
 .segment "CODE_0"
 
@@ -92,6 +93,12 @@ chr_tile_offset SPELL_DISABLED_BL_CORNER, 1, 14
 
 TILE_COL_OFFSET = 1
 TILE_ROW_OFFSET = 16
+
+BOMB_COUNTER_TENS = $C0
+BOMB_COUNTER_ONES = $E0
+
+BOMB_COUNTER_POS_X = 115
+BOMB_COUNTER_POS_Y = 194
 
 .macro draw_tile_at_x row, tile_id, attr
         lda tile_id
@@ -143,6 +150,7 @@ weapon_palette_table:
         sta BootsDisplayCurrent
         sta SpellDisplayCurrent
         sta ItemDisplayCurrent
+        sta ItemCountCurrent
 
         jsr draw_static_hud_elements
         mov16 DisplayedGold, PlayerGold
@@ -841,52 +849,6 @@ proceed_to_draw:
 
         far_call FAR_draw_banner_for_current_zone
 
-        ;ldx #20
-        ;draw_tile_at_x ROW_1, DrawTile, DrawAttr
-        ;inc DrawTile
-        ;inx
-        ;draw_tile_at_x ROW_1, DrawTile, DrawAttr
-;
-        ;perform_zpcm_inc
-
-        ; now proceed with the lower half of the banner; this may not be
-        ; near the header, as we usually try to only update the name/number
-        ; for efficiency reasons between floors
-        ;far_call FAR_current_zone_banner_tile
-
-        ;ldx #20
-        ;draw_tile_at_x ROW_2, DrawTile, DrawAttr
-        ;inc DrawTile
-        ;inx
-        ;draw_tile_at_x ROW_2, DrawTile, DrawAttr
-
-        ;clc
-        ;lda DrawTile
-        ;adc #15
-        ;sta DrawTile
-
-        ;ldx #20
-        ;draw_tile_at_x ROW_3, DrawTile, DrawAttr
-        ;inc DrawTile
-        ;inx
-        ;draw_tile_at_x ROW_3, DrawTile, DrawAttr
-
-        ;perform_zpcm_inc
-
-        ;clc
-        ;lda DrawTile
-        ;adc #15
-        ;sta DrawTile
-
-        ;ldx #20
-        ;draw_tile_at_x ROW_4, DrawTile, DrawAttr
-        ;inc DrawTile
-        ;inx
-        ;draw_tile_at_x ROW_4, DrawTile, DrawAttr
-
-        ; and that should be it!
-        ;perform_zpcm_inc
-
         rts
 .endproc
 
@@ -1203,11 +1165,19 @@ check_accessory:
 check_item:
         lda PlayerEquipmentBombs
         cmp ItemDisplayCurrent
-        jeq check_spell
+        beq check_item_count
         sta ItemDisplayCurrent
         sta ItemId
         st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 14)
         jsr draw_tabbed_b_icon
+        perform_zpcm_inc
+
+check_item_count:
+        lda PlayerBombCount
+        cmp ItemCountCurrent
+        beq check_spell
+        sta ItemCountCurrent
+        jsr draw_item_count_sprites
         perform_zpcm_inc
 
 check_spell:
@@ -1303,3 +1273,91 @@ Numeral := R0
         rts
 .endproc
 .endif
+
+.proc draw_item_count_sprites
+NumberWord := T0
+OnesDigit := T2
+TensDigit := T3
+HundredsDigit := T4
+ThousandsDigit := T5
+TenThousandsDigit := T6
+
+SpritePtr := R0
+
+        lda PlayerBombCount
+        bne draw_counter
+        
+clear_counter:
+        perform_zpcm_inc
+        ldy #BOMB_COUNT_FIRST_OAM_INDEX+0
+        lda sprite_ptr_lut_low, y
+        sta SpritePtr+0
+        lda sprite_ptr_lut_high, y
+        sta SpritePtr+1
+        lda #$F8
+        ldy #SelfModifiedSprite::PosY
+        sta (SpritePtr), y
+        ldy #BOMB_COUNT_FIRST_OAM_INDEX+1
+        lda sprite_ptr_lut_low, y
+        sta SpritePtr+0
+        lda sprite_ptr_lut_high, y
+        sta SpritePtr+1
+        lda #$F8
+        ldy #SelfModifiedSprite::PosY
+        sta (SpritePtr), y
+        rts
+
+draw_counter:
+        sta NumberWord+0
+        lda #0
+        sta NumberWord+1
+        near_call FAR_base_10
+
+        ; Tens Digit
+        perform_zpcm_inc
+        ldy #BOMB_COUNT_FIRST_OAM_INDEX+0
+        lda sprite_ptr_lut_low, y
+        sta SpritePtr+0
+        lda sprite_ptr_lut_high, y
+        sta SpritePtr+1
+        lda #BOMB_COUNTER_POS_X+0
+        ldy #SelfModifiedSprite::PosX
+        sta (SpritePtr), y
+        lda #BOMB_COUNTER_POS_Y
+        ldy #SelfModifiedSprite::PosY
+        sta (SpritePtr), y
+        lda TensDigit
+        asl
+        clc
+        adc #BOMB_COUNTER_TENS
+        ldy #SelfModifiedSprite::TileId
+        sta (SpritePtr), y
+        lda #SPRITE_PAL_YELLOW
+        ldy #SelfModifiedSprite::Attributes
+        sta (SpritePtr), y    
+
+        ; Ones Digit
+        perform_zpcm_inc
+        ldy #BOMB_COUNT_FIRST_OAM_INDEX+1
+        lda sprite_ptr_lut_low, y
+        sta SpritePtr+0
+        lda sprite_ptr_lut_high, y
+        sta SpritePtr+1
+        lda #BOMB_COUNTER_POS_X+8
+        ldy #SelfModifiedSprite::PosX
+        sta (SpritePtr), y
+        lda #BOMB_COUNTER_POS_Y
+        ldy #SelfModifiedSprite::PosY
+        sta (SpritePtr), y
+        lda OnesDigit
+        asl
+        clc
+        adc #BOMB_COUNTER_ONES
+        ldy #SelfModifiedSprite::TileId
+        sta (SpritePtr), y
+        lda #SPRITE_PAL_YELLOW
+        ldy #SelfModifiedSprite::Attributes
+        sta (SpritePtr), y   
+
+        rts
+.endproc
