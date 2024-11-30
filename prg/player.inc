@@ -52,8 +52,8 @@
 
 .global PlayerPassiveDialogSquare
 .global PlayerActiveDialogSquare
-
 .global PlayerIncomingDamageDirection
+.global PlayerHeldBombIndex
 
 MAX_HEARTS = 5
 MAX_GOLD = 9999

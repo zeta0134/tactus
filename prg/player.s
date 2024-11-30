@@ -105,6 +105,8 @@ PlayerTookDamageThisBeat: .res 1
 PlayerDamageAnimCounter: .res 1
 PlayerIncomingDamageDirection: .res 1
 
+PlayerHeldBombIndex: .res 1
+
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
 DIRECTION_SOUTH = 3
@@ -323,6 +325,9 @@ heart_loop:
         lda #0
         sta PlayerTookDamageThisBeat
         sta PlayerDamageAnimCounter
+
+        lda #$FF
+        sta PlayerHeldBombIndex
 
         rts
 
