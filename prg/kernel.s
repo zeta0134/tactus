@@ -7,6 +7,7 @@
         .include "bhop/bhop.inc"
         .include "battlefield.inc"
         .include "beat_tracker.inc"
+        .include "bombs.inc"
         .include "coins.inc"
         .include "chr.inc"
         .include "debug.inc"
@@ -501,6 +502,9 @@ LayoutPtr := R0
         far_call FAR_despawn_unimportant_sprites
         perform_zpcm_inc
 
+        ; Clear out any other lingering state
+        far_call FAR_init_bomb_state
+
         ; As a hack, draw the entire floor right now (we don't have
         ; the usual active_queue to draw for us)
         ; This will cause a couple of frames of lag!
@@ -822,6 +826,10 @@ continue_waiting:
 
         ; Set the next kernel mode early; the player might override this
         st16 GameMode, update_enemies_1
+
+        ; - First, tick any non-player entities that need to update before
+        ;   the player's inputs are processed
+        far_call FAR_tick_bomb_fuses
 
         ; - Resolve the player's action
         debug_color (TINT_B | LIGHTGRAY)
@@ -1220,6 +1228,8 @@ continue_waiting:
 
         far_call FAR_update_palette_cycler
 
+        perform_zpcm_inc
+        far_call FAR_update_active_bombs
         perform_zpcm_inc
         far_call FAR_determine_player_intent
         far_call FAR_draw_player

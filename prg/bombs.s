@@ -182,6 +182,7 @@ safe_to_throw:
         jmp (DispatchPtr) ; Wheeeee
 .endproc
 
+; NOTE: Do not clobber R14-R15!
 .proc throw_standard_bomb
         ; TODO: do we need to resync with the player position here? What if the
         ; player got shoved by an enemy?

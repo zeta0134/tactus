@@ -4,6 +4,7 @@
         .include "_globals.inc"
 
         .include "battlefield.inc"
+        .include "bombs.inc"
         .include "dialog.inc"
         .include "debug.inc"
         .include "enemies.inc"
@@ -231,9 +232,13 @@ HeartCount := R2
         sta PlayerEquipmentBoots
         lda #ITEM_CHAIN_LINK
         sta PlayerEquipmentAccessory
-        lda #ITEM_NONE
+        lda #ITEM_BOMB_STANDARD
         sta PlayerEquipmentBombs
+        lda #ITEM_NONE
         sta PlayerEquipmentSpell
+
+        lda #15
+        sta PlayerBombCount
 
         near_call FAR_initialize_hearts_for_game
         
@@ -897,8 +902,17 @@ done_with_initial_pose:
         lda #0
         sta PlayerCombo
 
+        ; If we aren't intending to move, then skip to collision processing
         lda PlayerNextDirection
         beq resolve_enemy_collision
+        ; If we are attempting to move but we are holding a bomb, do that instead
+        lda PlayerHeldBombIndex
+        cmp #$FF
+        beq perform_normal_movement
+perform_bomb_throw:
+        far_call FAR_throw_held_bomb
+        jmp resolve_enemy_collision
+perform_normal_movement:
 
         lda #0
         sta PlayerIdleBeats
@@ -983,6 +997,9 @@ no_darkness:
 
         ; Detect pausing. (The boss key, the mom alert, etc.)
         jsr detect_pause_action
+
+        ; Detect bomb hoisting (aggressive negotiations from afar)
+        jsr detect_bomb_hoist
 
         ; TODO: Detect other types of intent here. These aren't implemented,
         ; so just clear the intent flags for now.
@@ -2000,3 +2017,19 @@ continue_being_paused:
 
         rts
 .endproc
+
+.proc detect_bomb_hoist
+        lda PlayerIntendsToBomb
+        bne proceed_to_hoist
+        rts
+proceed_to_hoist:
+        ; TODO: if any other actions should prevent the bomb hoist action,
+        ; do that here!
+
+        ; The bomb logic handles all of the
+        ; other fiddly stuff like "do we actually have bombs" and 
+        ; "are we already holding something"
+        far_call FAR_try_hoist_bomb
+        rts
+.endproc
+
