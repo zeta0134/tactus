@@ -237,7 +237,7 @@ HeartCount := R2
         lda #ITEM_NONE
         sta PlayerEquipmentSpell
 
-        lda #15
+        lda #99
         sta PlayerBombCount
 
         near_call FAR_initialize_hearts_for_game
@@ -2020,7 +2020,15 @@ continue_being_paused:
 
 .proc detect_bomb_hoist
         lda PlayerIntendsToBomb
-        bne proceed_to_hoist
+        bne check_hands
+        rts
+check_hands:
+        lda PlayerHeldBombIndex
+        cmp #$FF
+        beq proceed_to_hoist
+        ; for now, if the player is holding a bomb, take no action
+        ; (later we might have specific bomb types detect this and
+        ; use it as a nondirectional input?)
         rts
 proceed_to_hoist:
         ; TODO: if any other actions should prevent the bomb hoist action,
@@ -2030,6 +2038,7 @@ proceed_to_hoist:
         ; other fiddly stuff like "do we actually have bombs" and 
         ; "are we already holding something"
         far_call FAR_try_hoist_bomb
+        sta PlayerHeldBombIndex
         rts
 .endproc
 

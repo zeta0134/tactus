@@ -120,6 +120,7 @@ done_picking_state:
 
         lda MetaSpriteIndex
         sta bomb_entities + BombState::MetaspriteIndex, x
+        lda #0
         sta bomb_entities + BombState::FuseDuration, x
         sta bomb_entities + BombState::FrameCounter, x
         ; Initialize the bomb position to the player position
@@ -218,6 +219,8 @@ try_right:
         jsr _nudge_right
         jmp done_moving
 done_moving:
+        ; Because we may have just moved, update our target coordinates
+        jsr _set_bomb_target_coordinates
         ; sanity check: did we successfully move away from the player?
         ; if not, cancel the throw
         lda bomb_entities + BombState::CurrentCol, x
@@ -233,6 +236,9 @@ successful_throw:
         ; Switch our own state to "thrown"
         lda #BOMB_STATE_STANDARD_THROWN
         sta bomb_entities + BombState::State, x
+        ; Remove ourselves from the player's hands
+        lda #$FF
+        sta PlayerHeldBombIndex
         ; and... that should be it? our update function will take over
         ; from here and do the right thing, one hopes.
         rts
@@ -362,8 +368,8 @@ update_loop:
         ; state machine. Don't draw the result, let the state function
         ; handle that in its own way.
         jsr _lerp_bomb_to_target_coordinates
-        ldx CurrentBombIndex
 
+        ldx CurrentBombIndex
         lda bomb_entities + BombState::State, x
         asl
         tay
@@ -376,10 +382,16 @@ update_loop:
         ; Advance the frame counter, but don't let it exceed
         ; 15, as our lookup tables aren't longer than this
         ldx CurrentBombIndex
-        lda bomb_entities + BombState::FuseDuration, x
+        lda bomb_entities + BombState::FrameCounter, x
         cmp #15
         bcs done_with_this_bomb
-        inc bomb_entities + BombState::FuseDuration, x
+        inc bomb_entities + BombState::FrameCounter, x
+
+        ; All standard bombs have the same coloration based on fuse
+        ; length, so handle that here
+        ldx CurrentBombIndex
+        jsr _set_color_based_on_fuse_length_standard
+
 done_with_this_bomb:
 
         lda CurrentBombIndex
@@ -407,8 +419,34 @@ hold_height_lut:
 ; A delightful arc. The underlying lerp is quite
 ; fast, so don't go nuts with hangtime
 toss_height_lut:
-        .byte 18, 19, 18, 17, 14, 11, 7, 4
+        .byte 18, 17, 12, 7,  2
         .byte  0,  2,  3,  1,  0,  0, 0, 0
+        .byte 0, 0, 0, 0, 0, 0, 0, 0
+
+fuse_tick_pal_lut:
+        .byte SPRITE_ACTIVE | SPRITE_PAL_YELLOW
+        .byte SPRITE_ACTIVE | SPRITE_PAL_YELLOW
+        .byte SPRITE_ACTIVE | SPRITE_PAL_RED
+        .repeat 13
+        .byte SPRITE_ACTIVE | SPRITE_PAL_PURPLE
+        .endrepeat
+
+earth_shattering_pal_lut:
+        .byte SPRITE_ACTIVE | SPRITE_PAL_YELLOW
+        .byte SPRITE_ACTIVE | SPRITE_PAL_YELLOW
+        .byte SPRITE_ACTIVE | SPRITE_PAL_PURPLE
+        .byte SPRITE_ACTIVE | SPRITE_PAL_PURPLE
+        .byte SPRITE_ACTIVE | SPRITE_PAL_YELLOW
+        .byte SPRITE_ACTIVE | SPRITE_PAL_YELLOW
+        .byte SPRITE_ACTIVE | SPRITE_PAL_PURPLE
+        .byte SPRITE_ACTIVE | SPRITE_PAL_PURPLE
+        .byte SPRITE_ACTIVE | SPRITE_PAL_YELLOW
+        .byte SPRITE_ACTIVE | SPRITE_PAL_YELLOW
+        .byte SPRITE_ACTIVE | SPRITE_PAL_PURPLE
+        .byte SPRITE_ACTIVE | SPRITE_PAL_PURPLE
+        .repeat 10
+        .byte SPRITE_ACTIVE | SPRITE_PAL_RED
+        .endrepeat
 
 .proc standard_bomb_update_init
 CurrentBombIndex := R15
@@ -437,8 +475,8 @@ CurrentBombIndex := R15
         sta sprite_table + MetaSpriteState::PositionX, y
         lda bomb_entities + BombState::CurrentPosY+1, x
         ldy bomb_entities + BombState::FrameCounter, x
-        clc
-        adc hoist_height_lut, y
+        sec
+        sbc hoist_height_lut, y
         ldy bomb_entities + BombState::MetaspriteIndex, x
         sta sprite_table + MetaSpriteState::PositionY, y
         ; and... that's it?
@@ -455,8 +493,8 @@ CurrentBombIndex := R15
         sta sprite_table + MetaSpriteState::PositionX, y
         lda bomb_entities + BombState::CurrentPosY+1, x
         ldy bomb_entities + BombState::FrameCounter, x
-        clc
-        adc hold_height_lut, y
+        sec
+        sbc hold_height_lut, y
         ldy bomb_entities + BombState::MetaspriteIndex, x
         sta sprite_table + MetaSpriteState::PositionY, y
         ; and... that's it?
@@ -473,8 +511,8 @@ CurrentBombIndex := R15
         sta sprite_table + MetaSpriteState::PositionX, y
         lda bomb_entities + BombState::CurrentPosY+1, x
         ldy bomb_entities + BombState::FrameCounter, x
-        clc
-        adc toss_height_lut, y
+        sec
+        sbc toss_height_lut, y
         ldy bomb_entities + BombState::MetaspriteIndex, x
         sta sprite_table + MetaSpriteState::PositionY, y
         ; and... that's it?
@@ -492,6 +530,31 @@ CurrentBombIndex := R15
         lda bomb_entities + BombState::CurrentPosY+1, x
         sta sprite_table + MetaSpriteState::PositionY, y
         ; and... that's it?
+        rts
+.endproc
+
+; X is the bomb index, etc
+.proc _set_color_based_on_fuse_length_standard
+        lda bomb_entities + BombState::FuseDuration, x
+        beq hoist_pal
+        cmp #3
+        beq earth_shattering_pal
+fuse_tick_pal:
+        ldy bomb_entities + BombState::FrameCounter, x
+        lda fuse_tick_pal_lut, y
+        ldy bomb_entities + BombState::MetaspriteIndex, x
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
+        rts
+earth_shattering_pal:
+        ldy bomb_entities + BombState::FrameCounter, x
+        lda earth_shattering_pal_lut, y
+        ldy bomb_entities + BombState::MetaspriteIndex, x
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
+        rts  
+hoist_pal:
+        ldy bomb_entities + BombState::MetaspriteIndex, x
+        lda #(SPRITE_ACTIVE | SPRITE_PAL_PURPLE)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
         rts
 .endproc
 
