@@ -260,6 +260,14 @@ DispatchPtr := R0
 DispatchPtr := R0
 CurrentBombIndex := R15
 
+        ; Do not tick fuses while paused!
+        ; (Frankly this is likely to become buggy; I'm tempted to suppress pausing
+        ; while there is any active bomb or special effect going on)
+        lda PlayerIsPaused
+        beq not_paused
+        rts
+not_paused:
+
         lda #0
         sta CurrentBombIndex
 fuse_tick_loop:

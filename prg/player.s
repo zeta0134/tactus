@@ -905,17 +905,32 @@ done_with_initial_pose:
         ; If we aren't intending to move, then skip to collision processing
         lda PlayerNextDirection
         beq resolve_enemy_collision
+
+        lda #0
+        sta PlayerIdleBeats
+
         ; If we are attempting to move but we are holding a bomb, do that instead
         lda PlayerHeldBombIndex
         cmp #$FF
         beq perform_normal_movement
 perform_bomb_throw:
         far_call FAR_throw_held_bomb
+
+        ; Here we need to set the facing direction ourselves, as the calling code
+        ; doesn't bother
+        lda PlayerNextDirection
+check_bomb_east:
+        cmp #DIRECTION_EAST
+        bne check_bomb_west
+        jsr player_face_right
+        jmp resolve_enemy_collision
+check_bomb_west:
+        cmp #DIRECTION_WEST
+        bne no_bomb_facing_change
+        jsr player_face_left
+no_bomb_facing_change:
         jmp resolve_enemy_collision
 perform_normal_movement:
-
-        lda #0
-        sta PlayerIdleBeats
 
         lda #0
         sta PlayerMovementBlocked
@@ -1973,6 +1988,14 @@ proceed_to_pause:
         lda #0
         sta PlayerIntendsToPause
 
+        ; Some actions can eat a pause intent and do nothing. Attempting to pause
+        ; while holding a bomb is one such case!
+        lda PlayerHeldBombIndex
+        cmp #$FF
+        beq not_holding_a_bomb
+        rts
+not_holding_a_bomb:
+
         ; Are we pausing or unpausing?
         lda PlayerIsPaused
         beq perform_pause
@@ -2019,6 +2042,12 @@ continue_being_paused:
 .endproc
 
 .proc detect_bomb_hoist
+        ; We may not hoist while paused!
+        lda PlayerIsPaused
+        beq not_paused
+        rts
+not_paused:
+
         lda PlayerIntendsToBomb
         bne check_hands
         rts
@@ -2039,6 +2068,16 @@ proceed_to_hoist:
         ; "are we already holding something"
         far_call FAR_try_hoist_bomb
         sta PlayerHeldBombIndex
+        cmp #$FF
+        beq all_done
+        ; If the hoist succeeded, do animation things
+        ; TODO: make this much fancier. For now just force us into the idle pose
+        lda #0
+        sta PlayerIdleBeats
+        ldx PlayerSpriteIndex
+        lda #SPRITE_TILE_PLAYER
+        sta sprite_table + MetaSpriteState::TileIndex, x
+all_done:
         rts
 .endproc
 
