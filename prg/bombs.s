@@ -817,6 +817,7 @@ pattern_loop:
         sta AttackSquare
         near_call FAR_explode_tile
         jsr draw_explosion_tile_here
+no_explosion_tile:
         inc CurrentPatternIndex
         lda CurrentPatternIndex
         cmp #9
@@ -846,6 +847,15 @@ HighRowScratch := ActiveDrawingScratch+4
 LowRowScratch := ActiveDrawingScratch+5
 
         perform_zpcm_inc
+
+        ; If the current tile is a wall, skip drawing an explosion
+        ; (todo: expand this for other problematic tiles as we encounter them)
+        ldx TargetIndex
+        lda battlefield, x
+        cmp #TILE_WALL
+        bne perform_draw
+        rts
+perform_draw:
 
         debug_color (TINT_G | LIGHTGRAY)
 
