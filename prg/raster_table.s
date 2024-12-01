@@ -71,6 +71,7 @@ RasterPlaybackSpeedLow: .res 1
         .include "raster/none.incs"
         .include "raster/screen_slide.incs"
         .include "raster/underwater.incs"
+        .include "raster/vertical_shift.incs"
 
         .segment "CODE_1"
 
@@ -96,6 +97,27 @@ raster_effects_list:
         .addr slide_up_frames
         .byte <.bank(slide_up_frames) ; frame table bank
         .byte 31 ; duration in frames
+        .addr minus_1_frames
+        .byte <.bank(minus_1_frames) ; frame table bank
+        .byte 1 ; duration in frames
+        .addr minus_2_frames
+        .byte <.bank(minus_2_frames) ; frame table bank
+        .byte 1 ; duration in frames
+        .addr minus_3_frames
+        .byte <.bank(minus_3_frames) ; frame table bank
+        .byte 1 ; duration in frames
+        .addr minus_4_frames
+        .byte <.bank(minus_4_frames) ; frame table bank
+        .byte 1 ; duration in frames
+        .addr plus_1_frames
+        .byte <.bank(plus_1_frames) ; frame table bank
+        .byte 1 ; duration in frames
+        .addr plus_2_frames
+        .byte <.bank(plus_2_frames) ; frame table bank
+        .byte 1 ; duration in frames
+        .addr plus_3_frames
+        .byte <.bank(plus_3_frames) ; frame table bank
+        .byte 1 ; duration in frames
 
 nametable_lut_x:
         .repeat 256, i
@@ -341,11 +363,6 @@ done:
 
 .proc finalize_irq_table
 FinalizerPtr := RasterScratch+0
-        ; for now, just write $FF to the scanline compare for the last entry,
-        ; which should disable any further splits.
-        ; TODO: this is where we'll append the palette swap and maybe dialog system.
-        ; we'll need a way to configure the finalizer depending on game state and UI mode!
-
         ; Y still holds the final entry in the table, so just reuse it
         ldx RasterEffectFinalizerIndex
         lda finalizer_table+0, x

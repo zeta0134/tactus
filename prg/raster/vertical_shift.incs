@@ -1,0 +1,148 @@
+; Variants of the "none" raster effect, shifted up or down by some number of
+; pixels. Includes extra splits on the trailing edge to repeat that scanline, as
+; this is a nicer looking visual than blocks of nothing
+
+vertical_shift_ppumask_common:
+  .repeat 16
+  .byte $1E
+  .endrepeat
+
+vertical_shift_irq_common:
+  .repeat 16
+  .byte >full_scroll_and_ppumask_irq
+  .endrepeat
+
+vertical_shift_scrollx_common:
+  .repeat 16
+  .byte 0
+  .endrepeat
+
+minus_1_frame_0:
+  .addr vertical_shift_scrollx_common, minus_1_scrolly, minus_1_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+
+minus_1_scrolly:
+  .byte 1
+  .byte 175
+
+minus_1_scanline:
+  .byte 4
+  .byte 179
+
+minus_1_frames:
+  .addr minus_1_frame_0
+  .byte 2
+  .byte <.bank(minus_1_frame_0)
+
+minus_2_frame_0:
+  .addr vertical_shift_scrollx_common, minus_2_scrolly, minus_2_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+
+minus_2_scrolly:
+  .byte 2
+  .byte 175
+  .byte 175
+
+minus_2_scanline:
+  .byte 4
+  .byte 178
+  .byte 179
+
+minus_2_frames:
+  .addr minus_2_frame_0
+  .byte 3
+  .byte <.bank(minus_2_frame_0)
+
+minus_3_frame_0:
+  .addr vertical_shift_scrollx_common, minus_3_scrolly, minus_3_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+
+minus_3_scrolly:
+  .byte 3
+  .byte 175
+  .byte 175
+  .byte 175
+
+minus_3_scanline:
+  .byte 4
+  .byte 177
+  .byte 178
+  .byte 179
+
+minus_3_frames:
+  .addr minus_3_frame_0
+  .byte 4
+  .byte <.bank(minus_3_frame_0)
+
+minus_4_frame_0:
+  .addr vertical_shift_scrollx_common, minus_4_scrolly, minus_4_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+
+minus_4_scrolly:
+  .byte 4
+  .byte 175
+  .byte 175
+  .byte 175
+  .byte 175
+
+minus_4_scanline:
+  .byte 4
+  .byte 176
+  .byte 177
+  .byte 178
+  .byte 179
+
+minus_4_frames:
+  .addr minus_4_frame_0
+  .byte 5
+  .byte <.bank(minus_4_frame_0)
+
+plus_1_frame_0:
+  .addr vertical_shift_scrollx_common, plus_1_scrolly, plus_1_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+
+plus_1_scrolly:
+  .byte 0
+  .byte 0
+
+plus_1_scanline:
+  .byte 4
+  .byte 5
+  
+plus_1_frames:
+  .addr plus_1_frame_0
+  .byte 2
+  .byte <.bank(plus_1_frame_0)
+
+plus_2_frame_0:
+  .addr vertical_shift_scrollx_common, plus_2_scrolly, plus_2_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+
+plus_2_scrolly:
+  .byte 0
+  .byte 0
+  .byte 0
+
+plus_2_scanline:
+  .byte 4
+  .byte 5
+  .byte 6
+  
+plus_2_frames:
+  .addr plus_2_frame_0
+  .byte 3
+  .byte <.bank(plus_2_frame_0)
+
+plus_3_frame_0:
+  .addr vertical_shift_scrollx_common, plus_3_scrolly, plus_3_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+
+plus_3_scrolly:
+  .byte 0
+  .byte 0
+  .byte 0
+  .byte 0
+
+plus_3_scanline:
+  .byte 4
+  .byte 5
+  .byte 6
+  .byte 7
+  
+plus_3_frames:
+  .addr plus_3_frame_0
+  .byte 4
+  .byte <.bank(plus_3_frame_0)

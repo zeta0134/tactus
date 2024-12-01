@@ -535,12 +535,12 @@ sfx_kaboom_noise:
 sfx_hoist_pulse:
         .byte 6
         ;                    pitch, duty, volume,                            sweep, length
-        pulse_init_sweep  PITCH_DS3,  $2,     $B, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      0
-        pulse_cont_duty               $2,     $C,                                        0
-        pulse_cont_duty               $2,     $D,                                        0
-        pulse_cont_duty               $2,     $E,                                        0
-        pulse_cont_duty               $2,     $D,                                        0
-        pulse_cont_duty               $2,     $C,                                        0
+        pulse_init_sweep  PITCH_DS3,  $0,     $B, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      0
+        pulse_cont_duty               $0,     $C,                                        0
+        pulse_cont_duty               $0,     $D,                                        0
+        pulse_cont_duty               $0,     $E,                                        0
+        pulse_cont_duty               $0,     $D,                                        0
+        pulse_cont_duty               $0,     $C,                                        0
 
 sfx_throw_pulse:
         .byte 12
