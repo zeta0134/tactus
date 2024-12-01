@@ -168,11 +168,8 @@ TargetSquare := R13
         lda #1 ; there is only one key per dungeon floor
         sta PlayerKeys
 
-        ; TODO: a nice SFX
-        st16 R0, sfx_key_pulse1
-        jsr play_sfx_pulse1
-        st16 R0, sfx_key_pulse2
-        jsr play_sfx_pulse2
+        queue_sfx_pulse1 sfx_key_pulse1
+        queue_sfx_pulse2 sfx_key_pulse2
 
         ; Now, draw a basic floor tile here, which will be underneath the player
         ldx TargetSquare

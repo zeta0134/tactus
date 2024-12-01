@@ -337,12 +337,10 @@ explode:
         ; KA-BOOM!
         jsr _explode_3x3_here
         ; Play a suitable explosion SFX
-        st16 R0, sfx_kaboom_pulse_1
-        jsr play_sfx_pulse1
-        st16 R0, sfx_kaboom_pulse_2
-        jsr play_sfx_pulse2
-        st16 R0, sfx_kaboom_noise
-        jsr play_sfx_noise
+        queue_sfx_pulse1_with_priority sfx_kaboom_pulse_1, #10
+        queue_sfx_pulse2_with_priority sfx_kaboom_pulse_1, #10
+        queue_sfx_noise_with_priority sfx_kaboom_noise, #10
+
         ; Have some screen shake, etc
         lda #2
         sta ScreenShakeDepth

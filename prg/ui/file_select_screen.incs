@@ -262,8 +262,7 @@ widget_file_select_mode := widgets_data0
         lda widget_file_select_mode, y
         beq done_with_sfx
 
-        st16 R0, sfx_dialog_close
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_dialog_close
 
 done_with_sfx:
         ldy #FILE_SELECT_CONTROLLER_INDEX
@@ -356,15 +355,12 @@ widget_copy_source_index := widgets_data1
         cmp #FILE_NEW
         bne perform_erase_confirm
         ; Fail (and stay in this mode). Play a buzzer SFX to indicate sadness!
-        st16 R0, sfx_too_poor_pulse1
-        jsr play_sfx_pulse1
-        st16 R0, sfx_too_poor_pulse2
-        jsr play_sfx_pulse2
+        queue_sfx_pulse1 sfx_too_poor_pulse1
+        queue_sfx_pulse2 sfx_too_poor_pulse2
         rts
 
 perform_erase_confirm:
-        st16 R0, sfx_dialog_advance
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_dialog_advance
 
         jsr enter_erase_confirm_mode
         rts
@@ -388,12 +384,9 @@ widget_file_index := widgets_data2
         ldy WidgetIndexUnderCursor
         set_widget_state_y widget_file_select_box_refresh
         ; play a suitable "file erased" SFX, which is also the death sound
-        st16 R0, sfx_death_spin_pulse
-        jsr play_sfx_pulse1
-        st16 R0, sfx_death_spin_pulse
-        jsr play_sfx_pulse1
-        st16 R0, sfx_death_spin_tri
-        jsr play_sfx_triangle
+        queue_sfx_pulse1 sfx_death_spin_pulse
+        queue_sfx_triangle sfx_death_spin_tri
+
         ; Move back to normal mode!
         jsr enter_normal_mode
 
@@ -415,10 +408,8 @@ widget_copy_source_index := widgets_data1
         cmp #FILE_NEW
         bne perform_copy_source_select
         ; Fail (and stay in this mode). Play a buzzer SFX to indicate sadness!
-        st16 R0, sfx_too_poor_pulse1
-        jsr play_sfx_pulse1
-        st16 R0, sfx_too_poor_pulse2
-        jsr play_sfx_pulse2
+        queue_sfx_pulse1 sfx_too_poor_pulse1
+        queue_sfx_pulse2 sfx_too_poor_pulse2
         rts
 
 perform_copy_source_select:
@@ -428,8 +419,7 @@ perform_copy_source_select:
         ldy #FILE_SELECT_CONTROLLER_INDEX
         sta widget_copy_source_index, y
         ; Play an advance SFX
-        st16 R0, sfx_dialog_advance
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_dialog_advance
 
         jsr enter_copy_dest_mode
         rts
@@ -451,10 +441,8 @@ widget_copy_source_index := widgets_data1
         ldy WidgetIndexUnderCursor
         cmp widget_file_index, y
         bne copy_dest_is_valid
-        st16 R0, sfx_too_poor_pulse1
-        jsr play_sfx_pulse1
-        st16 R0, sfx_too_poor_pulse2
-        jsr play_sfx_pulse2
+        queue_sfx_pulse1 sfx_too_poor_pulse1
+        queue_sfx_pulse2 sfx_too_poor_pulse2
         rts
 
 copy_dest_is_valid:
@@ -497,8 +485,8 @@ widget_copy_source_index := widgets_data1
         set_widget_state_y widget_file_select_box_refresh
 
         ; Play some sort of chime for a successful copy. I dunno, pause?
-        st16 R0, sfx_pause
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_pause
+
 
         ; Move back to normal mode!
         jsr enter_normal_mode
@@ -588,8 +576,7 @@ widget_text_string_high := widgets_data3
 .endproc
 
 .proc play_sfx_and_enter_erase_mode
-        st16 R0, sfx_dialog_advance
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_dialog_advance
         jmp enter_erase_mode
 .endproc
 
@@ -652,10 +639,8 @@ widget_text_string_high := widgets_data3
         ora #WIDGET_STATE_NAVIGABLE
         sta widgets_state_flags, y
 
-        st16 R0, sfx_siren_pulse_1
-        jsr play_sfx_pulse1
-        st16 R0, sfx_siren_pulse_2
-        jsr play_sfx_pulse2
+        queue_sfx_pulse1 sfx_siren_pulse_1
+        queue_sfx_pulse2 sfx_siren_pulse_2
 
         jsr apply_danger_ui_palette
 
@@ -663,8 +648,7 @@ widget_text_string_high := widgets_data3
 .endproc
 
 .proc play_sfx_and_enter_copy_mode
-        st16 R0, sfx_dialog_advance
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_dialog_advance
         jmp enter_copy_mode
 .endproc
 
@@ -773,10 +757,8 @@ widget_copy_source_index := widgets_data1
         ora #WIDGET_STATE_NAVIGABLE
         sta widgets_state_flags, y
 
-        st16 R0, sfx_siren_pulse_1
-        jsr play_sfx_pulse1
-        st16 R0, sfx_siren_pulse_2
-        jsr play_sfx_pulse2
+        queue_sfx_pulse1 sfx_siren_pulse_1
+        queue_sfx_pulse2 sfx_siren_pulse_2
 
         jsr apply_danger_ui_palette
 

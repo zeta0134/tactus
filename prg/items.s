@@ -1002,8 +1002,7 @@ done_with_this_room:
 
         ; Play a SFX! Maybe a custom one later, but we'll use the same one for health
         ; containers just to have something
-        st16 R0, sfx_heart_container
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_heart_container
 
         lda #0 ; return success
         rts
@@ -1027,8 +1026,7 @@ done_with_this_room:
 
         ; Play a SFX! Maybe a custom one later, but we'll use the same one for health
         ; containers just to have something
-        st16 R0, sfx_heart_container
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_heart_container
 
         lda #0 ; return success
         rts
@@ -1070,8 +1068,7 @@ proceed_to_heal:
         sta HealingAmount
         far_call FAR_receive_healing
 
-        st16 R0, sfx_small_heart
-        jsr play_sfx_triangle
+        queue_sfx_triangle sfx_small_heart
 
         lda #0 ; return success
         rts
@@ -1291,10 +1288,8 @@ NewItem := R18
 
         ; Play a joyous SFX
         ; TODO: should this be a different sound depending on the type of item? (yes, but how?)
-        st16 R0, sfx_equip_ability_pulse1
-        jsr play_sfx_pulse1
-        st16 R0, sfx_equip_ability_pulse2
-        jsr play_sfx_pulse2
+        queue_sfx_pulse1 sfx_equip_ability_pulse1
+        queue_sfx_pulse2 sfx_equip_ability_pulse2
 
         ldy #ItemDef::SlotId
         lda (ItemPtr), y

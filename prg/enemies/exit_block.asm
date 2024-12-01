@@ -42,9 +42,8 @@ TargetSquare := R13
 
         st16 FadeToGameMode, advance_to_next_floor
         st16 GameMode, fade_to_game_mode        
-        
-        st16 R0, sfx_teleport
-        jsr play_sfx_pulse1
+
+        queue_sfx_pulse1 sfx_teleport
 
         ldx TargetSquare
         lda tile_data, x

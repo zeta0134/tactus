@@ -1,11 +1,11 @@
 .global play_track
 .global play_variant
 .global fade_to_track
-.global play_sfx_pulse1
-.global play_sfx_pulse2
-.global play_sfx_triangle
-.global play_sfx_noise
-.global play_sfx_dpcm
+
+.global _play_sfx_pulse1
+.global _play_sfx_pulse2
+.global _play_sfx_triangle
+.global _play_sfx_noise
 
 .global FAR_init_audio
 .global FAR_update_audio
@@ -54,29 +54,8 @@
 .global sfx_kaboom_pulse_2
 .global sfx_kaboom_noise
 
-.macro play_dpcm sample_addr, length
-.scope
-SampleAddr := R0
-SampleLength := R1
-SampleRate := R2
-SampleBank := R3
-SfxFrames := R4
-        lda #<((sample_addr  - $C000) >> 6)
-        sta SampleAddr
-        lda #<(.bank(sample_addr))
-        sta SampleBank
-
-        lda #((length - 1) / 16)
-        sta SampleLength
-        lda #(length / 69)
-        sta SfxFrames
-
-        ; for now, all triggered dpcm SFX are at the max rate
-        lda #$0F
-        sta SampleRate
-        jsr play_sfx_dpcm
-.endscope
-.endmacro
+.global CandidateSfxPtr
+.global CandidateSfxPriority
 
 TRACK_SILENCE          = 0
 TRACK_CLICK            = 1
@@ -90,3 +69,78 @@ TRACK_BOUNCY           = 7
 TRACK_VARIANT_NORMAL   = 0 ; every track has this
 TRACK_VARIANT_INTERIOR = 1 ; most level themes have these
 TRACK_VARIANT_PAUSE    = 2
+
+; 0 is the lowest priority, which seems like a reasonable default.
+; For many games this is sufficient; the newest sound wins. Priority
+; is helpful in complex situations where you need to choose between
+; several otherwise conflicting candidate sounds on the same frame.
+
+.macro queue_sfx_pulse1_with_priority sound_ptr, priority
+        lda #<sound_ptr
+        sta CandidateSfxPtr+0
+        lda #>sound_ptr
+        sta CandidateSfxPtr+1
+        lda priority
+        sta CandidateSfxPriority
+        jsr _play_sfx_pulse1
+.endmacro
+
+.macro queue_sfx_pulse1_with_priority_ptr sound_ptr, priority
+        lda sound_ptr+0
+        sta CandidateSfxPtr+0
+        lda sound_ptr+1
+        sta CandidateSfxPtr+1
+        lda priority
+        sta CandidateSfxPriority
+        jsr _play_sfx_pulse1
+.endmacro
+
+.macro queue_sfx_pulse1 sound_ptr
+        queue_sfx_pulse1_with_priority sound_ptr, #0
+.endmacro
+
+.macro queue_sfx_pulse1_ptr sound_ptr
+        queue_sfx_pulse1_with_priority_ptr sound_ptr, #0
+.endmacro
+
+.macro queue_sfx_pulse2_with_priority sound_ptr, priority
+lda #<sound_ptr
+        sta CandidateSfxPtr+0
+        lda #>sound_ptr
+        sta CandidateSfxPtr+1
+        lda priority
+        sta CandidateSfxPriority
+        jsr _play_sfx_pulse2
+.endmacro
+
+.macro queue_sfx_pulse2 sound_ptr
+        queue_sfx_pulse2_with_priority sound_ptr, #0
+.endmacro
+
+.macro queue_sfx_triangle_with_priority sound_ptr, priority
+        lda #<sound_ptr
+        sta CandidateSfxPtr+0
+        lda #>sound_ptr
+        sta CandidateSfxPtr+1
+        lda priority
+        sta CandidateSfxPriority
+        jsr _play_sfx_triangle
+.endmacro
+
+.macro queue_sfx_triangle sound_ptr
+        queue_sfx_triangle_with_priority sound_ptr, #0
+.endmacro
+
+.macro queue_sfx_noise_with_priority sound_ptr, priority
+        lda #<sound_ptr
+        sta CandidateSfxPtr+0
+        lda #>sound_ptr
+        sta CandidateSfxPtr+1
+        lda priority
+        sta CandidateSfxPriority
+        jsr _play_sfx_noise
+.endmacro
+
+.macro queue_sfx_noise sound_ptr
+        queue_sfx_noise_with_priority sound_ptr, #0
+.endmacro

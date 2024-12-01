@@ -236,8 +236,7 @@ game_over:
         st16 StringPtr, game_over_text
         jsr draw_string_imm
 
-        st16 R0, sfx_death_splat_noise
-        jsr play_sfx_noise
+        queue_sfx_noise sfx_death_splat_noise
 
         ; TODO; replace this with the game over jingle, when and if we have one
         lda #TRACK_GAMEOVER

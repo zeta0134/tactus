@@ -234,8 +234,7 @@ done:
 
 ; Teleports to various game modes, including other UI subscreens
 .proc go_to_file_select
-        st16 R0, sfx_teleport
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, file_select_prep
         st16 GameMode, fade_to_game_mode
@@ -243,8 +242,7 @@ done:
 .endproc
 
 .proc go_to_options
-        st16 R0, sfx_teleport
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, options_prep
         st16 GameMode, fade_to_game_mode
@@ -252,8 +250,7 @@ done:
 .endproc
 
 .proc go_to_gameplay
-        st16 R0, sfx_teleport
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, game_prep
         st16 GameMode, fade_to_game_mode
@@ -261,8 +258,7 @@ done:
 .endproc
 
 .proc go_to_name_entry
-        st16 R0, sfx_teleport
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, name_entry_prep
         st16 GameMode, fade_to_game_mode
@@ -270,8 +266,7 @@ done:
 .endproc
 
 .proc go_to_file_details
-        st16 R0, sfx_teleport
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, file_details_prep
         st16 GameMode, fade_to_game_mode
@@ -279,8 +274,7 @@ done:
 .endproc
 
 .proc return_to_title
-        st16 R0, sfx_teleport
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_teleport
 
         st16 FadeToGameMode, title_prep
         st16 GameMode, fade_to_game_mode

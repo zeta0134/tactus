@@ -27,10 +27,18 @@ Pulse2DelayCounter: .res 1
 TriangleDelayCounter: .res 1
 NoiseDelayCounter: .res 1
 
+Pulse1Priority: .res 1
+Pulse2Priority: .res 1
+TrianglePriority: .res 1
+NoisePriority: .res 1
+
 MusicCurrentTrack: .res 1
 MusicCurrentBank: .res 1
 MusicTargetTrack: .res 1
 FadeCounter: .res 1
+
+CandidateSfxPtr: .res 2
+CandidateSfxPriority: .res 1
 
         .zeropage
 Pulse1SfxPtr: .res 2
@@ -293,9 +301,18 @@ invalid_variant:
         rts
 .endproc
 
-.proc play_sfx_pulse1
-SfxPtr := R0
+.proc _play_sfx_pulse1
         perform_zpcm_inc
+
+        ; Check our candidate priority against the channel's active priority.
+        ; If the candidate is lower (<) than the current priority, bail without
+        ; doing anything.
+        lda CandidateSfxPriority
+        cmp Pulse1Priority
+        bcs candidate_check_succeeded
+        rts
+candidate_check_succeeded:
+        sta Pulse1Priority
 
         lda system_type
         cmp #SYSTEM_TYPE_PAL
@@ -308,9 +325,9 @@ use_pal_sfx:
         jmp done_picking_sfx_bank
 done_picking_sfx_bank:
 
-        lda SfxPtr
+        lda CandidateSfxPtr
         sta Pulse1SfxPtr
-        lda SfxPtr+1
+        lda CandidateSfxPtr+1
         sta Pulse1SfxPtr+1
         ldy #0
         lda (Pulse1SfxPtr), y
@@ -325,9 +342,18 @@ done_picking_sfx_bank:
         rts
 .endproc
 
-.proc play_sfx_pulse2
-SfxPtr := R0
+.proc _play_sfx_pulse2
         perform_zpcm_inc
+
+        ; Check our candidate priority against the channel's active priority.
+        ; If the candidate is lower (<) than the current priority, bail without
+        ; doing anything.
+        lda CandidateSfxPriority
+        cmp Pulse2Priority
+        bcs candidate_check_succeeded
+        rts
+candidate_check_succeeded:
+        sta Pulse2Priority
 
         lda system_type
         cmp #SYSTEM_TYPE_PAL
@@ -340,9 +366,9 @@ use_pal_sfx:
         jmp done_picking_sfx_bank
 done_picking_sfx_bank:
 
-        lda SfxPtr
+        lda CandidateSfxPtr
         sta Pulse2SfxPtr
-        lda SfxPtr+1
+        lda CandidateSfxPtr+1
         sta Pulse2SfxPtr+1
         ldy #0
         lda (Pulse2SfxPtr), y
@@ -357,9 +383,18 @@ done_picking_sfx_bank:
         rts
 .endproc
 
-.proc play_sfx_triangle
-SfxPtr := R0
+.proc _play_sfx_triangle
         perform_zpcm_inc
+
+        ; Check our candidate priority against the channel's active priority.
+        ; If the candidate is lower (<) than the current priority, bail without
+        ; doing anything.
+        lda CandidateSfxPriority
+        cmp TrianglePriority
+        bcs candidate_check_succeeded
+        rts
+candidate_check_succeeded:
+        sta TrianglePriority
 
         lda system_type
         cmp #SYSTEM_TYPE_PAL
@@ -372,9 +407,9 @@ use_pal_sfx:
         jmp done_picking_sfx_bank
 done_picking_sfx_bank:
 
-        lda SfxPtr
+        lda CandidateSfxPtr
         sta TriangleSfxPtr
-        lda SfxPtr+1
+        lda CandidateSfxPtr+1
         sta TriangleSfxPtr+1
         ldy #0
         lda (TriangleSfxPtr), y
@@ -389,9 +424,18 @@ done_picking_sfx_bank:
         rts
 .endproc
 
-.proc play_sfx_noise
-SfxPtr := R0
+.proc _play_sfx_noise
         perform_zpcm_inc
+
+        ; Check our candidate priority against the channel's active priority.
+        ; If the candidate is lower (<) than the current priority, bail without
+        ; doing anything.
+        lda CandidateSfxPriority
+        cmp NoisePriority
+        bcs candidate_check_succeeded
+        rts
+candidate_check_succeeded:
+        sta NoisePriority
 
         lda system_type
         cmp #SYSTEM_TYPE_PAL
@@ -404,9 +448,9 @@ use_pal_sfx:
         jmp done_picking_sfx_bank
 done_picking_sfx_bank:
 
-        lda SfxPtr
+        lda CandidateSfxPtr
         sta NoiseSfxPtr
-        lda SfxPtr+1
+        lda CandidateSfxPtr+1
         sta NoiseSfxPtr+1
         ldy #0
         lda (NoiseSfxPtr), y
@@ -446,8 +490,6 @@ done_picking_sfx_bank:
         ldx MusicCurrentTrack
         lda track_table_bank, x
         far_call bhop_set_module_bank
-
-
 
         perform_zpcm_inc
 
@@ -669,5 +711,12 @@ done:
         perform_zpcm_inc
         near_call update_noise
         perform_zpcm_inc
+
+        lda #0
+        sta Pulse1Priority
+        sta Pulse2Priority
+        sta TrianglePriority
+        sta NoisePriority
+
         rts
 .endproc

@@ -1396,8 +1396,7 @@ done_with_swing:
         ; ... play a weapon slash effect
         lda EnemyDiedThisFrame
         bne skip_weapon_sfx
-        st16 R0, sfx_weapon_slash
-        jsr play_sfx_noise
+        queue_sfx_noise sfx_weapon_slash
 skip_weapon_sfx:
         ; ... and set our sprite state to attacking
         ; TODO: if we have multiple or weapon-specific attack animations, here is where to apply them
@@ -1789,12 +1788,9 @@ damage_amount_okay:
         sta ScreenShakeDecayCounter
 
         ; Taking damage is a *big deal*
-        st16 R0, sfx_weak_hit_pulse
-        jsr play_sfx_pulse1
-        st16 R0, sfx_weak_hit_tri
-        jsr play_sfx_triangle
-        st16 R0, sfx_weak_hit_noise
-        jsr play_sfx_noise
+        queue_sfx_pulse1 sfx_weak_hit_pulse
+        queue_sfx_triangle sfx_weak_hit_tri
+        queue_sfx_noise sfx_weak_hit_noise
 
         ; Taking damage resets any ongoing chain. We want to
         ; reward SKILLED play, not merely one's ability to
@@ -1967,12 +1963,8 @@ converge:
         sta play_track
 
         ; Oops
-        st16 R0, sfx_death_spin_pulse
-        jsr play_sfx_pulse1
-        st16 R0, sfx_death_spin_pulse
-        jsr play_sfx_pulse1
-        st16 R0, sfx_death_spin_tri
-        jsr play_sfx_triangle
+        queue_sfx_pulse1 sfx_death_spin_pulse
+        queue_sfx_triangle sfx_death_spin_tri
 existence_proven:
         rts
 .endproc
@@ -2007,8 +1999,7 @@ perform_unpause:
 
         near_call FAR_play_music_for_current_room
 
-        st16 R0, sfx_pause
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_pause
 
         rts
 perform_pause:
@@ -2020,8 +2011,7 @@ perform_pause:
         lda #TRACK_VARIANT_PAUSE
         jsr play_variant
 
-        st16 R0, sfx_pause
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_pause
 
         jmp continue_being_paused
         rts

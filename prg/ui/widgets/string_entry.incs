@@ -233,8 +233,7 @@ page_in_range:
         ; draw the letter grid and refresh the controls
         jsr draw_current_page
         jsr draw_controls
-        st16 R0, sfx_dialog_advance
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_dialog_advance
         rts
 .endproc
 
@@ -420,12 +419,10 @@ widget_grid_pos_y   := widgets_data6
         sta (StringPtr), y
         ; finally, draw the string again
         jsr draw_target_string
-        st16 R0, sfx_select_cursor
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_select_cursor
         rts
 fail_to_add:
-        st16 R0, sfx_cursor_fail
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_cursor_fail
         rts
 .endproc
 
@@ -454,12 +451,10 @@ widget_target_string_high := widgets_data3
         sta (StringPtr), y
         ; finally, draw the string again
         jsr draw_target_string
-        st16 R0, sfx_select_cursor
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_select_cursor
         rts
 fail_to_add:
-        st16 R0, sfx_cursor_fail
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_cursor_fail
         rts
 .endproc
 
@@ -488,8 +483,7 @@ widget_grid_pos_y   := widgets_data6
 position_is_fine:
         jsr draw_current_page
         jsr draw_controls
-        st16 R0, sfx_move_cursor
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_move_cursor
 cancel_move:
         rts
 .endproc
@@ -508,8 +502,7 @@ widget_grid_pos_y   := widgets_data6
         sta widget_grid_pos_x, y
         jsr draw_current_page
         jsr draw_controls
-        st16 R0, sfx_move_cursor
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_move_cursor
 cancel_move:
         rts
 .endproc
@@ -528,8 +521,7 @@ widget_grid_pos_y   := widgets_data6
         sta widget_grid_pos_y, y
         jsr draw_current_page
         jsr draw_controls
-        st16 R0, sfx_move_cursor
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_move_cursor
 cancel_move:
         rts
 .endproc
@@ -560,8 +552,7 @@ allow_move:
         sta widget_grid_pos_y, y
         jsr draw_current_page
         jsr draw_controls
-        st16 R0, sfx_move_cursor
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_move_cursor
 cancel_move:
         rts
 .endproc
@@ -632,10 +623,8 @@ widget_target_string_high := widgets_data3
         rts
 
 buzz_and_fail:
-        st16 R0, sfx_too_poor_pulse1
-        jsr play_sfx_pulse1
-        st16 R0, sfx_too_poor_pulse2
-        jsr play_sfx_pulse2
+        queue_sfx_pulse1 sfx_too_poor_pulse1
+        queue_sfx_pulse2 sfx_too_poor_pulse2
         rts
 .endproc
 

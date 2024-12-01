@@ -343,10 +343,8 @@ deny_collection:
 
         ; TODO: should we have different "cancel" sounds for purchase / nonpurchase? We could
         ; do that here easily, or we could move this into the item collection logic.
-        st16 R0, sfx_too_poor_pulse1
-        jsr play_sfx_pulse1
-        st16 R0, sfx_too_poor_pulse2
-        jsr play_sfx_pulse2
+        queue_sfx_pulse1 sfx_too_poor_pulse1
+        queue_sfx_pulse2 sfx_too_poor_pulse2
 
         rts
 .endproc

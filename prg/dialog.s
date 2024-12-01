@@ -166,8 +166,7 @@ check_for_active:
         lda #0
         sta DialogOpenClosePos
         ; Play an opening sfx, as this is an "interaction" with some in-game object
-        st16 R0, sfx_dialog_advance
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_dialog_advance
 
         st16 DialogState, state_open_dialog_animation
         perform_zpcm_inc
@@ -394,12 +393,10 @@ perform_active_mode_checks:
         cmp #D_CLOSE
         bne play_advance_sfx
 play_close_sfx:
-        st16 R0, sfx_dialog_close
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_dialog_close
         jmp advance
 play_advance_sfx:
-        st16 R0, sfx_dialog_advance
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_dialog_advance
         jmp advance
 no_active_advance:
 
@@ -408,8 +405,7 @@ no_active_advance:
         beq no_active_dismiss
         lda #0
         sta DialogDismissActiveMode ; consume the flag
-        st16 R0, sfx_dialog_close
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_dialog_close
         jmp close_early
 no_active_dismiss:
         jmp active_waiting
@@ -585,7 +581,7 @@ play_chirp:
         sta SfxPtr+0
         lda chirps_lut+1, x
         sta SfxPtr+1
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1_ptr SfxPtr
 
         perform_zpcm_inc
         rts

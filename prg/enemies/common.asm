@@ -658,10 +658,8 @@ die:
         roll_loot_at OriginalAttackSquare
 
         ; Play an appropriately crunchy death sound
-        st16 R0, sfx_defeat_enemy_pulse
-        jsr play_sfx_pulse1
-        st16 R0, sfx_defeat_enemy_noise
-        jsr play_sfx_noise
+        queue_sfx_pulse1 sfx_defeat_enemy_pulse
+        queue_sfx_noise sfx_defeat_enemy_noise
 
         lda #1
         sta EnemyDiedThisFrame

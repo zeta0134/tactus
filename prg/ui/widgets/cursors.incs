@@ -99,8 +99,7 @@ found_one:
         ; preserve?
         lda R0
         pha
-        st16 R0, sfx_move_cursor
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_move_cursor
         pla
         sta R0
 
@@ -143,8 +142,7 @@ found_one:
         ; preserve
         lda R0
         pha
-        st16 R0, sfx_move_cursor
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_move_cursor
         pla
         sta R0
 

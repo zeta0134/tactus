@@ -191,8 +191,7 @@ stay_here:
         lda #OPTIONS_SAVE_BUTTON_INDEX
         sta widget_cursor_nav_index, y
 
-        st16 R0, sfx_move_cursor
-        jsr play_sfx_pulse2
+        queue_sfx_pulse2 sfx_move_cursor
 
 leave_that_cursor_alone:
         rts

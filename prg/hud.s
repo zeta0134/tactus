@@ -886,8 +886,7 @@ converge:
         rts
         
 play_coin_sfx:
-        st16 R0, sfx_cash_flow
-        jsr play_sfx_pulse1
+        queue_sfx_pulse1 sfx_cash_flow
 
         lda #3
         sta GoldSfxCooldown
