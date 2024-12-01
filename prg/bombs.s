@@ -772,8 +772,20 @@ arrived_at_target:
         rts
 .endproc
 
+pattern_3x3_lut:
+        .byte <(-BATTLEFIELD_WIDTH - 1)
+        .byte <(-BATTLEFIELD_WIDTH + 0)
+        .byte <(-BATTLEFIELD_WIDTH + 1)
+        .byte <(                 0 - 1)
+        .byte <(                 0 + 0)
+        .byte <(                 0 + 1)
+        .byte <( BATTLEFIELD_WIDTH - 1)
+        .byte <( BATTLEFIELD_WIDTH + 0)
+        .byte <( BATTLEFIELD_WIDTH + 1)
+
 .proc _explode_3x3_here
 ; Our current state
+CurrentPatternIndex := R12
 TargetPattern := R13
 TargetAttribute := R14
 CurrentBombIndex := R15
@@ -790,15 +802,25 @@ EffectiveAttackSquare := R10
         lda #>BG_TILE_EXPLOSION
         ora #PAL_AIR
         sta TargetAttribute
-        
+        lda #0
+        sta CurrentPatternIndex
+
+pattern_loop:
         ldx CurrentBombIndex
         ldy bomb_entities + BombState::CurrentRow, x
         lda row_number_to_tile_index_lut, y
         clc
         adc bomb_entities + BombState::CurrentCol, x
+        ldy CurrentPatternIndex
+        clc
+        adc pattern_3x3_lut, y
         sta AttackSquare
         near_call FAR_explode_tile
         jsr draw_explosion_tile_here
+        inc CurrentPatternIndex
+        lda CurrentPatternIndex
+        cmp #9
+        bne pattern_loop
 
         rts
 .endproc

@@ -224,7 +224,7 @@ HeartCount := R2
         ; The player should start with whatever Zeta likes        
         lda #ITEM_SPEAR_L2
         sta PlayerEquipmentWeapon
-        lda #ITEM_LARGE_TORCH
+        lda #ITEM_NONE
         sta PlayerEquipmentTorch
         lda #ITEM_SHIELD
         sta PlayerEquipmentArmor
