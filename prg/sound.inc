@@ -53,6 +53,8 @@
 .global sfx_kaboom_pulse_1
 .global sfx_kaboom_pulse_2
 .global sfx_kaboom_noise
+.global sfx_hoist_pulse
+.global sfx_throw_pulse
 
 .global CandidateSfxPtr
 .global CandidateSfxPriority

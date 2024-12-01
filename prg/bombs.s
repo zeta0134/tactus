@@ -152,6 +152,9 @@ done_picking_state:
         lda #<SPRITE_TILE_PLAYER
         sta sprite_table + MetaSpriteState::TileIndex, x
 
+        ; We're hoisting a bomb (successfully) so play an appropriate SFX
+        queue_sfx_pulse1 sfx_hoist_pulse
+
         ; and... in theory that's it? ah, but we need to return the index
         lda NewBombIndex
         rts
@@ -245,6 +248,8 @@ successful_throw:
         ; Remove ourselves from the player's hands
         lda #$FF
         sta PlayerHeldBombIndex
+        ; We threw successfully, so play an appropriate SFX
+        queue_sfx_pulse1 sfx_throw_pulse
         ; and... that should be it? our update function will take over
         ; from here and do the right thing, one hopes.
         rts
