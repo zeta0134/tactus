@@ -8,10 +8,13 @@
         .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
+        .include "kernel.inc"
         .include "nes.inc"
         .include "player.inc"
         .include "rainbow.inc"
+        .include "sound.inc"
         .include "sprites.inc"
+        .include "word_util.inc"
         .include "zpcm.inc"
         .include "zeropage.inc"
 
@@ -331,11 +334,21 @@ done_with_state_changes:
         bcs explode
         rts
 explode:
-        ; TODO: the actual explosion here!
+        ; KA-BOOM!
         jsr _explode_3x3_here
-
         ; Play a suitable explosion SFX
+        st16 R0, sfx_kaboom_pulse_1
+        jsr play_sfx_pulse1
+        st16 R0, sfx_kaboom_pulse_2
+        jsr play_sfx_pulse2
+        st16 R0, sfx_kaboom_noise
+        jsr play_sfx_noise
         ; Have some screen shake, etc
+        lda #2
+        sta ScreenShakeDepth
+        lda #8
+        sta ScreenShakeSpeed
+        sta ScreenShakeDecayCounter
 
         ; Cleanup: if we were held by the player, clear that
         lda PlayerHeldBombIndex

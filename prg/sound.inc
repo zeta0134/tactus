@@ -50,6 +50,10 @@
 .global sfx_siren_pulse_1
 .global sfx_siren_pulse_2
 
+.global sfx_kaboom_pulse_1
+.global sfx_kaboom_pulse_2
+.global sfx_kaboom_noise
+
 .macro play_dpcm sample_addr, length
 .scope
 SampleAddr := R0
