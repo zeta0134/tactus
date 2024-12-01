@@ -30,3 +30,5 @@ R20: .byte $00
 GameloopCounter: .byte $00
 LastNmi: .byte $00
 NmiSoftDisable: .byte $00
+
+ActiveDrawingScratch: .res 6

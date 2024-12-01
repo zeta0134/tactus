@@ -673,6 +673,87 @@ die:
 .endproc
 
 ; ============================================================================================================================
+; ===                                    Explosion Attacks Enemy Behaviors                                                 ===
+; ============================================================================================================================
+        .segment "ENEMY_BOMB_SPELL"
+
+.proc ENEMY_BOMB_SPELL_direct_explode
+AttackSquare := R3
+EffectiveAttackSquare := R10
+        ; Copy in the attack square, so we can use shared logic to process the effect
+        lda AttackSquare
+        sta EffectiveAttackSquare
+        near_call ENEMY_BOMB_SPELL_explode_common
+        rts
+.endproc
+
+.proc ENEMY_BOMB_SPELL_indirect_explode
+        near_call ENEMY_BOMB_SPELL_explode_common
+        rts
+.endproc
+
+.proc ENEMY_BOMB_SPELL_explode_common
+; For drawing tiles
+TargetIndex := R0
+OriginalAttackSquare := R3
+EffectiveAttackSquare := R10
+
+        ; No funny business. Explosions kill common enemies in one hit!
+
+die:
+        ; Replace the struck enemy with a regular floor, and spawn the usual death juice
+        ldx EffectiveAttackSquare
+        stx DiscoTile
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_disco_tile_here
+        ; Yes, do draw the active tile, in case this enemy tried to leave
+        ; the explosion radius. This may result in some overdraw; it's fine.
+        lda EffectiveAttackSquare
+        sta TargetIndex
+        jsr draw_active_tile
+
+        ldx EffectiveAttackSquare
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+
+        ; Juice: spawn a floaty, flashy death skull above our tile
+        ; #RIP
+        far_call ENEMY_ATTACK_spawn_death_sprite_here
+
+        ; Make this square a one beat hazard
+        ldx OriginalAttackSquare
+        lda #TILE_ONE_BEAT_HAZARD
+        sta battlefield, x
+
+        ; Do NOT update the player's combo!
+        ; Do NOT roll for loot (TODO: if we want loot, wee if we can roll without considering chain/combo)
+        ; Do NOT play a SFX, the explosion SFX is already queued up
+
+        ; DO decrement the active counter, as we have just properly died
+        ; and such. (TODO: investigate if a moving enemy can double-decrement,
+        ; and whether we consider this to be a game-breaking flaw if it would
+        ; occur near the clearing of the room?)
+        dec enemies_active
+
+        rts
+.endproc
+
+; Mostly used by disco floors and objects that we want to "destroy" without
+; making the resulting square safe to step on. One beat hazards revert themselves
+; to standard disco tiles on the next beat, and the visual jank here will be
+; hidden by explosion tiles, drawn separately.
+.proc ENEMY_BOMB_SPELL_become_one_beat_hazard
+OriginalAttackSquare := R3
+EffectiveAttackSquare := R10 ; Unused (call this directly)
+        ldx OriginalAttackSquare
+        lda #TILE_ONE_BEAT_HAZARD
+        sta battlefield, x
+        rts
+.endproc
+
+; ============================================================================================================================
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================
         .segment "ENEMY_COLLIDE"

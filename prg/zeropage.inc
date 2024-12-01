@@ -8,3 +8,4 @@
 .globalzp R16,R17,R18,R19,R20
 
 .globalzp GameloopCounter, LastNmi, NmiSoftDisable
+.globalzp ActiveDrawingScratch

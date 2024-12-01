@@ -5,7 +5,10 @@
         .include "bombs.inc"
 
         .include "battlefield.inc"
+        .include "debug.inc"
+        .include "enemies.inc"
         .include "far_call.inc"
+        .include "nes.inc"
         .include "player.inc"
         .include "rainbow.inc"
         .include "sprites.inc"
@@ -329,6 +332,7 @@ done_with_state_changes:
         rts
 explode:
         ; TODO: the actual explosion here!
+        jsr _explode_3x3_here
 
         ; Play a suitable explosion SFX
         ; Have some screen shake, etc
@@ -340,6 +344,7 @@ explode:
         lda #$FF
         sta PlayerHeldBombIndex
 not_currently_held:
+        ldx CurrentBombIndex
         ; Despawn our own metasprite
         ldy bomb_entities + BombState::MetaspriteIndex, x
         lda #0
@@ -764,5 +769,153 @@ arrived_at_target:
         sta CurrentPos + 1
         lda #0
         sta CurrentPos
+        rts
+.endproc
+
+.proc _explode_3x3_here
+; Our current state
+TargetPattern := R13
+TargetAttribute := R14
+CurrentBombIndex := R15
+; For upstream explode func
+AttackSquare := R3
+; Upstream Clobbers:
+; R0 - R2
+EffectiveAttackSquare := R10
+        
+        ; For great testing, just explode 1x1 here. close enough?
+
+        lda #<BG_TILE_EXPLOSION
+        sta TargetPattern
+        lda #>BG_TILE_EXPLOSION
+        ora #PAL_AIR
+        sta TargetAttribute
+        
+        ldx CurrentBombIndex
+        ldy bomb_entities + BombState::CurrentRow, x
+        lda row_number_to_tile_index_lut, y
+        clc
+        adc bomb_entities + BombState::CurrentCol, x
+        sta AttackSquare
+        near_call FAR_explode_tile
+        jsr draw_explosion_tile_here
+
+        rts
+.endproc
+
+PALETTE_MASK  := %11000000
+LIGHTING_MASK := %00000011
+CORNER_MASK   := %11111100
+
+TOP_LEFT_BITS     := %00 ; not actually used
+TOP_RIGHT_BITS    := %10
+BOTTOM_LEFT_BITS  := %01
+BOTTOM_RIGHT_BITS := %11
+
+; Note: this is kinda slow! specialized
+.proc draw_explosion_tile_here
+TargetIndex := R3
+TargetPattern := R13
+TargetAttribute := R14
+
+NametableAddr := ActiveDrawingScratch+0
+AttributeAddr := ActiveDrawingScratch+2
+HighRowScratch := ActiveDrawingScratch+4
+LowRowScratch := ActiveDrawingScratch+5
+
+        perform_zpcm_inc
+
+        debug_color (TINT_G | LIGHTGRAY)
+
+        ; init some scratch space
+        lda #0
+        sta HighRowScratch
+
+        ; work out the high bits of the row, these are the top 4 bits of TargetIndex x64, so they
+        ; are split across both nametable address bytes
+        lda TargetIndex
+        asl
+        rol HighRowScratch
+        asl
+        rol HighRowScratch
+        and #%11000000
+        sta LowRowScratch
+        ; now deal with the column, which here is x2 (we'll do a +32 later to skip over the row)
+        lda TargetIndex
+        asl
+        and #%00011110
+        ora LowRowScratch
+        sta NametableAddr+0
+        sta AttributeAddr+0
+
+        lda active_battlefield
+        bne second_nametable
+        lda #$50
+        ldy #$58
+        jmp set_high_bytes
+second_nametable:
+        lda #$54
+        ldy #$5C
+set_high_bytes:
+        ora HighRowScratch
+        sta NametableAddr+1
+        tya
+        ora HighRowScratch
+        sta AttributeAddr+1
+        
+        ; now actually draw the tile, here fixed to the TargetPattern we defined
+        ldy #0
+
+        ; top left tile
+        lda TargetPattern
+        and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
+        ; ora #TOP_LEFT_BITS   ; this would be a nop
+        sta (NametableAddr), y  ; store that to our regular nametable
+        ; top-left attribute
+        lda (AttributeAddr), y
+        and #LIGHTING_MASK      ; keep only lighting bits        
+        ora TargetAttribute  ; NEW apply palette and high tile bits
+        sta (AttributeAddr), y  ;
+        iny ; Y = Y + 1
+
+        ; top right tile
+        lda TargetPattern
+        and #CORNER_MASK
+        ora #TOP_RIGHT_BITS
+        sta (NametableAddr), y
+        ; top-right attribute
+        lda (AttributeAddr), y
+        and #LIGHTING_MASK      ; keep only lighting bits
+        ora TargetAttribute  ; NEW apply palette and high tile bits
+        sta (AttributeAddr), y  ;
+        
+        ldy #32 ; skip to the start of the next row for this tile
+
+        ; bottom left tile
+        lda TargetPattern
+        and #CORNER_MASK        ; clear out the low 2 bits, we'll use these to pick a corner tile
+        ora #BOTTOM_LEFT_BITS
+        sta (NametableAddr), y  ; store that to our regular nametable
+        ; bottom-left attribute
+        lda (AttributeAddr), y
+        and #LIGHTING_MASK      ; keep only lighting bits        
+        ora TargetAttribute  ; NEW apply palette and high tile bits
+        sta (AttributeAddr), y  ;
+        iny
+
+        ; bottom right tile
+        lda TargetPattern
+        and #CORNER_MASK
+        ora #BOTTOM_RIGHT_BITS
+        sta (NametableAddr), y
+        ; top-right attribute
+        lda (AttributeAddr), y
+        and #LIGHTING_MASK      ; keep only lighting bits
+        ora TargetAttribute  ; NEW apply palette and high tile bits
+        sta (AttributeAddr), y  ;
+
+        ; and with all that... we're done?
+        debug_color LIGHTGRAY
+        perform_zpcm_inc
         rts
 .endproc

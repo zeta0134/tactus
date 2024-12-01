@@ -40,6 +40,7 @@ TILE_SIGN              = 25
 .global FAR_attack_enemy_tile
 .global FAR_player_collides_with_tile
 .global FAR_suspend_entire_room
+.global FAR_explode_tile
 
 FLAG_MOVED_THIS_FRAME = %10000000
 

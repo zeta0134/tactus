@@ -45,6 +45,31 @@ TargetCol := R15
         rts
 .endproc
 
+; ============================================================================================================================
+; ===                                    Explosion Attacks Enemy Behaviors                                                 ===
+; ============================================================================================================================
+        .segment "ENEMY_BOMB_SPELL"
+
+.proc ENEMY_BOMB_SPELL_explode_puff
+AttackSquare := R3
+EffectiveAttackSquare := R10 
+        
+        ; A puff stores the tile index of the enemy that moved in its
+        ; tile_data, so we'll roll an indirect attack on that square
+        ldx AttackSquare
+        lda tile_data, x
+        sta EffectiveAttackSquare
+        ldx EffectiveAttackSquare
+        ldy battlefield, x
+        lda indirect_explode_behaviors_low, y
+        sta DestPtr+0
+        lda indirect_explode_behaviors_high, y
+        sta DestPtr+1
+        jsr __trampoline
+
+        rts
+.endproc
+
         .segment "ENEMY_UPDATE"
 
 OFFSET_N  =  0 * 4
