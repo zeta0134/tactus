@@ -140,7 +140,7 @@ track_table_num_variants:
         .byte 1 ; silence 
         .byte 1 ; click_track
         .byte 1 ; title music
-        .byte 1 ; options music
+        .byte 3 ; options music
         .byte 1 ; gameover music
         .byte 1 ; level music
         .byte 3 ; in another world (warp zone)
