@@ -314,7 +314,7 @@ loop:
         ; for comparison, let's try the less stupid, but slower version
         lda (TablePpuScrollXPtr), y    ; 5
         clc                            ; 2
-        adc PpuScrollX                 ; 3
+        adc ScreenShakeX               ; 3
         sta table_ppuscroll_x, y       ; 5
         lda (TablePpuScrollYPtr), y    ; 5
         clc                            ; 2

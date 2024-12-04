@@ -545,8 +545,8 @@ sfx_hoist_pulse:
 sfx_throw_pulse:
         .byte 12
         ;                    pitch, duty, volume,                    sweep, length
-        pulse_init        PITCH_A4,   $2,     $B,                                0
-        pulse_init_sweep  PITCH_A4,   $2,     $8, (S_PERIOD_0 | S_SHIFT_5),      0
+        pulse_init        PITCH_D5,   $2,     $B,                                0
+        pulse_init_sweep  PITCH_D5,   $2,     $8, (S_PERIOD_0 | S_SHIFT_5),      0
         pulse_cont_duty               $2,     $E,                                0
         pulse_cont_duty               $2,     $8,                                0
         pulse_cont_duty               $2,     $D,                                0

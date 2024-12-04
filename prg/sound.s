@@ -179,7 +179,7 @@ loop:
 
 .proc bhop_disable_zpcm
 ScratchPtr := NmiSafePtr
-        ; set the PCM address to $5011 when doing slow OAM transfers
+        ; set the PCM address to $FF11 when doing slow OAM transfers
         st16 ScratchPtr, SPRITE_TRANSFER_BASE
         ldx #16
         ldy #(SpriteRunWithSample::__zpcm_addr + 1)
@@ -195,10 +195,10 @@ loop:
         ; to the zpcm-enabled universe
         lda code_bank_shadow
         and #<__BANK_MASK__
-        ora #16
+        ora #32
         sta MAP_PRG_8_LO
 
-        lda #(3 + 16)
+        lda #(3 + 32)
         sta MAP_PRG_E_LO
 
         perform_zpcm_inc

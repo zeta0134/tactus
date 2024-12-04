@@ -117,6 +117,12 @@ done_picking_state:
         ; At this point the bomb *definitely* succeeded in spawning.
         ; Hoist the bomb! Decrement the counter and initialize all the things
         dec PlayerBombCount
+        ; If this was our last bomb, clear the item slot
+        lda PlayerBombCount
+        bne more_bombs_remain
+        lda #ITEM_NONE
+        sta PlayerEquipmentBombs
+more_bombs_remain:
 
         ; Now we may initialize the rest of the bomb state
         lda #BOMB_FLAG_ACTIVE

@@ -228,7 +228,8 @@ HeartCount := R2
         sta PlayerEquipmentTorch
         lda #ITEM_SHIELD
         sta PlayerEquipmentArmor
-        lda #ITEM_NONE
+        ;lda #ITEM_NONE
+        lda #ITEM_GO_GO_BOOTS
         sta PlayerEquipmentBoots
         lda #ITEM_CHAIN_LINK
         sta PlayerEquipmentAccessory
@@ -1061,6 +1062,7 @@ done_with_passive_dialog:
 .endproc
 
 .proc handle_go_go_boots_movement
+PlayerSquare := R2
 TargetRow := R14
 TargetCol := R15
         ; ITEM: if the player has the gogo boots equipped, 
@@ -1136,6 +1138,17 @@ move_player:
 
 resolve_enemy_collision:
         near_call FAR_player_resolve_collision
+
+        ; Bugfix: if the player has a passive dialogue square, update it to
+        ; their new location
+        lda PlayerPassiveDialogSquare
+        beq done_fixing_dialogue_square
+        ldx TargetRow
+        lda player_tile_index_table, x ; Row * Width
+        clc
+        adc TargetCol                  ; ... + Col
+        sta PlayerPassiveDialogSquare
+done_fixing_dialogue_square:
 
 done_with_go_go_boots:
         rts

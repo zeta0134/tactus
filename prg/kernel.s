@@ -47,9 +47,8 @@ FadeToGameMode: .res 2
 ScreenShakeDepth: .res 1
 ScreenShakeSpeed: .res 1
 ScreenShakeDecayCounter: .res 1
-PpuScrollX: .res 1
-PpuScrollY: .res 1
-PpuScrollNametable: .res 1
+ScreenShakeX: .res 1
+ScreenShakeY: .res 1
 
 .segment "RAM"
 CurrentBeatCounter: .res 1
@@ -95,9 +94,8 @@ main_loop:
 ; === Special game mode: fade brightness to 0 and THEN run the next state ===
 .proc fade_to_game_mode
         lda #0
-        sta PpuScrollX
-        sta PpuScrollY
-        sta PpuScrollNametable
+        sta ScreenShakeX
+        sta ScreenShakeY
 
         lda #0
         sta TargetBrightness
@@ -404,11 +402,7 @@ LayoutPtr := R0
 
         ; Initially the game enables just the HUD and nothing else. Game logic
         ; will shift these around as necessary.
-
-        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, #0
-        ; For debugging lag, let's turn on an expensive underwater-y distortion
-        ; Later, let's have rooms specify this, kay? it's irritating to change the build just to see it
-        ;set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #0
+        jsr set_raster_effect_for_room
 
         set_raster_playback_speed #1, #0
         ; Enable NMI first (but not rendering)
@@ -727,9 +721,7 @@ setup_default_transition:
         ; a laggy beat_frame_1 seems to briefly render the wrong nametable at
         ; fast tempo. Investigate!
 
-        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, #0
-        ; For great debugging!
-        ;set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #0
+        jsr set_raster_effect_for_room
 
         set_raster_playback_speed #1, #0
         lda #0
@@ -1258,6 +1250,8 @@ continue_waiting:
         perform_zpcm_inc
         jsr update_screen_shake
         perform_zpcm_inc
+        jsr set_raster_effect_for_room
+        perform_zpcm_inc
 
         ; this stops the incompletely-drawn active battlefield from being displayed
         ; if we lag on the first frame of a new beat, which can mostly occur during
@@ -1361,7 +1355,7 @@ RandTemp := R1
         sbc ScreenShakeDepth
         sta DepthTemp
 
-        ; X can use the rand value almost directly
+        ; X can use the rand value directly
         jsr next_gameplay_rand
         perform_zpcm_inc
         sta RandTemp
@@ -1373,19 +1367,15 @@ x_loop:
         bit RandTemp
         bmi minus_x
 positive_x:
-        ldx #0
-        stx PpuScrollNametable
         jmp done_with_x
 minus_x:
         eor #$FF
         clc
         adc #1
-        ldx #1
-        stx PpuScrollNametable
 done_with_x:
-        sta PpuScrollX
+        sta ScreenShakeX
 
-        ; Y should remain in the range 0-240, so the minus case is handled diffrently
+        ; And for this implementation, Y can *also* use the rand value directly, so do that
         jsr next_gameplay_rand
         perform_zpcm_inc
         sta RandTemp
@@ -1398,12 +1388,11 @@ y_loop:
         bmi minus_y
         jmp done_with_y
 minus_y:
-        sta RandTemp
-        lda #239
-        sec
-        sbc RandTemp
+        eor #$FF
+        clc
+        adc #1
 done_with_y:
-        sta PpuScrollY
+        sta ScreenShakeY
 
         ; Now process the decay speed for this screen shake
         dec ScreenShakeDecayCounter
@@ -1416,8 +1405,40 @@ done:
 
 no_screen_shake:
         lda #0
-        sta PpuScrollX
-        sta PpuScrollY
-        sta PpuScrollNametable
+        sta ScreenShakeX
+        sta ScreenShakeY
+        rts
+.endproc
+
+; Only shake depth of -4 to +3 is actually programmed in
+; at the moment, so we'll need to clamp accordingly. We might
+; eventually want a stronger depth.
+screen_shake_raster_lut:
+        .byte RASTER_EFFECT_VS_MINUS_4
+        .byte RASTER_EFFECT_VS_MINUS_3
+        .byte RASTER_EFFECT_VS_MINUS_2
+        .byte RASTER_EFFECT_VS_MINUS_1
+        .byte RASTER_EFFECT_NONE
+        .byte RASTER_EFFECT_VS_PLUS_1
+        .byte RASTER_EFFECT_VS_PLUS_2
+        .byte RASTER_EFFECT_VS_PLUS_3
+
+.proc set_raster_effect_for_room
+        ; For now this merely handles vertical screen shake.
+        ; Later, once rooms have the appropriate metadata to set
+        ; the base effect, we should read that and apply it here.
+
+        ; Original fixed none, for reference
+        ; set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, #0
+        ; Original debug underwater, for reference
+        ; set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #0
+
+        lda ScreenShakeY
+        clc
+        adc #4    ; center on half the table size
+        and #%111 ; mask to the number of table elements (larger shake will simply wrap around)
+        tax
+        set_raster_effect_safely {screen_shake_raster_lut, x}, #RASTER_FINALIZER_PLAIN_HUD, #0
+
         rts
 .endproc

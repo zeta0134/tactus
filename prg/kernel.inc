@@ -30,8 +30,8 @@
 .global draw_battlefield_B
 .global draw_battlefield_C
 
-.globalzp PpuScrollX
-.globalzp PpuScrollY
+.globalzp ScreenShakeX
+.globalzp ScreenShakeY
 .globalzp PpuScrollNametable
 
 .globalzp ScreenShakeDepth

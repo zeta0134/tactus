@@ -1045,7 +1045,7 @@ b_item_equipped:
         ; draw the little B tab, enabled
         lda #SPELL_B_ENABLED
         sta (TileAddr), y
-        lda #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
+        lda #(HUD_PURPLE_PAL | CHR_BANK_ITEMS)
         sta (AttributeAddr), y
         rts
 no_b_item_equipped:

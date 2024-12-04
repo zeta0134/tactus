@@ -378,7 +378,7 @@ rare_treasure_table:
 
 consumable_treasure_table:
     ; FOOOOOOOOOOD! (Also should have bombs, heart containers, etc)
-    .byte 12
+    .byte 14
     .byte ITEM_SMALL_FRIES
     .byte ITEM_SMALL_FRIES
     .byte ITEM_SMALL_FRIES
@@ -391,12 +391,14 @@ consumable_treasure_table:
     .byte ITEM_TEMPORARY_HEART
     .byte ITEM_HEART_ARMOR
     .byte ITEM_HEART_ARMOR
+    .byte ITEM_BOMB_STANDARD_X3
+    .byte ITEM_BOMB_STANDARD_X3
 
 common_chest_treasure_table:
-    .byte 27
-    .byte ITEM_BASIC_TORCH ; TODO: this ought to move to the "helpful" chest
-    .byte ITEM_BASIC_TORCH
-    .byte ITEM_BASIC_TORCH
+    .byte 25
+    .byte ITEM_BOMB_STANDARD_X1
+    .byte ITEM_BOMB_STANDARD_X1
+    .byte ITEM_BOMB_STANDARD_X1
     .byte ITEM_SMALL_FRIES
     .byte ITEM_SMALL_FRIES
     .byte ITEM_SMALL_FRIES
@@ -409,11 +411,9 @@ common_chest_treasure_table:
     .byte ITEM_TEMPORARY_HEART
     .byte ITEM_TEMPORARY_HEART
     .byte ITEM_TEMPORARY_HEART
-    .byte ITEM_ALOHA_TSHIRT_1
-    .byte ITEM_ALOHA_TSHIRT_2
-    .byte ITEM_ALOHA_TSHIRT_3
-    .byte ITEM_GOLD_SACK
-    .byte ITEM_GOLD_SACK
+    .byte ITEM_BOMB_STANDARD_X1
+    .byte ITEM_BOMB_STANDARD_X3
+    .byte ITEM_BOMB_STANDARD_X3
     .byte ITEM_GOLD_SACK
     .byte ITEM_GOLD_SACK
     .byte ITEM_GOLD_SACK
@@ -429,8 +429,6 @@ MAX_COMBO = 4 ; actually 5, but we need to decrement
 ; LootTable to the desired table for all non-basic enemies.
 .proc FAR_roll_loot
     perform_zpcm_inc
-    ; TODO: combo and chain! (compute Y based on this)
-    ; FOR NOW, just grab the base entry in the list
     ldx PlayerChain
     cpx #MAX_CHAIN
     bcc chain_in_range
