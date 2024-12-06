@@ -17,6 +17,7 @@
         .include "bhop/longbranch.inc"
         .include "nes.inc"
         .include "player.inc"
+        .include "player_distance.inc"
         .include "palette.inc"
         .include "procgen.inc"
         .include "rainbow.inc"
@@ -1026,6 +1027,10 @@ no_darkness:
 
         ; If necessary, cleanup dialog states through movement
         jsr cleanup_dialog_state
+
+        ; Finally, our position is finalized, so compute the lookup table ptr for distance
+        ; (this massively improves enemy AI during pathfinding)
+        near_call FAR_compute_player_distance_lut_ptr
 
         rts
 .endproc

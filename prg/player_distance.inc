@@ -1,0 +1,4 @@
+.globalzp PlayerDistanceLut
+.global player_distance_lut_by_x_pos
+.global player_distance_luts
+.global FAR_compute_player_distance_lut_ptr
