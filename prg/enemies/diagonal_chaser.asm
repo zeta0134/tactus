@@ -56,28 +56,14 @@ CurrentRow := R14
 CurrentTile := R15
         jsr _setup_diagonal_targets_common
 
-        ; setup completely random weights for the directions,
-        ; so we pick a given valid tile completely arbitrarily
-        ; (the 2 upper bits are sufficient for a larger/smaller
-        ; check, the lower 6 bits can be ignored. don't waste cycles
-        ; zeroing them out)
         prng_from_table_y
-        lsr
-        ror candidate_weights+0
-        lsr
-        ror candidate_weights+0
-        lsr
-        ror candidate_weights+1
-        lsr
-        ror candidate_weights+1
-        lsr
-        ror candidate_weights+2
-        lsr
-        ror candidate_weights+2
-        lsr
-        ror candidate_weights+3
-        lsr
-        ror candidate_weights+3
+        sta candidate_weights+0
+        prng_from_table_y
+        sta candidate_weights+1
+        prng_from_table_y
+        sta candidate_weights+2
+        prng_from_table_y
+        sta candidate_weights+3
 
         ; actually pick the direction
         lda #4
@@ -101,30 +87,17 @@ CurrentRow := R14
 CurrentTile := R15
         jsr _setup_diagonal_targets_common
 
-        ; We'll use some random bytes to unbias the target directions
-        prng_from_table_y
-        sta RandomScratch0
-        prng_from_table_y
-        sta RandomScratch1
-
-        ; For the weights, work out the manhattan distance for each potential
+        ; For the weights, work out the distance to the player for each potential
         ; target tile. We'll try to prefer the shortest distance to close
         ; the gap
 
         .repeat 4, i
-        lda candidate_tiles+i
-        sta TargetTile
-        lda candidate_rows+i
-        sta TargetRow
-        near_call ENEMY_UPDATE_target_manhattan_distance_to_player
-        lda PlayerDistance
-         ; PlayerDistance = (PlayerDistance * 8) + 0-7
-        rol RandomScratch0
-        rol
-        rol RandomScratch0
-        rol
-        rol RandomScratch1
-        rol
+        prng_from_table_y
+        and #%11 ; the lower 2 bits will be randomly inverted to help with tiebreaking
+        sta PlayerDistance
+        ldy candidate_tiles+i
+        lda (PlayerDistanceLut), y
+        eor PlayerDistance
         sta candidate_weights+i
         .endrepeat
 
@@ -188,7 +161,8 @@ CurrentRow := R14
 CurrentTile := R15
         inc enemies_active
 
-        near_call ENEMY_UPDATE_player_manhattan_distance
+        ldy CurrentTile
+        lda (PlayerDistanceLut), y
 track_player:
         ; First the row
         ; If we're outside the tracking radius, choose it randomly

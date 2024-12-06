@@ -171,7 +171,8 @@ CurrentRow := R14
 CurrentTile := R15
         inc enemies_active
 
-        near_call ENEMY_UPDATE_player_manhattan_distance
+        ldy CurrentTile
+        lda (PlayerDistanceLut), y
 track_player:        
         ; If we're outside the tracking radius, choose our next position randomly
         ; (here, A already has the distance from before)

@@ -74,7 +74,7 @@ BIRB_ADVANCED_LOOT     = advanced_loot_table
 
 
 ; Below this distance, spiders will prefer to move directly towards the player
-SPIDER_TARGET_RADIUS = 16
+SPIDER_TARGET_RADIUS = $c6 ; about 16 squares
 
 SPIDER_BASIC_IDLE_DELAY        = 3
 SPIDER_BASIC_HP                = BASIC_HP
@@ -89,7 +89,7 @@ SPIDER_ADVANCED_HP             = ADVANCED_HP
 SPIDER_ADVANCED_LOOT           = advanced_loot_table
 
 ; Below this distance, zombies will prefer to move directly towards the player
-ZOMBIE_TARGET_RADIUS           = 16
+ZOMBIE_TARGET_RADIUS           = $c6 ; about 16 squares
 
 ZOMBIE_BASIC_IDLE_DELAY        = 3
 ZOMBIE_BASIC_HP                = BASIC_HP
