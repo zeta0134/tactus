@@ -96,30 +96,17 @@ CurrentRow := R14
 CurrentTile := R15
         jsr _setup_cardinal_targets_common
 
-        ; We'll use some random bytes to unbias the target directions
-        prng_from_table_y
-        sta RandomScratch0
-        prng_from_table_y
-        sta RandomScratch1
-
-        ; For the weights, work out the manhattan distance for each potential
+        ; For the weights, work out the distance to the player for each potential
         ; target tile. We'll try to prefer the shortest distance to close
         ; the gap
 
         .repeat 4, i
-        lda candidate_tiles+i
-        sta TargetTile
-        lda candidate_rows+i
-        sta TargetRow
-        near_call ENEMY_UPDATE_target_manhattan_distance_to_player
-        lda PlayerDistance
-         ; PlayerDistance = (PlayerDistance * 8) + 0-7
-        rol RandomScratch0
-        rol
-        rol RandomScratch0
-        rol
-        rol RandomScratch1
-        rol
+        prng_from_table_y
+        and #%11 ; the lower 2 bits will be randomly inverted to help with tiebreaking
+        sta PlayerDistance
+        ldy candidate_tiles+i
+        lda (PlayerDistanceLut), y
+        eor PlayerDistance
         sta candidate_weights+i
         .endrepeat
 

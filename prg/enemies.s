@@ -20,6 +20,7 @@
         .include "palette.inc"
         .include "palette_cycler.inc"
         .include "player.inc"
+        .include "player_distance.inc"
         .include "prng.inc"
         .include "procgen.inc"
         .include "rainbow.inc"

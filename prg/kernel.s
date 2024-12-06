@@ -24,6 +24,7 @@
         .include "palette.inc"
         .include "palette_cycler.inc"
         .include "player.inc"
+        .include "player_distance.inc"
         .include "prng.inc"
         .include "procgen.inc"
         .include "ppu.inc"
@@ -866,6 +867,8 @@ StartingTile := R15
         far_call FAR_clear_active_move_flags
         debug_color LIGHTGRAY
 
+        access_data_bank #<.bank(player_distance_luts)
+
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
         lda #0
         sta StartingRow
@@ -890,6 +893,8 @@ StartingTile := R15
         far_call FAR_update_static_enemy_row
         debug_color LIGHTGRAY
 
+        restore_previous_bank
+
         jsr every_gameloop
         st16 GameMode, update_enemies_2
         rts
@@ -898,6 +903,8 @@ StartingTile := R15
 .proc update_enemies_2
 StartingRow := R14
 StartingTile := R15
+
+        access_data_bank #<.bank(player_distance_luts)
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
         lda #3
@@ -931,6 +938,8 @@ StartingTile := R15
         far_call FAR_update_static_enemy_row
         debug_color LIGHTGRAY
 
+        restore_previous_bank
+
         jsr every_gameloop
         st16 GameMode, update_enemies_3
         rts
@@ -939,6 +948,8 @@ StartingTile := R15
 .proc update_enemies_3
 StartingRow := R14
 StartingTile := R15
+
+        access_data_bank #<.bank(player_distance_luts)
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
         lda #7
@@ -971,6 +982,8 @@ StartingTile := R15
         sta StartingTile
         far_call FAR_update_static_enemy_row
         debug_color LIGHTGRAY
+
+        restore_previous_bank
 
         ; Now that we have run all enemy logic, it is safe to run clear checks and such
         lda #0
