@@ -751,6 +751,18 @@ EffectiveAttackSquare := R10 ; Unused (call this directly)
         rts
 .endproc
 
+.proc ENEMY_BOMB_SPELL_slime_spell_dispatch
+        rts
+.endproc
+
+; For any standard enemy that, specifically:
+;  - Takes player damage using the common routine, after which this behavior is modeled
+;  - Should change to the spell color for the four elemental spells
+;  - Requires NO special behavior for any other spell (ie, the common behavior is fine)
+.proc ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
+        rts
+.endproc
+
 ; ============================================================================================================================
 ; ===                                Enemy Attacks Player / Collision Behaviors                                            ===
 ; ============================================================================================================================

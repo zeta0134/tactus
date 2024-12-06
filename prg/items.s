@@ -255,6 +255,52 @@ bombs_description:
         .byte "Explodes in a 3x3 area!", D_NEWLINE
         .byte "B to hold, + to throw", D_WAIT, D_CLOSE
 
+spell_fire_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "SCORCH", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Burns one entire chamber!", D_WAIT, D_CLOSE
+
+spell_air_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "SHOCK", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Electrify one entire", D_NEWLINE
+        .byte "chamber!", D_WAIT, D_CLOSE
+
+spell_ice_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "CHILL", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Freeze one entire chamber!", D_WAIT, D_CLOSE
+
+spell_earth_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "GROWTH", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Return one entire chamber", D_NEWLINE
+        .byte "to nature!", D_WAIT, D_CLOSE
+
+spell_bomb_fiesta_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "BOMB FIESTA", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "It's a party and the whole", D_NEWLINE
+        .byte "chamber's invited!", D_WAIT, D_CLOSE
+
+spell_life_description:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
+        .byte "HEALING", D_NEWLINE
+        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
+        .byte "Fully restore all hearts!", D_NEWLINE
+        .byte "Tastes like strawberries.", D_WAIT, D_CLOSE
+
         .segment "DATA_0"
 
 item_table:
@@ -292,6 +338,13 @@ item_table:
         .word bomb_standard
         .word bomb_standard_one_pack
         .word bomb_standard_three_pack
+        .word spell_fire
+        .word spell_air
+        .word spell_ice
+        .word spell_earth
+        .word spell_bomb_fiesta
+        .word spell_healing
+
         ; safety
         .repeat 128
         .word no_item
@@ -628,7 +681,7 @@ medium_fries:
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
         .byte 0                               ; HudSpriteTile (unused)
         .byte 0                               ; HudSpriteAttr (unused)
-        .word 100                             ; ShopCost
+        .word 75                              ; ShopCost
         .byte WEAPON_DAGGER                   ; WeaponShape    (unused)
         .addr no_effect                       ; DamageFunc     (unused)
         .addr no_effect                       ; TorchlightFunc (unused)
@@ -645,7 +698,7 @@ large_fries:
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
         .byte 0                               ; HudSpriteTile (unused)
         .byte 0                               ; HudSpriteAttr (unused)
-        .word 250                             ; ShopCost
+        .word 150                             ; ShopCost
         .byte WEAPON_DAGGER                   ; WeaponShape    (unused)
         .addr no_effect                       ; DamageFunc     (unused)
         .addr no_effect                       ; TorchlightFunc (unused)
@@ -879,6 +932,111 @@ bomb_standard_three_pack:
         .addr no_effect                         ; DmgReductionFunc
         .addr bombs_description                 ; DescriptionStringPtr
         .byte <.bank(bombs_description)         ; DescriptionStringBank
+
+; Spells all have pretty much fully custom behavior, so their item functions
+; will go mostly unused.
+
+spell_fire:
+        .byte SLOT_SPELL                        ; SlotId
+        .byte SPRITE_TILE_SPELL_FIRE            ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
+        .byte EQUIPMENT_SPELL_FIRE              ; HudBgTile (unused)
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                                 ; HudSpriteTile (unused)
+        .byte 0                                 ; HudSpriteAttr (unused)
+        .word 100                               ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr no_effect                         ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr no_effect                         ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr spell_fire_description            ; DescriptionStringPtr
+        .byte <.bank(spell_fire_description)    ; DescriptionStringBank
+
+spell_air:
+        .byte SLOT_SPELL                        ; SlotId
+        .byte SPRITE_TILE_SPELL_AIR             ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
+        .byte EQUIPMENT_SPELL_AIR               ; HudBgTile (unused)
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                                 ; HudSpriteTile (unused)
+        .byte 0                                 ; HudSpriteAttr (unused)
+        .word 100                               ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr no_effect                         ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr no_effect                         ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr spell_air_description             ; DescriptionStringPtr
+        .byte <.bank(spell_air_description)     ; DescriptionStringBank
+
+spell_ice:
+        .byte SLOT_SPELL                        ; SlotId
+        .byte SPRITE_TILE_SPELL_ICE             ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
+        .byte EQUIPMENT_SPELL_ICE               ; HudBgTile (unused)
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                                 ; HudSpriteTile (unused)
+        .byte 0                                 ; HudSpriteAttr (unused)
+        .word 100                               ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr no_effect                         ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr no_effect                         ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr spell_ice_description             ; DescriptionStringPtr
+        .byte <.bank(spell_ice_description)     ; DescriptionStringBank
+
+spell_earth:
+        .byte SLOT_SPELL                        ; SlotId
+        .byte SPRITE_TILE_SPELL_EARTH           ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
+        .byte EQUIPMENT_SPELL_EARTH             ; HudBgTile (unused)
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                                 ; HudSpriteTile (unused)
+        .byte 0                                 ; HudSpriteAttr (unused)
+        .word 100                               ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr no_effect                         ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr no_effect                         ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr spell_earth_description           ; DescriptionStringPtr
+        .byte <.bank(spell_earth_description)   ; DescriptionStringBank
+
+spell_bomb_fiesta:
+        .byte SLOT_SPELL                            ; SlotId
+        .byte SPRITE_TILE_SPELL_BOMB_FIESTA         ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                     ; WorldSpriteAttr
+        .byte EQUIPMENT_SPELL_BOMB_FIESTA           ; HudBgTile (unused)
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS)     ; HudBgAttr (unused)
+        .byte 0                                     ; HudSpriteTile (unused)
+        .byte 0                                     ; HudSpriteAttr (unused)
+        .word 100                                   ; ShopCost
+        .byte WEAPON_DAGGER                         ; WeaponShape (unused)
+        .addr no_effect                             ; DamageFunc
+        .addr no_effect                             ; TorchlightFunc
+        .addr no_effect                             ; UseFunc
+        .addr no_effect                             ; DmgReductionFunc
+        .addr spell_bomb_fiesta_description         ; DescriptionStringPtr
+        .byte <.bank(spell_bomb_fiesta_description) ; DescriptionStringBank
+
+spell_healing:
+        .byte SLOT_SPELL                        ; SlotId
+        .byte SPRITE_TILE_SPELL_LIFE            ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
+        .byte EQUIPMENT_SPELL_LIFE              ; HudBgTile (unused)
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                                 ; HudSpriteTile (unused)
+        .byte 0                                 ; HudSpriteAttr (unused)
+        .word 250                               ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr no_effect                         ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr no_effect                         ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr spell_life_description            ; DescriptionStringPtr
+        .byte <.bank(spell_life_description)    ; DescriptionStringBank
 
         .segment "CODE_ITEMS"
 

@@ -311,7 +311,7 @@ common_treasure_table:
     ;.byte ITEM_ALOHA_TSHIRT_2
     ;.byte ITEM_ALOHA_TSHIRT_3
 
-    .byte 30
+    .byte 34
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L1
@@ -342,10 +342,14 @@ common_treasure_table:
     .byte ITEM_ALOHA_TSHIRT_1
     .byte ITEM_ALOHA_TSHIRT_2
     .byte ITEM_ALOHA_TSHIRT_3
+    .byte ITEM_SPELL_FIRE
+    .byte ITEM_SPELL_AIR
+    .byte ITEM_SPELL_ICE
+    .byte ITEM_SPELL_EARTH
 
 ; heavily weighted towards L2 items, some L3 items too
 rare_treasure_table:
-    .byte 29
+    .byte 35
     .byte ITEM_BROADSWORD_L2
     .byte ITEM_BROADSWORD_L2
     .byte ITEM_BROADSWORD_L2
@@ -375,6 +379,13 @@ rare_treasure_table:
     .byte ITEM_SHIELD
     .byte ITEM_SHIELD
     .byte ITEM_SHIELD
+    .byte ITEM_SPELL_FIRE
+    .byte ITEM_SPELL_AIR
+    .byte ITEM_SPELL_ICE
+    .byte ITEM_SPELL_EARTH
+    .byte ITEM_SPELL_BOMB
+    .byte ITEM_SPELL_LIFE
+
 
 consumable_treasure_table:
     ; FOOOOOOOOOOD! (Also should have bombs, heart containers, etc)
@@ -395,7 +406,7 @@ consumable_treasure_table:
     .byte ITEM_BOMB_STANDARD_X3
 
 common_chest_treasure_table:
-    .byte 25
+    .byte 31
     .byte ITEM_BOMB_STANDARD_X1
     .byte ITEM_BOMB_STANDARD_X1
     .byte ITEM_BOMB_STANDARD_X1
@@ -421,6 +432,12 @@ common_chest_treasure_table:
     .byte ITEM_GOLD_SACK
     .byte ITEM_GOLD_SACK
     .byte ITEM_GOLD_SACK
+    .byte ITEM_SPELL_FIRE
+    .byte ITEM_SPELL_AIR
+    .byte ITEM_SPELL_ICE
+    .byte ITEM_SPELL_EARTH
+    .byte ITEM_SPELL_BOMB
+    .byte ITEM_SPELL_LIFE
     
 MAX_CHAIN = 8
 MAX_COMBO = 4 ; actually 5, but we need to decrement

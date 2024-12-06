@@ -36,9 +36,12 @@ chr_tile_offset EQUIPMENT_BOOTS_2, 2, 8
 chr_tile_offset EQUIPMENT_BOOTS_3, 4, 8
 chr_tile_offset EQUIPMENT_BOOTS_4, 6, 8
 
-chr_tile_offset EQUIPMENT_SPELL_1, 0, 12
-chr_tile_offset EQUIPMENT_SPELL_2, 2, 12
-chr_tile_offset EQUIPMENT_SPELL_3, 4, 12
+chr_tile_offset EQUIPMENT_SPELL_FIRE,         0, 12
+chr_tile_offset EQUIPMENT_SPELL_AIR,          2, 12
+chr_tile_offset EQUIPMENT_SPELL_ICE,          4, 12
+chr_tile_offset EQUIPMENT_SPELL_EARTH,        6, 12
+chr_tile_offset EQUIPMENT_SPELL_BOMB_FIESTA,  8, 12
+chr_tile_offset EQUIPMENT_SPELL_LIFE,        10, 12
 
 chr_tile_offset EQUIPMENT_BOMB_STANDARD, 4, 14
 chr_tile_offset EQUIPMENT_ITEM_2, 6, 14

@@ -302,157 +302,182 @@ tile_attack  TILE_SMOKE_PUFF, ENEMY_ATTACK_direct_attack_puff, FIXED_no_behavior
 tile_collide TILE_SMOKE_PUFF, FIXED_no_behavior
 tile_suspend TILE_SMOKE_PUFF, ENEMY_UTIL_draw_cleared_disco_tile
 tile_explode TILE_SMOKE_PUFF, ENEMY_BOMB_SPELL_explode_puff, FIXED_no_behavior
-tile_spell   TILE_SMOKE_PUFF, FIXED_no_behavior
+tile_spell   TILE_SMOKE_PUFF, FIXED_no_behavior ; TODO: should we have these draw as disco tiles?
         
 tile_update  TILE_SLIME, ENEMY_UPDATE_update_slime
 tile_attack  TILE_SLIME, ENEMY_ATTACK_direct_attack_slime, ENEMY_ATTACK_indirect_attack_slime
 tile_collide TILE_SLIME, ENEMY_COLLIDE_basic_enemy_attacks_player
 tile_suspend TILE_SLIME, ENEMY_UTIL_move_away_from_map_edge
 tile_explode TILE_SLIME, ENEMY_BOMB_SPELL_direct_explode, ENEMY_BOMB_SPELL_indirect_explode
+tile_spell   TILE_SLIME, ENEMY_BOMB_SPELL_slime_spell_dispatch
 
 tile_update  TILE_SPIDER, ENEMY_UPDATE_update_spider_base
 tile_attack  TILE_SPIDER, ENEMY_ATTACK_direct_attack_spider, ENEMY_ATTACK_indirect_attack_spider
 tile_collide TILE_SPIDER, ENEMY_COLLIDE_basic_enemy_attacks_player
 tile_suspend TILE_SPIDER, ENEMY_UTIL_move_away_from_map_edge
 tile_explode TILE_SPIDER, ENEMY_BOMB_SPELL_direct_explode, ENEMY_BOMB_SPELL_indirect_explode
+tile_spell   TILE_SPIDER, ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
 
 tile_update  TILE_SPIDER_ANTICIPATE, ENEMY_UPDATE_update_spider_anticipate
 tile_attack  TILE_SPIDER_ANTICIPATE, ENEMY_ATTACK_direct_attack_spider, ENEMY_ATTACK_indirect_attack_spider
 tile_collide TILE_SPIDER_ANTICIPATE, ENEMY_COLLIDE_basic_enemy_attacks_player
 tile_suspend TILE_SPIDER_ANTICIPATE, ENEMY_UTIL_move_away_from_map_edge
 tile_explode TILE_SPIDER_ANTICIPATE, ENEMY_BOMB_SPELL_direct_explode, ENEMY_BOMB_SPELL_indirect_explode
+tile_spell   TILE_SPIDER_ANTICIPATE, ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
 
 tile_update  TILE_ZOMBIE, ENEMY_UPDATE_update_zombie_base
 tile_attack  TILE_ZOMBIE, ENEMY_ATTACK_direct_attack_zombie, ENEMY_ATTACK_indirect_attack_zombie
 tile_collide TILE_ZOMBIE, ENEMY_COLLIDE_basic_enemy_attacks_player
 tile_suspend TILE_ZOMBIE, ENEMY_UTIL_move_away_from_map_edge
 tile_explode TILE_ZOMBIE, ENEMY_BOMB_SPELL_direct_explode, ENEMY_BOMB_SPELL_indirect_explode
+tile_spell   TILE_ZOMBIE, ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
 
 tile_update  TILE_ZOMBIE_ANTICIPATE, ENEMY_UPDATE_update_zombie_anticipate
 tile_attack  TILE_ZOMBIE_ANTICIPATE, ENEMY_ATTACK_direct_attack_zombie, ENEMY_ATTACK_indirect_attack_zombie
 tile_collide TILE_ZOMBIE_ANTICIPATE, ENEMY_COLLIDE_basic_enemy_attacks_player
 tile_suspend TILE_ZOMBIE_ANTICIPATE, ENEMY_UTIL_move_away_from_map_edge
 tile_explode TILE_ZOMBIE_ANTICIPATE, ENEMY_BOMB_SPELL_direct_explode, ENEMY_BOMB_SPELL_indirect_explode
+tile_spell   TILE_ZOMBIE_ANTICIPATE, ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
 
 tile_update  TILE_BIRB_LEFT, ENEMY_UPDATE_update_birb_left
 tile_attack  TILE_BIRB_LEFT, ENEMY_ATTACK_direct_attack_birb, ENEMY_ATTACK_indirect_attack_birb
 tile_collide TILE_BIRB_LEFT, ENEMY_COLLIDE_basic_enemy_attacks_player
 tile_suspend TILE_BIRB_LEFT, ENEMY_UTIL_move_away_from_map_edge
 tile_explode TILE_BIRB_LEFT, ENEMY_BOMB_SPELL_direct_explode, ENEMY_BOMB_SPELL_indirect_explode
+tile_spell   TILE_BIRB_LEFT, ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
 
 tile_update  TILE_BIRB_RIGHT, ENEMY_UPDATE_update_birb_right
 tile_attack  TILE_BIRB_RIGHT, ENEMY_ATTACK_direct_attack_birb, ENEMY_ATTACK_indirect_attack_birb
 tile_collide TILE_BIRB_RIGHT, ENEMY_COLLIDE_basic_enemy_attacks_player
 tile_suspend TILE_BIRB_RIGHT, ENEMY_UTIL_move_away_from_map_edge
 tile_explode TILE_BIRB_RIGHT, ENEMY_BOMB_SPELL_direct_explode, ENEMY_BOMB_SPELL_indirect_explode
+tile_spell   TILE_BIRB_RIGHT, ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
 
 tile_update  TILE_BIRB_LEFT_FLYING, ENEMY_UPDATE_update_birb_flying_left
 tile_attack  TILE_BIRB_LEFT_FLYING, ENEMY_ATTACK_direct_attack_birb, ENEMY_ATTACK_indirect_attack_birb
 tile_collide TILE_BIRB_LEFT_FLYING, ENEMY_COLLIDE_basic_enemy_attacks_player
 tile_suspend TILE_BIRB_LEFT_FLYING, ENEMY_UTIL_move_away_from_map_edge
 tile_explode TILE_BIRB_LEFT_FLYING, ENEMY_BOMB_SPELL_direct_explode, ENEMY_BOMB_SPELL_indirect_explode
+tile_spell   TILE_BIRB_LEFT_FLYING, ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
 
 tile_update  TILE_BIRB_RIGHT_FLYING, ENEMY_UPDATE_update_birb_flying_right
 tile_attack  TILE_BIRB_RIGHT_FLYING, ENEMY_ATTACK_direct_attack_birb, ENEMY_ATTACK_indirect_attack_birb
 tile_collide TILE_BIRB_RIGHT_FLYING, ENEMY_COLLIDE_basic_enemy_attacks_player
 tile_suspend TILE_BIRB_RIGHT_FLYING, ENEMY_UTIL_move_away_from_map_edge
 tile_explode TILE_BIRB_RIGHT_FLYING, ENEMY_BOMB_SPELL_direct_explode, ENEMY_BOMB_SPELL_indirect_explode
+tile_spell   TILE_BIRB_RIGHT_FLYING, ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
 
 tile_update  TILE_MOLE_HOLE, ENEMY_UPDATE_update_mole_hole
 tile_attack  TILE_MOLE_HOLE, ENEMY_ATTACK_direct_attack_mole_hole, FIXED_no_behavior
 tile_collide TILE_MOLE_HOLE, FIXED_no_behavior
 tile_suspend TILE_MOLE_HOLE, FIXED_no_behavior
 tile_explode TILE_MOLE_HOLE, ENEMY_BOMB_SPELL_direct_explode, FIXED_no_behavior
+tile_spell   TILE_MOLE_HOLE, ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
 
 tile_update  TILE_MOLE_THROWING, ENEMY_UPDATE_update_mole_throwing
 tile_attack  TILE_MOLE_THROWING, ENEMY_ATTACK_direct_attack_mole_throwing, FIXED_no_behavior
 tile_collide TILE_MOLE_THROWING, ENEMY_COLLIDE_basic_enemy_attacks_player
 tile_suspend TILE_MOLE_THROWING, FIXED_no_behavior
 tile_explode TILE_MOLE_THROWING, ENEMY_BOMB_SPELL_direct_explode, FIXED_no_behavior
+tile_spell   TILE_MOLE_THROWING, ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
 
 tile_update  TILE_MOLE_IDLE, ENEMY_UPDATE_update_mole_idle
 tile_attack  TILE_MOLE_IDLE, ENEMY_ATTACK_direct_attack_mole_idle,     FIXED_no_behavior
 tile_collide TILE_MOLE_IDLE, ENEMY_COLLIDE_basic_enemy_attacks_player
 tile_suspend TILE_MOLE_IDLE, FIXED_no_behavior
 tile_explode TILE_MOLE_IDLE, ENEMY_BOMB_SPELL_direct_explode, FIXED_no_behavior
+tile_spell   TILE_MOLE_IDLE, ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
 
 tile_update  TILE_WRENCH_PROJECTILE, ENEMY_UPDATE_update_wrench_projectile
 tile_attack  TILE_WRENCH_PROJECTILE, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_WRENCH_PROJECTILE, ENEMY_COLLIDE_projectile_attacks_player
 tile_suspend TILE_WRENCH_PROJECTILE, ENEMY_UTIL_draw_cleared_disco_tile
 tile_explode TILE_WRENCH_PROJECTILE, ENEMY_BOMB_SPELL_become_one_beat_hazard, FIXED_no_behavior ; TODO: clean these up?
+tile_spell   TILE_WRENCH_PROJECTILE, FIXED_no_behavior
 
 tile_update  TILE_CHALLENGE_SPIKES, ENEMY_UPDATE_update_challenge_spike
 tile_attack  TILE_CHALLENGE_SPIKES, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_CHALLENGE_SPIKES, ENEMY_COLLIDE_challenge_spike_solid_test
 tile_suspend TILE_CHALLENGE_SPIKES, FIXED_no_behavior
 tile_explode TILE_CHALLENGE_SPIKES, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_CHALLENGE_SPIKES, FIXED_no_behavior
 
 tile_update  TILE_MUSHROOM, ENEMY_UPDATE_update_mushroom
 tile_attack  TILE_MUSHROOM, ENEMY_ATTACK_direct_attack_mushroom, FIXED_no_behavior
 tile_collide TILE_MUSHROOM, ENEMY_COLLIDE_basic_enemy_attacks_player
 tile_suspend TILE_MUSHROOM, FIXED_no_behavior
 tile_explode TILE_MUSHROOM, ENEMY_BOMB_SPELL_direct_explode, FIXED_no_behavior
+tile_spell   TILE_MUSHROOM, ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
 
 tile_update  TILE_ONE_BEAT_HAZARD, ENEMY_UPDATE_update_one_beat_hazard
 tile_attack  TILE_ONE_BEAT_HAZARD, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_ONE_BEAT_HAZARD, ENEMY_COLLIDE_hazard_damages_player
 tile_suspend TILE_ONE_BEAT_HAZARD, FIXED_no_behavior
 tile_explode TILE_ONE_BEAT_HAZARD, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_ONE_BEAT_HAZARD, FIXED_no_behavior ; TODO: do we need to revert to a disco tile?
 
 tile_update  TILE_DISCO_FLOOR, ENEMY_UPDATE_draw_disco_tile
 tile_attack  TILE_DISCO_FLOOR, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_DISCO_FLOOR, FIXED_no_behavior
 tile_suspend TILE_DISCO_FLOOR, ENEMY_UTIL_draw_cleared_disco_tile
 tile_explode TILE_DISCO_FLOOR, ENEMY_BOMB_SPELL_become_one_beat_hazard, FIXED_no_behavior
+tile_spell   TILE_DISCO_FLOOR, FIXED_no_behavior ; TODO: should we update normally, to suggest visual continiuty?
 
 tile_update  TILE_SEMISAFE_FLOOR, ENEMY_UPDATE_update_semisafe_tile
 tile_attack  TILE_SEMISAFE_FLOOR, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_SEMISAFE_FLOOR, ENEMY_COLLIDE_semisolid_attacks_player
 tile_suspend TILE_SEMISAFE_FLOOR, FIXED_no_behavior
 tile_explode TILE_SEMISAFE_FLOOR, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_SEMISAFE_FLOOR, FIXED_no_behavior
 
 tile_update  TILE_WALL, FIXED_no_behavior
 tile_attack  TILE_WALL, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_WALL, ENEMY_COLLIDE_solid_tile_forbids_movement
 tile_suspend TILE_WALL, FIXED_no_behavior
 tile_explode TILE_WALL, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_WALL, FIXED_no_behavior
 
 tile_update  TILE_ITEM_SHADOW, ENEMY_UPDATE_update_item_shadow
 tile_attack  TILE_ITEM_SHADOW, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_ITEM_SHADOW, ENEMY_COLLIDE_collect_item
 tile_suspend TILE_ITEM_SHADOW, ENEMY_UTIL_suspend_item_shadow
-tile_explode TILE_ITEM_SHADOW, FIXED_no_behavior, FIXED_no_behavior ; TODO: destroy unimportant items?
+tile_explode TILE_ITEM_SHADOW, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_ITEM_SHADOW, FIXED_no_behavior
 
 tile_update  TILE_TREASURE_CHEST, FIXED_no_behavior
 tile_attack  TILE_TREASURE_CHEST, ENEMY_ATTACK_attack_treasure_chest, FIXED_no_behavior
 tile_collide TILE_TREASURE_CHEST, ENEMY_COLLIDE_solid_tile_forbids_movement
 tile_suspend TILE_TREASURE_CHEST, FIXED_no_behavior
-tile_explode TILE_TREASURE_CHEST, FIXED_no_behavior, FIXED_no_behavior ; TODO: open chests? destroy chests?
+tile_explode TILE_TREASURE_CHEST, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_TREASURE_CHEST, FIXED_no_behavior
 
 tile_update  TILE_BIG_KEY, FIXED_no_behavior
 tile_attack  TILE_BIG_KEY, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_BIG_KEY, ENEMY_COLLIDE_collect_key
 tile_suspend TILE_BIG_KEY, FIXED_no_behavior
 tile_explode TILE_BIG_KEY, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_BIG_KEY, FIXED_no_behavior
 
 tile_update  TILE_EXIT_BLOCK, FIXED_no_behavior
 tile_attack  TILE_EXIT_BLOCK, ENEMY_ATTACK_attack_exit_block, FIXED_no_behavior
 tile_collide TILE_EXIT_BLOCK, ENEMY_COLLIDE_solid_tile_forbids_movement
 tile_suspend TILE_EXIT_BLOCK, FIXED_no_behavior
 tile_explode TILE_EXIT_BLOCK, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_EXIT_BLOCK, FIXED_no_behavior
 
 tile_update  TILE_EXIT_STAIRS, FIXED_no_behavior
 tile_attack  TILE_EXIT_STAIRS, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_EXIT_STAIRS, ENEMY_COLLIDE_descend_stairs
 tile_suspend TILE_EXIT_STAIRS, FIXED_no_behavior
 tile_explode TILE_EXIT_STAIRS, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_EXIT_STAIRS, FIXED_no_behavior
 
 tile_update  TILE_SIGN, FIXED_no_behavior
 tile_attack  TILE_SIGN, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_SIGN, ENEMY_COLLIDE_player_reads_sign
 tile_suspend TILE_SIGN, FIXED_no_behavior
 tile_explode TILE_SIGN, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_SIGN, FIXED_no_behavior
 
 .segment "ENEMY_UPDATE"
 
@@ -683,3 +708,16 @@ AttackSquare := R3
 
         rts
 .endproc
+
+spell_dispatch_behaviors_low:
+        .lobytes enemy_spell_table
+        .repeat ($100 - _expected_spell_tileid)
+        .byte <FIXED_crash_handler
+        .endrepeat
+
+spell_dispatch_behaviors_high:
+        .hibytes enemy_spell_table
+        .repeat ($100 - _expected_spell_tileid)
+        .byte >FIXED_crash_handler
+        .endrepeat
+

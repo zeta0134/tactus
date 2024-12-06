@@ -229,8 +229,7 @@ HeartCount := R2
         sta PlayerEquipmentTorch
         lda #ITEM_SHIELD
         sta PlayerEquipmentArmor
-        ;lda #ITEM_NONE
-        lda #ITEM_GO_GO_BOOTS
+        lda #ITEM_NONE
         sta PlayerEquipmentBoots
         lda #ITEM_CHAIN_LINK
         sta PlayerEquipmentAccessory
@@ -266,7 +265,7 @@ HeartCount := R2
         sta HealingAmount
         near_call FAR_receive_healing
 
-        st16 PlayerGold, 150
+        st16 PlayerGold, 500
 .else
         ; The player should start with a standard L1-DAGGER
         lda #PLAYER_NORMAL_WEAPON
