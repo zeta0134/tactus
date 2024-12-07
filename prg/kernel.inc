@@ -30,6 +30,11 @@
 .global draw_battlefield_B
 .global draw_battlefield_C
 
+; The default AI update routine
+.global update_enemies_1
+; The player may switch to this to process spellcasting logic
+.global update_spells_1
+
 .globalzp ScreenShakeX
 .globalzp ScreenShakeY
 .globalzp PpuScrollNametable

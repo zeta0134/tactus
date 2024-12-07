@@ -126,7 +126,7 @@ continue_waiting:
         far_call FAR_disable_all_oam_entries_playfield
         far_call FAR_disable_all_oam_entries_hud
 
-        near_call FAR_init_save_subsystem
+        far_call FAR_init_save_subsystem
         far_call FAR_compute_player_colors
 
         ; NORMAL: start on the title screen
@@ -849,6 +849,144 @@ continue_waiting:
         far_call FAR_refresh_hud
         perform_zpcm_inc
         jsr every_gameloop
+        rts
+.endproc
+
+; Like update enemies in every sense, but we do the spellcasting logic instead
+.proc update_spells_1
+StartingRow := R14
+StartingTile := R15
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+
+        far_call FAR_reset_price_tracker
+        perform_zpcm_inc
+
+        ; - clear "moved this frame" flags from all tiles, permitting
+        ;   the updates we will perform over the next few frames
+        debug_color (TINT_R | TINT_G | LIGHTGRAY)
+        far_call FAR_clear_active_move_flags
+        debug_color LIGHTGRAY
+
+        access_data_bank #<.bank(player_distance_luts)
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+        lda #0
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 0)
+        sta StartingTile
+        far_call FAR_cast_spell_on_static_enemy_row
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+        lda #1
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 1)
+        sta StartingTile
+        far_call FAR_cast_spell_on_static_enemy_row
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+        lda #2
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 2)
+        sta StartingTile
+        far_call FAR_cast_spell_on_static_enemy_row
+        debug_color LIGHTGRAY
+
+        restore_previous_bank
+
+        jsr every_gameloop
+        st16 GameMode, update_spells_2
+        rts
+.endproc
+
+.proc update_spells_2
+StartingRow := R14
+StartingTile := R15
+
+        access_data_bank #<.bank(player_distance_luts)
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+        lda #3
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 3)
+        sta StartingTile
+        far_call FAR_cast_spell_on_static_enemy_row
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+        lda #4
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 4)
+        sta StartingTile
+        far_call FAR_cast_spell_on_static_enemy_row
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+        lda #5
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 5)
+        sta StartingTile
+        far_call FAR_cast_spell_on_static_enemy_row
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+        lda #6
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 6)
+        sta StartingTile
+        far_call FAR_cast_spell_on_static_enemy_row
+        debug_color LIGHTGRAY
+
+        restore_previous_bank
+
+        jsr every_gameloop
+        st16 GameMode, update_spells_3
+        rts
+.endproc
+
+.proc update_spells_3
+StartingRow := R14
+StartingTile := R15
+
+        access_data_bank #<.bank(player_distance_luts)
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+        lda #7
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 7)
+        sta StartingTile
+        far_call FAR_cast_spell_on_static_enemy_row
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+        lda #8
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 8)
+        sta StartingTile
+        far_call FAR_cast_spell_on_static_enemy_row
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+        lda #9
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 9)
+        sta StartingTile
+        far_call FAR_cast_spell_on_static_enemy_row
+        debug_color LIGHTGRAY
+
+        debug_color (TINT_B | TINT_R | LIGHTGRAY)
+        lda #10
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 10)
+        sta StartingTile
+        far_call FAR_cast_spell_on_static_enemy_row
+        debug_color LIGHTGRAY
+
+        restore_previous_bank
+
+        jsr every_gameloop
+        st16 GameMode, draw_battlefield_A
         rts
 .endproc
 

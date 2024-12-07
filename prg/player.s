@@ -56,7 +56,6 @@ player_equipment_by_index: ; for indexing into this like a list
 
 PlayerState: .res 1
 PlayerBeatsInThisState: .res 1
-PlayerRequestsSpellBehavior: .res 1
 
 PlayerBombCount: .res 1
 
@@ -239,7 +238,7 @@ HeartCount := R2
         sta PlayerEquipmentAccessory
         lda #ITEM_BOMB_STANDARD
         sta PlayerEquipmentBombs
-        lda #ITEM_SPELL_FIRE
+        lda #ITEM_SPELL_EARTH
         sta PlayerEquipmentSpell
 
         lda #99
@@ -343,7 +342,6 @@ heart_loop:
         sta PlayerState
         lda #0
         sta PlayerBeatsInThisState
-        sta PlayerRequestsSpellBehavior
 
         rts
 
@@ -2428,8 +2426,7 @@ proceed_to_cast:
         beq full_room_spell
         jmp done_with_full_room_prep
 full_room_spell:
-        lda #1
-        sta PlayerRequestsSpellBehavior
+        st16 GameMode, update_spells_1
 done_with_full_room_prep:
 
         ; Move the player into the spellcasting state

@@ -102,7 +102,7 @@ FlagsPtr := R0
     rts
 .endproc
 
-    .segment "CODE_1"
+    .segment "CODE_2"
 
 .define SavePersistencePtrs persisted_block_0, persisted_block_1, persisted_block_2, persisted_block_3, persisted_block_4, persisted_block_5
 PERSISTENCE_TABLE_LENGTH = 6

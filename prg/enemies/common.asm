@@ -825,6 +825,7 @@ CurrentTile := R15
         rts
 safe_to_dispatch:
         asl
+        tax
         lda slime_spell_lut+0, x
         sta DispatchPtr+0
         lda slime_spell_lut+1, x
