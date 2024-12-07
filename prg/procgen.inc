@@ -9,6 +9,7 @@
 .global FAR_update_room_state
 
 .global room_layouts, room_flags, room_floorplan, room_properties, room_bank, room_ptr_high, room_ptr_low
+.global room_raster_effect, room_color_emphasis
 .global first_beat_after_load, enemies_active
 
 ; layouts

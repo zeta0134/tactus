@@ -236,6 +236,11 @@ LayoutPtr := R0
         lda #0
         sta NmiSoftDisable
 
+        ; Set the initial color emphasis to none (which the UI controllers
+        ; may of course override at their leisure)
+        lda #0
+        near_call FAR_apply_room_global_color_emphasis
+
         st16 GameMode, run_ui_subsystem
         jsr wait_for_next_vblank
 
@@ -517,6 +522,8 @@ LayoutPtr := R0
 
         far_call FAR_reset_price_tracker
 
+        jsr set_color_emphasis_for_room
+
         st16 GameMode, beat_frame_1
         rts
 .endproc
@@ -618,6 +625,9 @@ not_too_high:
 .proc room_transition
         ; Load the current room (which is now pregenerated)
         far_call FAR_load_current_room
+
+        ; Set this room's color emphasis
+        jsr set_color_emphasis_for_room
 
         ; switch music track/variant if necessary
         far_call FAR_play_music_for_current_room
@@ -1574,6 +1584,14 @@ screen_shake_raster_lut:
         .byte RASTER_EFFECT_VS_PLUS_2
         .byte RASTER_EFFECT_VS_PLUS_3
 
+.proc set_color_emphasis_for_room
+        ; This is kinda expensive, don't call it too often
+        ldx PlayerRoomIndex
+        lda room_color_emphasis, x
+        near_call FAR_apply_room_global_color_emphasis
+        rts
+.endproc
+
 .proc set_raster_effect_for_room
         ; For now this merely handles vertical screen shake.
         ; Later, once rooms have the appropriate metadata to set
@@ -1584,12 +1602,27 @@ screen_shake_raster_lut:
         ; Original debug underwater, for reference
         ; set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #0
 
+        ldx PlayerRoomIndex
+        lda room_raster_effect, x
+        cmp #RASTER_EFFECT_NONE
+        beq apply_screen_shake_effect
+        ; TODO: temporary spell effects?
+        jmp apply_room_specific_effect
+apply_screen_shake_effect:
         lda ScreenShakeY
         clc
         adc #4    ; center on half the table size
         and #%111 ; mask to the number of table elements (larger shake will simply wrap around)
         tax
         set_raster_effect_safely {screen_shake_raster_lut, x}, #RASTER_FINALIZER_PLAIN_HUD, #0
+        rts
 
+apply_room_specific_effect:
+        ; Only apply the room specific effect if it differs from the current effect
+        ; (otherwise we continually reset the animation timing)
+        cmp RasterEffectIndex
+        beq keep_current_effect
+        set_raster_effect_safely {room_raster_effect, x}, #RASTER_FINALIZER_PLAIN_HUD, #0
+keep_current_effect:   
         rts
 .endproc

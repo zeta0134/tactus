@@ -1263,6 +1263,15 @@ accept_this_room:
         ldy #Room::Properties
         lda (RoomPtr), y
         sta room_properties, x
+        ; Also load in this room's base raster effect and color emphasis
+        ; settings while we're in here. These might later get overridden by
+        ; spell effects
+        ldy #Room::RasterEffect
+        lda (RoomPtr), y
+        sta room_raster_effect, x
+        ldy #Room::ColorEmphasis
+        lda (RoomPtr), y
+        sta room_color_emphasis, x
         ; Done reading room data for now
         restore_previous_bank ; RoomBank
 
