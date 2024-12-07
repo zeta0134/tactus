@@ -1,5 +1,6 @@
 .global FAR_initialize_irq_table
 .global FAR_setup_raster_table_for_frame
+.global FAR_apply_room_global_color_emphasis
 .globalzp self_modifying_irq
 
 .globalzp RasterEffectFrame, RasterEffectIndex, RasterEffectFinalizerIndex, RasterLoopPoint

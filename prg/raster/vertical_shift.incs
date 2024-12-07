@@ -2,11 +2,6 @@
 ; pixels. Includes extra splits on the trailing edge to repeat that scanline, as
 ; this is a nicer looking visual than blocks of nothing
 
-vertical_shift_ppumask_common:
-  .repeat 16
-  .byte $1E
-  .endrepeat
-
 vertical_shift_irq_common:
   .repeat 16
   .byte >full_scroll_and_ppumask_irq
@@ -18,7 +13,7 @@ vertical_shift_scrollx_common:
   .endrepeat
 
 minus_1_frame_0:
-  .addr vertical_shift_scrollx_common, minus_1_scrolly, minus_1_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+  .addr vertical_shift_scrollx_common, minus_1_scrolly, minus_1_scanline, room_global_ppumask, vertical_shift_irq_common
 
 minus_1_scrolly:
   .byte 1
@@ -34,7 +29,7 @@ minus_1_frames:
   .byte <.bank(minus_1_frame_0)
 
 minus_2_frame_0:
-  .addr vertical_shift_scrollx_common, minus_2_scrolly, minus_2_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+  .addr vertical_shift_scrollx_common, minus_2_scrolly, minus_2_scanline, room_global_ppumask, vertical_shift_irq_common
 
 minus_2_scrolly:
   .byte 2
@@ -52,7 +47,7 @@ minus_2_frames:
   .byte <.bank(minus_2_frame_0)
 
 minus_3_frame_0:
-  .addr vertical_shift_scrollx_common, minus_3_scrolly, minus_3_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+  .addr vertical_shift_scrollx_common, minus_3_scrolly, minus_3_scanline, room_global_ppumask, vertical_shift_irq_common
 
 minus_3_scrolly:
   .byte 3
@@ -72,7 +67,7 @@ minus_3_frames:
   .byte <.bank(minus_3_frame_0)
 
 minus_4_frame_0:
-  .addr vertical_shift_scrollx_common, minus_4_scrolly, minus_4_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+  .addr vertical_shift_scrollx_common, minus_4_scrolly, minus_4_scanline, room_global_ppumask, vertical_shift_irq_common
 
 minus_4_scrolly:
   .byte 4
@@ -94,7 +89,7 @@ minus_4_frames:
   .byte <.bank(minus_4_frame_0)
 
 plus_1_frame_0:
-  .addr vertical_shift_scrollx_common, plus_1_scrolly, plus_1_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+  .addr vertical_shift_scrollx_common, plus_1_scrolly, plus_1_scanline, room_global_ppumask, vertical_shift_irq_common
 
 plus_1_scrolly:
   .byte 0
@@ -110,7 +105,7 @@ plus_1_frames:
   .byte <.bank(plus_1_frame_0)
 
 plus_2_frame_0:
-  .addr vertical_shift_scrollx_common, plus_2_scrolly, plus_2_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+  .addr vertical_shift_scrollx_common, plus_2_scrolly, plus_2_scanline, room_global_ppumask, vertical_shift_irq_common
 
 plus_2_scrolly:
   .byte 0
@@ -128,7 +123,7 @@ plus_2_frames:
   .byte <.bank(plus_2_frame_0)
 
 plus_3_frame_0:
-  .addr vertical_shift_scrollx_common, plus_3_scrolly, plus_3_scanline, vertical_shift_ppumask_common, vertical_shift_irq_common
+  .addr vertical_shift_scrollx_common, plus_3_scrolly, plus_3_scanline, room_global_ppumask, vertical_shift_irq_common
 
 plus_3_scrolly:
   .byte 0

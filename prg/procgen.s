@@ -40,6 +40,10 @@ room_flags: .res ::FLOOR_SIZE ; what did we spawn in here? what is the current s
 room_floorplan: .res ::FLOOR_SIZE ; properties of this cell in the floor's maze layout
 room_properties: .res ::FLOOR_SIZE ; properties of the selected room that populates this cell
 room_population_order: .res ::FLOOR_SIZE
+
+room_color_emphasis: .res ::FLOOR_SIZE
+room_raster_effect: .res ::FLOOR_SIZE
+
 enemies_active: .res 1
 first_beat_after_load: .res 1
 chest_spawn_cooldown: .res 1

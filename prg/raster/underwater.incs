@@ -1,136 +1,131 @@
 underwater_frame_0:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_0, underwater_scanline_frame_0, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_0, underwater_scanline_frame_0, room_global_ppumask, underwater_irq_common
 underwater_frame_1:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_1, underwater_scanline_frame_1, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_1, underwater_scanline_frame_1, room_global_ppumask, underwater_irq_common
 underwater_frame_2:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_2, underwater_scanline_frame_2, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_2, underwater_scanline_frame_2, room_global_ppumask, underwater_irq_common
 underwater_frame_3:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_3, underwater_scanline_frame_3, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_3, underwater_scanline_frame_3, room_global_ppumask, underwater_irq_common
 underwater_frame_4:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_4, underwater_scanline_frame_4, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_4, underwater_scanline_frame_4, room_global_ppumask, underwater_irq_common
 underwater_frame_5:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_5, underwater_scanline_frame_5, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_5, underwater_scanline_frame_5, room_global_ppumask, underwater_irq_common
 underwater_frame_6:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_6, underwater_scanline_frame_6, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_6, underwater_scanline_frame_6, room_global_ppumask, underwater_irq_common
 underwater_frame_7:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_7, underwater_scanline_frame_7, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_7, underwater_scanline_frame_7, room_global_ppumask, underwater_irq_common
 underwater_frame_8:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_8, underwater_scanline_frame_8, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_8, underwater_scanline_frame_8, room_global_ppumask, underwater_irq_common
 underwater_frame_9:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_9, underwater_scanline_frame_9, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_9, underwater_scanline_frame_9, room_global_ppumask, underwater_irq_common
 underwater_frame_10:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_10, underwater_scanline_frame_10, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_10, underwater_scanline_frame_10, room_global_ppumask, underwater_irq_common
 underwater_frame_11:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_11, underwater_scanline_frame_11, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_11, underwater_scanline_frame_11, room_global_ppumask, underwater_irq_common
 underwater_frame_12:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_12, underwater_scanline_frame_12, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_12, underwater_scanline_frame_12, room_global_ppumask, underwater_irq_common
 underwater_frame_13:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_13, underwater_scanline_frame_13, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_13, underwater_scanline_frame_13, room_global_ppumask, underwater_irq_common
 underwater_frame_14:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_14, underwater_scanline_frame_14, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_14, underwater_scanline_frame_14, room_global_ppumask, underwater_irq_common
 underwater_frame_15:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_15, underwater_scanline_frame_15, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_15, underwater_scanline_frame_15, room_global_ppumask, underwater_irq_common
 underwater_frame_16:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_16, underwater_scanline_frame_16, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_16, underwater_scanline_frame_16, room_global_ppumask, underwater_irq_common
 underwater_frame_17:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_17, underwater_scanline_frame_17, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_17, underwater_scanline_frame_17, room_global_ppumask, underwater_irq_common
 underwater_frame_18:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_18, underwater_scanline_frame_18, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_18, underwater_scanline_frame_18, room_global_ppumask, underwater_irq_common
 underwater_frame_19:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_19, underwater_scanline_frame_19, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_19, underwater_scanline_frame_19, room_global_ppumask, underwater_irq_common
 underwater_frame_20:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_20, underwater_scanline_frame_20, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_20, underwater_scanline_frame_20, room_global_ppumask, underwater_irq_common
 underwater_frame_21:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_21, underwater_scanline_frame_21, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_21, underwater_scanline_frame_21, room_global_ppumask, underwater_irq_common
 underwater_frame_22:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_22, underwater_scanline_frame_22, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_22, underwater_scanline_frame_22, room_global_ppumask, underwater_irq_common
 underwater_frame_23:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_23, underwater_scanline_frame_23, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_23, underwater_scanline_frame_23, room_global_ppumask, underwater_irq_common
 underwater_frame_24:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_24, underwater_scanline_frame_24, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_24, underwater_scanline_frame_24, room_global_ppumask, underwater_irq_common
 underwater_frame_25:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_25, underwater_scanline_frame_25, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_25, underwater_scanline_frame_25, room_global_ppumask, underwater_irq_common
 underwater_frame_26:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_26, underwater_scanline_frame_26, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_26, underwater_scanline_frame_26, room_global_ppumask, underwater_irq_common
 underwater_frame_27:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_27, underwater_scanline_frame_27, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_27, underwater_scanline_frame_27, room_global_ppumask, underwater_irq_common
 underwater_frame_28:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_28, underwater_scanline_frame_28, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_28, underwater_scanline_frame_28, room_global_ppumask, underwater_irq_common
 underwater_frame_29:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_29, underwater_scanline_frame_29, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_29, underwater_scanline_frame_29, room_global_ppumask, underwater_irq_common
 underwater_frame_30:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_30, underwater_scanline_frame_30, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_30, underwater_scanline_frame_30, room_global_ppumask, underwater_irq_common
 underwater_frame_31:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_31, underwater_scanline_frame_31, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_31, underwater_scanline_frame_31, room_global_ppumask, underwater_irq_common
 underwater_frame_32:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_32, underwater_scanline_frame_32, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_32, underwater_scanline_frame_32, room_global_ppumask, underwater_irq_common
 underwater_frame_33:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_33, underwater_scanline_frame_33, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_33, underwater_scanline_frame_33, room_global_ppumask, underwater_irq_common
 underwater_frame_34:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_34, underwater_scanline_frame_34, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_34, underwater_scanline_frame_34, room_global_ppumask, underwater_irq_common
 underwater_frame_35:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_35, underwater_scanline_frame_35, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_35, underwater_scanline_frame_35, room_global_ppumask, underwater_irq_common
 underwater_frame_36:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_36, underwater_scanline_frame_36, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_36, underwater_scanline_frame_36, room_global_ppumask, underwater_irq_common
 underwater_frame_37:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_37, underwater_scanline_frame_37, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_37, underwater_scanline_frame_37, room_global_ppumask, underwater_irq_common
 underwater_frame_38:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_38, underwater_scanline_frame_38, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_38, underwater_scanline_frame_38, room_global_ppumask, underwater_irq_common
 underwater_frame_39:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_39, underwater_scanline_frame_39, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_39, underwater_scanline_frame_39, room_global_ppumask, underwater_irq_common
 underwater_frame_40:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_40, underwater_scanline_frame_40, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_40, underwater_scanline_frame_40, room_global_ppumask, underwater_irq_common
 underwater_frame_41:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_41, underwater_scanline_frame_41, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_41, underwater_scanline_frame_41, room_global_ppumask, underwater_irq_common
 underwater_frame_42:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_42, underwater_scanline_frame_42, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_42, underwater_scanline_frame_42, room_global_ppumask, underwater_irq_common
 underwater_frame_43:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_43, underwater_scanline_frame_43, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_43, underwater_scanline_frame_43, room_global_ppumask, underwater_irq_common
 underwater_frame_44:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_44, underwater_scanline_frame_44, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_44, underwater_scanline_frame_44, room_global_ppumask, underwater_irq_common
 underwater_frame_45:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_45, underwater_scanline_frame_45, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_45, underwater_scanline_frame_45, room_global_ppumask, underwater_irq_common
 underwater_frame_46:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_46, underwater_scanline_frame_46, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_46, underwater_scanline_frame_46, room_global_ppumask, underwater_irq_common
 underwater_frame_47:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_47, underwater_scanline_frame_47, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_47, underwater_scanline_frame_47, room_global_ppumask, underwater_irq_common
 underwater_frame_48:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_48, underwater_scanline_frame_48, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_48, underwater_scanline_frame_48, room_global_ppumask, underwater_irq_common
 underwater_frame_49:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_49, underwater_scanline_frame_49, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_49, underwater_scanline_frame_49, room_global_ppumask, underwater_irq_common
 underwater_frame_50:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_50, underwater_scanline_frame_50, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_50, underwater_scanline_frame_50, room_global_ppumask, underwater_irq_common
 underwater_frame_51:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_51, underwater_scanline_frame_51, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_51, underwater_scanline_frame_51, room_global_ppumask, underwater_irq_common
 underwater_frame_52:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_52, underwater_scanline_frame_52, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_52, underwater_scanline_frame_52, room_global_ppumask, underwater_irq_common
 underwater_frame_53:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_53, underwater_scanline_frame_53, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_53, underwater_scanline_frame_53, room_global_ppumask, underwater_irq_common
 underwater_frame_54:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_54, underwater_scanline_frame_54, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_54, underwater_scanline_frame_54, room_global_ppumask, underwater_irq_common
 underwater_frame_55:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_55, underwater_scanline_frame_55, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_55, underwater_scanline_frame_55, room_global_ppumask, underwater_irq_common
 underwater_frame_56:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_56, underwater_scanline_frame_56, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_56, underwater_scanline_frame_56, room_global_ppumask, underwater_irq_common
 underwater_frame_57:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_57, underwater_scanline_frame_57, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_57, underwater_scanline_frame_57, room_global_ppumask, underwater_irq_common
 underwater_frame_58:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_58, underwater_scanline_frame_58, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_58, underwater_scanline_frame_58, room_global_ppumask, underwater_irq_common
 underwater_frame_59:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_59, underwater_scanline_frame_59, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_59, underwater_scanline_frame_59, room_global_ppumask, underwater_irq_common
 underwater_frame_60:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_60, underwater_scanline_frame_60, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_60, underwater_scanline_frame_60, room_global_ppumask, underwater_irq_common
 underwater_frame_61:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_61, underwater_scanline_frame_61, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_61, underwater_scanline_frame_61, room_global_ppumask, underwater_irq_common
 underwater_frame_62:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_62, underwater_scanline_frame_62, underwater_ppumask_common, underwater_irq_common
+  .addr underwater_scrollx_common, underwater_scrolly_frame_62, underwater_scanline_frame_62, room_global_ppumask, underwater_irq_common
 underwater_frame_63:
-  .addr underwater_scrollx_common, underwater_scrolly_frame_63, underwater_scanline_frame_63, underwater_ppumask_common, underwater_irq_common
-
-underwater_ppumask_common:
-  .repeat 32
-  .byte $1E
-  .endrepeat
+  .addr underwater_scrollx_common, underwater_scrolly_frame_63, underwater_scanline_frame_63, room_global_ppumask, underwater_irq_common
 
 underwater_irq_common:
   .repeat 32

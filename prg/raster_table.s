@@ -2,6 +2,7 @@
         .include "_globals.inc"
 
         .include "dialog.inc"
+        .include "far_call.inc"
         .include "kernel.inc"
         .include "nes.inc"
         .include "pal.inc"
@@ -65,6 +66,12 @@ table_irq_high:         .res 32
 
 RasterPlaybackSpeedHigh: .res 1
 RasterPlaybackSpeedLow: .res 1
+
+; For raster effects to point to as a source for data to copy
+; This is how we change the global ppumask for room-specific
+; color emphasis and other effects. Be sure it is initialized
+; to (and ORA'd with) $1E or the raster system may break entirely!
+room_global_ppumask: .res 32
 
         .segment "DATA_4"
 
@@ -184,7 +191,32 @@ scroll_y_wraparound_lut:
         sta LeftNametableAttr
         sta RightNametableAttr
 
+        lda #0
+        near_call FAR_apply_room_global_color_emphasis
+
         perform_zpcm_inc
+
+        rts
+.endproc
+
+; Desired color emphasis bits in A
+; (we'll ORA with the other flags as needed)
+.proc FAR_apply_room_global_color_emphasis
+        ; First for safety, mask the input byte
+        ; to include only the color emphasis properties
+        and #(TINT_R|TINT_G|TINT_B|LIGHTGRAY)
+        ; now set the rendering enable bits
+        ora #(BG_ON|OBJ_ON)
+
+        ; and finally, write this into place. we can be a little
+        ; slow here for size reasons, this won't be called all
+        ; that often
+        ldy #0
+loop:
+        sta room_global_ppumask, y
+        iny
+        cpy #32
+        bne loop
 
         rts
 .endproc
