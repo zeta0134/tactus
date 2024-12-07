@@ -57,3 +57,17 @@
 
 MAX_HEARTS = 5
 MAX_GOLD = 9999
+
+; By far the most common state, this allows the player to move,
+; swing their weapon, and activate all abilities normally
+PLAYER_STATE_NORMAL = 0
+; We have hoisted a bomb and are currently trying to throw it.
+; (most other abilities are suppressed)
+PLAYER_STATE_BOMB = 1
+; We are in the process of casting a spell
+PLAYER_STATE_CASTING = 2
+; Oops! We have definitely died, and are in the process of
+; animating (hopefully with lots of dramatic juice) into our
+; grave. This state will transition out of gameplay once
+; entered!
+PLAYER_STATE_DEAD = 3

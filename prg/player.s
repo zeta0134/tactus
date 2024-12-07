@@ -54,6 +54,9 @@ player_equipment_by_index: ; for indexing into this like a list
         PlayerEquipmentBombs: .res 1
         PlayerEquipmentSpell: .res 1
 
+PlayerState: .res 1
+PlayerBeatsInThisState: .res 1
+
 PlayerBombCount: .res 1
 
 PlayerSpriteIndex: .res 1
@@ -334,6 +337,11 @@ heart_loop:
 
         lda #$FF
         sta PlayerHeldBombIndex
+
+        lda #PLAYER_STATE_NORMAL
+        sta PlayerState
+        lda #0
+        sta PlayerBeatsInThisState
 
         rts
 
@@ -843,8 +851,26 @@ arrived_at_target:
         rts
 .endproc
 
+player_state_lut:
+        .word player_state_normal
+        .word player_state_bomb
+        .word player_state_casting
+        .word player_state_dead
+
 ; Called once at the beginning of every beat
 .proc FAR_update_player
+PlayerStatePtr := R0
+        lda PlayerState
+        asl
+        tax
+        lda player_state_lut+0, x
+        sta PlayerStatePtr+0
+        lda player_state_lut+1, x
+        sta PlayerStatePtr+1
+        jmp (PlayerStatePtr)
+.endproc
+
+.proc player_state_normal
 TorchlightTotal := R0
 
 PlayerSquare := R2
@@ -1031,6 +1057,21 @@ no_darkness:
         ; (this massively improves enemy AI during pathfinding)
         near_call FAR_compute_player_distance_lut_ptr
 
+        rts
+.endproc
+
+.proc player_state_bomb
+        ; TODO!
+        rts
+.endproc
+
+.proc player_state_casting
+        ; TODO!
+        rts
+.endproc
+
+.proc player_state_dead
+        ; RIP
         rts
 .endproc
 
