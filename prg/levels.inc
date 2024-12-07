@@ -178,6 +178,8 @@ ROOM_POOL_BLOCKING_INTERIOR = 5
 .struct Room
         Properties .byte
         Exits .byte
+        RasterEffect .byte
+        ColorEmphasis .byte
         BgPalette .word
         ObjPalette .word
         OverlayList .word

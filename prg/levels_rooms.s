@@ -3,10 +3,12 @@
         .include "enemies.inc"
         .include "far_call.inc"
         .include "levels.inc"
+        .include "nes.inc"
         .include "palette.inc"
         .include "procgen.inc"
         .include "prng.inc"
         .include "rainbow.inc"
+        .include "raster_table.inc"
         .include "signs.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
@@ -16,17 +18,17 @@
         .include "../build/rooms/Grasslands_Standard.incs"
         .include "../build/rooms/Caves_Standard.incs"
         .include "../build/rooms/OutOfBounds.incs"
-        .include "../build/rooms/ChallengeArena_Standard.incs"
 
         .segment "LEVEL_DATA_ROOMS_1"
 
+        .include "../build/rooms/ChallengeArena_Standard.incs"
         .include "../build/rooms/Grasslands_Round.incs"
         .include "../build/rooms/Shop_Standard.incs"        
-        .include "../build/rooms/Blocking_Chamber.incs"
-        .include "../build/rooms/HubWarpChamber.incs"
 
         .segment "LEVEL_DATA_ROOMS_2"
 
+        .include "../build/rooms/Blocking_Chamber.incs"
+        .include "../build/rooms/HubWarpChamber.incs"
         .include "../build/rooms/Blocking_Cave.incs"
 
         .segment "CODE_4"

@@ -53,6 +53,8 @@ class Room:
     category: str
     bg_palette: str
     obj_palette: str
+    raster_effect: str
+    color_emphasis: str
     
 def read_boolean_properties(tile_element):
     boolean_properties = {}
@@ -218,6 +220,8 @@ def read_room(map_filename):
     string_properties = read_string_properties(map_element)
     room_bg_palette = string_properties.get("room_palette","grassy_palette")
     room_obj_palette = string_properties.get("room_obj_palette","sprite_palette_overworld")
+    raster_effect = string_properties.get("raster_effect","RASTER_EFFECT_NONE")
+    color_emphasis = string_properties.get("color_emphasis","0")
 
     # finally let's make the name something useful
     (_, plain_filename) = os.path.split(map_filename)
@@ -226,7 +230,7 @@ def read_room(map_filename):
 
     return Room(name=safe_label, width=map_width, height=map_height, tiles=combined_tiles, overlays=overlays,
         exit_id=exit_id, bg_palette=room_bg_palette, obj_palette=room_obj_palette, dark=is_dark, category=category,
-        forbid_spawning=forbid_spawning)
+        forbid_spawning=forbid_spawning, raster_effect=raster_effect, color_emphasis=color_emphasis)
 
 def tile_id_bytes(tiles):
   raw_bytes = []
@@ -420,6 +424,8 @@ def write_room(tilemap, output_file):
     output_file.write(ca65_label("room_"+tilemap.name) + "\n")
     output_file.write("  .byte " + ca65_byte_literal(properties_byte) + " ; property flags\n")
     output_file.write("  .byte " + ca65_byte_literal(tilemap.exit_id) + " ; supported exits\n")
+    output_file.write("  .byte " + (tilemap.raster_effect) + " ; raster effect\n")
+    output_file.write("  .byte " + (tilemap.color_emphasis) + " ; color emphasis\n")
     output_file.write("  .addr " + tilemap.bg_palette + " ; BG palette for this room\n")
     output_file.write("  .addr " + tilemap.obj_palette + " ; OBJ palette for this room\n")
     output_file.write("  .addr " + "overlays_"+tilemap.name + "; overlay list\n")
