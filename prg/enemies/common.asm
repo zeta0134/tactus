@@ -751,8 +751,86 @@ EffectiveAttackSquare := R10 ; Unused (call this directly)
         rts
 .endproc
 
-.proc ENEMY_BOMB_SPELL_slime_spell_dispatch
+; ============================================================================================================================
+; ===                                      Spell Tickles Enemy Behaviors                                                   ===
+; ============================================================================================================================
+
+; All of these are called when a particular spell needs to affect the *entire* battlefield. Note the player will still have
+; the spell equipped to A at this point, so we can just read the spell ID from there. The outer dispatch doesn't care what
+; spell was called, so each dispatch function here will need to check the spell ID and deliniate accordingly.
+; Otherwise the arguments are the same as enemy update, etc.
+
+        .segment "ENEMY_BOMB_SPELL"
+
+; Shared by the four "apply element to room" spells. This simply changes
+; the color of the enemy tile to match the spell that was cast. Generally
+; call this after processing other enemy logic, especially if the enemy
+; can potentially be defeated by the unique effects before we get here.
+.proc ENEMY_BOMB_SPELL_change_my_color
+TargetColor := R0
+CurrentRow := R14
+CurrentTile := R15
+        lda PlayerEquipmentSpell
+        cmp #ITEM_SPELL_FIRE
+        beq choose_fire
+        cmp #ITEM_SPELL_AIR
+        beq choose_air
+        cmp #ITEM_SPELL_ICE
+        beq choose_ice
+choose_earth:
+        lda #PAL_EARTH
+        jmp done_choosing_color
+choose_fire:
+        lda #PAL_FIRE
+        jmp done_choosing_color
+choose_air:
+        lda #PAL_AIR
+        jmp done_choosing_color
+choose_ice:
+        lda #PAL_WATER
+done_choosing_color:
+        sta TargetColor
+
+        ldx CurrentTile
+        lda tile_attributes, x
+        and #($FF-PAL_MASK)
+        ora TargetColor
+        sta tile_attributes, x
         rts
+.endproc
+
+slime_spell_lut:
+        ; Slimes have the most basic response to elemental spells:
+        ; they simply change color on the spot.
+        ; TODO: should we reset their movement pattern data?
+        .word ENEMY_BOMB_SPELL_change_my_color ; SPELL_FIRE
+        .word ENEMY_BOMB_SPELL_change_my_color ; SPELL_AIR
+        .word ENEMY_BOMB_SPELL_change_my_color ; SPELL_ICE
+        .word ENEMY_BOMB_SPELL_change_my_color ; SPELL_EARTH
+        .word FIXED_no_behavior                ; SPELL_BOMB
+        .word FIXED_no_behavior                ; SPELL_LIFE
+
+.proc ENEMY_BOMB_SPELL_slime_spell_dispatch
+DispatchPtr := R0
+;Length := R13
+CurrentRow := R14
+CurrentTile := R15
+        lda PlayerEquipmentSpell
+        sec
+        sbc #FIRST_SPELL_IN_ITEM_LIST
+        ; Safety: don't call a spell effect that doesn't exist
+        ; (This shouldn't happen, but crashing is no fun)
+        cmp #LAST_SPELL_IN_ITEM_LIST
+        bcc safe_to_dispatch
+        rts
+safe_to_dispatch:
+        asl
+        lda slime_spell_lut+0, x
+        sta DispatchPtr+0
+        lda slime_spell_lut+1, x
+        sta DispatchPtr+1
+        jmp (DispatchPtr)
+        ; does not return
 .endproc
 
 ; For any standard enemy that, specifically:
@@ -760,6 +838,8 @@ EffectiveAttackSquare := R10 ; Unused (call this directly)
 ;  - Should change to the spell color for the four elemental spells
 ;  - Requires NO special behavior for any other spell (ie, the common behavior is fine)
 .proc ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
+        ; TODO: really not this. For now, all enemies just do the color change thing.
+        jsr ENEMY_BOMB_SPELL_slime_spell_dispatch
         rts
 .endproc
 

@@ -722,3 +722,25 @@ spell_dispatch_behaviors_high:
         .byte >FIXED_crash_handler
         .endrepeat
 
+; Note: parameters are intentionally backloaded, to allow the behavior functions to use R0+
+; without conflict
+.proc FAR_cast_spell_on_static_enemy_row
+Length := R13
+CurrentRow := R14
+StartingTile := R15
+        lda #::BATTLEFIELD_WIDTH
+        sta Length
+loop:
+        perform_zpcm_inc
+        ldx StartingTile
+        ldy battlefield, x
+        lda spell_dispatch_behaviors_low, y
+        sta DestPtr+0
+        lda spell_dispatch_behaviors_high, y
+        sta DestPtr+1
+        jsr __trampoline
+        inc StartingTile
+        dec Length
+        bne loop
+        rts
+.endproc
