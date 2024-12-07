@@ -56,6 +56,8 @@
 .global sfx_hoist_pulse
 .global sfx_throw_pulse
 
+.global sfx_cast_pulse
+
 .global CandidateSfxPtr
 .global CandidateSfxPriority
 

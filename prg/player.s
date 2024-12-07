@@ -56,6 +56,7 @@ player_equipment_by_index: ; for indexing into this like a list
 
 PlayerState: .res 1
 PlayerBeatsInThisState: .res 1
+PlayerRequestsSpellBehavior: .res 1
 
 PlayerBombCount: .res 1
 
@@ -238,7 +239,7 @@ HeartCount := R2
         sta PlayerEquipmentAccessory
         lda #ITEM_BOMB_STANDARD
         sta PlayerEquipmentBombs
-        lda #ITEM_NONE
+        lda #ITEM_SPELL_FIRE
         sta PlayerEquipmentSpell
 
         lda #99
@@ -342,6 +343,7 @@ heart_loop:
         sta PlayerState
         lda #0
         sta PlayerBeatsInThisState
+        sta PlayerRequestsSpellBehavior
 
         rts
 
@@ -1035,6 +1037,9 @@ skip_jumping_pose:
         ; Detect bomb hoisting (aggressive negotiations from afar)
         jsr detect_bomb_hoist
 
+        ; Detect spell casting (its the WHEEL OF MAGIC!)
+        jsr detect_spell_cast
+
         ; TODO: Detect other types of intent here. These aren't implemented,
         ; so just clear the intent flags for now.
         lda #0
@@ -1143,6 +1148,7 @@ resolve_enemy_collision:
         sta PlayerIntendsToBomb
         sta PlayerIntendsToCast
         sta PlayerIntendsToWait
+        sta PlayerIntendsToPause
 
         ; If necessary, cleanup dialog states through movement
         jsr cleanup_dialog_state
@@ -1153,8 +1159,163 @@ resolve_enemy_collision:
         rts
 .endproc
 
+spell_casting_dispatch_lut:
+        .word cast_spell_fire
+        .word cast_spell_air
+        .word cast_spell_ice
+        .word cast_spell_earth
+        .word cast_spell_bomb_fiesta
+        .word cast_spell_life
+
 .proc player_state_casting
-        ; TODO!
+SpellCastPtr := R0
+TorchlightTotal := R0
+
+PlayerSquare := R2
+
+TargetRow := R14
+TargetCol := R15
+        lda #0
+        sta PlayerTookDamageThisBeat
+        sta PlayerDamageAnimCounter
+        ; If no damage direction is set, default to a kinda random-circle-y lookin' thing.
+        sta PlayerIncomingDamageDirection
+
+        ; Every beat we'll by default be in our generic palette. We need to recover from whatever
+        ; the previous beat's effect was doing, so flag that here.
+        lda #1
+        sta ObjPaletteDirty
+
+        ; There is nothing fancy to do at the end of spellcasting, just revert to the normal state
+        lda #PLAYER_STATE_NORMAL
+        sta PlayerState
+        lda #0
+        sta PlayerBeatsInThisState
+        ; Set our animation frame back to idle
+        ldx PlayerSpriteIndex
+        lda #SPRITE_TILE_PLAYER
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+resolve_enemy_collision:
+        lda PlayerRow
+        sta TargetRow
+        lda PlayerCol
+        sta TargetCol
+        near_call FAR_player_resolve_collision
+
+        ; Update the player's combo counter
+        jsr update_chain_and_combo
+
+        ; Now we may finalize the player's position and draw
+        lda TargetRow
+        sta PlayerRow
+        lda TargetCol
+        sta PlayerCol
+
+        jsr set_player_target_coordinates
+
+        ; Clear player intent for the next beat
+        lda #0
+        sta PlayerNextDirection
+
+        jsr apply_player_torchlight
+
+        ; Detect exits and, if necessary, transition to the next room
+        jsr detect_exit
+
+        ; Detect being dead and, if necessary, transition to the end screen
+        jsr detect_critical_existence_failure
+
+        ; (Notably: do not detect pausing or spellcasting. Holding a bomb overrides both!)
+
+        lda #0
+        sta PlayerIntendsToBomb
+        sta PlayerIntendsToCast
+        sta PlayerIntendsToWait
+        sta PlayerIntendsToPause
+
+        ; If necessary, cleanup dialog states through movement
+        jsr cleanup_dialog_state
+
+        ; Finally, our position is finalized, so compute the lookup table ptr for distance
+        ; (this massively improves enemy AI during pathfinding)
+        near_call FAR_compute_player_distance_lut_ptr
+
+        ; We must actually cast the spell, yes yes!
+        ; We do this bit last, so that any spell effects aren't clobbered by
+        ; the above default-resolution behavior, etc etc.
+        lda PlayerEquipmentSpell
+        sec
+        sbc #FIRST_SPELL_IN_ITEM_LIST
+        ; Safety: don't call a spell effect that doesn't exist
+        ; (This shouldn't happen, but crashing is no fun)
+        cmp #LAST_SPELL_IN_ITEM_LIST
+        bcs not_safe_to_dispatch
+        asl
+        tax
+        lda spell_casting_dispatch_lut+0, x
+        sta SpellCastPtr+0
+        lda spell_casting_dispatch_lut+1, x
+        sta SpellCastPtr+1
+        jsr _spellcasting_trampoline
+not_safe_to_dispatch:
+        ; Finally, the spell is used up! Remove it from our hands
+
+        ; DEBUG: no, let the player cast it repeatedly for easier testing
+        ;lda #ITEM_NONE
+        ;sta PlayerEquipmentSpell
+
+        rts
+.endproc
+
+.proc _spellcasting_trampoline
+SpellCastPtr := R0
+        jmp (SpellCastPtr)
+.endproc
+
+.proc brighten_room
+        ; This is a room-effecting shenanigan! Brighten almost all the way and fade back down
+        lda #8
+        sta Brightness
+        lda #4
+        sta TargetBrightness
+        lda #1
+        sta BgPaletteDirty
+        sta ObjPaletteDirty
+        rts
+.endproc
+
+.proc cast_spell_fire
+        jsr brighten_room
+        ; TODO: fancy stuffs!
+        rts
+.endproc
+
+.proc cast_spell_air
+        jsr brighten_room
+        ; TODO: fancy stuffs!
+        rts
+.endproc
+
+.proc cast_spell_ice
+        jsr brighten_room
+        ; TODO: fancy stuffs!
+        rts
+.endproc
+
+.proc cast_spell_earth
+        jsr brighten_room
+        ; TODO: fancy stuffs!
+        rts
+.endproc
+
+.proc cast_spell_bomb_fiesta
+        ; TODO: whatever this needs!
+        rts
+.endproc
+
+.proc cast_spell_life
+        ; TODO: this thing!
         rts
 .endproc
 
@@ -2224,3 +2385,99 @@ all_done:
         rts
 .endproc
 
+spell_casting_sprite_lut:
+        .byte SPRITE_TILE_SPELL_FIRE_CASTING
+        .byte SPRITE_TILE_SPELL_AIR_CASTING
+        .byte SPRITE_TILE_SPELL_ICE_CASTING
+        .byte SPRITE_TILE_SPELL_EARTH_CASTING
+        .byte SPRITE_TILE_SPELL_BOMB_FIESTA_CASTING
+        .byte SPRITE_TILE_SPELL_LIFE_CASTING
+
+.proc detect_spell_cast
+MetaSpriteIndex := R0
+        ; We may not cast while paused!
+        lda PlayerIsPaused
+        beq not_paused
+        rts
+not_paused:
+
+        lda PlayerIntendsToCast
+        bne check_equipped_spell
+        rts
+check_equipped_spell:
+        lda PlayerEquipmentSpell
+        cmp #ITEM_NONE
+        bne proceed_to_cast
+        rts
+
+proceed_to_cast:
+        ; Yes, spellcasting is more important than explosions, since
+        ; it is a player input associated with a major state change
+        queue_sfx_pulse1_with_priority sfx_cast_pulse, #10
+
+        ; A few spells need to affect the room, so we'll signal to the kernel that this should happen
+        ; on the next beat (the kernel will consume and clear this flag)
+        lda PlayerEquipmentSpell
+        cmp #ITEM_SPELL_FIRE
+        beq full_room_spell
+        cmp #ITEM_SPELL_AIR
+        beq full_room_spell
+        cmp #ITEM_SPELL_ICE
+        beq full_room_spell
+        cmp #ITEM_SPELL_EARTH
+        beq full_room_spell
+        jmp done_with_full_room_prep
+full_room_spell:
+        lda #1
+        sta PlayerRequestsSpellBehavior
+done_with_full_room_prep:
+
+        ; Move the player into the spellcasting state
+        lda #PLAYER_STATE_CASTING
+        sta PlayerState
+        lda #0
+        sta PlayerBeatsInThisState
+
+        ; Animate them into the... hrm. Item holding pose, yes!
+        ldx PlayerSpriteIndex
+        lda #SPRITE_TILE_PLAYER_HAND_RAISED
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+        ; Spawn in a sprite at the player's current tile coordinates, with
+        ; that spell item rising up into the air, just like a death sprite
+        far_call FAR_find_unused_sprite
+        ldx MetaSpriteIndex
+        cpx #$FF
+        beq sprite_failed
+        lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_RISE | SPRITE_PAL_YELLOW)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+        lda PlayerCol
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_X
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda PlayerRow
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_Y
+        sec
+        sbc #12 ; start it fairly above the player
+        sta sprite_table + MetaSpriteState::PositionY, x
+
+        lda PlayerEquipmentSpell
+        sec
+        sbc #FIRST_SPELL_IN_ITEM_LIST
+        tay
+        lda spell_casting_sprite_lut, y
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+sprite_failed:
+        ; For now, that is all. Spell effects will fly elsewhere, yes!
+        rts
+.endproc

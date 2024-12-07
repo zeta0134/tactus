@@ -558,3 +558,87 @@ sfx_throw_pulse:
         pulse_cont_duty               $2,     $A,                                0
         pulse_cont_duty               $2,     $6,                                0
 
+sfx_cast_pulse:
+        ; Length in rows
+        .byte 80
+        ;                     pitch, duty, volume,                            sweep, length
+        pulse_init_sweep  PITCH_GS4,   $2,     $F, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_DS4,   $2,     $F, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_A4,    $2,     $F, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_E4,    $2,     $F, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_AS4,   $2,     $F, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_F4,    $2,     $F, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_B4,    $2,     $F, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_FS4,   $2,     $F, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_C5,    $2,     $E, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_G4,    $2,     $E, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_CS5,   $2,     $E, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_GS4,   $2,     $E, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_D5,    $2,     $E, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_A4,    $2,     $E, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_DS5,   $2,     $E, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_AS4,   $2,     $E, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_E5,    $2,     $D, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_B4,    $2,     $D, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_F5,    $2,     $D, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_C5,    $2,     $D, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_FS5,   $2,     $C, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_CS5,   $2,     $C, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_G5,    $2,     $C, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_D5,    $2,     $C, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_GS5,   $2,     $B, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_DS5,   $2,     $B, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_A5,    $2,     $A, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_E5,    $2,     $A, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_AS5,   $2,     $9, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_F5,    $2,     $9, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_B5,    $2,     $8, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_G5,    $2,     $8, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_GS5,   $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_DS5,   $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_A5,    $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_E5,    $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_AS5,   $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_F5,    $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_B5,    $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_G5,    $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_GS5,   $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_DS5,   $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_A5,    $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_E5,    $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_AS5,   $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_F5,    $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_B5,    $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_G5,    $2,     $7, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_GS5,   $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_DS5,   $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_A5,    $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_E5,    $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_AS5,   $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_F5,    $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_B5,    $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_G5,    $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_GS5,   $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_DS5,   $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_A5,    $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_E5,    $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_AS5,   $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_F5,    $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_B5,    $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_G5,    $2,     $6, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_GS5,   $2,     $5, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_DS5,   $2,     $5, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_A5,    $2,     $5, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_E5,    $2,     $5, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_AS5,   $2,     $4, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_F5,    $2,     $4, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_B5,    $2,     $4, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_G5,    $2,     $4, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_GS5,   $2,     $3, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_DS5,   $2,     $3, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_A5,    $2,     $3, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_E5,    $2,     $3, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_AS5,   $2,     $2, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_F5,    $2,     $2, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
+        pulse_init_sweep  PITCH_B5,    $2,     $1, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      1
+        pulse_init_sweep  PITCH_G5,    $2,     $1, (S_PERIOD_0 | S_SHIFT_3 | S_NEG),      0
