@@ -870,14 +870,9 @@ PlayerStatePtr := R0
         jmp (PlayerStatePtr)
 .endproc
 
-.proc player_state_normal
-TorchlightTotal := R0
-
-PlayerSquare := R2
-
-TargetRow := R14
-TargetCol := R15
-        
+; Stuff we need to clear out on every beat, no matter which state we're
+; currently in
+.proc player_global_reset
         lda #0
         sta PlayerTookDamageThisBeat
         sta PlayerDamageAnimCounter
@@ -888,6 +883,47 @@ TargetCol := R15
         ; the previous beat's effect was doing, so flag that here.
         lda #1
         sta ObjPaletteDirty
+
+        ; Always reset the player's palette back to 0 at the start of the beat
+        ; (in case some other state changed it for an effect)
+        ldx PlayerSpriteIndex
+        lda sprite_table + MetaSpriteState::BehaviorFlags, x
+        and #($FF - SPRITE_PAL_MASK)
+        ora #SPRITE_PAL_0
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+
+        lda #0
+        sta PlayerCombo
+
+        rts
+.endproc
+
+.proc apply_player_torchlight
+TorchlightTotal := R0
+        ; Detect equipment changes and update static player stats as necessary
+        ; (this needs to happen BEFORE our exit changes, to facilitate room transition logic)
+        far_call FAR_equipment_torchlight
+        lda TorchlightTotal
+        sta PlayerTorchlightRadius
+        ; If this room is darkened, apply torchlight
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_DARK
+        beq no_darkness
+        lda PlayerTorchlightRadius
+        sta target_torchlight_radius
+no_darkness:
+        rts
+.endproc
+
+.proc player_state_normal
+TorchlightTotal := R0
+
+PlayerSquare := R2
+
+TargetRow := R14
+TargetCol := R15
+        jsr player_global_reset
 
         ; First up, default the player's animation cel to either standing or, if it's been a really long
         ; time since we got a player input AND the room is clear, the idle pose for flavor
@@ -911,23 +947,12 @@ pick_standard_pose:
         sta sprite_table + MetaSpriteState::TileIndex, x
 done_with_initial_pose:
 
-        ; Always reset the player's palette back to 0 at the start of the beat
-        ; (in case some other state changed it for an effect)
-        ldx PlayerSpriteIndex
-        lda sprite_table + MetaSpriteState::BehaviorFlags, x
-        and #($FF - SPRITE_PAL_MASK)
-        ora #SPRITE_PAL_0
-        sta sprite_table + MetaSpriteState::BehaviorFlags, x
-
         lda PlayerRow
         sta TargetRow
         lda PlayerCol
         sta TargetCol
 
         inc PlayerIdleBeats
-
-        lda #0
-        sta PlayerCombo
 
         ; If we aren't intending to move, then skip to collision processing
         lda PlayerNextDirection
@@ -936,27 +961,6 @@ done_with_initial_pose:
         lda #0
         sta PlayerIdleBeats
 
-        ; If we are attempting to move but we are holding a bomb, do that instead
-        lda PlayerHeldBombIndex
-        cmp #$FF
-        beq perform_normal_movement
-perform_bomb_throw:
-        far_call FAR_throw_held_bomb
-
-        ; Here we need to set the facing direction ourselves, as the calling code
-        ; doesn't bother
-        lda PlayerNextDirection
-check_bomb_east:
-        cmp #DIRECTION_EAST
-        bne check_bomb_west
-        jsr player_face_right
-        jmp resolve_enemy_collision
-check_bomb_west:
-        cmp #DIRECTION_WEST
-        bne no_bomb_facing_change
-        jsr player_face_left
-no_bomb_facing_change:
-        jmp resolve_enemy_collision
 perform_normal_movement:
 
         lda #0
@@ -1017,19 +1021,7 @@ skip_jumping_pose:
         lda #0
         sta PlayerNextDirection
 
-        ; Detect equipment changes and update static player stats as necessary
-        ; (this needs to happen BEFORE our exit changes, to facilitate room transition logic)
-        far_call FAR_equipment_torchlight
-        lda TorchlightTotal
-        sta PlayerTorchlightRadius
-        ; If this room is darkened, apply torchlight
-        ldx PlayerRoomIndex
-        lda room_flags, x
-        and #ROOM_FLAG_DARK
-        beq no_darkness
-        lda PlayerTorchlightRadius
-        sta target_torchlight_radius
-no_darkness:
+        jsr apply_player_torchlight
 
         ; Detect exits and, if necessary, transition to the next room
         jsr detect_exit
@@ -1061,7 +1053,103 @@ no_darkness:
 .endproc
 
 .proc player_state_bomb
-        ; TODO!
+TorchlightTotal := R0
+
+PlayerSquare := R2
+
+TargetRow := R14
+TargetCol := R15
+        lda #0
+        sta PlayerTookDamageThisBeat
+        sta PlayerDamageAnimCounter
+        ; If no damage direction is set, default to a kinda random-circle-y lookin' thing.
+        sta PlayerIncomingDamageDirection
+
+        ; Every beat we'll by default be in our generic palette. We need to recover from whatever
+        ; the previous beat's effect was doing, so flag that here.
+        lda #1
+        sta ObjPaletteDirty
+
+        ; Always try to throw the bomb. Whether this does anything depends on the
+        ; bomb's internal logic; most require a directional input.
+perform_bomb_throw:
+        far_call FAR_throw_held_bomb
+
+        ; Here we need to set the facing direction ourselves, as the calling code
+        ; doesn't bother
+        lda PlayerNextDirection
+check_bomb_east:
+        cmp #DIRECTION_EAST
+        bne check_bomb_west
+        jsr player_face_right
+        jmp check_bomb_in_hand
+check_bomb_west:
+        cmp #DIRECTION_WEST
+        bne no_bomb_facing_change
+        jsr player_face_left
+no_bomb_facing_change:
+        jmp check_bomb_in_hand
+
+check_bomb_in_hand:
+        ; If we are no longer holding a bomb, clean up and return to normal behavior
+        lda PlayerHeldBombIndex
+        cmp #$FF
+        beq not_holding_bomb
+        ; Otherwise advance our animation state, in case bomb logic needs to use that
+        inc PlayerBeatsInThisState
+        jmp resolve_enemy_collision
+
+not_holding_bomb:
+        ; Where did the bomb go? Oh well, revert to normal state on the next frame
+        ; (also we are probably about to take damage)
+        lda #PLAYER_STATE_NORMAL
+        sta PlayerState
+        lda #0
+        sta PlayerBeatsInThisState
+
+resolve_enemy_collision:
+        lda PlayerRow
+        sta TargetRow
+        lda PlayerCol
+        sta TargetCol
+        near_call FAR_player_resolve_collision
+
+        ; Update the player's combo counter
+        jsr update_chain_and_combo
+
+        ; Now we may finalize the player's position and draw
+        lda TargetRow
+        sta PlayerRow
+        lda TargetCol
+        sta PlayerCol
+
+        jsr set_player_target_coordinates
+
+        ; Clear player intent for the next beat
+        lda #0
+        sta PlayerNextDirection
+
+        jsr apply_player_torchlight
+
+        ; Detect exits and, if necessary, transition to the next room
+        jsr detect_exit
+
+        ; Detect being dead and, if necessary, transition to the end screen
+        jsr detect_critical_existence_failure
+
+        ; (Notably: do not detect pausing or spellcasting. Holding a bomb overrides both!)
+
+        lda #0
+        sta PlayerIntendsToBomb
+        sta PlayerIntendsToCast
+        sta PlayerIntendsToWait
+
+        ; If necessary, cleanup dialog states through movement
+        jsr cleanup_dialog_state
+
+        ; Finally, our position is finalized, so compute the lookup table ptr for distance
+        ; (this massively improves enemy AI during pathfinding)
+        near_call FAR_compute_player_distance_lut_ptr
         rts
 .endproc
 
@@ -2118,7 +2206,14 @@ proceed_to_hoist:
         sta PlayerHeldBombIndex
         cmp #$FF
         beq all_done
-        ; If the hoist succeeded, do animation things
+
+        ; The hoist succeeded! Transition the player into the bomb holding state
+        lda #PLAYER_STATE_BOMB
+        sta PlayerState
+        lda #0
+        sta PlayerBeatsInThisState
+
+        ; Do animation things! This should later become the "lifting bomb" pose
         ; TODO: make this much fancier. For now just force us into the idle pose
         lda #0
         sta PlayerIdleBeats
