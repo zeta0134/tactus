@@ -238,7 +238,7 @@ HeartCount := R2
         sta PlayerEquipmentAccessory
         lda #ITEM_BOMB_STANDARD
         sta PlayerEquipmentBombs
-        lda #ITEM_SPELL_EARTH
+        lda #ITEM_SPELL_LIFE
         sta PlayerEquipmentSpell
 
         lda #99
@@ -1285,24 +1285,44 @@ SpellCastPtr := R0
 
 .proc cast_spell_fire
         jsr brighten_room
-        ; TODO: fancy stuffs!
+        ; Apply red emphasis to this chamber (permanently)
+        ldx PlayerRoomIndex
+        lda #(TINT_R)
+        sta room_color_emphasis, x
+        far_call FAR_apply_room_global_color_emphasis
+        ; TODO: fancy particles? animations? custom palettes? etc, etc
         rts
 .endproc
 
 .proc cast_spell_air
         jsr brighten_room
+        ; Apply yellow emphasis to this chamber (permanently)
+        ldx PlayerRoomIndex
+        lda #(TINT_R | TINT_G)
+        sta room_color_emphasis, x
+        far_call FAR_apply_room_global_color_emphasis
         ; TODO: fancy stuffs!
         rts
 .endproc
 
 .proc cast_spell_ice
         jsr brighten_room
+        ; Apply blue emphasis to this chamber (permanently)
+        ldx PlayerRoomIndex
+        lda #(TINT_B)
+        sta room_color_emphasis, x
+        far_call FAR_apply_room_global_color_emphasis
         ; TODO: fancy stuffs!
         rts
 .endproc
 
 .proc cast_spell_earth
         jsr brighten_room
+        ; Apply green emphasis to this chamber (permanently)
+        ldx PlayerRoomIndex
+        lda #(TINT_G)
+        sta room_color_emphasis, x
+        far_call FAR_apply_room_global_color_emphasis
         ; TODO: fancy stuffs!
         rts
 .endproc
@@ -1313,7 +1333,19 @@ SpellCastPtr := R0
 .endproc
 
 .proc cast_spell_life
-        ; TODO: this thing!
+        ; TODO: not this! Let's lighten the **player** instead.
+        jsr brighten_room
+
+        ; Heal ALL the health
+        lda #255
+        near_call FAR_receive_healing
+
+        ; Max ALL the temporary hearts, if missing
+        far_call FAR_give_temporary_heart
+
+        ; TODO: any other fun effects, like maybe temporary shield / invuln, etc
+        queue_sfx_pulse1 sfx_heart_container
+        queue_sfx_pulse2 sfx_heart_container
         rts
 .endproc
 

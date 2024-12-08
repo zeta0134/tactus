@@ -772,7 +772,7 @@ temporary_heart:
         .byte WEAPON_DAGGER                      ; WeaponShape (unused)
         .addr no_effect                          ; DamageFunc
         .addr no_effect                          ; TorchlightFunc
-        .addr give_temporary_heart               ; UseFunc
+        .addr FAR_give_temporary_heart           ; UseFunc
         .addr no_effect                          ; DmgReductionFunc
         .addr temporary_heart_description        ; DescriptionStringPtr
         .byte <.bank(temporary_heart_description) ; DescriptionStringBank
@@ -1266,7 +1266,7 @@ okay_to_increase:
         rts
 .endproc
 
-.proc give_temporary_heart
+.proc FAR_give_temporary_heart
 NewHeartType := R0
         ; Can the player actually hold an additional temporary heart?
         ; For this routine we intentionally restrict the player to 1

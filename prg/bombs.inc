@@ -8,6 +8,7 @@ BOMB_FLAG_ACTIVE = %10000000
     State .byte
     FuseDuration .byte ; in whole beats
     FrameCounter .byte ; in non-lag hardware frames
+    PartyCounter .byte ; in non-lag hardware frames
     MetaspriteIndex .byte
     CurrentRow .byte ; in tiles, mostly used for game logic
     CurrentCol .byte

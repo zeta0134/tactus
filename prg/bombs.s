@@ -26,6 +26,8 @@ BOMB_STATE_STANDARD_HOISTING = 1
 BOMB_STATE_STANDARD_HELD     = 2
 BOMB_STATE_STANDARD_THROWN   = 3
 BOMB_STATE_STANDARD_GROUNDED = 4
+BOMB_STATE_PARTY_INIT     = 5
+BOMB_STATE_PARTY_GROUNDED = 6
 
 ; Corresponding to player inputs
 DIRECTION_NORTH = 1
@@ -109,7 +111,10 @@ bomb_sprite_allocation_succeeded:
         lda #$FF
         rts
 standard:
-        lda #BOMB_STATE_STANDARD_INIT
+        ; What this should be
+        ;lda #BOMB_STATE_STANDARD_INIT
+        ; For great testing!
+        lda #BOMB_STATE_PARTY_INIT
         sta bomb_entities + BombState::State, x
         jmp done_picking_state
 done_picking_state:
@@ -135,6 +140,7 @@ more_bombs_remain:
         lda #0
         sta bomb_entities + BombState::FuseDuration, x
         sta bomb_entities + BombState::FrameCounter, x
+        sta bomb_entities + BombState::PartyCounter, x
         ; Initialize the bomb position to the player position
         lda PlayerRow
         sta bomb_entities + BombState::CurrentRow, x
@@ -179,6 +185,8 @@ throw_bomb_dispatch_table:
         .addr throw_standard_bomb ; BOMB_STATE_STANDARD_HELD    
         .addr do_nothing          ; BOMB_STATE_STANDARD_THROWN  
         .addr do_nothing          ; BOMB_STATE_STANDARD_GROUNDED
+        .addr do_nothing          ; BOMB_STATE_PARTY_INIT
+        .addr do_nothing          ; BOMB_STATE_PARTY_GROUNDED
 
 .proc FAR_throw_held_bomb
 DispatchPtr := R0
@@ -267,6 +275,8 @@ tick_fuse_dispatch_table:
         .addr standard_bomb_tick_fuse ; BOMB_STATE_STANDARD_HELD    
         .addr standard_bomb_tick_fuse ; BOMB_STATE_STANDARD_THROWN  
         .addr standard_bomb_tick_fuse ; BOMB_STATE_STANDARD_GROUNDED
+        .addr party_bomb_tick_fuse    ; BOMB_STATE_PARTY_INIT
+        .addr party_bomb_tick_fuse    ; BOMB_STATE_PARTY_GROUNDED
 
 .proc _bomb_trampoline
 DispatchPtr := R0
@@ -378,12 +388,67 @@ not_currently_held:
         rts
 .endproc
 
+.proc party_bomb_tick_fuse
+CurrentBombIndex := R15
+        ldx CurrentBombIndex
+        ; Always perform basic fuse management
+        inc bomb_entities + BombState::FuseDuration, x
+        lda #0
+        sta bomb_entities + BombState::FrameCounter, x
+
+        ; Cleanup: if we were held by the player, clear that
+        ; (party bombs shouldn't normally be held, but they are for
+        ; testing, so don't do dumb things)
+        lda PlayerHeldBombIndex
+        cmp CurrentBombIndex
+        bne not_currently_held
+        lda #$FF
+        sta PlayerHeldBombIndex
+not_currently_held:
+
+        ; If we've exceeded the fuse length, pretty much no matter what
+        ; actual state we're in, EXPLODE on the spot. Otherwise, we're done
+        lda bomb_entities + BombState::FuseDuration, x
+        cmp #4
+        bcs explode
+        rts
+explode:
+        ; KA-BOOM!
+        jsr _explode_3x3_here
+        ; Play a suitable explosion SFX
+        queue_sfx_pulse1_with_priority sfx_kaboom_pulse_1, #10
+        queue_sfx_pulse2_with_priority sfx_kaboom_pulse_1, #10
+        queue_sfx_noise_with_priority sfx_kaboom_noise, #10
+
+        ; Have some screen shake, etc. Not as much as a standard
+        ; bomb, since these will be happening more frequently and the
+        ; player will be reacting quite a bit
+        lda #1
+        sta ScreenShakeDepth
+        lda #8
+        sta ScreenShakeSpeed
+        sta ScreenShakeDecayCounter
+
+        ldx CurrentBombIndex
+        ; Despawn our own metasprite
+        ldy bomb_entities + BombState::MetaspriteIndex, x
+        lda #0
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
+        ; Mark ourselves as inactive
+        lda #0
+        sta bomb_entities + BombState::Flags, x
+        ; And... that should be it.
+        rts
+.endproc
+
 update_bomb_dispatch_table:
         .addr standard_bomb_update_init     ; BOMB_STATE_STANDARD_INIT    
         .addr standard_bomb_update_hoist    ; BOMB_STATE_STANDARD_HOISTING
         .addr standard_bomb_update_held     ; BOMB_STATE_STANDARD_HELD    
         .addr standard_bomb_update_thrown   ; BOMB_STATE_STANDARD_THROWN  
         .addr standard_bomb_update_grounded ; BOMB_STATE_STANDARD_GROUNDED
+        .addr standard_bomb_party_init      ; BOMB_STATE_PARTY_INIT
+        .addr standard_bomb_party_grounded  ; BOMB_STATE_PARTY_GROUNDED
 
 .proc FAR_update_active_bombs
 DispatchPtr := R0
@@ -412,13 +477,13 @@ update_loop:
         sta DispatchPtr+0
         lda update_bomb_dispatch_table+1, y
         sta DispatchPtr+1
-        jsr _bomb_trampoline
+        jsr _bomb_trampoline        
 
         ; Advance the frame counter, but don't let it exceed
-        ; 15, as our lookup tables aren't longer than this
+        ; 31, as our lookup tables aren't longer than this
         ldx CurrentBombIndex
         lda bomb_entities + BombState::FrameCounter, x
-        cmp #15
+        cmp #31
         bcs done_with_this_bomb
         inc bomb_entities + BombState::FrameCounter, x
 
@@ -443,26 +508,39 @@ done_with_this_bomb:
 ; animating something of a "lift up item" thing.
 ; make it quick, no time for fluff at faster tempos
 hoist_height_lut:
-        .byte 0, 8, 12, 16, 18, 18, 17, 16
+        .byte  0,  8, 12, 16, 18, 18, 17, 16
+        .byte 16, 16, 16, 16, 16, 16, 16, 16
+        .byte 16, 16, 16, 16, 16, 16, 16, 16
         .byte 16, 16, 16, 16, 16, 16, 16, 16
 
 ; A cute little bounce on the beat, don't overdo it
 hold_height_lut:
         .byte 14, 14, 14, 15, 15, 16, 16, 16
         .byte 16, 16, 16, 16, 16, 16, 16, 16
+        .byte 16, 16, 16, 16, 16, 16, 16, 16
+        .byte 16, 16, 16, 16, 16, 16, 16, 16
 
 ; A delightful arc. The underlying lerp is quite
 ; fast, so don't go nuts with hangtime
 toss_height_lut:
-        .byte 18, 17, 12, 7,  2
-        .byte  0,  2,  3,  1,  0,  0, 0, 0
-        .byte 0, 0, 0, 0, 0, 0, 0, 0
+        .byte 18, 17, 12, 7, 2, 0, 2, 3
+        .byte  1,  0,  0, 0, 0, 0, 0, 0
+        .byte  0,  0,  0, 0, 0, 0, 0, 0
+        .byte  0,  0,  0, 0, 0, 0, 0, 0
+
+; Fall from way up in the SKY
+; TODO: make this easing function suck less
+party_height_lut:
+        .byte 60,59,58,55,52,47,42,35
+        .byte 28,19,10, 0, 5, 9,12,14
+        .byte 15,15,14,11, 8, 4, 0, 3
+        .byte  4, 4, 3, 1, 1, 1, 0, 0
 
 fuse_tick_pal_lut:
         .byte SPRITE_ACTIVE | SPRITE_PAL_YELLOW
         .byte SPRITE_ACTIVE | SPRITE_PAL_YELLOW
         .byte SPRITE_ACTIVE | SPRITE_PAL_RED
-        .repeat 13
+        .repeat 29
         .byte SPRITE_ACTIVE | SPRITE_PAL_PURPLE
         .endrepeat
 
@@ -479,7 +557,7 @@ earth_shattering_pal_lut:
         .byte SPRITE_ACTIVE | SPRITE_PAL_YELLOW
         .byte SPRITE_ACTIVE | SPRITE_PAL_PURPLE
         .byte SPRITE_ACTIVE | SPRITE_PAL_PURPLE
-        .repeat 10
+        .repeat 20
         .byte SPRITE_ACTIVE | SPRITE_PAL_RED
         .endrepeat
 
@@ -565,6 +643,54 @@ CurrentBombIndex := R15
         lda bomb_entities + BombState::CurrentPosY+1, x
         sta sprite_table + MetaSpriteState::PositionY, y
         ; and... that's it?
+        rts
+.endproc
+
+.proc standard_bomb_party_init
+CurrentBombIndex := R15
+        ; setup sprite things!
+        ldx CurrentBombIndex
+        ldy bomb_entities + BombState::MetaspriteIndex, x
+        lda #SPRITE_TILE_BOMB_STANDARD
+        sta sprite_table + MetaSpriteState::TileIndex, y
+        lda #(SPRITE_ACTIVE | SPRITE_PAL_PURPLE)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
+        ; Switch into "hoist" mode
+        lda #BOMB_STATE_PARTY_GROUNDED
+        sta bomb_entities + BombState::State, x
+        ; And because we are hoisting already, run that state too
+        jsr standard_bomb_party_grounded
+        rts
+.endproc
+
+.proc standard_bomb_party_grounded
+CurrentBombIndex := R15
+        ; Apply our lerped position to the sprite, offset by the
+        ; thrown height table
+        ldx CurrentBombIndex
+        ldy bomb_entities + BombState::MetaspriteIndex, x
+        lda bomb_entities + BombState::CurrentPosX+1, x
+        sta sprite_table + MetaSpriteState::PositionX, y
+        lda bomb_entities + BombState::CurrentPosY+1, x
+        ldy bomb_entities + BombState::PartyCounter, x
+        sec
+        sbc party_height_lut, y
+        bcc off_top_of_screen
+        jmp converge
+off_top_of_screen:
+        lda #$F8
+converge:
+        ldy bomb_entities + BombState::MetaspriteIndex, x
+        sta sprite_table + MetaSpriteState::PositionY, y
+        ; update the party counter separately
+        lda bomb_entities + BombState::PartyCounter, x
+        clc
+        adc #1
+        cmp #31
+        bcs done
+        sta bomb_entities + BombState::PartyCounter, x
+        ; and... that's it?
+done:
         rts
 .endproc
 
