@@ -1258,10 +1258,12 @@ resolve_enemy_collision:
         jsr _spellcasting_trampoline
 not_safe_to_dispatch:
         ; Finally, the spell is used up! Remove it from our hands
-
-        ; DEBUG: no, let the player cast it repeatedly for easier testing
-        ;lda #ITEM_NONE
-        ;sta PlayerEquipmentSpell
+.if ::DEBUG_GOD_MODE
+        ; Nope! Keep the spell so we can easily re-cast it
+.else
+        lda #ITEM_NONE
+        sta PlayerEquipmentSpell
+.endif
 
         rts
 .endproc

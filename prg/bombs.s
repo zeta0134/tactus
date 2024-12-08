@@ -112,13 +112,16 @@ bomb_sprite_allocation_succeeded:
         rts
 standard:
         ; What this should be
-        ;lda #BOMB_STATE_STANDARD_INIT
+        lda #BOMB_STATE_STANDARD_INIT
         ; For great testing!
-        lda #BOMB_STATE_PARTY_INIT
+        ;lda #BOMB_STATE_PARTY_INIT
         sta bomb_entities + BombState::State, x
         jmp done_picking_state
 done_picking_state:
 
+.if ::DEBUG_GOD_MODE
+        ; Do not decrement the bomb counter! Infinite bombs for testing, yes yes
+.else
         ; At this point the bomb *definitely* succeeded in spawning.
         ; Hoist the bomb! Decrement the counter and initialize all the things
         dec PlayerBombCount
@@ -128,6 +131,7 @@ done_picking_state:
         lda #ITEM_NONE
         sta PlayerEquipmentBombs
 more_bombs_remain:
+.endif
 
         ; Now we may initialize the rest of the bomb state
         lda #BOMB_FLAG_ACTIVE

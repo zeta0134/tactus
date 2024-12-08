@@ -16,7 +16,7 @@
 .zeropage
 current_sprite_ptr: .res 2
 
-.segment "RAM"
+.segment "PRGRAM"
 sprite_table:
         .repeat MAX_METASPRITES
         .tag MetaSpriteState

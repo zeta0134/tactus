@@ -9,7 +9,7 @@
 .global FAR_update_room_state
 
 .global room_layouts, room_flags, room_floorplan, room_properties, room_bank, room_ptr_high, room_ptr_low
-.global room_raster_effect, room_color_emphasis
+.global room_raster_effect, room_color_emphasis, room_base_beat_logic, room_spell_beat_logic, room_spell_update_logic
 .global first_beat_after_load, enemies_active
 
 ; layouts
@@ -76,3 +76,8 @@ DETAIL_GRASS_WALL_LOWER_BORDER = 12
 DETAIL_GRASS_WALL              = 14
 DETAIL_GRASS_WALL_UPPER_BORDER = 16
 DETAIL_GRASS_WALL_HORIZ_STRIP  = 18
+
+ROOM_LOGIC_NORMAL = 0
+
+SPELL_LOGIC_NONE = 0
+SPELL_LOGIC_BOMB_FIESTA = 1

@@ -44,6 +44,10 @@ room_population_order: .res ::FLOOR_SIZE
 room_color_emphasis: .res ::FLOOR_SIZE
 room_raster_effect: .res ::FLOOR_SIZE
 
+room_base_beat_logic: .res  ::FLOOR_SIZE
+room_spell_beat_logic: .res  ::FLOOR_SIZE
+room_spell_data0: .res  ::FLOOR_SIZE
+
 enemies_active: .res 1
 first_beat_after_load: .res 1
 chest_spawn_cooldown: .res 1
@@ -1136,6 +1140,10 @@ room_setup_loop:
         perform_zpcm_inc
         lda #0
         sta room_flags, x
+        lda #ROOM_LOGIC_NORMAL
+        sta room_base_beat_logic, x
+        lda #SPELL_LOGIC_NONE
+        sta room_spell_beat_logic, x
         inx
         cpx #::FLOOR_SIZE
         bne room_setup_loop
@@ -1621,12 +1629,19 @@ done_with_torchlight:
         rts
 .endproc
 
+; Yes it is very silly to have just one entry here, but we'll get around to
+; expanding this when bosses need update functions.
+room_state_dispatch_lut:
+        .word room_clear_and_chest_spawn
+
+spell_state_dispatch_lut:
+        .word spells_do_nothing
+        .word spell_effect_bomb_fiesta
+
 ; Called during gameplay, not during generation. Handles ongoing room flag
 ; state, and checks for any entities that need to spawn post-generation
 .proc FAR_update_room_state
-EntityId := R1
-EntityPattern := R2
-EntityAttribute := R3
+DispatchPtr := R0
         perform_zpcm_inc
         ; safety: if we are currently paused, don't process any of this
         lda PlayerIsPaused
@@ -1634,6 +1649,40 @@ EntityAttribute := R3
         rts
 not_paused:
 
+        ; First the room's basic logic
+        ldx PlayerRoomIndex
+        lda room_base_beat_logic, x
+        asl
+        tax
+        lda room_state_dispatch_lut+0, x
+        sta DispatchPtr+0
+        lda room_state_dispatch_lut+1, x
+        sta DispatchPtr+1
+        jsr _room_state_trampoline
+
+        ; Now any additional logic for spells, if applicable
+        ldx PlayerRoomIndex
+        lda room_spell_beat_logic, x
+        asl
+        tax
+        lda spell_state_dispatch_lut+0, x
+        sta DispatchPtr+0
+        lda spell_state_dispatch_lut+1, x
+        sta DispatchPtr+1
+        jsr _room_state_trampoline
+
+        rts
+.endproc
+
+.proc _room_state_trampoline
+DispatchPtr := R0
+        jmp (DispatchPtr)
+.endproc
+
+.proc room_clear_and_chest_spawn
+EntityId := R1
+EntityPattern := R2
+EntityAttribute := R3
         ; sanity: if this room is freshly loaded, don't do any of this. the enemies
         ; haven't had a real processing round yet, and we are operating on incomplete
         ; information (possibly stale from the previous room)
@@ -1725,6 +1774,15 @@ init_room_not_clear:
 init_room_clear:
         lda #1
         sta current_clear_status
+        rts
+.endproc
+
+.proc spells_do_nothing
+        rts
+.endproc
+
+.proc spell_effect_bomb_fiesta
+        ; TODO!
         rts
 .endproc
 
