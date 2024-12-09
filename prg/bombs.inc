@@ -4,7 +4,6 @@ BOMB_FLAG_ACTIVE = %10000000
 
 .struct BombState
     Flags .byte
-    Type .byte
     State .byte
     FuseDuration .byte ; in whole beats
     FrameCounter .byte ; in non-lag hardware frames
@@ -23,3 +22,4 @@ BOMB_FLAG_ACTIVE = %10000000
 .global FAR_throw_held_bomb
 .global FAR_tick_bomb_fuses
 .global FAR_update_active_bombs
+.global FAR_spawn_party_bomb

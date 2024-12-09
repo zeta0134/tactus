@@ -238,7 +238,7 @@ HeartCount := R2
         sta PlayerEquipmentAccessory
         lda #ITEM_BOMB_STANDARD
         sta PlayerEquipmentBombs
-        lda #ITEM_SPELL_LIFE
+        lda #ITEM_SPELL_BOMB
         sta PlayerEquipmentSpell
 
         lda #99
@@ -1330,7 +1330,23 @@ SpellCastPtr := R0
 .endproc
 
 .proc cast_spell_bomb_fiesta
-        ; TODO: whatever this needs!
+        ; Set the room into fiesta mode
+        ldx PlayerRoomIndex
+        lda #SPELL_LOGIC_BOMB_FIESTA
+        sta room_spell_beat_logic, x
+        ; Initialize that beat timer to 0, so the spell starts at the beginning
+        lda #0
+        sta room_spell_data0, x
+        ; I kindof want an earthquakey warning rumble before the party starts
+        queue_sfx_noise sfx_low_noise
+        ; Earthquakes come with screen shake
+        lda #1
+        sta ScreenShakeDepth
+        lda #64
+        sta ScreenShakeSpeed
+        sta ScreenShakeDecayCounter
+        ; TODO: any other initial effects? most of the flashy stuff is part of
+        ; the beat update logic, so maybe not
         rts
 .endproc
 

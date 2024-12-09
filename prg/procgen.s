@@ -6,12 +6,14 @@
 
         .include "battlefield.inc"
         .include "chr.inc"
+        .include "bombs.inc"
         .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
         .include "floor_preservation.inc"
         .include "hud.inc"
         .include "items.inc"
+        .include "kernel.inc"
         .include "levels.inc"
         .include "loot.inc"
         .include "nes.inc"
@@ -21,6 +23,7 @@
         .include "prng.inc"
         .include "procgen.inc"
         .include "rainbow.inc"
+        .include "sound.inc"
         .include "torchlight.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
@@ -1781,8 +1784,88 @@ init_room_clear:
         rts
 .endproc
 
+bomb_fiesta_dispatch_lut:
+        .word bf_continue_earthquake
+        .word bf_continue_earthquake
+        .word bf_toot_party_horn
+        .repeat 16
+        .word bf_spawn_party_bomb
+        .endrepeat
+        .word bf_end
+
 .proc spell_effect_bomb_fiesta
-        ; TODO!
+DispatchPtr := R0
+        ldx PlayerRoomIndex
+        lda room_spell_data0, x
+        asl
+        tax
+        lda bomb_fiesta_dispatch_lut+0, x
+        sta DispatchPtr+0
+        lda bomb_fiesta_dispatch_lut+1, x
+        sta DispatchPtr+1
+        jmp (DispatchPtr)
+        rts
+.endproc
+
+.proc bf_continue_earthquake
+        ; Both the earthquake sfx and the screen shake will terminate prematurely
+        ; in PATIENT mode, and we need to restart them on the following beat to signal
+        ; to the player that their spell effect is still ongoing, but the party
+        ; hasn't started yet
+        queue_sfx_noise sfx_low_noise
+        lda #1
+        sta ScreenShakeDepth
+        lda #64
+        sta ScreenShakeSpeed
+        sta ScreenShakeDecayCounter
+        ; On the next beat however...
+        ldx PlayerRoomIndex
+        inc room_spell_data0, x
+        rts
+.endproc
+
+.proc bf_toot_party_horn
+        ; If any screen shake is still ongoing, kill that
+        lda #0
+        sta ScreenShakeDepth
+        ; Brighten the screen at this point, like we do when other spell effects apply
+        lda #8
+        sta Brightness
+        lda #4
+        sta TargetBrightness
+        lda #1
+        sta BgPaletteDirty
+        sta ObjPaletteDirty
+        ; Signal the oncoming, unavoidable approach of JOYOUS EXCITEMENT
+        queue_sfx_pulse1 sfx_party_pulse1
+        queue_sfx_pulse2 sfx_party_pulse2
+        queue_sfx_noise sfx_kaboom_noise
+        ; Onward to the party!
+        ldx PlayerRoomIndex
+        inc room_spell_data0, x
+        rts
+.endproc
+
+.proc bf_spawn_party_bomb
+        ; Run the party bomb spawning logic! This can fail, although it
+        ; really shouldn't... but if it does, we can postpone the party
+        ; for one beat.
+        far_call FAR_spawn_party_bomb
+        cmp #$FF
+        beq there_was_supposed_to_be_an_earth_shattering_kaboom
+        ldx PlayerRoomIndex
+        inc room_spell_data0, x
+there_was_supposed_to_be_an_earth_shattering_kaboom:
+        rts
+.endproc
+
+.proc bf_end
+        ; Show's over folks, nothing to see here
+        ldx PlayerRoomIndex
+        lda #SPELL_LOGIC_NONE
+        sta room_spell_beat_logic, x
+        lda #0
+        sta room_spell_data0, x
         rts
 .endproc
 

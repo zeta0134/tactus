@@ -416,7 +416,7 @@ done_picking_sfx_bank:
         sta TriangleRowCounter
         inc16 TriangleSfxPtr
         lda #0
-        sta Pulse2DelayCounter
+        sta TriangleDelayCounter
         lda #2
         far_call bhop_mute_channel
         restore_previous_bank
@@ -457,7 +457,7 @@ done_picking_sfx_bank:
         sta NoiseRowCounter
         inc16 NoiseSfxPtr
         lda #0
-        sta Pulse2DelayCounter
+        sta NoiseDelayCounter
         lda #3
         far_call bhop_mute_channel
         restore_previous_bank

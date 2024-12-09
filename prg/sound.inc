@@ -58,6 +58,12 @@
 
 .global sfx_cast_pulse
 
+.global sfx_party_pulse1
+.global sfx_party_pulse2
+.global sfx_cartoony_fall_tri
+
+.global sfx_low_noise
+
 .global CandidateSfxPtr
 .global CandidateSfxPriority
 

@@ -11,6 +11,7 @@
         .include "kernel.inc"
         .include "nes.inc"
         .include "player.inc"
+        .include "prng.inc"
         .include "rainbow.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -39,6 +40,9 @@ DIRECTION_WEST  = 4
 
 bomb_entities: .res ::MAX_ACTIVE_BOMBS * .sizeof(BombState)
 
+LastPartyBombCol: .res 1
+LastPartyBombRow: .res 1
+
         .segment "ENEMY_BOMB_SPELL"
 
 .proc FAR_init_bomb_state
@@ -46,6 +50,8 @@ bomb_entities: .res ::MAX_ACTIVE_BOMBS * .sizeof(BombState)
         .repeat ::MAX_ACTIVE_BOMBS, i
         sta bomb_entities + BombState::Flags + (i * .sizeof(BombState))
         .endrepeat
+        sta LastPartyBombCol
+        sta LastPartyBombRow
         rts
 .endproc
 
@@ -136,8 +142,6 @@ more_bombs_remain:
         ; Now we may initialize the rest of the bomb state
         lda #BOMB_FLAG_ACTIVE
         sta bomb_entities + BombState::Flags, x
-        lda PlayerEquipmentBombs
-        sta bomb_entities + BombState::Type, x
 
         lda MetaSpriteIndex
         sta bomb_entities + BombState::MetaspriteIndex, x
@@ -170,6 +174,168 @@ more_bombs_remain:
 
         ; We're hoisting a bomb (successfully) so play an appropriate SFX
         queue_sfx_pulse1 sfx_hoist_pulse
+
+        ; and... in theory that's it? ah, but we need to return the index
+        lda NewBombIndex
+        rts
+.endproc
+
+; 32 entries, slightly disfavoring the map edges
+party_bomb_x_lut:
+        .byte 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+        .byte 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13
+        .byte       4, 5, 6, 7, 8, 9, 10, 11
+party_bomb_y_lut:
+        .byte 2, 3, 4, 5, 6, 7, 8
+        .byte 2, 3, 4, 5, 6, 7, 8
+        .byte 2, 3, 4, 5, 6, 7, 8
+        .byte 2, 3, 4, 5, 6, 7, 8
+        .byte       4, 5, 6, 7
+
+.proc FAR_spawn_party_bomb
+MetaSpriteIndex := R0
+TempCol := R1
+TempRow := R2
+WallAttempts := R3
+OverlapAttempts := R4
+NewBombIndex := R8
+        ; Game logic is passed, try to spawn a bomb entity
+        jsr _find_first_inactive_bomb_slot
+        cpx #$FF
+        bne bomb_entity_spawning_success
+        ; We are out of active bomb slots! Cancel the hoist input
+        lda #$FF
+        rts
+bomb_entity_spawning_success:
+        stx NewBombIndex
+
+        ; Before we activate this entity, try to spawn a metasprite
+        ; (which may also fail in extremely busy situations)
+        far_call FAR_find_unused_sprite
+        ldx MetaSpriteIndex
+        cpx #$FF
+        bne bomb_sprite_allocation_succeeded
+        ; We are out of metasprites! We can't have a bomb without one,
+        ; so react by canceling the hoist. Hopefully this should be a quite
+        ; uncommon occurrence, but it may happen in semi-rare circumstances
+        ; when many enemies are defeated on a single turn.
+        lda #$FF
+        rts
+bomb_sprite_allocation_succeeded:
+        ldx NewBombIndex
+        
+        lda #BOMB_STATE_PARTY_INIT
+        sta bomb_entities + BombState::State, x
+        jmp done_picking_state
+done_picking_state:
+
+        ; Generate a spawn location for the party. This two notable
+        ; constraints:
+        ;   - It should be within the bounds of the map, so the bomb
+        ;       lands where its 3x3 blast radius can potentially hit
+        ;       all 9 targets
+        ;   - The bomb should try not to drop itself into a wall tile
+        ; We can't stall here forever, so after a few attempts we'll
+        ; drop the wall requirement, and after a few more attempts we'll
+        ; accept whatever we rolled.
+        lda #8
+        sta WallAttempts
+        lda #16
+        sta OverlapAttempts
+bomb_positioning_loop:
+        prng_from_table_y
+        and #$1F
+        tay
+        lda party_bomb_x_lut, y
+        sta TempCol
+        prng_from_table_y
+        and #$1F
+        tay
+        lda party_bomb_y_lut, y
+        sta TempRow
+        ; First check to see if this is inside a wall tile
+        lda WallAttempts
+        beq wall_check_passed
+        ldx TempRow
+        lda tile_index_to_row_lut, x
+        clc
+        adc TempCol
+        tax
+        lda battlefield, x
+        cmp #TILE_WALL
+        bne wall_check_passed
+        dec WallAttempts
+        jmp bomb_positioning_loop
+wall_check_passed:
+        ; Next check to see if we are overlapping the 3x3 blast radius
+        ; of the party bomb we spawned previously
+        lda OverlapAttempts
+        beq overlap_check_passed
+
+        lda TempRow
+        sec
+        sbc LastPartyBombRow
+        beq overlap_check_failed ; exact match
+        cmp #1
+        beq overlap_check_failed ; +1
+        cmp #$FF
+        beq overlap_check_failed ; -1
+
+        lda TempCol
+        sec
+        sbc LastPartyBombCol
+        beq overlap_check_failed ; exact match
+        cmp #1
+        beq overlap_check_failed ; +1
+        cmp #$FF
+        beq overlap_check_failed ; -1
+        jmp overlap_check_passed
+overlap_check_failed:
+        dec OverlapAttempts
+        jmp bomb_positioning_loop
+overlap_check_passed:
+        ; At this point we'll keep this bomb, so write its position out
+        ; for the next check, and also into our struct for spawning
+        ldx NewBombIndex
+        lda TempRow
+        sta LastPartyBombRow
+        sta bomb_entities + BombState::CurrentRow, x
+        lda TempCol
+        sta LastPartyBombCol
+        sta bomb_entities + BombState::CurrentCol, x
+
+        ; And from here, proceed to spawn the bomb the same way as a hoist,
+        ; minus the player holding business
+        lda #BOMB_FLAG_ACTIVE
+        sta bomb_entities + BombState::Flags, x
+
+        lda MetaSpriteIndex
+        sta bomb_entities + BombState::MetaspriteIndex, x
+        lda #0
+        sta bomb_entities + BombState::FuseDuration, x
+        sta bomb_entities + BombState::FrameCounter, x
+        sta bomb_entities + BombState::PartyCounter, x
+        ; Initialize the bomb position to our chosen position
+        jsr _set_bomb_target_coordinates
+        jsr _snap_to_target_position
+        ; Now, our update routine will draw the sprite properly later,
+        ; but we at least need to mark it as "active" so the metasprite
+        ; isn't reclaimed for something else before that runs. do that here,
+        ; and set it offscreen.
+        ldx MetaSpriteIndex
+        lda #(SPRITE_ACTIVE)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+        lda #0 ; irrelevant
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda #$FF ; intentionally offscreen
+        sta sprite_table + MetaSpriteState::PositionY, x
+        lda #<SPRITE_TILE_PLAYER
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+        ; Party bombs should play a cartoony "long fall" SFX
+        queue_sfx_triangle sfx_cartoony_fall_tri
 
         ; and... in theory that's it? ah, but we need to return the index
         lda NewBombIndex

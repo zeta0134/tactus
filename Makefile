@@ -65,6 +65,9 @@ debugzpcm: dir $(ROM_NAME)
 profile: dir $(ROM_NAME)
 	vendor/Mesen $(ROM_NAME) debug_profile.lua
 
+memory: dir $(ROM_NAME)
+	ruby vendor/linker_map_reader.rb build/map.txt
+
 debugfpga: dir $(ROM_NAME)
 	vendor/Mesen $(ROM_NAME) debug_fpgaram_writes.lua
 
