@@ -159,7 +159,7 @@ room20_tile_patterns: .res ::BATTLEFIELD_SIZE
 room20_tile_attributes: .res ::BATTLEFIELD_SIZE
 room20_tile_detail: .res ::BATTLEFIELD_SIZE
 
-    .segment "PRGRAM"
+    .segment "LEVEL_RAM_3"
 
 room21_battlefield: .res ::BATTLEFIELD_SIZE
 room21_tile_data: .res ::BATTLEFIELD_SIZE
@@ -303,6 +303,14 @@ PreservedTilePatternsPtr := R8
 PreservedTileAttributesPtr := R10
 PreservedTileDetailPtr := R12
     perform_zpcm_inc
+
+    ; Some of the level data is preserved to bank #1 of FPGA RAM,
+    ; which isn't automatically banked in down below. This is the only
+    ; place where we'll use this, so switch to it here and switch
+    ; back when we're done
+    lda #1
+    sta MAP_PRG_5
+
     ldx RoomIndex
     jsr setup_preservation_pointers
     ldx RoomIndex
@@ -328,6 +336,11 @@ loop:
     iny
     cpy #BATTLEFIELD_SIZE
     bne loop
+
+    ; Put the nametable memory back in FPGA RAM
+    lda #0
+    sta MAP_PRG_5
+
     perform_zpcm_inc
 
     restore_previous_bank
@@ -346,6 +359,14 @@ PreservedTilePatternsPtr := R8
 PreservedTileAttributesPtr := R10
 PreservedTileDetailPtr := R12
     perform_zpcm_inc
+
+    ; Some of the level data is preserved to bank #1 of FPGA RAM,
+    ; which isn't automatically banked in down below. This is the only
+    ; place where we'll use this, so switch to it here and switch
+    ; back when we're done
+    lda #1
+    sta MAP_PRG_5
+
     ldx RoomIndex
     jsr setup_preservation_pointers
     ldx RoomIndex
@@ -371,8 +392,12 @@ loop:
     iny
     cpy #BATTLEFIELD_SIZE
     bne loop
+
+    ; Put the nametable memory back in FPGA RAM
+    lda #0
+    sta MAP_PRG_5
+
     perform_zpcm_inc
-    
     restore_previous_bank
     rts
 .endproc
