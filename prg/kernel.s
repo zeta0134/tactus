@@ -23,6 +23,7 @@
         .include "nes.inc"
         .include "palette.inc"
         .include "palette_cycler.inc"
+        .include "particles.inc"
         .include "player.inc"
         .include "player_distance.inc"
         .include "prng.inc"
@@ -469,6 +470,9 @@ LayoutPtr := R0
 .proc zone_init
         perform_zpcm_inc
 
+        ; Clear out any gameplay state that will look odd over the zone transition
+        .global FAR_init_particles
+
         ; Generate proper mazes and randomize player, exit, and boss
         far_call FAR_init_floor
         far_call FAR_generate_rooms_for_floor
@@ -769,6 +773,7 @@ continue_waiting:
 
         far_call FAR_update_coins
         far_call FAR_update_indicators
+        far_call FAR_draw_particles
 
         perform_zpcm_inc
         far_call FAR_update_brightness
@@ -1403,6 +1408,7 @@ continue_waiting:
 
         far_call FAR_update_coins
         far_call FAR_update_indicators
+        far_call FAR_draw_particles
 
         perform_zpcm_inc
         far_call FAR_update_brightness

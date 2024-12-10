@@ -119,8 +119,11 @@ done:
         sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (0 + (3 * 4))) + SelfModifiedSprite::PosY ; 48
         sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (0 + (3 * 4))) + SelfModifiedSprite::PosY ; 49
 
-        ; HUD
-
+        ; PARTICLES
+        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (2 + (3 * 4))) + SelfModifiedSprite::PosY ; 56
+        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (2 + (3 * 4))) + SelfModifiedSprite::PosY ; 57
+        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (2 + (3 * 4))) + SelfModifiedSprite::PosY ; 58
+        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (2 + (3 * 4))) + SelfModifiedSprite::PosY ; 59
         sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (3 + (3 * 4))) + SelfModifiedSprite::PosY ; 60
         sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (3 + (3 * 4))) + SelfModifiedSprite::PosY ; 61
         sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (3 + (3 * 4))) + SelfModifiedSprite::PosY ; 62
@@ -132,17 +135,14 @@ done:
 .proc FAR_disable_all_oam_entries_hud
         lda #$F8
         perform_zpcm_inc
-        ; PLAYFIELD
+        ; BANNER
         sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (0 + (3 * 4))) + SelfModifiedSprite::PosY ; 50
         sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (0 + (3 * 4))) + SelfModifiedSprite::PosY ; 51
         sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (1 + (3 * 4))) + SelfModifiedSprite::PosY ; 52
         sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (1 + (3 * 4))) + SelfModifiedSprite::PosY ; 53
+        ; BOMB INDICATOR
         sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (1 + (3 * 4))) + SelfModifiedSprite::PosY ; 54
         sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (1 + (3 * 4))) + SelfModifiedSprite::PosY ; 55
-        sta SPRITE_TRANSFER_BASE + (20 * 0) + (83 * (2 + (3 * 4))) + SelfModifiedSprite::PosY ; 56
-        sta SPRITE_TRANSFER_BASE + (20 * 1) + (83 * (2 + (3 * 4))) + SelfModifiedSprite::PosY ; 57
-        sta SPRITE_TRANSFER_BASE + (20 * 2) + (83 * (2 + (3 * 4))) + SelfModifiedSprite::PosY ; 58
-        sta SPRITE_TRANSFER_BASE + (20 * 3) + (83 * (2 + (3 * 4))) + SelfModifiedSprite::PosY ; 59
         ; FREE PARKING
         perform_zpcm_inc
         rts
