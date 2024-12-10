@@ -32,7 +32,7 @@
 .zeropage
 BigFloorPtr: .res 2
 
-.segment "RAM"
+.segment "PRGRAM"
 
 BigFloorBank: .res 1
 

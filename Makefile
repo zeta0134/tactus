@@ -48,9 +48,11 @@ cleancode:
 	-@rm -f $(DBG_NAME)
 
 run: dir $(ROM_NAME)
+	bash -c "ruby vendor/linker_map_reader.rb build/map.txt | grep -E 'RAM|ZEROPAGE'"
 	rustico-sdl $(ROM_NAME)
 
 mesen: dir $(ROM_NAME)
+	bash -c "ruby vendor/linker_map_reader.rb build/map.txt | grep -E 'RAM|ZEROPAGE'"
 	vendor/Mesen $(ROM_NAME)
 
 beta: dir $(ROM_NAME)
