@@ -1330,13 +1330,18 @@ SpellCastPtr := R0
 .endproc
 
 .proc cast_spell_bomb_fiesta
+bomb_fiesta_state := room_spell_data0
+previous_room_effect := room_spell_data1
+
         ; Set the room into fiesta mode
         ldx PlayerRoomIndex
+        lda room_spell_beat_logic, x
+        sta previous_room_effect, x
         lda #SPELL_LOGIC_BOMB_FIESTA
         sta room_spell_beat_logic, x
         ; Initialize that beat timer to 0, so the spell starts at the beginning
         lda #0
-        sta room_spell_data0, x
+        sta bomb_fiesta_state, x
         ; I kindof want an earthquakey warning rumble before the party starts
         queue_sfx_noise sfx_low_noise
         ; Earthquakes come with screen shake

@@ -1408,6 +1408,7 @@ continue_waiting:
 
         far_call FAR_update_coins
         far_call FAR_update_indicators
+        far_call FAR_update_room_effects
         far_call FAR_draw_particles
 
         perform_zpcm_inc

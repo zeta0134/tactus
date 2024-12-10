@@ -21,7 +21,54 @@ NextParticleIndex: .res 1
         .segment "DATA_PARTICLES"
 particle_data_segment:
 
-; TODO!
+        ; A coin which simply rises into the air over 30 frames
+a_test_particle:
+        .byte 30, (PARTICLE_ACTIVE | PARTICLE_FLICKER)
+        .repeat 30, i
+        .byte 0, <-i, SPRITE_TILE_LOOT_01, SPRITE_PAL_YELLOW
+        .endrepeat
+
+        .segment "PRGFIXED_E000"
+
+; Called immediately after writing new particle data
+; into the active index, sets up some initial state
+; and advances the index
+; Input: Y = particle index to initialize
+.proc init_particle
+ParticlePtr := R0 ; TODO: not clobber R0 maybe?
+        ; Read and initialize this particle's lifetime
+        access_data_bank #<.bank(particle_data_segment)
+        ; X is already our particle index at this point, so reuse that
+        lda particles + ParticleState::DataPtr+0, x
+        sta ParticlePtr+0
+        lda particles + ParticleState::DataPtr+1, x
+        sta ParticlePtr+1
+        ldy #0
+        lda (ParticlePtr), y
+        sta particles + ParticleState::Lifetime, x
+        ldy #1
+        lda (ParticlePtr), y
+        sta particles + ParticleState::Behavior, x ; sets behavior flags, mostly flicker, by particle type
+advance_data_pointer:
+        clc
+        lda particles + ParticleState::DataPtr+0, x
+        adc #2
+        sta particles + ParticleState::DataPtr+0, x
+        lda particles + ParticleState::DataPtr+1, x
+        adc #0
+        sta particles + ParticleState::DataPtr+1, x
+        restore_previous_bank
+advance_particle_index:
+        clc
+        lda NextParticleIndex
+        adc #.sizeof(ParticleState)
+        cmp #(::MAX_ACTIVE_PARTICLES * .sizeof(ParticleState))
+        bne no_wraparound
+        lda #0
+no_wraparound:
+        sta NextParticleIndex
+        rts
+.endproc
 
         .segment "CODE_PARTICLES"
 

@@ -18,6 +18,7 @@
         .include "loot.inc"
         .include "nes.inc"
         .include "palette.inc"
+        .include "particles.inc"
         .include "player.inc"
         .include "ppu.inc"
         .include "prng.inc"
@@ -50,6 +51,7 @@ room_raster_effect: .res ::FLOOR_SIZE
 room_base_beat_logic: .res  ::FLOOR_SIZE
 room_spell_beat_logic: .res  ::FLOOR_SIZE
 room_spell_data0: .res  ::FLOOR_SIZE
+room_spell_data1: .res  ::FLOOR_SIZE
 
 enemies_active: .res 1
 first_beat_after_load: .res 1
@@ -63,6 +65,11 @@ floors_rerolled: .res 2
 
 RoomIndexToGenerate: .res 1
 LoadedRoomIndex: .res 1
+
+; Shared, as there should generally only be
+; one spell effective active at a time, and particles themselves
+; don't reset between rooms
+SpellParticleSpawnCooldown: .res 1
 
         ; should match levels_structures.s! it relies on several of our functions,
         ; and the far-call overhead for those functions is significant
@@ -1641,6 +1648,10 @@ spell_state_dispatch_lut:
         .word spells_do_nothing
         .word spell_effect_bomb_fiesta
 
+spell_fx_dispatch_lut:
+        .word bf_spawn_confetti_particles
+        .word bf_spawn_confetti_particles
+
 ; Called during gameplay, not during generation. Handles ongoing room flag
 ; state, and checks for any entities that need to spawn post-generation
 .proc FAR_update_room_state
@@ -1674,6 +1685,29 @@ not_paused:
         sta DispatchPtr+1
         jsr _room_state_trampoline
 
+        rts
+.endproc
+
+; Called every frame!
+.proc FAR_update_room_effects
+DispatchPtr := R0
+        perform_zpcm_inc
+        ; safety: if we are currently paused, don't process any of this
+        lda PlayerIsPaused
+        beq not_paused
+        rts
+not_paused:
+        ldx PlayerRoomIndex
+        lda room_spell_beat_logic, x
+        ;beq done ; speed optimization once regular rooms don't have any fx
+        asl
+        tax
+        lda spell_fx_dispatch_lut+0, x
+        sta DispatchPtr+0
+        lda spell_fx_dispatch_lut+1, x
+        sta DispatchPtr+1
+        jsr _room_state_trampoline
+done:
         rts
 .endproc
 
@@ -1795,8 +1829,12 @@ bomb_fiesta_dispatch_lut:
 
 .proc spell_effect_bomb_fiesta
 DispatchPtr := R0
+
+bomb_fiesta_state := room_spell_data0
+previous_room_effect := room_spell_data1
+
         ldx PlayerRoomIndex
-        lda room_spell_data0, x
+        lda bomb_fiesta_state, x
         asl
         tax
         lda bomb_fiesta_dispatch_lut+0, x
@@ -1808,6 +1846,8 @@ DispatchPtr := R0
 .endproc
 
 .proc bf_continue_earthquake
+bomb_fiesta_state := room_spell_data0
+previous_room_effect := room_spell_data1
         ; Both the earthquake sfx and the screen shake will terminate prematurely
         ; in PATIENT mode, and we need to restart them on the following beat to signal
         ; to the player that their spell effect is still ongoing, but the party
@@ -1820,11 +1860,13 @@ DispatchPtr := R0
         sta ScreenShakeDecayCounter
         ; On the next beat however...
         ldx PlayerRoomIndex
-        inc room_spell_data0, x
+        inc bomb_fiesta_state, x
         rts
 .endproc
 
 .proc bf_toot_party_horn
+bomb_fiesta_state := room_spell_data0
+previous_room_effect := room_spell_data1
         ; If any screen shake is still ongoing, kill that
         lda #0
         sta ScreenShakeDepth
@@ -1842,11 +1884,13 @@ DispatchPtr := R0
         queue_sfx_noise sfx_kaboom_noise
         ; Onward to the party!
         ldx PlayerRoomIndex
-        inc room_spell_data0, x
+        inc bomb_fiesta_state, x
         rts
 .endproc
 
 .proc bf_spawn_party_bomb
+bomb_fiesta_state := room_spell_data0
+previous_room_effect := room_spell_data1
         ; Run the party bomb spawning logic! This can fail, although it
         ; really shouldn't... but if it does, we can postpone the party
         ; for one beat.
@@ -1854,18 +1898,39 @@ DispatchPtr := R0
         cmp #$FF
         beq there_was_supposed_to_be_an_earth_shattering_kaboom
         ldx PlayerRoomIndex
-        inc room_spell_data0, x
+        inc bomb_fiesta_state, x
 there_was_supposed_to_be_an_earth_shattering_kaboom:
         rts
 .endproc
 
 .proc bf_end
+bomb_fiesta_state := room_spell_data0
+previous_room_effect := room_spell_data1
         ; Show's over folks, nothing to see here
         ldx PlayerRoomIndex
-        lda #SPELL_LOGIC_NONE
+        lda previous_room_effect, x
         sta room_spell_beat_logic, x
         lda #0
-        sta room_spell_data0, x
+        sta bomb_fiesta_state, x
+        rts
+.endproc
+
+.proc bf_spawn_confetti_particles
+PosX := R0
+PosY := R1
+        lda SpellParticleSpawnCooldown
+        beq proceed_to_spawn
+        dec SpellParticleSpawnCooldown
+        rts
+proceed_to_spawn:
+        lda #1
+        sta SpellParticleSpawnCooldown
+        prng_from_table_x
+        sta PosX
+        ; everything after this point is debug testing mode, etc
+        lda #160
+        sta PosY
+        spawn_particle #a_test_particle, PosX, PosY
         rts
 .endproc
 
