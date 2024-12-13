@@ -1488,6 +1488,7 @@ cleared_gameplay:
         ; static elements (like flickering torchlight, dancing flowers, etc)
         ldx TrackedMusicPos
         lda tracked_animation_frame, x
+        ora #$04
         sta PlayfieldBgHighBank
         ; the sprite layer meanwhile continues to follow the player
         ldx TrackedGameplayPos
@@ -1499,13 +1500,14 @@ normal_gameplay:
         ; remain in perfect sync, even if the player's inputs are a little late
         ldx TrackedGameplayPos
         lda tracked_animation_frame, x
-        sta PlayfieldBgHighBank
         sta PlayfieldObjHighBank
+        ora #$04
+        sta PlayfieldBgHighBank
         rts
 paused_gameplay:
         ; During a pause state, the sprite layer continues to update (so the player's idle animaton works)
         ; but the background layer is permanently frozen on frame 0, freezing enemies in place
-        lda #0
+        lda #$04
         sta PlayfieldBgHighBank
         ldx TrackedMusicPos
         lda tracked_animation_frame, x

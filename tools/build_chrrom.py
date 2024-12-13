@@ -24,13 +24,14 @@ from ca65 import ca65_byte_literal, ca65_word_literal
 # Miscellaneous CHR pages can also be provided, for one-off static screens and
 # other tomfoolery. Not sure yet if they can be animated, I'm working that out.
 
-BACKGROUND_REGION_BASE = 0x00
-SPRITE_REGION_BASE     = 0x30
-RAW_CHR_REGION_BASE    = 0x38
+SPRITE_BANKS_BASE      = 0x000
+SPRITE_REGION_BASE     = 0x030
+RAW_CHR_REGION_BASE    = 0x038
+BACKGROUND_REGION_BASE = 0x100
 
-MAX_BACKGROUND_TILES = ((SPRITE_REGION_BASE - BACKGROUND_REGION_BASE) / 4) * 64
-MAX_SPRITE_TILES = (RAW_CHR_REGION_BASE - SPRITE_REGION_BASE) * 64
-MAX_CHR_PAGES = 0x40 - RAW_CHR_REGION_BASE
+def constant_name(filename):
+  file_str = str(pathlib.PurePath(pathlib.PurePath(filename).name).stem)
+  return re.sub('[^A-Z0-9_]', '', file_str.upper())
 
 def bits_to_byte(bit_array):
   byte = 0
@@ -201,6 +202,22 @@ def read_png_chr(filename):
   is_obj = "_obj" in str(filename)
   return convert_to_raw_chr(im, is_obj=is_obj)
 
+def read_sprite_bank(foldername):
+  sprite_bank_bytes = [0] * 512 * 4
+  sprite_filenames = sorted(list(foldername.glob("*.png")))
+  assert len(sprite_filenames) <= 8, "More than 8 sprites found in bank: " + foldername
+  sprite_tiles = [read_sprite_tile(f) for f in sprite_filenames]
+  for i in range(0, len(sprite_tiles)):
+    chr_data = convert_to_chr(sprite_tiles[i])
+    metatile_base_addr = banked_sprite_tile_base_address(i)
+    for animation_frame in range(0, 4):
+      for tile_id in range(0, 4):
+        dest_addr = (animation_frame * 512) + metatile_base_addr + (tile_id * 16)
+        chr_addr = (animation_frame * 16 * 4) + (tile_id * 16)
+        sprite_bank_bytes[dest_addr:dest_addr+16] = chr_data[chr_addr:chr_addr+16]
+  filenames = [constant_name(filename) for filename in sprite_filenames]
+  return {"folder": constant_name(foldername), "filenames": filenames, "data": sprite_bank_bytes}
+
 def background_tile_base_address(tile_id):
   # location of the top-left tile, within the 0th lighting page,
   # on the 0th animation outer bank. Start with this and tweak
@@ -214,12 +231,19 @@ def sprite_tile_base_address(tile_id):
   inner_tile_address = (tile_id % 64) * 64
   return (SPRITE_REGION_BASE * 4096) + (page_id * 4096) + inner_tile_address
 
+def banked_sprite_tile_base_address(tile_id):
+  inner_tile_address = (tile_id % 64) * 64
+  return inner_tile_address
+
 def chr_bank_base_address(bank_id):
   return (RAW_CHR_REGION_BASE * 4096) + (bank_id * 4096)
 
-def generate_chr(background_tiles, sprite_tiles, raw_chr_banks):
-  # start with 1 MB of blank CHR tiles
-  chr_bytes = [0] * 1024 * 1024
+def sprite_bank_base_address(bank_id):
+  return (SPRITE_BANKS_BASE * 2048) + (bank_id * 2048)
+
+def generate_chr(background_tiles, sprite_tiles, raw_chr_banks, raw_sprite_banks):
+  # start with 2 MB of blank CHR tiles
+  chr_bytes = [0] * 1024 * 1024 * 2
   # for every background tile, which is now 64x64 and a 4x4 grid of CHR tiles,
   # write those tiles into the appropriate location
   for i in range(0, len(background_tiles)):
@@ -251,6 +275,12 @@ def generate_chr(background_tiles, sprite_tiles, raw_chr_banks):
         chr_bytes[dest_addr:dest_addr+4096] = raw_chr_banks[i][animation_frame*4096:animation_frame*4096+4096]
       else:
         raise "Wrong length for raw chr data!"
+  # sprite banks are a similar deal, but each one is just 2048 bytes in size, 
+  # comprising 4 animation frames for each 512-byte window
+  for i in range(0, len(raw_sprite_banks)):
+    for animation_frame in range(0, 4):
+      sprite_bank_addr = sprite_bank_base_address(i)
+      chr_bytes[sprite_bank_addr:sprite_bank_addr+2048] = raw_sprite_banks[i]["data"]
   return chr_bytes
 
 disco_filenames = sorted(list(pathlib.Path('art/disco_tiles').glob('*.png')))
@@ -261,12 +291,14 @@ background_filenames = disco_filenames + map_filenames + loose_background_filena
 sprite_filenames = sorted(list(pathlib.Path('art/sprite_tiles').glob('*.png')))
 raw_chr_filenames = sorted(list(pathlib.Path('art/raw_chr').glob('*.chr')))
 png_chr_filenames = sorted(list(pathlib.Path('art/raw_chr').glob('*.png')))
+sprite_bank_foldernames = sorted(list(pathlib.Path('art/sprite_banks').glob("*")))
 
 background_tiles = [read_background_tile(f) for f in background_filenames]
 sprite_tiles = [read_sprite_tile(f) for f in sprite_filenames]
 raw_chr_banks = [read_raw_chr(f) for f in raw_chr_filenames]
 png_chr_banks = [read_png_chr(f) for f in png_chr_filenames]
-chr_bytes = generate_chr(background_tiles, sprite_tiles, raw_chr_banks + png_chr_banks)
+raw_sprite_banks = [read_sprite_bank(f) for f in sprite_bank_foldernames]
+chr_bytes = generate_chr(background_tiles, sprite_tiles, raw_chr_banks + png_chr_banks, raw_sprite_banks)
 
 
 with open('build/output_chr.bin', 'wb') as chr_file:
@@ -282,12 +314,9 @@ for sprite_filename in sprite_filenames:
   test_destination = "build/expanded_tiles/sprite_"+sprite_filename.name
   expanded_tile.save(test_destination)
 
-def constant_name(filename):
-  file_str = str(pathlib.PurePath(pathlib.PurePath(filename).name).stem)
-  return re.sub('[^A-Z0-9_]', '', file_str.upper())
-
 with open('build/tile_defs.inc', 'w') as definitions:
   print("; segment definitions", file=definitions)
+  print("SPRITE_BANKS_BASE = %s" % (ca65_byte_literal(SPRITE_BANKS_BASE)), file=definitions)
   print("BACKGROUND_REGION_BASE = %s" % (ca65_byte_literal(BACKGROUND_REGION_BASE)), file=definitions)
   print("SPRITE_REGION_BASE = %s" % (ca65_byte_literal(SPRITE_REGION_BASE)), file=definitions)
   print("RAW_CHR_REGION_BASE = %s" % (ca65_byte_literal(RAW_CHR_REGION_BASE)), file=definitions)
@@ -299,16 +328,20 @@ with open('build/tile_defs.inc', 'w') as definitions:
     tiledef = (bank_id << 8) + metatile_id
     print("BG_TILE_%s = %s" % (constant_name(background_filenames[i]), ca65_word_literal(tiledef)), file=definitions)
   print("", file=definitions)
+
+  # New system which supports totally arbitrary sprite banking
+  print("; banked sprite tiles", file=definitions)
+  for i in range(0, len(raw_sprite_banks)):
+    bank_id = i * 4
+    for j in range(0, len(raw_sprite_banks[i]["filenames"])):
+      metatile_id = j * 4
+      tiledef = (bank_id << 8) + metatile_id
+      print("SPRITE_%s_%s = %s" % (raw_sprite_banks[i]["folder"], raw_sprite_banks[i]["filenames"][j], ca65_word_literal(tiledef)), file=definitions)
+  print("", file=definitions)
+
+  # Old system which restricts sprite tiles to just 8k of space
   print("; sprite tiles", file=definitions)
   for i in range(0, len(sprite_filenames)):
-    # sprites will, for now, fit in 2 CHR pages, so we have 256 8x16 sprites total. Right now
-    # I don't think we'll exceed this limit, we can revisit the whole sprite strategy if it looks like
-    # it'll be a problem
-    
-    #metatile_id = (i % 64) * 4
-    #bank_id = math.floor(i / 64) + SPRITE_REGION_BASE
-    #tiledef = (bank_id << 8) + metatile_id
-
     metatile_id = (i % 64) * 4
     bank_id = math.floor(i / 64)
     tiledef = (bank_id & 0x01) + (metatile_id & 0xFE)
