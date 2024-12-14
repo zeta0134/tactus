@@ -17,6 +17,11 @@ game_over_str:   .asciiz "GAME OVER (WIP)"
 .proc game_over_controller_init
 CurrentWidgetIndex := R20
 
+        lda #0
+        jsr set_brightness
+        lda #4
+        sta TargetBrightness
+
         ldy CurrentWidgetIndex
         set_widget_state_y game_over_controller_update
         rts

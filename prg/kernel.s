@@ -152,6 +152,11 @@ continue_waiting:
 ; === Game Mode Functions Follow ===
 
 .proc init_engine
+        lda #0
+        jsr set_brightness
+        lda #0
+        sta TargetBrightness
+
         far_call FAR_disable_all_oam_entries_playfield
         far_call FAR_disable_all_oam_entries_hud
 
@@ -234,10 +239,9 @@ LayoutPtr := R0
         sta NmiSoftDisable
 
         ; Setup a fade to black into the target mode
-        lda #0
-        jsr set_brightness
-        lda #4
-        sta TargetBrightness
+        ; NO! This was causing us to draw before the controller had a chance
+        ; to fully initialize itself. Each controller widget will be in charge
+        ; of deciding when to run this logic.
 
         ; clear FPGA RAM
         jsr clear_fpga_ram
@@ -467,10 +471,11 @@ LayoutPtr := R0
         sta CurrentBeatCounter
         sta AccumulatedGameBeats
         sta AccumulatedGameBeats+1
-        sta PlayfieldBgHighBank
         sta PlayfieldObjHighBank
         sta HudBgHighBank
         sta HudObjHighBank
+        lda #4
+        sta PlayfieldBgHighBank
 
         lda #$FF
         sta ClearedRoomCooldown

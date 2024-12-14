@@ -195,6 +195,11 @@ widget_file_select_mode := widgets_data0
 
         jsr apply_standard_ui_palette
 
+        lda #0
+        jsr set_brightness
+        lda #4
+        sta TargetBrightness
+
         ldy CurrentWidgetIndex
         lda #FILE_SELECT_MODE_NORMAL
         sta widget_file_select_mode, y

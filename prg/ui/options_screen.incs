@@ -174,6 +174,11 @@ bg_loop:
         lda #<SPRITE_TILE_PLAIN_SQUARES_RIGHT
         sta sprite_table + MetaSpriteState::TileIndex, x
 
+        lda #0
+        jsr set_brightness
+        lda #4
+        sta TargetBrightness
+
         ldy CurrentWidgetIndex
         set_widget_state_y options_controller_update
         rts

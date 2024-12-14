@@ -68,6 +68,11 @@ widget_last_cursor_pos := widgets_data0
         ; Get the file select palettes loaded in
         jsr apply_standard_ui_palette
 
+        lda #0
+        jsr set_brightness
+        lda #4
+        sta TargetBrightness
+
         ldy CurrentWidgetIndex
         lda #$FF
         sta widget_last_cursor_pos, y

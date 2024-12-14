@@ -101,7 +101,10 @@ bg_loop:
         cpy #16
         bne bg_loop
 
-        ; TODO: initial drawing, etc
+        lda #0
+        jsr set_brightness
+        lda #4
+        sta TargetBrightness
 
         ldy CurrentWidgetIndex
         set_widget_state_y name_entry_controller_update
