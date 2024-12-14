@@ -24,10 +24,12 @@ from ca65 import ca65_byte_literal, ca65_word_literal
 # Miscellaneous CHR pages can also be provided, for one-off static screens and
 # other tomfoolery. Not sure yet if they can be animated, I'm working that out.
 
-SPRITE_BANKS_BASE      = 0x000
-SPRITE_REGION_BASE     = 0x030
-RAW_CHR_REGION_BASE    = 0x038
-BACKGROUND_REGION_BASE = 0x100
+SPRITE_BANKS_BASE             = 0x000
+SPRITE_REGION_BASE            = 0x030
+RAW_CHR_UI_REGION_BASE        = 0x038
+
+BACKGROUND_REGION_BASE        = 0x100
+RAW_CHR_PLAYFIELD_REGION_BASE = 0x138
 
 def constant_name(filename):
   file_str = str(pathlib.PurePath(pathlib.PurePath(filename).name).stem)
@@ -235,13 +237,16 @@ def banked_sprite_tile_base_address(tile_id):
   inner_tile_address = (tile_id % 64) * 64
   return inner_tile_address
 
-def chr_bank_base_address(bank_id):
-  return (RAW_CHR_REGION_BASE * 4096) + (bank_id * 4096)
+def playfield_chr_bank_base_address(bank_id):
+  return (RAW_CHR_PLAYFIELD_REGION_BASE * 4096) + (bank_id * 4096)
+
+def ui_chr_bank_base_address(bank_id):
+  return (RAW_CHR_UI_REGION_BASE * 4096) + (bank_id * 4096)
 
 def sprite_bank_base_address(bank_id):
   return (SPRITE_BANKS_BASE * 2048) + (bank_id * 2048)
 
-def generate_chr(background_tiles, sprite_tiles, raw_chr_banks, raw_sprite_banks):
+def generate_chr(background_tiles, sprite_tiles, raw_chr_playfield_banks, raw_chr_ui_banks, raw_sprite_banks):
   # start with 2 MB of blank CHR tiles
   chr_bytes = [0] * 1024 * 1024 * 2
   # for every background tile, which is now 64x64 and a 4x4 grid of CHR tiles,
@@ -265,14 +270,24 @@ def generate_chr(background_tiles, sprite_tiles, raw_chr_banks, raw_sprite_banks
         chr_addr = (animation_frame * 16 * 4) + (tile_id * 16)
         chr_bytes[dest_addr:dest_addr+16] = chr_data[chr_addr:chr_addr+16]
   # chr banks are just written right into place in all four animation banks
-  for i in range(0, len(raw_chr_banks)):
+  for i in range(0, len(raw_chr_playfield_banks)):
     for animation_frame in range(0, 4):
-      chr_addr = chr_bank_base_address(i)
+      chr_addr = playfield_chr_bank_base_address(i)
       dest_addr = (animation_frame * 256 * 1024) + chr_addr
-      if len(raw_chr_banks[i]) <= 4096:
-        chr_bytes[dest_addr:dest_addr+4096] = raw_chr_banks[i]
-      elif len(raw_chr_banks[i]) == 4096*4:
-        chr_bytes[dest_addr:dest_addr+4096] = raw_chr_banks[i][animation_frame*4096:animation_frame*4096+4096]
+      if len(raw_chr_playfield_banks[i]) <= 4096:
+        chr_bytes[dest_addr:dest_addr+4096] = raw_chr_playfield_banks[i]
+      elif len(raw_chr_playfield_banks[i]) == 4096*4:
+        chr_bytes[dest_addr:dest_addr+4096] = raw_chr_playfield_banks[i][animation_frame*4096:animation_frame*4096+4096]
+      else:
+        raise "Wrong length for raw chr data!"
+  for i in range(0, len(raw_chr_ui_banks)):
+    for animation_frame in range(0, 4):
+      chr_addr = ui_chr_bank_base_address(i)
+      dest_addr = (animation_frame * 256 * 1024) + chr_addr
+      if len(raw_chr_ui_banks[i]) <= 4096:
+        chr_bytes[dest_addr:dest_addr+4096] = raw_chr_ui_banks[i]
+      elif len(raw_chr_ui_banks[i]) == 4096*4:
+        chr_bytes[dest_addr:dest_addr+4096] = raw_chr_ui_banks[i][animation_frame*4096:animation_frame*4096+4096]
       else:
         raise "Wrong length for raw chr data!"
   # sprite banks are a similar deal, but each one is just 2048 bytes in size, 
@@ -289,16 +304,23 @@ loose_background_filenames = sorted(list(pathlib.Path('art/background_tiles').gl
 background_filenames = disco_filenames + map_filenames + loose_background_filenames
 
 sprite_filenames = sorted(list(pathlib.Path('art/sprite_tiles').glob('*.png')))
-raw_chr_filenames = sorted(list(pathlib.Path('art/raw_chr').glob('*.chr')))
-png_chr_filenames = sorted(list(pathlib.Path('art/raw_chr').glob('*.png')))
+raw_chr_playfield_filenames = sorted(list(pathlib.Path('art/raw_chr_playfield').glob('*.chr')))
+png_chr_playfield_filenames = sorted(list(pathlib.Path('art/raw_chr_playfield').glob('*.png')))
+raw_chr_ui_filenames = sorted(list(pathlib.Path('art/raw_chr_ui').glob('*.chr')))
+png_chr_ui_filenames = sorted(list(pathlib.Path('art/raw_chr_ui').glob('*.png')))
 sprite_bank_foldernames = sorted(list(pathlib.Path('art/sprite_banks').glob("*")))
 
 background_tiles = [read_background_tile(f) for f in background_filenames]
 sprite_tiles = [read_sprite_tile(f) for f in sprite_filenames]
-raw_chr_banks = [read_raw_chr(f) for f in raw_chr_filenames]
-png_chr_banks = [read_png_chr(f) for f in png_chr_filenames]
+raw_chr_playfield_banks = [read_raw_chr(f) for f in raw_chr_playfield_filenames]
+png_chr_playfield_banks = [read_png_chr(f) for f in png_chr_playfield_filenames]
+raw_chr_ui_banks = [read_raw_chr(f) for f in raw_chr_ui_filenames]
+png_chr_ui_banks = [read_png_chr(f) for f in png_chr_ui_filenames]
 raw_sprite_banks = [read_sprite_bank(f) for f in sprite_bank_foldernames]
-chr_bytes = generate_chr(background_tiles, sprite_tiles, raw_chr_banks + png_chr_banks, raw_sprite_banks)
+chr_bytes = generate_chr(background_tiles, sprite_tiles, 
+  raw_chr_playfield_banks + png_chr_playfield_banks, 
+  raw_chr_ui_banks + png_chr_ui_banks, 
+  raw_sprite_banks)
 
 
 with open('build/output_chr.bin', 'wb') as chr_file:
@@ -319,7 +341,8 @@ with open('build/tile_defs.inc', 'w') as definitions:
   print("SPRITE_BANKS_BASE = %s" % (ca65_byte_literal(SPRITE_BANKS_BASE)), file=definitions)
   print("BACKGROUND_REGION_BASE = %s" % (ca65_byte_literal(BACKGROUND_REGION_BASE)), file=definitions)
   print("SPRITE_REGION_BASE = %s" % (ca65_byte_literal(SPRITE_REGION_BASE)), file=definitions)
-  print("RAW_CHR_REGION_BASE = %s" % (ca65_byte_literal(RAW_CHR_REGION_BASE)), file=definitions)
+  print("RAW_CHR_PLAYFIELD_REGION_BASE = %s" % (ca65_byte_literal(RAW_CHR_PLAYFIELD_REGION_BASE)), file=definitions)
+  print("RAW_CHR_UI_REGION_BASE = %s" % (ca65_byte_literal(RAW_CHR_UI_REGION_BASE)), file=definitions)
   print("", file=definitions)
   print("; background tiles", file=definitions)
   for i in range(0, len(background_filenames)):
@@ -345,14 +368,21 @@ with open('build/tile_defs.inc', 'w') as definitions:
     metatile_id = (i % 64) * 4
     bank_id = math.floor(i / 64)
     tiledef = (bank_id & 0x01) + (metatile_id & 0xFE)
-
     print("SPRITE_TILE_%s = %s" % (constant_name(sprite_filenames[i]), ca65_byte_literal(tiledef)), file=definitions)
   print("", file=definitions)
-  print("; raw_chr banks", file=definitions)
-  combined_chr_filenames = raw_chr_filenames + png_chr_filenames
-  for i in range(0, len(combined_chr_filenames)):
-    bank_id = i + RAW_CHR_REGION_BASE
-    print("CHR_BANK_%s = %s" % (constant_name(combined_chr_filenames[i]), ca65_byte_literal(bank_id)), file=definitions)
+
+  print("; raw_chr playfield banks", file=definitions)
+  combined_chr_playfield_filenames = raw_chr_playfield_filenames + png_chr_playfield_filenames
+  for i in range(0, len(combined_chr_playfield_filenames)):
+    bank_id = i + RAW_CHR_PLAYFIELD_REGION_BASE
+    print("CHR_BANK_%s = %s" % (constant_name(combined_chr_playfield_filenames[i]), ca65_byte_literal(bank_id)), file=definitions)
+  print("", file=definitions)
+
+  print("; raw_chr ui banks", file=definitions)
+  combined_chr_ui_filenames = raw_chr_ui_filenames + png_chr_ui_filenames
+  for i in range(0, len(combined_chr_ui_filenames)):
+    bank_id = i + RAW_CHR_UI_REGION_BASE
+    print("CHR_BANK_%s = %s" % (constant_name(combined_chr_ui_filenames[i]), ca65_byte_literal(bank_id)), file=definitions)
   print("", file=definitions)
 
 
