@@ -297,8 +297,8 @@ LayoutPtr := R0
         perform_zpcm_inc
         far_call FAR_refresh_palettes_gameloop
 
-        far_call FAR_update_widgets
         jsr update_beat_counters_title
+        far_call FAR_update_widgets
 
         jsr wait_for_next_vblank
         rts

@@ -186,6 +186,16 @@ bg_loop:
 
 .proc options_controller_update
 widget_cursor_nav_index := widgets_data1
+
+        ; We need the playfield to start in CHR 1M mode, to display
+        ; the battlefield. We use a raster effect to switch back to
+        ; 0M mode using the HUD. This is the only screen that needs this,
+        ; which is why we do a simple bodge here.
+        lda PlayfieldBgHighBank
+        clc
+        adc #4
+        sta PlayfieldBgHighBank
+
         lda #KEY_B
         and ButtonsDown
         beq stay_here
