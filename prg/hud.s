@@ -6,7 +6,6 @@
 
         .include "bhop/bhop.inc"
         .include "battlefield.inc"
-        .include "charmap.inc"
         .include "chr.inc"
         .include "debug.inc"
         .include "dialog.inc"
@@ -944,20 +943,35 @@ TenThousandsDigit := T6
         lda ThousandsDigit
         beq draw_little_x
 draw_thousands_digit:
+        clc
+        adc #'0'
+        sta ThousandsDigit
         ldx #15
-        draw_tile_at_x ROW_4, ThousandsDigit, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        draw_tile_at_x ROW_4, ThousandsDigit, #(HUD_TEXT_PAL | CHR_BANK_FONT_MARSHMALLOW)
         jmp converge
 draw_little_x:
         ldx #15
         draw_tile_at_x ROW_4, #COIN_X, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 converge:
         perform_zpcm_inc
+        lda HundredsDigit
+        clc
+        adc #'0'
+        sta HundredsDigit
         ldx #16
-        draw_tile_at_x ROW_4, HundredsDigit, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        draw_tile_at_x ROW_4, HundredsDigit, #(HUD_TEXT_PAL | CHR_BANK_FONT_MARSHMALLOW)
+        lda TensDigit
+        clc
+        adc #'0'
+        sta TensDigit
         ldx #17
-        draw_tile_at_x ROW_4, TensDigit, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        draw_tile_at_x ROW_4, TensDigit, #(HUD_TEXT_PAL | CHR_BANK_FONT_MARSHMALLOW)
+        lda OnesDigit
+        clc
+        adc #'0'
+        sta OnesDigit
         ldx #18
-        draw_tile_at_x ROW_4, OnesDigit, #(HUD_TEXT_PAL | CHR_BANK_000_SHIFTED_NUMERALS)
+        draw_tile_at_x ROW_4, OnesDigit, #(HUD_TEXT_PAL | CHR_BANK_FONT_MARSHMALLOW)
         perform_zpcm_inc
         rts
 .endproc
