@@ -55,7 +55,6 @@ ItemCountCurrent: .res 1
 .segment "CODE_0"
 
 HUD_TILE_BASE        = $52C0
-HUD_NAMETABLE_OFFSET = $0400
 HUD_ATTR_OFFSET      = $0800
 
 ROW_0 = (32*0)
@@ -64,6 +63,8 @@ ROW_2 = (32*2)
 ROW_3 = (32*3)
 ROW_4 = (32*4)
 ROW_5 = (32*5)
+ROW_6 = (32*6)
+ROW_7 = (32*7)
 
 chr_tile_offset MAP_BORDER_TL, 6, 7
 chr_tile_offset MAP_BORDER_TM, 7, 7
@@ -152,6 +153,7 @@ weapon_palette_table:
         sta ItemDisplayCurrent
         sta ItemCountCurrent
 
+        jsr clear_hud_canvas
         jsr draw_static_hud_elements
         mov16 DisplayedGold, PlayerGold
         jsr draw_coin_counter
@@ -550,6 +552,33 @@ draw_bottom_right:
         perform_zpcm_inc
         inx
 
+        rts
+.endproc
+
+.proc clear_hud_canvas
+        ldy #0
+loop:
+        lda #BLANK_TILE
+        sta HUD_TILE_BASE + ROW_0, y
+        sta HUD_TILE_BASE + ROW_1, y
+        sta HUD_TILE_BASE + ROW_2, y
+        sta HUD_TILE_BASE + ROW_3, y
+        sta HUD_TILE_BASE + ROW_4, y
+        sta HUD_TILE_BASE + ROW_5, y
+        sta HUD_TILE_BASE + ROW_6, y
+        sta HUD_TILE_BASE + ROW_7, y
+        lda #CHR_BANK_HUD
+        sta HUD_TILE_BASE + HUD_ATTR_OFFSET + ROW_0, y
+        sta HUD_TILE_BASE + HUD_ATTR_OFFSET + ROW_1, y
+        sta HUD_TILE_BASE + HUD_ATTR_OFFSET + ROW_2, y
+        sta HUD_TILE_BASE + HUD_ATTR_OFFSET + ROW_3, y
+        sta HUD_TILE_BASE + HUD_ATTR_OFFSET + ROW_4, y
+        sta HUD_TILE_BASE + HUD_ATTR_OFFSET + ROW_5, y
+        sta HUD_TILE_BASE + HUD_ATTR_OFFSET + ROW_6, y
+        sta HUD_TILE_BASE + HUD_ATTR_OFFSET + ROW_7, y
+        iny
+        cpy #32
+        bne loop
         rts
 .endproc
 
