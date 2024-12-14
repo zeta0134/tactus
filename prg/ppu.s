@@ -51,27 +51,7 @@ loop:
 .proc FAR_initialize_palettes
         ;  Set the palettes up with a nice greyscale for everything
 
-        ; disable rendering
-        lda #$00
-        sta PPUMASK
-
-        ; Set OBJ and BG palettes to all black
-        set_ppuaddr #$3F00
-        lda #$0F
-        ldx #0
-palette_loop:
-        perform_zpcm_inc
-        sta PPUDATA
-        inx
-        cpx #32
-        bne palette_loop
-
-        near_call FAR_initialize_title_palettes
-
-        ; Reset PPUADDR to 0,0
-        lda #$00
-        sta PPUADDR
-        sta PPUADDR
+        near_call FAR_initialize_title_palettes        
 
         ; Initialize brightness to 0 (fully black) so we can fade it in
         lda #0

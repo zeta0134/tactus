@@ -128,9 +128,14 @@ brightness_table:
         ldx #0
 loop:
         perform_zpcm_inc
-        sta staging_palette, x
+        sta staging_palette+0, x
+        sta staging_palette+16, x
+        sta BgPaletteBuffer, x
+        sta ObjPaletteBuffer, x
+        sta HudPaletteBuffer+0, x
+        sta HudPaletteBuffer+16, x
         inx
-        cpx #32
+        cpx #16
         bne loop
 
         rts

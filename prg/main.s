@@ -20,10 +20,27 @@
 
 .segment "PRGFIXED_E000"
 
+.proc quickly_clear_palettes
+        ; Set OBJ and BG palettes to all black
+        set_ppuaddr #$3F00
+        lda #$0F
+        ldx #0
+palette_loop:
+        sta PPUDATA
+        inx
+        cpx #32
+        bne palette_loop
+        rts
+.endproc
+
 start:
         lda #$00
         sta PPUMASK ; disable rendering
         sta PPUCTRL ; and NMI
+
+        ; Quickly copy in a blank palette, just so we have something
+        ; that isn't the default boot color
+        jsr quickly_clear_palettes
 
         ; Clear out large memory regions (the reset vector handles zp/stack)
         st16 R0, ($0200) ; internal RAM from 0x200 - 0x7FF
@@ -40,6 +57,7 @@ start:
 
         jsr init_far_calls
 
+        far_call FAR_init_palettes
         far_call FAR_initialize_palettes
         far_call FAR_initialize_ppu
         ;jsr init_irq_subsystem
