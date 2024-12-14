@@ -9,11 +9,13 @@
         .include "zpcm.inc"
 
         .zeropage
+; Copied in during NMI where every cycle is precious. Spare no expense!
 staging_palette: .res 32
 
         .segment "RAM"
 BgPaletteDirty: .res 1
 ObjPaletteDirty: .res 1
+HudPaletteDirty: .res 1
 BgPaletteBuffer: .res 16
 ObjPaletteBuffer: .res 16
 Brightness: .res 1
@@ -22,6 +24,9 @@ BrightnessDelay: .res 1
 
 ; not sure I'll use all of this, but we'll allocate the whole 32 bytes just in case
 HudPaletteBuffer: .res 32
+; Copied in during a raster effect which needs lots of delay anyway, so regular RAM
+; is just fine. 
+HudStagingPalette: .res 32
 
         .segment "CODE_0"
 
@@ -99,6 +104,7 @@ brightness_table:
         lda #1
         sta BgPaletteDirty
         sta ObjPaletteDirty
+        sta HudPaletteDirty
         rts
 .endproc
 
@@ -134,6 +140,8 @@ loop:
         sta ObjPaletteBuffer, x
         sta HudPaletteBuffer+0, x
         sta HudPaletteBuffer+16, x
+        sta HudStagingPalette+0, x
+        sta HudStagingPalette+16, x
         inx
         cpx #16
         bne loop
@@ -148,6 +156,7 @@ DestPalIndex := R3
         perform_zpcm_inc
         lda BgPaletteDirty
         ora ObjPaletteDirty
+        ora HudPaletteDirty
         jeq done
 
         perform_zpcm_inc
@@ -195,7 +204,7 @@ bg_loop:
 
 check_obj_palette:
         lda ObjPaletteDirty
-        beq done
+        beq check_hud_palette
 
         lda #0
         sta SourcePalIndex
@@ -227,11 +236,33 @@ obj_loop:
         cmp SourcePalIndex
         bne obj_loop
 
+check_hud_palette:
+        lda HudPaletteDirty
+        beq done
+
+        lda #0
+        sta SourcePalIndex
+        sta DestPalIndex
+hud_loop:
+        perform_zpcm_inc
+        ; just fade the whole palette for this, don't be excessively fancy about it
+        ldx SourcePalIndex           ; From the original buffer
+        ldy HudPaletteBuffer, x ; Grab a palette color
+        lda (PalAddr), y       ; And use it to index the brightness table we picked
+        ldx DestPalIndex
+        sta HudStagingPalette, x
+        inc SourcePalIndex
+        inc DestPalIndex
+        lda #20 ; we are only using up to OBJ0 so far, so don't waste time fading the rest
+        cmp SourcePalIndex
+        bne hud_loop
+
 done:
         perform_zpcm_inc
         lda #0
         sta BgPaletteDirty
         sta ObjPaletteDirty
+        sta HudPaletteDirty
 
         rts
 .endproc
@@ -255,6 +286,7 @@ converge:
         lda #1
         sta BgPaletteDirty
         sta ObjPaletteDirty
+        sta HudPaletteDirty
         lda #GLOBAL_PALETTE_FADE_SPEED
         sta BrightnessDelay
 done:

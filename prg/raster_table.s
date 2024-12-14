@@ -770,9 +770,9 @@ return_from_delay:
         sta MAP_NT_D_CONTROL ; 4
 
         ; prep the first round of palette updates
-        lda HudPaletteBuffer+0 ; 4
-        ldx HudPaletteBuffer+1 ; 4
-        ldy HudPaletteBuffer+2 ; 4
+        lda HudStagingPalette+0 ; 4
+        ldx HudStagingPalette+1 ; 4
+        ldy HudStagingPalette+2 ; 4
 
         ; delay: 68 cycles
         jsr delay_12
@@ -786,15 +786,15 @@ return_from_delay:
         sta PPUDATA ; 4
         stx PPUDATA ; 4
         sty PPUDATA ; 4
-        lda HudPaletteBuffer+3 ; 4
+        lda HudStagingPalette+3 ; 4
         sta PPUDATA ; 4
 
         ; ppu dot here: 308
 
         ; prep the second round of palette updates
-        lda HudPaletteBuffer+4 ; 4
-        ldx HudPaletteBuffer+5 ; 4
-        ldy HudPaletteBuffer+6 ; 4
+        lda HudStagingPalette+4 ; 4
+        ldx HudStagingPalette+5 ; 4
+        ldy HudStagingPalette+6 ; 4
 
         ; ppu dot here: 3
 
@@ -810,15 +810,15 @@ return_from_delay:
         sta PPUDATA ; 4
         stx PPUDATA ; 4
         sty PPUDATA ; 4
-        lda HudPaletteBuffer+7 ; 4
+        lda HudStagingPalette+7 ; 4
         sta PPUDATA ; 4
 
         ; ppu dot here: 309
 
         ; prep the third round of palette updates
-        lda HudPaletteBuffer+8  ; 4
-        ldx HudPaletteBuffer+9  ; 4
-        ldy HudPaletteBuffer+10 ; 4
+        lda HudStagingPalette+8  ; 4
+        ldx HudStagingPalette+9  ; 4
+        ldy HudStagingPalette+10 ; 4
 
         ; ppu dot here: 4
 
@@ -834,15 +834,15 @@ return_from_delay:
         sta PPUDATA ; 4
         stx PPUDATA ; 4
         sty PPUDATA ; 4
-        lda HudPaletteBuffer+11 ; 4
+        lda HudStagingPalette+11 ; 4
         sta PPUDATA ; 4
 
         ; ppu dot here: 310
 
         ; prep the third round of palette updates
-        lda HudPaletteBuffer+12  ; 4
-        ldx HudPaletteBuffer+13  ; 4
-        ldy HudPaletteBuffer+14  ; 4
+        lda HudStagingPalette+12  ; 4
+        ldx HudStagingPalette+13  ; 4
+        ldy HudStagingPalette+14  ; 4
 
         ; ppu dot here: 5
 
@@ -860,15 +860,15 @@ return_from_delay:
         sta PPUDATA ; 4
         stx PPUDATA ; 4
         sty PPUDATA ; 4
-        lda HudPaletteBuffer+15 ; 4
+        lda HudStagingPalette+15 ; 4
         sta PPUDATA ; 4
 
         ; ppu dot here: 308
 
         ; prep the fourth round of palette updates
-        lda HudPaletteBuffer+16  ; 4
-        ldx HudPaletteBuffer+17  ; 4
-        ldy HudPaletteBuffer+18  ; 4
+        lda HudStagingPalette+16  ; 4
+        ldx HudStagingPalette+17  ; 4
+        ldy HudStagingPalette+18  ; 4
 
         ; ppu dot here: 3
 
@@ -886,7 +886,7 @@ return_from_delay:
         sta PPUDATA ; 4
         stx PPUDATA ; 4
         sty PPUDATA ; 4
-        lda HudPaletteBuffer+19 ; 4
+        lda HudStagingPalette+19 ; 4
         sta PPUDATA ; 4
 
         ; ppu dot here: 309
@@ -1061,9 +1061,9 @@ return_from_delay:
         sta MAP_NT_D_CONTROL ; 4
 
         ; prep the first round of palette updates
-        lda HudPaletteBuffer+0 ; 4
-        ldx HudPaletteBuffer+1 ; 4
-        ldy HudPaletteBuffer+2 ; 4
+        lda HudStagingPalette+0 ; 4
+        ldx HudStagingPalette+1 ; 4
+        ldy HudStagingPalette+2 ; 4
 
         ; delay: 68 cycles
 
@@ -1080,15 +1080,15 @@ return_from_delay:
         sta PPUDATA ; 4
         stx PPUDATA ; 4
         sty PPUDATA ; 4
-        lda HudPaletteBuffer+3 ; 4
+        lda HudStagingPalette+3 ; 4
         sta PPUDATA ; 4
 
         ; ppu dot here: 308
 
         ; prep the second round of palette updates
-        lda HudPaletteBuffer+4 ; 4
-        ldx HudPaletteBuffer+5 ; 4
-        ldy HudPaletteBuffer+6 ; 4
+        lda HudStagingPalette+4 ; 4
+        ldx HudStagingPalette+5 ; 4
+        ldy HudStagingPalette+6 ; 4
 
         ; ppu dot here: 3
 
@@ -1109,15 +1109,15 @@ return_from_delay:
         sta PPUDATA ; 4
         stx PPUDATA ; 4
         sty PPUDATA ; 4
-        lda HudPaletteBuffer+7 ; 4
+        lda HudStagingPalette+7 ; 4
         sta PPUDATA ; 4
 
         ; ppu dot here: 309
 
         ; prep the third round of palette updates
-        lda HudPaletteBuffer+8  ; 4
-        ldx HudPaletteBuffer+9  ; 4
-        ldy HudPaletteBuffer+10 ; 4
+        lda HudStagingPalette+8  ; 4
+        ldx HudStagingPalette+9  ; 4
+        ldy HudStagingPalette+10 ; 4
 
         ; ppu dot here: 4
 
@@ -1139,15 +1139,15 @@ return_from_delay:
         sta PPUDATA ; 4
         stx PPUDATA ; 4
         sty PPUDATA ; 4
-        lda HudPaletteBuffer+11 ; 4
+        lda HudStagingPalette+11 ; 4
         sta PPUDATA ; 4
 
         ; ppu dot here: 310
 
         ; prep the third round of palette updates
-        lda HudPaletteBuffer+12  ; 4
-        ldx HudPaletteBuffer+13  ; 4
-        ldy HudPaletteBuffer+14  ; 4
+        lda HudStagingPalette+12  ; 4
+        ldx HudStagingPalette+13  ; 4
+        ldy HudStagingPalette+14  ; 4
 
         ; ppu dot here: 5
 
@@ -1165,15 +1165,15 @@ return_from_delay:
         sta PPUDATA ; 4
         stx PPUDATA ; 4
         sty PPUDATA ; 4
-        lda HudPaletteBuffer+15 ; 4
+        lda HudStagingPalette+15 ; 4
         sta PPUDATA ; 4
 
         ; ppu dot here: 308
 
         ; prep the fourth round of palette updates
-        lda HudPaletteBuffer+16  ; 4
-        ldx HudPaletteBuffer+17  ; 4
-        ldy HudPaletteBuffer+18  ; 4
+        lda HudStagingPalette+16  ; 4
+        ldx HudStagingPalette+17  ; 4
+        ldy HudStagingPalette+18  ; 4
 
         ; ppu dot here: 3
 
@@ -1194,7 +1194,7 @@ return_from_delay:
         sta PPUDATA ; 4
         stx PPUDATA ; 4
         sty PPUDATA ; 4
-        lda HudPaletteBuffer+19 ; 4
+        lda HudStagingPalette+19 ; 4
         sta PPUDATA ; 4
 
         ; ppu dot here: 308

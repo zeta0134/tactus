@@ -4,6 +4,7 @@
 .global BgPaletteBuffer
 .global ObjPaletteBuffer
 .global HudPaletteBuffer
+.global HudStagingPalette
 .global Brightness
 .global TargetBrightness
 
