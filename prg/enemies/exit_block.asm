@@ -41,7 +41,7 @@ ExitIndex := R0
 TargetSquare := R13
 
         st16 FadeToGameMode, advance_to_next_floor
-        st16 GameMode, fade_to_game_mode        
+        st16 GameMode, fade_to_game_mode_from_gameplay
 
         queue_sfx_pulse1 sfx_teleport
 

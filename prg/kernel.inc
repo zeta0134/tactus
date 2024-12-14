@@ -18,7 +18,11 @@
 .global room_transition
 .global room_init
 .global advance_to_next_floor
-.global fade_to_game_mode
+
+; is our initial split in CHR 0M or CHR 1M?
+.global fade_to_game_mode_from_gameplay ; 1M
+.global fade_to_game_mode_from_ui       ; 0M
+
 .global game_prep
 .global title_prep
 .global options_prep

@@ -75,6 +75,7 @@ RasterPlaybackSpeedLow: .res 1
 
         .segment "DATA_4"
 
+        .include "raster/options.incs"
         .include "raster/none.incs"
         .include "raster/screen_slide.incs"
         .include "raster/underwater.incs"
@@ -124,6 +125,9 @@ raster_effects_list:
         .byte 1 ; duration in frames
         .addr plus_3_frames
         .byte <.bank(plus_3_frames) ; frame table bank
+        .byte 1 ; duration in frames
+        .addr options_frames
+        .byte <.bank(options_frames) ; frame table bank
         .byte 1 ; duration in frames
 
 nametable_lut_x:
@@ -1319,6 +1323,36 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
 
         ; this is always the last split, so disable IRQs entirely
         sta MAP_PPU_IRQ_DISABLE
+
+        lda IrqPreserveA ; 3
+        ldx IrqPreserveX ; 3
+        perform_zpcm_inc ; (6)
+        rti
+.endproc
+
+.align 256 
+; mostly used by various options screens, JUST applies hud-style banking
+.proc hud_chr_banks_only_irq
+        perform_zpcm_inc ; (6)
+        ; register preservation to zeropage (6)
+        sta IrqPreserveA ; 3
+        stx IrqPreserveX ; 3
+
+        ; BEFORE the end of the scanline (mostly) (3)
+        ldx RasterTableIndex     ; 3
+
+        ; first, acknowledge the IRQ and set up for the next one (12)
+        lda table_scanline_compare+1, x ; 4
+        sta MAP_PPU_IRQ_LATCH           ; 4 (set new cmp value)
+        lda MAP_PPU_IRQ_STATUS          ; 4 (acknowledge)
+
+        jsr delay_20
+
+        ; Apply the hud animation bank, and do little else
+        lda HudBgActual         ; 4
+        sta MAP_BG_EXT_BANK     ; 4
+
+        inc RasterTableIndex ; ... 5?
 
         lda IrqPreserveA ; 3
         ldx IrqPreserveX ; 3

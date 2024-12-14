@@ -120,6 +120,11 @@ widget_color_bottom_metasprite_index := widgets_data1
         sta LeftNametableAttr
         sta RightNametableAttr
 
+        ; we need a fancy mid-frame split to switch from the battlefield preview
+        ; to the hud set instead
+        set_raster_effect_safely #RASTER_EFFECT_OPTIONS, #RASTER_FINALIZER_NONE, #0
+        set_raster_playback_speed #1, #0
+
         ; Get the option palettes loaded in
         ldy #0
 bg_loop:

@@ -237,7 +237,7 @@ done:
         queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, file_select_prep
-        st16 GameMode, fade_to_game_mode
+        st16 GameMode, fade_to_game_mode_from_ui
         rts
 .endproc
 
@@ -245,7 +245,7 @@ done:
         queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, options_prep
-        st16 GameMode, fade_to_game_mode
+        st16 GameMode, fade_to_game_mode_from_ui
         rts
 .endproc
 
@@ -253,7 +253,7 @@ done:
         queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, game_prep
-        st16 GameMode, fade_to_game_mode
+        st16 GameMode, fade_to_game_mode_from_ui
         rts
 .endproc
 
@@ -261,7 +261,7 @@ done:
         queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, name_entry_prep
-        st16 GameMode, fade_to_game_mode
+        st16 GameMode, fade_to_game_mode_from_ui
         rts
 .endproc
 
@@ -269,7 +269,7 @@ done:
         queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, file_details_prep
-        st16 GameMode, fade_to_game_mode
+        st16 GameMode, fade_to_game_mode_from_ui
         rts
 .endproc
 
@@ -277,7 +277,7 @@ done:
         queue_sfx_pulse1 sfx_teleport
 
         st16 FadeToGameMode, title_prep
-        st16 GameMode, fade_to_game_mode
+        st16 GameMode, fade_to_game_mode_from_ui
         rts
 .endproc
 

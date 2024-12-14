@@ -347,7 +347,7 @@ attribute_loop_right:
 
         ; TODO: fade out to game prep?
         st16 FadeToGameMode, title_prep
-        st16 GameMode, fade_to_game_mode
+        st16 GameMode, fade_to_game_mode_from_ui
 
 stay_here:
         rts

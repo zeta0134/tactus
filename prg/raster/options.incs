@@ -1,0 +1,26 @@
+; After the pseudo-battlefield is drawn, we need to switch out the
+; CHR banks (and later maybe set the scroll) so do that here
+
+options_frame_0:
+  .addr options_scrollx_common, options_scrolly_common, options_scanline_common, room_global_ppumask, options_irq_common
+
+options_irq_common:
+  .byte >full_scroll_and_ppumask_irq
+  .byte >hud_chr_banks_only_irq
+
+options_scrollx_common:
+  .byte 0
+  .byte 0
+
+options_scrolly_common:
+  .byte 0
+  .byte 0
+
+options_scanline_common:
+  .byte 4
+  .byte 100
+
+options_frames:
+  .addr options_frame_0
+  .byte 2
+  .byte <.bank(options_frame_0)

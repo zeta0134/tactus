@@ -94,7 +94,7 @@ main_loop:
 .endproc
 
 ; === Special game mode: fade brightness to 0 and THEN run the next state ===
-.proc fade_to_game_mode
+.proc fade_to_game_mode_from_gameplay
         lda #0
         sta ScreenShakeX
         sta ScreenShakeY
@@ -116,6 +116,34 @@ continue_waiting:
         far_call FAR_refresh_palettes_gameloop
         perform_zpcm_inc
         jsr update_beat_counters
+
+        jsr wait_for_next_vblank
+        rts
+.endproc
+
+; === Special game mode: fade brightness to 0 and THEN run the next state ===
+.proc fade_to_game_mode_from_ui
+        lda #0
+        sta ScreenShakeX
+        sta ScreenShakeY
+
+        lda #0
+        sta TargetBrightness
+        lda Brightness
+        bne continue_waiting
+
+        lda FadeToGameMode
+        sta GameMode
+        lda FadeToGameMode+1
+        sta GameMode+1
+
+continue_waiting:
+        perform_zpcm_inc
+        far_call FAR_update_brightness
+        perform_zpcm_inc
+        far_call FAR_refresh_palettes_gameloop
+        perform_zpcm_inc
+        jsr update_beat_counters_title
 
         jsr wait_for_next_vblank
         rts
