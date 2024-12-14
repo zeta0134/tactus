@@ -370,3 +370,28 @@ PaletteIndex := T7
 
         rts
 .endproc
+
+; Used by UI screens, often WIP, which don't have a default
+; actual nametable to load. Just fill everything with space
+; tiles. Clobbers R0-R5
+.proc FAR_draw_blank_nametable
+NametableAddr := R0
+AttributeAddr := R2
+Length := R4
+        st16 NametableAddr, $5000
+        st16 AttributeAddr, $5800
+        st16 Length, $0400
+        ldy #0
+loop:
+        lda #' '
+        sta (NametableAddr), y
+        lda #CHR_BANK_FONT_MARSHMALLOW
+        sta (AttributeAddr), y
+        inc16 NametableAddr
+        inc16 AttributeAddr
+        dec16 Length
+        lda Length+0
+        ora Length+1
+        bne loop
+        rts
+.endproc

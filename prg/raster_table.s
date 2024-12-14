@@ -1349,7 +1349,8 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         jsr delay_20
 
         ; Apply the hud animation bank, and do little else
-        lda HudBgActual         ; 4
+        ; (use the real value because it is synced well enough)
+        lda HudBgHighBank       ; 4
         sta MAP_BG_EXT_BANK     ; 4
 
         inc RasterTableIndex ; ... 5?

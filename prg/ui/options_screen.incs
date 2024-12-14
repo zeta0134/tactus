@@ -99,9 +99,9 @@ options_obj_palette:
 ;                       Screen Specific Logic
 ; ======================================================================
 
-.segment "CODE_UI_WIDGETS"
+.segment "CODE_UI_UTIL"
 
-.proc options_controller_init
+.proc FAR_options_controller_init
 MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
 widget_color_top_metasprite_index := widgets_data0
@@ -119,6 +119,24 @@ widget_color_bottom_metasprite_index := widgets_data1
         lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
         sta LeftNametableAttr
         sta RightNametableAttr
+
+        ; Initialize with a totally blank nametable
+        far_call FAR_draw_blank_nametable
+
+        ; Now we need to zero out the first 6 metatiles, for the pseudo background
+        ; to use the correct torchlight (as we aren't actually doing torchlight)
+        ; (I guess we could load in a static torchlight pattern if we really wanted to?)
+        lda #0
+        ldy #0
+torchlight_loop_a:
+        sta $5800, y
+        iny
+        bne torchlight_loop_a
+torchlight_loop_b:
+        sta $5900, y
+        iny
+        cpy #128
+        bne torchlight_loop_b
 
         ; we need a fancy mid-frame split to switch from the battlefield preview
         ; to the hud set instead
@@ -181,6 +199,13 @@ bg_loop:
 
         ldy CurrentWidgetIndex
         set_widget_state_y options_controller_update
+        rts
+.endproc
+
+        .segment "CODE_UI_WIDGETS"
+
+.proc options_controller_init
+        far_call FAR_options_controller_init
         rts
 .endproc
 
