@@ -169,7 +169,7 @@ more_bombs_remain:
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #$FF ; intentionally offscreen
         sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_PLAYER
+        lda #<SPRITE_TILE_BOMB_STANDARD
         sta sprite_table + MetaSpriteState::TileIndex, x
 
         ; We're hoisting a bomb (successfully) so play an appropriate SFX
@@ -331,7 +331,7 @@ overlap_check_passed:
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #$FF ; intentionally offscreen
         sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_PLAYER
+        lda #<SPRITE_TILE_BOMB_STANDARD
         sta sprite_table + MetaSpriteState::TileIndex, x
 
         ; Party bombs should play a cartoony "long fall" SFX

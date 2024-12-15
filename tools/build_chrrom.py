@@ -261,14 +261,14 @@ def generate_chr(background_tiles, sprite_tiles, raw_chr_playfield_banks, raw_ch
           chr_addr = (animation_frame * 16 * 16) + (lighting_variant * 16 * 4) + (tile_id * 16)
           chr_bytes[dest_addr:dest_addr+16] = chr_data[chr_addr:chr_addr+16]
   # sprite tiles are very similar, but without the lighting variant offsets
-  for i in range(0, len(sprite_tiles)):
-    chr_data = convert_to_chr(sprite_tiles[i])
-    metatile_base_addr = sprite_tile_base_address(i)
-    for animation_frame in range(0, 4):
-      for tile_id in range(0, 4):
-        dest_addr = (animation_frame * 256 * 1024) + metatile_base_addr + (tile_id * 16)
-        chr_addr = (animation_frame * 16 * 4) + (tile_id * 16)
-        chr_bytes[dest_addr:dest_addr+16] = chr_data[chr_addr:chr_addr+16]
+  #for i in range(0, len(sprite_tiles)):
+  #  chr_data = convert_to_chr(sprite_tiles[i])
+  #  metatile_base_addr = sprite_tile_base_address(i)
+  #  for animation_frame in range(0, 4):
+  #    for tile_id in range(0, 4):
+  #      dest_addr = (animation_frame * 256 * 1024) + metatile_base_addr + (tile_id * 16)
+  #      chr_addr = (animation_frame * 16 * 4) + (tile_id * 16)
+  #      chr_bytes[dest_addr:dest_addr+16] = chr_data[chr_addr:chr_addr+16]
   # chr banks are just written right into place in all four animation banks
   for i in range(0, len(raw_chr_playfield_banks)):
     for animation_frame in range(0, 4):

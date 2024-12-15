@@ -58,12 +58,15 @@ LastBeat: .res 1
 AccumulatedGameBeats: .res 2
 
 PlayfieldBgHighBank: .res 1
-PlayfieldObjHighBank: .res 1
+PlayfieldObjHighBank: .res 1 ; this is really more like "animation offset" but w/e
 HudBgHighBank: .res 1
-HudObjHighBank: .res 1
+HudObjHighBank: .res 1 ; ditto
 
 ClearedRoomCooldown: .res 1
 RoomTransitionType: .res 1
+
+PlayfieldObjBanks: .res 16
+HudObjBanks: .res 8
 
 .segment "CODE_1"
 
@@ -156,6 +159,14 @@ continue_waiting:
         jsr set_brightness
         lda #0
         sta TargetBrightness
+
+        lda #0
+        .repeat 16, i
+        sta PlayfieldObjBanks + i
+        .endrepeat
+        .repeat 8, i
+        sta HudObjBanks + i
+        .endrepeat
 
         far_call FAR_disable_all_oam_entries_playfield
         far_call FAR_disable_all_oam_entries_hud

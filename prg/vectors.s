@@ -117,7 +117,6 @@ loop:
         lda GameloopCounter
         sta LastNmi
         jmp all_frames
-
 lag_frame:
         ; If necessary: actions to be performed only on lag frames
         
@@ -140,15 +139,25 @@ all_frames:
         lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | OBJ_8X16 | NT_2000)
         sta PPUCTRL
        
+        ; TODO: is this even needed? scanline 4 overwrites this...
         lda #0
         sta PPUSCROLL
         lda #0
         sta PPUSCROLL
 
+        ; Set the one (1) upper background register
         rainbow_set_upper_bg_chr PlayfieldBgHighBank
-        rainbow_set_upper_obj_chr PlayfieldObjHighBank, #SPRITE_REGION_BASE
-
         
+        ; for sprites, set all (all) 16 sprite registers, including their
+        ; current animation frame. yay, 176 cycles!
+        ; TODO: see if we can't break this up into high priority, low priority
+        ; blocks, to move some of this logic out of actual vblank. we are in a
+        ; race condition against the start of raster splits, after all
+        .repeat 16, i
+        lda PlayfieldObjBanks+i  ; 4
+        ora PlayfieldObjHighBank ; 3
+        sta MAP_CHR_0_LO + i     ; 4
+        .endrepeat
 
         ; re-enable rendering (the IRQ may have disabled it, if it ran)
         ; note: sans backgrounds! we'll turn those on with a raster effect later
@@ -158,6 +167,8 @@ all_frames:
         ; always run this (whether it does anything meaningful is controlled with a flag)
         ;jsr setup_irq_during_nmi
         ;cli ; always enable interrupts; whether they get generated is up to the routine above
+
+        ; TODO: can we make this not a far call? it'll save quite a lot of cycles
         far_call_nmi FAR_setup_raster_table_for_frame
         
         ; Advance the gameplay pRNG once every frame

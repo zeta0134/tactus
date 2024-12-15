@@ -38,20 +38,30 @@ data_bank_high_shadow: .res 1
 	sta MAP_PRG_CONTROL
 	; Ideally we didn't just crash [fingers crossed] and can continue with setup XD
 
-	; for CHR we want our CHR ROM accessible (for now) in big 4k chunks:
-	lda #(CHR_CHIP_ROM | CHR_MODE_1)
+	; We want our CHR ROM accessible in little tiny 512b chunks:
+	lda #(CHR_CHIP_ROM | CHR_MODE_4)
 	sta MAP_CHR_CONTROL
-	;  for now, place the same sprite bank into both 4k regions
-	lda #SPRITE_REGION_BASE
-	sta MAP_CHR_0_LO
+	; initialize all the high bank portions to 0; only the sprite layer actually uses them,
+	; and they won't be displayed until some more sophisticated system initializes
+	; them properly. generally we arrange our CHR so that we don't need to change the
+	; high bank at all.
 	lda #0
 	sta MAP_CHR_0_HI
-
-	lda #(SPRITE_REGION_BASE+1)
-	sta MAP_CHR_1_LO
-	lda #0
 	sta MAP_CHR_1_HI
-	; for backgrounds, 
+	sta MAP_CHR_2_HI
+	sta MAP_CHR_3_HI
+	sta MAP_CHR_4_HI
+	sta MAP_CHR_5_HI
+	sta MAP_CHR_6_HI
+	sta MAP_CHR_7_HI
+	sta MAP_CHR_8_HI
+	sta MAP_CHR_9_HI
+	sta MAP_CHR_A_HI
+	sta MAP_CHR_B_HI
+	sta MAP_CHR_C_HI
+	sta MAP_CHR_D_HI
+	sta MAP_CHR_E_HI
+	sta MAP_CHR_F_HI
 
 	; for PRG RAM, put bank $00 in the $6000-$7FFF region. We treat
 	; this as "fixed" work RAM for the most part.

@@ -207,8 +207,7 @@ HeartCount := R2
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #$FF ; intentionally offscreen
         sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_PLAYER
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER
 
         ; For now, init the player to position 6, 6 (for no particular reason)
         lda #6
@@ -938,13 +937,11 @@ check_for_idle_pose:
         lda #16
         sta PlayerIdleBeats
         ldx PlayerSpriteIndex
-        lda #<SPRITE_TILE_PLAYER_IDLE
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER_IDLE
         jmp done_with_initial_pose
 pick_standard_pose:
         ldx PlayerSpriteIndex
-        lda #<SPRITE_TILE_PLAYER
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER
 done_with_initial_pose:
 
         lda PlayerRow
@@ -999,8 +996,7 @@ resolve_enemy_collision:
         jmp skip_jumping_pose
 apply_jumping_pose:
         ldx PlayerSpriteIndex
-        lda #<SPRITE_TILE_PLAYER_JUMP
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER_JUMP
         ; The player's movement succeeded, so store that in a flag
         lda PlayerNextDirection
         sta PlayerPreviousSuccessfulDirection
@@ -1191,8 +1187,7 @@ TargetCol := R15
         sta PlayerBeatsInThisState
         ; Set our animation frame back to idle
         ldx PlayerSpriteIndex
-        lda #SPRITE_TILE_PLAYER
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER
 
 resolve_enemy_collision:
         lda PlayerRow
@@ -1477,8 +1472,7 @@ done_with_map_edge_checks:
         ; the previous move actually happened, so apply the jumping pose
         ; (even if the next one fails!)
         ldx PlayerSpriteIndex
-        lda #<SPRITE_TILE_PLAYER_JUMP
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER_JUMP
 
 move_player:
         jsr player_move        
@@ -1761,8 +1755,7 @@ skip_weapon_sfx:
         ; ... and set our sprite state to attacking
         ; TODO: if we have multiple or weapon-specific attack animations, here is where to apply them
         ldx PlayerSpriteIndex
-        lda #<SPRITE_TILE_PLAYER_ATTACK
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER_ATTACK
 
 done:
         ; If there is any cleanup to do, do that here. Otherwise we're finished I think?
@@ -2173,14 +2166,13 @@ damage_amount_okay:
         ; animation override the damage state though, as it's more important)
         ldx PlayerSpriteIndex
         lda sprite_table + MetaSpriteState::TileIndex, x
-        cmp #<SPRITE_TILE_PLAYER
+        cmp #<SPRITE_PLAYER_01_PLAYER
         beq apply_damage_animation
-        cmp #<SPRITE_TILE_PLAYER_IDLE
+        cmp #<SPRITE_PLAYER_01_PLAYER_IDLE
         beq apply_damage_animation
         jmp action_overrides_damage_animation
 apply_damage_animation:
-        lda #<SPRITE_TILE_PLAYER_HIT
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER_HIT
 action_overrides_damage_animation:
         rts
 
@@ -2379,8 +2371,7 @@ perform_pause:
 continue_being_paused:
         ; Put player in the "idle" pose during a pause
         ldx PlayerSpriteIndex
-        lda #<SPRITE_TILE_PLAYER_IDLE
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER_IDLE
 
         ; Important: do NOT process any actual game logic while we are paused!
         ; Jump ahead to battlefield drawing, which will re-use the state we just computed.
@@ -2432,8 +2423,7 @@ proceed_to_hoist:
         lda #0
         sta PlayerIdleBeats
         ldx PlayerSpriteIndex
-        lda #SPRITE_TILE_PLAYER
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER
 all_done:
         rts
 .endproc
@@ -2492,8 +2482,7 @@ done_with_full_room_prep:
 
         ; Animate them into the... hrm. Item holding pose, yes!
         ldx PlayerSpriteIndex
-        lda #SPRITE_TILE_PLAYER_HAND_RAISED
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER_HAND_RAISED
 
         ; Spawn in a sprite at the player's current tile coordinates, with
         ; that spell item rising up into the air, just like a death sprite
