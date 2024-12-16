@@ -119,8 +119,6 @@ bomb_sprite_allocation_succeeded:
 standard:
         ; What this should be
         lda #BOMB_STATE_STANDARD_INIT
-        ; For great testing!
-        ;lda #BOMB_STATE_PARTY_INIT
         sta bomb_entities + BombState::State, x
         jmp done_picking_state
 done_picking_state:
@@ -169,8 +167,7 @@ more_bombs_remain:
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #$FF ; intentionally offscreen
         sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_BOMB_STANDARD
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_static_02_sprite_x SPRITE_STATIC_02_BOMB_STANDARD
 
         ; We're hoisting a bomb (successfully) so play an appropriate SFX
         queue_sfx_pulse1 sfx_hoist_pulse
@@ -331,8 +328,7 @@ overlap_check_passed:
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #$FF ; intentionally offscreen
         sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_BOMB_STANDARD
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_static_02_sprite_x SPRITE_STATIC_02_BOMB_STANDARD
 
         ; Party bombs should play a cartoony "long fall" SFX
         queue_sfx_triangle sfx_cartoony_fall_tri
@@ -661,6 +657,7 @@ update_loop:
         ; length, so handle that here
         ldx CurrentBombIndex
         jsr _set_color_based_on_fuse_length_standard
+        jsr _set_sprite_based_on_fuse_length_standard
 
 done_with_this_bomb:
 
@@ -736,8 +733,7 @@ CurrentBombIndex := R15
         ; setup sprite things!
         ldx CurrentBombIndex
         ldy bomb_entities + BombState::MetaspriteIndex, x
-        lda #SPRITE_TILE_BOMB_STANDARD
-        sta sprite_table + MetaSpriteState::TileIndex, y
+        set_static_02_sprite_y SPRITE_STATIC_02_BOMB_STANDARD
         lda #(SPRITE_ACTIVE | SPRITE_PAL_PURPLE)
         sta sprite_table + MetaSpriteState::BehaviorFlags, y
         ; Switch into "hoist" mode
@@ -821,8 +817,7 @@ CurrentBombIndex := R15
         ; setup sprite things!
         ldx CurrentBombIndex
         ldy bomb_entities + BombState::MetaspriteIndex, x
-        lda #SPRITE_TILE_BOMB_STANDARD
-        sta sprite_table + MetaSpriteState::TileIndex, y
+        set_static_02_sprite_y SPRITE_STATIC_02_BOMB_STANDARD
         lda #(SPRITE_ACTIVE | SPRITE_PAL_PURPLE)
         sta sprite_table + MetaSpriteState::BehaviorFlags, y
         ; Switch into "hoist" mode
@@ -886,6 +881,21 @@ hoist_pal:
         ldy bomb_entities + BombState::MetaspriteIndex, x
         lda #(SPRITE_ACTIVE | SPRITE_PAL_PURPLE)
         sta sprite_table + MetaSpriteState::BehaviorFlags, y
+        rts
+.endproc
+
+; X is the bomb index, etc
+.proc _set_sprite_based_on_fuse_length_standard
+        lda bomb_entities + BombState::FuseDuration, x
+        cmp #3
+        beq earth_shattering_sprite
+boring_sprite:
+        ldy bomb_entities + BombState::MetaspriteIndex, x
+        set_static_02_sprite_y SPRITE_STATIC_02_BOMB_STANDARD
+        rts
+earth_shattering_sprite:
+        ldy bomb_entities + BombState::MetaspriteIndex, x
+        set_static_02_sprite_y SPRITE_STATIC_02_BOMB_STANDARD_GROWING
         rts
 .endproc
 

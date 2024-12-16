@@ -1094,8 +1094,24 @@ check_bomb_in_hand:
         lda PlayerHeldBombIndex
         cmp #$FF
         beq not_holding_bomb
+
         ; Otherwise advance our animation state, in case bomb logic needs to use that
         inc PlayerBeatsInThisState
+        ; Normally while holding a bomb we should use our held state:
+        ldx PlayerSpriteIndex
+        set_player_sprite_x SPRITE_PLAYER_02_PLAYER_HOLD
+        ; If we are now holding a standard bomb and we are on beat 3, PANIC
+        lda PlayerEquipmentBombs
+        cmp #ITEM_BOMB_STANDARD
+        bne done_panicking
+        lda PlayerBeatsInThisState
+        cmp #3
+        bcc done_panicking
+        ; Set the panic sprite
+        ldx PlayerSpriteIndex
+        set_player_sprite_x SPRITE_PLAYER_02_PLAYER_PANIC
+done_panicking:
+
         jmp resolve_enemy_collision
 
 not_holding_bomb:
@@ -1105,6 +1121,9 @@ not_holding_bomb:
         sta PlayerState
         lda #0
         sta PlayerBeatsInThisState
+        ; Reset to idle, so the damage logic switches to that sprite
+        ldx PlayerSpriteIndex
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER
 
 resolve_enemy_collision:
         lda PlayerRow
@@ -2423,7 +2442,7 @@ proceed_to_hoist:
         lda #0
         sta PlayerIdleBeats
         ldx PlayerSpriteIndex
-        set_player_sprite_x SPRITE_PLAYER_01_PLAYER
+        set_player_sprite_x SPRITE_PLAYER_02_PLAYER_HOIST
 all_done:
         rts
 .endproc

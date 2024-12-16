@@ -454,6 +454,19 @@ LayoutPtr := R0
         ; will shift these around as necessary.
         jsr set_raster_effect_for_room
 
+        ; During main gameplay, we have a fixed set of static
+        ; banks, so get those all loaded in
+        lda #>SPRITE_STATIC_00_PARTICLES_DARK_01
+        sta SPRITE_BANK_STATIC0
+        lda #>SPRITE_STATIC_01_DAMAGE_FLASHING_SQUARE
+        sta SPRITE_BANK_STATIC1
+        lda #>SPRITE_STATIC_02_BOMB_STANDARD
+        sta SPRITE_BANK_STATIC2
+        lda #>SPRITE_STATIC_03_UI_SLIDER
+        sta SPRITE_BANK_STATIC3
+        ; TODO: the other four static banks!!
+
+
         set_raster_playback_speed #1, #0
         ; Enable NMI first (but not rendering)
         lda #0

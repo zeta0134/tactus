@@ -127,3 +127,57 @@ SPRITE_OFFSET_HUD_STATIC5  = $E0
     sta sprite_table + MetaSpriteState::TileIndex, y
     set_sprite_bank SPRITE_BANK_PLAYER, tile_id
 .endmacro
+
+.macro set_static_00_sprite_x tile_id
+    lda #<(tile_id + SPRITE_OFFSET_STATIC0)
+    sta sprite_table + MetaSpriteState::TileIndex, x
+    set_sprite_bank SPRITE_BANK_STATIC0, tile_id
+.endmacro
+
+.macro set_static_01_sprite_x tile_id
+    lda #<(tile_id + SPRITE_OFFSET_STATIC1)
+    sta sprite_table + MetaSpriteState::TileIndex, x
+    set_sprite_bank SPRITE_BANK_STATIC1, tile_id
+.endmacro
+
+.macro set_static_02_sprite_x tile_id
+    lda #<(tile_id + SPRITE_OFFSET_STATIC2)
+    sta sprite_table + MetaSpriteState::TileIndex, x
+    set_sprite_bank SPRITE_BANK_STATIC2, tile_id
+.endmacro
+
+.macro set_static_02_sprite_y tile_id
+    lda #<(tile_id + SPRITE_OFFSET_STATIC2)
+    sta sprite_table + MetaSpriteState::TileIndex, y
+    set_sprite_bank SPRITE_BANK_STATIC2, tile_id
+.endmacro
+
+.macro set_static_03_sprite_x tile_id
+    lda #<(tile_id + SPRITE_OFFSET_STATIC3)
+    sta sprite_table + MetaSpriteState::TileIndex, x
+    set_sprite_bank SPRITE_BANK_STATIC3, tile_id
+.endmacro
+
+.macro set_static_04_sprite_x tile_id
+    lda #<(tile_id + SPRITE_OFFSET_STATIC4)
+    sta sprite_table + MetaSpriteState::TileIndex, x
+    set_sprite_bank SPRITE_BANK_STATIC4, tile_id
+.endmacro
+
+.macro set_static_05_sprite_x tile_id
+    lda #<(tile_id + SPRITE_OFFSET_STATIC5)
+    sta sprite_table + MetaSpriteState::TileIndex, x
+    set_sprite_bank SPRITE_BANK_STATIC5, tile_id
+.endmacro
+
+.macro set_static_06_sprite_x tile_id
+    lda #<(tile_id + SPRITE_OFFSET_STATIC6)
+    sta sprite_table + MetaSpriteState::TileIndex, x
+    set_sprite_bank SPRITE_BANK_STATIC6, tile_id
+.endmacro
+
+.macro set_static_07_sprite_x tile_id
+    lda #<(tile_id + SPRITE_OFFSET_STATIC7)
+    sta sprite_table + MetaSpriteState::TileIndex, x
+    set_sprite_bank SPRITE_BANK_STATIC7, tile_id
+.endmacro
