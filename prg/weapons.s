@@ -300,25 +300,57 @@ longsword_west:
         .lobytes -1,  0, SPRITE_TILE_LONGSWORD_WEST_2, NONE, (WEAPON_CANCEL_MOVEMENT)
         .lobytes -2,  0, SPRITE_TILE_LONGSWORD_WEST_1, NONE, (WEAPON_CANCEL_MOVEMENT)
 
+longsword_north_anim:
+        .byte 2  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes   0, -32, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_1, (SPRITE_ONE_BEAT)
+        .lobytes   0, -16, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_2, (SPRITE_ONE_BEAT)
+
+longsword_east_anim:
+        .byte 2  ; length
+                 ; X,   Y,                                   TileId, Sprite Behavior
+        .lobytes  32,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_1, (SPRITE_ONE_BEAT)
+        .lobytes  16,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_2, (SPRITE_ONE_BEAT)
+
+longsword_south_anim:
+        .byte 2  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes   0,  32, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes   0,  16, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+
+longsword_west_anim:
+        .byte 2  ; length
+                 ; X,   Y,                                   TileId, Sprite Behavior
+        .lobytes -32,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+
 ; Longswords have no special behavior; each directional strike sets up a common anim table
 .proc longsword_init_north
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_1
+        st16 WeaponAnimPtr, longsword_north_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
 .endproc
 
 .proc longsword_init_east
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_1
+        st16 WeaponAnimPtr, longsword_east_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
 .endproc
 
 .proc longsword_init_south
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_1
+        st16 WeaponAnimPtr, longsword_south_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
 .endproc
 
 .proc longsword_init_west
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_1
+        st16 WeaponAnimPtr, longsword_west_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
 .endproc
 
 ; Spears are almost identical to longswords, except they can only target one enemy
