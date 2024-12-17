@@ -24,4 +24,6 @@ WEAPON_BROADSWORD = 1
 WEAPON_LONGSWORD = 2
 WEAPON_SPEAR = 3
 WEAPON_FLAIL = 4
+
 .global weapon_class_table
+.global weapon_update_none

@@ -43,6 +43,8 @@ PlayerZonePtr: .res 2
 
 .segment "RAM"
 
+WeaponDrawFunc: .res 2
+
 DestinationZonePtr: .res 2
 
 player_equipment_by_index: ; for indexing into this like a list
@@ -111,6 +113,8 @@ PlayerDamageAnimCounter: .res 1
 PlayerIncomingDamageDirection: .res 1
 
 PlayerHeldBombIndex: .res 1
+
+WeaponSingleTargetIndex: .res 1
 
 DIRECTION_NORTH = 1
 DIRECTION_EAST  = 2
@@ -193,6 +197,8 @@ NewHeartType := R0
 HealingAmount := R0
 MetaSpriteIndex := R0
 HeartCount := R2
+        st16 WeaponDrawFunc, weapon_update_none
+
         ; spawn in the player sprite
         far_call FAR_find_unused_sprite
         ldx MetaSpriteIndex
@@ -470,8 +476,16 @@ done_with_damage_offset:
         inc PlayerDamageAnimCounter
 done_with_damage:
 
+        ; Draw weapon effects every frame! Most weapons will spawn sprites only
+        ; on their first frame, but some may have additional behavior
+        jsr draw_weapon_effects
+
         perform_zpcm_inc
         rts
+.endproc
+
+.proc draw_weapon_effects
+        jmp (WeaponDrawFunc)
 .endproc
 
 player_horiz_offset_lut:
@@ -859,6 +873,9 @@ player_state_lut:
 ; Called once at the beginning of every beat
 .proc FAR_update_player
 PlayerStatePtr := R0
+        ; basic cleanup applied to all on-beat states
+        st16 WeaponDrawFunc, weapon_update_none
+
         lda PlayerState
         asl
         tax
@@ -1639,11 +1656,23 @@ done_choosing_direction:
         iny
         lda (PlayerWeaponPtr), y
         sta WeaponSquaresPtr+1
+        ; skip ahead 4 words, minus 1 for the iny we already did, to nab
+        ; the corresponding animation init routine for this direction
+        .repeat 7 
+        iny       
+        .endrepeat
+        ; preload the weapon init animation (which we may cancel later)
+        lda (PlayerWeaponPtr), y
+        sta WeaponDrawFunc+0
+        iny
+        lda (PlayerWeaponPtr), y
+        sta WeaponDrawFunc+1
         
         ; Now we iterate through each of these squares, roll an attack against the square
         lda #0
         sta AttackLanded
         sta WeaponSquaresIndex
+
         ldy #WeaponClass::NumSquares
         lda (PlayerWeaponPtr), y
         sta TilesRemaining
@@ -1748,8 +1777,11 @@ check_early_exit:
         ; Then we are done with the swing, and should clean up
         lda AttackSquare
         sta SingleHitAttackSquare
-        jsr draw_single_hit_fx
-        jsr draw_multiple_hit_sfx
+        
+        ; TODO: weapon drawing!
+        ;jsr draw_single_hit_fx
+        ;jsr draw_multiple_hit_sfx
+        
         jmp done_with_swing
 no_early_exit:
         ; Otherwise, iterate to the next weapon square and continue
@@ -1758,13 +1790,15 @@ no_early_exit:
 
         lda AttackLanded
         beq done_with_swing
-        jsr draw_multiple_hit_fx
+        
+        ; TODO: weapon drawing!
+        ;jsr draw_multiple_hit_fx
 
 done_with_swing:
         perform_zpcm_inc
         ; if an attack landed at all ...
         lda AttackLanded
-        beq done
+        beq attack_missed
         
         ; ... play a weapon slash effect
         lda EnemyDiedThisFrame
@@ -1778,6 +1812,13 @@ skip_weapon_sfx:
 
 done:
         ; If there is any cleanup to do, do that here. Otherwise we're finished I think?
+        perform_zpcm_inc
+        rts
+
+attack_missed:
+        ; Clear out our animation routine which we preloaded earlier, we want to
+        ; draw nothing instead
+        st16 WeaponDrawFunc, weapon_update_none
         perform_zpcm_inc
         rts
 .endproc
@@ -1817,300 +1858,6 @@ chain_over:
         sta PlayerChainGrace
 
 cleanup:
-        perform_zpcm_inc
-        rts
-.endproc
-
-.proc draw_single_hit_fx
-AttackSquare := R3
-        jsr spawn_fx_sprite_here
-        rts
-.endproc
-
-.proc draw_multiple_hit_fx
-PlayerSquare := R2
-AttackSquare := R3
-WeaponSquaresIndex := R4
-WeaponSquaresPtr := R5 ; R6
-TilesRemaining := R9
-        ; For this we actually need to loop all the way back over the structure
-        ldy #WeaponClass::NumSquares
-        lda (PlayerWeaponPtr), y
-        sta TilesRemaining
-
-        ; Just like when swinging the weapon, we must compute the position of each square
-        lda #0
-        sta WeaponSquaresIndex
-        ldy #WeaponClass::NumSquares
-        lda (PlayerWeaponPtr), y
-        sta TilesRemaining
-loop:
-        perform_zpcm_inc
-        ; Reset to the player's position
-        lda PlayerSquare
-        sta AttackSquare
-        ; For safety, track the raw row/col as well
-        lda PlayerRow
-        sta SafetyRow
-        lda PlayerCol
-        sta SafetyCol
-        ; Add the relative offset from the considered square
-        ldy WeaponSquaresIndex
-        lda (WeaponSquaresPtr), y ; X offset
-        clc
-        adc AttackSquare
-        sta AttackSquare
-
-        ; Also add it to our tracked SafetyCol
-        lda PlayerCol
-        clc
-        adc (WeaponSquaresPtr), y ; X offset
-        sta SafetyCol
-
-        iny
-        ; For the SafetyRow, we can do simple arithmetic here
-        lda (WeaponSquaresPtr), y ; Y offset
-        clc
-        adc SafetyRow
-        sta SafetyRow
-
-        lda (WeaponSquaresPtr), y ; Y offset
-        bmi negative_y
-positive_y:
-        tax        
-        lda player_tile_index_table, x
-        clc
-        adc AttackSquare
-        sta AttackSquare
-        jmp converge
-negative_y:
-        eor #$FF
-        tax
-        inx
-        sec
-        lda AttackSquare
-        sbc player_tile_index_table, x
-        sta AttackSquare
-converge:
-        iny
-        perform_zpcm_inc
-
-        ; Read the FX ID, which we are about to draw
-        lda (WeaponSquaresPtr), y
-        sta FxTileId
-        iny
-        lda (WeaponSquaresPtr), y
-        sta SfxTileId
-        iny
-
-        ; Skip over the behavioral flags
-        iny
-        sty WeaponSquaresIndex
-
-        ; Safety Dance: do NOT draw tiles that are out of bounds
-        lda SafetyCol
-        bmi skip_out_of_bounds
-        cmp #BATTLEFIELD_WIDTH
-        bcs skip_out_of_bounds
-        lda SafetyRow
-        bmi skip_out_of_bounds
-        cmp #BATTLEFIELD_HEIGHT
-        bcs skip_out_of_bounds
-
-        ; Now we have the attack square, we can draw the weapon FX 
-        jsr spawn_fx_sprite_here
-skip_out_of_bounds:
-        dec TilesRemaining
-        bne loop
-
-        rts
-.endproc
-
-; Variant used by spears and flails, for their non-hit sprites
-.proc draw_multiple_hit_sfx
-PlayerSquare := R2
-AttackSquare := R3
-WeaponSquaresIndex := R4
-WeaponSquaresPtr := R5 ; R6
-TilesRemaining := R9
-        ; For this we actually need to loop all the way back over the structure
-        ldy #WeaponClass::NumSquares
-        lda (PlayerWeaponPtr), y
-        sta TilesRemaining
-
-        ; Just like when swinging the weapon, we must compute the position of each square
-        lda #0
-        sta WeaponSquaresIndex
-        ldy #WeaponClass::NumSquares
-        lda (PlayerWeaponPtr), y
-        sta TilesRemaining
-loop:
-        perform_zpcm_inc
-        ; Reset to the player's position
-        lda PlayerSquare
-        sta AttackSquare
-        ; For safety, track the raw row/col as well
-        lda PlayerRow
-        sta SafetyRow
-        lda PlayerCol
-        sta SafetyCol
-        ; Add the relative offset from the considered square
-        ldy WeaponSquaresIndex
-        lda (WeaponSquaresPtr), y ; X offset
-        clc
-        adc AttackSquare
-        sta AttackSquare
-
-        ; Also add it to our tracked SafetyCol
-        lda PlayerCol
-        clc
-        adc (WeaponSquaresPtr), y ; X offset
-        sta SafetyCol
-
-        iny
-        ; For the SafetyRow, we can do simple arithmetic here
-        lda (WeaponSquaresPtr), y ; Y offset
-        clc
-        adc SafetyRow
-        sta SafetyRow
-
-        lda (WeaponSquaresPtr), y ; Y offset
-        bmi negative_y
-positive_y:
-        tax        
-        lda player_tile_index_table, x
-        clc
-        adc AttackSquare
-        sta AttackSquare
-        jmp converge
-negative_y:
-        eor #$FF
-        tax
-        inx
-        sec
-        lda AttackSquare
-        sbc player_tile_index_table, x
-        sta AttackSquare
-converge:
-        iny
-        perform_zpcm_inc
-
-        ; Read the FX ID, which we are about to draw
-        lda (WeaponSquaresPtr), y
-        sta FxTileId
-        iny
-        lda (WeaponSquaresPtr), y
-        sta SfxTileId
-        iny
-
-        ; Skip over the behavioral flags
-        iny
-        sty WeaponSquaresIndex
-
-        ; Now we have the attack square, we can draw the weapon FX 
-        ; But for SFX, only if this is NOT the square where the attack landed
-        ; (... and maybe not if it matches the player's location?)
-        lda AttackSquare
-        cmp SingleHitAttackSquare
-        beq skip_draw
-
-        ; Safety Dance: do NOT draw tiles that are out of bounds
-        lda SafetyCol
-        bmi skip_draw
-        cmp #BATTLEFIELD_WIDTH
-        bcs skip_draw
-        lda SafetyRow
-        bmi skip_draw
-        cmp #BATTLEFIELD_HEIGHT
-        bcs skip_draw
-
-        jsr spawn_sfx_sprite_here
-skip_draw:
-
-        dec TilesRemaining
-        bne loop
-
-        rts
-.endproc
-
-.proc spawn_fx_sprite_here
-MetaSpriteIndex := R0
-AttackSquare := R3
-        perform_zpcm_inc
-        far_call FAR_find_unused_sprite
-        ldx MetaSpriteIndex
-        cpx #$FF
-        beq sprite_failed
-
-        perform_zpcm_inc
-
-        lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_PAL_1)
-        sta sprite_table + MetaSpriteState::BehaviorFlags, x
-        lda #$FF
-        sta sprite_table + MetaSpriteState::LifetimeBeats, x
-
-        ldy AttackSquare
-        lda tile_index_to_col_lut, y
-        .repeat 4
-        asl
-        .endrepeat
-        clc
-        adc #BATTLEFIELD_OFFSET_X
-        sta sprite_table + MetaSpriteState::PositionX, x
-
-        lda tile_index_to_row_lut, y
-        .repeat 4
-        asl
-        .endrepeat
-        clc
-        adc #BATTLEFIELD_OFFSET_Y
-        sta sprite_table + MetaSpriteState::PositionY, x
-
-        lda FxTileId
-        sta sprite_table + MetaSpriteState::TileIndex, x
-
-sprite_failed:
-        perform_zpcm_inc
-        rts
-.endproc
-
-.proc spawn_sfx_sprite_here
-MetaSpriteIndex := R0
-AttackSquare := R3
-        perform_zpcm_inc
-        far_call FAR_find_unused_sprite
-        ldx MetaSpriteIndex
-        cpx #$FF
-        beq sprite_failed
-
-        perform_zpcm_inc
-
-        lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_PAL_1)
-        sta sprite_table + MetaSpriteState::BehaviorFlags, x
-        lda #$FF
-        sta sprite_table + MetaSpriteState::LifetimeBeats, x
-
-        ldy AttackSquare
-        lda tile_index_to_col_lut, y
-        .repeat 4
-        asl
-        .endrepeat
-        clc
-        adc #BATTLEFIELD_OFFSET_X
-        sta sprite_table + MetaSpriteState::PositionX, x
-
-        lda tile_index_to_row_lut, y
-        .repeat 4
-        asl
-        .endrepeat
-        clc
-        adc #BATTLEFIELD_OFFSET_Y
-        sta sprite_table + MetaSpriteState::PositionY, x
-
-        lda SfxTileId
-        sta sprite_table + MetaSpriteState::TileIndex, x
-
-sprite_failed:
         perform_zpcm_inc
         rts
 .endproc
