@@ -16,7 +16,7 @@
 ; oh, this is probably overkill. it's fine.
 weapon_metasprite_ids: .res 8
 
-.segment "CODE_4"
+.segment "CODE_PLAYER"
 
 ; TODO: move this to a data bank?
 weapon_class_table:
@@ -425,26 +425,102 @@ spear_west:
         .lobytes -1,  0, SPRITE_TILE_SPEAR_WEST_1, SPRITE_TILE_SPEAR_WEST_2, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
         .lobytes -2,  0, SPRITE_TILE_SPEAR_WEST_1, NONE, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
 
+spear_north_distant_anim:
+        .byte 2  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes   0, -32, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1, (SPRITE_ONE_BEAT)
+        .lobytes   0, -16, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_2, (SPRITE_ONE_BEAT)
+
+spear_north_near_anim:
+        .byte 1  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes   0, -16, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1, (SPRITE_ONE_BEAT)
+
+spear_east_distant_anim:
+        .byte 2  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes  32,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1, (SPRITE_ONE_BEAT)
+        .lobytes  16,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_2, (SPRITE_ONE_BEAT)
+
+spear_east_near_anim:
+        .byte 1  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes  16,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1, (SPRITE_ONE_BEAT)
+
+spear_south_distant_anim:
+        .byte 2  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes   0,  32, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes   0,  16, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+
+spear_south_near_anim:
+        .byte 1  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes   0,  16, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+
+spear_west_distant_anim:
+        .byte 2  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes -32,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+
+spear_west_near_anim:
+        .byte 1  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes -16,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+
 ; Spears select from one of two animation tables, depending on whether the near
 ; or far target was struck
 .proc spear_init_north
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1
+        st16 WeaponDrawFunc, weapon_update_none
+        lda WeaponSingleTargetIndex
+        beq near
+distant:
+        st16 WeaponAnimPtr, spear_north_distant_anim
+        jmp weapon_init_common
+near:
+        st16 WeaponAnimPtr, spear_north_near_anim
+        jmp weapon_init_common
 .endproc
 
 .proc spear_init_east
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1
+        st16 WeaponDrawFunc, weapon_update_none
+        lda WeaponSingleTargetIndex
+        beq near
+distant:
+        st16 WeaponAnimPtr, spear_east_distant_anim
+        jmp weapon_init_common
+near:
+        st16 WeaponAnimPtr, spear_east_near_anim
+        jmp weapon_init_common
 .endproc
 
 .proc spear_init_south
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1
+        st16 WeaponDrawFunc, weapon_update_none
+        lda WeaponSingleTargetIndex
+        beq near
+distant:
+        st16 WeaponAnimPtr, spear_south_distant_anim
+        jmp weapon_init_common
+near:
+        st16 WeaponAnimPtr, spear_south_near_anim
+        jmp weapon_init_common
 .endproc
 
 .proc spear_init_west
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1
+        st16 WeaponDrawFunc, weapon_update_none
+        lda WeaponSingleTargetIndex
+        beq near
+distant:
+        st16 WeaponAnimPtr, spear_west_distant_anim
+        jmp weapon_init_common
+near:
+        st16 WeaponAnimPtr, spear_west_near_anim
+        jmp weapon_init_common
 .endproc
 
 ; Flails have the widest attack pattern, hit a single enemy, and mostly

@@ -36,7 +36,6 @@
 
 FxTileId: .res 1
 SfxTileId: .res 1
-SingleHitAttackSquare: .res 1
 PlayerWeaponPtr: .res 2
 
 PlayerZonePtr: .res 2
@@ -137,7 +136,7 @@ player_tile_index_table:
         .byte (::BATTLEFIELD_WIDTH * i)
         .endrepeat
 
-.segment "CODE_4"
+.segment "CODE_PLAYER"
 
 JUMP_HEIGHT_END = 5
 jump_height_table:
@@ -233,7 +232,7 @@ HeartCount := R2
 
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
-        lda #ITEM_DAGGER_L1
+        lda #ITEM_SPEAR_L1
         sta PlayerEquipmentWeapon
         lda #ITEM_NONE
         sta PlayerEquipmentTorch
@@ -1674,6 +1673,7 @@ done_choosing_direction:
         lda #0
         sta AttackLanded
         sta WeaponSquaresIndex
+        sta WeaponSingleTargetIndex
 
         ldy #WeaponClass::NumSquares
         lda (PlayerWeaponPtr), y
@@ -1777,24 +1777,12 @@ check_early_exit:
         lda AttackLanded
         beq no_early_exit
         ; Then we are done with the swing, and should clean up
-        lda AttackSquare
-        sta SingleHitAttackSquare
-        
-        ; TODO: weapon drawing!
-        ;jsr draw_single_hit_fx
-        ;jsr draw_multiple_hit_sfx
-        
         jmp done_with_swing
 no_early_exit:
         ; Otherwise, iterate to the next weapon square and continue
+        inc WeaponSingleTargetIndex
         dec TilesRemaining
         jne loop
-
-        lda AttackLanded
-        beq done_with_swing
-        
-        ; TODO: weapon drawing!
-        ;jsr draw_multiple_hit_fx
 
 done_with_swing:
         perform_zpcm_inc
@@ -2117,7 +2105,7 @@ perform_unpause:
         lda #4
         sta TargetBrightness
 
-        near_call FAR_play_music_for_current_room
+        far_call FAR_play_music_for_current_room
 
         queue_sfx_pulse1 sfx_pause
 

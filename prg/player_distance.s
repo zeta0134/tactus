@@ -7,7 +7,7 @@
         .zeropage
 PlayerDistanceLut: .res 2
 
-        .segment "CODE_4"
+        .segment "CODE_PLAYER"
 
 player_distance_lut_by_x_pos:
   .word player_distance_lut_0
