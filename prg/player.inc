@@ -56,6 +56,9 @@
 .global PlayerHeldBombIndex
 .global PlayerRequestsSpellBehavior
 
+.globalzp WeaponAnimPtr
+.global WeaponDrawFunc
+
 MAX_HEARTS = 5
 MAX_GOLD = 9999
 

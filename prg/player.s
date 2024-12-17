@@ -41,6 +41,8 @@ PlayerWeaponPtr: .res 2
 
 PlayerZonePtr: .res 2
 
+WeaponAnimPtr: .res 2
+
 .segment "RAM"
 
 WeaponDrawFunc: .res 2
@@ -231,7 +233,7 @@ HeartCount := R2
 
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
-        lda #ITEM_SPEAR_L2
+        lda #ITEM_BROADSWORD_L2
         sta PlayerEquipmentWeapon
         lda #ITEM_NONE
         sta PlayerEquipmentTorch

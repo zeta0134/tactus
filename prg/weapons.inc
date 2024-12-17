@@ -15,6 +15,13 @@
         BehaviorFlags .byte
 .endstruct
 
+.struct WeaponAnimEntry
+        RelativePixelPosX .byte
+        RelativePixelPosY .byte
+        TileId .byte
+        BehaviorFlags .byte
+.endstruct
+
 WEAPON_SINGLE_TARGET   = %00000001
 WEAPON_CANCEL_MOVEMENT = %00000010
 

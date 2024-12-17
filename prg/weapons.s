@@ -2,7 +2,19 @@
 
         .include "../build/tile_defs.inc"
 
+        .include "far_call.inc"
+        .include "kernel.inc"
+        .include "player.inc"
+        .include "rainbow.inc"
+        .include "sprites.inc"
         .include "weapons.inc"
+        .include "word_util.inc"
+        .include "zeropage.inc"
+
+.segment "RAM"
+
+; oh, this is probably overkill. it's fine.
+weapon_metasprite_ids: .res 8
 
 .segment "CODE_4"
 
@@ -36,8 +48,66 @@ SFX_VT := <SPRITE_TILE_VERTICAL_SLASH_SFX
         rts
 .endproc
 
+; Make sure WeaponAnimPtr is set before calling!
 .proc weapon_init_common
-        ; TODO
+MetaSpriteIndex := R0
+EntriesRemaining := R1
+CurrentEntry := R2
+AnimPtr := R3
+
+        mov16 AnimPtr, WeaponAnimPtr
+
+        ldy #0
+        lda (AnimPtr), y
+        sta EntriesRemaining
+        bne safe_to_continue
+        ; huh? empty set? okay, do nothing
+        rts 
+safe_to_continue:
+        inc16 AnimPtr
+        lda #0
+        sta CurrentEntry
+loop:
+        far_call FAR_find_unused_sprite
+        ldy CurrentEntry
+        lda MetaSpriteIndex
+        sta weapon_metasprite_ids, y
+        cmp #$FF
+        beq sprite_failed
+
+        ldx MetaSpriteIndex
+        ldy #WeaponAnimEntry::TileId
+        lda (AnimPtr), y
+        clc
+        adc #SPRITE_OFFSET_WEAPON
+        sta sprite_table + MetaSpriteState::TileIndex, x
+
+        ldy #WeaponAnimEntry::BehaviorFlags
+        lda (AnimPtr), y
+        ora #SPRITE_ACTIVE
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+
+        lda #0
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+
+        ldy #WeaponAnimEntry::RelativePixelPosX
+        lda (AnimPtr), y
+        clc
+        adc PlayerCurrentX+1
+        sta sprite_table + MetaSpriteState::PositionX, x
+
+        ldy #WeaponAnimEntry::RelativePixelPosY
+        lda (AnimPtr), y
+        clc
+        adc PlayerCurrentY+1
+        sta sprite_table + MetaSpriteState::PositionY, x
+
+sprite_failed:
+        add16b AnimPtr, #.sizeof(WeaponAnimEntry)
+        inc CurrentEntry
+        dec EntriesRemaining
+        bne loop
+
         rts
 .endproc
 
@@ -75,7 +145,6 @@ dagger_south:
 dagger_west:
         ;         X,  Y, TileId, Behavior
         .lobytes -1,  0, SPRITE_WEAPON_DAGGER_DAGGER_WEST, NONE, (WEAPON_CANCEL_MOVEMENT)
-
 
 ; Daggers have no special behavior; each directional strike sets up a common anim table
 .proc dagger_init_north
@@ -139,25 +208,61 @@ broadsword_west:
         .lobytes -1,  0, SPRITE_TILE_BROADSWORD_WEST_2, NONE, (WEAPON_CANCEL_MOVEMENT)
         .lobytes -1, -1, SPRITE_TILE_BROADSWORD_WEST_3, NONE, (WEAPON_CANCEL_MOVEMENT)
 
+broadsword_north_clockwise_anim:
+        .byte 3  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes -16, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_1, (SPRITE_ONE_BEAT)
+        .lobytes   0, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_2, (SPRITE_ONE_BEAT)
+        .lobytes  16, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_3, (SPRITE_ONE_BEAT)
+
+broadsword_east_clockwise_anim:
+        .byte 3  ; length
+                 ; X,   Y,                        TileId, Sprite Behavior
+        .lobytes  16, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_1, (SPRITE_ONE_BEAT)
+        .lobytes  16,   0, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_2, (SPRITE_ONE_BEAT)
+        .lobytes  16,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_3, (SPRITE_ONE_BEAT)
+
+broadsword_south_clockwise_anim:
+        .byte 3  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes -16,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_3, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes   0,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes  16,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+
+broadsword_west_clockwise_anim:
+        .byte 3  ; length
+                 ; X,   Y,                        TileId, Sprite Behavior
+        .lobytes -16, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_3, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16,   0, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+
 ; Broadswords have no special behavior; each directional strike sets up a common anim table
 .proc broadsword_init_north
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_1
+        st16 WeaponAnimPtr, broadsword_north_clockwise_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
 .endproc
 
 .proc broadsword_init_east
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_1
+        st16 WeaponAnimPtr, broadsword_east_clockwise_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
 .endproc
 
 .proc broadsword_init_south
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_1
+        st16 WeaponAnimPtr, broadsword_south_clockwise_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
 .endproc
 
 .proc broadsword_init_west
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_1
+        st16 WeaponAnimPtr, broadsword_west_clockwise_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
 .endproc
 
 ; Longswords are like daggers that hit an extra square in front of the player
