@@ -132,39 +132,71 @@ dagger:
 
 dagger_north:
         ;         X,  Y, TileId,        Behavior
-        .lobytes  0, -1, SPRITE_WEAPON_DAGGER_DAGGER_NORTH, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -1, SPRITE_TILE_DAGGER, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 dagger_east:
         ;         X,  Y, TileId, Behavior
-        .lobytes  1,  0, SPRITE_WEAPON_DAGGER_DAGGER_EAST, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  0, SPRITE_TILE_DAGGER, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 dagger_south:
         ;         X,  Y, TileId, Behavior
-        .lobytes  0,  1, SPRITE_WEAPON_DAGGER_DAGGER_SOUTH, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  1, SPRITE_TILE_DAGGER, NONE, (WEAPON_CANCEL_MOVEMENT)
 
 dagger_west:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1,  0, SPRITE_WEAPON_DAGGER_DAGGER_WEST, NONE, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  0, SPRITE_TILE_DAGGER, NONE, (WEAPON_CANCEL_MOVEMENT)
+
+dagger_north_anim:
+        .byte 2  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes  -8, -16, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_1, (SPRITE_ONE_BEAT)
+        .lobytes   8, -16, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_2, (SPRITE_ONE_BEAT)
+
+dagger_east_anim:
+        .byte 2  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes  16,  -8, SPRITE_WEAPON_DAGGER_DAGGER_EAST_1, (SPRITE_ONE_BEAT)
+        .lobytes  16,   8, SPRITE_WEAPON_DAGGER_DAGGER_EAST_2, (SPRITE_ONE_BEAT)
+
+dagger_south_anim:
+        .byte 2  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes  -8,  16, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes   8,  16, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+
+dagger_west_anim:
+        .byte 2  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes -16,  -8, SPRITE_WEAPON_DAGGER_DAGGER_EAST_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16,   8, SPRITE_WEAPON_DAGGER_DAGGER_EAST_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
 
 ; Daggers have no special behavior; each directional strike sets up a common anim table
 .proc dagger_init_north
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_1
+        st16 WeaponAnimPtr, dagger_north_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
 .endproc
 
 .proc dagger_init_east
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_DAGGER_DAGGER_EAST_1
+        st16 WeaponAnimPtr, dagger_east_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
 .endproc
 
 .proc dagger_init_south
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_1
+        st16 WeaponAnimPtr, dagger_south_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
 .endproc
 
 .proc dagger_init_west
-        ; TODO
-        rts
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_DAGGER_DAGGER_EAST_1
+        st16 WeaponAnimPtr, dagger_west_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
 .endproc
 
 ; Broadswords hit a wide field of 3 tiles in front of the player. Great
