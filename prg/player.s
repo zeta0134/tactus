@@ -232,7 +232,7 @@ HeartCount := R2
 
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
-        lda #ITEM_SPEAR_L1
+        lda #ITEM_FLAIL_L1
         sta PlayerEquipmentWeapon
         lda #ITEM_NONE
         sta PlayerEquipmentTorch

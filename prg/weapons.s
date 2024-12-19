@@ -2,6 +2,8 @@
 
         .include "../build/tile_defs.inc"
 
+        .include "_globals.inc"
+
         .include "far_call.inc"
         .include "kernel.inc"
         .include "player.inc"
@@ -84,7 +86,7 @@ loop:
 
         ldy #WeaponAnimEntry::BehaviorFlags
         lda (AnimPtr), y
-        ora #SPRITE_ACTIVE
+        ora #(SPRITE_ACTIVE | SPRITE_ONE_BEAT)
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
 
         lda #0
@@ -149,26 +151,26 @@ dagger_west:
 dagger_north_anim:
         .byte 2  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes  -8, -16, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_1, (SPRITE_ONE_BEAT)
-        .lobytes   8, -16, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_2, (SPRITE_ONE_BEAT)
+        .lobytes  -8, -16, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_1, (SPRITE_PAL_YELLOW)
+        .lobytes   8, -16, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_2, (SPRITE_PAL_YELLOW)
 
 dagger_east_anim:
         .byte 2  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes  16,  -8, SPRITE_WEAPON_DAGGER_DAGGER_EAST_1, (SPRITE_ONE_BEAT)
-        .lobytes  16,   8, SPRITE_WEAPON_DAGGER_DAGGER_EAST_2, (SPRITE_ONE_BEAT)
+        .lobytes  16,  -8, SPRITE_WEAPON_DAGGER_DAGGER_EAST_1, (SPRITE_PAL_YELLOW)
+        .lobytes  16,   8, SPRITE_WEAPON_DAGGER_DAGGER_EAST_2, (SPRITE_PAL_YELLOW)
 
 dagger_south_anim:
         .byte 2  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes  -8,  16, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
-        .lobytes   8,  16, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes  -8,  16, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_2, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes   8,  16, SPRITE_WEAPON_DAGGER_DAGGER_NORTH_1, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
 
 dagger_west_anim:
         .byte 2  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes -16,  -8, SPRITE_WEAPON_DAGGER_DAGGER_EAST_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
-        .lobytes -16,   8, SPRITE_WEAPON_DAGGER_DAGGER_EAST_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16,  -8, SPRITE_WEAPON_DAGGER_DAGGER_EAST_2, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16,   8, SPRITE_WEAPON_DAGGER_DAGGER_EAST_1, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
 
 ; Daggers have no special behavior; each directional strike sets up a common anim table
 .proc dagger_init_north
@@ -243,30 +245,30 @@ broadsword_west:
 broadsword_north_clockwise_anim:
         .byte 3  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes -16, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_1, (SPRITE_ONE_BEAT)
-        .lobytes   0, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_2, (SPRITE_ONE_BEAT)
-        .lobytes  16, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_3, (SPRITE_ONE_BEAT)
+        .lobytes -16, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_1, (SPRITE_PAL_YELLOW)
+        .lobytes   0, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_2, (SPRITE_PAL_YELLOW)
+        .lobytes  16, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_3, (SPRITE_PAL_YELLOW)
 
 broadsword_east_clockwise_anim:
         .byte 3  ; length
                  ; X,   Y,                        TileId, Sprite Behavior
-        .lobytes  16, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_1, (SPRITE_ONE_BEAT)
-        .lobytes  16,   0, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_2, (SPRITE_ONE_BEAT)
-        .lobytes  16,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_3, (SPRITE_ONE_BEAT)
+        .lobytes  16, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_1, (SPRITE_PAL_YELLOW)
+        .lobytes  16,   0, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_2, (SPRITE_PAL_YELLOW)
+        .lobytes  16,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_3, (SPRITE_PAL_YELLOW)
 
 broadsword_south_clockwise_anim:
         .byte 3  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes -16,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_3, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
-        .lobytes   0,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
-        .lobytes  16,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_3, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes   0,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_2, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes  16,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_NORTH_1, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
 
 broadsword_west_clockwise_anim:
         .byte 3  ; length
                  ; X,   Y,                        TileId, Sprite Behavior
-        .lobytes -16, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_3, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
-        .lobytes -16,   0, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
-        .lobytes -16,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_3, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16,   0, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_2, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_1, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
 
 ; Broadswords have no special behavior; each directional strike sets up a common anim table
 .proc broadsword_init_north
@@ -335,26 +337,26 @@ longsword_west:
 longsword_north_anim:
         .byte 2  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes   0, -32, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_1, (SPRITE_ONE_BEAT)
-        .lobytes   0, -16, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_2, (SPRITE_ONE_BEAT)
+        .lobytes   0, -32, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_1, (SPRITE_PAL_YELLOW)
+        .lobytes   0, -16, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_2, (SPRITE_PAL_YELLOW)
 
 longsword_east_anim:
         .byte 2  ; length
                  ; X,   Y,                                   TileId, Sprite Behavior
-        .lobytes  32,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_1, (SPRITE_ONE_BEAT)
-        .lobytes  16,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_2, (SPRITE_ONE_BEAT)
+        .lobytes  32,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_1, (SPRITE_PAL_YELLOW)
+        .lobytes  16,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_2, (SPRITE_PAL_YELLOW)
 
 longsword_south_anim:
         .byte 2  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes   0,  32, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
-        .lobytes   0,  16, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes   0,  32, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_1, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes   0,  16, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_2, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
 
 longsword_west_anim:
         .byte 2  ; length
                  ; X,   Y,                                   TileId, Sprite Behavior
-        .lobytes -32,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
-        .lobytes -16,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -32,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_1, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_2, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
 
 ; Longswords have no special behavior; each directional strike sets up a common anim table
 .proc longsword_init_north
@@ -428,46 +430,46 @@ spear_west:
 spear_north_distant_anim:
         .byte 2  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes   0, -32, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1, (SPRITE_ONE_BEAT)
-        .lobytes   0, -16, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_2, (SPRITE_ONE_BEAT)
+        .lobytes   0, -32, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1, (SPRITE_PAL_YELLOW)
+        .lobytes   0, -16, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_2, (SPRITE_PAL_YELLOW)
 
 spear_north_near_anim:
         .byte 1  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes   0, -16, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1, (SPRITE_ONE_BEAT)
+        .lobytes   0, -16, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1, (SPRITE_PAL_YELLOW)
 
 spear_east_distant_anim:
         .byte 2  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes  32,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1, (SPRITE_ONE_BEAT)
-        .lobytes  16,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_2, (SPRITE_ONE_BEAT)
+        .lobytes  32,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1, (SPRITE_PAL_YELLOW)
+        .lobytes  16,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_2, (SPRITE_PAL_YELLOW)
 
 spear_east_near_anim:
         .byte 1  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes  16,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1, (SPRITE_ONE_BEAT)
+        .lobytes  16,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1, (SPRITE_PAL_YELLOW)
 
 spear_south_distant_anim:
         .byte 2  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes   0,  32, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
-        .lobytes   0,  16, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes   0,  32, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes   0,  16, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_2, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
 
 spear_south_near_anim:
         .byte 1  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes   0,  16, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes   0,  16, SPRITE_WEAPON_SPEAR_SPEAR_NORTH_1, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
 
 spear_west_distant_anim:
         .byte 2  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes -32,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
-        .lobytes -16,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_2, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -32,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_2, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
 
 spear_west_near_anim:
         .byte 1  ; length
                  ; X,   Y,                         TileId, Sprite Behavior
-        .lobytes -16,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1, (SPRITE_ONE_BEAT | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+        .lobytes -16,   0, SPRITE_WEAPON_SPEAR_SPEAR_EAST_1, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
 
 ; Spears select from one of two animation tables, depending on whether the near
 ; or far target was struck
@@ -564,38 +566,174 @@ flail_east:
 
 flail_south:
         ;         X,  Y, TileId, Behavior
-        .lobytes -2,  1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
         .lobytes  2,  1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes -1,  1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
+        .lobytes -2,  1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
         .lobytes  1,  1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
+        .lobytes -1,  1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
         .lobytes  0,  1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
 
 flail_west:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1, -2, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
         .lobytes -1,  2, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes -1, -1, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
+        .lobytes -1, -2, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
         .lobytes -1,  1, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
+        .lobytes -1, -1, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
         .lobytes -1,  0, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
+
+flail_anim_north_long:
+        .byte 2  ; length
+                 ; X,   Y,                                  TileId,     Sprite Behavior
+        .lobytes   0, -32, SPRITE_WEAPON_FLAIL_01_HEAD_EXTENDED_NORTH, (SPRITE_PAL_YELLOW)
+        .lobytes   0, -16, SPRITE_WEAPON_FLAIL_01_CHAIN_BASE_NORTH,    (SPRITE_PAL_YELLOW)
+
+flail_anim_north_short:
+        .byte 1  ; length
+                 ; X,   Y,                               TileId,     Sprite Behavior
+        .lobytes   0, -16, SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_NORTH,    (SPRITE_PAL_YELLOW)
+
+flail_anim_east_long:
+        .byte 2  ; length
+                 ; X,   Y,                                  TileId,     Sprite Behavior
+        .lobytes  32,   0, SPRITE_WEAPON_FLAIL_01_HEAD_EXTENDED_EAST, (SPRITE_PAL_YELLOW)
+        .lobytes  16,   0, SPRITE_WEAPON_FLAIL_01_CHAIN_BASE_EAST,    (SPRITE_PAL_YELLOW)
+
+flail_anim_east_short:
+        .byte 1  ; length
+                 ; X,   Y,                               TileId,     Sprite Behavior
+        .lobytes  16,   0, SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_EAST,    (SPRITE_PAL_YELLOW)
+
+flail_anim_south_long:
+        .byte 2  ; length
+                 ; X,   Y,                                  TileId,     Sprite Behavior
+        .lobytes   0,  32, SPRITE_WEAPON_FLAIL_02_HEAD_EXTENDED_SOUTH, (SPRITE_PAL_YELLOW)
+        .lobytes   0,  16, SPRITE_WEAPON_FLAIL_02_CHAIN_BASE_SOUTH,    (SPRITE_PAL_YELLOW)
+
+flail_anim_south_short:
+        .byte 1  ; length
+                 ; X,   Y,                               TileId,     Sprite Behavior
+        .lobytes   0,  16, SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_SOUTH,    (SPRITE_PAL_YELLOW)
+
+flail_anim_west_long:
+        .byte 2  ; length
+                 ; X,   Y,                                  TileId,     Sprite Behavior
+        .lobytes -32,   0, SPRITE_WEAPON_FLAIL_02_HEAD_EXTENDED_WEST, (SPRITE_PAL_YELLOW)
+        .lobytes -16,   0, SPRITE_WEAPON_FLAIL_02_CHAIN_BASE_WEST,    (SPRITE_PAL_YELLOW)
+
+flail_anim_west_short:
+        .byte 1  ; length
+                 ; X,   Y,                               TileId,     Sprite Behavior
+        .lobytes -16,   0, SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_WEST,    (SPRITE_PAL_YELLOW)
+
+
 
 ; Flails are the most complex by far, choosing from one of 5 animation tables
 ; depending on which tile was struck.
+
+north_anim_lut:
+        .word flail_anim_west_long
+        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_WEST, 0
+        .word flail_anim_east_long
+        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_EAST, 0
+        .word flail_anim_west_short
+        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_WEST, 0
+        .word flail_anim_east_short
+        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_EAST, 0
+        .word flail_anim_north_short
+        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_NORTH, 0
+
+east_anim_lut:
+        .word flail_anim_north_long
+        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_NORTH, 0
+        .word flail_anim_south_long
+        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_SOUTH, 0
+        .word flail_anim_north_short
+        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_NORTH, 0
+        .word flail_anim_south_short
+        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_SOUTH, 0
+        .word flail_anim_east_short
+        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_EAST, 0
+
+south_anim_lut:
+        .word flail_anim_east_long
+        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_EAST, 0
+        .word flail_anim_west_long
+        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_WEST, 0
+        .word flail_anim_east_short
+        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_EAST, 0
+        .word flail_anim_west_short
+        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_WEST, 0
+        .word flail_anim_south_short
+        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_SOUTH, 0
+
+west_anim_lut:
+        .word flail_anim_south_long
+        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_SOUTH, 0
+        .word flail_anim_north_long
+        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_NORTH, 0
+        .word flail_anim_south_short
+        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_SOUTH, 0
+        .word flail_anim_north_short
+        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_NORTH, 0
+        .word flail_anim_west_short
+        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_WEST, 0
+
 .proc flail_init_north
-        ; TODO
-        rts
+SpriteBank := R0
+        st16 WeaponDrawFunc, weapon_update_track_player
+        lda WeaponSingleTargetIndex
+        asl
+        asl
+        tax
+        lda north_anim_lut+0, x
+        sta WeaponAnimPtr+0
+        lda north_anim_lut+1, x
+        sta WeaponAnimPtr+1
+        lda north_anim_lut+2, x
+        sta SPRITE_BANK_WEAPON
+        jmp weapon_init_common
 .endproc
 
 .proc flail_init_east
-        ; TODO
-        rts
+        st16 WeaponDrawFunc, weapon_update_track_player
+        lda WeaponSingleTargetIndex
+        asl
+        asl
+        tax
+        lda east_anim_lut+0, x
+        sta WeaponAnimPtr+0
+        lda east_anim_lut+1, x
+        sta WeaponAnimPtr+1
+        lda east_anim_lut+2, x
+        sta SPRITE_BANK_WEAPON
+        jmp weapon_init_common
 .endproc
 
 .proc flail_init_south
-        ; TODO
-        rts
+        st16 WeaponDrawFunc, weapon_update_track_player
+        lda WeaponSingleTargetIndex
+        asl
+        asl
+        tax
+        lda south_anim_lut+0, x
+        sta WeaponAnimPtr+0
+        lda south_anim_lut+1, x
+        sta WeaponAnimPtr+1
+        lda south_anim_lut+2, x
+        sta SPRITE_BANK_WEAPON
+        jmp weapon_init_common
 .endproc
 
 .proc flail_init_west
-        ; TODO
-        rts
+        st16 WeaponDrawFunc, weapon_update_track_player
+        lda WeaponSingleTargetIndex
+        asl
+        asl
+        tax
+        lda west_anim_lut+0, x
+        sta WeaponAnimPtr+0
+        lda west_anim_lut+1, x
+        sta WeaponAnimPtr+1
+        lda west_anim_lut+2, x
+        sta SPRITE_BANK_WEAPON
+        jmp weapon_init_common
 .endproc
