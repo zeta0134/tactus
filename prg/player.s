@@ -1730,13 +1730,6 @@ converge:
         iny
         perform_zpcm_inc
 
-        lda (WeaponSquaresPtr), y
-        sta FxTileId ; stash for if this hits
-        iny
-        lda (WeaponSquaresPtr), y
-        sta SfxTileId ; stash for if this hits
-        iny
-
         lda (WeaponSquaresPtr), y ; Behavioral Flags for this tile
         sta WeaponProperties      ; Stash these here so the enemies can see them (if applicable)
         iny

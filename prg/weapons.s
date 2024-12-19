@@ -28,12 +28,6 @@ weapon_class_table:
         .word spear
         .word flail
 
-NONE := $FD
-FX_HZ := <SPRITE_TILE_HORIZONTAL_SLASH
-FX_VT := <SPRITE_TILE_VERTICAL_SLASH
-SFX_HZ := <SPRITE_TILE_HORIZONTAL_SLASH_SFX
-SFX_VT := <SPRITE_TILE_VERTICAL_SLASH_SFX
-
 ; Programmer notes: try to prefer clockwise update order, for consistency.
 ; That means single-hit weapons should prioritize the *player's* left
 
@@ -188,20 +182,20 @@ dagger:
         .word dagger_init_north, dagger_init_east, dagger_init_south, dagger_init_west
 
 dagger_north:
-        ;         X,  Y, TileId,        Behavior
-        .lobytes  0, -1, SPRITE_TILE_DAGGER, NONE, (WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes  0, -1, (WEAPON_CANCEL_MOVEMENT)
 
 dagger_east:
-        ;         X,  Y, TileId, Behavior
-        .lobytes  1,  0, SPRITE_TILE_DAGGER, NONE, (WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes  1,  0, (WEAPON_CANCEL_MOVEMENT)
 
 dagger_south:
-        ;         X,  Y, TileId, Behavior
-        .lobytes  0,  1, SPRITE_TILE_DAGGER, NONE, (WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes  0,  1, (WEAPON_CANCEL_MOVEMENT)
 
 dagger_west:
-        ;         X,  Y, TileId, Behavior
-        .lobytes -1,  0, SPRITE_TILE_DAGGER, NONE, (WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes -1,  0, (WEAPON_CANCEL_MOVEMENT)
 
 dagger_north_anim:
         .byte 2  ; length
@@ -274,28 +268,28 @@ broadsword:
         .word broadsword_init_north, broadsword_init_east, broadsword_init_south, broadsword_init_west
 
 broadsword_north:
-        ;         X,  Y, TileId, Behavior
-        .lobytes -1, -1, SPRITE_TILE_BROADSWORD_NORTH_1, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  0, -1, SPRITE_TILE_BROADSWORD_NORTH_2, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  1, -1, SPRITE_TILE_BROADSWORD_NORTH_3, NONE, (WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes -1, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1, -1, (WEAPON_CANCEL_MOVEMENT)
 
 broadsword_east:
-        ;         X,  Y, TileId, Behavior
-        .lobytes  1, -1, SPRITE_TILE_BROADSWORD_EAST_1, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  1,  0, SPRITE_TILE_BROADSWORD_EAST_2, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  1,  1, SPRITE_TILE_BROADSWORD_EAST_3, NONE, (WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes  1, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  1, (WEAPON_CANCEL_MOVEMENT)
 
 broadsword_south:
-        ;         X,  Y, TileId, Behavior
-        .lobytes  1,  1, SPRITE_TILE_BROADSWORD_SOUTH_1, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  0,  1, SPRITE_TILE_BROADSWORD_SOUTH_2, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes -1,  1, SPRITE_TILE_BROADSWORD_SOUTH_3, NONE, (WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes  1,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  1, (WEAPON_CANCEL_MOVEMENT)
 
 broadsword_west:
-        ;         X,  Y, TileId, Behavior
-        .lobytes -1,  1, SPRITE_TILE_BROADSWORD_WEST_1, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes -1,  0, SPRITE_TILE_BROADSWORD_WEST_2, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes -1, -1, SPRITE_TILE_BROADSWORD_WEST_3, NONE, (WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes -1,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1, -1, (WEAPON_CANCEL_MOVEMENT)
 
 broadsword_north_clockwise_anim:
         .byte 3  ; length
@@ -370,24 +364,24 @@ longsword:
         .word longsword_init_north, longsword_init_east, longsword_init_south, longsword_init_west
 
 longsword_north:
-        ;         X,  Y, TileId, Behavior
-        .lobytes  0, -1, SPRITE_TILE_LONGSWORD_NORTH_2, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  0, -2, SPRITE_TILE_LONGSWORD_NORTH_1, NONE, (WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes  0, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -2, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_east:
-        ;         X,  Y, TileId, Behavior
-        .lobytes  1,  0, SPRITE_TILE_LONGSWORD_EAST_2, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  2,  0, SPRITE_TILE_LONGSWORD_EAST_1, NONE, (WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes  1,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  2,  0, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_south:
-        ;         X,  Y, TileId, Behavior
-        .lobytes  0,  1, SPRITE_TILE_LONGSWORD_SOUTH_2, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes  0,  2, SPRITE_TILE_LONGSWORD_SOUTH_1, NONE, (WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes  0,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  2, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_west:
-        ;         X,  Y, TileId, Behavior
-        .lobytes -1,  0, SPRITE_TILE_LONGSWORD_WEST_2, NONE, (WEAPON_CANCEL_MOVEMENT)
-        .lobytes -2,  0, SPRITE_TILE_LONGSWORD_WEST_1, NONE, (WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes -1,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -2,  0, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_north_anim:
         .byte 2  ; length
@@ -463,24 +457,24 @@ spear:
         .word spear_init_north, spear_init_east, spear_init_south, spear_init_west
 
 spear_north:
-        ;         X,  Y, TileId, Behavior
-        .lobytes  0, -1, SPRITE_TILE_SPEAR_NORTH_1, SPRITE_TILE_SPEAR_NORTH_2, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
-        .lobytes  0, -2, SPRITE_TILE_SPEAR_NORTH_1, NONE, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        ;         X,  Y, Behavior
+        .lobytes  0, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        .lobytes  0, -2, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
 
 spear_east:
-        ;         X,  Y, TileId, Behavior
-        .lobytes  1,  0, SPRITE_TILE_SPEAR_EAST_1, SPRITE_TILE_SPEAR_EAST_2, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
-        .lobytes  2,  0, SPRITE_TILE_SPEAR_EAST_1, NONE, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        ;         X,  Y, Behavior
+        .lobytes  1,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        .lobytes  2,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
 
 spear_south:
-        ;         X,  Y, TileId, Behavior
-        .lobytes  0,  1, SPRITE_TILE_SPEAR_SOUTH_1, SPRITE_TILE_SPEAR_SOUTH_2, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
-        .lobytes  0,  2, SPRITE_TILE_SPEAR_SOUTH_1, NONE, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        ;         X,  Y, Behavior
+        .lobytes  0,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        .lobytes  0,  2, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
 
 spear_west:
-        ;         X,  Y, TileId, Behavior
-        .lobytes -1,  0, SPRITE_TILE_SPEAR_WEST_1, SPRITE_TILE_SPEAR_WEST_2, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
-        .lobytes -2,  0, SPRITE_TILE_SPEAR_WEST_1, NONE, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        ;         X,  Y, Behavior
+        .lobytes -1,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
+        .lobytes -2,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_SINGLE_TARGET)
 
 spear_north_distant_anim:
         .byte 2  ; length
@@ -604,36 +598,36 @@ flail:
         .word flail_init_north, flail_init_east, flail_init_south, flail_init_west
 
 flail_north:
-        ;         X,  Y, TileId, Behavior
-        .lobytes -2, -1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes  2, -1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes -1, -1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes  1, -1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes  0, -1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes -2, -1, (WEAPON_SINGLE_TARGET)
+        .lobytes  2, -1, (WEAPON_SINGLE_TARGET)
+        .lobytes -1, -1, (WEAPON_SINGLE_TARGET)
+        .lobytes  1, -1, (WEAPON_SINGLE_TARGET)
+        .lobytes  0, -1, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
 
 flail_east:
-        ;         X,  Y, TileId, Behavior
-        .lobytes  1, -2, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes  1,  2, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes  1, -1, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes  1,  1, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes  1,  0, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes  1, -2, (WEAPON_SINGLE_TARGET)
+        .lobytes  1,  2, (WEAPON_SINGLE_TARGET)
+        .lobytes  1, -1, (WEAPON_SINGLE_TARGET)
+        .lobytes  1,  1, (WEAPON_SINGLE_TARGET)
+        .lobytes  1,  0, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
 
 flail_south:
-        ;         X,  Y, TileId, Behavior
-        .lobytes  2,  1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes -2,  1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes  1,  1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes -1,  1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET)
-        .lobytes  0,  1, SPRITE_TILE_FLAIL_HEAD, SFX_HZ, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
+        ;         X,  Y, Behavior
+        .lobytes  2,  1, (WEAPON_SINGLE_TARGET)
+        .lobytes -2,  1, (WEAPON_SINGLE_TARGET)
+        .lobytes  1,  1, (WEAPON_SINGLE_TARGET)
+        .lobytes -1,  1, (WEAPON_SINGLE_TARGET)
+        .lobytes  0,  1, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
 
 flail_west:
         ;         X,  Y, TileId, Behavior
-        .lobytes -1,  2, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes -1, -2, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes -1,  1, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes -1, -1, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET)
-        .lobytes -1,  0, SPRITE_TILE_FLAIL_HEAD, SFX_VT, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  2, (WEAPON_SINGLE_TARGET)
+        .lobytes -1, -2, (WEAPON_SINGLE_TARGET)
+        .lobytes -1,  1, (WEAPON_SINGLE_TARGET)
+        .lobytes -1, -1, (WEAPON_SINGLE_TARGET)
+        .lobytes -1,  0, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
 
 flail_anim_north_long:
         .byte 2  ; length
