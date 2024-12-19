@@ -46,7 +46,62 @@ SFX_VT := <SPRITE_TILE_VERTICAL_SLASH_SFX
 ; Weapon sprites should track the player! Ideal for weapons that do not cancel
 ; the player's movement, so the animation appears to travel appropriately
 .proc weapon_update_track_player
-        ; TODO
+MetaSpriteIndex := R0
+EntriesRemaining := R1
+CurrentEntry := R2
+AnimPtr := R3
+        mov16 AnimPtr, WeaponAnimPtr
+
+        ldy #0
+        lda (AnimPtr), y
+        sta EntriesRemaining
+        bne safe_to_continue
+        ; huh? empty set? okay, do nothing
+        rts 
+safe_to_continue:
+        inc16 AnimPtr
+        lda #0
+        sta CurrentEntry
+loop:
+        ldy CurrentEntry
+        lda weapon_metasprite_ids, y
+        sta MetaSpriteIndex
+        ; sanity check #1: is this index valid? the sprite
+        ; may have failed to spawn during init; if so, do nothing
+        cmp #$FF
+        beq skip_this_sprite
+        ; sanity check #2: is this metasprite still active? it
+        ; really "should" be, but trust nothing; if it has gone inactive,
+        ; permanently mark this slot as invalid and then do nothing
+        ldx MetaSpriteIndex
+        lda sprite_table + MetaSpriteState::BehaviorFlags, x
+        and #SPRITE_ACTIVE
+        bne update_this_sprite
+        lda #$FF
+        ldy CurrentEntry
+        sta weapon_metasprite_ids, y
+        jmp skip_this_sprite
+update_this_sprite:
+        ; using the entry in the table, compute the new sprite position
+        ; based on the player's current position, and move the metasprite
+        ; to that location
+        ldy #WeaponAnimEntry::RelativePixelPosX
+        lda (AnimPtr), y
+        clc
+        adc PlayerCurrentX+1
+        sta sprite_table + MetaSpriteState::PositionX, x
+
+        ldy #WeaponAnimEntry::RelativePixelPosY
+        lda (AnimPtr), y
+        clc
+        adc PlayerCurrentY+1
+        sta sprite_table + MetaSpriteState::PositionY, x
+skip_this_sprite:
+        add16b AnimPtr, #.sizeof(WeaponAnimEntry)
+        inc CurrentEntry
+        dec EntriesRemaining
+        bne loop
+
         rts
 .endproc
 

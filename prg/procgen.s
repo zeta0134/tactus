@@ -1649,7 +1649,7 @@ spell_state_dispatch_lut:
         .word spell_effect_bomb_fiesta
 
 spell_fx_dispatch_lut:
-        .word bf_spawn_confetti_particles
+        .word spells_do_nothing
         .word bf_spawn_confetti_particles
 
 ; Called during gameplay, not during generation. Handles ongoing room flag
