@@ -31,6 +31,9 @@ SLOT_CONSUMABLE = 7
 .global FAR_apply_item_world_metasprite
 .global FAR_apply_item_hud_metasprite
 .global FAR_display_item_description
+.global FAR_init_item_bank_allocations ; call this between rooms
+.global FAR_allocate_item_bank         ; call this when allocating metasprites for items 
+.global FAR_free_item_bank             ; call this when freeing those metasprites (index in R1)
 
 ; utilities for working out the (generic) effects of most items
 ; (some unique item effects are not covered here)

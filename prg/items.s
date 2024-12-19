@@ -8,6 +8,7 @@
         .include "far_call.inc"
         .include "hearts.inc"
         .include "hud.inc"
+        .include "kernel.inc"
         .include "prng.inc"
         .include "procgen.inc"
         .include "player.inc"
@@ -26,6 +27,11 @@
 ; dance around scratch byte allocation
 ItemPtr: .res 2
 ItemFuncPtr: .res 2
+
+        .segment "RAM"
+
+item_bank_ids: .res 4
+item_bank_refs: .res 4
 
         .segment "TEXT_STRINGS"
 
@@ -1361,10 +1367,118 @@ upgrade_to_temporary_armored:
         rts
 .endproc
 
+.proc FAR_init_item_bank_allocations
+        lda #$FF
+        .repeat 4, i
+        sta item_bank_ids+i
+        .endrepeat
+        lda #0
+        .repeat 4, i
+        sta item_bank_refs+i
+        .endrepeat
+        rts
+.endproc
+
+item_bank_offset_lut:
+        .byte SPRITE_OFFSET_ITEM_00
+        .byte SPRITE_OFFSET_ITEM_01
+        .byte SPRITE_OFFSET_ITEM_02
+        .byte SPRITE_OFFSET_ITEM_03
+
+.proc FAR_allocate_item_bank
+ItemIndex := R1
+ItemPtr := R2
+BankOffset := R4
+        ldx #0
+        ; First check for an existing allocation
+        ; which matches this item
+existing_loop:
+        lda item_bank_ids, x
+        cmp ItemIndex
+        beq increase_refs
+        inx
+        cpx #4
+        bne existing_loop
+
+        ; Failing that, try to allocate a new slot
+        ldx #0
+new_loop:
+        lda item_bank_ids, x
+        cmp #$FF
+        beq allocate_new_slot
+        inx
+        cpx #4
+        bne new_loop
+
+        ; Failing THAT, the allocation as a whole fails,
+        ; so set the resulting BankOffset to $FF to signify this
+        lda #$FF
+        sta BankOffset
+        rts
+
+allocate_new_slot:
+        lda ItemIndex
+        sta item_bank_ids, x
+        lda #1
+        sta item_bank_refs, x
+        jmp set_bank_offset
+
+increase_refs:
+        inc item_bank_refs, x
+        jmp set_bank_offset
+
+set_bank_offset:
+        lda item_bank_offset_lut, x
+        sta BankOffset
+
+        ; And actually allocate that bank
+        access_data_bank #<.bank(item_table)
+
+        lda ItemIndex
+        asl ; index into the word table
+        tay
+        lda item_table+0, y
+        sta ItemPtr+0
+        lda item_table+1, y
+        sta ItemPtr+1
+
+        ldy #ItemDef::WorldSpriteTile+1
+        lda (ItemPtr), y
+        sta SPRITE_BANK_ITEM_00, x
+
+        restore_previous_bank
+        ; Use the BankOffset as the return code, just in case
+        ; the call site needs to clobber this or whatever
+        lda BankOffset
+        rts
+.endproc
+
+.proc FAR_free_item_bank
+ItemIndex := R1
+        ldx #0
+loop:
+        lda item_bank_ids, x
+        cmp ItemIndex
+        bne done_with_this_offset
+        lda item_bank_refs, x
+        beq clear_item_slot ; shouldn't ever be taken !?
+        dec item_bank_refs, x
+        bne done_with_this_offset
+clear_item_slot:
+        lda #$FF
+        sta item_bank_ids, x
+done_with_this_offset:
+        inx
+        cpx #4
+        bne loop
+        rts
+.endproc
+
 .proc FAR_apply_item_world_metasprite
 MetaSpriteIndex := R0
 ItemIndex := R1
 ItemPtr := R2
+BankOffset := R4
         access_data_bank #<.bank(item_table)
 
         lda ItemIndex
@@ -1378,12 +1492,14 @@ ItemPtr := R2
         ldx MetaSpriteIndex
         ldy #ItemDef::WorldSpriteTile
         lda (ItemPtr), y
+        clc
+        adc BankOffset
         sta sprite_table + MetaSpriteState::TileIndex, x
 
         ldx MetaSpriteIndex
         ldy #ItemDef::WorldSpriteAttr
         lda (ItemPtr), y
-        ora #SPRITE_ACTIVE ; TODO: if we're going to bob the item up and down, do that here
+        ora #SPRITE_ACTIVE
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
 
         restore_previous_bank

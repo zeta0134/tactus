@@ -17,6 +17,7 @@
         .include "hud.inc"
         .include "indicators.inc"
         .include "input.inc"
+        .include "items.inc"
         .include "kernel.inc"
         .include "levels.inc"
         .include "loot.inc"
@@ -568,6 +569,8 @@ LayoutPtr := R0
         perform_zpcm_inc
         far_call FAR_despawn_unimportant_sprites
         perform_zpcm_inc
+        far_call FAR_init_item_bank_allocations
+        perform_zpcm_inc
 
         ; Clear out any other lingering state
         far_call FAR_init_bomb_state
@@ -703,6 +706,8 @@ not_too_high:
         ; (stuff like death sprites and item shadows)
         perform_zpcm_inc
         far_call FAR_despawn_unimportant_sprites
+        perform_zpcm_inc
+        far_call FAR_init_item_bank_allocations
         perform_zpcm_inc
 
         far_call FAR_reset_price_tracker

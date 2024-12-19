@@ -3,6 +3,7 @@
 ; as used by FAR_apply_item_world_metasprite 
 MetaSpriteIndex := R0
 ItemIndex := R1
+BankOffset := R4
 
 CurrentRow := R14
 CurrentTile := R15
@@ -62,6 +63,9 @@ ItemCost        := R2
 PriceColor      := R4
 
 MetaSpriteIndex := R0
+
+ItemIndex := R1
+BankOffset := R4
 
 ; these are provided for us
 CurrentRow := R14
@@ -158,12 +162,23 @@ proceed_to_spawn_sprite:
         cpx #$FF
         beq sprite_failed
 
-        perform_zpcm_inc
-
         ; We need to despawn this later, so store the index
         ldy CurrentTile
         txa
         sta tile_metasprite, y
+
+        perform_zpcm_inc
+
+        ; Allocate the bank to display this item sprite in
+        ldx CurrentTile
+        lda tile_data, x
+        sta ItemIndex
+        far_call FAR_allocate_item_bank
+        lda BankOffset
+        cmp #$FF
+        beq sprite_failed
+
+        perform_zpcm_inc
 
         near_call ENEMY_UPDATE_draw_item_sprite
 
@@ -191,6 +206,8 @@ sprite_failed:
 NewItem := R0
 OldItem := R0
 ; item pickup logic may clobber R1-R7, so give it lots of breathing room
+
+ItemIndex := R1
 
 ; for processing shop items
 ItemPtr := R8
@@ -262,7 +279,7 @@ player_can_afford_item:
         ldx TargetSquare
         lda OldItem
         cmp tile_data, x
-        beq deny_collection
+        jeq deny_collection
         ; The pickup attempt succeeded. If this was a purchase, deduct the price at this point
         ldx TargetSquare
         lda tile_flags, x
@@ -291,6 +308,13 @@ item_is_free:
         tay
         lda #0
         sta sprite_table + MetaSpriteState::BehaviorFlags, y
+
+        ; we also despawn the item bank here, accordingly, since we'll allocate a new one
+        ; if we need to draw another item later
+        ldx TargetSquare
+        lda tile_data, x
+        sta ItemIndex
+        far_call FAR_free_item_bank
 
         ; run the display logic for the item we just collected, popping up a tooltip with its
         ; description, etc. this may do nothing depending on player settings.
