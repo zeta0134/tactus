@@ -5,6 +5,7 @@
         .include "particles.inc"
 
         .include "far_call.inc"
+        .include "kernel.inc"
         .include "slowam.inc"
         .include "rainbow.inc"
         .include "word_util.inc"
@@ -25,7 +26,7 @@ particle_data_segment:
 a_test_particle:
         .byte 30, (PARTICLE_ACTIVE | PARTICLE_FLICKER)
         .repeat 30, i
-        .byte 0, <-i, SPRITE_TILE_LOOT_01, SPRITE_PAL_YELLOW
+        .byte 0, <-i, <SPRITE_STATIC_00_PARTICLES_LIGHT_23 + SPRITE_OFFSET_STATIC_00, SPRITE_PAL_YELLOW
         .endrepeat
 
         .segment "PRGFIXED_E000"

@@ -457,15 +457,21 @@ LayoutPtr := R0
         ; During main gameplay, we have a fixed set of static
         ; banks, so get those all loaded in
         lda #>SPRITE_STATIC_00_PARTICLES_DARK_01
-        sta SPRITE_BANK_STATIC0
+        sta SPRITE_BANK_STATIC_00
         lda #>SPRITE_STATIC_01_DAMAGE_FLASHING_SQUARE
-        sta SPRITE_BANK_STATIC1
+        sta SPRITE_BANK_STATIC_01
         lda #>SPRITE_STATIC_02_BOMB_STANDARD
-        sta SPRITE_BANK_STATIC2
+        sta SPRITE_BANK_STATIC_02
         lda #>SPRITE_STATIC_03_UI_SLIDER
-        sta SPRITE_BANK_STATIC3
-        ; TODO: the other four static banks!!
-
+        sta SPRITE_BANK_STATIC_03
+        lda #>SPRITE_STATIC_04_PLACEHOLDER
+        sta SPRITE_BANK_STATIC_04
+        lda #>SPRITE_STATIC_05_PLACEHOLDER
+        sta SPRITE_BANK_STATIC_05
+        lda #>SPRITE_STATIC_06_PLACEHOLDER
+        sta SPRITE_BANK_STATIC_06
+        lda #>SPRITE_STATIC_07_PLACEHOLDER
+        sta SPRITE_BANK_STATIC_07
 
         set_raster_playback_speed #1, #0
         ; Enable NMI first (but not rendering)

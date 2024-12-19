@@ -59,57 +59,57 @@ ROOM_TRANSITION_SLIDE_UP    = 3
 ROOM_TRANSITION_SLIDE_DOWN  = 4
 ; TODO: more!
 
-SPRITE_BANK_PLAYER  = PlayfieldObjBanks+0
-SPRITE_BANK_WEAPON  = PlayfieldObjBanks+1
-SPRITE_BANK_COMBO   = PlayfieldObjBanks+2
-SPRITE_BANK_CHAIN   = PlayfieldObjBanks+3
-SPRITE_BANK_ITEM0   = PlayfieldObjBanks+4
-SPRITE_BANK_ITEM1   = PlayfieldObjBanks+5
-SPRITE_BANK_ITEM2   = PlayfieldObjBanks+6
-SPRITE_BANK_ITEM3   = PlayfieldObjBanks+7
-SPRITE_BANK_STATIC0 = PlayfieldObjBanks+8
-SPRITE_BANK_STATIC1 = PlayfieldObjBanks+9
-SPRITE_BANK_STATIC2 = PlayfieldObjBanks+10
-SPRITE_BANK_STATIC3 = PlayfieldObjBanks+11
-SPRITE_BANK_STATIC4 = PlayfieldObjBanks+12
-SPRITE_BANK_STATIC5 = PlayfieldObjBanks+13
-SPRITE_BANK_STATIC6 = PlayfieldObjBanks+14
-SPRITE_BANK_STATIC7 = PlayfieldObjBanks+15
+SPRITE_BANK_PLAYER    = PlayfieldObjBanks+0
+SPRITE_BANK_WEAPON    = PlayfieldObjBanks+1
+SPRITE_BANK_COMBO     = PlayfieldObjBanks+2
+SPRITE_BANK_CHAIN     = PlayfieldObjBanks+3
+SPRITE_BANK_ITEM_00   = PlayfieldObjBanks+4
+SPRITE_BANK_ITEM_01   = PlayfieldObjBanks+5
+SPRITE_BANK_ITEM_02   = PlayfieldObjBanks+6
+SPRITE_BANK_ITEM_03   = PlayfieldObjBanks+7
+SPRITE_BANK_STATIC_00 = PlayfieldObjBanks+8
+SPRITE_BANK_STATIC_01 = PlayfieldObjBanks+9
+SPRITE_BANK_STATIC_02 = PlayfieldObjBanks+10
+SPRITE_BANK_STATIC_03 = PlayfieldObjBanks+11
+SPRITE_BANK_STATIC_04 = PlayfieldObjBanks+12
+SPRITE_BANK_STATIC_05 = PlayfieldObjBanks+13
+SPRITE_BANK_STATIC_06 = PlayfieldObjBanks+14
+SPRITE_BANK_STATIC_07 = PlayfieldObjBanks+15
 
-SPRITE_BANK_BANNER_UPPER = HudObjBanks+0
-SPRITE_BANK_BANNER_LOWER = HudObjBanks+1
-SPRITE_BANK_HUD_STATIC0  = HudObjBanks+2
-SPRITE_BANK_HUD_STATIC1  = HudObjBanks+3
-SPRITE_BANK_HUD_STATIC2  = HudObjBanks+4
-SPRITE_BANK_HUD_STATIC3  = HudObjBanks+5
-SPRITE_BANK_HUD_STATIC4  = HudObjBanks+6
-SPRITE_BANK_HUD_STATIC5  = HudObjBanks+7
+SPRITE_BANK_HUD_STATIC_00  = HudObjBanks+0
+SPRITE_BANK_HUD_STATIC_01  = HudObjBanks+1
+SPRITE_BANK_HUD_STATIC_02  = HudObjBanks+2
+SPRITE_BANK_HUD_STATIC_03  = HudObjBanks+3
+SPRITE_BANK_HUD_STATIC_04  = HudObjBanks+4
+SPRITE_BANK_HUD_STATIC_05  = HudObjBanks+5
+SPRITE_BANK_BANNER_UPPER   = HudObjBanks+6
+SPRITE_BANK_BANNER_LOWER   = HudObjBanks+7
 
-SPRITE_OFFSET_PLAYER  = $00
-SPRITE_OFFSET_WEAPON  = $20
-SPRITE_OFFSET_COMBO   = $40
-SPRITE_OFFSET_CHAIN   = $60
-SPRITE_OFFSET_ITEM0   = $80
-SPRITE_OFFSET_ITEM1   = $A0
-SPRITE_OFFSET_ITEM2   = $C0
-SPRITE_OFFSET_ITEM3   = $E0
-SPRITE_OFFSET_STATIC0 = $01
-SPRITE_OFFSET_STATIC1 = $21
-SPRITE_OFFSET_STATIC2 = $41
-SPRITE_OFFSET_STATIC3 = $61
-SPRITE_OFFSET_STATIC4 = $81
-SPRITE_OFFSET_STATIC5 = $A1
-SPRITE_OFFSET_STATIC6 = $C1
-SPRITE_OFFSET_STATIC7 = $E1
+SPRITE_OFFSET_PLAYER    = $00
+SPRITE_OFFSET_WEAPON    = $20
+SPRITE_OFFSET_COMBO     = $40
+SPRITE_OFFSET_CHAIN     = $60
+SPRITE_OFFSET_ITEM_00   = $80
+SPRITE_OFFSET_ITEM_01   = $A0
+SPRITE_OFFSET_ITEM_02   = $C0
+SPRITE_OFFSET_ITEM_03   = $E0
+SPRITE_OFFSET_STATIC_00 = $01
+SPRITE_OFFSET_STATIC_01 = $21
+SPRITE_OFFSET_STATIC_02 = $41
+SPRITE_OFFSET_STATIC_03 = $61
+SPRITE_OFFSET_STATIC_04 = $81
+SPRITE_OFFSET_STATIC_05 = $A1
+SPRITE_OFFSET_STATIC_06 = $C1
+SPRITE_OFFSET_STATIC_07 = $E1
 
-SPRITE_OFFSET_BANNER_UPPER = $00
-SPRITE_OFFSET_BANNER_LOWER = $20
-SPRITE_OFFSET_HUD_STATIC0  = $40
-SPRITE_OFFSET_HUD_STATIC1  = $60
-SPRITE_OFFSET_HUD_STATIC2  = $80
-SPRITE_OFFSET_HUD_STATIC3  = $A0
-SPRITE_OFFSET_HUD_STATIC4  = $C0
-SPRITE_OFFSET_HUD_STATIC5  = $E0
+SPRITE_OFFSET_HUD_STATIC_00  = $00
+SPRITE_OFFSET_HUD_STATIC_01  = $20
+SPRITE_OFFSET_HUD_STATIC_02  = $40
+SPRITE_OFFSET_HUD_STATIC_03  = $60
+SPRITE_OFFSET_HUD_STATIC_04  = $80
+SPRITE_OFFSET_HUD_STATIC_05  = $A0
+SPRITE_OFFSET_BANNER_UPPER   = $C0
+SPRITE_OFFSET_BANNER_LOWER   = $E0
 
 .macro set_sprite_bank bank_number, tile_id
     lda #>tile_id
@@ -129,55 +129,55 @@ SPRITE_OFFSET_HUD_STATIC5  = $E0
 .endmacro
 
 .macro set_static_00_sprite_x tile_id
-    lda #<(tile_id + SPRITE_OFFSET_STATIC0)
+    lda #<(tile_id + SPRITE_OFFSET_STATIC_00)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC0, tile_id
+    set_sprite_bank SPRITE_BANK_STATIC_00, tile_id
 .endmacro
 
 .macro set_static_01_sprite_x tile_id
-    lda #<(tile_id + SPRITE_OFFSET_STATIC1)
+    lda #<(tile_id + SPRITE_OFFSET_STATIC_01)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC1, tile_id
+    set_sprite_bank SPRITE_BANK_STATIC_01, tile_id
 .endmacro
 
 .macro set_static_02_sprite_x tile_id
-    lda #<(tile_id + SPRITE_OFFSET_STATIC2)
+    lda #<(tile_id + SPRITE_OFFSET_STATIC_02)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC2, tile_id
+    set_sprite_bank SPRITE_BANK_STATIC_02, tile_id
 .endmacro
 
 .macro set_static_02_sprite_y tile_id
-    lda #<(tile_id + SPRITE_OFFSET_STATIC2)
+    lda #<(tile_id + SPRITE_OFFSET_STATIC_02)
     sta sprite_table + MetaSpriteState::TileIndex, y
-    set_sprite_bank SPRITE_BANK_STATIC2, tile_id
+    set_sprite_bank SPRITE_BANK_STATIC_02, tile_id
 .endmacro
 
 .macro set_static_03_sprite_x tile_id
-    lda #<(tile_id + SPRITE_OFFSET_STATIC3)
+    lda #<(tile_id + SPRITE_OFFSET_STATIC_03)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC3, tile_id
+    set_sprite_bank SPRITE_BANK_STATIC_03, tile_id
 .endmacro
 
 .macro set_static_04_sprite_x tile_id
-    lda #<(tile_id + SPRITE_OFFSET_STATIC4)
+    lda #<(tile_id + SPRITE_OFFSET_STATIC_04)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC4, tile_id
+    set_sprite_bank SPRITE_BANK_STATIC_04, tile_id
 .endmacro
 
 .macro set_static_05_sprite_x tile_id
-    lda #<(tile_id + SPRITE_OFFSET_STATIC5)
+    lda #<(tile_id + SPRITE_OFFSET_STATIC_05)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC5, tile_id
+    set_sprite_bank SPRITE_BANK_STATIC_05, tile_id
 .endmacro
 
 .macro set_static_06_sprite_x tile_id
-    lda #<(tile_id + SPRITE_OFFSET_STATIC6)
+    lda #<(tile_id + SPRITE_OFFSET_STATIC_06)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC6, tile_id
+    set_sprite_bank SPRITE_BANK_STATIC_06, tile_id
 .endmacro
 
 .macro set_static_07_sprite_x tile_id
-    lda #<(tile_id + SPRITE_OFFSET_STATIC7)
+    lda #<(tile_id + SPRITE_OFFSET_STATIC_07)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC7, tile_id
+    set_sprite_bank SPRITE_BANK_STATIC_07, tile_id
 .endmacro

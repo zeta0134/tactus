@@ -4,6 +4,7 @@
 
     .include "battlefield.inc"
     .include "coins.inc"
+    .include "kernel.inc"
     .include "player.inc"
     .include "sprites.inc"
     .include "slowam.inc"
@@ -72,15 +73,15 @@ COIN_PAL_PPL = $03
 ; game logic will ultimately specify when spawning coins, usually on
 ; enemy defeat
 coin_type_tile_id_lut:
-    .byte SPRITE_TILE_LOOT_01 + 0 ; 0-value diamond (should be unused)
-    .byte SPRITE_TILE_LOOT_01 + 2 ; 1-coin (white)
-    .byte SPRITE_TILE_LOOT_23 + 0 ; 2-gem (red)
-    .byte SPRITE_TILE_LOOT_23 + 2 ; 3-gem (purple)
-    .byte SPRITE_TILE_LOOT_45 + 0 ; 5-jewel (red)
-    .byte SPRITE_TILE_LOOT_45 + 2 ; 5-jewel (purple)
-    .byte SPRITE_TILE_LOOT_67 + 0 ; 10-pearl (white)
-    .byte SPRITE_TILE_LOOT_67 + 2 ; 10-obelisk (purple)
-    .byte SPRITE_TILE_LOOT_01 + 0 ; 25-diamond (white)
+    .byte <SPRITE_STATIC_01_LOOT_01 + SPRITE_OFFSET_STATIC_01 + 0 ; 0-value diamond (should be unused)
+    .byte <SPRITE_STATIC_01_LOOT_01 + SPRITE_OFFSET_STATIC_01 + 2 ; 1-coin (white)
+    .byte <SPRITE_STATIC_01_LOOT_23 + SPRITE_OFFSET_STATIC_01 + 0 ; 2-gem (red)
+    .byte <SPRITE_STATIC_01_LOOT_23 + SPRITE_OFFSET_STATIC_01 + 2 ; 3-gem (purple)
+    .byte <SPRITE_STATIC_01_LOOT_45 + SPRITE_OFFSET_STATIC_01 + 0 ; 5-jewel (red)
+    .byte <SPRITE_STATIC_01_LOOT_45 + SPRITE_OFFSET_STATIC_01 + 2 ; 5-jewel (purple)
+    .byte <SPRITE_STATIC_01_LOOT_67 + SPRITE_OFFSET_STATIC_01 + 0 ; 10-pearl (white)
+    .byte <SPRITE_STATIC_01_LOOT_67 + SPRITE_OFFSET_STATIC_01 + 2 ; 10-obelisk (purple)
+    .byte <SPRITE_STATIC_01_LOOT_01 + SPRITE_OFFSET_STATIC_01 + 0 ; 25-diamond (white)
 coin_type_attribute_lut:
     .byte COIN_PAL_WHI ; 0-value diamond (should be unused)
     .byte COIN_PAL_WHI ; 1-coin
