@@ -2178,12 +2178,20 @@ all_done:
 .endproc
 
 spell_casting_sprite_lut:
-        .byte SPRITE_TILE_SPELL_FIRE_CASTING
-        .byte SPRITE_TILE_SPELL_AIR_CASTING
-        .byte SPRITE_TILE_SPELL_ICE_CASTING
-        .byte SPRITE_TILE_SPELL_EARTH_CASTING
-        .byte SPRITE_TILE_SPELL_BOMB_FIESTA_CASTING
-        .byte SPRITE_TILE_SPELL_LIFE_CASTING
+        .byte <SPRITE_WEAPON_SPELLCASTING_SPELL_FIRE_CASTING + SPRITE_OFFSET_WEAPON
+        .byte <SPRITE_WEAPON_SPELLCASTING_SPELL_AIR_CASTING + SPRITE_OFFSET_WEAPON
+        .byte <SPRITE_WEAPON_SPELLCASTING_SPELL_ICE_CASTING + SPRITE_OFFSET_WEAPON
+        .byte <SPRITE_WEAPON_SPELLCASTING_SPELL_EARTH_CASTING + SPRITE_OFFSET_WEAPON
+        .byte <SPRITE_WEAPON_SPELLCASTING_SPELL_BOMB_FIESTA_CASTING + SPRITE_OFFSET_WEAPON
+        .byte <SPRITE_WEAPON_SPELLCASTING_SPELL_LIFE_CASTING + SPRITE_OFFSET_WEAPON
+
+spell_casting_bank_lut:
+        .byte >SPRITE_WEAPON_SPELLCASTING_SPELL_FIRE_CASTING
+        .byte >SPRITE_WEAPON_SPELLCASTING_SPELL_AIR_CASTING
+        .byte >SPRITE_WEAPON_SPELLCASTING_SPELL_ICE_CASTING
+        .byte >SPRITE_WEAPON_SPELLCASTING_SPELL_EARTH_CASTING
+        .byte >SPRITE_WEAPON_SPELLCASTING_SPELL_BOMB_FIESTA_CASTING
+        .byte >SPRITE_WEAPON_SPELLCASTING_SPELL_LIFE_CASTING
 
 .proc detect_spell_cast
 MetaSpriteIndex := R0
@@ -2266,6 +2274,9 @@ done_with_full_room_prep:
         tay
         lda spell_casting_sprite_lut, y
         sta sprite_table + MetaSpriteState::TileIndex, x
+        ; all spellcasting sprites are currently in the same bank, so load that in
+        lda spell_casting_bank_lut, y
+        sta SPRITE_BANK_WEAPON
 
 sprite_failed:
         ; For now, that is all. Spell effects will fly elsewhere, yes!
