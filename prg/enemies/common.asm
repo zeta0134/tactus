@@ -202,8 +202,7 @@ EffectiveAttackSquare := R10
         adc #BATTLEFIELD_OFFSET_Y
         sta sprite_table + MetaSpriteState::PositionY, x
 
-        lda #<SPRITE_TILE_DEATH_SKULL
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_static_02_sprite_x SPRITE_STATIC_02_DEATH_SKULL
 
 sprite_failed:
         rts
@@ -320,8 +319,7 @@ TargetSquare := R13
         lda DamageSpriteCoordY
         sta sprite_table + MetaSpriteState::PositionY, x
 
-        lda #<SPRITE_TILE_DAMAGE_PLAYER
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_static_02_sprite_x SPRITE_STATIC_02_DAMAGE_PLAYER
 
         ; Now spawn a second sprite, directly under the puff spot, to
         ; indicate that this particular spot is where the damage came
@@ -353,8 +351,7 @@ TargetSquare := R13
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
         lda #$FF
         sta sprite_table + MetaSpriteState::LifetimeBeats, x
-        lda #<SPRITE_TILE_DAMAGE_FLASHING_SQUARE
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_static_01_sprite_x SPRITE_STATIC_01_DAMAGE_FLASHING_SQUARE
         ; and... that's it?
 
 sprite_failed:

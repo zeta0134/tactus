@@ -130,54 +130,45 @@ SPRITE_OFFSET_BANNER_LOWER   = $E0
 
 .macro set_static_00_sprite_x tile_id
     lda #<(tile_id + SPRITE_OFFSET_STATIC_00)
-    sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC_00, tile_id
+    sta sprite_table + MetaSpriteState::TileIndex, x    
 .endmacro
 
 .macro set_static_01_sprite_x tile_id
     lda #<(tile_id + SPRITE_OFFSET_STATIC_01)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC_01, tile_id
 .endmacro
 
 .macro set_static_02_sprite_x tile_id
     lda #<(tile_id + SPRITE_OFFSET_STATIC_02)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC_02, tile_id
 .endmacro
 
 .macro set_static_02_sprite_y tile_id
     lda #<(tile_id + SPRITE_OFFSET_STATIC_02)
     sta sprite_table + MetaSpriteState::TileIndex, y
-    set_sprite_bank SPRITE_BANK_STATIC_02, tile_id
 .endmacro
 
 .macro set_static_03_sprite_x tile_id
     lda #<(tile_id + SPRITE_OFFSET_STATIC_03)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC_03, tile_id
 .endmacro
 
 .macro set_static_04_sprite_x tile_id
     lda #<(tile_id + SPRITE_OFFSET_STATIC_04)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC_04, tile_id
 .endmacro
 
 .macro set_static_05_sprite_x tile_id
     lda #<(tile_id + SPRITE_OFFSET_STATIC_05)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC_05, tile_id
 .endmacro
 
 .macro set_static_06_sprite_x tile_id
     lda #<(tile_id + SPRITE_OFFSET_STATIC_06)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC_06, tile_id
 .endmacro
 
 .macro set_static_07_sprite_x tile_id
     lda #<(tile_id + SPRITE_OFFSET_STATIC_07)
     sta sprite_table + MetaSpriteState::TileIndex, x
-    set_sprite_bank SPRITE_BANK_STATIC_07, tile_id
 .endmacro
