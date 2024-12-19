@@ -175,7 +175,7 @@ sprite_failed:
 
 dagger:
         ;       Tile, Length
-        .byte   <SPRITE_TILE_DAGGER, $01
+        .byte   $00, $01
         ; behavior tables
         .word dagger_north, dagger_east, dagger_south, dagger_west
         ; animation routines
@@ -261,7 +261,7 @@ dagger_west_anim:
 
 broadsword:
         ;       Tile, Length
-        .byte   <SPRITE_TILE_BROADSWORD, $03
+        .byte   $00, $03
         ; behavior tables
         .word broadsword_north, broadsword_east, broadsword_south, broadsword_west
         ; animation routines
@@ -357,7 +357,7 @@ broadsword_west_clockwise_anim:
 
 longsword:
         ;       Tile, Length
-        .byte   <SPRITE_TILE_LONGSWORD, $02
+        .byte   $00, $02
         ; behavior tables
         .word longsword_north, longsword_east, longsword_south, longsword_west
         ; animation routines
@@ -450,7 +450,7 @@ longsword_west_anim:
 
 spear:
         ;       Tile, Length
-        .byte   <SPRITE_TILE_SPEAR, $02
+        .byte   $00, $02
         ; behavior tables
         .word spear_north, spear_east, spear_south, spear_west
         ; animation routines
@@ -591,7 +591,7 @@ near:
 
 flail:
         ;       Tile, Length
-        .byte   <SPRITE_TILE_FLAIL, $05
+        .byte   $00, $05
         ; behavior tables
         .word flail_north, flail_east, flail_south, flail_west
         ; animation routines

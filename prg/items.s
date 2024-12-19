@@ -352,7 +352,7 @@ item_table:
 
 no_item:
         .byte SLOT_WEAPON                     ; SlotId (irrelevant)
-        .byte SPRITE_TILE_MENU_CURSOR_SPIN    ; WorldSpriteTile (obviously broken)
+        .word SPRITE_ITEMS_04_INVALID_ITEM    ; WorldSpriteTile (obviously broken)
         .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -369,7 +369,7 @@ no_item:
 
 dagger_lvl_1:
         .byte SLOT_WEAPON                     ; SlotId
-        .byte SPRITE_TILE_DAGGER              ; WorldSpriteTile
+        .word SPRITE_ITEMS_01_DAGGER          ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_DAGGER         ; HudBgTile
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -386,7 +386,7 @@ dagger_lvl_1:
 
 broadsword_lvl_1:
         .byte SLOT_WEAPON                       ; SlotId
-        .byte SPRITE_TILE_BROADSWORD            ; WorldSpriteTile
+        .word SPRITE_ITEMS_01_BROADSWORD        ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_BROADSWORD       ; HudBgTile
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -403,7 +403,7 @@ broadsword_lvl_1:
 
 broadsword_lvl_2:
         .byte SLOT_WEAPON                       ; SlotId
-        .byte SPRITE_TILE_BROADSWORD            ; WorldSpriteTile
+        .word SPRITE_ITEMS_01_BROADSWORD        ; WorldSpriteTile
         .byte SPRITE_PAL_RED                    ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_BROADSWORD       ; HudBgTile
         .byte (HUD_RED_PAL | CHR_BANK_ITEMS)    ; HudBgAttr
@@ -420,7 +420,7 @@ broadsword_lvl_2:
 
 broadsword_lvl_3:
         .byte SLOT_WEAPON                       ; SlotId
-        .byte SPRITE_TILE_BROADSWORD            ; WorldSpriteTile
+        .word SPRITE_ITEMS_01_BROADSWORD        ; WorldSpriteTile
         .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_BROADSWORD       ; HudBgTile
         .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -437,7 +437,7 @@ broadsword_lvl_3:
 
 longsword_lvl_1:
         .byte SLOT_WEAPON                       ; SlotId
-        .byte SPRITE_TILE_LONGSWORD             ; WorldSpriteTile
+        .word SPRITE_ITEMS_03_LONGSWORD         ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_LONGSWORD        ; HudBgTile
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -454,7 +454,7 @@ longsword_lvl_1:
 
 longsword_lvl_2:
         .byte SLOT_WEAPON                      ; SlotId
-        .byte SPRITE_TILE_LONGSWORD            ; WorldSpriteTile
+        .word SPRITE_ITEMS_03_LONGSWORD        ; WorldSpriteTile
         .byte SPRITE_PAL_RED                   ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_LONGSWORD       ; HudBgTile
         .byte (HUD_RED_PAL | CHR_BANK_ITEMS)   ; HudBgAttr
@@ -471,7 +471,7 @@ longsword_lvl_2:
 
 longsword_lvl_3:
         .byte SLOT_WEAPON                       ; SlotId
-        .byte SPRITE_TILE_LONGSWORD             ; WorldSpriteTile
+        .word SPRITE_ITEMS_03_LONGSWORD         ; WorldSpriteTile
         .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_LONGSWORD        ; HudBgTile
         .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -488,7 +488,7 @@ longsword_lvl_3:
 
 spear_lvl_1:
         .byte SLOT_WEAPON                       ; SlotId
-        .byte SPRITE_TILE_SPEAR                 ; WorldSpriteTile
+        .word SPRITE_ITEMS_03_SPEAR             ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_SPEAR            ; HudBgTile
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -505,7 +505,7 @@ spear_lvl_1:
 
 spear_lvl_2:
         .byte SLOT_WEAPON                     ; SlotId
-        .byte SPRITE_TILE_SPEAR               ; WorldSpriteTile
+        .word SPRITE_ITEMS_03_SPEAR           ; WorldSpriteTile
         .byte SPRITE_PAL_RED                  ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_SPEAR          ; HudBgTile
         .byte (HUD_RED_PAL | CHR_BANK_ITEMS)  ; HudBgAttr
@@ -522,7 +522,7 @@ spear_lvl_2:
 
 spear_lvl_3:
         .byte SLOT_WEAPON                       ; SlotId
-        .byte SPRITE_TILE_SPEAR                 ; WorldSpriteTile
+        .word SPRITE_ITEMS_03_SPEAR             ; WorldSpriteTile
         .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_SPEAR            ; HudBgTile
         .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -539,7 +539,7 @@ spear_lvl_3:
 
 flail_lvl_1:
         .byte SLOT_WEAPON                       ; SlotId
-        .byte SPRITE_TILE_FLAIL                 ; WorldSpriteTile
+        .word SPRITE_ITEMS_02_FLAIL             ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_FLAIL            ; HudBgTile
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -556,7 +556,7 @@ flail_lvl_1:
 
 flail_lvl_2:
         .byte SLOT_WEAPON                     ; SlotId
-        .byte SPRITE_TILE_FLAIL               ; WorldSpriteTile
+        .word SPRITE_ITEMS_02_FLAIL           ; WorldSpriteTile
         .byte SPRITE_PAL_RED                  ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_FLAIL          ; HudBgTile
         .byte (HUD_RED_PAL | CHR_BANK_ITEMS)  ; HudBgAttr
@@ -573,7 +573,7 @@ flail_lvl_2:
 
 flail_lvl_3:
         .byte SLOT_WEAPON                       ; SlotId
-        .byte SPRITE_TILE_FLAIL                 ; WorldSpriteTile
+        .word SPRITE_ITEMS_02_FLAIL             ; WorldSpriteTile
         .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_FLAIL            ; HudBgTile
         .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -590,7 +590,7 @@ flail_lvl_3:
 
 basic_torch:
         .byte SLOT_TORCH                        ; SlotId
-        .byte SPRITE_TILE_BASIC_TORCH           ; WorldSpriteTile
+        .word SPRITE_ITEMS_01_BASIC_TORCH       ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_BASIC_TORCH             ; HudBgTile
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -607,7 +607,7 @@ basic_torch:
 
 large_torch:
         .byte SLOT_TORCH                        ; SlotId
-        .byte SPRITE_TILE_LARGE_TORCH           ; WorldSpriteTile
+        .word SPRITE_ITEMS_03_LARGE_TORCH       ; WorldSpriteTile
         .byte SPRITE_PAL_RED                    ; WorldSpriteAttr
         .byte EQUIPMENT_LARGE_TORCH             ; HudBgTile
         .byte (HUD_RED_PAL | CHR_BANK_ITEMS)    ; HudBgAttr
@@ -624,7 +624,7 @@ large_torch:
 
 compass:
         .byte SLOT_CONSUMABLE                 ; SlotId
-        .byte SPRITE_TILE_COMPASS             ; WorldSpriteTile
+        .word SPRITE_ITEMS_01_COMPASS         ; WorldSpriteTile
         .byte SPRITE_PAL_PURPLE               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -641,7 +641,7 @@ compass:
 
 map:
         .byte SLOT_CONSUMABLE                 ; SlotId
-        .byte SPRITE_TILE_MAP                 ; WorldSpriteTile
+        .word SPRITE_ITEMS_03_MAP             ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -658,7 +658,7 @@ map:
 
 small_fries:
         .byte SLOT_CONSUMABLE                 ; SlotId
-        .byte SPRITE_TILE_SMALL_FRIES         ; WorldSpriteTile
+        .word SPRITE_ITEMS_03_SMALL_FRIES     ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -675,7 +675,7 @@ small_fries:
 
 medium_fries:
         .byte SLOT_CONSUMABLE                 ; SlotId
-        .byte SPRITE_TILE_MEDIUM_FRIES        ; WorldSpriteTile
+        .word SPRITE_ITEMS_03_MEDIUM_FRIES    ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -692,7 +692,7 @@ medium_fries:
 
 large_fries:
         .byte SLOT_CONSUMABLE                 ; SlotId
-        .byte SPRITE_TILE_LARGE_FRIES         ; WorldSpriteTile
+        .word SPRITE_ITEMS_02_LARGE_FRIES     ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -711,7 +711,7 @@ large_fries:
 ; in the player movement code
 go_go_boots:
         .byte SLOT_BOOTS                      ; SlotId
-        .byte SPRITE_TILE_GO_GO_BOOTS         ; WorldSpriteTile
+        .word SPRITE_ITEMS_02_GO_GO_BOOTS     ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_GO_GO_BOOTS           ; HudBgTile
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -728,7 +728,7 @@ go_go_boots:
 
 gold_sack:
         .byte SLOT_CONSUMABLE                 ; SlotId
-        .byte SPRITE_TILE_GOLD_SACK           ; WorldSpriteTile
+        .word SPRITE_ITEMS_02_GOLD_SACK       ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -745,7 +745,7 @@ gold_sack:
 
 heart_container:
         .byte SLOT_CONSUMABLE                    ; SlotId
-        .byte SPRITE_TILE_HEART_CONTAINER        ; WorldSpriteTile
+        .word SPRITE_ITEMS_02_HEART_CONTAINER    ; WorldSpriteTile
         .byte SPRITE_PAL_RED                     ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                     ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS)    ; HudBgAttr (unused)
@@ -762,7 +762,7 @@ heart_container:
 
 temporary_heart:
         .byte SLOT_CONSUMABLE                    ; SlotId
-        .byte SPRITE_TILE_HEART_CONTAINER        ; WorldSpriteTile
+        .word SPRITE_ITEMS_02_HEART_CONTAINER    ; WorldSpriteTile
         .byte SPRITE_PAL_PURPLE                  ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                     ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS)    ; HudBgAttr (unused)
@@ -779,7 +779,7 @@ temporary_heart:
 
 heart_armor:
         .byte SLOT_CONSUMABLE                 ; SlotId
-        .byte SPRITE_TILE_HEART_ARMOR         ; WorldSpriteTile
+        .word SPRITE_ITEMS_02_HEART_ARMOR     ; WorldSpriteTile
         .byte SPRITE_PAL_PURPLE               ; WorldSpriteAttr
         .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
         .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -797,7 +797,7 @@ heart_armor:
 ; TODO: this really needs to be directional, and much stronger
 defensive_shield:
         .byte SLOT_ARMOR                           ; SlotId
-        .byte SPRITE_TILE_SHIELD                   ; WorldSpriteTile
+        .word SPRITE_ITEMS_03_SHIELD               ; WorldSpriteTile
         .byte SPRITE_PAL_PURPLE                    ; WorldSpriteAttr
         .byte EQUIPMENT_ARMOR_SHIELD               ; HudBgTile (unused)
         .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS)    ; HudBgAttr (unused)
@@ -816,7 +816,7 @@ defensive_shield:
 ; it manually in the one spot where it would apply
 chain_link:
         .byte SLOT_ACCESSORY                    ; SlotId
-        .byte SPRITE_TILE_CHAIN_LINK            ; WorldSpriteTile
+        .word SPRITE_ITEMS_01_CHAIN_LINK        ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_ACCESSORY_CHAIN_LINK    ; HudBgTile (unused)
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -833,7 +833,7 @@ chain_link:
 
 aloha_tshirt_1:
         .byte SLOT_ARMOR                        ; SlotId
-        .byte SPRITE_TILE_ALOHA_TSHIRT_TEXT     ; WorldSpriteTile
+        .word SPRITE_ITEMS_01_ALOHA_TSHIRT_TEXT ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_ARMOR_TSHIRT_TEXT       ; HudBgTile (unused)
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -849,42 +849,42 @@ aloha_tshirt_1:
         .byte <.bank(aloha_tshirt_description)  ; DescriptionStringBank
 
 aloha_tshirt_2:
-        .byte SLOT_ARMOR                        ; SlotId
-        .byte SPRITE_TILE_ALOHA_TSHIRT_FLORAL   ; WorldSpriteTile
-        .byte SPRITE_PAL_RED                    ; WorldSpriteAttr
-        .byte EQUIPMENT_ARMOR_TSHIRT_FLORAL     ; HudBgTile (unused)
-        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)    ; HudBgAttr (unused)
-        .byte 0                                 ; HudSpriteTile (unused)
-        .byte 0                                 ; HudSpriteAttr (unused)
-        .word 99                                ; ShopCost
-        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
-        .addr no_effect                         ; DamageFunc        
-        .addr no_effect                         ; TorchlightFunc
-        .addr do_nothing                        ; UseFunc
-        .addr flat_1                            ; DmgReductionFunc
-        .addr aloha_tshirt_description          ; DescriptionStringPtr
-        .byte <.bank(aloha_tshirt_description)  ; DescriptionStringBank
+        .byte SLOT_ARMOR                          ; SlotId
+        .word SPRITE_ITEMS_01_ALOHA_TSHIRT_FLORAL ; WorldSpriteTile
+        .byte SPRITE_PAL_RED                      ; WorldSpriteAttr
+        .byte EQUIPMENT_ARMOR_TSHIRT_FLORAL       ; HudBgTile (unused)
+        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)      ; HudBgAttr (unused)
+        .byte 0                                   ; HudSpriteTile (unused)
+        .byte 0                                   ; HudSpriteAttr (unused)
+        .word 99                                  ; ShopCost
+        .byte WEAPON_DAGGER                       ; WeaponShape (unused)
+        .addr no_effect                           ; DamageFunc        
+        .addr no_effect                           ; TorchlightFunc
+        .addr do_nothing                          ; UseFunc
+        .addr flat_1                              ; DmgReductionFunc
+        .addr aloha_tshirt_description            ; DescriptionStringPtr
+        .byte <.bank(aloha_tshirt_description)    ; DescriptionStringBank
 
 aloha_tshirt_3:
-        .byte SLOT_ARMOR                        ; SlotId
-        .byte SPRITE_TILE_ALOHA_TSHIRT_SKULL    ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
-        .byte EQUIPMENT_ARMOR_TSHIRT_SKULL      ; HudBgTile (unused)
-        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
-        .byte 0                                 ; HudSpriteTile (unused)
-        .byte 0                                 ; HudSpriteAttr (unused)
-        .word 99                                ; ShopCost
-        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
-        .addr no_effect                         ; DamageFunc        
-        .addr no_effect                         ; TorchlightFunc
-        .addr do_nothing                        ; UseFunc
-        .addr flat_1                            ; DmgReductionFunc
-        .addr aloha_tshirt_description          ; DescriptionStringPtr
-        .byte <.bank(aloha_tshirt_description)  ; DescriptionStringBank
+        .byte SLOT_ARMOR                         ; SlotId
+        .word SPRITE_ITEMS_01_ALOHA_TSHIRT_SKULL ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                  ; WorldSpriteAttr
+        .byte EQUIPMENT_ARMOR_TSHIRT_SKULL       ; HudBgTile (unused)
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS)  ; HudBgAttr (unused)
+        .byte 0                                  ; HudSpriteTile (unused)
+        .byte 0                                  ; HudSpriteAttr (unused)
+        .word 99                                 ; ShopCost
+        .byte WEAPON_DAGGER                      ; WeaponShape (unused)
+        .addr no_effect                          ; DamageFunc        
+        .addr no_effect                          ; TorchlightFunc
+        .addr do_nothing                         ; UseFunc
+        .addr flat_1                             ; DmgReductionFunc
+        .addr aloha_tshirt_description           ; DescriptionStringPtr
+        .byte <.bank(aloha_tshirt_description)   ; DescriptionStringBank
 
 bomb_standard:
         .byte SLOT_ITEM                         ; SlotId
-        .byte SPRITE_TILE_MENU_CURSOR_SPIN      ; WorldSpriteTile (unused)
+        .word SPRITE_ITEMS_04_INVALID_ITEM      ; WorldSpriteTile (unused)
         .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
         .byte EQUIPMENT_BOMB_STANDARD           ; HudBgTile
         .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
@@ -901,7 +901,7 @@ bomb_standard:
 
 bomb_standard_one_pack:
         .byte SLOT_CONSUMABLE                   ; SlotId
-        .byte SPRITE_TILE_ITEM_BOMB_SINGLE      ; WorldSpriteTile
+        .word SPRITE_ITEMS_02_ITEM_BOMB_SINGLE  ; WorldSpriteTile
         .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_DAGGER           ; HudBgTile (unused)
         .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -918,7 +918,7 @@ bomb_standard_one_pack:
 
 bomb_standard_three_pack:
         .byte SLOT_CONSUMABLE                   ; SlotId
-        .byte SPRITE_TILE_ITEM_BOMB_TRIO        ; WorldSpriteTile
+        .word SPRITE_ITEMS_02_ITEM_BOMB_TRIO    ; WorldSpriteTile
         .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_DAGGER           ; HudBgTile (unused)
         .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -938,7 +938,7 @@ bomb_standard_three_pack:
 
 spell_fire:
         .byte SLOT_SPELL                        ; SlotId
-        .byte SPRITE_TILE_SPELL_FIRE            ; WorldSpriteTile
+        .word SPRITE_ITEMS_04_SPELL_FIRE        ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_SPELL_FIRE              ; HudBgTile (unused)
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -955,7 +955,7 @@ spell_fire:
 
 spell_air:
         .byte SLOT_SPELL                        ; SlotId
-        .byte SPRITE_TILE_SPELL_AIR             ; WorldSpriteTile
+        .word SPRITE_ITEMS_03_SPELL_AIR         ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_SPELL_AIR               ; HudBgTile (unused)
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -972,7 +972,7 @@ spell_air:
 
 spell_ice:
         .byte SLOT_SPELL                        ; SlotId
-        .byte SPRITE_TILE_SPELL_ICE             ; WorldSpriteTile
+        .word SPRITE_ITEMS_04_SPELL_ICE         ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_SPELL_ICE               ; HudBgTile (unused)
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -989,7 +989,7 @@ spell_ice:
 
 spell_earth:
         .byte SLOT_SPELL                        ; SlotId
-        .byte SPRITE_TILE_SPELL_EARTH           ; WorldSpriteTile
+        .word SPRITE_ITEMS_04_SPELL_EARTH       ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_SPELL_EARTH             ; HudBgTile (unused)
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
@@ -1006,7 +1006,7 @@ spell_earth:
 
 spell_bomb_fiesta:
         .byte SLOT_SPELL                            ; SlotId
-        .byte SPRITE_TILE_SPELL_BOMB_FIESTA         ; WorldSpriteTile
+        .word SPRITE_ITEMS_04_SPELL_BOMB_FIESTA     ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                     ; WorldSpriteAttr
         .byte EQUIPMENT_SPELL_BOMB_FIESTA           ; HudBgTile (unused)
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS)     ; HudBgAttr (unused)
@@ -1023,7 +1023,7 @@ spell_bomb_fiesta:
 
 spell_healing:
         .byte SLOT_SPELL                        ; SlotId
-        .byte SPRITE_TILE_SPELL_LIFE            ; WorldSpriteTile
+        .word SPRITE_ITEMS_04_SPELL_LIFE        ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
         .byte EQUIPMENT_SPELL_LIFE              ; HudBgTile (unused)
         .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)

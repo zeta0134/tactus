@@ -1,6 +1,6 @@
 .struct ItemDef
     SlotId .byte
-    WorldSpriteTile .byte
+    WorldSpriteTile .word
     WorldSpriteAttr .byte
     HudBgTile .byte
     HudBgAttr .byte
