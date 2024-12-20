@@ -11,6 +11,7 @@
         .include "enemies.inc"
         .include "far_call.inc"
         .include "hud.inc"
+        .include "kernel.inc"
         .include "levels.inc"
         .include "loot.inc"
         .include "palette.inc"
@@ -115,9 +116,7 @@ zone_blocking_mazes:
 ;    ######   ##     ## ##     ##  ######   ######  ######## ##     ## ##    ## ########   ######  
 
 zone_grasslands_banner_1_1:
-        ; 8x16 sprite tiles
-        .byte $00, $02
-        .byte $A0, $A2
+        hud_banner_sprite SPRITE_BANNERS_00_GRASSLANDS_1_1, SPRITE_BANNERS_00_GRASSLANDS_LOWER
         ; 8x16 sprite attributes
         .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
         .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
@@ -133,9 +132,7 @@ zone_grasslands_banner_1_1:
         .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
 
 zone_grasslands_banner_1_2:
-        ; 8x16 sprite tiles
-        .byte $20, $22
-        .byte $A0, $A2
+        hud_banner_sprite SPRITE_BANNERS_00_GRASSLANDS_1_2, SPRITE_BANNERS_00_GRASSLANDS_LOWER
         ; 8x16 sprite attributes
         .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
         .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
@@ -151,9 +148,7 @@ zone_grasslands_banner_1_2:
         .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
 
 zone_grasslands_banner_1_3:
-        ; 8x16 sprite tiles
-        .byte $40, $42
-        .byte $A0, $A2
+        hud_banner_sprite SPRITE_BANNERS_00_GRASSLANDS_1_3, SPRITE_BANNERS_00_GRASSLANDS_LOWER
         ; 8x16 sprite attributes
         .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
         .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
@@ -169,9 +164,7 @@ zone_grasslands_banner_1_3:
         .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
 
 zone_grasslands_banner_1_4:
-        ; 8x16 sprite tiles
-        .byte $60, $62
-        .byte $A0, $A2
+        hud_banner_sprite SPRITE_BANNERS_00_GRASSLANDS_1_4, SPRITE_BANNERS_00_GRASSLANDS_LOWER
         ; 8x16 sprite attributes
         .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
         .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
@@ -340,9 +333,7 @@ zone_grasslands_floor_234_mazes:
 ;  ##     ##  #######  ########  
 
 zone_hub_banner:
-        ; 8x16 sprite tiles
-        .byte $1C, $1E
-        .byte $BC, $BE
+        hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_BANNERS_00_HUD_LOWER
         ; 8x16 sprite attributes
         .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
         .byte SPRITE_PAL_ZONE, SPRITE_PAL_ZONE
@@ -685,6 +676,16 @@ SpritePtr := R8
         iny
         lda (PlayerZonePtr), y
         sta BannerDefPtr+1
+
+        ; Banner banks
+        perform_zpcm_inc
+        ldy #HudBannerDef::SpriteBankUpper
+        lda (BannerDefPtr), y
+        sta SPRITE_BANK_BANNER_UPPER
+
+        ldy #HudBannerDef::SpriteBankLower
+        lda (BannerDefPtr), y
+        sta SPRITE_BANK_BANNER_LOWER
 
         ; Nametable Tiles
         perform_zpcm_inc

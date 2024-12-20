@@ -107,11 +107,24 @@
 ; ===============
 
 .struct HudBannerDef
+        SpriteBankUpper .byte 1
+        SpriteBankLower .byte 1
         SpriteTileIds .byte 4
         SpriteAttrs .byte 4
         BgTileIds .byte 8
         BgTileAttrs .byte 8
 .endstruct
+
+.macro hud_banner_sprite upper_sprite, lower_sprite
+        ; 8x16 sprite banks
+        .byte >upper_sprite
+        .byte >lower_sprite
+        ; 8x16 sprite tiles
+        .byte <upper_sprite + 0 + SPRITE_OFFSET_BANNER_UPPER
+        .byte <upper_sprite + 2 + SPRITE_OFFSET_BANNER_UPPER
+        .byte <lower_sprite + 0 + SPRITE_OFFSET_BANNER_LOWER
+        .byte <lower_sprite + 2 + SPRITE_OFFSET_BANNER_LOWER
+.endmacro
 
 .struct ZoneDefinition
         GeneralSpawnPool .addr
