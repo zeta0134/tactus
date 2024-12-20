@@ -474,6 +474,19 @@ LayoutPtr := R0
         lda #>SPRITE_STATIC_07_PLACEHOLDER
         sta SPRITE_BANK_STATIC_07
 
+        lda #>SPRITE_HUD_STATIC_00_COUNTER_01S_01
+        sta SPRITE_BANK_HUD_STATIC_00
+        lda #>SPRITE_HUD_STATIC_01_COUNTER_10S_67
+        sta SPRITE_BANK_HUD_STATIC_01
+        lda #>SPRITE_HUD_STATIC_02_PLACEHOLDER
+        sta SPRITE_BANK_HUD_STATIC_02
+        lda #>SPRITE_HUD_STATIC_03_PLACEHOLDER
+        sta SPRITE_BANK_HUD_STATIC_03
+        lda #>SPRITE_HUD_STATIC_04_PLACEHOLDER
+        sta SPRITE_BANK_HUD_STATIC_04
+        lda #>SPRITE_HUD_STATIC_05_PLACEHOLDER
+        sta SPRITE_BANK_HUD_STATIC_05
+
         set_raster_playback_speed #1, #0
         ; Enable NMI first (but not rendering)
         lda #0

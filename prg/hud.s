@@ -13,6 +13,7 @@
         .include "hearts.inc"
         .include "hud.inc"
         .include "items.inc"
+        .include "kernel.inc"
         .include "levels.inc"
         .include "nes.inc"
         .include "player.inc"
@@ -93,9 +94,6 @@ chr_tile_offset SPELL_DISABLED_BL_CORNER, 1, 14
 
 TILE_COL_OFFSET = 1
 TILE_ROW_OFFSET = 16
-
-BOMB_COUNTER_TENS = $C0
-BOMB_COUNTER_ONES = $E0
 
 BOMB_COUNTER_POS_X = 115
 BOMB_COUNTER_POS_Y = 194
@@ -1316,6 +1314,30 @@ Numeral := R0
 .endproc
 .endif
 
+bomb_counter_tens_lut:
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_10S_01 + 0 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_10S_01 + 2 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_10S_23 + 0 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_10S_23 + 2 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_10S_45 + 0 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_10S_45 + 2 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_01_COUNTER_10S_67 + 0 + SPRITE_OFFSET_HUD_STATIC_01
+        .byte <SPRITE_HUD_STATIC_01_COUNTER_10S_67 + 2 + SPRITE_OFFSET_HUD_STATIC_01
+        .byte <SPRITE_HUD_STATIC_01_COUNTER_10S_89 + 0 + SPRITE_OFFSET_HUD_STATIC_01
+        .byte <SPRITE_HUD_STATIC_01_COUNTER_10S_89 + 2 + SPRITE_OFFSET_HUD_STATIC_01
+
+bomb_counter_ones_lut:
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_01S_01 + 0 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_01S_01 + 2 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_01S_23 + 0 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_01S_23 + 2 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_01S_45 + 0 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_01S_45 + 2 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_01S_67 + 0 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_01S_67 + 2 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_01S_89 + 0 + SPRITE_OFFSET_HUD_STATIC_00
+        .byte <SPRITE_HUD_STATIC_00_COUNTER_01S_89 + 2 + SPRITE_OFFSET_HUD_STATIC_00
+
 .proc draw_item_count_sprites
 NumberWord := T0
 OnesDigit := T2
@@ -1368,10 +1390,8 @@ draw_counter:
         lda #BOMB_COUNTER_POS_Y
         ldy #SelfModifiedSprite::PosY
         sta (SpritePtr), y
-        lda TensDigit
-        asl
-        clc
-        adc #BOMB_COUNTER_TENS
+        ldx TensDigit
+        lda bomb_counter_tens_lut, x
         ldy #SelfModifiedSprite::TileId
         sta (SpritePtr), y
         lda #SPRITE_PAL_YELLOW
@@ -1391,10 +1411,8 @@ draw_counter:
         lda #BOMB_COUNTER_POS_Y
         ldy #SelfModifiedSprite::PosY
         sta (SpritePtr), y
-        lda OnesDigit
-        asl
-        clc
-        adc #BOMB_COUNTER_ONES
+        ldx OnesDigit
+        lda bomb_counter_ones_lut, x
         ldy #SelfModifiedSprite::TileId
         sta (SpritePtr), y
         lda #SPRITE_PAL_YELLOW
