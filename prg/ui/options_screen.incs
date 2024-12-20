@@ -171,8 +171,7 @@ bg_loop:
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #168
         sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_PLAIN_SQUARES_LEFT
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_ui_00_sprite_x SPRITE_UI_00_PLAIN_SQUARES_LEFT
 
         far_call FAR_find_unused_sprite
         lda MetaSpriteIndex
@@ -189,8 +188,7 @@ bg_loop:
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #184
         sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_PLAIN_SQUARES_RIGHT
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_ui_00_sprite_x SPRITE_UI_00_PLAIN_SQUARES_RIGHT
 
         lda #0
         jsr set_brightness
@@ -287,7 +285,7 @@ widget_disco_active_setting := widgets_data3
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #64
         sta sprite_table + MetaSpriteState::PositionY, x
-        set_player_sprite_x SPRITE_PLAYER_01_PLAYER
+        set_ui_00_sprite_x SPRITE_UI_00_PLAYER
 
         ldx CurrentWidgetIndex
         lda CurrentBeat

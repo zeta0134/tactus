@@ -198,8 +198,7 @@ widget_frames_at_this_location := widgets_data7
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #$F0 ; offscreen for now 
         sta sprite_table + MetaSpriteState::PositionY, x
-        lda #<SPRITE_TILE_MENU_CURSOR_SPIN
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_ui_00_sprite_x SPRITE_UI_00_MENU_CURSOR_SPIN
 
         ldy CurrentWidgetIndex
         set_widget_state_y widget_cursor_update
@@ -339,7 +338,7 @@ widget_frames_at_this_location := widgets_data7
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #$F0 ; offscreen for now 
         sta sprite_table + MetaSpriteState::PositionY, x
-        set_player_sprite_x SPRITE_PLAYER_01_PLAYER
+        set_ui_00_sprite_x SPRITE_UI_00_PLAYER
         
         ldy CurrentWidgetIndex
         set_widget_state_y widget_player_cursor_update
@@ -396,10 +395,10 @@ no_adjustment:
         cmp #16
         bcs use_idle_pose
 use_regular_pose: 
-        set_player_sprite_x SPRITE_PLAYER_01_PLAYER
+        set_ui_00_sprite_x SPRITE_UI_00_PLAYER
         rts
 use_idle_pose:
-        set_player_sprite_x SPRITE_PLAYER_01_PLAYER_IDLE
+        set_ui_00_sprite_x SPRITE_UI_00_PLAYER_IDLE
         rts
 .endproc
 

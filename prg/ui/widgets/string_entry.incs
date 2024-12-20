@@ -942,7 +942,7 @@ widget_right_pos_y_pixel     := widgets_data6
         lda sprite_ptr_lut_high, y
         sta SpritePtr+1
 
-        lda #SPRITE_TILE_MENU_CURSOR_SQUARE + 0
+        lda #<SPRITE_UI_00_MENU_CURSOR_SQUARE + 0 + SPRITE_OFFSET_UI_00
         ldy #SelfModifiedSprite::TileId
         sta (SpritePtr), y
         lda #SPRITE_PAL_0
@@ -963,7 +963,7 @@ widget_right_pos_y_pixel     := widgets_data6
         lda sprite_ptr_lut_high, y
         sta SpritePtr+1
 
-        lda #SPRITE_TILE_MENU_CURSOR_SQUARE + 2
+        lda #<SPRITE_UI_00_MENU_CURSOR_SQUARE + 2 + SPRITE_OFFSET_UI_00
         ldy #SelfModifiedSprite::TileId
         sta (SpritePtr), y
         lda #SPRITE_PAL_0

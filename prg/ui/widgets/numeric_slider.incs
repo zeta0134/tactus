@@ -111,8 +111,7 @@ done_with_mid_segments:
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
         lda #$FF
         sta sprite_table + MetaSpriteState::LifetimeBeats, x
-        lda #<SPRITE_TILE_UI_SLIDER
-        sta sprite_table + MetaSpriteState::TileIndex, x
+        set_ui_00_sprite_x SPRITE_UI_00_UI_SLIDER
 
         perform_zpcm_inc
 

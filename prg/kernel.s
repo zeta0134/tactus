@@ -286,6 +286,9 @@ LayoutPtr := R0
         lda #0
         near_call FAR_apply_room_global_color_emphasis
 
+        ; Set the initial sprite banks for the UI, which will animate as usual
+        jsr set_ui_banks
+
         st16 GameMode, run_ui_subsystem
         jsr wait_for_next_vblank
 
@@ -402,6 +405,76 @@ LayoutPtr := R0
         rts
 .endproc
 
+.proc set_gameplay_static_banks
+        ; During main gameplay, we have a fixed set of static
+        ; banks, so get those all loaded in. The rest are unspecified;
+        ; other gameplay systems will set them as needed
+        lda #>SPRITE_STATIC_00_PARTICLES_DARK_01
+        sta SPRITE_BANK_STATIC_00
+        lda #>SPRITE_STATIC_01_DAMAGE_FLASHING_SQUARE
+        sta SPRITE_BANK_STATIC_01
+        lda #>SPRITE_STATIC_02_BOMB_STANDARD
+        sta SPRITE_BANK_STATIC_02
+        lda #>SPRITE_STATIC_03_PLACEHOLDER
+        sta SPRITE_BANK_STATIC_03
+        lda #>SPRITE_STATIC_04_PLACEHOLDER
+        sta SPRITE_BANK_STATIC_04
+        lda #>SPRITE_STATIC_05_PLACEHOLDER
+        sta SPRITE_BANK_STATIC_05
+        lda #>SPRITE_STATIC_06_PLACEHOLDER
+        sta SPRITE_BANK_STATIC_06
+        lda #>SPRITE_STATIC_07_PLACEHOLDER
+        sta SPRITE_BANK_STATIC_07
+
+        lda #>SPRITE_HUD_STATIC_00_COUNTER_01S_01
+        sta SPRITE_BANK_HUD_STATIC_00
+        lda #>SPRITE_HUD_STATIC_01_COUNTER_10S_67
+        sta SPRITE_BANK_HUD_STATIC_01
+        lda #>SPRITE_HUD_STATIC_02_PLACEHOLDER
+        sta SPRITE_BANK_HUD_STATIC_02
+        lda #>SPRITE_HUD_STATIC_03_PLACEHOLDER
+        sta SPRITE_BANK_HUD_STATIC_03
+        lda #>SPRITE_HUD_STATIC_04_PLACEHOLDER
+        sta SPRITE_BANK_HUD_STATIC_04
+        lda #>SPRITE_HUD_STATIC_05_PLACEHOLDER
+        sta SPRITE_BANK_HUD_STATIC_05
+        rts
+.endproc
+
+.proc set_ui_banks
+        ; For now, the UI uses an entirely fixed set of banks. Set all the others
+        ; to "blank" to simplify raster splits if those are needed
+        lda #>SPRITE_UI_00_MENU_CURSOR_SPIN
+        sta SPRITE_BANK_UI_00
+        lda #>SPRITE_000_BLANK_NOTHING
+        sta SPRITE_BANK_UI_01
+        lda #>SPRITE_000_BLANK_NOTHING
+        sta SPRITE_BANK_UI_02
+        lda #>SPRITE_000_BLANK_NOTHING
+        sta SPRITE_BANK_UI_03
+        lda #>SPRITE_000_BLANK_NOTHING
+        sta SPRITE_BANK_UI_04
+        lda #>SPRITE_000_BLANK_NOTHING
+        sta SPRITE_BANK_UI_05
+        lda #>SPRITE_000_BLANK_NOTHING
+        sta SPRITE_BANK_UI_06
+        lda #>SPRITE_000_BLANK_NOTHING
+        sta SPRITE_BANK_UI_07
+
+        ; The UI shouldn't use the $1000 table at all, so blank
+        ; that out entirely.
+        lda #>SPRITE_000_BLANK_NOTHING
+        sta SPRITE_BANK_STATIC_00
+        sta SPRITE_BANK_STATIC_01
+        sta SPRITE_BANK_STATIC_02
+        sta SPRITE_BANK_STATIC_03
+        sta SPRITE_BANK_STATIC_04
+        sta SPRITE_BANK_STATIC_05
+        sta SPRITE_BANK_STATIC_06
+        sta SPRITE_BANK_STATIC_07
+        rts
+.endproc
+
 .proc game_prep
         ; copy the run seed before we use it to generate the game state
         ; (we'll display this in the debug HUD / game end screens, etc)
@@ -455,37 +528,7 @@ LayoutPtr := R0
         ; will shift these around as necessary.
         jsr set_raster_effect_for_room
 
-        ; During main gameplay, we have a fixed set of static
-        ; banks, so get those all loaded in
-        lda #>SPRITE_STATIC_00_PARTICLES_DARK_01
-        sta SPRITE_BANK_STATIC_00
-        lda #>SPRITE_STATIC_01_DAMAGE_FLASHING_SQUARE
-        sta SPRITE_BANK_STATIC_01
-        lda #>SPRITE_STATIC_02_BOMB_STANDARD
-        sta SPRITE_BANK_STATIC_02
-        lda #>SPRITE_STATIC_03_UI_SLIDER
-        sta SPRITE_BANK_STATIC_03
-        lda #>SPRITE_STATIC_04_PLACEHOLDER
-        sta SPRITE_BANK_STATIC_04
-        lda #>SPRITE_STATIC_05_PLACEHOLDER
-        sta SPRITE_BANK_STATIC_05
-        lda #>SPRITE_STATIC_06_PLACEHOLDER
-        sta SPRITE_BANK_STATIC_06
-        lda #>SPRITE_STATIC_07_PLACEHOLDER
-        sta SPRITE_BANK_STATIC_07
-
-        lda #>SPRITE_HUD_STATIC_00_COUNTER_01S_01
-        sta SPRITE_BANK_HUD_STATIC_00
-        lda #>SPRITE_HUD_STATIC_01_COUNTER_10S_67
-        sta SPRITE_BANK_HUD_STATIC_01
-        lda #>SPRITE_HUD_STATIC_02_PLACEHOLDER
-        sta SPRITE_BANK_HUD_STATIC_02
-        lda #>SPRITE_HUD_STATIC_03_PLACEHOLDER
-        sta SPRITE_BANK_HUD_STATIC_03
-        lda #>SPRITE_HUD_STATIC_04_PLACEHOLDER
-        sta SPRITE_BANK_HUD_STATIC_04
-        lda #>SPRITE_HUD_STATIC_05_PLACEHOLDER
-        sta SPRITE_BANK_HUD_STATIC_05
+        jsr set_gameplay_static_banks
 
         set_raster_playback_speed #1, #0
         ; Enable NMI first (but not rendering)

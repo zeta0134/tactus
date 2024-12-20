@@ -524,7 +524,7 @@ widget_sprite_index := widgets_data4
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #$F0 ; offscreen for now 
         sta sprite_table + MetaSpriteState::PositionY, x
-        set_player_sprite_x SPRITE_PLAYER_01_PLAYER
+        set_ui_00_sprite_x SPRITE_UI_00_PLAYER
 
         ; populate this box's contents (which manipulates that sprite
         ; up there)

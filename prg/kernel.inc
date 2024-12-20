@@ -111,6 +111,24 @@ SPRITE_OFFSET_HUD_STATIC_05  = $A0
 SPRITE_OFFSET_BANNER_UPPER   = $C0
 SPRITE_OFFSET_BANNER_LOWER   = $E0
 
+SPRITE_BANK_UI_00 = PlayfieldObjBanks+0
+SPRITE_BANK_UI_01 = PlayfieldObjBanks+1
+SPRITE_BANK_UI_02 = PlayfieldObjBanks+2
+SPRITE_BANK_UI_03 = PlayfieldObjBanks+3
+SPRITE_BANK_UI_04 = PlayfieldObjBanks+4
+SPRITE_BANK_UI_05 = PlayfieldObjBanks+5
+SPRITE_BANK_UI_06 = PlayfieldObjBanks+6
+SPRITE_BANK_UI_07 = PlayfieldObjBanks+7
+
+SPRITE_OFFSET_UI_00  = $00
+SPRITE_OFFSET_UI_01  = $20
+SPRITE_OFFSET_UI_02  = $40
+SPRITE_OFFSET_UI_03  = $60
+SPRITE_OFFSET_UI_04  = $80
+SPRITE_OFFSET_UI_05  = $A0
+SPRITE_OFFSET_UI_06  = $C0
+SPRITE_OFFSET_UI_07  = $E0
+
 .macro set_sprite_bank bank_number, tile_id
     lda #>tile_id
     sta bank_number
@@ -171,4 +189,9 @@ SPRITE_OFFSET_BANNER_LOWER   = $E0
 .macro set_static_07_sprite_x tile_id
     lda #<(tile_id + SPRITE_OFFSET_STATIC_07)
     sta sprite_table + MetaSpriteState::TileIndex, x
+.endmacro
+
+.macro set_ui_00_sprite_x tile_id
+    lda #<(tile_id + SPRITE_OFFSET_UI_00)
+    sta sprite_table + MetaSpriteState::TileIndex, x    
 .endmacro
