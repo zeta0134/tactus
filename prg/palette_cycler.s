@@ -34,6 +34,9 @@ full:
 ; don't expect this to work correctly if it's not
 ; clobbers A, X
 .proc unqueue_palette_cycle
+        ; sanity: don't run on an empty list!!
+        ldx num_tiles_to_cycle
+        beq not_found
         ldx #0
 scan_loop:
         perform_zpcm_inc
