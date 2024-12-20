@@ -955,29 +955,6 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         nop
         .endrepeat
 
-        ; old, to remove cost: 26
-        ;lda HudObjActual        ; 4 - %......HL
-        ;ror                     ; 2 - %.......H C:L
-        ;ror                     ; 2 - %L....... C:H
-        ;ror                     ; 2 - %HL......
-        ;and #%11000000          ; 2 (safety)
-        ;ora #CHR_BANK_ZONES_OBJ ; 2 (later: replace with HUD sprite base!)
-        ;sta MAP_CHR_0_LO        ; 4
-        ;and #%11000000          ; 2
-        ;ora #CHR_BANK_HUD       ; 2 (also used to draw background tiles for 3 visible slivers!)
-        ;sta MAP_CHR_1_LO        ; 4
-
-        ; ppu dot here: 117
-
-        ; now we simply wait for hblank (256), then re-enable backgrounds:
-        ; old delay: 38
-        ;jsr delay_12
-        ;jsr delay_12
-        ;jsr delay_12
-        ;.repeat 1
-        ;nop
-        ;.endrepeat
-
         lda #BG_ON ; 2
 
         ; ppu dot here: 261
@@ -1149,6 +1126,14 @@ return_from_delay:
 
         ; ppu dot here: 309
 
+        ; hud obj first quarter: write our chosen banks into CHR at $0000
+        ; adjusted for the desired animation timing
+        .repeat 4, i ; 44
+        lda HudObjBanks+i  ; 4
+        ora HudObjActual   ; 3
+        sta MAP_CHR_0_LO+i ; 4
+        .endrepeat
+
         ; prep the third round of palette updates
         lda HudStagingPalette+8  ; 4
         ldx HudStagingPalette+9  ; 4
@@ -1158,14 +1143,11 @@ return_from_delay:
 
         ; wait until hblank (248)
 
-        ; NTSC: was 82
-        ; PAL: should be 75
-        jsr delay_20
-        jsr delay_20
+        ; PAL: 31
         jsr delay_20
         php ; 3
         plp ; 4
-        .repeat 4
+        .repeat 2
         nop
         .endrepeat
 
@@ -1205,6 +1187,14 @@ return_from_delay:
 
         ; ppu dot here: 308
 
+        ; hud obj second quarter: write our chosen banks into CHR at $0800
+        ; adjusted for the desired animation timing
+        .repeat 4, i ; 44
+        lda HudObjBanks+4+i  ; 4
+        ora HudObjActual     ; 3
+        sta MAP_CHR_0_LO+4+i ; 4
+        .endrepeat
+
         ; prep the fourth round of palette updates
         lda HudStagingPalette+16  ; 4
         ldx HudStagingPalette+17  ; 4
@@ -1213,14 +1203,11 @@ return_from_delay:
         ; ppu dot here: 3
 
         ; wait until hblank (248)
-        ; NTSC: was 81
-        ; PAL: should be 74
-        jsr delay_20
-        jsr delay_20
+        ; PAL: 31
         jsr delay_20
         php ; 3
         plp ; 4
-        .repeat 4 ; 8
+        .repeat 2
         nop
         .endrepeat
 
@@ -1261,34 +1248,40 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         ; since we have time to kill, we might as well compute the musical beat and set
         ; the new animation frame right here
 
-        ; new cost: 26
+        ; new cost: 8
         lda HudBgActual         ; 4
         sta MAP_BG_EXT_BANK     ; 4
-        lda HudObjActual        ; 4 - %......HL
-        ror                     ; 2 - %.......H C:L
-        ror                     ; 2 - %L....... C:H
-        ror                     ; 2 - %HL......
-        and #%11000000          ; 2 (safety)
-        ora #CHR_BANK_ZONES_OBJ ; 2 (later: replace with HUD sprite base!)
-        sta MAP_CHR_0_LO        ; 4
 
-        ; NEW STUFF
-        and #%11000000          ; 2
-        ora #CHR_BANK_HUD       ; 2 (also used to draw background tiles for 3 visible slivers!)
-        sta MAP_CHR_1_LO        ; 4
+        ; hud obj second half: write all blank banks to CHR at $1000
+        ; we don't need these, and they're used to render the first 3
+        ; BG slivers after the split, which we always want to be 
+        ; completely empty
+        .repeat 8, i ; 48
+        lda #>SPRITE_000_BLANK_NOTHING ; 2
+        sta MAP_CHR_0_LO+8+i           ; 4
+        .endrepeat
+
+        ; to remove: 25
+        ;lda HudObjActual        ; 3 - %......HL
+        ;ror                     ; 2 - %.......H C:L
+        ;ror                     ; 2 - %L....... C:H
+        ;ror                     ; 2 - %HL......
+        ;and #%11000000          ; 2 (safety)
+        ;ora #CHR_BANK_ZONES_OBJ ; 2 (later: replace with HUD sprite base!)
+        ;sta MAP_CHR_0_LO        ; 4
+        ;and #%11000000          ; 2
+        ;ora #CHR_BANK_HUD       ; 2 (also used to draw background tiles for 3 visible slivers!)
+        ;sta MAP_CHR_1_LO        ; 4
 
         ; ppu dot here: 117
 
         ; now we simply wait for hblank (256), then re-enable backgrounds:
-        lda #BG_ON ; 2
-        ; NTSC: was 38
-        ; PAL: should be 31
-        jsr delay_20
-        php ; 3
-        plp ; 4
-        nop ; 2
-        nop ; 2
+        ; PAL: should be 8
+        .repeat 4
+        nop
+        .endrepeat
 
+        lda #BG_ON ; 2
         ; ppu dot here: 261
         sta PPUMASK ; 4
 
