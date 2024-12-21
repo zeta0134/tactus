@@ -629,102 +629,185 @@ flail_west:
         .lobytes -1, -1, (WEAPON_SINGLE_TARGET)
         .lobytes -1,  0, (WEAPON_SINGLE_TARGET | WEAPON_CANCEL_MOVEMENT)
 
-flail_anim_north_long:
-        .byte 2  ; length
-                 ; X,   Y,                                  TileId,     Sprite Behavior
-        .lobytes   0, -32, SPRITE_WEAPON_FLAIL_01_HEAD_EXTENDED_NORTH, (SPRITE_PAL_YELLOW)
-        .lobytes   0, -16, SPRITE_WEAPON_FLAIL_01_CHAIN_BASE_NORTH,    (SPRITE_PAL_YELLOW)
+; === NORTH ===
+flail_anim_north_long_cw:
+        .byte 3  ; length
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes -16, -32, SPRITE_WEAPON_FLAIL_NORTH_TRAIL_CW, (SPRITE_PAL_YELLOW)         
+        .lobytes   0, -32, SPRITE_WEAPON_FLAIL_NORTH_HEAD_CW,  (SPRITE_PAL_YELLOW)
+        .lobytes   0, -16, SPRITE_WEAPON_FLAIL_NORTH_CHAIN_CW, (SPRITE_PAL_YELLOW)
 
-flail_anim_north_short:
+flail_anim_north_long_ccw:
+        .byte 3  ; length
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes  16, -32, SPRITE_WEAPON_FLAIL_NORTH_TRAIL_CCW, (SPRITE_PAL_YELLOW)         
+        .lobytes   0, -32, SPRITE_WEAPON_FLAIL_NORTH_HEAD_CCW,  (SPRITE_PAL_YELLOW)
+        .lobytes   0, -16, SPRITE_WEAPON_FLAIL_NORTH_CHAIN_CCW, (SPRITE_PAL_YELLOW)
+
+flail_anim_north_short_cw:
+        .byte 2  ; length
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes -16, -16, SPRITE_WEAPON_FLAIL_NORTH_TRAIL_CW, (SPRITE_PAL_YELLOW)         
+        .lobytes   0, -16, SPRITE_WEAPON_FLAIL_NORTH_HEAD_CW,  (SPRITE_PAL_YELLOW)
+
+flail_anim_north_short_ccw:
+        .byte 2  ; length
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes  16, -16, SPRITE_WEAPON_FLAIL_NORTH_TRAIL_CCW, (SPRITE_PAL_YELLOW)         
+        .lobytes   0, -16, SPRITE_WEAPON_FLAIL_NORTH_HEAD_CCW,  (SPRITE_PAL_YELLOW)        
+
+flail_anim_north_bash:
         .byte 1  ; length
                  ; X,   Y,                               TileId,     Sprite Behavior
-        .lobytes   0, -16, SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_NORTH,    (SPRITE_PAL_YELLOW)
+        .lobytes   0, -16, SPRITE_WEAPON_FLAIL_NORTH_HEAD_PLAIN,  (SPRITE_PAL_YELLOW) 
 
-flail_anim_east_long:
+; === EAST ===
+flail_anim_east_long_cw:
+        .byte 3  ; length
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes  32, -16, SPRITE_WEAPON_FLAIL_EAST_TRAIL_CW, (SPRITE_PAL_YELLOW)         
+        .lobytes  32,   0, SPRITE_WEAPON_FLAIL_EAST_HEAD_CW,  (SPRITE_PAL_YELLOW)
+        .lobytes  16,   0, SPRITE_WEAPON_FLAIL_EAST_CHAIN_CW, (SPRITE_PAL_YELLOW)
+
+flail_anim_east_long_ccw:
+        .byte 3  ; length
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes  32,  16, SPRITE_WEAPON_FLAIL_EAST_TRAIL_CCW, (SPRITE_PAL_YELLOW)         
+        .lobytes  32,   0, SPRITE_WEAPON_FLAIL_EAST_HEAD_CCW,  (SPRITE_PAL_YELLOW)
+        .lobytes  16,   0, SPRITE_WEAPON_FLAIL_EAST_CHAIN_CCW, (SPRITE_PAL_YELLOW)
+
+flail_anim_east_short_cw:
         .byte 2  ; length
-                 ; X,   Y,                                  TileId,     Sprite Behavior
-        .lobytes  32,   0, SPRITE_WEAPON_FLAIL_01_HEAD_EXTENDED_EAST, (SPRITE_PAL_YELLOW)
-        .lobytes  16,   0, SPRITE_WEAPON_FLAIL_01_CHAIN_BASE_EAST,    (SPRITE_PAL_YELLOW)
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes  16, -16, SPRITE_WEAPON_FLAIL_EAST_TRAIL_CW, (SPRITE_PAL_YELLOW)         
+        .lobytes  16,   0, SPRITE_WEAPON_FLAIL_EAST_HEAD_CW,  (SPRITE_PAL_YELLOW)
 
-flail_anim_east_short:
+flail_anim_east_short_ccw:
+        .byte 2  ; length
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes  16,  16, SPRITE_WEAPON_FLAIL_EAST_TRAIL_CCW, (SPRITE_PAL_YELLOW)         
+        .lobytes  16,   0, SPRITE_WEAPON_FLAIL_EAST_HEAD_CCW,  (SPRITE_PAL_YELLOW)
+
+flail_anim_east_bash:
         .byte 1  ; length
                  ; X,   Y,                               TileId,     Sprite Behavior
-        .lobytes  16,   0, SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_EAST,    (SPRITE_PAL_YELLOW)
+        .lobytes  16,   0, SPRITE_WEAPON_FLAIL_EAST_HEAD_PLAIN,  (SPRITE_PAL_YELLOW) 
 
-flail_anim_south_long:
+; === SOUTH ===
+flail_anim_south_long_cw:
+        .byte 3  ; length
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes  16,  32, SPRITE_WEAPON_FLAIL_SOUTH_TRAIL_CW, (SPRITE_PAL_YELLOW)         
+        .lobytes   0,  32, SPRITE_WEAPON_FLAIL_SOUTH_HEAD_CW,  (SPRITE_PAL_YELLOW)
+        .lobytes   0,  16, SPRITE_WEAPON_FLAIL_SOUTH_CHAIN_CW, (SPRITE_PAL_YELLOW)
+
+flail_anim_south_long_ccw:
+        .byte 3  ; length
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes -16,  32, SPRITE_WEAPON_FLAIL_SOUTH_TRAIL_CCW, (SPRITE_PAL_YELLOW)         
+        .lobytes   0,  32, SPRITE_WEAPON_FLAIL_SOUTH_HEAD_CCW,  (SPRITE_PAL_YELLOW)
+        .lobytes   0,  16, SPRITE_WEAPON_FLAIL_SOUTH_CHAIN_CCW, (SPRITE_PAL_YELLOW)
+
+flail_anim_south_short_cw:
         .byte 2  ; length
-                 ; X,   Y,                                  TileId,     Sprite Behavior
-        .lobytes   0,  32, SPRITE_WEAPON_FLAIL_02_HEAD_EXTENDED_SOUTH, (SPRITE_PAL_YELLOW)
-        .lobytes   0,  16, SPRITE_WEAPON_FLAIL_02_CHAIN_BASE_SOUTH,    (SPRITE_PAL_YELLOW)
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes  16,  16, SPRITE_WEAPON_FLAIL_SOUTH_TRAIL_CW, (SPRITE_PAL_YELLOW)         
+        .lobytes   0,  16, SPRITE_WEAPON_FLAIL_SOUTH_HEAD_CW,  (SPRITE_PAL_YELLOW)        
 
-flail_anim_south_short:
+flail_anim_south_short_ccw:
+        .byte 2  ; length
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes -16,  16, SPRITE_WEAPON_FLAIL_SOUTH_TRAIL_CCW, (SPRITE_PAL_YELLOW)         
+        .lobytes   0,  16, SPRITE_WEAPON_FLAIL_SOUTH_HEAD_CCW,  (SPRITE_PAL_YELLOW)
+
+flail_anim_south_bash:
         .byte 1  ; length
                  ; X,   Y,                               TileId,     Sprite Behavior
-        .lobytes   0,  16, SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_SOUTH,    (SPRITE_PAL_YELLOW)
+        .lobytes   0,  16, SPRITE_WEAPON_FLAIL_SOUTH_HEAD_PLAIN,  (SPRITE_PAL_YELLOW) 
 
-flail_anim_west_long:
+; === WEST ===
+flail_anim_west_long_cw:
+        .byte 3  ; length
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes -32,  16, SPRITE_WEAPON_FLAIL_WEST_TRAIL_CW, (SPRITE_PAL_YELLOW)         
+        .lobytes -32,   0, SPRITE_WEAPON_FLAIL_WEST_HEAD_CW,  (SPRITE_PAL_YELLOW)
+        .lobytes -16,   0, SPRITE_WEAPON_FLAIL_WEST_CHAIN_CW, (SPRITE_PAL_YELLOW)
+
+flail_anim_west_long_ccw:
+        .byte 3  ; length
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes -32, -16, SPRITE_WEAPON_FLAIL_WEST_TRAIL_CCW, (SPRITE_PAL_YELLOW)         
+        .lobytes -32,   0, SPRITE_WEAPON_FLAIL_WEST_HEAD_CCW,  (SPRITE_PAL_YELLOW)
+        .lobytes -16,   0, SPRITE_WEAPON_FLAIL_WEST_CHAIN_CCW, (SPRITE_PAL_YELLOW)
+
+flail_anim_west_short_cw:
         .byte 2  ; length
-                 ; X,   Y,                                  TileId,     Sprite Behavior
-        .lobytes -32,   0, SPRITE_WEAPON_FLAIL_02_HEAD_EXTENDED_WEST, (SPRITE_PAL_YELLOW)
-        .lobytes -16,   0, SPRITE_WEAPON_FLAIL_02_CHAIN_BASE_WEST,    (SPRITE_PAL_YELLOW)
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes -16,  16, SPRITE_WEAPON_FLAIL_WEST_TRAIL_CW, (SPRITE_PAL_YELLOW)         
+        .lobytes -16,   0, SPRITE_WEAPON_FLAIL_WEST_HEAD_CW,  (SPRITE_PAL_YELLOW)
 
-flail_anim_west_short:
+flail_anim_west_short_ccw:
+        .byte 2  ; length
+                 ; X,   Y,                             TileId,     Sprite Behavior
+        .lobytes -16, -16, SPRITE_WEAPON_FLAIL_WEST_TRAIL_CCW, (SPRITE_PAL_YELLOW)         
+        .lobytes -16,   0, SPRITE_WEAPON_FLAIL_WEST_HEAD_CCW,  (SPRITE_PAL_YELLOW)
+
+flail_anim_west_bash:
         .byte 1  ; length
                  ; X,   Y,                               TileId,     Sprite Behavior
-        .lobytes -16,   0, SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_WEST,    (SPRITE_PAL_YELLOW)
-
-
+        .lobytes -16,   0, SPRITE_WEAPON_FLAIL_WEST_HEAD_PLAIN,  (SPRITE_PAL_YELLOW) 
 
 ; Flails are the most complex by far, choosing from one of 5 animation tables
 ; depending on which tile was struck.
 
 north_anim_lut:
-        .word flail_anim_west_long
-        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_WEST, 0
-        .word flail_anim_east_long
-        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_EAST, 0
-        .word flail_anim_west_short
-        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_WEST, 0
-        .word flail_anim_east_short
-        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_EAST, 0
-        .word flail_anim_north_short
-        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_NORTH, 0
+        .word flail_anim_west_long_cw
+        .byte >SPRITE_WEAPON_FLAIL_WEST_HEAD_PLAIN, 0
+        .word flail_anim_east_long_ccw
+        .byte >SPRITE_WEAPON_FLAIL_EAST_HEAD_PLAIN, 0
+        .word flail_anim_west_short_cw
+        .byte >SPRITE_WEAPON_FLAIL_WEST_HEAD_PLAIN, 0
+        .word flail_anim_east_short_ccw
+        .byte >SPRITE_WEAPON_FLAIL_EAST_HEAD_PLAIN, 0
+        .word flail_anim_north_bash
+        .byte >SPRITE_WEAPON_FLAIL_NORTH_HEAD_PLAIN, 0
 
 east_anim_lut:
-        .word flail_anim_north_long
-        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_NORTH, 0
-        .word flail_anim_south_long
-        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_SOUTH, 0
-        .word flail_anim_north_short
-        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_NORTH, 0
-        .word flail_anim_south_short
-        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_SOUTH, 0
-        .word flail_anim_east_short
-        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_EAST, 0
+        .word flail_anim_north_long_cw
+        .byte >SPRITE_WEAPON_FLAIL_NORTH_HEAD_PLAIN, 0
+        .word flail_anim_south_long_ccw
+        .byte >SPRITE_WEAPON_FLAIL_SOUTH_HEAD_PLAIN, 0
+        .word flail_anim_north_short_cw
+        .byte >SPRITE_WEAPON_FLAIL_NORTH_HEAD_PLAIN, 0
+        .word flail_anim_south_short_ccw
+        .byte >SPRITE_WEAPON_FLAIL_SOUTH_HEAD_PLAIN, 0
+        .word flail_anim_east_bash
+        .byte >SPRITE_WEAPON_FLAIL_EAST_HEAD_PLAIN, 0
 
 south_anim_lut:
-        .word flail_anim_east_long
-        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_EAST, 0
-        .word flail_anim_west_long
-        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_WEST, 0
-        .word flail_anim_east_short
-        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_EAST, 0
-        .word flail_anim_west_short
-        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_WEST, 0
-        .word flail_anim_south_short
-        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_SOUTH, 0
+        .word flail_anim_east_long_cw
+        .byte >SPRITE_WEAPON_FLAIL_EAST_HEAD_PLAIN, 0
+        .word flail_anim_west_long_ccw
+        .byte >SPRITE_WEAPON_FLAIL_WEST_HEAD_PLAIN, 0
+        .word flail_anim_east_short_cw
+        .byte >SPRITE_WEAPON_FLAIL_EAST_HEAD_PLAIN, 0
+        .word flail_anim_west_short_ccw
+        .byte >SPRITE_WEAPON_FLAIL_WEST_HEAD_PLAIN, 0
+        .word flail_anim_south_bash
+        .byte >SPRITE_WEAPON_FLAIL_SOUTH_HEAD_PLAIN, 0
 
 west_anim_lut:
-        .word flail_anim_south_long
-        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_SOUTH, 0
-        .word flail_anim_north_long
-        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_NORTH, 0
-        .word flail_anim_south_short
-        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_SOUTH, 0
-        .word flail_anim_north_short
-        .byte >SPRITE_WEAPON_FLAIL_01_HEAD_SHORT_NORTH, 0
-        .word flail_anim_west_short
-        .byte >SPRITE_WEAPON_FLAIL_02_HEAD_SHORT_WEST, 0
+        .word flail_anim_south_long_cw
+        .byte >SPRITE_WEAPON_FLAIL_SOUTH_HEAD_PLAIN, 0
+        .word flail_anim_north_long_ccw
+        .byte >SPRITE_WEAPON_FLAIL_NORTH_HEAD_PLAIN, 0
+        .word flail_anim_south_short_cw
+        .byte >SPRITE_WEAPON_FLAIL_SOUTH_HEAD_PLAIN, 0
+        .word flail_anim_north_short_ccw
+        .byte >SPRITE_WEAPON_FLAIL_NORTH_HEAD_PLAIN, 0
+        .word flail_anim_west_bash
+        .byte >SPRITE_WEAPON_FLAIL_WEST_HEAD_PLAIN, 0
+
 
 .proc flail_init_north
 SpriteBank := R0
