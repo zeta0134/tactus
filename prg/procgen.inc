@@ -11,6 +11,7 @@
 
 .global room_layouts, room_flags, room_floorplan, room_properties, room_bank, room_ptr_high, room_ptr_low
 .global room_raster_effect, room_color_emphasis, room_base_beat_logic, room_spell_beat_logic, room_spell_data0, room_spell_data1
+.global room_palette_variant
 .global first_beat_after_load, enemies_active
 
 ; layouts

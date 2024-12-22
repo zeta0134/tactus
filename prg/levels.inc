@@ -202,7 +202,8 @@ ROOM_POOL_BLOCKING_INTERIOR = 5
         FlagBytes .byte 176
 .endstruct
 
-.global FAR_load_room_palette
+.global FAR_load_room_palette             ; used during procgen, not general
+.global FAR_load_palette_for_current_room ; can be called from almost anywhere, relies on PlayerRoomIndex
 .global FAR_roll_room_from_floorplan_at_current_index
 
 ; ==================

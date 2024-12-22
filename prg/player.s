@@ -244,7 +244,7 @@ HeartCount := R2
         sta PlayerEquipmentAccessory
         lda #ITEM_BOMB_STANDARD
         sta PlayerEquipmentBombs
-        lda #ITEM_SPELL_BOMB
+        lda #ITEM_SPELL_ICE
         sta PlayerEquipmentSpell
 
         lda #99
@@ -1324,7 +1324,12 @@ SpellCastPtr := R0
         lda #(TINT_R)
         sta room_color_emphasis, x
         far_call FAR_apply_room_global_color_emphasis
-        ; TODO: fancy particles? animations? custom palettes? etc, etc
+        ; Apply fancy custom "scorched" palette to the room (permanently)
+        ldx PlayerRoomIndex
+        lda #ROOM_PALETTE_FIRE
+        sta room_palette_variant, x
+        far_call FAR_load_palette_for_current_room
+        ; TODO: fancy particles? raster animations? etc, etc
         rts
 .endproc
 
@@ -1335,6 +1340,11 @@ SpellCastPtr := R0
         lda #(TINT_R | TINT_G)
         sta room_color_emphasis, x
         far_call FAR_apply_room_global_color_emphasis
+        ; Apply fancy custom "shocked" palette to the room (permanently)
+        ldx PlayerRoomIndex
+        lda #ROOM_PALETTE_AIR
+        sta room_palette_variant, x
+        far_call FAR_load_palette_for_current_room
         ; TODO: fancy stuffs!
         rts
 .endproc
@@ -1346,6 +1356,11 @@ SpellCastPtr := R0
         lda #(TINT_B)
         sta room_color_emphasis, x
         far_call FAR_apply_room_global_color_emphasis
+        ; Apply fancy custom "frozen" palette to the room (permanently)
+        ldx PlayerRoomIndex
+        lda #ROOM_PALETTE_ICE
+        sta room_palette_variant, x
+        far_call FAR_load_palette_for_current_room
         ; TODO: fancy stuffs!
         rts
 .endproc
@@ -1357,6 +1372,11 @@ SpellCastPtr := R0
         lda #(TINT_G)
         sta room_color_emphasis, x
         far_call FAR_apply_room_global_color_emphasis
+        ; Apply fancy custom "overgrown" palette to the room (permanently)
+        ldx PlayerRoomIndex
+        lda #ROOM_PALETTE_EARTH
+        sta room_palette_variant, x
+        far_call FAR_load_palette_for_current_room
         ; TODO: fancy stuffs!
         rts
 .endproc

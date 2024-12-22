@@ -1,10 +1,13 @@
         .include "../build/tile_defs.inc"
 
+
+
         .include "enemies.inc"
         .include "far_call.inc"
         .include "levels.inc"
         .include "nes.inc"
         .include "palette.inc"
+        .include "player.inc"
         .include "procgen.inc"
         .include "prng.inc"
         .include "rainbow.inc"
@@ -112,34 +115,93 @@ room_pool_blocking_cave:
         .endrepeat
 
         sprite_palette_overworld:
-        .incbin "../art/sprite_palette_overworld.pal"
+                .incbin "../art/sprite_palette_overworld.pal"
         sprite_palette_underworld:
                 .incbin "../art/sprite_palette.pal"
 
         oob_palette:
                 .incbin "../art/oob_palette.pal"
+                .incbin "../art/oob_palette.pal"
+                .incbin "../art/oob_palette.pal"
+                .incbin "../art/oob_palette.pal"
+                .incbin "../art/oob_palette.pal"
         test_palette:
                 .incbin "../art/test_palette.pal"
+                .incbin "../art/test_palette.pal"
+                .incbin "../art/test_palette.pal"
+                .incbin "../art/test_palette.pal"
+                .incbin "../art/test_palette.pal"
         grassy_palette:
-                .incbin "../art/extra_grassy_palette.pal"
+                .incbin "../art/palettes/grasslands/base.pal"
+                .incbin "../art/palettes/grasslands/scorched.pal"
+                .incbin "../art/palettes/grasslands/frozen.pal"
+                .incbin "../art/palettes/grasslands/shocked.pal"
+                .incbin "../art/palettes/grasslands/overgrown.pal"
         dank_cave_palette:
-                .incbin "../art/dank_cave.pal"
+                .incbin "../art/palettes/caves/base.pal"
+                .incbin "../art/palettes/caves/scorched.pal"
+                .incbin "../art/palettes/caves/frozen.pal"
+                .incbin "../art/palettes/caves/shocked.pal"
+                .incbin "../art/palettes/caves/overgrown.pal"
         challenge_pit_darkblue:
                 .incbin "../art/challenge_pit_darkblue.pal"
+                .incbin "../art/challenge_pit_darkblue.pal"
+                .incbin "../art/challenge_pit_darkblue.pal"
+                .incbin "../art/challenge_pit_darkblue.pal"
+                .incbin "../art/challenge_pit_darkblue.pal"
         challenge_pit_darkred:
-                .incbin "../art/challenge_pit_darkred.pal"
+                .incbin "../art/palettes/challenge_darkred/base.pal"
+                .incbin "../art/palettes/challenge_darkred/scorched.pal"
+                .incbin "../art/palettes/challenge_darkred/frozen.pal"
+                .incbin "../art/palettes/challenge_darkred/shocked.pal"
+                .incbin "../art/palettes/challenge_darkred/overgrown.pal"
         shop_palette:
+                .incbin "../art/shop_palette.pal"
+                .incbin "../art/shop_palette.pal"
+                .incbin "../art/shop_palette.pal"
+                .incbin "../art/shop_palette.pal"
                 .incbin "../art/shop_palette.pal"
         hub_world_palette:
                 .incbin "../art/hub_world_palette.pal"
+                .incbin "../art/hub_world_palette.pal"
+                .incbin "../art/hub_world_palette.pal"
+                .incbin "../art/hub_world_palette.pal"
+                .incbin "../art/hub_world_palette.pal"
         blocking_exterior_palette:
-                .incbin "../art/blocking_exterior.pal"
+                .incbin "../art/palettes/blocking_exterior/base.pal"
+                .incbin "../art/palettes/blocking_exterior/scorched.pal"
+                .incbin "../art/palettes/blocking_exterior/frozen.pal"
+                .incbin "../art/palettes/blocking_exterior/shocked.pal"
+                .incbin "../art/palettes/blocking_exterior/overgrown.pal"
         blocking_interior_palette:
-                .incbin "../art/blocking_interior.pal"
+                .incbin "../art/palettes/blocking_interior/base.pal"
+                .incbin "../art/palettes/blocking_interior/scorched.pal"
+                .incbin "../art/palettes/blocking_interior/frozen.pal"
+                .incbin "../art/palettes/blocking_interior/shocked.pal"
+                .incbin "../art/palettes/blocking_interior/overgrown.pal"
+
+
+; more general variant: assumes nothing, sets thing up, etc etc
+.proc FAR_load_palette_for_current_room
+RoomPtr := R0
+RoomBank := R2
+        ldx PlayerRoomIndex
+        lda room_bank, x
+        sta RoomBank
+        lda room_ptr_low, x
+        sta RoomPtr+0
+        lda room_ptr_high, x
+        sta RoomPtr+1
+        access_data_bank RoomBank 
+        near_call FAR_load_room_palette
+        restore_previous_bank
+        rts
+.endproc
 
 ; note: utility function, assumes the room data is already banked in, etc
 ; this code is colocated with the palettes so a simple far call is all that
 ; is needed to operate it
+
 .proc FAR_load_room_palette
 RoomPtr := R0
 PalettePtr := R2
@@ -148,6 +210,18 @@ PalettePtr := R2
         sta PalettePtr+0
         iny
         lda (RoomPtr), y
+        sta PalettePtr+1
+
+        ldy PlayerRoomIndex
+        lda room_palette_variant, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc PalettePtr+0
+        sta PalettePtr+0
+        lda #0
+        adc PalettePtr+1
         sta PalettePtr+1
 
         ldy #0

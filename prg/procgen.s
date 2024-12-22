@@ -47,6 +47,7 @@ room_population_order: .res ::FLOOR_SIZE
 
 room_color_emphasis: .res ::FLOOR_SIZE
 room_raster_effect: .res ::FLOOR_SIZE
+room_palette_variant: .res ::FLOOR_SIZE
 
 room_base_beat_logic: .res  ::FLOOR_SIZE
 room_spell_beat_logic: .res  ::FLOOR_SIZE
@@ -1154,6 +1155,8 @@ room_setup_loop:
         sta room_base_beat_logic, x
         lda #SPELL_LOGIC_NONE
         sta room_spell_beat_logic, x
+        lda #ROOM_PALETTE_BASE
+        sta room_palette_variant, x
         inx
         cpx #::FLOOR_SIZE
         bne room_setup_loop
