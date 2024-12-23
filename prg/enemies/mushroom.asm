@@ -425,3 +425,75 @@ TargetFuncPtr := R0
         perform_zpcm_inc
         rts
 .endproc
+
+        .segment "ENEMY_BOMB_SPELL"
+
+mushroom_spell_lut:
+        .word ENEMY_BOMB_SPELL_mushroom_elemental_attack ; SPELL_FIRE
+        .word ENEMY_BOMB_SPELL_mushroom_elemental_attack ; SPELL_AIR
+        .word ENEMY_BOMB_SPELL_mushroom_elemental_attack ; SPELL_ICE
+        .word ENEMY_BOMB_SPELL_mushroom_elemental_attack ; SPELL_EARTH
+        .word FIXED_no_behavior                ; SPELL_BOMB
+        .word FIXED_no_behavior                ; SPELL_LIFE
+
+.proc ENEMY_BOMB_SPELL_mushroom_spell_dispatch
+DispatchPtr := R0
+;Length := R13
+CurrentRow := R14
+CurrentTile := R15
+        lda PlayerEquipmentSpell
+        sec
+        sbc #FIRST_SPELL_IN_ITEM_LIST
+        ; Safety: don't call a spell effect that doesn't exist
+        ; (This shouldn't happen, but crashing is no fun)
+        cmp #LAST_SPELL_IN_ITEM_LIST
+        bcc safe_to_dispatch
+        rts
+safe_to_dispatch:
+        asl
+        tax
+        lda mushroom_spell_lut+0, x
+        sta DispatchPtr+0
+        lda mushroom_spell_lut+1, x
+        sta DispatchPtr+1
+        jmp (DispatchPtr)
+        ; does not return
+.endproc
+
+.proc ENEMY_BOMB_SPELL_mushroom_elemental_attack
+EnemyHealth := R12
+
+CurrentRow := R14
+CurrentTile := R15
+        ldx CurrentTile
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_EARTH
+        beq weird_hp
+        cmp #PAL_WATER
+        beq intermediate_hp
+        cmp #PAL_AIR
+        beq advanced_hp
+basic_hp:
+        set_loot_table MUSHROOM_BASIC_LOOT
+        lda #MUSHROOM_BASIC_HP
+        sta EnemyHealth
+        jmp done
+intermediate_hp:
+        set_loot_table MUSHROOM_INTERMEDIATE_LOOT
+        lda #MUSHROOM_INTERMEDIATE_HP
+        sta EnemyHealth
+        jmp done
+advanced_hp:
+        set_loot_table MUSHROOM_ADVANCED_LOOT
+        lda #MUSHROOM_ADVANCED_HP
+        sta EnemyHealth
+        jmp done
+weird_hp:
+        set_loot_table MUSHROOM_WEIRD_LOOT
+        lda #MUSHROOM_WEIRD_HP
+        sta EnemyHealth
+done:
+        near_call ENEMY_BOMB_SPELL_regular_enemy_elemental_spell_common
+        rts
+.endproc

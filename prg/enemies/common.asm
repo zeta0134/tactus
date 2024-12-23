@@ -831,13 +831,128 @@ safe_to_dispatch:
         ; does not return
 .endproc
 
+palette_match_lut:
+        .byte PAL_FIRE
+        .byte PAL_AIR
+        .byte PAL_WATER
+        .byte PAL_EARTH
+
 ; For any standard enemy that, specifically:
 ;  - Takes player damage using the common routine, after which this behavior is modeled
 ;  - Should change to the spell color for the four elemental spells
 ;  - Requires NO special behavior for any other spell (ie, the common behavior is fine)
-.proc ENEMY_BOMB_SPELL_regular_enemy_spell_dispatch
-        ; TODO: really not this. For now, all enemies just do the color change thing.
-        jsr ENEMY_BOMB_SPELL_slime_spell_dispatch
+.proc ENEMY_BOMB_SPELL_regular_enemy_elemental_spell_common
+TargetIndex := R0
+DispatchPtr := R0
+
+SpellIndex := R2
+
+EnemyHealth := R12
+
+CurrentRow := R14
+CurrentTile := R15
+        lda PlayerEquipmentSpell
+        sec
+        sbc #FIRST_SPELL_IN_ITEM_LIST
+        sta SpellIndex
+
+        ; If we match this spell's color, heal ourselves completely
+        ldx CurrentTile
+        lda tile_attributes, x
+        and #PAL_MASK
+        ldx SpellIndex
+        cmp palette_match_lut, x
+        jeq heal_completely
+
+        ; Otherwise, elemental spells attempt to deal one (1) dmg
+take_one_damage:
+        lda #1
+        ldx CurrentTile
+        clc
+        adc tile_flags, x
+        sta tile_flags, x
+        ; Now check: if the damage, NOT including the movement bit, is greater than our health...
+        and #%01111111
+        cmp EnemyHealth
+        bcs die
+        jmp survived_spell
+die:
+        ; Replace ourselves with a regular floor, and spawn the usual death juice
+        ldx CurrentTile
+        stx DiscoTile
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_disco_tile_here
+
+        ldx CurrentTile
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+
+        ; Juice: spawn a floaty, flashy death skull above our tile
+        ; #RIP
+        near_call ENEMY_BOMB_SPELL_spawn_death_sprite_here
+
+        ; Roll for loot here!
+        roll_loot_at CurrentTile
+
+        ; Play an appropriately crunchy death sound? ... sure? I feel like
+        ; actual spell SFX might should play instead...
+        queue_sfx_pulse1 sfx_defeat_enemy_pulse
+        queue_sfx_noise sfx_defeat_enemy_noise
+
+        ; and that should be it for this path
+        rts
+
+heal_completely:
+        ldx CurrentTile
+        lda tile_flags, x
+        and #%10000000 ; reset DMG to 0
+        sta tile_flags, x
+        ; Fall through to survive-spell stuff for now
+        ; (later we should probably take a different path)
+survived_spell:
+        ; Change our color to match the spell's target element
+        near_call ENEMY_BOMB_SPELL_change_my_color
+        ; And that's... it?
+        rts
+.endproc
+
+.proc ENEMY_BOMB_SPELL_spawn_death_sprite_here
+MetaSpriteIndex := R0
+CurrentRow := R14
+CurrentTile := R15
+
+        far_call FAR_find_unused_sprite
+        ldx MetaSpriteIndex
+        cpx #$FF
+        beq sprite_failed
+
+        lda #(SPRITE_ACTIVE | SPRITE_ONE_BEAT | SPRITE_RISE | SPRITE_PAL_3)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #$FF
+        sta sprite_table + MetaSpriteState::LifetimeBeats, x
+
+        ldy CurrentTile
+        lda tile_index_to_col_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_X
+        sta sprite_table + MetaSpriteState::PositionX, x
+
+        lda tile_index_to_row_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_Y
+        sta sprite_table + MetaSpriteState::PositionY, x
+
+        set_static_02_sprite_x SPRITE_STATIC_02_DEATH_SKULL
+
+sprite_failed:
         rts
 .endproc
 
