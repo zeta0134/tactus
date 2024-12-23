@@ -58,7 +58,7 @@ coin_sprite_starting_index: .res 1
     sta queued_coin_pos, y
     inc coin_queue_last
     lda coin_queue_last
-    and #$1F
+    and #$3F
     sta coin_queue_last
     rts
 .endproc
@@ -203,8 +203,13 @@ CoinIndex := R15
     rts
 safe_to_update:
 
+    ; unless we are deferred...
+    lda DeferLootProcessing
+    bne skip_coin_spawning
     ; try to spawn a new coin every frame
     jsr spawn_one_new_coin
+skip_coin_spawning:
+
     ; draw all active coins
     jsr draw_coins
 
@@ -274,7 +279,9 @@ proceed_to_spawn:
     sta coin_pos_x_subpixels, x
     sta coin_pos_y_subpixels, x
     ; use the queue index to initialize the direction/speed
-    ldy coin_queue_next
+    lda coin_queue_next
+    and #$1F ; these tables only have 31 entries
+    tay
     lda coin_speed_slow_x_low_lut, y
     sta coin_speed_x_slow_low, x
     lda coin_speed_slow_x_high_lut, y
@@ -338,7 +345,7 @@ done_advancing_active_coins:
 
     inc coin_queue_next
     lda coin_queue_next
-    and #$1F
+    and #$3F
     sta coin_queue_next
 
     lda #2

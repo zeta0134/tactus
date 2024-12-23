@@ -1,5 +1,5 @@
 ; Controls for update and drawing
-MAX_QUEUED_COINS = 32
+MAX_QUEUED_COINS = 64
 
 
 .global FIXED_spawn_coin

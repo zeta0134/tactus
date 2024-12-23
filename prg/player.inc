@@ -60,6 +60,9 @@
 .global WeaponDrawFunc
 .global WeaponSingleTargetIndex
 
+.global SpellDefeatsEnemy
+.global DeferLootProcessing
+
 MAX_HEARTS = 5
 MAX_GOLD = 9999
 

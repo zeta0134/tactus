@@ -14,6 +14,11 @@ PARTICLE_OAM_ADVANCE_AMOUNT = 5
 
 .global a_test_particle
 
+.global particle_snow_a
+.global particle_snow_b
+.global particle_snow_c
+.global particle_snow_d
+
 ; Note: make sure this is an ODD number of bytes in size! This is important
 ; for flicker detection
 .struct ParticleState

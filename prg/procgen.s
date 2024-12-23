@@ -1652,7 +1652,7 @@ spell_state_dispatch_lut:
         .word spell_effect_bomb_fiesta
 
 spell_fx_dispatch_lut:
-        .word spells_do_nothing
+        .word spawn_elemental_particles
         .word bf_spawn_confetti_particles
 
 ; Called during gameplay, not during generation. Handles ongoing room flag
@@ -1934,6 +1934,74 @@ proceed_to_spawn:
         lda #160
         sta PosY
         spawn_particle #a_test_particle, PosX, PosY
+        rts
+.endproc
+
+snow_particle_types:
+        .word particle_snow_a
+        .word particle_snow_b
+        .word particle_snow_c
+        .word particle_snow_d
+
+.proc spawn_elemental_particles
+PosX := R0
+PosY := R1
+ParticlePtr := R2
+        ; if we're in the normal room state, bail real fast
+        ldx PlayerRoomIndex
+        lda room_palette_variant, x
+        cmp #ROOM_PALETTE_BASE
+        beq spawn_nothing
+
+        lda SpellParticleSpawnCooldown
+        beq proceed_to_spawn
+        dec SpellParticleSpawnCooldown
+spawn_nothing:
+        rts
+proceed_to_spawn:
+        ldx PlayerRoomIndex
+        lda room_palette_variant, x
+        cmp #ROOM_PALETTE_FIRE
+        beq spawn_heat_particle
+        cmp #ROOM_PALETTE_ICE
+        beq spawn_snow_particle
+        cmp #ROOM_PALETTE_AIR
+        beq spawn_lightning_particle
+        cmp #ROOM_PALETTE_EARTH
+        beq spawn_petal_particle
+        rts
+
+spawn_heat_particle:
+        ; TODO!
+        rts
+spawn_snow_particle:
+        ; Snow is a lazy drifting effect; not too busy
+        lda #4
+        sta SpellParticleSpawnCooldown
+
+        ; Snow mostly covers the top of the screen with a tiny bit of height variance
+        prng_from_table_x
+        sta PosX
+        prng_from_table_x
+        and #$03
+        sta PosY
+        prng_from_table_x
+        and #%110
+        tax
+        lda snow_particle_types+0, x
+        sta ParticlePtr+0
+        lda snow_particle_types+1, x
+        sta ParticlePtr+1
+        ; TODO: randomly pick which snow particle... somehow
+        spawn_particle ParticlePtr, PosX, PosY
+
+        ; TODO!
+        rts
+spawn_lightning_particle:
+        ; TODO!
+        rts
+spawn_petal_particle:
+        ; TODO!
         rts
 .endproc
 

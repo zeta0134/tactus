@@ -896,10 +896,9 @@ die:
         ; Roll for loot here!
         roll_loot_at CurrentTile
 
-        ; Play an appropriately crunchy death sound? ... sure? I feel like
-        ; actual spell SFX might should play instead...
-        queue_sfx_pulse1 sfx_defeat_enemy_pulse
-        queue_sfx_noise sfx_defeat_enemy_noise
+        ; Play an appropriately crunchy death sound, but not until later :D
+        lda #1
+        sta SpellDefeatsEnemy
 
         ; and that should be it for this path
         rts

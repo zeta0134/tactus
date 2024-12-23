@@ -44,6 +44,9 @@ WeaponAnimPtr: .res 2
 
 .segment "RAM"
 
+SpellDefeatsEnemy: .res 1
+DeferLootProcessing: .res 1
+
 WeaponDrawFunc: .res 2
 
 DestinationZonePtr: .res 2
@@ -348,6 +351,10 @@ heart_loop:
         sta PlayerState
         lda #0
         sta PlayerBeatsInThisState
+
+        lda #0
+        sta DeferLootProcessing
+        sta SpellDefeatsEnemy
 
         rts
 
@@ -1289,6 +1296,23 @@ resolve_enemy_collision:
         sta SpellCastPtr+1
         jsr _spellcasting_trampoline
 not_safe_to_dispatch:
+
+        ; If the spell effects deferred loot generation, release that here
+        lda #0
+        sta DeferLootProcessing
+
+        ; If the spell effects caused an enemy to be defeated, play that SFX
+        lda SpellDefeatsEnemy
+        beq no_defeat_sfx
+
+        ; Play an appropriately crunchy death sound
+        queue_sfx_pulse1 sfx_defeat_enemy_pulse
+        queue_sfx_noise sfx_defeat_enemy_noise
+
+no_defeat_sfx:
+        lda #0
+        sta SpellDefeatsEnemy
+
         ; Finally, the spell is used up! Remove it from our hands
 .if ::DEBUG_GOD_MODE
         ; Nope! Keep the spell so we can easily re-cast it
@@ -2248,6 +2272,22 @@ proceed_to_cast:
         beq full_room_spell
         jmp done_with_full_room_prep
 full_room_spell:
+        ; Full room spells can award loot; we want this to NOT be influenced by the player's
+        ; ongoing chain/combo, so reset those both
+        lda #0
+        sta PlayerChain
+        ; note: 0 has a wraparound issue due to update order
+        ; 1 is the canonical "no combo" value
+        lda #1          
+        sta PlayerCombo
+        ; Furthermore, we need to defer loot generation until after the spell visibly
+        ; takes effect
+        lda #1
+        sta DeferLootProcessing
+        ; Finally, we need to know if the spell defeats an enemy, so we can play the
+        ; defeat SFX when the spell effect ends
+        lda #0
+        sta SpellDefeatsEnemy
         st16 GameMode, update_spells_1
 done_with_full_room_prep:
 

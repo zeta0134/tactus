@@ -29,6 +29,48 @@ a_test_particle:
         .byte 0, <-i, <SPRITE_STATIC_00_PARTICLES_LIGHT_23 + SPRITE_OFFSET_STATIC_00, SPRITE_PAL_YELLOW
         .endrepeat
 
+particle_snow_a:
+        .byte 60, (PARTICLE_ACTIVE | PARTICLE_FLICKER)
+        .repeat 50, i
+        .byte <-(i / 3), <(i / 3), <SPRITE_STATIC_00_PARTICLES_LIGHT_67 + 2 + SPRITE_OFFSET_STATIC_00, SPRITE_PAL_YELLOW
+        .endrepeat
+        .repeat 5, i
+        .byte <-((i+50) / 3), <((i+50) / 3), <SPRITE_STATIC_00_PARTICLES_LIGHT_67 + 0 + SPRITE_OFFSET_STATIC_00, SPRITE_PAL_YELLOW
+        .endrepeat
+        .repeat 5, i
+        .byte <-((i+55) / 3), <((i+55) / 3), <SPRITE_STATIC_00_PARTICLES_LIGHT_45 + 2 + SPRITE_OFFSET_STATIC_00, SPRITE_PAL_YELLOW
+        .endrepeat
+
+particle_snow_b:
+        .byte 60, (PARTICLE_ACTIVE | PARTICLE_FLICKER)
+        .repeat 50, i
+        .byte <-(i / 4), <(i / 3), <SPRITE_STATIC_00_PARTICLES_LIGHT_67 + 0 + SPRITE_OFFSET_STATIC_00, SPRITE_PAL_YELLOW
+        .endrepeat
+        .repeat 10, i
+        .byte <-((i+50) / 4), <((i+50) / 3), <SPRITE_STATIC_00_PARTICLES_LIGHT_45 + 2 + SPRITE_OFFSET_STATIC_00, SPRITE_PAL_YELLOW
+        .endrepeat
+
+particle_snow_c:
+        .byte 60, (PARTICLE_ACTIVE | PARTICLE_FLICKER)
+        .repeat 50, i
+        .byte <-(i / 3), <(i / 2), <SPRITE_STATIC_00_PARTICLES_LIGHT_67 + 2 + SPRITE_OFFSET_STATIC_00, SPRITE_PAL_YELLOW
+        .endrepeat
+        .repeat 5, i
+        .byte <-((i+50) / 3), <((i+50) / 2), <SPRITE_STATIC_00_PARTICLES_LIGHT_67 + 0 + SPRITE_OFFSET_STATIC_00, SPRITE_PAL_YELLOW
+        .endrepeat
+        .repeat 5, i
+        .byte <-((i+55) / 3), <((i+55) / 2), <SPRITE_STATIC_00_PARTICLES_LIGHT_45 + 2 + SPRITE_OFFSET_STATIC_00, SPRITE_PAL_YELLOW
+        .endrepeat
+
+particle_snow_d:
+        .byte 60, (PARTICLE_ACTIVE | PARTICLE_FLICKER)
+        .repeat 50, i
+        .byte <-(i / 4), <(i / 2), <SPRITE_STATIC_00_PARTICLES_LIGHT_67 + 0 + SPRITE_OFFSET_STATIC_00, SPRITE_PAL_YELLOW
+        .endrepeat
+        .repeat 10, i
+        .byte <-((i+50) / 4), <((i+50) / 2), <SPRITE_STATIC_00_PARTICLES_LIGHT_45 + 2 + SPRITE_OFFSET_STATIC_00, SPRITE_PAL_YELLOW
+        .endrepeat
+
         .segment "PRGFIXED_E000"
 
 ; Called immediately after writing new particle data
@@ -158,6 +200,9 @@ age_this_particle:
         lda particles + ParticleState::DataPtr+0, x
         adc #.sizeof(ParticleDataEntry)
         sta particles + ParticleState::DataPtr+0, x
+        lda particles + ParticleState::DataPtr+1, x
+        adc #0
+        sta particles + ParticleState::DataPtr+1, x
         ; Decrement our lifetime and, if terminal, deactivate this particle
         dec particles + ParticleState::Lifetime, x
         bne done_with_this_particle
