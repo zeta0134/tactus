@@ -81,6 +81,10 @@ RasterPlaybackSpeedLow: .res 1
         .include "raster/underwater.incs"
         .include "raster/vertical_shift.incs"
 
+        .segment "DATA_2"
+
+        .include "raster/heat.incs"
+
         .segment "CODE_1"
 
 ; this is the one we should probably split into tables, if we
@@ -129,6 +133,9 @@ raster_effects_list:
         .addr options_frames
         .byte <.bank(options_frames) ; frame table bank
         .byte 1 ; duration in frames
+        .addr heat_frames
+        .byte <.bank(heat_frames) ; frame table bank
+        .byte 128 ; duration in frames
 
 nametable_lut_x:
         .repeat 256, i
@@ -206,6 +213,11 @@ scroll_y_wraparound_lut:
 ; Desired color emphasis bits in A
 ; (we'll ORA with the other flags as needed)
 .proc FAR_apply_room_global_color_emphasis
+        ; TODO: if we're going to disable emphasis effects with an option,
+        ; do it right here!
+        ; TODO: if we're running on PAL we need to xor the emphasis bits
+        ; to fix the wrong coloration!
+
         ; First for safety, mask the input byte
         ; to include only the color emphasis properties
         and #(TINT_R|TINT_G|TINT_B|LIGHTGRAY)
@@ -270,7 +282,14 @@ ScanlineCount := RasterScratch+6
         ; From the frame list, read in the specific frame that we are on
         lda RasterEffectFrame
         asl
+        bcc no_double_inc
+        inc FrameListPtr+1
+        inc FrameListPtr+1
+no_double_inc:
         asl
+        bcc no_inc
+        inc FrameListPtr+1
+no_inc:
         tay
         lda (FrameListPtr), y
         sta FramePtr+0

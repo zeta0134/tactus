@@ -63,6 +63,13 @@
 .global sfx_cartoony_fall_tri
 
 .global sfx_low_noise
+.global sfx_scorch_noise
+
+.global sfx_shock_noise
+.global sfx_shock_pulse
+
+.global sfx_fae_pulse1
+.global sfx_fae_pulse2
 
 .global CandidateSfxPtr
 .global CandidateSfxPriority

@@ -1,0 +1,1170 @@
+heat_frame_0:
+  .addr heat_scrollx_common, heat_scrolly_frame_0, heat_scanline_frame_0, heat_ppumask_common, heat_irq_common
+heat_frame_1:
+  .addr heat_scrollx_common, heat_scrolly_frame_1, heat_scanline_frame_1, heat_ppumask_common, heat_irq_common
+heat_frame_2:
+  .addr heat_scrollx_common, heat_scrolly_frame_2, heat_scanline_frame_2, heat_ppumask_common, heat_irq_common
+heat_frame_3:
+  .addr heat_scrollx_common, heat_scrolly_frame_3, heat_scanline_frame_3, heat_ppumask_common, heat_irq_common
+heat_frame_4:
+  .addr heat_scrollx_common, heat_scrolly_frame_4, heat_scanline_frame_4, heat_ppumask_common, heat_irq_common
+heat_frame_5:
+  .addr heat_scrollx_common, heat_scrolly_frame_5, heat_scanline_frame_5, heat_ppumask_common, heat_irq_common
+heat_frame_6:
+  .addr heat_scrollx_common, heat_scrolly_frame_6, heat_scanline_frame_6, heat_ppumask_common, heat_irq_common
+heat_frame_7:
+  .addr heat_scrollx_common, heat_scrolly_frame_7, heat_scanline_frame_7, heat_ppumask_common, heat_irq_common
+heat_frame_8:
+  .addr heat_scrollx_common, heat_scrolly_frame_8, heat_scanline_frame_8, heat_ppumask_common, heat_irq_common
+heat_frame_9:
+  .addr heat_scrollx_common, heat_scrolly_frame_9, heat_scanline_frame_9, heat_ppumask_common, heat_irq_common
+heat_frame_10:
+  .addr heat_scrollx_common, heat_scrolly_frame_10, heat_scanline_frame_10, heat_ppumask_common, heat_irq_common
+heat_frame_11:
+  .addr heat_scrollx_common, heat_scrolly_frame_11, heat_scanline_frame_11, heat_ppumask_common, heat_irq_common
+heat_frame_12:
+  .addr heat_scrollx_common, heat_scrolly_frame_12, heat_scanline_frame_12, heat_ppumask_common, heat_irq_common
+heat_frame_13:
+  .addr heat_scrollx_common, heat_scrolly_frame_13, heat_scanline_frame_13, heat_ppumask_common, heat_irq_common
+heat_frame_14:
+  .addr heat_scrollx_common, heat_scrolly_frame_14, heat_scanline_frame_14, heat_ppumask_common, heat_irq_common
+heat_frame_15:
+  .addr heat_scrollx_common, heat_scrolly_frame_15, heat_scanline_frame_15, heat_ppumask_common, heat_irq_common
+heat_frame_16:
+  .addr heat_scrollx_common, heat_scrolly_frame_16, heat_scanline_frame_16, heat_ppumask_common, heat_irq_common
+heat_frame_17:
+  .addr heat_scrollx_common, heat_scrolly_frame_17, heat_scanline_frame_17, heat_ppumask_common, heat_irq_common
+heat_frame_18:
+  .addr heat_scrollx_common, heat_scrolly_frame_18, heat_scanline_frame_18, heat_ppumask_common, heat_irq_common
+heat_frame_19:
+  .addr heat_scrollx_common, heat_scrolly_frame_19, heat_scanline_frame_19, heat_ppumask_common, heat_irq_common
+heat_frame_20:
+  .addr heat_scrollx_common, heat_scrolly_frame_20, heat_scanline_frame_20, heat_ppumask_common, heat_irq_common
+heat_frame_21:
+  .addr heat_scrollx_common, heat_scrolly_frame_21, heat_scanline_frame_21, heat_ppumask_common, heat_irq_common
+heat_frame_22:
+  .addr heat_scrollx_common, heat_scrolly_frame_22, heat_scanline_frame_22, heat_ppumask_common, heat_irq_common
+heat_frame_23:
+  .addr heat_scrollx_common, heat_scrolly_frame_23, heat_scanline_frame_23, heat_ppumask_common, heat_irq_common
+heat_frame_24:
+  .addr heat_scrollx_common, heat_scrolly_frame_24, heat_scanline_frame_24, heat_ppumask_common, heat_irq_common
+heat_frame_25:
+  .addr heat_scrollx_common, heat_scrolly_frame_25, heat_scanline_frame_25, heat_ppumask_common, heat_irq_common
+heat_frame_26:
+  .addr heat_scrollx_common, heat_scrolly_frame_26, heat_scanline_frame_26, heat_ppumask_common, heat_irq_common
+heat_frame_27:
+  .addr heat_scrollx_common, heat_scrolly_frame_27, heat_scanline_frame_27, heat_ppumask_common, heat_irq_common
+heat_frame_28:
+  .addr heat_scrollx_common, heat_scrolly_frame_28, heat_scanline_frame_28, heat_ppumask_common, heat_irq_common
+heat_frame_29:
+  .addr heat_scrollx_common, heat_scrolly_frame_29, heat_scanline_frame_29, heat_ppumask_common, heat_irq_common
+heat_frame_30:
+  .addr heat_scrollx_common, heat_scrolly_frame_30, heat_scanline_frame_30, heat_ppumask_common, heat_irq_common
+heat_frame_31:
+  .addr heat_scrollx_common, heat_scrolly_frame_31, heat_scanline_frame_31, heat_ppumask_common, heat_irq_common
+heat_frame_32:
+  .addr heat_scrollx_common, heat_scrolly_frame_32, heat_scanline_frame_32, heat_ppumask_common, heat_irq_common
+heat_frame_33:
+  .addr heat_scrollx_common, heat_scrolly_frame_33, heat_scanline_frame_33, heat_ppumask_common, heat_irq_common
+heat_frame_34:
+  .addr heat_scrollx_common, heat_scrolly_frame_34, heat_scanline_frame_34, heat_ppumask_common, heat_irq_common
+heat_frame_35:
+  .addr heat_scrollx_common, heat_scrolly_frame_35, heat_scanline_frame_35, heat_ppumask_common, heat_irq_common
+heat_frame_36:
+  .addr heat_scrollx_common, heat_scrolly_frame_36, heat_scanline_frame_36, heat_ppumask_common, heat_irq_common
+heat_frame_37:
+  .addr heat_scrollx_common, heat_scrolly_frame_37, heat_scanline_frame_37, heat_ppumask_common, heat_irq_common
+heat_frame_38:
+  .addr heat_scrollx_common, heat_scrolly_frame_38, heat_scanline_frame_38, heat_ppumask_common, heat_irq_common
+heat_frame_39:
+  .addr heat_scrollx_common, heat_scrolly_frame_39, heat_scanline_frame_39, heat_ppumask_common, heat_irq_common
+heat_frame_40:
+  .addr heat_scrollx_common, heat_scrolly_frame_40, heat_scanline_frame_40, heat_ppumask_common, heat_irq_common
+heat_frame_41:
+  .addr heat_scrollx_common, heat_scrolly_frame_41, heat_scanline_frame_41, heat_ppumask_common, heat_irq_common
+heat_frame_42:
+  .addr heat_scrollx_common, heat_scrolly_frame_42, heat_scanline_frame_42, heat_ppumask_common, heat_irq_common
+heat_frame_43:
+  .addr heat_scrollx_common, heat_scrolly_frame_43, heat_scanline_frame_43, heat_ppumask_common, heat_irq_common
+heat_frame_44:
+  .addr heat_scrollx_common, heat_scrolly_frame_44, heat_scanline_frame_44, heat_ppumask_common, heat_irq_common
+heat_frame_45:
+  .addr heat_scrollx_common, heat_scrolly_frame_45, heat_scanline_frame_45, heat_ppumask_common, heat_irq_common
+heat_frame_46:
+  .addr heat_scrollx_common, heat_scrolly_frame_46, heat_scanline_frame_46, heat_ppumask_common, heat_irq_common
+heat_frame_47:
+  .addr heat_scrollx_common, heat_scrolly_frame_47, heat_scanline_frame_47, heat_ppumask_common, heat_irq_common
+heat_frame_48:
+  .addr heat_scrollx_common, heat_scrolly_frame_48, heat_scanline_frame_48, heat_ppumask_common, heat_irq_common
+heat_frame_49:
+  .addr heat_scrollx_common, heat_scrolly_frame_49, heat_scanline_frame_49, heat_ppumask_common, heat_irq_common
+heat_frame_50:
+  .addr heat_scrollx_common, heat_scrolly_frame_50, heat_scanline_frame_50, heat_ppumask_common, heat_irq_common
+heat_frame_51:
+  .addr heat_scrollx_common, heat_scrolly_frame_51, heat_scanline_frame_51, heat_ppumask_common, heat_irq_common
+heat_frame_52:
+  .addr heat_scrollx_common, heat_scrolly_frame_52, heat_scanline_frame_52, heat_ppumask_common, heat_irq_common
+heat_frame_53:
+  .addr heat_scrollx_common, heat_scrolly_frame_53, heat_scanline_frame_53, heat_ppumask_common, heat_irq_common
+heat_frame_54:
+  .addr heat_scrollx_common, heat_scrolly_frame_54, heat_scanline_frame_54, heat_ppumask_common, heat_irq_common
+heat_frame_55:
+  .addr heat_scrollx_common, heat_scrolly_frame_55, heat_scanline_frame_55, heat_ppumask_common, heat_irq_common
+heat_frame_56:
+  .addr heat_scrollx_common, heat_scrolly_frame_56, heat_scanline_frame_56, heat_ppumask_common, heat_irq_common
+heat_frame_57:
+  .addr heat_scrollx_common, heat_scrolly_frame_57, heat_scanline_frame_57, heat_ppumask_common, heat_irq_common
+heat_frame_58:
+  .addr heat_scrollx_common, heat_scrolly_frame_58, heat_scanline_frame_58, heat_ppumask_common, heat_irq_common
+heat_frame_59:
+  .addr heat_scrollx_common, heat_scrolly_frame_59, heat_scanline_frame_59, heat_ppumask_common, heat_irq_common
+heat_frame_60:
+  .addr heat_scrollx_common, heat_scrolly_frame_60, heat_scanline_frame_60, heat_ppumask_common, heat_irq_common
+heat_frame_61:
+  .addr heat_scrollx_common, heat_scrolly_frame_61, heat_scanline_frame_61, heat_ppumask_common, heat_irq_common
+heat_frame_62:
+  .addr heat_scrollx_common, heat_scrolly_frame_62, heat_scanline_frame_62, heat_ppumask_common, heat_irq_common
+heat_frame_63:
+  .addr heat_scrollx_common, heat_scrolly_frame_63, heat_scanline_frame_63, heat_ppumask_common, heat_irq_common
+heat_frame_64:
+  .addr heat_scrollx_common, heat_scrolly_frame_64, heat_scanline_frame_64, heat_ppumask_common, heat_irq_common
+heat_frame_65:
+  .addr heat_scrollx_common, heat_scrolly_frame_65, heat_scanline_frame_65, heat_ppumask_common, heat_irq_common
+heat_frame_66:
+  .addr heat_scrollx_common, heat_scrolly_frame_66, heat_scanline_frame_66, heat_ppumask_common, heat_irq_common
+heat_frame_67:
+  .addr heat_scrollx_common, heat_scrolly_frame_67, heat_scanline_frame_67, heat_ppumask_common, heat_irq_common
+heat_frame_68:
+  .addr heat_scrollx_common, heat_scrolly_frame_68, heat_scanline_frame_68, heat_ppumask_common, heat_irq_common
+heat_frame_69:
+  .addr heat_scrollx_common, heat_scrolly_frame_69, heat_scanline_frame_69, heat_ppumask_common, heat_irq_common
+heat_frame_70:
+  .addr heat_scrollx_common, heat_scrolly_frame_70, heat_scanline_frame_70, heat_ppumask_common, heat_irq_common
+heat_frame_71:
+  .addr heat_scrollx_common, heat_scrolly_frame_71, heat_scanline_frame_71, heat_ppumask_common, heat_irq_common
+heat_frame_72:
+  .addr heat_scrollx_common, heat_scrolly_frame_72, heat_scanline_frame_72, heat_ppumask_common, heat_irq_common
+heat_frame_73:
+  .addr heat_scrollx_common, heat_scrolly_frame_73, heat_scanline_frame_73, heat_ppumask_common, heat_irq_common
+heat_frame_74:
+  .addr heat_scrollx_common, heat_scrolly_frame_74, heat_scanline_frame_74, heat_ppumask_common, heat_irq_common
+heat_frame_75:
+  .addr heat_scrollx_common, heat_scrolly_frame_75, heat_scanline_frame_75, heat_ppumask_common, heat_irq_common
+heat_frame_76:
+  .addr heat_scrollx_common, heat_scrolly_frame_76, heat_scanline_frame_76, heat_ppumask_common, heat_irq_common
+heat_frame_77:
+  .addr heat_scrollx_common, heat_scrolly_frame_77, heat_scanline_frame_77, heat_ppumask_common, heat_irq_common
+heat_frame_78:
+  .addr heat_scrollx_common, heat_scrolly_frame_78, heat_scanline_frame_78, heat_ppumask_common, heat_irq_common
+heat_frame_79:
+  .addr heat_scrollx_common, heat_scrolly_frame_79, heat_scanline_frame_79, heat_ppumask_common, heat_irq_common
+heat_frame_80:
+  .addr heat_scrollx_common, heat_scrolly_frame_80, heat_scanline_frame_80, heat_ppumask_common, heat_irq_common
+heat_frame_81:
+  .addr heat_scrollx_common, heat_scrolly_frame_81, heat_scanline_frame_81, heat_ppumask_common, heat_irq_common
+heat_frame_82:
+  .addr heat_scrollx_common, heat_scrolly_frame_82, heat_scanline_frame_82, heat_ppumask_common, heat_irq_common
+heat_frame_83:
+  .addr heat_scrollx_common, heat_scrolly_frame_83, heat_scanline_frame_83, heat_ppumask_common, heat_irq_common
+heat_frame_84:
+  .addr heat_scrollx_common, heat_scrolly_frame_84, heat_scanline_frame_84, heat_ppumask_common, heat_irq_common
+heat_frame_85:
+  .addr heat_scrollx_common, heat_scrolly_frame_85, heat_scanline_frame_85, heat_ppumask_common, heat_irq_common
+heat_frame_86:
+  .addr heat_scrollx_common, heat_scrolly_frame_86, heat_scanline_frame_86, heat_ppumask_common, heat_irq_common
+heat_frame_87:
+  .addr heat_scrollx_common, heat_scrolly_frame_87, heat_scanline_frame_87, heat_ppumask_common, heat_irq_common
+heat_frame_88:
+  .addr heat_scrollx_common, heat_scrolly_frame_88, heat_scanline_frame_88, heat_ppumask_common, heat_irq_common
+heat_frame_89:
+  .addr heat_scrollx_common, heat_scrolly_frame_89, heat_scanline_frame_89, heat_ppumask_common, heat_irq_common
+heat_frame_90:
+  .addr heat_scrollx_common, heat_scrolly_frame_90, heat_scanline_frame_90, heat_ppumask_common, heat_irq_common
+heat_frame_91:
+  .addr heat_scrollx_common, heat_scrolly_frame_91, heat_scanline_frame_91, heat_ppumask_common, heat_irq_common
+heat_frame_92:
+  .addr heat_scrollx_common, heat_scrolly_frame_92, heat_scanline_frame_92, heat_ppumask_common, heat_irq_common
+heat_frame_93:
+  .addr heat_scrollx_common, heat_scrolly_frame_93, heat_scanline_frame_93, heat_ppumask_common, heat_irq_common
+heat_frame_94:
+  .addr heat_scrollx_common, heat_scrolly_frame_94, heat_scanline_frame_94, heat_ppumask_common, heat_irq_common
+heat_frame_95:
+  .addr heat_scrollx_common, heat_scrolly_frame_95, heat_scanline_frame_95, heat_ppumask_common, heat_irq_common
+heat_frame_96:
+  .addr heat_scrollx_common, heat_scrolly_frame_96, heat_scanline_frame_96, heat_ppumask_common, heat_irq_common
+heat_frame_97:
+  .addr heat_scrollx_common, heat_scrolly_frame_97, heat_scanline_frame_97, heat_ppumask_common, heat_irq_common
+heat_frame_98:
+  .addr heat_scrollx_common, heat_scrolly_frame_98, heat_scanline_frame_98, heat_ppumask_common, heat_irq_common
+heat_frame_99:
+  .addr heat_scrollx_common, heat_scrolly_frame_99, heat_scanline_frame_99, heat_ppumask_common, heat_irq_common
+heat_frame_100:
+  .addr heat_scrollx_common, heat_scrolly_frame_100, heat_scanline_frame_100, heat_ppumask_common, heat_irq_common
+heat_frame_101:
+  .addr heat_scrollx_common, heat_scrolly_frame_101, heat_scanline_frame_101, heat_ppumask_common, heat_irq_common
+heat_frame_102:
+  .addr heat_scrollx_common, heat_scrolly_frame_102, heat_scanline_frame_102, heat_ppumask_common, heat_irq_common
+heat_frame_103:
+  .addr heat_scrollx_common, heat_scrolly_frame_103, heat_scanline_frame_103, heat_ppumask_common, heat_irq_common
+heat_frame_104:
+  .addr heat_scrollx_common, heat_scrolly_frame_104, heat_scanline_frame_104, heat_ppumask_common, heat_irq_common
+heat_frame_105:
+  .addr heat_scrollx_common, heat_scrolly_frame_105, heat_scanline_frame_105, heat_ppumask_common, heat_irq_common
+heat_frame_106:
+  .addr heat_scrollx_common, heat_scrolly_frame_106, heat_scanline_frame_106, heat_ppumask_common, heat_irq_common
+heat_frame_107:
+  .addr heat_scrollx_common, heat_scrolly_frame_107, heat_scanline_frame_107, heat_ppumask_common, heat_irq_common
+heat_frame_108:
+  .addr heat_scrollx_common, heat_scrolly_frame_108, heat_scanline_frame_108, heat_ppumask_common, heat_irq_common
+heat_frame_109:
+  .addr heat_scrollx_common, heat_scrolly_frame_109, heat_scanline_frame_109, heat_ppumask_common, heat_irq_common
+heat_frame_110:
+  .addr heat_scrollx_common, heat_scrolly_frame_110, heat_scanline_frame_110, heat_ppumask_common, heat_irq_common
+heat_frame_111:
+  .addr heat_scrollx_common, heat_scrolly_frame_111, heat_scanline_frame_111, heat_ppumask_common, heat_irq_common
+heat_frame_112:
+  .addr heat_scrollx_common, heat_scrolly_frame_112, heat_scanline_frame_112, heat_ppumask_common, heat_irq_common
+heat_frame_113:
+  .addr heat_scrollx_common, heat_scrolly_frame_113, heat_scanline_frame_113, heat_ppumask_common, heat_irq_common
+heat_frame_114:
+  .addr heat_scrollx_common, heat_scrolly_frame_114, heat_scanline_frame_114, heat_ppumask_common, heat_irq_common
+heat_frame_115:
+  .addr heat_scrollx_common, heat_scrolly_frame_115, heat_scanline_frame_115, heat_ppumask_common, heat_irq_common
+heat_frame_116:
+  .addr heat_scrollx_common, heat_scrolly_frame_116, heat_scanline_frame_116, heat_ppumask_common, heat_irq_common
+heat_frame_117:
+  .addr heat_scrollx_common, heat_scrolly_frame_117, heat_scanline_frame_117, heat_ppumask_common, heat_irq_common
+heat_frame_118:
+  .addr heat_scrollx_common, heat_scrolly_frame_118, heat_scanline_frame_118, heat_ppumask_common, heat_irq_common
+heat_frame_119:
+  .addr heat_scrollx_common, heat_scrolly_frame_119, heat_scanline_frame_119, heat_ppumask_common, heat_irq_common
+heat_frame_120:
+  .addr heat_scrollx_common, heat_scrolly_frame_120, heat_scanline_frame_120, heat_ppumask_common, heat_irq_common
+heat_frame_121:
+  .addr heat_scrollx_common, heat_scrolly_frame_121, heat_scanline_frame_121, heat_ppumask_common, heat_irq_common
+heat_frame_122:
+  .addr heat_scrollx_common, heat_scrolly_frame_122, heat_scanline_frame_122, heat_ppumask_common, heat_irq_common
+heat_frame_123:
+  .addr heat_scrollx_common, heat_scrolly_frame_123, heat_scanline_frame_123, heat_ppumask_common, heat_irq_common
+heat_frame_124:
+  .addr heat_scrollx_common, heat_scrolly_frame_124, heat_scanline_frame_124, heat_ppumask_common, heat_irq_common
+heat_frame_125:
+  .addr heat_scrollx_common, heat_scrolly_frame_125, heat_scanline_frame_125, heat_ppumask_common, heat_irq_common
+heat_frame_126:
+  .addr heat_scrollx_common, heat_scrolly_frame_126, heat_scanline_frame_126, heat_ppumask_common, heat_irq_common
+heat_frame_127:
+  .addr heat_scrollx_common, heat_scrolly_frame_127, heat_scanline_frame_127, heat_ppumask_common, heat_irq_common
+
+heat_ppumask_common:
+  .repeat 32
+  .byte $1E
+  .endrepeat
+
+heat_irq_common:
+  .repeat 32
+  .byte >full_scroll_and_ppumask_irq
+  .endrepeat
+
+heat_scrollx_common:
+  .repeat 32
+  .byte 0
+  .endrepeat
+
+heat_scrolly_frame_0:
+  .byte $00, $0c, $36, $4a, $76, $8c, $af
+heat_scanline_frame_0:
+  .byte $04, $0f, $3a, $4f, $7a, $8f, $b3
+heat_scrolly_frame_1:
+  .byte $00, $0b, $35, $49, $75, $8b, $af
+heat_scanline_frame_1:
+  .byte $04, $0e, $39, $4e, $79, $8e, $b3
+heat_scrolly_frame_2:
+  .byte $00, $0a, $34, $48, $74, $8a, $af
+heat_scanline_frame_2:
+  .byte $04, $0d, $38, $4d, $78, $8d, $b3
+heat_scrolly_frame_3:
+  .byte $00, $09, $33, $47, $73, $89, $af
+heat_scanline_frame_3:
+  .byte $04, $0c, $37, $4c, $77, $8c, $b3
+heat_scrolly_frame_4:
+  .byte $00, $08, $32, $46, $72, $88, $af
+heat_scanline_frame_4:
+  .byte $04, $0b, $36, $4b, $76, $8b, $b3
+heat_scrolly_frame_5:
+  .byte $00, $07, $31, $45, $71, $87, $af
+heat_scanline_frame_5:
+  .byte $04, $0a, $35, $4a, $75, $8a, $b3
+heat_scrolly_frame_6:
+  .byte $00, $06, $30, $44, $70, $86, $af
+heat_scanline_frame_6:
+  .byte $04, $09, $34, $49, $74, $89, $b3
+heat_scrolly_frame_7:
+  .byte $00, $05, $2f, $43, $6f, $85, $af
+heat_scanline_frame_7:
+  .byte $04, $08, $33, $48, $73, $88, $b3
+heat_scrolly_frame_8:
+  .byte $00, $04, $2e, $42, $6e, $84, $ae
+heat_scanline_frame_8:
+  .byte $04, $07, $32, $47, $72, $87, $b2
+heat_scrolly_frame_9:
+  .byte $00, $03, $2d, $41, $6d, $83, $ad
+heat_scanline_frame_9:
+  .byte $04, $06, $31, $46, $71, $86, $b1
+heat_scrolly_frame_10:
+  .byte $00, $02, $2c, $40, $6c, $82, $ac
+heat_scanline_frame_10:
+  .byte $04, $05, $30, $45, $70, $85, $b0
+heat_scrolly_frame_11:
+  .byte $01, $2b, $3f, $6b, $81, $ab
+heat_scanline_frame_11:
+  .byte $04, $2f, $44, $6f, $84, $af
+heat_scrolly_frame_12:
+  .byte $01, $2a, $3e, $6a, $80, $aa
+heat_scanline_frame_12:
+  .byte $04, $2e, $43, $6e, $83, $ae
+heat_scrolly_frame_13:
+  .byte $01, $29, $3d, $69, $7f, $a9
+heat_scanline_frame_13:
+  .byte $04, $2d, $42, $6d, $82, $ad
+heat_scrolly_frame_14:
+  .byte $01, $28, $3c, $68, $7e, $a8
+heat_scanline_frame_14:
+  .byte $04, $2c, $41, $6c, $81, $ac
+heat_scrolly_frame_15:
+  .byte $01, $27, $3b, $67, $7d, $a7
+heat_scanline_frame_15:
+  .byte $04, $2b, $40, $6b, $80, $ab
+heat_scrolly_frame_16:
+  .byte $01, $26, $3a, $66, $7c, $a6
+heat_scanline_frame_16:
+  .byte $04, $2a, $3f, $6a, $7f, $aa
+heat_scrolly_frame_17:
+  .byte $01, $25, $39, $65, $7b, $a5
+heat_scanline_frame_17:
+  .byte $04, $29, $3e, $69, $7e, $a9
+heat_scrolly_frame_18:
+  .byte $01, $24, $38, $64, $7a, $a4
+heat_scanline_frame_18:
+  .byte $04, $28, $3d, $68, $7d, $a8
+heat_scrolly_frame_19:
+  .byte $01, $23, $37, $63, $79, $a3
+heat_scanline_frame_19:
+  .byte $04, $27, $3c, $67, $7c, $a7
+heat_scrolly_frame_20:
+  .byte $01, $22, $36, $62, $78, $a2
+heat_scanline_frame_20:
+  .byte $04, $26, $3b, $66, $7b, $a6
+heat_scrolly_frame_21:
+  .byte $01, $21, $35, $61, $77, $a1
+heat_scanline_frame_21:
+  .byte $04, $25, $3a, $65, $7a, $a5
+heat_scrolly_frame_22:
+  .byte $01, $20, $34, $60, $76, $a0
+heat_scanline_frame_22:
+  .byte $04, $24, $39, $64, $79, $a4
+heat_scrolly_frame_23:
+  .byte $01, $1f, $33, $5f, $75, $9f
+heat_scanline_frame_23:
+  .byte $04, $23, $38, $63, $78, $a3
+heat_scrolly_frame_24:
+  .byte $01, $1e, $32, $5e, $74, $9e
+heat_scanline_frame_24:
+  .byte $04, $22, $37, $62, $77, $a2
+heat_scrolly_frame_25:
+  .byte $01, $1d, $31, $5d, $73, $9d
+heat_scanline_frame_25:
+  .byte $04, $21, $36, $61, $76, $a1
+heat_scrolly_frame_26:
+  .byte $01, $1c, $30, $5c, $72, $9c
+heat_scanline_frame_26:
+  .byte $04, $20, $35, $60, $75, $a0
+heat_scrolly_frame_27:
+  .byte $01, $1b, $2f, $5b, $71, $9b
+heat_scanline_frame_27:
+  .byte $04, $1f, $34, $5f, $74, $9f
+heat_scrolly_frame_28:
+  .byte $01, $1a, $2e, $5a, $70, $9a, $ae
+heat_scanline_frame_28:
+  .byte $04, $1e, $33, $5e, $73, $9e, $b3
+heat_scrolly_frame_29:
+  .byte $01, $19, $2d, $59, $6f, $99, $ad
+heat_scanline_frame_29:
+  .byte $04, $1d, $32, $5d, $72, $9d, $b2
+heat_scrolly_frame_30:
+  .byte $01, $18, $2c, $58, $6e, $98, $ac
+heat_scanline_frame_30:
+  .byte $04, $1c, $31, $5c, $71, $9c, $b1
+heat_scrolly_frame_31:
+  .byte $01, $17, $2b, $57, $6d, $97, $ab
+heat_scanline_frame_31:
+  .byte $04, $1b, $30, $5b, $70, $9b, $b0
+heat_scrolly_frame_32:
+  .byte $01, $16, $2a, $56, $6c, $96, $aa
+heat_scanline_frame_32:
+  .byte $04, $1a, $2f, $5a, $6f, $9a, $af
+heat_scrolly_frame_33:
+  .byte $01, $15, $29, $55, $6b, $95, $a9
+heat_scanline_frame_33:
+  .byte $04, $19, $2e, $59, $6e, $99, $ae
+heat_scrolly_frame_34:
+  .byte $01, $14, $28, $54, $6a, $94, $a8
+heat_scanline_frame_34:
+  .byte $04, $18, $2d, $58, $6d, $98, $ad
+heat_scrolly_frame_35:
+  .byte $01, $13, $27, $53, $69, $93, $a7
+heat_scanline_frame_35:
+  .byte $04, $17, $2c, $57, $6c, $97, $ac
+heat_scrolly_frame_36:
+  .byte $01, $12, $26, $52, $68, $92, $a6
+heat_scanline_frame_36:
+  .byte $04, $16, $2b, $56, $6b, $96, $ab
+heat_scrolly_frame_37:
+  .byte $01, $11, $25, $51, $67, $91, $a5
+heat_scanline_frame_37:
+  .byte $04, $15, $2a, $55, $6a, $95, $aa
+heat_scrolly_frame_38:
+  .byte $01, $10, $24, $50, $66, $90, $a4
+heat_scanline_frame_38:
+  .byte $04, $14, $29, $54, $69, $94, $a9
+heat_scrolly_frame_39:
+  .byte $01, $0f, $23, $4f, $65, $8f, $a3
+heat_scanline_frame_39:
+  .byte $04, $13, $28, $53, $68, $93, $a8
+heat_scrolly_frame_40:
+  .byte $01, $0e, $22, $4e, $64, $8e, $a2
+heat_scanline_frame_40:
+  .byte $04, $12, $27, $52, $67, $92, $a7
+heat_scrolly_frame_41:
+  .byte $01, $0d, $21, $4d, $63, $8d, $a1
+heat_scanline_frame_41:
+  .byte $04, $11, $26, $51, $66, $91, $a6
+heat_scrolly_frame_42:
+  .byte $01, $0c, $20, $4c, $62, $8c, $a0
+heat_scanline_frame_42:
+  .byte $04, $10, $25, $50, $65, $90, $a5
+heat_scrolly_frame_43:
+  .byte $01, $0b, $1f, $4b, $61, $8b, $9f
+heat_scanline_frame_43:
+  .byte $04, $0f, $24, $4f, $64, $8f, $a4
+heat_scrolly_frame_44:
+  .byte $01, $0a, $1e, $4a, $60, $8a, $9e
+heat_scanline_frame_44:
+  .byte $04, $0e, $23, $4e, $63, $8e, $a3
+heat_scrolly_frame_45:
+  .byte $01, $09, $1d, $49, $5f, $89, $9d
+heat_scanline_frame_45:
+  .byte $04, $0d, $22, $4d, $62, $8d, $a2
+heat_scrolly_frame_46:
+  .byte $01, $08, $1c, $48, $5e, $88, $9c
+heat_scanline_frame_46:
+  .byte $04, $0c, $21, $4c, $61, $8c, $a1
+heat_scrolly_frame_47:
+  .byte $01, $07, $1b, $47, $5d, $87, $9b
+heat_scanline_frame_47:
+  .byte $04, $0b, $20, $4b, $60, $8b, $a0
+heat_scrolly_frame_48:
+  .byte $01, $06, $1a, $46, $5c, $86, $9a
+heat_scanline_frame_48:
+  .byte $04, $0a, $1f, $4a, $5f, $8a, $9f
+heat_scrolly_frame_49:
+  .byte $01, $05, $19, $45, $5b, $85, $99
+heat_scanline_frame_49:
+  .byte $04, $09, $1e, $49, $5e, $89, $9e
+heat_scrolly_frame_50:
+  .byte $01, $04, $18, $44, $5a, $84, $98
+heat_scanline_frame_50:
+  .byte $04, $08, $1d, $48, $5d, $88, $9d
+heat_scrolly_frame_51:
+  .byte $01, $03, $17, $43, $59, $83, $97
+heat_scanline_frame_51:
+  .byte $04, $07, $1c, $47, $5c, $87, $9c
+heat_scrolly_frame_52:
+  .byte $01, $02, $16, $42, $58, $82, $96
+heat_scanline_frame_52:
+  .byte $04, $06, $1b, $46, $5b, $86, $9b
+heat_scrolly_frame_53:
+  .byte $01, $01, $15, $41, $57, $81, $95
+heat_scanline_frame_53:
+  .byte $04, $05, $1a, $45, $5a, $85, $9a
+heat_scrolly_frame_54:
+  .byte $00, $14, $40, $56, $80, $94
+heat_scanline_frame_54:
+  .byte $04, $19, $44, $59, $84, $99
+heat_scrolly_frame_55:
+  .byte $00, $13, $3f, $55, $7f, $93
+heat_scanline_frame_55:
+  .byte $04, $18, $43, $58, $83, $98
+heat_scrolly_frame_56:
+  .byte $00, $12, $3e, $54, $7e, $92
+heat_scanline_frame_56:
+  .byte $04, $17, $42, $57, $82, $97
+heat_scrolly_frame_57:
+  .byte $00, $11, $3d, $53, $7d, $91
+heat_scanline_frame_57:
+  .byte $04, $16, $41, $56, $81, $96
+heat_scrolly_frame_58:
+  .byte $00, $10, $3c, $52, $7c, $90
+heat_scanline_frame_58:
+  .byte $04, $15, $40, $55, $80, $95
+heat_scrolly_frame_59:
+  .byte $00, $0f, $3b, $51, $7b, $8f
+heat_scanline_frame_59:
+  .byte $04, $14, $3f, $54, $7f, $94
+heat_scrolly_frame_60:
+  .byte $00, $0e, $3a, $50, $7a, $8e
+heat_scanline_frame_60:
+  .byte $04, $13, $3e, $53, $7e, $93
+heat_scrolly_frame_61:
+  .byte $00, $0d, $39, $4f, $79, $8d
+heat_scanline_frame_61:
+  .byte $04, $12, $3d, $52, $7d, $92
+heat_scrolly_frame_62:
+  .byte $00, $0c, $38, $4e, $78, $8c
+heat_scanline_frame_62:
+  .byte $04, $11, $3c, $51, $7c, $91
+heat_scrolly_frame_63:
+  .byte $00, $0b, $37, $4d, $77, $8b
+heat_scanline_frame_63:
+  .byte $04, $10, $3b, $50, $7b, $90
+heat_scrolly_frame_64:
+  .byte $00, $0a, $36, $4c, $76, $8a
+heat_scanline_frame_64:
+  .byte $04, $0f, $3a, $4f, $7a, $8f
+heat_scrolly_frame_65:
+  .byte $00, $09, $35, $4b, $75, $89
+heat_scanline_frame_65:
+  .byte $04, $0e, $39, $4e, $79, $8e
+heat_scrolly_frame_66:
+  .byte $00, $08, $34, $4a, $74, $88
+heat_scanline_frame_66:
+  .byte $04, $0d, $38, $4d, $78, $8d
+heat_scrolly_frame_67:
+  .byte $00, $07, $33, $49, $73, $87
+heat_scanline_frame_67:
+  .byte $04, $0c, $37, $4c, $77, $8c
+heat_scrolly_frame_68:
+  .byte $00, $06, $32, $48, $72, $86
+heat_scanline_frame_68:
+  .byte $04, $0b, $36, $4b, $76, $8b
+heat_scrolly_frame_69:
+  .byte $00, $05, $31, $47, $71, $85
+heat_scanline_frame_69:
+  .byte $04, $0a, $35, $4a, $75, $8a
+heat_scrolly_frame_70:
+  .byte $00, $04, $30, $46, $70, $84
+heat_scanline_frame_70:
+  .byte $04, $09, $34, $49, $74, $89
+heat_scrolly_frame_71:
+  .byte $00, $03, $2f, $45, $6f, $83, $af
+heat_scanline_frame_71:
+  .byte $04, $08, $33, $48, $73, $88, $b3
+heat_scrolly_frame_72:
+  .byte $00, $02, $2e, $44, $6e, $82, $ae
+heat_scanline_frame_72:
+  .byte $04, $07, $32, $47, $72, $87, $b2
+heat_scrolly_frame_73:
+  .byte $00, $01, $2d, $43, $6d, $81, $ad
+heat_scanline_frame_73:
+  .byte $04, $06, $31, $46, $71, $86, $b1
+heat_scrolly_frame_74:
+  .byte $00, $00, $2c, $42, $6c, $80, $ac
+heat_scanline_frame_74:
+  .byte $04, $05, $30, $45, $70, $85, $b0
+heat_scrolly_frame_75:
+  .byte $00, $00, $2b, $41, $6b, $7f, $ab
+heat_scanline_frame_75:
+  .byte $04, $05, $2f, $44, $6f, $84, $af
+heat_scrolly_frame_76:
+  .byte $00, $00, $2a, $40, $6a, $7e, $aa
+heat_scanline_frame_76:
+  .byte $04, $05, $2e, $43, $6e, $83, $ae
+heat_scrolly_frame_77:
+  .byte $00, $00, $29, $3f, $69, $7d, $a9
+heat_scanline_frame_77:
+  .byte $04, $05, $2d, $42, $6d, $82, $ad
+heat_scrolly_frame_78:
+  .byte $00, $00, $28, $3e, $68, $7c, $a8
+heat_scanline_frame_78:
+  .byte $04, $05, $2c, $41, $6c, $81, $ac
+heat_scrolly_frame_79:
+  .byte $00, $00, $27, $3d, $67, $7b, $a7
+heat_scanline_frame_79:
+  .byte $04, $05, $2b, $40, $6b, $80, $ab
+heat_scrolly_frame_80:
+  .byte $00, $00, $26, $3c, $66, $7a, $a6
+heat_scanline_frame_80:
+  .byte $04, $05, $2a, $3f, $6a, $7f, $aa
+heat_scrolly_frame_81:
+  .byte $00, $00, $25, $3b, $65, $79, $a5
+heat_scanline_frame_81:
+  .byte $04, $05, $29, $3e, $69, $7e, $a9
+heat_scrolly_frame_82:
+  .byte $00, $00, $24, $3a, $64, $78, $a4
+heat_scanline_frame_82:
+  .byte $04, $05, $28, $3d, $68, $7d, $a8
+heat_scrolly_frame_83:
+  .byte $00, $00, $23, $39, $63, $77, $a3
+heat_scanline_frame_83:
+  .byte $04, $05, $27, $3c, $67, $7c, $a7
+heat_scrolly_frame_84:
+  .byte $00, $00, $22, $38, $62, $76, $a2
+heat_scanline_frame_84:
+  .byte $04, $05, $26, $3b, $66, $7b, $a6
+heat_scrolly_frame_85:
+  .byte $00, $00, $21, $37, $61, $75, $a1
+heat_scanline_frame_85:
+  .byte $04, $05, $25, $3a, $65, $7a, $a5
+heat_scrolly_frame_86:
+  .byte $00, $00, $20, $36, $60, $74, $a0
+heat_scanline_frame_86:
+  .byte $04, $05, $24, $39, $64, $79, $a4
+heat_scrolly_frame_87:
+  .byte $00, $00, $1f, $35, $5f, $73, $9f
+heat_scanline_frame_87:
+  .byte $04, $05, $23, $38, $63, $78, $a3
+heat_scrolly_frame_88:
+  .byte $00, $00, $1e, $34, $5e, $72, $9e
+heat_scanline_frame_88:
+  .byte $04, $05, $22, $37, $62, $77, $a2
+heat_scrolly_frame_89:
+  .byte $00, $00, $1d, $33, $5d, $71, $9d
+heat_scanline_frame_89:
+  .byte $04, $05, $21, $36, $61, $76, $a1
+heat_scrolly_frame_90:
+  .byte $00, $00, $1c, $32, $5c, $70, $9c
+heat_scanline_frame_90:
+  .byte $04, $05, $20, $35, $60, $75, $a0
+heat_scrolly_frame_91:
+  .byte $00, $00, $1b, $31, $5b, $6f, $9b
+heat_scanline_frame_91:
+  .byte $04, $05, $1f, $34, $5f, $74, $9f
+heat_scrolly_frame_92:
+  .byte $00, $00, $1a, $30, $5a, $6e, $9a
+heat_scanline_frame_92:
+  .byte $04, $05, $1e, $33, $5e, $73, $9e
+heat_scrolly_frame_93:
+  .byte $00, $00, $19, $2f, $59, $6d, $99, $af, $af
+heat_scanline_frame_93:
+  .byte $04, $05, $1d, $32, $5d, $72, $9d, $b2, $b3
+heat_scrolly_frame_94:
+  .byte $00, $00, $18, $2e, $58, $6c, $98, $ae, $af
+heat_scanline_frame_94:
+  .byte $04, $05, $1c, $31, $5c, $71, $9c, $b1, $b3
+heat_scrolly_frame_95:
+  .byte $00, $00, $17, $2d, $57, $6b, $97, $ad, $af
+heat_scanline_frame_95:
+  .byte $04, $05, $1b, $30, $5b, $70, $9b, $b0, $b3
+heat_scrolly_frame_96:
+  .byte $00, $00, $16, $2c, $56, $6a, $96, $ac, $af
+heat_scanline_frame_96:
+  .byte $04, $05, $1a, $2f, $5a, $6f, $9a, $af, $b3
+heat_scrolly_frame_97:
+  .byte $00, $00, $15, $2b, $55, $69, $95, $ab, $af
+heat_scanline_frame_97:
+  .byte $04, $05, $19, $2e, $59, $6e, $99, $ae, $b3
+heat_scrolly_frame_98:
+  .byte $00, $00, $14, $2a, $54, $68, $94, $aa, $af
+heat_scanline_frame_98:
+  .byte $04, $05, $18, $2d, $58, $6d, $98, $ad, $b3
+heat_scrolly_frame_99:
+  .byte $00, $00, $13, $29, $53, $67, $93, $a9, $af
+heat_scanline_frame_99:
+  .byte $04, $05, $17, $2c, $57, $6c, $97, $ac, $b3
+heat_scrolly_frame_100:
+  .byte $00, $00, $12, $28, $52, $66, $92, $a8, $af
+heat_scanline_frame_100:
+  .byte $04, $05, $16, $2b, $56, $6b, $96, $ab, $b3
+heat_scrolly_frame_101:
+  .byte $00, $00, $11, $27, $51, $65, $91, $a7, $af
+heat_scanline_frame_101:
+  .byte $04, $05, $15, $2a, $55, $6a, $95, $aa, $b3
+heat_scrolly_frame_102:
+  .byte $00, $00, $10, $26, $50, $64, $90, $a6, $af
+heat_scanline_frame_102:
+  .byte $04, $05, $14, $29, $54, $69, $94, $a9, $b3
+heat_scrolly_frame_103:
+  .byte $00, $00, $0f, $25, $4f, $63, $8f, $a5, $af
+heat_scanline_frame_103:
+  .byte $04, $05, $13, $28, $53, $68, $93, $a8, $b3
+heat_scrolly_frame_104:
+  .byte $00, $00, $0e, $24, $4e, $62, $8e, $a4, $af
+heat_scanline_frame_104:
+  .byte $04, $05, $12, $27, $52, $67, $92, $a7, $b3
+heat_scrolly_frame_105:
+  .byte $00, $00, $0d, $23, $4d, $61, $8d, $a3, $af
+heat_scanline_frame_105:
+  .byte $04, $05, $11, $26, $51, $66, $91, $a6, $b3
+heat_scrolly_frame_106:
+  .byte $00, $00, $0c, $22, $4c, $60, $8c, $a2, $af
+heat_scanline_frame_106:
+  .byte $04, $05, $10, $25, $50, $65, $90, $a5, $b3
+heat_scrolly_frame_107:
+  .byte $00, $00, $0b, $21, $4b, $5f, $8b, $a1, $af
+heat_scanline_frame_107:
+  .byte $04, $05, $0f, $24, $4f, $64, $8f, $a4, $b3
+heat_scrolly_frame_108:
+  .byte $00, $00, $0a, $20, $4a, $5e, $8a, $a0, $af
+heat_scanline_frame_108:
+  .byte $04, $05, $0e, $23, $4e, $63, $8e, $a3, $b3
+heat_scrolly_frame_109:
+  .byte $00, $00, $09, $1f, $49, $5d, $89, $9f, $af
+heat_scanline_frame_109:
+  .byte $04, $05, $0d, $22, $4d, $62, $8d, $a2, $b3
+heat_scrolly_frame_110:
+  .byte $00, $00, $08, $1e, $48, $5c, $88, $9e, $af
+heat_scanline_frame_110:
+  .byte $04, $05, $0c, $21, $4c, $61, $8c, $a1, $b3
+heat_scrolly_frame_111:
+  .byte $00, $00, $07, $1d, $47, $5b, $87, $9d, $af
+heat_scanline_frame_111:
+  .byte $04, $05, $0b, $20, $4b, $60, $8b, $a0, $b3
+heat_scrolly_frame_112:
+  .byte $00, $00, $06, $1c, $46, $5a, $86, $9c, $af
+heat_scanline_frame_112:
+  .byte $04, $05, $0a, $1f, $4a, $5f, $8a, $9f, $b3
+heat_scrolly_frame_113:
+  .byte $00, $00, $05, $1b, $45, $59, $85, $9b, $af
+heat_scanline_frame_113:
+  .byte $04, $05, $09, $1e, $49, $5e, $89, $9e, $b3
+heat_scrolly_frame_114:
+  .byte $00, $00, $04, $1a, $44, $58, $84, $9a, $af
+heat_scanline_frame_114:
+  .byte $04, $05, $08, $1d, $48, $5d, $88, $9d, $b3
+heat_scrolly_frame_115:
+  .byte $00, $00, $03, $19, $43, $57, $83, $99, $af
+heat_scanline_frame_115:
+  .byte $04, $05, $07, $1c, $47, $5c, $87, $9c, $b3
+heat_scrolly_frame_116:
+  .byte $00, $00, $02, $18, $42, $56, $82, $98, $af
+heat_scanline_frame_116:
+  .byte $04, $05, $06, $1b, $46, $5b, $86, $9b, $b3
+heat_scrolly_frame_117:
+  .byte $00, $17, $41, $55, $81, $97, $af
+heat_scanline_frame_117:
+  .byte $04, $1a, $45, $5a, $85, $9a, $b3
+heat_scrolly_frame_118:
+  .byte $00, $16, $40, $54, $80, $96, $af
+heat_scanline_frame_118:
+  .byte $04, $19, $44, $59, $84, $99, $b3
+heat_scrolly_frame_119:
+  .byte $00, $15, $3f, $53, $7f, $95, $af
+heat_scanline_frame_119:
+  .byte $04, $18, $43, $58, $83, $98, $b3
+heat_scrolly_frame_120:
+  .byte $00, $14, $3e, $52, $7e, $94, $af
+heat_scanline_frame_120:
+  .byte $04, $17, $42, $57, $82, $97, $b3
+heat_scrolly_frame_121:
+  .byte $00, $13, $3d, $51, $7d, $93, $af
+heat_scanline_frame_121:
+  .byte $04, $16, $41, $56, $81, $96, $b3
+heat_scrolly_frame_122:
+  .byte $00, $12, $3c, $50, $7c, $92, $af
+heat_scanline_frame_122:
+  .byte $04, $15, $40, $55, $80, $95, $b3
+heat_scrolly_frame_123:
+  .byte $00, $11, $3b, $4f, $7b, $91, $af
+heat_scanline_frame_123:
+  .byte $04, $14, $3f, $54, $7f, $94, $b3
+heat_scrolly_frame_124:
+  .byte $00, $10, $3a, $4e, $7a, $90, $af
+heat_scanline_frame_124:
+  .byte $04, $13, $3e, $53, $7e, $93, $b3
+heat_scrolly_frame_125:
+  .byte $00, $0f, $39, $4d, $79, $8f, $af
+heat_scanline_frame_125:
+  .byte $04, $12, $3d, $52, $7d, $92, $b3
+heat_scrolly_frame_126:
+  .byte $00, $0e, $38, $4c, $78, $8e, $af
+heat_scanline_frame_126:
+  .byte $04, $11, $3c, $51, $7c, $91, $b3
+heat_scrolly_frame_127:
+  .byte $00, $0d, $37, $4b, $77, $8d, $af
+heat_scanline_frame_127:
+  .byte $04, $10, $3b, $50, $7b, $90, $b3
+heat_frames:
+  .addr heat_frame_0
+  .byte 7
+  .byte <.bank(heat_frame_0)
+  .addr heat_frame_1
+  .byte 7
+  .byte <.bank(heat_frame_1)
+  .addr heat_frame_2
+  .byte 7
+  .byte <.bank(heat_frame_2)
+  .addr heat_frame_3
+  .byte 7
+  .byte <.bank(heat_frame_3)
+  .addr heat_frame_4
+  .byte 7
+  .byte <.bank(heat_frame_4)
+  .addr heat_frame_5
+  .byte 7
+  .byte <.bank(heat_frame_5)
+  .addr heat_frame_6
+  .byte 7
+  .byte <.bank(heat_frame_6)
+  .addr heat_frame_7
+  .byte 7
+  .byte <.bank(heat_frame_7)
+  .addr heat_frame_8
+  .byte 7
+  .byte <.bank(heat_frame_8)
+  .addr heat_frame_9
+  .byte 7
+  .byte <.bank(heat_frame_9)
+  .addr heat_frame_10
+  .byte 7
+  .byte <.bank(heat_frame_10)
+  .addr heat_frame_11
+  .byte 6
+  .byte <.bank(heat_frame_11)
+  .addr heat_frame_12
+  .byte 6
+  .byte <.bank(heat_frame_12)
+  .addr heat_frame_13
+  .byte 6
+  .byte <.bank(heat_frame_13)
+  .addr heat_frame_14
+  .byte 6
+  .byte <.bank(heat_frame_14)
+  .addr heat_frame_15
+  .byte 6
+  .byte <.bank(heat_frame_15)
+  .addr heat_frame_16
+  .byte 6
+  .byte <.bank(heat_frame_16)
+  .addr heat_frame_17
+  .byte 6
+  .byte <.bank(heat_frame_17)
+  .addr heat_frame_18
+  .byte 6
+  .byte <.bank(heat_frame_18)
+  .addr heat_frame_19
+  .byte 6
+  .byte <.bank(heat_frame_19)
+  .addr heat_frame_20
+  .byte 6
+  .byte <.bank(heat_frame_20)
+  .addr heat_frame_21
+  .byte 6
+  .byte <.bank(heat_frame_21)
+  .addr heat_frame_22
+  .byte 6
+  .byte <.bank(heat_frame_22)
+  .addr heat_frame_23
+  .byte 6
+  .byte <.bank(heat_frame_23)
+  .addr heat_frame_24
+  .byte 6
+  .byte <.bank(heat_frame_24)
+  .addr heat_frame_25
+  .byte 6
+  .byte <.bank(heat_frame_25)
+  .addr heat_frame_26
+  .byte 6
+  .byte <.bank(heat_frame_26)
+  .addr heat_frame_27
+  .byte 6
+  .byte <.bank(heat_frame_27)
+  .addr heat_frame_28
+  .byte 7
+  .byte <.bank(heat_frame_28)
+  .addr heat_frame_29
+  .byte 7
+  .byte <.bank(heat_frame_29)
+  .addr heat_frame_30
+  .byte 7
+  .byte <.bank(heat_frame_30)
+  .addr heat_frame_31
+  .byte 7
+  .byte <.bank(heat_frame_31)
+  .addr heat_frame_32
+  .byte 7
+  .byte <.bank(heat_frame_32)
+  .addr heat_frame_33
+  .byte 7
+  .byte <.bank(heat_frame_33)
+  .addr heat_frame_34
+  .byte 7
+  .byte <.bank(heat_frame_34)
+  .addr heat_frame_35
+  .byte 7
+  .byte <.bank(heat_frame_35)
+  .addr heat_frame_36
+  .byte 7
+  .byte <.bank(heat_frame_36)
+  .addr heat_frame_37
+  .byte 7
+  .byte <.bank(heat_frame_37)
+  .addr heat_frame_38
+  .byte 7
+  .byte <.bank(heat_frame_38)
+  .addr heat_frame_39
+  .byte 7
+  .byte <.bank(heat_frame_39)
+  .addr heat_frame_40
+  .byte 7
+  .byte <.bank(heat_frame_40)
+  .addr heat_frame_41
+  .byte 7
+  .byte <.bank(heat_frame_41)
+  .addr heat_frame_42
+  .byte 7
+  .byte <.bank(heat_frame_42)
+  .addr heat_frame_43
+  .byte 7
+  .byte <.bank(heat_frame_43)
+  .addr heat_frame_44
+  .byte 7
+  .byte <.bank(heat_frame_44)
+  .addr heat_frame_45
+  .byte 7
+  .byte <.bank(heat_frame_45)
+  .addr heat_frame_46
+  .byte 7
+  .byte <.bank(heat_frame_46)
+  .addr heat_frame_47
+  .byte 7
+  .byte <.bank(heat_frame_47)
+  .addr heat_frame_48
+  .byte 7
+  .byte <.bank(heat_frame_48)
+  .addr heat_frame_49
+  .byte 7
+  .byte <.bank(heat_frame_49)
+  .addr heat_frame_50
+  .byte 7
+  .byte <.bank(heat_frame_50)
+  .addr heat_frame_51
+  .byte 7
+  .byte <.bank(heat_frame_51)
+  .addr heat_frame_52
+  .byte 7
+  .byte <.bank(heat_frame_52)
+  .addr heat_frame_53
+  .byte 7
+  .byte <.bank(heat_frame_53)
+  .addr heat_frame_54
+  .byte 6
+  .byte <.bank(heat_frame_54)
+  .addr heat_frame_55
+  .byte 6
+  .byte <.bank(heat_frame_55)
+  .addr heat_frame_56
+  .byte 6
+  .byte <.bank(heat_frame_56)
+  .addr heat_frame_57
+  .byte 6
+  .byte <.bank(heat_frame_57)
+  .addr heat_frame_58
+  .byte 6
+  .byte <.bank(heat_frame_58)
+  .addr heat_frame_59
+  .byte 6
+  .byte <.bank(heat_frame_59)
+  .addr heat_frame_60
+  .byte 6
+  .byte <.bank(heat_frame_60)
+  .addr heat_frame_61
+  .byte 6
+  .byte <.bank(heat_frame_61)
+  .addr heat_frame_62
+  .byte 6
+  .byte <.bank(heat_frame_62)
+  .addr heat_frame_63
+  .byte 6
+  .byte <.bank(heat_frame_63)
+  .addr heat_frame_64
+  .byte 6
+  .byte <.bank(heat_frame_64)
+  .addr heat_frame_65
+  .byte 6
+  .byte <.bank(heat_frame_65)
+  .addr heat_frame_66
+  .byte 6
+  .byte <.bank(heat_frame_66)
+  .addr heat_frame_67
+  .byte 6
+  .byte <.bank(heat_frame_67)
+  .addr heat_frame_68
+  .byte 6
+  .byte <.bank(heat_frame_68)
+  .addr heat_frame_69
+  .byte 6
+  .byte <.bank(heat_frame_69)
+  .addr heat_frame_70
+  .byte 6
+  .byte <.bank(heat_frame_70)
+  .addr heat_frame_71
+  .byte 7
+  .byte <.bank(heat_frame_71)
+  .addr heat_frame_72
+  .byte 7
+  .byte <.bank(heat_frame_72)
+  .addr heat_frame_73
+  .byte 7
+  .byte <.bank(heat_frame_73)
+  .addr heat_frame_74
+  .byte 7
+  .byte <.bank(heat_frame_74)
+  .addr heat_frame_75
+  .byte 7
+  .byte <.bank(heat_frame_75)
+  .addr heat_frame_76
+  .byte 7
+  .byte <.bank(heat_frame_76)
+  .addr heat_frame_77
+  .byte 7
+  .byte <.bank(heat_frame_77)
+  .addr heat_frame_78
+  .byte 7
+  .byte <.bank(heat_frame_78)
+  .addr heat_frame_79
+  .byte 7
+  .byte <.bank(heat_frame_79)
+  .addr heat_frame_80
+  .byte 7
+  .byte <.bank(heat_frame_80)
+  .addr heat_frame_81
+  .byte 7
+  .byte <.bank(heat_frame_81)
+  .addr heat_frame_82
+  .byte 7
+  .byte <.bank(heat_frame_82)
+  .addr heat_frame_83
+  .byte 7
+  .byte <.bank(heat_frame_83)
+  .addr heat_frame_84
+  .byte 7
+  .byte <.bank(heat_frame_84)
+  .addr heat_frame_85
+  .byte 7
+  .byte <.bank(heat_frame_85)
+  .addr heat_frame_86
+  .byte 7
+  .byte <.bank(heat_frame_86)
+  .addr heat_frame_87
+  .byte 7
+  .byte <.bank(heat_frame_87)
+  .addr heat_frame_88
+  .byte 7
+  .byte <.bank(heat_frame_88)
+  .addr heat_frame_89
+  .byte 7
+  .byte <.bank(heat_frame_89)
+  .addr heat_frame_90
+  .byte 7
+  .byte <.bank(heat_frame_90)
+  .addr heat_frame_91
+  .byte 7
+  .byte <.bank(heat_frame_91)
+  .addr heat_frame_92
+  .byte 7
+  .byte <.bank(heat_frame_92)
+  .addr heat_frame_93
+  .byte 9
+  .byte <.bank(heat_frame_93)
+  .addr heat_frame_94
+  .byte 9
+  .byte <.bank(heat_frame_94)
+  .addr heat_frame_95
+  .byte 9
+  .byte <.bank(heat_frame_95)
+  .addr heat_frame_96
+  .byte 9
+  .byte <.bank(heat_frame_96)
+  .addr heat_frame_97
+  .byte 9
+  .byte <.bank(heat_frame_97)
+  .addr heat_frame_98
+  .byte 9
+  .byte <.bank(heat_frame_98)
+  .addr heat_frame_99
+  .byte 9
+  .byte <.bank(heat_frame_99)
+  .addr heat_frame_100
+  .byte 9
+  .byte <.bank(heat_frame_100)
+  .addr heat_frame_101
+  .byte 9
+  .byte <.bank(heat_frame_101)
+  .addr heat_frame_102
+  .byte 9
+  .byte <.bank(heat_frame_102)
+  .addr heat_frame_103
+  .byte 9
+  .byte <.bank(heat_frame_103)
+  .addr heat_frame_104
+  .byte 9
+  .byte <.bank(heat_frame_104)
+  .addr heat_frame_105
+  .byte 9
+  .byte <.bank(heat_frame_105)
+  .addr heat_frame_106
+  .byte 9
+  .byte <.bank(heat_frame_106)
+  .addr heat_frame_107
+  .byte 9
+  .byte <.bank(heat_frame_107)
+  .addr heat_frame_108
+  .byte 9
+  .byte <.bank(heat_frame_108)
+  .addr heat_frame_109
+  .byte 9
+  .byte <.bank(heat_frame_109)
+  .addr heat_frame_110
+  .byte 9
+  .byte <.bank(heat_frame_110)
+  .addr heat_frame_111
+  .byte 9
+  .byte <.bank(heat_frame_111)
+  .addr heat_frame_112
+  .byte 9
+  .byte <.bank(heat_frame_112)
+  .addr heat_frame_113
+  .byte 9
+  .byte <.bank(heat_frame_113)
+  .addr heat_frame_114
+  .byte 9
+  .byte <.bank(heat_frame_114)
+  .addr heat_frame_115
+  .byte 9
+  .byte <.bank(heat_frame_115)
+  .addr heat_frame_116
+  .byte 9
+  .byte <.bank(heat_frame_116)
+  .addr heat_frame_117
+  .byte 7
+  .byte <.bank(heat_frame_117)
+  .addr heat_frame_118
+  .byte 7
+  .byte <.bank(heat_frame_118)
+  .addr heat_frame_119
+  .byte 7
+  .byte <.bank(heat_frame_119)
+  .addr heat_frame_120
+  .byte 7
+  .byte <.bank(heat_frame_120)
+  .addr heat_frame_121
+  .byte 7
+  .byte <.bank(heat_frame_121)
+  .addr heat_frame_122
+  .byte 7
+  .byte <.bank(heat_frame_122)
+  .addr heat_frame_123
+  .byte 7
+  .byte <.bank(heat_frame_123)
+  .addr heat_frame_124
+  .byte 7
+  .byte <.bank(heat_frame_124)
+  .addr heat_frame_125
+  .byte 7
+  .byte <.bank(heat_frame_125)
+  .addr heat_frame_126
+  .byte 7
+  .byte <.bank(heat_frame_126)
+  .addr heat_frame_127
+  .byte 7
+  .byte <.bank(heat_frame_127)
+

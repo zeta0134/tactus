@@ -91,8 +91,8 @@ def print_frame_list(effect_name, framesets):
         print(f"  .byte <.bank({effect_name}_frame_{i})", file=output_file)
     print("", file=output_file)
 
-effect_name = "underwater"
-period = 64      # height of the sine wave, also playback frames/duration
+effect_name = "heat"
+period = 128     # height of the sine wave, also playback frames/duration
 amplitude = 1    # strength of the distortion
 step_count = 176 # height of the playfield
 initial_scanline = 4 # because we can't start at the top of the screen

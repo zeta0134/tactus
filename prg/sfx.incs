@@ -771,3 +771,165 @@ sfx_low_noise:
         .byte 1
         ;          Mode Period  Vol  Length
         noise_init    0,    $0,  $F,      255
+
+sfx_scorch_noise:
+        ; Length in rows
+        .byte 42
+        ;          Mode Period  Vol  Length
+        noise_init    0,    $2,  $F,      0
+        noise_init    0,    $1,  $C,      0
+        noise_init    0,    $0,  $8,      0
+        noise_init    0,    $1,  $A,      0
+        noise_init    0,    $1,  $C,      0
+        noise_init    0,    $1,  $D,      0
+        noise_init    0,    $2,  $D,      0
+        noise_init    0,    $1,  $D,      0
+        noise_init    0,    $2,  $D,      0
+        noise_init    0,    $1,  $D,      0
+        noise_init    0,    $2,  $E,      0
+        noise_init    0,    $2,  $E,      0
+        noise_init    0,    $2,  $E,      0
+        noise_init    0,    $2,  $E,      0
+        noise_init    0,    $3,  $F,      0
+        noise_init    0,    $2,  $F,      0
+        noise_init    0,    $3,  $F,      0
+        noise_init    0,    $2,  $F,      0
+        noise_init    0,    $3,  $F,      0
+        noise_init    0,    $3,  $F,      0
+        noise_init    0,    $3,  $F,      0
+        noise_init    0,    $3,  $E,      0
+        noise_init    0,    $4,  $E,      0
+        noise_init    0,    $3,  $D,      0
+        noise_init    0,    $4,  $D,      0
+        noise_init    0,    $3,  $D,      0
+        noise_init    0,    $4,  $C,      0
+        noise_init    0,    $3,  $C,      0
+        noise_init    0,    $4,  $C,      0
+        noise_init    0,    $4,  $B,      0
+        noise_init    0,    $4,  $B,      0
+        noise_init    0,    $4,  $A,      0
+        noise_init    0,    $4,  $A,      0
+        noise_init    0,    $5,  $9,      0
+        noise_init    0,    $4,  $9,      0
+        noise_init    0,    $5,  $8,      0
+        noise_init    0,    $5,  $7,      0
+        noise_init    0,    $5,  $6,      0
+        noise_init    0,    $5,  $5,      0
+        noise_init    0,    $6,  $4,      0
+        noise_init    0,    $5,  $3,      0
+        noise_init    0,    $6,  $3,      0
+
+
+sfx_shock_noise:
+        ; Length in rows
+        .byte 26
+        ;          Mode Period  Vol  Length
+        noise_init    1,    $7,  $F,      0
+        noise_init    1,    $7,  $C,      0
+        noise_init    1,    $7,  $A,      0
+        noise_init    1,    $7,  $0,      0
+        noise_init    1,    $9,  $F,      0
+        noise_init    0,    $9,  $F,      0
+        noise_init    1,    $B,  $F,      0
+        noise_init    0,    $9,  $E,      0
+        noise_init    1,    $9,  $E,      0
+        noise_init    0,    $8,  $E,      0
+        noise_init    1,    $9,  $D,      0
+        noise_init    0,    $9,  $D,      0
+        noise_init    1,    $8,  $D,      0
+        noise_init    0,    $7,  $C,      0
+        noise_init    1,    $7,  $C,      0
+        noise_init    0,    $8,  $B,      0
+        noise_init    1,    $7,  $A,      0
+        noise_init    0,    $7,  $9,      0
+        noise_init    1,    $6,  $8,      0
+        noise_init    0,    $6,  $7,      0
+        noise_init    1,    $7,  $6,      0
+        noise_init    0,    $6,  $5,      0
+        noise_init    1,    $5,  $4,      0
+        noise_init    0,    $5,  $3,      0
+        noise_init    1,    $6,  $2,      0
+        noise_init    0,    $5,  $1,      0
+        
+sfx_shock_pulse:
+        ; Length in rows
+        .byte 3
+        ;                     pitch, duty, volume,                            sweep, length
+        pulse_init_sweep  PITCH_C2 ,   $2,     $F,        (S_PERIOD_0 | S_SHIFT_4),       2
+        pulse_cont_duty                $2,     $0,                                        0
+        pulse_init_sweep  PITCH_G2 ,   $2,     $F,        (S_PERIOD_0 | S_SHIFT_5),      22
+
+sfx_fae_pulse1:
+        ; Length in rows
+        .byte 32
+        ;                     pitch, duty, volume,                            sweep, length
+        pulse_init_sweep  PITCH_D3 ,   $1,     $2, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      0
+        pulse_cont_duty                $1,     $8,                                        0
+        pulse_cont_duty                $1,     $A,                                        0
+        pulse_cont_duty                $1,     $C,                                        0
+        pulse_init_sweep  PITCH_DS3,   $1,     $2, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      0
+        pulse_cont_duty                $1,     $8,                                        0
+        pulse_cont_duty                $1,     $A,                                        0
+        pulse_cont_duty                $1,     $C,                                        0
+        pulse_init_sweep  PITCH_E3 ,   $1,     $2, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      0
+        pulse_cont_duty                $1,     $8,                                        0
+        pulse_cont_duty                $1,     $A,                                        0
+        pulse_cont_duty                $1,     $C,                                        0
+        pulse_init_sweep  PITCH_F3 ,   $1,     $2, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      0
+        pulse_cont_duty                $1,     $8,                                        0
+        pulse_cont_duty                $1,     $A,                                        0
+        pulse_cont_duty                $1,     $C,                                        0
+        pulse_init_sweep  PITCH_FS3,   $1,     $1, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      0
+        pulse_cont_duty                $1,     $7,                                        0
+        pulse_cont_duty                $1,     $9,                                        0
+        pulse_cont_duty                $1,     $B,                                        0
+        pulse_init_sweep  PITCH_G3 ,   $1,     $1, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      0
+        pulse_cont_duty                $1,     $7,                                        0
+        pulse_cont_duty                $1,     $9,                                        0
+        pulse_cont_duty                $1,     $B,                                        0
+        pulse_init_sweep  PITCH_GS3,   $1,     $1, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      0
+        pulse_cont_duty                $1,     $6,                                        0
+        pulse_cont_duty                $1,     $8,                                        0
+        pulse_cont_duty                $1,     $A,                                        0
+        pulse_init_sweep  PITCH_A3 ,   $1,     $1, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      0
+        pulse_cont_duty                $1,     $5,                                        0
+        pulse_cont_duty                $1,     $7,                                        0
+        pulse_cont_duty                $1,     $9,                                        0
+
+sfx_fae_pulse2:
+        ; Length in rows
+        .byte 33
+        ;                     pitch, duty, volume,                            sweep, length
+        pulse_init_sweep  PITCH_GS3,   $1,     $0,         (S_PERIOD_0 | S_SHIFT_4),      0
+        pulse_init_sweep  PITCH_GS3,   $1,     $1,         (S_PERIOD_0 | S_SHIFT_4),      0
+        pulse_cont_duty                $1,     $7,                                        0
+        pulse_cont_duty                $1,     $9,                                        0
+        pulse_cont_duty                $1,     $B,                                        0
+        pulse_init_sweep  PITCH_A3 ,   $1,     $1,         (S_PERIOD_0 | S_SHIFT_4),      0
+        pulse_cont_duty                $1,     $7,                                        0
+        pulse_cont_duty                $1,     $9,                                        0
+        pulse_cont_duty                $1,     $B,                                        0
+        pulse_init_sweep  PITCH_AS3,   $1,     $1,         (S_PERIOD_0 | S_SHIFT_4),      0
+        pulse_cont_duty                $1,     $7,                                        0
+        pulse_cont_duty                $1,     $9,                                        0
+        pulse_cont_duty                $1,     $B,                                        0
+        pulse_init_sweep  PITCH_B3 ,   $1,     $1,         (S_PERIOD_0 | S_SHIFT_4),      0
+        pulse_cont_duty                $1,     $7,                                        0
+        pulse_cont_duty                $1,     $9,                                        0
+        pulse_cont_duty                $1,     $B,                                        0
+        pulse_init_sweep  PITCH_C4 ,   $1,     $1,         (S_PERIOD_0 | S_SHIFT_4),      0
+        pulse_cont_duty                $1,     $6,                                        0
+        pulse_cont_duty                $1,     $8,                                        0
+        pulse_cont_duty                $1,     $A,                                        0
+        pulse_init_sweep  PITCH_CS4,   $1,     $1,         (S_PERIOD_0 | S_SHIFT_4),      0
+        pulse_cont_duty                $1,     $6,                                        0
+        pulse_cont_duty                $1,     $8,                                        0
+        pulse_cont_duty                $1,     $A,                                        0
+        pulse_init_sweep  PITCH_D4 ,   $1,     $1,         (S_PERIOD_0 | S_SHIFT_4),      0
+        pulse_cont_duty                $1,     $6,                                        0
+        pulse_cont_duty                $1,     $8,                                        0
+        pulse_cont_duty                $1,     $A,                                        0
+        pulse_init_sweep  PITCH_DS4,   $1,     $1,         (S_PERIOD_0 | S_SHIFT_4),      0
+        pulse_cont_duty                $1,     $5,                                        0
+        pulse_cont_duty                $1,     $7,                                        0
+        pulse_cont_duty                $1,     $9,                                        0

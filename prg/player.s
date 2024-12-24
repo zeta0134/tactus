@@ -247,7 +247,7 @@ HeartCount := R2
         sta PlayerEquipmentAccessory
         lda #ITEM_BOMB_STANDARD
         sta PlayerEquipmentBombs
-        lda #ITEM_SPELL_FIRE
+        lda #ITEM_SPELL_EARTH
         sta PlayerEquipmentSpell
 
         lda #99
@@ -1341,8 +1341,35 @@ SpellCastPtr := R0
         rts
 .endproc
 
+.proc remove_elemental_raster_effects
+        ldx PlayerRoomIndex
+        lda room_raster_effect, x
+        cmp #RASTER_EFFECT_SCORCHED
+        beq proceed_to_remove
+        ; TODO: other persistent elemental effect checks here
+        rts
+proceed_to_remove:
+        lda #RASTER_EFFECT_NONE
+        sta room_raster_effect, x
+        rts
+.endproc
+
+.proc apply_scorched_raster_effect
+        ldx PlayerRoomIndex
+        lda room_raster_effect, x
+        cmp #RASTER_EFFECT_NONE
+        beq safe_to_apply
+        rts
+safe_to_apply:
+        lda #RASTER_EFFECT_SCORCHED
+        sta room_raster_effect, x
+        rts
+.endproc
+
 .proc cast_spell_fire
         jsr brighten_room
+        jsr remove_elemental_raster_effects
+        jsr apply_scorched_raster_effect
         ; Apply red emphasis to this chamber (permanently)
         ldx PlayerRoomIndex
         lda #(TINT_R)
@@ -1353,12 +1380,13 @@ SpellCastPtr := R0
         lda #ROOM_PALETTE_FIRE
         sta room_palette_variant, x
         far_call FAR_load_palette_for_current_room
-        ; TODO: fancy particles? raster animations? etc, etc
+        queue_sfx_noise_with_priority sfx_scorch_noise, #10
         rts
 .endproc
 
 .proc cast_spell_air
         jsr brighten_room
+        jsr remove_elemental_raster_effects
         ; Apply yellow emphasis to this chamber (permanently)
         ldx PlayerRoomIndex
         lda #(TINT_R | TINT_G)
@@ -1369,12 +1397,15 @@ SpellCastPtr := R0
         lda #ROOM_PALETTE_AIR
         sta room_palette_variant, x
         far_call FAR_load_palette_for_current_room
-        ; TODO: fancy stuffs!
+        
+        queue_sfx_noise_with_priority sfx_shock_noise, #10
+        queue_sfx_pulse1_with_priority sfx_shock_pulse, #10
         rts
 .endproc
 
 .proc cast_spell_ice
         jsr brighten_room
+        jsr remove_elemental_raster_effects
         ; Apply blue emphasis to this chamber (permanently)
         ldx PlayerRoomIndex
         lda #(TINT_B)
@@ -1391,6 +1422,7 @@ SpellCastPtr := R0
 
 .proc cast_spell_earth
         jsr brighten_room
+        jsr remove_elemental_raster_effects
         ; Apply green emphasis to this chamber (permanently)
         ldx PlayerRoomIndex
         lda #(TINT_G)
@@ -1402,6 +1434,8 @@ SpellCastPtr := R0
         sta room_palette_variant, x
         far_call FAR_load_palette_for_current_room
         ; TODO: fancy stuffs!
+        queue_sfx_pulse1_with_priority sfx_fae_pulse1, #10
+        queue_sfx_pulse2_with_priority sfx_fae_pulse2, #10
         rts
 .endproc
 

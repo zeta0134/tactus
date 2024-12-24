@@ -1726,15 +1726,6 @@ screen_shake_raster_lut:
 .endproc
 
 .proc set_raster_effect_for_room
-        ; For now this merely handles vertical screen shake.
-        ; Later, once rooms have the appropriate metadata to set
-        ; the base effect, we should read that and apply it here.
-
-        ; Original fixed none, for reference
-        ; set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_PLAIN_HUD, #0
-        ; Original debug underwater, for reference
-        ; set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #0
-
         ldx PlayerRoomIndex
         lda room_raster_effect, x
         cmp #RASTER_EFFECT_NONE
