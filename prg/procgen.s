@@ -1918,22 +1918,58 @@ previous_room_effect := room_spell_data1
         rts
 .endproc
 
+confetti_particle_types:
+        .word particle_confetti_a
+        .word particle_confetti_b
+        .word particle_confetti_c
+        .word particle_confetti_d
+        .word particle_confetti_e
+        .word particle_confetti_f
+        .word particle_confetti_g
+        .word particle_confetti_h
+        .word particle_confetti_i
+        .word particle_confetti_j
+        .word particle_confetti_k
+        .word particle_confetti_l
+        .word particle_confetti_m
+        .word particle_confetti_n
+        .word particle_confetti_o
+        .word particle_confetti_p
+
 .proc bf_spawn_confetti_particles
 PosX := R0
 PosY := R1
+ParticlePtr := R2
+
+bomb_fiesta_state := room_spell_data0
+
+        ; Don't spawn particles until we've tooted the party horn
+        ldx PlayerRoomIndex
+        lda bomb_fiesta_state, x
+        cmp #3
+        bcs proceed_to_party
+        rts
+proceed_to_party:
+
         lda SpellParticleSpawnCooldown
         beq proceed_to_spawn
         dec SpellParticleSpawnCooldown
         rts
 proceed_to_spawn:
-        lda #1
+        lda #2
         sta SpellParticleSpawnCooldown
         prng_from_table_x
         sta PosX
-        ; everything after this point is debug testing mode, etc
-        lda #160
+        lda #0
         sta PosY
-        spawn_particle #a_test_particle, PosX, PosY
+        prng_from_table_x
+        and #%11110
+        tax
+        lda confetti_particle_types+0, x
+        sta ParticlePtr+0
+        lda confetti_particle_types+1, x
+        sta ParticlePtr+1
+        spawn_particle ParticlePtr, PosX, PosY
         rts
 .endproc
 

@@ -7,6 +7,7 @@
         .include "far_call.inc"
         .include "kernel.inc"
         .include "slowam.inc"
+        .include "sprites.inc"
         .include "rainbow.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
@@ -70,6 +71,67 @@ particle_snow_d:
         .repeat 10, i
         .byte <-((i+50) / 4), <((i+50) / 2), <SPRITE_STATIC_00_PARTICLES_LIGHT_45 + 2 + SPRITE_OFFSET_STATIC_00, SPRITE_PAL_YELLOW
         .endrepeat
+
+CONFETTI_ANIMATION_OFFSET_0 = 0
+CONFETTI_ANIMATION_OFFSET_1 = 2
+CONFETTI_ANIMATION_OFFSET_2 = 4
+CONFETTI_ANIMATION_OFFSET_3 = 4
+CONFETTI_ANIMATION_OFFSET_4 = 2
+CONFETTI_ANIMATION_OFFSET_5 = 0
+
+CONFETTI_FLIP_0 = 0
+CONFETTI_FLIP_1 = 0
+CONFETTI_FLIP_2 = 0
+CONFETTI_FLIP_3 = SPRITE_HORIZ_FLIP
+CONFETTI_FLIP_4 = SPRITE_HORIZ_FLIP
+CONFETTI_FLIP_5 = SPRITE_HORIZ_FLIP
+
+.macro confetti_particles horiz_speed, tile_base, color
+        .byte 40, (PARTICLE_ACTIVE)
+        .repeat 40, i
+        animation_frame .set ((i / 2) .MOD 6)
+        .byte <(i / horiz_speed)
+        .byte <(i / 1)
+        .byte <SPRITE_OFFSET_STATIC_00 + <tile_base + .ident(.concat("CONFETTI_ANIMATION_OFFSET_", .sprintf("%d", animation_frame)))
+        .byte color + .ident(.concat("CONFETTI_FLIP_", .sprintf("%d", animation_frame)))
+        .endrepeat
+.endmacro
+
+particle_confetti_a:
+        confetti_particles -2, SPRITE_STATIC_00_PARTICLES_LIGHT_01, SPRITE_PAL_PURPLE
+particle_confetti_b:
+        confetti_particles -5, SPRITE_STATIC_00_PARTICLES_LIGHT_01, SPRITE_PAL_PURPLE
+particle_confetti_c:
+        confetti_particles  2, SPRITE_STATIC_00_PARTICLES_LIGHT_01, SPRITE_PAL_PURPLE
+particle_confetti_d:
+        confetti_particles  5, SPRITE_STATIC_00_PARTICLES_LIGHT_01, SPRITE_PAL_PURPLE
+
+particle_confetti_e:
+        confetti_particles -2, SPRITE_STATIC_00_PARTICLES_LIGHT_01, SPRITE_PAL_RED
+particle_confetti_f:
+        confetti_particles -5, SPRITE_STATIC_00_PARTICLES_LIGHT_01, SPRITE_PAL_RED
+particle_confetti_g:
+        confetti_particles  2, SPRITE_STATIC_00_PARTICLES_LIGHT_01, SPRITE_PAL_RED
+particle_confetti_h:
+        confetti_particles  5, SPRITE_STATIC_00_PARTICLES_LIGHT_01, SPRITE_PAL_RED
+
+particle_confetti_i:
+        confetti_particles -2, SPRITE_STATIC_00_PARTICLES_LIGHT_01, SPRITE_PAL_YELLOW
+particle_confetti_j:
+        confetti_particles -5, SPRITE_STATIC_00_PARTICLES_LIGHT_01, SPRITE_PAL_YELLOW
+particle_confetti_k:
+        confetti_particles  2, SPRITE_STATIC_00_PARTICLES_LIGHT_01, SPRITE_PAL_YELLOW
+particle_confetti_l:
+        confetti_particles  5, SPRITE_STATIC_00_PARTICLES_LIGHT_01, SPRITE_PAL_YELLOW
+
+particle_confetti_m:
+        confetti_particles -2, SPRITE_STATIC_00_PARTICLES_DARK_01, SPRITE_PAL_YELLOW
+particle_confetti_n:
+        confetti_particles -5, SPRITE_STATIC_00_PARTICLES_DARK_01, SPRITE_PAL_YELLOW
+particle_confetti_o:
+        confetti_particles  2, SPRITE_STATIC_00_PARTICLES_DARK_01, SPRITE_PAL_YELLOW
+particle_confetti_p:
+        confetti_particles  5, SPRITE_STATIC_00_PARTICLES_DARK_01, SPRITE_PAL_YELLOW
 
         .segment "PRGFIXED_E000"
 
