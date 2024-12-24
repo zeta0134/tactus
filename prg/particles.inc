@@ -39,6 +39,8 @@ PARTICLE_OAM_ADVANCE_AMOUNT = 5
 .global particle_cherry_blossom_a
 .global particle_cherry_blossom_b
 
+.global zap_particle_white
+
 ; Note: make sure this is an ODD number of bytes in size! This is important
 ; for flicker detection
 .struct ParticleState

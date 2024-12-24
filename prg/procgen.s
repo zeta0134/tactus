@@ -1983,6 +1983,12 @@ snow_particle_types:
         .word particle_snow_c
         .word particle_snow_d
 
+lightning_particle_types:
+        .word zap_particle_white
+        .word zap_particle_white
+        .word zap_particle_white
+        .word zap_particle_white
+
 petal_particle_types:
         .word particle_cherry_blossom_a
         .word particle_cherry_blossom_b
@@ -2012,7 +2018,7 @@ proceed_to_spawn:
         cmp #ROOM_PALETTE_AIR
         beq spawn_lightning_particle
         cmp #ROOM_PALETTE_EARTH
-        beq spawn_petal_particle
+        jeq spawn_petal_particle
         rts
 
 spawn_heat_particle:
@@ -2040,7 +2046,34 @@ spawn_snow_particle:
 
         rts
 spawn_lightning_particle:
-        ; TODO!
+        ; Lightning lingers for a good 33 frames, so we don't need to spawn it very often... maybe
+        ; we want 2-3 active at once?
+        lda #9
+        sta SpellParticleSpawnCooldown
+
+        ; It should cover the left and right sides of the screen with some variance, so it stays out
+        ; of the main playfield... let's say, 32px from either edge
+        prng_from_table_x
+        and #$3F ; clamp to 0-63
+        sec
+        sbc #32  ; wraps around, becoming 0-31 or 224-255
+        sta PosX
+        ; It should cover the full vertical range of the playfield, but it migrates "up" by 21px, and its
+        ; base is 16px tall... let's see... 176 - that = 139... so we'll do 0-127 plus some margin
+        prng_from_table_x
+        and #$7F ; clamp to 0-127
+        clc
+        adc #8 ; center it a bit better
+        sta PosY
+        ; Finally choose a zap zap from the table, and get it spawned!
+        prng_from_table_x
+        and #%110
+        tax
+        lda lightning_particle_types+0, x
+        sta ParticlePtr+0
+        lda lightning_particle_types+1, x
+        sta ParticlePtr+1
+        spawn_particle ParticlePtr, PosX, PosY
         rts
 spawn_petal_particle:
         ; Petals are particularly sparse; they linger and drift lazily for a good long while

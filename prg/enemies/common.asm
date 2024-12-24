@@ -767,6 +767,11 @@ EffectiveAttackSquare := R10 ; Unused (call this directly)
 TargetColor := R0
 CurrentRow := R14
 CurrentTile := R15
+        ; enemies having their color changed are "active"
+        ; this covers slimes and enemies which survive the normal elemental
+        ; spell effects
+        inc enemies_active
+
         lda PlayerEquipmentSpell
         cmp #ITEM_SPELL_FIRE
         beq choose_fire
