@@ -1836,6 +1836,10 @@ DispatchPtr := R0
 bomb_fiesta_state := room_spell_data0
 previous_room_effect := room_spell_data1
 
+        ; as long as the bomb fiesta is ongoing, count it
+        ; as an "enemy". the room does not clear until it ends!
+        inc enemies_active
+
         ldx PlayerRoomIndex
         lda bomb_fiesta_state, x
         asl
