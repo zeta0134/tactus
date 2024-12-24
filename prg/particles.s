@@ -133,6 +133,49 @@ particle_confetti_o:
 particle_confetti_p:
         confetti_particles  5, SPRITE_STATIC_00_PARTICLES_DARK_01, SPRITE_PAL_YELLOW
 
+
+PETALS_ANIMATION_OFFSET_0 = 0
+PETALS_ANIMATION_OFFSET_1 = 2
+PETALS_ANIMATION_OFFSET_2 = 2
+PETALS_ANIMATION_OFFSET_3 = 2
+PETALS_ANIMATION_OFFSET_4 = 2
+PETALS_ANIMATION_OFFSET_5 = 0
+
+PETALS_FLIP_0 = 0
+PETALS_FLIP_1 = 0
+PETALS_FLIP_2 = 0
+PETALS_FLIP_3 = SPRITE_HORIZ_FLIP
+PETALS_FLIP_4 = SPRITE_HORIZ_FLIP
+PETALS_FLIP_5 = SPRITE_HORIZ_FLIP
+
+.macro petal_particles horiz_speed, tile_base, color
+        .byte 120, (PARTICLE_ACTIVE)
+        .repeat 110, i
+        animation_frame .set ((i / 6) .MOD 6)
+        .byte <(i / horiz_speed)
+        .byte <(i / 5)
+        .byte <SPRITE_OFFSET_STATIC_00 + <tile_base + .ident(.concat("PETALS_ANIMATION_OFFSET_", .sprintf("%d", animation_frame)))
+        .byte color + .ident(.concat("PETALS_FLIP_", .sprintf("%d", animation_frame)))
+        .endrepeat
+        .repeat 5, i
+        .byte <((i + 110) / horiz_speed)
+        .byte <((i + 110) / 5) + 2
+        .byte <SPRITE_OFFSET_STATIC_00 + <SPRITE_STATIC_00_PARTICLES_LIGHT_67 + 0
+        .byte color
+        .endrepeat
+        .repeat 5, i
+        .byte <((i + 115) / horiz_speed)
+        .byte <((i + 115) / 5) + 2
+        .byte <SPRITE_OFFSET_STATIC_00 + <SPRITE_STATIC_00_PARTICLES_LIGHT_45 + 2
+        .byte color
+        .endrepeat
+.endmacro
+
+particle_cherry_blossom_a:
+        petal_particles -3, SPRITE_STATIC_00_PARTICLES_LIGHT_23 + 2, SPRITE_PAL_RED
+particle_cherry_blossom_b:
+        petal_particles -2, SPRITE_STATIC_00_PARTICLES_LIGHT_23 + 2, SPRITE_PAL_RED
+
         .segment "PRGFIXED_E000"
 
 ; Called immediately after writing new particle data

@@ -1983,6 +1983,10 @@ snow_particle_types:
         .word particle_snow_c
         .word particle_snow_d
 
+petal_particle_types:
+        .word particle_cherry_blossom_a
+        .word particle_cherry_blossom_b
+
 .proc spawn_elemental_particles
 PosX := R0
 PosY := R1
@@ -2032,16 +2036,31 @@ spawn_snow_particle:
         sta ParticlePtr+0
         lda snow_particle_types+1, x
         sta ParticlePtr+1
-        ; TODO: randomly pick which snow particle... somehow
         spawn_particle ParticlePtr, PosX, PosY
 
-        ; TODO!
         rts
 spawn_lightning_particle:
         ; TODO!
         rts
 spawn_petal_particle:
-        ; TODO!
+        ; Petals are particularly sparse; they linger and drift lazily for a good long while
+        lda #16
+        sta SpellParticleSpawnCooldown
+
+        ; Petals mostly cover the top of the screen
+        prng_from_table_x
+        sta PosX
+        prng_from_table_x
+        and #$03
+        sta PosY
+        prng_from_table_x
+        and #%10
+        tax
+        lda petal_particle_types+0, x
+        sta ParticlePtr+0
+        lda petal_particle_types+1, x
+        sta ParticlePtr+1
+        spawn_particle ParticlePtr, PosX, PosY
         rts
 .endproc
 
