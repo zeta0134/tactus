@@ -1977,6 +1977,17 @@ proceed_to_spawn:
         rts
 .endproc
 
+heat_particle_types:
+        .word heat_particles_a ; white hot
+        .word heat_particles_b ; white hot
+        .word heat_particles_c ; ember orange
+        .word heat_particles_d ; ember orange
+        .word heat_particles_c ; ember orange
+        .word heat_particles_d ; ember orange
+        .word heat_particles_e ; dark soot
+        .word heat_particles_f ; dark soot
+
+
 snow_particle_types:
         .word particle_snow_a
         .word particle_snow_b
@@ -2016,13 +2027,30 @@ proceed_to_spawn:
         cmp #ROOM_PALETTE_ICE
         beq spawn_snow_particle
         cmp #ROOM_PALETTE_AIR
-        beq spawn_lightning_particle
+        jeq spawn_lightning_particle
         cmp #ROOM_PALETTE_EARTH
         jeq spawn_petal_particle
         rts
 
 spawn_heat_particle:
-        ; TODO!
+        ; We don't want a bunch of embers; they have slightly wild movement
+        lda #8
+        sta SpellParticleSpawnCooldown
+
+        ; Heat rises from the bottom of the playfield, minus 16px to account for the height
+        prng_from_table_x
+        sta PosX
+        lda #176
+        sta PosY
+        prng_from_table_x
+        and #%1110
+        tax
+        lda heat_particle_types+0, x
+        sta ParticlePtr+0
+        lda heat_particle_types+1, x
+        sta ParticlePtr+1
+        spawn_particle ParticlePtr, PosX, PosY
+
         rts
 spawn_snow_particle:
         ; Snow is a lazy drifting effect; not too busy

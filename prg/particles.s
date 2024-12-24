@@ -222,6 +222,50 @@ zap_particle_white:
         .byte 0,  0, <SPRITE_STATIC_01_PARTICLES_LIGHTNING_23 + SPRITE_OFFSET_STATIC_01 + 0, SPRITE_PAL_YELLOW | SPRITE_HORIZ_FLIP
         .byte 0,  0, <SPRITE_STATIC_01_PARTICLES_LIGHTNING_01 + SPRITE_OFFSET_STATIC_01 + 0, SPRITE_PAL_YELLOW | SPRITE_HORIZ_FLIP
 
+.macro ember_particles horiz_speed, color
+        .byte 30, (PARTICLE_ACTIVE)
+        .repeat 25, i
+        .byte <(i*i / horiz_speed)
+        .byte <-(i / 2)
+        .byte <SPRITE_OFFSET_STATIC_00 + <SPRITE_STATIC_00_PARTICLES_LIGHT_67 + 0
+        .byte color
+        .endrepeat
+        .repeat 5, i
+        .byte <((i+25)*(i+25) / horiz_speed)
+        .byte <-((i+25) / 2)
+        .byte <SPRITE_OFFSET_STATIC_00 + <SPRITE_STATIC_00_PARTICLES_LIGHT_45 + 2
+        .byte color
+        .endrepeat
+.endmacro
+
+.macro soot_particles horiz_speed, color
+        .byte 30, (PARTICLE_ACTIVE)
+        .repeat 25, i
+        .byte <(i*i / horiz_speed)
+        .byte <-(i / 2)
+        .byte <SPRITE_OFFSET_STATIC_00 + <SPRITE_STATIC_00_PARTICLES_DARK_67 + 0
+        .byte color
+        .endrepeat
+        .repeat 5, i
+        .byte <((i+25)*(i+25) / horiz_speed)
+        .byte <-((i+25) / 2)
+        .byte <SPRITE_OFFSET_STATIC_00 + <SPRITE_STATIC_00_PARTICLES_DARK_45 + 2
+        .byte color
+        .endrepeat
+.endmacro
+
+heat_particles_a:
+        ember_particles 40, SPRITE_PAL_YELLOW
+heat_particles_b:
+        ember_particles -40, SPRITE_PAL_YELLOW
+heat_particles_c:
+        soot_particles 60, SPRITE_PAL_YELLOW
+heat_particles_d:
+        soot_particles -60, SPRITE_PAL_YELLOW
+heat_particles_e:
+        soot_particles 80, SPRITE_PAL_PURPLE
+heat_particles_f:
+        soot_particles -80, SPRITE_PAL_PURPLE
 
         .segment "PRGFIXED_E000"
 

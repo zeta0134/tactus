@@ -41,6 +41,13 @@ PARTICLE_OAM_ADVANCE_AMOUNT = 5
 
 .global zap_particle_white
 
+.global heat_particles_a
+.global heat_particles_b
+.global heat_particles_c
+.global heat_particles_d
+.global heat_particles_e
+.global heat_particles_f
+
 ; Note: make sure this is an ODD number of bytes in size! This is important
 ; for flicker detection
 .struct ParticleState
