@@ -15,6 +15,7 @@ CurrentTile := R15
         inc enemies_active
 
         ; Determine how many beats we should remain idle, based on difficulty
+        ldx CurrentTile
         lda tile_attributes, x
         and #PAL_MASK
         cmp #PAL_AIR
@@ -114,21 +115,52 @@ do_nothing:
         rts
 .endproc
 
-.proc ENEMY_UPDATE_update_mole_throwing
+.proc _attempt_to_spawn_wrench
 TargetRow := R0
 TargetTile := R1
+TargetDirection := R2
 ; these are provided for us
 CurrentRow := R14
 CurrentTile := R15
-        inc enemies_active
+        if_valid_destination spawn_wrench
+        jmp cancel_wrench_spawning
+spawn_wrench:
+        ldx CurrentTile
+        ldy TargetTile
 
+        ; Draw a wrench at the chosen target location, using our palette from the
+        ; current location
+        draw_at_y_with_pal_x TILE_WRENCH_PROJECTILE, BG_TILE_WRENCH_PROJECTILE
+
+        ; Write the throw direction to the data byte for the wrench, that way
+        ; it keeps going in the same direction we threw it initially
+        lda TargetDirection
+        sta tile_data, y
+        ; Set the flags on the wrench to indicate that we have just moved,
+        ; this prevents us from going an extra square in the east/south directions
+        lda #FLAG_MOVED_THIS_FRAME
+        sta tile_flags, y
+
+cancel_wrench_spawning:
+        rts
+.endproc
+
+.proc _throw_single_wrench
+TargetRow := R0
+TargetTile := R1
+TargetDirection := R2
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
         lda CurrentTile
         sta TargetTile
         lda CurrentRow
         sta TargetRow
+
         ; Using our tile data, determine which direction we will be attempting to throw
         ldx CurrentTile
         lda tile_data, x
+        sta TargetDirection
         cmp #MOLE_EAST
         beq east
         cmp #MOLE_SOUTH
@@ -141,42 +173,128 @@ north:
         sec
         sbc #::BATTLEFIELD_WIDTH
         sta TargetTile
-        jmp attempt_to_spawn_wrench
+        jmp done_choosing_direction
 east:
         inc TargetTile
-        jmp attempt_to_spawn_wrench
+        jmp done_choosing_direction
 south:
         inc TargetRow
         lda TargetTile
         clc
         adc #::BATTLEFIELD_WIDTH
         sta TargetTile
-        jmp attempt_to_spawn_wrench
+        jmp done_choosing_direction
 west:
         dec TargetTile
-attempt_to_spawn_wrench:
-        if_valid_destination spawn_wrench
-        jmp switch_to_idle_pose
-spawn_wrench:
-        ldx CurrentTile
-        ldy TargetTile
-
-        ; Draw a wrench at the chosen target location, using our palette from the
-        ; current location
-        draw_at_y_with_pal_x TILE_WRENCH_PROJECTILE, BG_TILE_WRENCH_PROJECTILE
-
-        ; Write the throw direction to the data byte for the wrench, that way
-        ; it keeps going in the same direction we threw it initially
-        lda tile_data, x
-        sta tile_data, y
-        ; Set the flags on the wrench to indicate that we have just moved,
-        ; this prevents us from going an extra square in the east/south directions
-        lda #FLAG_MOVED_THIS_FRAME
-        sta tile_flags, y
+done_choosing_direction:
+        jsr _attempt_to_spawn_wrench
 
 switch_to_idle_pose:
         ldx CurrentTile
         draw_at_x_keeppal TILE_MOLE_IDLE, BG_TILE_MOLE_IDLE
+
+        rts
+.endproc
+
+.proc _throw_four_wrenches
+TargetRow := R0
+TargetTile := R1
+TargetDirection := R2
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+        lda CurrentTile
+        sta TargetTile
+        lda CurrentRow
+        sta TargetRow
+
+        ; Unconditionally attempt to spawn four wrenches, in all
+        ; four cardinal directions
+
+        ; NORTH
+        lda CurrentTile
+        sta TargetTile
+        lda CurrentRow
+        sta TargetRow
+
+        lda #MOLE_NORTH
+        sta TargetDirection
+
+        dec TargetRow
+        lda TargetTile
+        sec
+        sbc #::BATTLEFIELD_WIDTH
+        sta TargetTile
+        jsr _attempt_to_spawn_wrench
+
+        ; EAST
+        lda CurrentTile
+        sta TargetTile
+        lda CurrentRow
+        sta TargetRow
+
+        lda #MOLE_EAST
+        sta TargetDirection
+
+        inc TargetTile
+        jsr _attempt_to_spawn_wrench
+
+        ; SOUTH
+        lda CurrentTile
+        sta TargetTile
+        lda CurrentRow
+        sta TargetRow
+
+        lda #MOLE_SOUTH
+        sta TargetDirection
+
+        inc TargetRow
+        lda TargetTile
+        clc
+        adc #::BATTLEFIELD_WIDTH
+        sta TargetTile
+        jsr _attempt_to_spawn_wrench
+
+        ; WEST
+        lda CurrentTile
+        sta TargetTile
+        lda CurrentRow
+        sta TargetRow
+
+        lda #MOLE_WEST
+        sta TargetDirection
+
+        dec TargetTile
+        jsr _attempt_to_spawn_wrench
+
+switch_to_idle_pose:
+        ldx CurrentTile
+        draw_at_x_keeppal TILE_MOLE_IDLE, BG_TILE_MOLE_IDLE
+
+        rts
+.endproc
+
+.proc ENEMY_UPDATE_update_mole_throwing
+TargetRow := R0
+TargetTile := R1
+; these are provided for us
+CurrentRow := R14
+CurrentTile := R15
+        inc enemies_active
+
+        ldx CurrentTile
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_EARTH
+        beq earth
+regular:
+        jsr _throw_single_wrench
+        jmp converge
+earth:
+        jsr _throw_four_wrenches
+converge:
+
+        
 
         ; reset tile_data to 0, it will be our counter for idle -> hole
         lda #0

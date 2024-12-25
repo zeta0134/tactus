@@ -148,24 +148,24 @@ MOLE_AIR_LOOT           = advanced_loot_table
 MOLE_WRENCH_DMG = 4
 
 ; Note: these attack on cardinals
-MUSHROOM_BASIC_BEATS        = 4
-MUSHROOM_BASIC_HP           = BASIC_HP
-MUSHROOM_BASIC_LOOT         = basic_loot_table
+MUSHROOM_FIRE_BEATS    = 4
+MUSHROOM_FIRE_HP       = BASIC_HP
+MUSHROOM_FIRE_LOOT     = basic_loot_table
 
 ; Note: these attack in all 8 directions
-MUSHROOM_INTERMEDIATE_BEATS = 4
-MUSHROOM_INTERMEDIATE_HP    = INTERMEDIATE_HP
-MUSHROOM_INTERMEDIATE_LOOT  = intermediate_loot_table
+MUSHROOM_ICE_BEATS     = 4
+MUSHROOM_ICE_HP        = INTERMEDIATE_HP
+MUSHROOM_ICE_LOOT      = intermediate_loot_table
 
-MUSHROOM_ADVANCED_BEATS     = 3
-MUSHROOM_ADVANCED_HP        = ADVANCED_HP
-MUSHROOM_ADVANCED_LOOT      = advanced_loot_table
+MUSHROOM_AIR_BEATS     = 3
+MUSHROOM_AIR_HP        = ADVANCED_HP
+MUSHROOM_AIR_LOOT      = advanced_loot_table
 
-MUSHROOM_WEIRD_BEATS        = 5
-MUSHROOM_WEIRD_HP           = INTERMEDIATE_HP
-MUSHROOM_WEIRD_LOOT         = advanced_loot_table
+MUSHROOM_EARTH_BEATS   = 5
+MUSHROOM_EARTH_HP      = INTERMEDIATE_HP
+MUSHROOM_EARTH_LOOT    = advanced_loot_table
 
-MUSHROOM_SPORE_DMG          = 4
+MUSHROOM_SPORE_DMG     = 4
 
 ; All slime types are defeated in one hit
 ; and share a loot table.

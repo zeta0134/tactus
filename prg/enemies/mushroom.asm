@@ -11,25 +11,25 @@ CurrentTile := R15
         lda tile_attributes, x
         and #PAL_MASK
         cmp #PAL_EARTH
-        beq weird
+        beq earth
         cmp #PAL_ICE
-        beq intermediate
+        beq ice
         cmp #PAL_AIR
-        beq advanced
-basic:
-        lda #(MUSHROOM_BASIC_BEATS-1)
+        beq air
+fire:
+        lda #(MUSHROOM_FIRE_BEATS-1)
         sta IdleDelay
         jmp done_picking_idle_duration
-intermediate:
-        lda #(MUSHROOM_INTERMEDIATE_BEATS-1)
+earth:
+        lda #(MUSHROOM_EARTH_BEATS-1)
         sta IdleDelay
         jmp done_picking_idle_duration
-advanced:
-        lda #(MUSHROOM_ADVANCED_BEATS-1)
+ice:
+        lda #(MUSHROOM_ICE_BEATS-1)
         sta IdleDelay
         jmp done_picking_idle_duration
-weird:
-        lda #(MUSHROOM_WEIRD_BEATS-1)
+air:
+        lda #(MUSHROOM_AIR_BEATS-1)
         sta IdleDelay
 done_picking_idle_duration:
 
@@ -193,29 +193,29 @@ EnemyHealth := R11
         lda tile_attributes, x
         and #PAL_MASK
         cmp #PAL_EARTH
-        beq weird_hp
+        beq earth_hp
         cmp #PAL_ICE
-        beq intermediate_hp
+        beq ice_hp
         cmp #PAL_AIR
-        beq advanced_hp
-basic_hp:
-        set_loot_table MUSHROOM_BASIC_LOOT
-        lda #MUSHROOM_BASIC_HP
+        beq air_hp
+fire_hp:
+        set_loot_table MUSHROOM_FIRE_LOOT
+        lda #MUSHROOM_FIRE_HP
         sta EnemyHealth
         jmp done
-intermediate_hp:
-        set_loot_table MUSHROOM_INTERMEDIATE_LOOT
-        lda #MUSHROOM_INTERMEDIATE_HP
+earth_hp:
+        set_loot_table MUSHROOM_EARTH_LOOT
+        lda #MUSHROOM_EARTH_HP
         sta EnemyHealth
         jmp done
-advanced_hp:
-        set_loot_table MUSHROOM_ADVANCED_LOOT
-        lda #MUSHROOM_ADVANCED_HP
+ice_hp:
+        set_loot_table MUSHROOM_ICE_LOOT
+        lda #MUSHROOM_ICE_HP
         sta EnemyHealth
         jmp done
-weird_hp:
-        set_loot_table MUSHROOM_WEIRD_LOOT
-        lda #MUSHROOM_WEIRD_HP
+air_hp:
+        set_loot_table MUSHROOM_AIR_LOOT
+        lda #MUSHROOM_AIR_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_direct_attack_with_hp
@@ -469,29 +469,29 @@ CurrentTile := R15
         lda tile_attributes, x
         and #PAL_MASK
         cmp #PAL_EARTH
-        beq weird_hp
+        beq earth_hp
         cmp #PAL_ICE
-        beq intermediate_hp
+        beq ice_hp
         cmp #PAL_AIR
-        beq advanced_hp
-basic_hp:
-        set_loot_table MUSHROOM_BASIC_LOOT
-        lda #MUSHROOM_BASIC_HP
+        beq air_hp
+fire_hp:
+        set_loot_table MUSHROOM_FIRE_LOOT
+        lda #MUSHROOM_FIRE_HP
         sta EnemyHealth
         jmp done
-intermediate_hp:
-        set_loot_table MUSHROOM_INTERMEDIATE_LOOT
-        lda #MUSHROOM_INTERMEDIATE_HP
+earth_hp:
+        set_loot_table MUSHROOM_EARTH_LOOT
+        lda #MUSHROOM_EARTH_HP
         sta EnemyHealth
         jmp done
-advanced_hp:
-        set_loot_table MUSHROOM_ADVANCED_LOOT
-        lda #MUSHROOM_ADVANCED_HP
+ice_hp:
+        set_loot_table MUSHROOM_ICE_LOOT
+        lda #MUSHROOM_ICE_HP
         sta EnemyHealth
         jmp done
-weird_hp:
-        set_loot_table MUSHROOM_WEIRD_LOOT
-        lda #MUSHROOM_WEIRD_HP
+air_hp:
+        set_loot_table MUSHROOM_AIR_LOOT
+        lda #MUSHROOM_AIR_HP
         sta EnemyHealth
 done:
         near_call ENEMY_BOMB_SPELL_regular_enemy_elemental_spell_common
