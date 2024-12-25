@@ -1840,6 +1840,13 @@ previous_room_effect := room_spell_data1
         ; as an "enemy". the room does not clear until it ends!
         inc enemies_active
 
+        ; if the player has just entered this room, delay the party
+        ; (it's polite)
+        lda first_beat_after_load
+        beq safe_to_party
+        rts
+safe_to_party:
+
         ldx PlayerRoomIndex
         lda bomb_fiesta_state, x
         asl
