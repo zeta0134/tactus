@@ -111,22 +111,18 @@ loop:
         ;debug_color (TINT_G | LIGHTGRAY)
         jsr SPRITE_TRANSFER_BASE
         ;debug_color 0
-        ; Update palette memory very quickly
-        jsr refresh_palettes_nmi        
         ; This signals to the gameloop that it may continue
         lda GameloopCounter
         sta LastNmi
-        jmp all_frames
+        ;jmp all_frames (currently not needed)
 lag_frame:
-        ; If necessary: actions to be performed only on lag frames
-        
+        ; If necessary: actions to be performed only on lag frames        
+all_frames:
         ; Update palette memory, even on lag frames, because we may
         ; have clobbered it during the raster split (if we are partway
         ; through a palette update and we cause lag, oh well! try not
         ; to do that.)
-        jsr refresh_palettes_nmi
-
-all_frames:
+        INLINE_refresh_palettes_nmi
         ; ===========================================================
         ; Tasks which MUST be performed every frame
         ;   - Mostly IRQ setup here, if we miss doing this the render
@@ -163,10 +159,6 @@ all_frames:
         ; note: sans backgrounds! we'll turn those on with a raster effect later
         lda #(OBJ_ON | BG_OFF)
         sta PPUMASK
-
-        ; always run this (whether it does anything meaningful is controlled with a flag)
-        ;jsr setup_irq_during_nmi
-        ;cli ; always enable interrupts; whether they get generated is up to the routine above
 
         ; TODO: can we make this not a far call? it'll save quite a lot of cycles
         far_call_nmi FAR_setup_raster_table_for_frame
