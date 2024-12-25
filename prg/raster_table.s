@@ -278,7 +278,7 @@ ScanlineCount := RasterScratch+6
         sta Duration
         ; Swap in the bank that contains this effect data, quickly and without
         ; using the usual stack mechanism (we'll restore this clobber at the end of NMI)
-        rainbow_set_data_bank {raster_effects_list + RasterEffectEntry::BankIndex, x}, #PRG_CHIPSEL_ROM
+        rainbow_set_data_bank_noshadow {raster_effects_list + RasterEffectEntry::BankIndex, x}, #PRG_CHIPSEL_ROM
         ; From the frame list, read in the specific frame that we are on
         lda RasterEffectFrame
         asl

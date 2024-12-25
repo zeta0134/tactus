@@ -80,16 +80,6 @@ loop:
         tya
         pha
 
-        ; because far calls will potentially change the current code and data bank,
-        ; first preserve them to the stack
-        lda code_bank_shadow
-        sta NmiCurrentBank ; might as well initialize the NMI call stack with the current bank
-        pha
-        lda data_bank_low_shadow
-        pha
-        lda data_bank_high_shadow
-        pha
-
         ; is NMI disabled? if so get outta here fast
         lda NmiSoftDisable
         jne nmi_soft_disable
@@ -165,6 +155,16 @@ all_frames:
 nmi_soft_disable:
         ; Here we *only* update the audio engine, nothing else. This is mostly to
         ; smooth over transitions when loading a new level.
+
+        ; because far calls will potentially change the current code and data bank,
+        ; first preserve them to the stack
+        lda code_bank_shadow
+        sta NmiCurrentBank ; might as well initialize the NMI call stack with the current bank
+        pha
+        lda data_bank_low_shadow
+        pha
+        lda data_bank_high_shadow
+        pha
 
         far_call_nmi FAR_update_audio
         perform_zpcm_inc

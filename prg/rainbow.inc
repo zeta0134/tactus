@@ -231,6 +231,15 @@ NT_BANK_IDX           = %00111111
 	sta MAP_PRG_A_LO
 .endmacro
 
+; mostly for use during nmi / raster shenanigans
+.macro rainbow_set_data_bank_noshadow bank_value_low, bank_value_high
+	lda bank_value_high
+	sta MAP_PRG_A_HI
+
+	lda bank_value_low
+	sta MAP_PRG_A_LO
+.endmacro
+
 .macro rainbow_set_fixed_bank bank_value
 	lda bank_value
 	sta MAP_PRG_E_LO
