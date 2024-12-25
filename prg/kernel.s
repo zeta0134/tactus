@@ -766,6 +766,9 @@ not_too_high:
         far_call FAR_init_item_bank_allocations
         perform_zpcm_inc
 
+        ; Clear out any other lingering state
+        far_call FAR_init_bomb_state
+
         far_call FAR_reset_price_tracker
 
         ; Draw the entire target floor right now!
