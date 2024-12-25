@@ -159,10 +159,6 @@ all_frames:
         lda #<((.bank(FAR_setup_raster_table_for_frame) & __BANK_MASK__) | __BANK_OFFSET__)
         sta MAP_PRG_8_LO
         jsr FAR_setup_raster_table_for_frame
-        
-        ; Advance the gameplay pRNG once every frame
-        ; y'know... this is probably a bad idea. is this safe if it gets interrupted?
-        jsr next_gameplay_rand
 
         debug_color (TINT_R | LIGHTGRAY)
 
