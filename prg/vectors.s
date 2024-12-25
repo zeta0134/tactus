@@ -134,12 +134,6 @@ all_frames:
         ; during loading or something
         lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | OBJ_8X16 | NT_2000)
         sta PPUCTRL
-       
-        ; TODO: is this even needed? scanline 4 overwrites this...
-        lda #0
-        sta PPUSCROLL
-        lda #0
-        sta PPUSCROLL
 
         ; Set the one (1) upper background register
         rainbow_set_upper_bg_chr PlayfieldBgHighBank
