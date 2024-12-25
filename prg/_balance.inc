@@ -98,17 +98,22 @@ SPIDER_EARTH_LOOT          = advanced_loot_table
 ; Below this distance, zombies will prefer to move directly towards the player
 ZOMBIE_TARGET_RADIUS           = $c6 ; about 16 squares
 
-ZOMBIE_BASIC_IDLE_DELAY        = 3
-ZOMBIE_BASIC_HP                = BASIC_HP
-ZOMBIE_BASIC_LOOT              = basic_loot_table
+ZOMBIE_EARTH_IDLE_DELAY  = 3
+ZOMBIE_EARTH_HP          = BASIC_HP
+ZOMBIE_EARTH_LOOT        = basic_loot_table
 
-ZOMBIE_INTERMEDIATE_IDLE_DELAY = 2
-ZOMBIE_INTERMEDIATE_HP         = INTERMEDIATE_HP
-ZOMBIE_INTERMEDIATE_LOOT       = intermediate_loot_table
+ZOMBIE_AIR_IDLE_DELAY    = 2
+ZOMBIE_AIR_HP            = INTERMEDIATE_HP
+ZOMBIE_AIR_LOOT          = intermediate_loot_table
 
-ZOMBIE_ADVANCED_IDLE_DELAY     = 1
-ZOMBIE_ADVANCED_HP             = ADVANCED_HP
-ZOMBIE_ADVANCED_LOOT           = advanced_loot_table
+ZOMBIE_FIRE_IDLE_DELAY   = 1
+ZOMBIE_FIRE_HP           = ADVANCED_HP
+ZOMBIE_FIRE_LOOT         = advanced_loot_table
+
+; we'll eventually complicate these by having them freeze the player when attacking
+ZOMBIE_ICE_IDLE_DELAY    = 2
+ZOMBIE_ICE_HP            = INTERMEDIATE_HP
+ZOMBIE_ICE_LOOT          = advanced_loot_table
 
 ; Below this distance, moles will not rise out of the ground
 ; (intentionally very small, mostly to prevent the player from being able to

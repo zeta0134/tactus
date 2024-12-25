@@ -136,19 +136,25 @@ CurrentTile := R15
         lda tile_attributes, x
         and #PAL_MASK
         cmp #PAL_AIR
-        beq intermediate
+        beq air
         cmp #PAL_FIRE
-        beq advanced
-basic:
-        lda #ZOMBIE_BASIC_IDLE_DELAY
+        beq fire
+        cmp #PAL_ICE
+        beq ice
+earth:
+        lda #ZOMBIE_EARTH_IDLE_DELAY
         sta IdleDelay
         jmp done
-intermediate:
-        lda #ZOMBIE_INTERMEDIATE_IDLE_DELAY
+fire:
+        lda #ZOMBIE_FIRE_IDLE_DELAY
         sta IdleDelay
         jmp done
-advanced:
-        lda #ZOMBIE_ADVANCED_IDLE_DELAY
+air:
+        lda #ZOMBIE_AIR_IDLE_DELAY
+        sta IdleDelay
+        jmp done
+ice:
+        lda #ZOMBIE_ICE_IDLE_DELAY
         sta IdleDelay
 done:
         perform_zpcm_inc
@@ -257,23 +263,30 @@ EnemyHealth := R11
         ldx AttackSquare
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_AIR
-        beq intermediate_hp
+        cmp #PAL_ICE
+        beq ice_hp
         cmp #PAL_FIRE
-        beq advanced_hp
-basic_hp:
-        set_loot_table ZOMBIE_BASIC_LOOT
-        lda #ZOMBIE_BASIC_HP
+        beq fire_hp
+        cmp #PAL_AIR
+        beq air_hp
+earth_hp:
+        set_loot_table ZOMBIE_EARTH_LOOT
+        lda #ZOMBIE_EARTH_HP
         sta EnemyHealth
         jmp done
-intermediate_hp:
-        set_loot_table ZOMBIE_INTERMEDIATE_LOOT
-        lda #ZOMBIE_INTERMEDIATE_HP
+ice_hp:
+        set_loot_table ZOMBIE_ICE_LOOT
+        lda #SPIDER_ICE_HP
         sta EnemyHealth
         jmp done
-advanced_hp:
-        set_loot_table ZOMBIE_ADVANCED_LOOT
-        lda #ZOMBIE_ADVANCED_HP
+fire_hp:
+        set_loot_table ZOMBIE_FIRE_LOOT
+        lda #ZOMBIE_FIRE_HP
+        sta EnemyHealth        
+        jmp done
+air_hp:
+        set_loot_table ZOMBIE_AIR_LOOT
+        lda #ZOMBIE_AIR_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_direct_attack_with_hp
@@ -286,23 +299,30 @@ EnemyHealth := R11
         ldx EffectiveAttackSquare
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_AIR
-        beq intermediate_hp
+        cmp #PAL_ICE
+        beq ice_hp
         cmp #PAL_FIRE
-        beq advanced_hp
-basic_hp:
-        set_loot_table ZOMBIE_BASIC_LOOT
-        lda #ZOMBIE_BASIC_HP
+        beq fire_hp
+        cmp #PAL_AIR
+        beq air_hp
+earth_hp:
+        set_loot_table ZOMBIE_EARTH_LOOT
+        lda #ZOMBIE_EARTH_HP
         sta EnemyHealth
         jmp done
-intermediate_hp:
-        set_loot_table ZOMBIE_INTERMEDIATE_LOOT
-        lda #ZOMBIE_INTERMEDIATE_HP
+ice_hp:
+        set_loot_table ZOMBIE_ICE_LOOT
+        lda #SPIDER_ICE_HP
         sta EnemyHealth
         jmp done
-advanced_hp:
-        set_loot_table ZOMBIE_ADVANCED_LOOT
-        lda #ZOMBIE_ADVANCED_HP
+fire_hp:
+        set_loot_table ZOMBIE_FIRE_LOOT
+        lda #ZOMBIE_FIRE_HP
+        sta EnemyHealth        
+        jmp done
+air_hp:
+        set_loot_table ZOMBIE_AIR_LOOT
+        lda #ZOMBIE_AIR_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_indirect_attack_with_hp
@@ -351,23 +371,30 @@ CurrentTile := R15
         ldx CurrentTile
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_AIR
-        beq intermediate_hp
+        cmp #PAL_ICE
+        beq ice_hp
         cmp #PAL_FIRE
-        beq advanced_hp
-basic_hp:
-        set_loot_table ZOMBIE_BASIC_LOOT
-        lda #ZOMBIE_BASIC_HP
+        beq fire_hp
+        cmp #PAL_AIR
+        beq air_hp
+earth_hp:
+        set_loot_table ZOMBIE_EARTH_LOOT
+        lda #ZOMBIE_EARTH_HP
         sta EnemyHealth
         jmp done
-intermediate_hp:
-        set_loot_table ZOMBIE_INTERMEDIATE_LOOT
-        lda #ZOMBIE_INTERMEDIATE_HP
+ice_hp:
+        set_loot_table ZOMBIE_ICE_LOOT
+        lda #SPIDER_ICE_HP
         sta EnemyHealth
         jmp done
-advanced_hp:
-        set_loot_table ZOMBIE_ADVANCED_LOOT
-        lda #ZOMBIE_ADVANCED_HP
+fire_hp:
+        set_loot_table ZOMBIE_FIRE_LOOT
+        lda #ZOMBIE_FIRE_HP
+        sta EnemyHealth        
+        jmp done
+air_hp:
+        set_loot_table ZOMBIE_AIR_LOOT
+        lda #ZOMBIE_AIR_HP
         sta EnemyHealth
 done:
         near_call ENEMY_BOMB_SPELL_regular_enemy_elemental_spell_common
