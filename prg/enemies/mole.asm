@@ -17,14 +17,26 @@ CurrentTile := R15
         ; Determine how many beats we should remain idle, based on difficulty
         lda tile_attributes, x
         and #PAL_MASK
+        cmp #PAL_AIR
+        beq air
+        cmp #PAL_EARTH
+        beq earth
         cmp #PAL_ICE
-        beq advanced
-basic:
-        lda #MOLE_BASIC_POPUP_DELAY
+        beq ice
+fire:
+        lda #MOLE_FIRE_POPUP_DELAY
         sta IdleDelay
         jmp done
-advanced:
-        lda #MOLE_ADVANCED_POPUP_DELAY
+air:
+        lda #MOLE_AIR_POPUP_DELAY
+        sta IdleDelay
+        jmp done
+earth:
+        lda #MOLE_EARTH_POPUP_DELAY
+        sta IdleDelay
+        jmp done
+ice:
+        lda #MOLE_ICE_POPUP_DELAY
         sta IdleDelay
 done:
 
@@ -186,14 +198,26 @@ CurrentTile := R15
         ; Determine how many beats we should remain idle, based on difficulty
         lda tile_attributes, x
         and #PAL_MASK
+        cmp #PAL_AIR
+        beq air
+        cmp #PAL_EARTH
+        beq earth
         cmp #PAL_ICE
-        beq advanced
-basic:
-        lda #MOLE_BASIC_VANISH_DELAY
+        beq ice
+fire:
+        lda #MOLE_FIRE_VANISH_DELAY
         sta IdleDelay
         jmp done
-advanced:
-        lda #MOLE_ADVANCED_VANISH_DELAY
+air:
+        lda #MOLE_AIR_VANISH_DELAY
+        sta IdleDelay
+        jmp done
+earth:
+        lda #MOLE_EARTH_VANISH_DELAY
+        sta IdleDelay
+        jmp done
+ice:
+        lda #MOLE_ICE_VANISH_DELAY
         sta IdleDelay
 done:
 
@@ -327,15 +351,29 @@ EnemyHealth := R11
         lda tile_attributes, x
         and #PAL_MASK
         cmp #PAL_ICE
-        beq advanced_hp
-basic_hp:
-        set_loot_table intermediate_loot_table
-        lda #MOLE_BASIC_HP
+        beq ice_hp
+        cmp #PAL_FIRE
+        beq fire_hp
+        cmp #PAL_AIR
+        beq air_hp
+earth_hp:
+        set_loot_table MOLE_EARTH_LOOT
+        lda #MOLE_EARTH_HP
         sta EnemyHealth
         jmp done
-advanced_hp:
-        set_loot_table advanced_loot_table
-        lda #MOLE_ADVANCED_HP
+ice_hp:
+        set_loot_table MOLE_ICE_LOOT
+        lda #MOLE_ICE_HP
+        sta EnemyHealth
+        jmp done
+fire_hp:
+        set_loot_table MOLE_FIRE_LOOT
+        lda #MOLE_FIRE_HP
+        sta EnemyHealth        
+        jmp done
+air_hp:
+        set_loot_table MOLE_AIR_LOOT
+        lda #MOLE_AIR_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_direct_attack_with_hp
@@ -357,15 +395,29 @@ EnemyHealth := R11
         lda tile_attributes, x
         and #PAL_MASK
         cmp #PAL_ICE
-        beq advanced_hp
-basic_hp:
-        set_loot_table intermediate_loot_table
-        lda #MOLE_BASIC_HP
+        beq ice_hp
+        cmp #PAL_FIRE
+        beq fire_hp
+        cmp #PAL_AIR
+        beq air_hp
+earth_hp:
+        set_loot_table MOLE_EARTH_LOOT
+        lda #MOLE_EARTH_HP
         sta EnemyHealth
         jmp done
-advanced_hp:
-        set_loot_table advanced_loot_table
-        lda #MOLE_ADVANCED_HP
+ice_hp:
+        set_loot_table MOLE_ICE_LOOT
+        lda #MOLE_ICE_HP
+        sta EnemyHealth
+        jmp done
+fire_hp:
+        set_loot_table MOLE_FIRE_LOOT
+        lda #MOLE_FIRE_HP
+        sta EnemyHealth        
+        jmp done
+air_hp:
+        set_loot_table MOLE_AIR_LOOT
+        lda #MOLE_AIR_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_direct_attack_with_hp
@@ -387,15 +439,29 @@ allow_attack:
         lda tile_attributes, x
         and #PAL_MASK
         cmp #PAL_ICE
-        beq advanced_hp
-basic_hp:
-        set_loot_table intermediate_loot_table
-        lda #MOLE_BASIC_HP
+        beq ice_hp
+        cmp #PAL_FIRE
+        beq fire_hp
+        cmp #PAL_AIR
+        beq air_hp
+earth_hp:
+        set_loot_table MOLE_EARTH_LOOT
+        lda #MOLE_EARTH_HP
         sta EnemyHealth
         jmp done
-advanced_hp:
-        set_loot_table advanced_loot_table
-        lda #MOLE_ADVANCED_HP
+ice_hp:
+        set_loot_table MOLE_ICE_LOOT
+        lda #MOLE_ICE_HP
+        sta EnemyHealth
+        jmp done
+fire_hp:
+        set_loot_table MOLE_FIRE_LOOT
+        lda #MOLE_FIRE_HP
+        sta EnemyHealth        
+        jmp done
+air_hp:
+        set_loot_table MOLE_AIR_LOOT
+        lda #MOLE_AIR_HP
         sta EnemyHealth
 done:
         lda AttackSquare
@@ -590,15 +656,29 @@ CurrentTile := R15
         lda tile_attributes, x
         and #PAL_MASK
         cmp #PAL_ICE
-        beq advanced_hp
-basic_hp:
-        set_loot_table intermediate_loot_table
-        lda #MOLE_BASIC_HP
+        beq ice_hp
+        cmp #PAL_FIRE
+        beq fire_hp
+        cmp #PAL_AIR
+        beq air_hp
+earth_hp:
+        set_loot_table MOLE_EARTH_LOOT
+        lda #MOLE_EARTH_HP
         sta EnemyHealth
         jmp done
-advanced_hp:
-        set_loot_table advanced_loot_table
-        lda #MOLE_ADVANCED_HP
+ice_hp:
+        set_loot_table MOLE_ICE_LOOT
+        lda #MOLE_ICE_HP
+        sta EnemyHealth
+        jmp done
+fire_hp:
+        set_loot_table MOLE_FIRE_LOOT
+        lda #MOLE_FIRE_HP
+        sta EnemyHealth        
+        jmp done
+air_hp:
+        set_loot_table MOLE_AIR_LOOT
+        lda #MOLE_AIR_HP
         sta EnemyHealth
 done:
         near_call ENEMY_BOMB_SPELL_regular_enemy_elemental_spell_common

@@ -121,13 +121,29 @@ ZOMBIE_ICE_LOOT          = advanced_loot_table
 ; damage AND look weird)
 MOLE_SUPPRESSION_RADIUS    = 2
 
-MOLE_BASIC_POPUP_DELAY     = 2
-MOLE_BASIC_VANISH_DELAY    = 2
-MOLE_BASIC_HP              = BASIC_HP
+; Basic mole, throws standard wrenches
+MOLE_FIRE_POPUP_DELAY     = 2
+MOLE_FIRE_VANISH_DELAY    = 2
+MOLE_FIRE_HP              = BASIC_HP
+MOLE_FIRE_LOOT          = intermediate_loot_table
 
-MOLE_ADVANCED_POPUP_DELAY  = 0
-MOLE_ADVANCED_VANISH_DELAY = 1
-MOLE_ADVANCED_HP           = ADVANCED_HP
+; Should throw snowballs instead of wrenches, that freeze on contact
+MOLE_ICE_POPUP_DELAY  = 0
+MOLE_ICE_VANISH_DELAY = 1
+MOLE_ICE_HP           = ADVANCED_HP
+MOLE_ICE_LOOT        = advanced_loot_table
+
+; Rare variant. Should throw wrenches in all four directions
+MOLE_EARTH_POPUP_DELAY     = 0
+MOLE_EARTH_VANISH_DELAY    = 2
+MOLE_EARTH_HP              = INTERMEDIATE_HP
+MOLE_EARTH_LOOT             = advanced_loot_table
+
+; Should throw electrified wrenches, tethered to the mole by lightning
+MOLE_AIR_POPUP_DELAY     = 0
+MOLE_AIR_VANISH_DELAY    = 2
+MOLE_AIR_HP              = INTERMEDIATE_HP
+MOLE_AIR_LOOT           = advanced_loot_table
 
 MOLE_WRENCH_DMG = 4
 
