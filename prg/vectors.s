@@ -108,9 +108,7 @@ loop:
         perform_zpcm_inc
         lda #$00
         sta $2003
-        ;debug_color (TINT_G | LIGHTGRAY)
         jsr SPRITE_TRANSFER_BASE
-        ;debug_color 0
         ; This signals to the gameloop that it may continue
         lda GameloopCounter
         sta LastNmi
@@ -132,6 +130,8 @@ all_frames:
         ; scroll nametable doesn't matter, so we're really just setting
         ; up consistent rendering primitives here in case they were clobbered
         ; during loading or something
+        ; TODO: this reduces safety, but we don't _really_ need to ever change this
+        ; after RESET. We could rework this and save 6 cycles...
         lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | OBJ_8X16 | NT_2000)
         sta PPUCTRL
 
@@ -155,7 +155,10 @@ all_frames:
         sta PPUMASK
 
         ; TODO: can we make this not a far call? it'll save quite a lot of cycles
-        far_call_nmi FAR_setup_raster_table_for_frame
+        ;far_call_nmi FAR_setup_raster_table_for_frame
+        lda #<((.bank(FAR_setup_raster_table_for_frame) & __BANK_MASK__) | __BANK_OFFSET__)
+        sta MAP_PRG_8_LO
+        jsr FAR_setup_raster_table_for_frame
         
         ; Advance the gameplay pRNG once every frame
         ; y'know... this is probably a bad idea. is this safe if it gets interrupted?
