@@ -122,20 +122,26 @@ CurrentTile := R15
         ; Determine how many beats we should remain idle, based on difficulty
         lda tile_attributes, x
         and #PAL_MASK
+        cmp #PAL_EARTH
+        beq earth
         cmp #PAL_AIR
-        beq intermediate
+        beq air
         cmp #PAL_FIRE
-        beq advanced
-basic:
-        lda #SPIDER_BASIC_IDLE_DELAY
+        beq fire
+ice:
+        lda #SPIDER_ICE_IDLE_DELAY
         sta IdleDelay
         jmp done
-intermediate:
-        lda #SPIDER_INTERMEDIATE_IDLE_DELAY
+air:
+        lda #SPIDER_AIR_IDLE_DELAY
         sta IdleDelay
         jmp done
-advanced:
-        lda #SPIDER_ADVANCED_IDLE_DELAY
+earth:
+        lda #SPIDER_EARTH_IDLE_DELAY
+        sta IdleDelay
+        jmp done
+fire:
+        lda #SPIDER_FIRE_IDLE_DELAY
         sta IdleDelay
 done:
 
@@ -249,23 +255,30 @@ EnemyHealth := R11
         ldx AttackSquare
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_AIR
-        beq intermediate_hp
+        cmp #PAL_ICE
+        beq ice_hp
         cmp #PAL_FIRE
-        beq advanced_hp
-basic_hp:
-        set_loot_table SPIDER_BASIC_LOOT
-        lda #SPIDER_BASIC_HP
+        beq fire_hp
+        cmp #PAL_AIR
+        beq air_hp
+earth_hp:
+        set_loot_table SPIDER_EARTH_LOOT
+        lda #SPIDER_EARTH_HP
         sta EnemyHealth
         jmp done
-intermediate_hp:
-        set_loot_table SPIDER_INTERMEDIATE_LOOT
-        lda #SPIDER_INTERMEDIATE_HP
+ice_hp:
+        set_loot_table SPIDER_ICE_LOOT
+        lda #SPIDER_ICE_HP
         sta EnemyHealth
         jmp done
-advanced_hp:
-        set_loot_table SPIDER_ADVANCED_LOOT
-        lda #SPIDER_ADVANCED_HP
+fire_hp:
+        set_loot_table SPIDER_FIRE_LOOT
+        lda #SPIDER_FIRE_HP
+        sta EnemyHealth        
+        jmp done
+air_hp:
+        set_loot_table SPIDER_AIR_LOOT
+        lda #SPIDER_AIR_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_direct_attack_with_hp
@@ -278,23 +291,30 @@ EnemyHealth := R11
         ldx EffectiveAttackSquare
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_AIR
-        beq intermediate_hp
+        cmp #PAL_ICE
+        beq ice_hp
         cmp #PAL_FIRE
-        beq advanced_hp
-basic_hp:
-        set_loot_table SPIDER_BASIC_LOOT
-        lda #SPIDER_BASIC_HP
+        beq fire_hp
+        cmp #PAL_AIR
+        beq air_hp
+earth_hp:
+        set_loot_table SPIDER_EARTH_LOOT
+        lda #SPIDER_EARTH_HP
         sta EnemyHealth
         jmp done
-intermediate_hp:
-        set_loot_table SPIDER_INTERMEDIATE_LOOT
-        lda #SPIDER_INTERMEDIATE_HP
+ice_hp:
+        set_loot_table SPIDER_ICE_LOOT
+        lda #SPIDER_ICE_HP
         sta EnemyHealth
         jmp done
-advanced_hp:
-        set_loot_table SPIDER_ADVANCED_LOOT
-        lda #SPIDER_ADVANCED_HP
+fire_hp:
+        set_loot_table SPIDER_FIRE_LOOT
+        lda #SPIDER_FIRE_HP
+        sta EnemyHealth        
+        jmp done
+air_hp:
+        set_loot_table SPIDER_AIR_LOOT
+        lda #SPIDER_AIR_HP
         sta EnemyHealth
 done:
         near_call ENEMY_ATTACK_indirect_attack_with_hp
@@ -343,23 +363,30 @@ CurrentTile := R15
         ldx CurrentTile
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_AIR
-        beq intermediate_hp
+        cmp #PAL_ICE
+        beq ice_hp
         cmp #PAL_FIRE
-        beq advanced_hp
-basic_hp:
-        set_loot_table SPIDER_BASIC_LOOT
-        lda #SPIDER_BASIC_HP
+        beq fire_hp
+        cmp #PAL_AIR
+        beq air_hp
+earth_hp:
+        set_loot_table SPIDER_EARTH_LOOT
+        lda #SPIDER_EARTH_HP
         sta EnemyHealth
         jmp done
-intermediate_hp:
-        set_loot_table SPIDER_INTERMEDIATE_LOOT
-        lda #SPIDER_INTERMEDIATE_HP
+ice_hp:
+        set_loot_table SPIDER_ICE_LOOT
+        lda #SPIDER_ICE_HP
         sta EnemyHealth
         jmp done
-advanced_hp:
-        set_loot_table SPIDER_ADVANCED_LOOT
-        lda #SPIDER_ADVANCED_HP
+fire_hp:
+        set_loot_table SPIDER_FIRE_LOOT
+        lda #SPIDER_FIRE_HP
+        sta EnemyHealth        
+        jmp done
+air_hp:
+        set_loot_table SPIDER_AIR_LOOT
+        lda #SPIDER_AIR_HP
         sta EnemyHealth
 done:
         near_call ENEMY_BOMB_SPELL_regular_enemy_elemental_spell_common

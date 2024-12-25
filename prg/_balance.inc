@@ -63,30 +63,37 @@ ADVANCED_HP     = 3
 ; basically a "weak" attack. 4 HP == 1 Heart
 DEFAULT_DMG       = 4
 
-BIRB_BASIC_HP          = ONE_HIT_HP
-BIRB_BASIC_LOOT        = basic_loot_table
+BIRB_AIR_HP       = BASIC_HP
+BIRB_AIR_LOOT     = basic_loot_table
 
-BIRB_INTERMEDIATE_HP   = BASIC_HP
-BIRB_INTERMEDIATE_LOOT = intermediate_loot_table
+; These will eventually leave flames behind them, adding some spice
+BIRB_FIRE_HP        = INTERMEDIATE_HP
+BIRB_FIRE_LOOT      = advanced_loot_table
 
-BIRB_ADVANCED_HP       = INTERMEDIATE_HP
-BIRB_ADVANCED_LOOT     = advanced_loot_table
+BIRB_ICE_HP         = INTERMEDIATE_HP
+BIRB_ICE_LOOT       = intermediate_loot_table
 
+BIRB_EARTH_HP       = ADVANCED_HP
+BIRB_EARTH_LOOT     = advanced_loot_table
 
 ; Below this distance, spiders will prefer to move directly towards the player
 SPIDER_TARGET_RADIUS = $c6 ; about 16 squares
 
-SPIDER_BASIC_IDLE_DELAY        = 3
-SPIDER_BASIC_HP                = BASIC_HP
-SPIDER_BASIC_LOOT              = basic_loot_table
+SPIDER_ICE_IDLE_DELAY      = 3
+SPIDER_ICE_HP              = BASIC_HP
+SPIDER_ICE_LOOT            = basic_loot_table
 
-SPIDER_INTERMEDIATE_IDLE_DELAY = 2
-SPIDER_INTERMEDIATE_HP         = INTERMEDIATE_HP
-SPIDER_INTERMEDIATE_LOOT       = intermediate_loot_table
+SPIDER_AIR_IDLE_DELAY      = 2
+SPIDER_AIR_HP              = INTERMEDIATE_HP
+SPIDER_AIR_LOOT            = intermediate_loot_table
 
-SPIDER_ADVANCED_IDLE_DELAY     = 1
-SPIDER_ADVANCED_HP             = ADVANCED_HP
-SPIDER_ADVANCED_LOOT           = advanced_loot_table
+SPIDER_FIRE_IDLE_DELAY     = 1
+SPIDER_FIRE_HP             = ADVANCED_HP
+SPIDER_FIRE_LOOT           = advanced_loot_table
+
+SPIDER_EARTH_IDLE_DELAY    = 2
+SPIDER_EARTH_HP            = ADVANCED_HP
+SPIDER_EARTH_LOOT          = advanced_loot_table
 
 ; Below this distance, zombies will prefer to move directly towards the player
 ZOMBIE_TARGET_RADIUS           = $c6 ; about 16 squares

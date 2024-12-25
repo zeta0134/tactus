@@ -1,7 +1,7 @@
 
 ; The global set of spawn data, for use in spawn pools
 enemy_slime_basic:
-        basic_spawn_entry TILE_SLIME, BG_TILE_SLIME_IDLE, PAL_WATER
+        basic_spawn_entry TILE_SLIME, BG_TILE_SLIME_IDLE, PAL_ICE
         default_spawn_pool_details
         pack_size 2, 3
 
@@ -31,7 +31,7 @@ enemy_zombie_advanced:
         pack_size 1, 3
 
 enemy_spider_basic:
-        basic_spawn_entry TILE_SPIDER, BG_TILE_SPIDER, PAL_WATER
+        basic_spawn_entry TILE_SPIDER, BG_TILE_SPIDER, PAL_ICE
         default_spawn_pool_details
         pack_size 2, 4
 
@@ -68,22 +68,22 @@ enemy_mushroom_basic_beat_3:
         pack_size 1, 1
 
 enemy_mushroom_intermediate_beat_0:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_WATER, 0, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_ICE, 0, 0, ring_of_disco_tiles
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_intermediate_beat_1:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_WATER, 1, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_ICE, 1, 0, ring_of_disco_tiles
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_intermediate_beat_2:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_WATER, 2, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_ICE, 2, 0, ring_of_disco_tiles
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_intermediate_beat_3:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_WATER, 3, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_ICE, 3, 0, ring_of_disco_tiles
         default_spawn_pool_details
         pack_size 1, 1
 
@@ -138,12 +138,12 @@ enemy_birb_basic_right:
         pack_size 1, 2
 
 enemy_birb_intermediate_left:
-        basic_spawn_entry TILE_BIRB_LEFT, BG_TILE_BIRB_IDLE_LEFT, PAL_WATER
+        basic_spawn_entry TILE_BIRB_LEFT, BG_TILE_BIRB_IDLE_LEFT, PAL_ICE
         default_spawn_pool_details
         pack_size 1, 2
 
 enemy_birb_intermediate_right:
-        basic_spawn_entry TILE_BIRB_RIGHT, BG_TILE_BIRB_IDLE_RIGHT, PAL_WATER
+        basic_spawn_entry TILE_BIRB_RIGHT, BG_TILE_BIRB_IDLE_RIGHT, PAL_ICE
         default_spawn_pool_details
         pack_size 1, 2
 
@@ -163,7 +163,7 @@ enemy_mole_basic:
         pack_size 2, 4
 
 enemy_mole_advanced:
-        basic_spawn_entry TILE_MOLE_HOLE, BG_TILE_MOLE_HOLE, PAL_WATER
+        basic_spawn_entry TILE_MOLE_HOLE, BG_TILE_MOLE_HOLE, PAL_ICE
         default_spawn_pool_details
         pack_size 1, 3
 

@@ -119,7 +119,7 @@ normal_price:
         jcc thats_too_expensive ; Can't afford it. Sorry!
 
 sell_it_to_meeeeeee:
-        lda #(PAL_WATER | CHR_BANK_000_SHIFTED_NUMERALS)
+        lda #(PAL_ICE | CHR_BANK_000_SHIFTED_NUMERALS)
         jmp queue_cost
 thats_too_expensive:
         lda #(PAL_FIRE | CHR_BANK_000_SHIFTED_NUMERALS)

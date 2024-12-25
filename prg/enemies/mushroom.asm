@@ -12,7 +12,7 @@ CurrentTile := R15
         and #PAL_MASK
         cmp #PAL_EARTH
         beq weird
-        cmp #PAL_WATER
+        cmp #PAL_ICE
         beq intermediate
         cmp #PAL_AIR
         beq advanced
@@ -194,7 +194,7 @@ EnemyHealth := R11
         and #PAL_MASK
         cmp #PAL_EARTH
         beq weird_hp
-        cmp #PAL_WATER
+        cmp #PAL_ICE
         beq intermediate_hp
         cmp #PAL_AIR
         beq advanced_hp
@@ -470,7 +470,7 @@ CurrentTile := R15
         and #PAL_MASK
         cmp #PAL_EARTH
         beq weird_hp
-        cmp #PAL_WATER
+        cmp #PAL_ICE
         beq intermediate_hp
         cmp #PAL_AIR
         beq advanced_hp

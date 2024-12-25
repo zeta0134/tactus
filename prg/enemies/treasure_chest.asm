@@ -45,7 +45,7 @@ AttackSquare := R3
         ; Super easy: replace the chest with a big key tile
         ldx AttackSquare
         stx TargetIndex
-        draw_at_x_withpal TILE_BIG_KEY, BG_TILE_BIG_KEY, PAL_WATER
+        draw_at_x_withpal TILE_BIG_KEY, BG_TILE_BIG_KEY, PAL_ICE
 
         lda #0
         sta tile_data, x

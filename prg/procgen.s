@@ -2264,7 +2264,7 @@ EntityAttribute := R3
         sta EntityId
         lda #<BG_TILE_EXIT_BLOCK
         sta EntityPattern
-        lda #(>BG_TILE_EXIT_BLOCK | PAL_WATER)
+        lda #(>BG_TILE_EXIT_BLOCK | PAL_ICE)
         sta EntityAttribute
         jsr spawn_entity
         rts

@@ -389,7 +389,7 @@ disco_floor_bottom:
         sta battlefield, x
         lda #<BG_TILE_MUSHROOM_IDLE
         sta tile_patterns, x
-        lda #(>BG_TILE_MUSHROOM_IDLE | PAL_WATER)
+        lda #(>BG_TILE_MUSHROOM_IDLE | PAL_ICE)
         sta tile_attributes, x
 
         perform_zpcm_inc

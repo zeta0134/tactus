@@ -789,7 +789,7 @@ choose_air:
         lda #PAL_AIR
         jmp done_choosing_color
 choose_ice:
-        lda #PAL_WATER
+        lda #PAL_ICE
 done_choosing_color:
         sta TargetColor
 
@@ -839,7 +839,7 @@ safe_to_dispatch:
 palette_match_lut:
         .byte PAL_FIRE
         .byte PAL_AIR
-        .byte PAL_WATER
+        .byte PAL_ICE
         .byte PAL_EARTH
 
 ; For any standard enemy that, specifically:

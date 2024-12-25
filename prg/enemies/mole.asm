@@ -17,7 +17,7 @@ CurrentTile := R15
         ; Determine how many beats we should remain idle, based on difficulty
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_WATER
+        cmp #PAL_ICE
         beq advanced
 basic:
         lda #MOLE_BASIC_POPUP_DELAY
@@ -186,7 +186,7 @@ CurrentTile := R15
         ; Determine how many beats we should remain idle, based on difficulty
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_WATER
+        cmp #PAL_ICE
         beq advanced
 basic:
         lda #MOLE_BASIC_VANISH_DELAY
@@ -326,7 +326,7 @@ EnemyHealth := R11
         ldx AttackSquare
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_WATER
+        cmp #PAL_ICE
         beq advanced_hp
 basic_hp:
         set_loot_table intermediate_loot_table
@@ -356,7 +356,7 @@ EnemyHealth := R11
         ldx AttackSquare
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_WATER
+        cmp #PAL_ICE
         beq advanced_hp
 basic_hp:
         set_loot_table intermediate_loot_table
@@ -386,7 +386,7 @@ allow_attack:
         ldx AttackSquare
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_WATER
+        cmp #PAL_ICE
         beq advanced_hp
 basic_hp:
         set_loot_table intermediate_loot_table
@@ -589,7 +589,7 @@ CurrentTile := R15
         ldx CurrentTile
         lda tile_attributes, x
         and #PAL_MASK
-        cmp #PAL_WATER
+        cmp #PAL_ICE
         beq advanced_hp
 basic_hp:
         set_loot_table intermediate_loot_table
