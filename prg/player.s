@@ -1366,10 +1366,21 @@ safe_to_apply:
         rts
 .endproc
 
+.proc lighten_current_room
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #($FF - ROOM_FLAG_DARK)
+        sta room_flags, x
+        lda #30
+        sta target_torchlight_radius
+        rts
+.endproc
+
 .proc cast_spell_fire
         jsr brighten_room
         jsr remove_elemental_raster_effects
         jsr apply_scorched_raster_effect
+        jsr lighten_current_room
         ; Apply red emphasis to this chamber (permanently)
         ldx PlayerRoomIndex
         lda #(TINT_R)
@@ -1387,6 +1398,7 @@ safe_to_apply:
 .proc cast_spell_air
         jsr brighten_room
         jsr remove_elemental_raster_effects
+        jsr lighten_current_room
         ; Apply yellow emphasis to this chamber (permanently)
         ldx PlayerRoomIndex
         lda #(TINT_R | TINT_G)
