@@ -99,9 +99,6 @@ loop:
         lda #$00
         sta $2003
         jsr SPRITE_TRANSFER_BASE
-        ; This signals to the gameloop that it may continue
-        lda GameloopCounter
-        sta LastNmi
         ;jmp all_frames (currently not needed)
 lag_frame:
         ; If necessary: actions to be performed only on lag frames        
@@ -149,6 +146,10 @@ all_frames:
         lda #<((.bank(FAR_setup_raster_table_for_frame) & __BANK_MASK__) | __BANK_OFFSET__)
         sta MAP_PRG_8_LO
         jsr FAR_setup_raster_table_for_frame
+
+        ; This signals to the gameloop that it may continue
+        lda GameloopCounter
+        sta LastNmi
 
         debug_color (TINT_R | LIGHTGRAY)
 
