@@ -9,21 +9,26 @@ CurrentTile := R15
         lda tile_attributes, x
         and #PAL_MASK
         cmp #PAL_AIR
-        beq intermediate
+        beq air
         cmp #PAL_FIRE
-        beq advanced
-        ; Blue slimes have no update behavior; they are stationary
-        ; TODO: what should "world" slimes do?
+        beq fire
+        cmp #PAL_EARTH
+        beq earth
+ice:
+        ; Ice slimes have no update behavior; they are stationary
         rts
-intermediate:
-        near_call ENEMY_UPDATE_update_intermediate_slime
+air:
+        near_call ENEMY_UPDATE_update_air_slime
         rts
-advanced:
-        near_call ENEMY_UPDATE_update_advanced_slime
+fire:
+        near_call ENEMY_UPDATE_update_fire_slime
+        rts
+earth:
+        near_call ENEMY_UPDATE_update_earth_slime
         rts
 .endproc
 
-.proc ENEMY_UPDATE_update_intermediate_slime
+.proc ENEMY_UPDATE_update_air_slime
 TargetTile := R0
 CurrentRow := R14
 CurrentTile := R15
@@ -108,7 +113,7 @@ proceed_with_jump:
         rts
 .endproc
 
-.proc ENEMY_UPDATE_update_advanced_slime
+.proc ENEMY_UPDATE_update_fire_slime
 TargetTile := R0
 TargetRow := R1
 CurrentRow := R14
@@ -165,6 +170,122 @@ west:
         sec
         sbc #1
         sta TargetTile
+converge:
+        ; Sanity check: is the target tile free?
+        if_valid_destination proceed_with_jump
+cancel_jump:
+        ; fix our state and exit
+        ldx CurrentTile
+        lda tile_data, x
+        ; ahead and advance to the next direction
+        clc
+        adc #1 
+        ; but not too far
+        and #%00000011
+        sta tile_data, x
+        rts
+proceed_with_jump:
+        ldx CurrentTile
+        ldy TargetTile
+        ; Draw ourselves at the target (keep our color palette)
+        draw_at_y_with_pal_x TILE_SLIME, BG_TILE_SLIME_IDLE
+
+        ; Set up our attributes for the next jump
+        lda tile_data, x
+        ; ahead and advance to the next direction
+        clc
+        adc #1 
+        ; but not too far
+        and #%00000011
+        sta tile_data, y
+
+        ; Write our new position to the data byte for the puff of smoke
+        lda TargetTile
+        sta tile_data, x
+
+        ; Flag ourselves as having just moved; this signals to the player that our old
+        ; position is a valid target, and it also signals to the engine that we shouldn't be ticked
+        ; a second time, if our target square comes up while we're scanning
+        lda #FLAG_MOVED_THIS_FRAME
+        sta tile_flags, y
+        ; Clear the data flags for the puff of smoke, just to keep things tidy
+        lda #FLAG_MOVED_THIS_FRAME
+        sta tile_flags, x
+
+        ; Finally, draw the puff of smoke at our current location
+        ; (this clobbers X and Y, so we prefer to do it last)
+        lda CurrentTile
+        sta SmokePuffTile
+        lda CurrentRow
+        sta SmokePuffRow
+        near_call ENEMY_UPDATE_draw_smoke_puff
+
+        rts
+.endproc
+
+.proc ENEMY_UPDATE_update_earth_slime
+TargetTile := R0
+TargetRow := R1
+CurrentRow := R14
+CurrentTile := R15
+        ; Weird slime: every beat, move in one of the 4 diagonal direction
+        ; bits, which normally start all zero:
+        ; 76543210
+        ;       ||
+        ;       ++-- next direction
+        ldx CurrentTile
+        bail_if_already_moved
+
+        lda CurrentRow
+        sta TargetRow
+
+        lda tile_data, x
+        and #%00000011
+        cmp #0
+        beq southeast
+        cmp #1
+        beq southwest
+        cmp #2
+        beq northwest
+northeast:
+        lda #DUST_DIRECTION_SW
+        sta SmokePuffDirection
+        lda CurrentTile
+        sec
+        sbc #(BATTLEFIELD_WIDTH)
+        sta TargetTile
+        inc TargetTile
+        dec TargetRow
+        jmp converge
+southeast:
+        lda #DUST_DIRECTION_NW
+        sta SmokePuffDirection
+        lda CurrentTile
+        clc
+        adc #(BATTLEFIELD_WIDTH)
+        sta TargetTile
+        inc TargetTile
+        inc TargetRow
+        jmp converge
+southwest:
+        lda #DUST_DIRECTION_NE
+        sta SmokePuffDirection
+        lda CurrentTile
+        clc
+        adc #(BATTLEFIELD_WIDTH)
+        sta TargetTile
+        dec TargetTile
+        inc TargetRow
+        jmp converge
+northwest:
+        lda #DUST_DIRECTION_SE
+        sta SmokePuffDirection
+        lda CurrentTile
+        sec
+        sbc #(BATTLEFIELD_WIDTH)
+        sta TargetTile
+        dec TargetTile
+        dec TargetRow
 converge:
         ; Sanity check: is the target tile free?
         if_valid_destination proceed_with_jump

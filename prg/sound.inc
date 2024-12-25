@@ -77,6 +77,11 @@
 .global CandidateSfxPtr
 .global CandidateSfxPriority
 
+.global Pulse1RowCounter
+.global Pulse2RowCounter
+.global Pulse1DelayCounter
+.global Pulse2DelayCounter
+
 TRACK_SILENCE          = 0
 TRACK_CLICK            = 1
 TRACK_TITLE            = 2
@@ -115,6 +120,22 @@ TRACK_VARIANT_PAUSE    = 2
         jsr _play_sfx_pulse1
 .endmacro
 
+.macro queue_sfx_pulse1_with_lowest_priority sound_ptr
+.scope
+        lda Pulse1RowCounter
+        ora Pulse1DelayCounter
+        bne skip
+        lda #<sound_ptr
+        sta CandidateSfxPtr+0
+        lda #>sound_ptr
+        sta CandidateSfxPtr+1
+        lda #0
+        sta CandidateSfxPriority
+        jsr _play_sfx_pulse1
+skip:
+.endscope
+.endmacro
+
 .macro queue_sfx_pulse1 sound_ptr
         queue_sfx_pulse1_with_priority sound_ptr, #0
 .endmacro
@@ -131,6 +152,22 @@ lda #<sound_ptr
         lda priority
         sta CandidateSfxPriority
         jsr _play_sfx_pulse2
+.endmacro
+
+.macro queue_sfx_pulse2_with_lowest_priority sound_ptr
+.scope
+        lda Pulse2RowCounter
+        ora Pulse2DelayCounter
+        bne skip
+        lda #<sound_ptr
+        sta CandidateSfxPtr+0
+        lda #>sound_ptr
+        sta CandidateSfxPtr+1
+        lda #0
+        sta CandidateSfxPriority
+        jsr _play_sfx_pulse2
+skip:
+.endscope
 .endmacro
 
 .macro queue_sfx_pulse2 sound_ptr

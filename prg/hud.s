@@ -912,7 +912,7 @@ converge:
         rts
         
 play_coin_sfx:
-        queue_sfx_pulse1 sfx_cash_flow
+        queue_sfx_pulse1_with_lowest_priority sfx_cash_flow
 
         lda #3
         sta GoldSfxCooldown
