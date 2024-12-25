@@ -247,7 +247,7 @@ HeartCount := R2
         sta PlayerEquipmentAccessory
         lda #ITEM_BOMB_STANDARD
         sta PlayerEquipmentBombs
-        lda #ITEM_SPELL_BOMB
+        lda #ITEM_SPELL_ICE
         sta PlayerEquipmentSpell
 
         lda #99

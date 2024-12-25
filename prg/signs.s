@@ -5,6 +5,8 @@
         .include "_globals.inc"
 
         .include "dialog.inc"
+        .include "player.inc"
+        .include "procgen.inc"
         .include "prng.inc"
         .include "zpcm.inc"
 
@@ -18,6 +20,30 @@ sign_placeholder:
         .byte "Hello World! I'm just a", D_NEWLINE
         .byte "placeholder sign with", D_NEWLINE
         .byte "nothing important to say!", D_WAIT, D_CLOSE
+
+sign_snowy_shop_festivus:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_RED
+        .byte "HAPPY FESTIVUS", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_WHITE
+        .byte " Need to air grievances?", D_NEWLINE
+        .byte "  We've got just the thing!", D_WAIT, D_CLOSE
+
+sign_snowy_shop_happy_holidays:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_RED
+        .byte "HAPPY HOLIDAYS", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_WHITE
+        .byte "  From all of us at", D_NEWLINE
+        .byte "    Boxgirl Studios!", D_WAIT, D_CLOSE
+
+sign_snowy_shop_ho_ho_ho:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_RED
+        .byte "HO - HO - HO", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_WHITE
+        .byte "   Now I have", D_NEWLINE
+        .byte "      a machine gun!", D_WAIT, D_CLOSE
 
 sign_shop_generic:
         ;     0123456789012345678901234567 ; 28-char width
@@ -113,6 +139,12 @@ shop_text_table:
         .word shop_wicked_wares
 NUM_SHOP_SIGNS = 4
 
+sign_text_table_snowy:
+        .word sign_snowy_shop_festivus
+        .word sign_snowy_shop_happy_holidays
+        .word sign_snowy_shop_ho_ho_ho
+NUM_SNOWY_SHOP_SIGNS = 3
+
 .proc shop_sign_rng
         ; we actually want this to be really deterministic, so base it
         ; on the floor seed's lowest byte
@@ -123,7 +155,7 @@ NUM_SHOP_SIGNS = 4
 ; Sign ID in A
 .proc FAR_display_sign_text
         cmp #SIGN_SHOP
-        beq roll_random_shop_sign
+        beq shop_sign
         asl
         tax
         lda sign_text_table+0, x
@@ -131,13 +163,27 @@ NUM_SHOP_SIGNS = 4
         lda sign_text_table+1, x
         sta DialogActiveStringPtr+1
         jmp converge
-roll_random_shop_sign:
+shop_sign:
+        ldx PlayerRoomIndex
+        lda room_palette_variant, x
+        cmp #ROOM_PALETTE_ICE
+        beq roll_random_holiday_sign
+roll_random_regular_sign:
         in_range_smol shop_sign_rng, #NUM_SHOP_SIGNS
         asl
         tax
         lda shop_text_table+0, x
         sta DialogActiveStringPtr+0
         lda shop_text_table+1, x
+        sta DialogActiveStringPtr+1
+        jmp converge
+roll_random_holiday_sign:
+        in_range_smol shop_sign_rng, #NUM_SNOWY_SHOP_SIGNS
+        asl
+        tax
+        lda sign_text_table_snowy+0, x
+        sta DialogActiveStringPtr+0
+        lda sign_text_table_snowy+1, x
         sta DialogActiveStringPtr+1
 converge:
         lda #<.bank(sign_text_bank)
