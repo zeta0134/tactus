@@ -71,6 +71,9 @@
 .global sfx_fae_pulse1
 .global sfx_fae_pulse2
 
+.global sfx_chill_pulse1
+.global sfx_chill_pulse2
+
 .global CandidateSfxPtr
 .global CandidateSfxPriority
 

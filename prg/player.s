@@ -247,7 +247,7 @@ HeartCount := R2
         sta PlayerEquipmentAccessory
         lda #ITEM_BOMB_STANDARD
         sta PlayerEquipmentBombs
-        lda #ITEM_SPELL_EARTH
+        lda #ITEM_SPELL_ICE
         sta PlayerEquipmentSpell
 
         lda #99
@@ -1417,6 +1417,8 @@ safe_to_apply:
         sta room_palette_variant, x
         far_call FAR_load_palette_for_current_room
         ; TODO: fancy stuffs!
+        queue_sfx_pulse1_with_priority sfx_chill_pulse1, #10
+        queue_sfx_pulse2_with_priority sfx_chill_pulse2, #10
         rts
 .endproc
 

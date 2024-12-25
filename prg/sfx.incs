@@ -933,3 +933,60 @@ sfx_fae_pulse2:
         pulse_cont_duty                $1,     $5,                                        0
         pulse_cont_duty                $1,     $7,                                        0
         pulse_cont_duty                $1,     $9,                                        0
+
+sfx_chill_pulse1:
+        ; Length in rows
+        .byte 23
+        ;                    pitch, duty, volume,   length
+        pulse_init        PITCH_D7 ,   $2,     $F,         1
+        pulse_cont_freq   PITCH_A6 ,                       0
+        pulse_cont_freq   PITCH_F6 ,                       0
+        pulse_cont_freq   PITCH_D6 ,                       0
+        pulse_cont_freq   PITCH_A5 ,                       0
+        pulse_init        PITCH_A5 ,   $2,     $1,         0
+        pulse_init        PITCH_D7 ,   $2,     $A,         1
+        pulse_cont_freq   PITCH_A6 ,                       0
+        pulse_cont_freq   PITCH_F6 ,                       0
+        pulse_cont_freq   PITCH_D6 ,                       0
+        pulse_cont_freq   PITCH_A5 ,                       0
+        pulse_init        PITCH_A5 ,   $2,     $1,         0
+        pulse_init        PITCH_D7 ,   $2,     $8,         1
+        pulse_cont_freq   PITCH_A6 ,                       0
+        pulse_cont_freq   PITCH_F6 ,                       0
+        pulse_cont_freq   PITCH_D6 ,                       0
+        pulse_cont_freq   PITCH_A5 ,                       0
+        pulse_init        PITCH_A5 ,   $2,     $1,         0
+        pulse_init        PITCH_D7 ,   $2,     $4,         1
+        pulse_cont_freq   PITCH_A6 ,                       0
+        pulse_cont_freq   PITCH_F6 ,                       0
+        pulse_cont_freq   PITCH_D6 ,                       0
+        pulse_cont_freq   PITCH_A5 ,                       0
+
+sfx_chill_pulse2:
+        ; Length in rows
+        .byte 23
+        ;                    pitch, duty, volume,   length
+        pulse_init        PITCH_AS6,   $2,     $F,         1
+        pulse_cont_freq   PITCH_F6 ,                       0
+        pulse_cont_freq   PITCH_CS6,                       0
+        pulse_cont_freq   PITCH_AS5,                       0
+        pulse_cont_freq   PITCH_F5 ,                       0
+        pulse_init        PITCH_F5 ,   $2,     $1,         0
+        pulse_init        PITCH_AS6,   $2,     $A,         1
+        pulse_cont_freq   PITCH_F6 ,                       0
+        pulse_cont_freq   PITCH_CS6,                       0
+        pulse_cont_freq   PITCH_AS5,                       0
+        pulse_cont_freq   PITCH_F5 ,                       0
+        pulse_init        PITCH_F5 ,   $2,     $1,         0
+        pulse_init        PITCH_AS6,   $2,     $8,         1
+        pulse_cont_freq   PITCH_F6 ,                       0
+        pulse_cont_freq   PITCH_CS6,                       0
+        pulse_cont_freq   PITCH_AS5,                       0
+        pulse_cont_freq   PITCH_F5 ,                       0
+        pulse_init        PITCH_F5 ,   $2,     $1,         0
+        pulse_init        PITCH_AS6,   $2,     $4,         1
+        pulse_cont_freq   PITCH_F6 ,                       0
+        pulse_cont_freq   PITCH_CS6,                       0
+        pulse_cont_freq   PITCH_AS5,                       0
+        pulse_cont_freq   PITCH_F5 ,                       0
+        
