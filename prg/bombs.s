@@ -30,12 +30,6 @@ BOMB_STATE_STANDARD_GROUNDED = 4
 BOMB_STATE_PARTY_INIT     = 5
 BOMB_STATE_PARTY_GROUNDED = 6
 
-; Corresponding to player inputs
-DIRECTION_NORTH = 1
-DIRECTION_EAST  = 2
-DIRECTION_SOUTH = 3
-DIRECTION_WEST  = 4
-
         .segment "PRGRAM"
 
 bomb_entities: .res ::MAX_ACTIVE_BOMBS * .sizeof(BombState)
@@ -381,31 +375,35 @@ safe_to_throw:
         ; Based on the player's current throw direction, move the bomb ahead 2 squares
         ; in that direction. But! Don't move the bomb off the edge of the map
         lda PlayerNextDirection
-        cmp #DIRECTION_NORTH
+        cmp #PLAYER_DIRECTION_NORTH
         beq try_up
-        cmp #DIRECTION_SOUTH
+        cmp #PLAYER_DIRECTION_SOUTH
         beq try_down
-        cmp #DIRECTION_EAST
+        cmp #PLAYER_DIRECTION_EAST
         beq try_right
-        cmp #DIRECTION_WEST
+        cmp #PLAYER_DIRECTION_WEST
         beq try_left
         ; huh? well that's weird. cancel!
         rts
 try_up:
+        .repeat ::BOMB_STANDARD_THROW_DISTANCE
         jsr _nudge_up
-        jsr _nudge_up
+        .endrepeat
         jmp done_moving
 try_down:
+        .repeat ::BOMB_STANDARD_THROW_DISTANCE
         jsr _nudge_down
-        jsr _nudge_down
+        .endrepeat
         jmp done_moving
 try_left:
+        .repeat ::BOMB_STANDARD_THROW_DISTANCE
         jsr _nudge_left
-        jsr _nudge_left
+        .endrepeat
         jmp done_moving
 try_right:
+        .repeat ::BOMB_STANDARD_THROW_DISTANCE
         jsr _nudge_right
-        jsr _nudge_right
+        .endrepeat
         jmp done_moving
 done_moving:
         ; Because we may have just moved, update our target coordinates
@@ -517,7 +515,7 @@ done_with_state_changes:
         ; If we've exceeded the fuse length, pretty much no matter what
         ; actual state we're in, EXPLODE on the spot. Otherwise, we're done
         lda bomb_entities + BombState::FuseDuration, x
-        cmp #4
+        cmp #BOMB_STANDARD_FUSE_LENGTH
         bcs explode
         rts
 explode:
@@ -575,7 +573,7 @@ not_currently_held:
         ; If we've exceeded the fuse length, pretty much no matter what
         ; actual state we're in, EXPLODE on the spot. Otherwise, we're done
         lda bomb_entities + BombState::FuseDuration, x
-        cmp #4
+        cmp #BOMB_STANDARD_FUSE_LENGTH
         bcs explode
         rts
 explode:

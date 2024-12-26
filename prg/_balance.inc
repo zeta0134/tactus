@@ -179,4 +179,5 @@ SLIME_LOOT_TABLE = tiny_loot_table
 ; ░▒▓█▓▒░  ░▒▓█▓▒░   ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░      ░▒▓█▓▒░ 
 ; ░▒▓█▓▒░  ░▒▓█▓▒░   ░▒▓████████▓▒░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓███████▓▒░  
 
-
+BOMB_STANDARD_FUSE_LENGTH = 4
+BOMB_STANDARD_THROW_DISTANCE = 3

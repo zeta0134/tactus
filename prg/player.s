@@ -120,16 +120,6 @@ PlayerHeldBombIndex: .res 1
 
 WeaponSingleTargetIndex: .res 1
 
-DIRECTION_NORTH = 1
-DIRECTION_EAST  = 2
-DIRECTION_SOUTH = 3
-DIRECTION_WEST  = 4
-
-DIRECTION_NORTHEAST = 5
-DIRECTION_SOUTHEAST = 6
-DIRECTION_NORTHWEST = 7
-DIRECTION_SOUTHWEST = 8
-
 .segment "PRGFIXED_E000"
 
 ; For rapidly computing the tile row
@@ -632,7 +622,7 @@ check_north:
         lda #KEY_UP
         bit ButtonsDown
         beq check_east
-        lda #DIRECTION_NORTH
+        lda #PLAYER_DIRECTION_NORTH
         sta PlayerNextDirection
         lda #0
         sta PlayerIntendsToWait
@@ -643,7 +633,7 @@ check_east:
         lda #KEY_RIGHT
         bit ButtonsDown
         beq check_south        
-        lda #DIRECTION_EAST
+        lda #PLAYER_DIRECTION_EAST
         sta PlayerNextDirection
         lda #0
         sta PlayerIntendsToWait
@@ -654,7 +644,7 @@ check_south:
         lda #KEY_DOWN
         bit ButtonsDown
         beq check_west
-        lda #DIRECTION_SOUTH
+        lda #PLAYER_DIRECTION_SOUTH
         sta PlayerNextDirection
         lda #0
         sta PlayerIntendsToWait
@@ -665,7 +655,7 @@ check_west:
         lda #KEY_LEFT
         bit ButtonsDown
         beq check_wait ; this shouldn't be reachable
-        lda #DIRECTION_WEST
+        lda #PLAYER_DIRECTION_WEST
         sta PlayerNextDirection
         lda #0
         sta PlayerIntendsToWait
@@ -1103,12 +1093,12 @@ perform_bomb_throw:
         ; doesn't bother
         lda PlayerNextDirection
 check_bomb_east:
-        cmp #DIRECTION_EAST
+        cmp #PLAYER_DIRECTION_EAST
         bne check_bomb_west
         jsr player_face_right
         jmp check_bomb_in_hand
 check_bomb_west:
-        cmp #DIRECTION_WEST
+        cmp #PLAYER_DIRECTION_WEST
         bne no_bomb_facing_change
         jsr player_face_left
 no_bomb_facing_change:
@@ -1570,22 +1560,22 @@ previous_move_succeeded:
         ldx TargetCol
         ldy TargetRow
 check_north:
-        cmp #DIRECTION_NORTH
+        cmp #PLAYER_DIRECTION_NORTH
         bne check_east
         cpy #0
         beq done_with_go_go_boots
 check_east:
-        cmp #DIRECTION_EAST
+        cmp #PLAYER_DIRECTION_EAST
         bne check_south
         cpx #(BATTLEFIELD_WIDTH-1)
         beq done_with_go_go_boots
 check_south:
-        cmp #DIRECTION_SOUTH
+        cmp #PLAYER_DIRECTION_SOUTH
         bne check_west
         cpy #(BATTLEFIELD_HEIGHT-1)
         beq done_with_go_go_boots
 check_west:
-        cmp #DIRECTION_WEST
+        cmp #PLAYER_DIRECTION_WEST
         bne done_with_map_edge_checks
         cpx #0
         beq done_with_go_go_boots
@@ -1635,23 +1625,23 @@ TargetCol := R15
 ; Movement 
         lda PlayerNextDirection
 check_north:
-        cmp #DIRECTION_NORTH
+        cmp #PLAYER_DIRECTION_NORTH
         bne check_east
         dec TargetRow
         jmp done_choosing_target
 check_east:
-        cmp #DIRECTION_EAST
+        cmp #PLAYER_DIRECTION_EAST
         bne check_south
         inc TargetCol
         jsr player_face_right
         jmp done_choosing_target
 check_south:
-        cmp #DIRECTION_SOUTH
+        cmp #PLAYER_DIRECTION_SOUTH
         bne check_west
         inc TargetRow
         jmp done_choosing_target
 check_west:
-        cmp #DIRECTION_WEST
+        cmp #PLAYER_DIRECTION_WEST
         bne done_choosing_target
         dec TargetCol        
         jsr player_face_left
@@ -1721,23 +1711,23 @@ TargetCol := R15
 
         lda PlayerNextDirection
 check_north:
-        cmp #DIRECTION_NORTH
+        cmp #PLAYER_DIRECTION_NORTH
         bne check_east
         ldy #WeaponClass::NorthSquaresPtr
         jmp done_choosing_direction
 check_east:
-        cmp #DIRECTION_EAST
+        cmp #PLAYER_DIRECTION_EAST
         bne check_south
         jsr player_face_right
         ldy #WeaponClass::EastSquaresPtr
         jmp done_choosing_direction
 check_south:
-        cmp #DIRECTION_SOUTH
+        cmp #PLAYER_DIRECTION_SOUTH
         bne check_west
         ldy #WeaponClass::SouthSquaresPtr
         jmp done_choosing_direction
 check_west:
-        cmp #DIRECTION_WEST
+        cmp #PLAYER_DIRECTION_WEST
         bne done_choosing_direction ; should never be taken
         jsr player_face_left
         ldy #WeaponClass::WestSquaresPtr
