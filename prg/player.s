@@ -626,9 +626,14 @@ handle_button_press:
         ; Only one button can take effect
         lda #0
         sta PlayerIntendsToPause
-        ; Because we are taking a new action, clear any held state
+
+        ; If we are taking any action _other_ than SELECT, clear the held inputs.
+        lda #(KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT | KEY_B | KEY_A)
+        bit ButtonsDown
+        beq done_clearing_held_state
         lda #0
         sta PlayerHeldDirection
+done_clearing_held_state:
 
         ; For now, the last button press we receive in a given beat
         ; will be the one that counts once we begin processing.

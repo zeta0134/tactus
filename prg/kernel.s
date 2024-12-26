@@ -69,6 +69,8 @@ RoomTransitionType: .res 1
 PlayfieldObjBanks: .res 16
 HudObjBanks: .res 8
 
+HeldInputCooldown: .res 1
+
 .segment "CODE_1"
 
 ; === Utility Functions ===
@@ -488,6 +490,9 @@ LayoutPtr := R0
         sta tempo_adjustment
         lda #0
         sta RoomTransitionType
+
+        lda #0
+        sta HeldInputCooldown
 
         ; play lovely silence while we load
         ; (this also ensures the music / beat counter are in a deterministic spot when we fade back in)
@@ -1337,10 +1342,47 @@ patient_mode:
         rts
 .endproc
 
+.proc compute_synthetic_held_intent_cleared
+ScratchByte := R0
+SyntheticHeldIntent := R2
+        lda PlayerHeldDirection
+        beq not_holding_anything
+
+        lda HeldInputCooldown
+        cmp #$FF
+        beq skip_inc
+        inc HeldInputCooldown
+skip_inc:
+
+        ; For the held threshold in clear mode, we'll use
+        ; the full duration of one entire musical beat
+        lda HeldInputCooldown
+        cmp TrackedBeatLength
+        bcs threshold_met
+threshold_not_met:
+        lda #0
+        sta SyntheticHeldIntent
+        rts
+threshold_met:
+        ; Finally, apply the player's held intent and return
+        lda PlayerHeldDirection
+        sta SyntheticHeldIntent
+        rts
+
+not_holding_anything:
+        lda #0
+        sta SyntheticHeldIntent
+        sta HeldInputCooldown
+        rts
+.endproc
+
 .proc wait_for_the_next_cleared_room_beat
+SyntheticHeldIntent := R2
+        jsr compute_synthetic_held_intent_cleared
+
         ; If the player's input has arrived...
         lda PlayerNextDirection
-        ora PlayerHeldDirection
+        ora SyntheticHeldIntent
         ora PlayerIntendsToPause
         ora PlayerIntendsToWait
         ora PlayerIntendsToBomb
