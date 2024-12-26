@@ -491,9 +491,6 @@ LayoutPtr := R0
         lda #0
         sta RoomTransitionType
 
-        lda #0
-        sta HeldInputCooldown
-
         ; play lovely silence while we load
         ; (this also ensures the music / beat counter are in a deterministic spot when we fade back in)
         lda #TRACK_SILENCE
@@ -597,6 +594,10 @@ LayoutPtr := R0
 
         ; Clear out any gameplay state that will look odd over the zone transition
         .global FAR_init_particles
+
+        lda #0
+        sta HeldInputCooldown
+        sta PlayerHeldDirection
 
         ; Generate proper mazes and randomize player, exit, and boss
         far_call FAR_init_floor
@@ -1343,7 +1344,6 @@ patient_mode:
 .endproc
 
 .proc compute_synthetic_held_intent_cleared
-ScratchByte := R0
 SyntheticHeldIntent := R2
         lda PlayerHeldDirection
         beq not_holding_anything
@@ -1366,6 +1366,47 @@ threshold_not_met:
 threshold_met:
         ; Finally, apply the player's held intent and return
         lda PlayerHeldDirection
+        sta SyntheticHeldIntent
+        rts
+
+not_holding_anything:
+        lda #0
+        sta SyntheticHeldIntent
+        sta HeldInputCooldown
+        rts
+.endproc
+
+.proc compute_synthetic_held_intent_patient
+SyntheticHeldIntent := R2
+        lda PlayerHeldDirection
+        beq not_holding_anything
+
+        lda HeldInputCooldown
+        cmp #$FF
+        beq skip_inc
+        inc HeldInputCooldown
+skip_inc:
+
+        ; For the held threshold in patient mode, we'll also use
+        ; the full duration of one entire musical beat
+        lda HeldInputCooldown
+        cmp TrackedBeatLength
+        bcs threshold_met
+threshold_not_met:
+        lda #0
+        sta SyntheticHeldIntent
+        rts
+threshold_met:
+        ; Now, for patient mode, we will only apply HELD intent on beat boundaries
+        lda CurrentBeat
+        cmp LastBeat
+        beq not_yet
+get_on_with_it_already:
+        lda PlayerHeldDirection
+        sta SyntheticHeldIntent
+        rts
+not_yet:
+        lda #0
         sta SyntheticHeldIntent
         rts
 
@@ -1448,6 +1489,11 @@ process_next_beat_now:
 .endproc
 
 .proc wait_for_the_next_standard_gameplay_beat
+        ; Make sure when we transition OUT of standard gameplay we don't
+        ; insta-buffer a held repeat, as this can be quite awkward and fast
+        lda #0
+        sta HeldInputCooldown
+
         ; when we transition from standard -> cleared, do take the first on-beat
         ; transition right away. this eliminates a delay cycle with disco tiles still
         ; visible
@@ -1507,6 +1553,13 @@ continue_waiting:
 .endproc
 
 .proc wait_for_the_next_indefinite_gameplay_beat
+SyntheticHeldIntent := R2
+        jsr compute_synthetic_held_intent_patient
+
+        ; always track the last beat, as repeat inputs need to key on this
+        lda CurrentBeat
+        sta LastBeat
+
         ; when we transition from standard -> cleared, do take the first on-beat
         ; transition right away. this eliminates a delay cycle with disco tiles still
         ; visible
@@ -1516,7 +1569,7 @@ continue_waiting:
         ; Process a beat transition whenever. We are not synced to the rhythm at all!
         ; If the player's input HAS arrived:
         lda PlayerNextDirection
-        ora PlayerHeldDirection
+        ora SyntheticHeldIntent
         ora PlayerIntendsToPause
         ora PlayerIntendsToWait
         ora PlayerIntendsToBomb
