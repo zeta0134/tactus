@@ -990,3 +990,12 @@ sfx_chill_pulse2:
         pulse_cont_freq   PITCH_AS5,                       0
         pulse_cont_freq   PITCH_F5 ,                       0
         
+sfx_go_go_pulse:
+        .byte 6
+        ;                    pitch, duty, volume,                            sweep, length
+        pulse_init_sweep  PITCH_DS3,  $2,     $8, (S_PERIOD_0 | S_SHIFT_4 | S_NEG),      0
+        pulse_cont_duty               $2,     $9,                                        0
+        pulse_cont_duty               $2,     $A,                                        0
+        pulse_cont_duty               $2,     $B,                                        0
+        pulse_cont_duty               $2,     $9,                                        0
+        pulse_cont_duty               $2,     $7,                                        0

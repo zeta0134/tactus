@@ -1340,6 +1340,7 @@ patient_mode:
 .proc wait_for_the_next_cleared_room_beat
         ; If the player's input has arrived...
         lda PlayerNextDirection
+        ora PlayerHeldDirection
         ora PlayerIntendsToPause
         ora PlayerIntendsToWait
         ora PlayerIntendsToBomb
@@ -1418,6 +1419,7 @@ process_next_beat_now:
         ; The time for the next beat has come.
         ; If the player's input HAS arrived:
         lda PlayerNextDirection
+        ora PlayerHeldDirection
         ora PlayerIntendsToPause
         ora PlayerIntendsToWait
         ora PlayerIntendsToBomb
@@ -1472,6 +1474,7 @@ continue_waiting:
         ; Process a beat transition whenever. We are not synced to the rhythm at all!
         ; If the player's input HAS arrived:
         lda PlayerNextDirection
+        ora PlayerHeldDirection
         ora PlayerIntendsToPause
         ora PlayerIntendsToWait
         ora PlayerIntendsToBomb

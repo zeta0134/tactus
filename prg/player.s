@@ -70,6 +70,7 @@ PlayerRow: .res 1
 PlayerCol: .res 1
 
 PlayerNextDirection: .res 1
+PlayerHeldDirection: .res 1
 
 ; full words, to do a smooth little lerp thing
 PlayerCurrentX: .res 2
@@ -227,11 +228,11 @@ HeartCount := R2
         ; The player should start with whatever Zeta likes        
         lda #ITEM_FLAIL_L1
         sta PlayerEquipmentWeapon
-        lda #ITEM_NONE
+        lda #ITEM_LARGE_TORCH
         sta PlayerEquipmentTorch
         lda #ITEM_SHIELD
         sta PlayerEquipmentArmor
-        lda #ITEM_NONE
+        lda #ITEM_GO_GO_BOOTS
         sta PlayerEquipmentBoots
         lda #ITEM_CHAIN_LINK
         sta PlayerEquipmentAccessory
@@ -329,6 +330,7 @@ heart_loop:
         sta PlayerIntendsToWait
         sta PlayerIntendsToPause
         sta PlayerNextDirection
+        sta PlayerHeldDirection
 
         lda #0
         sta PlayerTookDamageThisBeat
@@ -588,6 +590,8 @@ correct_slide_up:
 ; all the other possibilities when chosen.
 
 .proc FAR_determine_player_intent
+        ; The attempt to pause takes the highest priority, and if met,
+        ; suppresses all other buttons
         lda #(KEY_START)
         bit ButtonsDown
         beq check_pause_state
@@ -595,13 +599,23 @@ correct_slide_up:
         sta PlayerIntendsToPause
         lda #0
         sta PlayerNextDirection
+        sta PlayerHeldDirection
         rts
 
         ; While actually paused, the only valid action is to attempt to unpause!
 check_pause_state:
         lda PlayerIsPaused
-        beq check_action_buttons
+        beq check_direction_release
         rts
+
+        ; If any button on the D-Pad is ever released, clear the hold action
+        ; (other buttons do not have hold states, so we'll ignore them here)
+check_direction_release:
+        lda #(KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT)
+        bit ButtonsUp
+        beq check_action_buttons
+        lda #0
+        sta PlayerHeldDirection
 
 check_action_buttons:
         lda #(KEY_DOWN | KEY_UP | KEY_LEFT | KEY_RIGHT | KEY_SELECT | KEY_B  | KEY_A)
@@ -612,6 +626,9 @@ handle_button_press:
         ; Only one button can take effect
         lda #0
         sta PlayerIntendsToPause
+        ; Because we are taking a new action, clear any held state
+        lda #0
+        sta PlayerHeldDirection
 
         ; For now, the last button press we receive in a given beat
         ; will be the one that counts once we begin processing.
@@ -930,6 +947,13 @@ no_darkness:
         rts
 .endproc
 
+player_direction_button_lut:
+        .byte $00 ; unused
+        .byte KEY_UP    ; PLAYER_DIRECTION_NORTH
+        .byte KEY_RIGHT ; PLAYER_DIRECTION_EAST
+        .byte KEY_DOWN  ; PLAYER_DIRECTION_SOUTH
+        .byte KEY_LEFT  ; PLAYER_DIRECTION_WEST
+
 .proc player_state_normal
 TorchlightTotal := R0
 
@@ -968,6 +992,7 @@ done_with_initial_pose:
 
         ; If we aren't intending to move, then skip to collision processing
         lda PlayerNextDirection
+        ora PlayerHeldDirection
         beq resolve_enemy_collision
 
         lda #0
@@ -1014,6 +1039,7 @@ apply_jumping_pose:
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER_JUMP
         ; The player's movement succeeded, so store that in a flag
         lda PlayerNextDirection
+        ora PlayerHeldDirection
         sta PlayerPreviousSuccessfulDirection
 skip_jumping_pose:
 
@@ -1028,6 +1054,17 @@ skip_jumping_pose:
 
         jsr set_player_target_coordinates
 
+        ; If the player is still holding this directional input, carry it over
+        ; to the next beat as a held input
+        ; (note: do this part unconditionally, as some mechanics rely on held inputs.
+        ; the optional ones will be checked at each site)
+        ldx PlayerNextDirection
+        lda player_direction_button_lut, x
+        and ButtonsThisFrame
+        beq done_with_held_inputs
+        lda PlayerNextDirection
+        sta PlayerHeldDirection
+done_with_held_inputs:
         ; Clear player intent for the next beat
         lda #0
         sta PlayerNextDirection
@@ -1158,6 +1195,17 @@ resolve_enemy_collision:
 
         jsr set_player_target_coordinates
 
+        ; If the player is still holding this directional input, carry it over
+        ; to the next beat as a held input
+        ; (note: do this part unconditionally, as some mechanics rely on held inputs.
+        ; the optional ones will be checked at each site)
+        ldx PlayerNextDirection
+        lda player_direction_button_lut, x
+        and ButtonsThisFrame
+        beq done_with_held_inputs
+        lda PlayerNextDirection
+        sta PlayerHeldDirection
+done_with_held_inputs:
         ; Clear player intent for the next beat
         lda #0
         sta PlayerNextDirection
@@ -1241,6 +1289,17 @@ resolve_enemy_collision:
 
         jsr set_player_target_coordinates
 
+        ; If the player is still holding some directional input,
+        ; even though we ignored it, carry it over anyway. (this way we don't eat that input.)
+        ; (note: do this part unconditionally, as some mechanics rely on held inputs.
+        ; the optional ones will be checked at each site)
+        ldx PlayerNextDirection
+        lda player_direction_button_lut, x
+        and ButtonsThisFrame
+        beq done_with_held_inputs
+        lda PlayerNextDirection
+        sta PlayerHeldDirection
+done_with_held_inputs:
         ; Clear player intent for the next beat
         lda #0
         sta PlayerNextDirection
@@ -1532,16 +1591,17 @@ TargetCol := R15
         ; then attempt a move again!
         lda PlayerEquipmentBoots
         cmp #ITEM_GO_GO_BOOTS
-        bne done_with_go_go_boots
+        jne done_with_go_go_boots
 
-        ; don't trigger if we aren't actually attempting a move
-        lda PlayerNextDirection
+        ; don't trigger if we aren't actually attempting a move. also, specifically,
+        ; go go boots now trigger on HELD movements only. Ignore a fresh press!
+        lda PlayerHeldDirection
         beq done_with_go_go_boots
 
         ; don't trigger if we are changing directions OR if this is our
         ; first movement in this chain
         lda PlayerPreviousSuccessfulDirection
-        cmp PlayerNextDirection
+        cmp PlayerHeldDirection
         bne done_with_go_go_boots
 
         ; don't trigger if the previous movement failed!
@@ -1556,7 +1616,7 @@ previous_move_succeeded:
 
         ; don't trigger if we are moving towards a map border and we have
         ; already arrived there!
-        lda PlayerNextDirection
+        lda PlayerHeldDirection
         ldx TargetCol
         ldy TargetRow
 check_north:
@@ -1580,8 +1640,9 @@ check_west:
         cpx #0
         beq done_with_go_go_boots
 done_with_map_edge_checks:
-
         ; finally, all the sanity checks having passed, do the thing
+        queue_sfx_pulse1 sfx_go_go_pulse
+
         ; firstly, commit the previous move (it succeeded)
         lda TargetCol
         sta PlayerCol
@@ -1624,6 +1685,7 @@ TargetCol := R15
 
 ; Movement 
         lda PlayerNextDirection
+        ora PlayerHeldDirection
 check_north:
         cmp #PLAYER_DIRECTION_NORTH
         bne check_east
@@ -1710,6 +1772,7 @@ TargetCol := R15
         ; the four directional pointers, so do that:
 
         lda PlayerNextDirection
+        ora PlayerHeldDirection
 check_north:
         cmp #PLAYER_DIRECTION_NORTH
         bne check_east

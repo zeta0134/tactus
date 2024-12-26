@@ -30,6 +30,7 @@
 .global PlayerGold
 .global PlayerSpriteIndex
 .global PlayerNextDirection
+.global PlayerHeldDirection
 .global PlayerTorchlightRadius
 
 .global PlayerCurrentX
