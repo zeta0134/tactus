@@ -309,12 +309,16 @@ item_is_free:
         lda #0
         sta sprite_table + MetaSpriteState::BehaviorFlags, y
 
+        perform_zpcm_inc
+
         ; we also despawn the item bank here, accordingly, since we'll allocate a new one
         ; if we need to draw another item later
         ldx TargetSquare
         lda tile_data, x
         sta ItemIndex
         far_call FAR_free_item_bank
+
+        perform_zpcm_inc
 
         ; run the display logic for the item we just collected, popping up a tooltip with its
         ; description, etc. this may do nothing depending on player settings.

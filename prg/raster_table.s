@@ -229,6 +229,7 @@ scroll_y_wraparound_lut:
         ; that often
         ldy #0
 loop:
+        perform_zpcm_inc
         sta room_global_ppumask, y
         iny
         cpy #32

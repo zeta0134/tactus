@@ -12,6 +12,7 @@
         .include "weapons.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
 .segment "RAM"
 
@@ -57,6 +58,7 @@ safe_to_continue:
         lda #0
         sta CurrentEntry
 loop:
+        perform_zpcm_inc
         ldy CurrentEntry
         lda weapon_metasprite_ids, y
         sta MetaSpriteIndex
@@ -95,7 +97,7 @@ skip_this_sprite:
         inc CurrentEntry
         dec EntriesRemaining
         bne loop
-
+        perform_zpcm_inc
         rts
 .endproc
 

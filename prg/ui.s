@@ -383,6 +383,7 @@ Length := R4
         st16 Length, $0400
         ldy #0
 loop:
+        perform_zpcm_inc
         lda #' '
         sta (NametableAddr), y
         lda #CHR_BANK_FONT_MARSHMALLOW
@@ -393,5 +394,6 @@ loop:
         lda Length+0
         ora Length+1
         bne loop
+        perform_zpcm_inc
         rts
 .endproc

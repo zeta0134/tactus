@@ -129,10 +129,12 @@ widget_color_bottom_metasprite_index := widgets_data1
         lda #0
         ldy #0
 torchlight_loop_a:
+        perform_zpcm_inc
         sta $5800, y
         iny
         bne torchlight_loop_a
 torchlight_loop_b:
+        perform_zpcm_inc
         sta $5900, y
         iny
         cpy #128
@@ -592,8 +594,9 @@ advance:
         ; When left/right are pressed, if we are currently on the Preset
         ; field, apply the preset colors to the sliders. If we're currently
         ; on any of the other fields, apply the slider values to the preset instead.
-        lda #(KEY_RIGHT | KEY_LEFT)
-        bit ButtonsDown
+        lda ButtonsDown
+        ora ButtonsHeld
+        and #(KEY_RIGHT | KEY_LEFT)
         bne perform_shenanigans
         rts
 

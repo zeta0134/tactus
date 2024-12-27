@@ -3,6 +3,7 @@
         .include "player.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
         .zeropage
 PlayerDistanceLut: .res 2
@@ -28,6 +29,7 @@ player_distance_lut_by_x_pos:
   .word player_distance_lut_15
 
 .proc FAR_compute_player_distance_lut_ptr
+        perform_zpcm_inc
         lda PlayerCol
         asl
         tax
@@ -48,6 +50,7 @@ player_distance_lut_by_x_pos:
         adc #0
         sta PlayerDistanceLut+1
 
+        perform_zpcm_inc
         rts
 .endproc
 

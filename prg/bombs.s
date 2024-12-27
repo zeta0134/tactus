@@ -16,8 +16,8 @@
         .include "sound.inc"
         .include "sprites.inc"
         .include "word_util.inc"
-        .include "zpcm.inc"
         .include "zeropage.inc"
+        .include "zpcm.inc"
 
 ; Note that fuse length is tracked separately.
 ; These two combined will determine where the
@@ -72,6 +72,7 @@ player_has_bombs:
         lda #$FF
         rts
 player_hands_empty:
+        perform_zpcm_inc
 
         ; Game logic is passed, try to spawn a bomb entity
         jsr _find_first_inactive_bomb_slot
@@ -190,6 +191,7 @@ TempRow := R2
 WallAttempts := R3
 OverlapAttempts := R4
 NewBombIndex := R8
+        perform_zpcm_inc
         ; Game logic is passed, try to spawn a bomb entity
         jsr _find_first_inactive_bomb_slot
         cpx #$FF
@@ -219,6 +221,7 @@ bomb_sprite_allocation_succeeded:
         sta bomb_entities + BombState::State, x
         jmp done_picking_state
 done_picking_state:
+        perform_zpcm_inc
 
         ; Generate a spawn location for the party. This two notable
         ; constraints:
@@ -234,6 +237,7 @@ done_picking_state:
         lda #16
         sta OverlapAttempts
 bomb_positioning_loop:
+        perform_zpcm_inc
         prng_from_table_y
         and #$1F
         tay
@@ -258,6 +262,7 @@ bomb_positioning_loop:
         dec WallAttempts
         jmp bomb_positioning_loop
 wall_check_passed:
+        perform_zpcm_inc
         ; Next check to see if we are overlapping the 3x3 blast radius
         ; of the party bomb we spawned previously
         lda OverlapAttempts
@@ -285,6 +290,7 @@ overlap_check_failed:
         dec OverlapAttempts
         jmp bomb_positioning_loop
 overlap_check_passed:
+        perform_zpcm_inc
         ; At this point we'll keep this bomb, so write its position out
         ; for the next check, and also into our struct for spawning
         ldx NewBombIndex
@@ -307,8 +313,10 @@ overlap_check_passed:
         sta bomb_entities + BombState::FrameCounter, x
         sta bomb_entities + BombState::PartyCounter, x
         ; Initialize the bomb position to our chosen position
+        perform_zpcm_inc
         jsr _set_bomb_target_coordinates
         jsr _snap_to_target_position
+        perform_zpcm_inc
         ; Now, our update routine will draw the sprite properly later,
         ; but we at least need to mark it as "active" so the metasprite
         ; isn't reclaimed for something else before that runs. do that here,
@@ -326,6 +334,8 @@ overlap_check_passed:
 
         ; Party bombs should play a cartoony "long fall" SFX
         queue_sfx_triangle sfx_cartoony_fall_tri
+
+        perform_zpcm_inc
 
         ; and... in theory that's it? ah, but we need to return the index
         lda NewBombIndex
@@ -456,12 +466,14 @@ CurrentBombIndex := R15
         ; while there is any active bomb or special effect going on)
         lda PlayerIsPaused
         beq not_paused
+        perform_zpcm_inc
         rts
 not_paused:
 
         lda #0
         sta CurrentBombIndex
 fuse_tick_loop:
+        perform_zpcm_inc
         ldx CurrentBombIndex
         lda bomb_entities + BombState::Flags, x
         and #BOMB_FLAG_ACTIVE
@@ -481,7 +493,7 @@ done_with_this_bomb:
         sta CurrentBombIndex
         cmp #(::MAX_ACTIVE_BOMBS * .sizeof(BombState))
         bne fuse_tick_loop
-
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -512,6 +524,7 @@ advance_to_grounded:
         sta bomb_entities + BombState::State, x
         jmp done_with_state_changes
 done_with_state_changes:
+        perform_zpcm_inc
         ; If we've exceeded the fuse length, pretty much no matter what
         ; actual state we're in, EXPLODE on the spot. Otherwise, we're done
         lda bomb_entities + BombState::FuseDuration, x
@@ -525,6 +538,8 @@ explode:
         queue_sfx_pulse1_with_priority sfx_kaboom_pulse_1, #10
         queue_sfx_pulse2_with_priority sfx_kaboom_pulse_1, #10
         queue_sfx_noise_with_priority sfx_kaboom_noise, #10
+
+        perform_zpcm_inc
 
         ; Have some screen shake, etc
         lda #2
@@ -549,6 +564,7 @@ not_currently_held:
         lda #0
         sta bomb_entities + BombState::Flags, x
         ; And... that should be it.
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -621,6 +637,7 @@ CurrentBombIndex := R15
         lda #0
         sta CurrentBombIndex
 update_loop:
+        perform_zpcm_inc
         ldx CurrentBombIndex
         lda bomb_entities + BombState::Flags, x
         and #BOMB_FLAG_ACTIVE
@@ -632,6 +649,7 @@ update_loop:
         ; state machine. Don't draw the result, let the state function
         ; handle that in its own way.
         jsr _lerp_bomb_to_target_coordinates
+        perform_zpcm_inc
 
         ldx CurrentBombIndex
         lda bomb_entities + BombState::State, x
@@ -650,6 +668,7 @@ update_loop:
         cmp #31
         bcs done_with_this_bomb
         inc bomb_entities + BombState::FrameCounter, x
+        perform_zpcm_inc
 
         ; All standard bombs have the same coloration based on fuse
         ; length, so handle that here
@@ -665,7 +684,7 @@ done_with_this_bomb:
         sta CurrentBombIndex
         cmp #(::MAX_ACTIVE_BOMBS * .sizeof(BombState))
         bne update_loop
-
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -943,6 +962,7 @@ nope:
         bne check_next
         rts
 check_next:
+        perform_zpcm_inc
         .endscope
         .endrepeat
         ldx #$FF ; failure
@@ -1132,6 +1152,7 @@ EffectiveAttackSquare := R10
         sta CurrentPatternIndex
 
 pattern_loop:
+        perform_zpcm_inc
         ldx CurrentBombIndex
         ldy bomb_entities + BombState::CurrentRow, x
         lda row_number_to_tile_index_lut, y
@@ -1148,7 +1169,7 @@ no_explosion_tile:
         lda CurrentPatternIndex
         cmp #9
         bne pattern_loop
-
+        perform_zpcm_inc
         rts
 .endproc
 

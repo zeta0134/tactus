@@ -25,6 +25,8 @@ widget_data_target_high := widgets_data7
 widget_metasprite_index := widgets_data2
 widget_displayed_value := widgets_data3
 
+widget_repeat_cooldown := widgets_data8
+
 NametableAddr := T0
 AttributeAddr := T2
         perform_zpcm_inc
@@ -117,6 +119,10 @@ done_with_mid_segments:
 
         ; Position the sprite properly
         jsr apply_ui_slider_position
+
+        ldy CurrentWidgetIndex
+        lda #0
+        sta widget_repeat_cooldown
 
         ; now switch to the update function
         ldy CurrentWidgetIndex
@@ -238,6 +244,25 @@ CurrentWidgetIndex := R20
 widget_displayed_value := widgets_data3
 widget_data_target_low := widgets_data6
 widget_data_target_high := widgets_data7
+widget_repeat_cooldown := widgets_data8
+        ; handle hold-to-repeat, as a nice feature
+        ldy CurrentWidgetIndex
+        lda ButtonsHeld
+        and #(KEY_RIGHT | KEY_LEFT)
+        beq not_held
+held:
+        lda widget_repeat_cooldown, y
+        clc
+        adc #1
+        beq done_holding
+        sta widget_repeat_cooldown, y
+        jmp done_holding
+not_held:
+        lda #0
+        sta widget_repeat_cooldown, y
+done_holding:
+        
+
         ; if we aren't even hovered, no change
         ldy CurrentWidgetIndex
         lda widgets_state_flags, y
@@ -253,9 +278,30 @@ check_for_forward_input:
 check_for_reverse_input:
         lda #(KEY_LEFT)
         bit ButtonsDown
+        beq check_for_held_inputs
+        jsr decrease_slider_position
+        jmp redraw_self
+check_for_held_inputs:
+        ldy CurrentWidgetIndex
+        lda widget_repeat_cooldown, y
+        cmp #20
+        bcc nothing_to_do
+        sec
+        sbc #5
+        sta widget_repeat_cooldown, y
+check_for_forward_held_input:
+        lda #(KEY_RIGHT)
+        bit ButtonsHeld
+        beq check_for_reverse_held_input
+        jsr increase_slider_position
+        jmp redraw_self
+check_for_reverse_held_input:
+        lda #(KEY_LEFT)
+        bit ButtonsHeld
         beq nothing_to_do
         jsr decrease_slider_position
         jmp redraw_self
+
 nothing_to_do:
         ; if we have changed value since our last update, we still need
         ; to redraw ourselves

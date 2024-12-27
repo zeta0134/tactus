@@ -238,7 +238,7 @@ HeartCount := R2
         sta PlayerEquipmentAccessory
         lda #ITEM_BOMB_STANDARD
         sta PlayerEquipmentBombs
-        lda #ITEM_SPELL_FIRE
+        lda #ITEM_SPELL_BOMB
         sta PlayerEquipmentSpell
 
         lda #99
@@ -903,6 +903,7 @@ PlayerStatePtr := R0
         sta PlayerStatePtr+0
         lda player_state_lut+1, x
         sta PlayerStatePtr+1
+        perform_zpcm_inc
         jmp (PlayerStatePtr)
 .endproc
 
@@ -931,6 +932,8 @@ PlayerStatePtr := R0
         lda #0
         sta PlayerCombo
 
+
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -1098,6 +1101,8 @@ done_with_held_inputs:
         sta PlayerIntendsToCast
         sta PlayerIntendsToWait
 
+        perform_zpcm_inc
+
         ; If necessary, cleanup dialog states through movement
         jsr cleanup_dialog_state
 
@@ -1231,6 +1236,8 @@ done_with_held_inputs:
         sta PlayerIntendsToWait
         sta PlayerIntendsToPause
 
+        perform_zpcm_inc
+
         ; If necessary, cleanup dialog states through movement
         jsr cleanup_dialog_state
 
@@ -1324,6 +1331,8 @@ done_with_held_inputs:
         sta PlayerIntendsToCast
         sta PlayerIntendsToWait
         sta PlayerIntendsToPause
+
+        perform_zpcm_inc
 
         ; If necessary, cleanup dialog states through movement
         jsr cleanup_dialog_state

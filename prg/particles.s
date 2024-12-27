@@ -275,6 +275,7 @@ heat_particles_f:
 ; Input: Y = particle index to initialize
 .proc init_particle
 ParticlePtr := R0 ; TODO: not clobber R0 maybe?
+        perform_zpcm_inc
         ; Read and initialize this particle's lifetime
         access_data_bank #<.bank(particle_data_segment)
         ; X is already our particle index at this point, so reuse that
@@ -306,6 +307,7 @@ advance_particle_index:
         lda #0
 no_wraparound:
         sta NextParticleIndex
+        perform_zpcm_inc
         rts
 .endproc
 

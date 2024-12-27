@@ -555,6 +555,7 @@ draw_bottom_right:
 .proc clear_hud_canvas
         ldy #0
 loop:
+        perform_zpcm_inc
         lda #BLANK_TILE
         sta HUD_TILE_BASE + ROW_0, y
         sta HUD_TILE_BASE + ROW_1, y
@@ -576,6 +577,7 @@ loop:
         iny
         cpy #32
         bne loop
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -1073,7 +1075,9 @@ AttributeAddr := R4
 DrawTile := R6
 DrawAttr := R7
 ItemPtr := R8
+        perform_zpcm_inc
         jsr draw_icon_common
+        perform_zpcm_inc
         ; at this point, Y points to the bottom-right tile
         ; backpedal unconditionally here
         dey
@@ -1088,6 +1092,7 @@ b_item_equipped:
         sta (TileAddr), y
         lda #(HUD_PURPLE_PAL | CHR_BANK_ITEMS)
         sta (AttributeAddr), y
+        perform_zpcm_inc
         rts
 no_b_item_equipped:
         ; draw the tabbed bottom left corner, disabled
@@ -1102,6 +1107,7 @@ no_b_item_equipped:
         sta (TileAddr), y
         lda #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         sta (AttributeAddr), y
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -1113,7 +1119,9 @@ AttributeAddr := R4
 DrawTile := R6
 DrawAttr := R7
 ItemPtr := R8
+        perform_zpcm_inc
         jsr draw_icon_common
+        perform_zpcm_inc
         ; at this point, Y points to the bottom-right tile
         ; backpedal unconditionally here
         dey
@@ -1128,6 +1136,7 @@ a_item_equipped:
         sta (TileAddr), y
         lda #(HUD_YELLOW_PAL | CHR_BANK_ITEMS)
         sta (AttributeAddr), y
+        perform_zpcm_inc
         rts
 no_a_item_equipped:
         ; draw the tabbed bottom left corner, disabled
@@ -1142,6 +1151,7 @@ no_a_item_equipped:
         sta (TileAddr), y
         lda #(HUD_TEXT_PAL | CHR_BANK_ITEMS)
         sta (AttributeAddr), y
+        perform_zpcm_inc
         rts
 .endproc
 
