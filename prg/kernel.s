@@ -149,7 +149,7 @@ continue_waiting:
         perform_zpcm_inc
         far_call FAR_refresh_palettes_gameloop
         perform_zpcm_inc
-        jsr update_beat_counters_title
+        ; jsr update_beat_counters_title
 
         jsr wait_for_next_vblank
         rts
