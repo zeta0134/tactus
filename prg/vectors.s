@@ -4,6 +4,8 @@
 
 .include "../build/tile_defs.inc"
 
+.include "_globals.inc"
+
 .include "battlefield.inc"
 .include "beat_tracker.inc"
 .include "bhop/bhop.inc"

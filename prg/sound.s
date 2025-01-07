@@ -1,6 +1,8 @@
         .setcpu "6502"
 
         .macpack longbranch
+
+        .include "_globals.inc"
         
         .include "bhop/bhop.inc"
         .include "debug.inc"

@@ -2,6 +2,8 @@
 
         .include "../build/tile_defs.inc"
 
+        .include "_globals.inc"
+
         .include "charmap.inc"
         .include "debug.inc"
         .include "far_call.inc"

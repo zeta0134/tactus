@@ -1,12 +1,16 @@
 DEBUG_MODE = 1
 DEBUG_MESEN_MODE = 1
 DEBUG_TIME_WASTE = 0
-DEBUG_DISABLE_MUSIC = 0
+DEBUG_DISABLE_MUSIC = 1
 DEBUG_GOD_MODE = 1
 
 DEBUG_SPAWN_OVERRIDE = 0
 
 DEBUG_SEED = 42
+
+; Force a single specific item to always spawn in shops, for testing
+DEBUG_SHOP_OVERRIDE = 1
+DEBUG_SHOP_ITEM = ITEM_SPELL_AIR
 
 .macro debug_color flags
         .if ::DEBUG_MODE

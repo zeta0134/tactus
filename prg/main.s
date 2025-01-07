@@ -1,5 +1,7 @@
         .setcpu "6502"
 
+        .include "_globals.inc"
+
         .include "battlefield.inc"
         .include "chr.inc"
         .include "debug.inc"

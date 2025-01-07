@@ -1546,7 +1546,20 @@ loop:
 
         far_call FAR_roll_shop_loot
         ldx CurrentTile
+
+.if ::DEBUG_SHOP_OVERRIDE
+        lda NextLootIndex
+        bne no_shop_override
+shop_override:
+        lda #::DEBUG_SHOP_ITEM
+        jmp done_with_shop_override
+no_shop_override:
         lda ItemId
+done_with_shop_override:
+.else
+        lda ItemId
+.endif
+
         sta tile_data, x
         lda tile_flags, x
         ora #ITEM_FOR_PURCHASE
