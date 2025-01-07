@@ -161,6 +161,192 @@ def generate_lighting_variants_dithered(image):
       new_image.putpixel((x, y), 0)
   return new_image
 
+dither_pattern_z0 = [
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 0],
+]
+
+dither_pattern_z1 = [
+  [0, 0, 0, 0, 1, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 0, 1],
+  [0, 0, 1, 0, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 1, 0, 0],
+  [1, 0, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 1, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 1, 0],
+  [0, 1, 0, 0, 0, 0, 0, 0],
+]
+
+dither_pattern_z2 = [
+  [0, 0, 0, 0, 1, 1, 0, 0],
+  [1, 0, 0, 0, 0, 0, 0, 1],
+  [0, 0, 1, 1, 0, 0, 0, 0],
+  [0, 0, 0, 0, 0, 1, 1, 0],
+  [1, 1, 0, 0, 0, 0, 0, 0],
+  [0, 0, 0, 1, 1, 0, 0, 0],
+  [0, 0, 0, 0, 0, 0, 1, 1],
+  [0, 1, 1, 0, 0, 0, 0, 0],
+]
+
+dither_pattern_z3 = [
+  [0, 0, 0, 0, 1, 1, 1, 0],
+  [1, 1, 0, 0, 0, 0, 0, 1],
+  [0, 0, 1, 1, 1, 0, 0, 0],
+  [0, 0, 0, 0, 0, 1, 1, 1],
+  [1, 1, 1, 0, 0, 0, 0, 0],
+  [0, 0, 0, 1, 1, 1, 0, 0],
+  [1, 0, 0, 0, 0, 0, 1, 1],
+  [0, 1, 1, 1, 0, 0, 0, 0],
+]
+
+dither_pattern_z4 = [
+  [0, 0, 0, 0, 1, 1, 1, 1],
+  [1, 1, 1, 0, 0, 0, 0, 1],
+  [0, 0, 1, 1, 1, 1, 0, 0],
+  [1, 0, 0, 0, 0, 1, 1, 1],
+  [1, 1, 1, 1, 0, 0, 0, 0],
+  [0, 0, 0, 1, 1, 1, 1, 0],
+  [1, 1, 0, 0, 0, 0, 1, 1],
+  [0, 1, 1, 1, 1, 0, 0, 0],
+]
+
+dither_pattern_z5 = [
+  [1, 0, 0, 0, 1, 1, 1, 1],
+  [1, 1, 1, 1, 0, 0, 0, 1],
+  [0, 0, 1, 1, 1, 1, 1, 0],
+  [1, 1, 0, 0, 0, 1, 1, 1],
+  [1, 1, 1, 1, 1, 0, 0, 0],
+  [0, 0, 0, 1, 1, 1, 1, 1],
+  [1, 1, 1, 0, 0, 0, 1, 1],
+  [0, 1, 1, 1, 1, 1, 0, 0],
+]
+
+dither_pattern_z6 = [
+  [1, 1, 0, 0, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 0, 0, 1],
+  [0, 0, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 0, 0, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 0, 0],
+  [1, 0, 0, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 0, 0, 1, 1],
+  [0, 1, 1, 1, 1, 1, 1, 0],
+]
+
+dither_pattern_z7 = [
+  [1, 1, 1, 0, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 0, 1],
+  [1, 0, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 0, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 0],
+  [1, 1, 0, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 0, 1, 1],
+  [0, 1, 1, 1, 1, 1, 1, 1],
+]
+
+dither_pattern_z8 = [
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+  [1, 1, 1, 1, 1, 1, 1, 1],
+]
+
+zebra_patterns_by_index = [
+  dither_pattern_z0,
+  dither_pattern_z1,
+  dither_pattern_z2,
+  dither_pattern_z3,
+  dither_pattern_z4,
+  dither_pattern_z5,
+  dither_pattern_z6,
+  dither_pattern_z7,
+  dither_pattern_z8,
+]
+
+rounded_zebra_variants_dark_outlines = [
+  [0, 1, 2, 3, 3, 2, 1, 0],
+  [1, 2, 3, 4, 4, 3, 2, 1],
+  [2, 3, 4, 4, 4, 4, 3, 2],
+  [3, 4, 4, 4, 4, 4, 4, 3],
+  [3, 4, 4, 4, 4, 4, 4, 3],
+  [2, 3, 4, 4, 4, 4, 3, 2],
+  [1, 2, 3, 4, 4, 3, 2, 1],
+  [0, 1, 2, 3, 3, 2, 1, 0],
+]
+
+rounded_zebra_variants_light_outlines = [
+  [8, 7, 6, 5, 5, 6, 7, 8],
+  [7, 6, 5, 4, 4, 5, 6, 7],
+  [6, 5, 4, 4, 4, 4, 5, 6],
+  [5, 4, 4, 4, 4, 4, 4, 5],
+  [5, 4, 4, 4, 4, 4, 4, 5],
+  [6, 5, 4, 4, 4, 4, 5, 6],
+  [7, 6, 5, 4, 4, 5, 6, 7],
+  [8, 7, 6, 5, 5, 6, 7, 8],
+]
+
+def generate_lighting_variants_zebra(image):
+  if image.height == 64:
+    return image
+  new_image = Image.new(image.mode, (image.width, 64))
+  new_image.putpalette(image.palette.getdata()[1])
+  # first duplicate the original image four times
+  new_image.paste(image, (0, 0))
+  new_image.paste(image, (0, 16))
+  new_image.paste(image, (0, 32))
+  new_image.paste(image, (0, 48))
+  # now subtract the metatile row from each palette index, to darken
+  # each pixel by one shade
+  for x in range(0, 64):
+    # for the first variant, we'll decrease all colors by 1 stage in a zebra pattern.
+    for y in range(16, 32):
+      old_palette_index = new_image.getpixel((x, y)) % 4
+      adjusted_palette_index = max(old_palette_index - 1, 0)
+      zebra_variant = zebra_patterns_by_index[rounded_zebra_variants_light_outlines[y % 8][x % 8]]
+      # we're structuring the code so that each input color can choose a different pattern,
+      # though we may end up using the same pattern depending on how we like the result
+      if old_palette_index == 0:
+        pass # black cannot darken further
+      if old_palette_index == 1:
+        if zebra_variant[y % 8][x % 8] == 0:
+          new_image.putpixel((x, y), adjusted_palette_index)
+      if old_palette_index == 2:
+        if zebra_variant[y % 8][x % 8] == 0:
+          new_image.putpixel((x, y), adjusted_palette_index)
+      if old_palette_index == 3:
+        if zebra_variant[y % 8][x % 8] == 0:
+          new_image.putpixel((x, y), adjusted_palette_index)
+    # for the second variant, always decrease the colors by 1 stage, and in a checkerboard
+    # pattern decrease by one additional stage
+    for y in range(32, 48):
+      old_palette_index = new_image.getpixel((x, y)) % 4
+      adjusted_palette_index = max(old_palette_index - 1, 0)
+      zebra_variant = zebra_patterns_by_index[rounded_zebra_variants_dark_outlines[y % 8][x % 8]]
+      if old_palette_index == 0:
+        pass # black cannot darken further
+      if old_palette_index == 1:
+        pass # darkest shade has already become solid black
+      if old_palette_index == 2:
+        if zebra_variant[y % 8][x % 8] == 0:
+          adjusted_palette_index = max(adjusted_palette_index - 1, 0)  
+      if old_palette_index == 3:
+        if zebra_variant[y % 8][x % 8] == 0:
+          adjusted_palette_index = max(adjusted_palette_index - 1, 0)
+      new_image.putpixel((x, y), adjusted_palette_index)
+    # the darkest generated variant is always solid BG0.0
+    for y in range(48, 64):
+      new_image.putpixel((x, y), 0)
+  return new_image
+
 def read_background_tile(filename):
   im = Image.open(filename)
   assert im.getpalette() != None, "Non-paletted tile found! This is unsupported: " + filename
@@ -172,7 +358,8 @@ def read_background_tile(filename):
     im = duplicate_static_frames(im)
   if im.height == 16:
     #im = generate_lighting_variants(im)
-    im = generate_lighting_variants_dithered(im)
+    #im = generate_lighting_variants_dithered(im)
+    im = generate_lighting_variants_zebra(im)
   return im
 
 def read_sprite_tile(filename):
