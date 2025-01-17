@@ -87,11 +87,13 @@
 TRACK_SILENCE          = 0
 TRACK_CLICK            = 1
 TRACK_TITLE            = 2
+;TRACK_TITLE            = 8 ; useful if we need an in-engine piano roll render
 TRACK_OPTIONS          = 3
 TRACK_GAMEOVER         = 4
 TRACK_SHOWER_GROOVE    = 5
 TRACK_IN_ANOTHER_WORLD = 6
 TRACK_BOUNCY           = 7
+TRACK_ECHOES           = 8
 
 TRACK_VARIANT_NORMAL   = 0 ; every track has this
 TRACK_VARIANT_INTERIOR = 1 ; most level themes have these

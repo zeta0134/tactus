@@ -94,6 +94,12 @@ FADE_SPEED = 8
         .include "../art/music/bouncy.asm"
         .endproc
 
+        .segment "MUSIC_6"
+        ; and MUSIC_7
+        .proc zeta_echoes
+        .include "../art/music/echoes.asm"
+        .endproc
+
         .segment "PRGFIXED_E000"
 
 ; todo: figure out if we can move this elsewhere? it might grow
@@ -107,6 +113,7 @@ track_table_module_low:
         .lobytes zeta_shower_groove
         .lobytes persune_in_another_world
         .lobytes zeta_bouncy
+        .lobytes zeta_echoes
 
 track_table_module_high:
         .hibytes zeta_silence
@@ -117,6 +124,7 @@ track_table_module_high:
         .hibytes zeta_shower_groove
         .hibytes persune_in_another_world
         .hibytes zeta_bouncy
+        .hibytes zeta_echoes
 
 track_table_bank:
         .lobytes .bank(zeta_silence)
@@ -127,6 +135,7 @@ track_table_bank:
         .lobytes .bank(zeta_shower_groove)
         .lobytes .bank(persune_in_another_world)
         .lobytes .bank(zeta_bouncy)
+        .lobytes .bank(zeta_echoes)
         
 track_table_song:
         .byte 0 ; silence (used for transitions)
@@ -137,6 +146,7 @@ track_table_song:
         .byte 0 ; shower groove
         .byte 0 ; in another world (warp zone)
         .byte 0 ; bouncy
+        .byte 0 ; echoes
 
 track_table_num_variants:
         .byte 1 ; silence 
@@ -147,6 +157,7 @@ track_table_num_variants:
         .byte 1 ; level music
         .byte 3 ; in another world (warp zone)
         .byte 3 ; bouncy
+        .byte 3 ; echoes
 
 ; bhop calls these functions for bank swapping and ZPCM tomfoolery
 .proc bhop_enable_zpcm

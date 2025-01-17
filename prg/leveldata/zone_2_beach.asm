@@ -94,7 +94,7 @@ zone_beach_floor_1:
         .byte 8                  ; PopulationLimit
         .addr zone_blocking_mazes ; Maze Pool
         .addr zone_beach_floor_1_exits ; Exit List
-        .byte TRACK_SHOWER_GROOVE   ; Music Track
+        .byte TRACK_ECHOES   ; Music Track
         .byte 0   ; Added Tempo
         .word zone_beach_banner_2_1 ; HudBanner
         .addr hud_beach_pal
@@ -119,7 +119,7 @@ zone_beach_floor_2:
         .byte 10                 ; PopulationLimit
         .addr zone_blocking_mazes ; Maze Pool
         .addr zone_beach_floor_2_exits ; Exit List
-        .byte TRACK_SHOWER_GROOVE   ; Music Track
+        .byte TRACK_ECHOES   ; Music Track
         .byte 5   ; Added Tempo
         .word zone_beach_banner_2_2 ; HudBanner
         .addr hud_beach_pal
@@ -144,7 +144,7 @@ zone_beach_floor_3:
         .byte 12                 ; PopulationLimit
         .addr zone_blocking_mazes ; Maze Pool
         .addr zone_beach_floor_3_exits ; Exit List
-        .byte TRACK_SHOWER_GROOVE   ; Music Track
+        .byte TRACK_ECHOES   ; Music Track
         .byte 10   ; Added Tempo
         .word zone_beach_banner_2_3 ; HudBanner
         .addr hud_beach_pal
@@ -169,7 +169,7 @@ zone_beach_floor_4:
         .byte 16                 ; PopulationLimit
         .addr zone_blocking_mazes ; Maze Pool
         .addr zone_beach_floor_4_exits ; Exit List
-        .byte TRACK_SHOWER_GROOVE   ; Music Track
+        .byte TRACK_ECHOES   ; Music Track
         .byte 15   ; Added Tempo
         .word zone_beach_banner_2_4 ; HudBanner
         .addr hud_beach_pal
