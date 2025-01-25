@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ElementTree
 import math, os, re, sys
 
 from dataclasses import dataclass, field
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import Dict
 
 from ca65 import pretty_print_table, pretty_print_table_str, ca65_label, ca65_byte_literal, ca65_word_literal
@@ -454,6 +454,9 @@ if __name__ == '__main__':
     output_filename = sys.argv[2]
 
     tilemap = read_room(input_filename)
+
+    parent_directory = Path(output_filename).parent
+    os.makedirs(parent_directory, exist_ok=True)
 
     with open(output_filename, "w") as output_file:
       write_room(tilemap, output_file)

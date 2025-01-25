@@ -18,21 +18,21 @@
 
         .segment "LEVEL_DATA_ROOMS_0"
 
-        .include "../build/rooms/Grasslands_Standard.incs"
-        .include "../build/rooms/Caves_Standard.incs"
-        .include "../build/rooms/OutOfBounds.incs"
+        .include "../build/rooms/Grasslands/Grasslands_Standard.incs"
+        .include "../build/rooms/Caves/Caves_Standard.incs"
+        .include "../build/rooms/Misc/OutOfBounds.incs"
 
         .segment "LEVEL_DATA_ROOMS_1"
 
-        .include "../build/rooms/ChallengeArena_Standard.incs"
-        .include "../build/rooms/Grasslands_Round.incs"
-        .include "../build/rooms/Shop_Standard.incs"        
+        .include "../build/rooms/Challenge/ChallengeArena_Standard.incs"
+        .include "../build/rooms/Grasslands/Grasslands_Round.incs"
+        .include "../build/rooms/Misc/Shop_Standard.incs"        
 
         .segment "LEVEL_DATA_ROOMS_2"
 
-        .include "../build/rooms/Blocking_Chamber.incs"
-        .include "../build/rooms/HubWarpChamber.incs"
-        .include "../build/rooms/Blocking_Cave.incs"
+        .include "../build/rooms/Blocking/Blocking_Chamber.incs"
+        .include "../build/rooms/Hub/HubWarpChamber.incs"
+        .include "../build/rooms/Blocking/Blocking_Cave.incs"
 
         .segment "CODE_4"
 

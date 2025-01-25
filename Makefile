@@ -19,7 +19,7 @@ FLOOR_TMX_FILES := $(wildcard $(ARTDIR)/floors/*.tmx)
 FLOOR_INCS_FILES := \
 	$(patsubst $(ARTDIR)/floors/%.tmx,$(BUILDDIR)/floors/%.incs,$(FLOOR_TMX_FILES)) \
 
-ROOM_TMX_FILES := $(wildcard $(ARTDIR)/rooms/*.tmx)
+ROOM_TMX_FILES := $(wildcard $(ARTDIR)/rooms/*/*.tmx)
 ROOM_INCS_FILES := \
 	$(patsubst $(ARTDIR)/rooms/%.tmx,$(BUILDDIR)/rooms/%.incs,$(ROOM_TMX_FILES)) \
 

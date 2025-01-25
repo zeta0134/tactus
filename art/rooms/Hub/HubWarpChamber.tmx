@@ -11,11 +11,11 @@
   <property name="room_obj_palette" value="sprite_palette_overworld"/>
   <property name="room_palette" value="hub_world_palette"/>
  </properties>
- <tileset firstgid="1" source="../MapTiles.tsx"/>
- <tileset firstgid="257" source="../DiscoFloorTiles.tsx"/>
- <tileset firstgid="289" source="../Attributes.tsx"/>
- <tileset firstgid="293" source="../TechnicalTiles.tsx"/>
- <tileset firstgid="357" source="../SignTiles.tsx"/>
+ <tileset firstgid="1" source="../../MapTiles.tsx"/>
+ <tileset firstgid="257" source="../../DiscoFloorTiles.tsx"/>
+ <tileset firstgid="289" source="../../Attributes.tsx"/>
+ <tileset firstgid="293" source="../../TechnicalTiles.tsx"/>
+ <tileset firstgid="357" source="../../SignTiles.tsx"/>
  <layer id="1" name="Base" width="16" height="11">
   <data encoding="csv">
 212,226,226,226,226,226,226,226,226,226,226,226,226,226,226,213,
