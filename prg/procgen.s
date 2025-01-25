@@ -129,6 +129,12 @@ no_exit_flag:
         beq no_sign_flag
         near_call FAR_process_sign_data
 no_sign_flag:
+        ldy CurrentTileId
+        lda (FlagsPtr), y
+        and #TILE_FLAG_ITEM
+        beq no_item_flag
+        near_call FAR_process_item_data
+no_item_flag:
         inc CurrentTileId
         lda CurrentTileId
         cmp #::BATTLEFIELD_SIZE
@@ -1030,19 +1036,14 @@ CurrentTileId := R10
 ; scratch for this routine
 DetailTablePtr := R12
 ScratchPal := R14
-        ; the desired exit ID ends up in tile patterns in this case
+        ; the desired sign ID ends up in tile behavior in this case
         ldy CurrentTileId
-        lda tile_patterns, y
+        lda battlefield, y
         sta tile_data, y
 
-        ; now we need to pick the exit graphic; for now, hardcode these
-        ; to stairs (later we might offer alternatives in the flags byte)
-        lda #<BG_TILE_EXIT_STAIRS
-        sta tile_patterns, y
-        lda tile_attributes, y
-        and #%11000000
-        ora #>BG_TILE_EXIT_STAIRS
-        sta tile_attributes, y
+        ; now we hardcode the exit behavior, and we're all set
+        lda #TILE_EXIT_STAIRS
+        sta battlefield, y
 
         rts
 .endproc
@@ -1064,9 +1065,34 @@ ScratchPal := R14
         sta tile_data, y
 
         ; now we hardcode the sign behavior, and we're all set
-        ; TODO: can we also do this for exits? it would trivially unlock
-        ; alternate patterns as map data
         lda #TILE_SIGN
+        sta battlefield, y
+
+        rts
+.endproc
+
+.proc FAR_process_item_data
+; in-use by the battlefield routine, don't clobber these
+RoomPtr := R0
+TileIdPtr := R2
+TileAddrPtr := R4
+BehaviorIdPtr := R6
+FlagsPtr := R8
+CurrentTileId := R10
+; scratch for this routine
+DetailTablePtr := R12
+ScratchPal := R14
+        ; the desired item ID ends up in tile behavior in this case
+        ldy CurrentTileId
+        lda battlefield, y
+        sta tile_data, y
+
+        ; TODO: what do we want to do about the purchase flag? right now we're
+        ; leaving it unset, so forced item spawns in map data are free to pick up.
+        ; Is that good enough?
+
+        ; now we hardcode the sign behavior, and we're all set
+        lda #TILE_ITEM_SHADOW
         sta battlefield, y
 
         rts

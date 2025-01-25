@@ -1,6 +1,6 @@
         .include "../build/tile_defs.inc"
 
-
+        .include "_globals.inc"
 
         .include "enemies.inc"
         .include "far_call.inc"
@@ -31,8 +31,14 @@
         .segment "LEVEL_DATA_ROOMS_2"
 
         .include "../build/rooms/Blocking/Blocking_Chamber.incs"
-        .include "../build/rooms/Hub/HubWarpChamber.incs"
         .include "../build/rooms/Blocking/Blocking_Cave.incs"
+        .include "../build/rooms/Hub/SpawnRoom.incs"
+        .include "../build/rooms/Hub/BigDoorRoom.incs"
+        .include "../build/rooms/Hub/DebugRoom1.incs"
+        .include "../build/rooms/Hub/DebugRoom2.incs"
+        .include "../build/rooms/Hub/DebugRoom3.incs"
+        .include "../build/rooms/Hub/DebugRoom4.incs"
+        .include "../build/rooms/Hub/DebugRoom5.incs"
 
         .segment "CODE_4"
 
@@ -40,9 +46,15 @@ room_pools_lut:
         .word room_pool_out_of_bounds
         .word room_pool_grassy_exterior
         .word room_pool_cave_interior
-        .word room_pool_hub_world_set_a
+        .word room_pool_hub_world_set_spawn
         .word room_pool_blocking_chamber
         .word room_pool_blocking_cave
+        .word room_pool_hub_world_set_big_door
+        .word room_pool_hub_world_set_debug1
+        .word room_pool_hub_world_set_debug2
+        .word room_pool_hub_world_set_debug3
+        .word room_pool_hub_world_set_debug4
+        .word room_pool_hub_world_set_debug5
 
 .macro room_entry room_label
         .addr room_label
@@ -87,9 +99,33 @@ room_pool_cave_interior:
         room_entry room_ChallengeArena_Standard
         .endrepeat
 
-room_pool_hub_world_set_a:
+room_pool_hub_world_set_spawn:
         .repeat 16
-        room_entry room_HubWarpChamber
+        room_entry room_SpawnRoom
+        .endrepeat
+room_pool_hub_world_set_big_door:
+        .repeat 16
+        room_entry room_BigDoorRoom
+        .endrepeat
+room_pool_hub_world_set_debug1:
+        .repeat 16
+        room_entry room_DebugRoom1
+        .endrepeat
+room_pool_hub_world_set_debug2:
+        .repeat 16
+        room_entry room_DebugRoom2
+        .endrepeat
+room_pool_hub_world_set_debug3:
+        .repeat 16
+        room_entry room_DebugRoom3
+        .endrepeat
+room_pool_hub_world_set_debug4:
+        .repeat 16
+        room_entry room_DebugRoom4
+        .endrepeat
+room_pool_hub_world_set_debug5:
+        .repeat 16
+        room_entry room_DebugRoom5
         .endrepeat
 
 room_pool_blocking_chamber:

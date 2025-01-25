@@ -244,8 +244,12 @@ def tile_id_bytes(tiles):
             raw_bytes.append(f"<BG_TILE_MAP_TILES_{tile.tiled_index:04}")
         elif tile.type == "sign":
             raw_bytes.append(f"<BG_TILE_MAP_TILES_{tile.tiled_index:04}")
+        elif tile.type == "exit":
+            raw_bytes.append(f"<BG_TILE_MAP_TILES_{tile.tiled_index:04}")
         elif tile.type == "detail":
             raw_bytes.append(f"<{tile.string_properties.get('detail')}")
+        elif tile.type == "item":
+            raw_bytes.append(f"<BG_TILE_WEAPON_SHADOW")
         elif tile.type == "blank":
             raw_bytes.append(f"ERROR_BLANK_TILE")
         else:
@@ -267,8 +271,12 @@ def tile_attr_bytes(tiles):
             raw_bytes.append(f">(BG_TILE_MAP_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
         elif tile.type == "sign":
             raw_bytes.append(f">(BG_TILE_MAP_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
+        elif tile.type == "exit":
+            raw_bytes.append(f">(BG_TILE_MAP_TILES_{tile.tiled_index:04}) | ${palette_index:02X}")
         elif tile.type == "detail":
             raw_bytes.append(f"${palette_index:02X}")
+        elif tile.type == "item":
+            raw_bytes.append(f">BG_TILE_WEAPON_SHADOW")
         elif tile.type == "blank":
             raw_bytes.append(f"ERROR_BLANK_TILE")
         else:
@@ -290,6 +298,12 @@ def behavior_id_bytes(tiles):
             raw_bytes.append(f"TILE_WALL")
         elif tile.type == "blank":
             raw_bytes.append(f"ERROR_BLANK_TILE")
+        elif tile.type == "sign":
+            raw_bytes.append(f"${tile.tiled_index:02X}")
+        elif tile.type == "exit":
+            raw_bytes.append(f"${tile.tiled_index:02X}")
+        elif tile.type == "item":
+            raw_bytes.append(f"ITEM_NONE")
         else:
             print(f"Unrecognized tile type: {tile.type}, activating my panic and spin routines. PANIC AND SPIN!")
             sys.exit(-1)
@@ -305,6 +319,8 @@ def behavior_flag_bytes(tiles):
         raw_bytes.append(f"TILE_FLAG_EXIT")
     elif tile.type == "sign":
         raw_bytes.append(f"TILE_FLAG_SIGN")
+    elif tile.type == "item":
+        raw_bytes.append(f"TILE_FLAG_ITEM")
     else:
         raw_bytes.append("$00")
   return raw_bytes

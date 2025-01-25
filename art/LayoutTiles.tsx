@@ -164,9 +164,39 @@
    <property name="room_pool" value="ROOM_POOL_DEBUG_ACTION_53"/>
   </properties>
  </tile>
+ <tile id="57">
+  <properties>
+   <property name="room_pool" value="ROOM_POOL_HUB_WORLD_SET_DEBUG_5"/>
+  </properties>
+ </tile>
+ <tile id="58">
+  <properties>
+   <property name="room_pool" value="ROOM_POOL_HUB_WORLD_SET_DEBUG_4"/>
+  </properties>
+ </tile>
+ <tile id="59">
+  <properties>
+   <property name="room_pool" value="ROOM_POOL_HUB_WORLD_SET_DEBUG_3"/>
+  </properties>
+ </tile>
+ <tile id="60">
+  <properties>
+   <property name="room_pool" value="ROOM_POOL_HUB_WORLD_SET_DEBUG_2"/>
+  </properties>
+ </tile>
+ <tile id="61">
+  <properties>
+   <property name="room_pool" value="ROOM_POOL_HUB_WORLD_SET_DEBUG_1"/>
+  </properties>
+ </tile>
+ <tile id="62">
+  <properties>
+   <property name="room_pool" value="ROOM_POOL_HUB_WORLD_SET_BIG_ROOM"/>
+  </properties>
+ </tile>
  <tile id="63">
   <properties>
-   <property name="room_pool" value="ROOM_POOL_HUB_WORLD_SET_A"/>
+   <property name="room_pool" value="ROOM_POOL_HUB_WORLD_SET_SPAWN"/>
   </properties>
  </tile>
 </tileset>

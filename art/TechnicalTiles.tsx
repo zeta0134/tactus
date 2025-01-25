@@ -73,100 +73,64 @@
    <property name="detail" value="DETAIL_GRASS_WALL_HORIZ_STRIP"/>
   </properties>
  </tile>
- <tile id="32" type="exit">
+ <tile id="32" type="item">
   <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="1"/>
+   <property name="behavior" value="ITEM_DAGGER_L1"/>
   </properties>
  </tile>
- <tile id="33" type="exit">
+ <tile id="33" type="item">
   <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="2"/>
+   <property name="behavior" value="ITEM_BROADSWORD_L1"/>
   </properties>
  </tile>
- <tile id="34" type="exit">
+ <tile id="34" type="item">
   <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="3"/>
+   <property name="behavior" value="ITEM_LONGSWORD_L1"/>
   </properties>
  </tile>
- <tile id="35" type="exit">
+ <tile id="35" type="item">
   <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="4"/>
+   <property name="behavior" value="ITEM_SPEAR_L1"/>
   </properties>
  </tile>
- <tile id="36" type="exit">
+ <tile id="36" type="item">
   <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="5"/>
+   <property name="behavior" value="ITEM_FLAIL_L1"/>
   </properties>
  </tile>
- <tile id="37" type="exit">
+ <tile id="37" type="item">
   <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="6"/>
+   <property name="behavior" value="ITEM_BOMB_STANDARD_X3"/>
   </properties>
  </tile>
- <tile id="38" type="exit">
+ <tile id="48" type="item">
   <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="7"/>
+   <property name="behavior" value="ITEM_SPELL_FIRE"/>
   </properties>
  </tile>
- <tile id="39" type="exit">
+ <tile id="49" type="item">
   <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="8"/>
+   <property name="behavior" value="ITEM_SPELL_AIR"/>
   </properties>
  </tile>
- <tile id="40" type="exit">
+ <tile id="50" type="item">
   <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="9"/>
+   <property name="behavior" value="ITEM_SPELL_ICE"/>
   </properties>
  </tile>
- <tile id="41" type="exit">
+ <tile id="51" type="item">
   <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="10"/>
+   <property name="behavior" value="ITEM_SPELL_EARTH"/>
   </properties>
  </tile>
- <tile id="42" type="exit">
+ <tile id="52" type="item">
   <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="11"/>
+   <property name="behavior" value="ITEM_SPELL_BOMB"/>
   </properties>
  </tile>
- <tile id="43" type="exit">
+ <tile id="53" type="item">
   <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="12"/>
-  </properties>
- </tile>
- <tile id="44" type="exit">
-  <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="13"/>
-  </properties>
- </tile>
- <tile id="45" type="exit">
-  <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="14"/>
-  </properties>
- </tile>
- <tile id="46" type="exit">
-  <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="15"/>
-  </properties>
- </tile>
- <tile id="47" type="exit">
-  <properties>
-   <property name="behavior" value="TILE_EXIT_STAIRS"/>
-   <property name="tile_id" value="16"/>
+   <property name="behavior" value="ITEM_SPELL_LIFE"/>
   </properties>
  </tile>
 </tileset>

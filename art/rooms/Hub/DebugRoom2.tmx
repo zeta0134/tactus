@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="16" height="11" tilewidth="16" tileheight="16" infinite="0" nextlayerid="66" nextobjectid="1">
+ <properties>
+  <property name="category" value="exterior"/>
+  <property name="dark" type="bool" value="false"/>
+  <property name="exit_east" type="bool" value="true"/>
+  <property name="exit_north" type="bool" value="true"/>
+  <property name="exit_south" type="bool" value="true"/>
+  <property name="exit_west" type="bool" value="true"/>
+  <property name="forbid_spawning" type="bool" value="false"/>
+  <property name="room_obj_palette" value="sprite_palette_overworld"/>
+  <property name="room_palette" value="hub_world_palette"/>
+ </properties>
+ <tileset firstgid="1" source="../../MapTiles.tsx"/>
+ <tileset firstgid="257" source="../../DiscoFloorTiles.tsx"/>
+ <tileset firstgid="289" source="../../Attributes.tsx"/>
+ <tileset firstgid="293" source="../../TechnicalTiles.tsx"/>
+ <tileset firstgid="357" source="../../SignTiles.tsx"/>
+ <tileset firstgid="485" source="../../ExitTiles.tsx"/>
+ <layer id="1" name="Base" width="16" height="11">
+  <data encoding="csv">
+212,226,226,226,226,226,226,226,226,226,227,266,257,257,268,209,
+211,242,242,242,242,242,242,242,242,242,243,266,257,257,268,209,
+211,258,510,259,509,508,507,259,506,364,259,270,257,257,341,209,
+211,266,273,257,257,257,257,257,257,257,257,257,257,257,342,209,
+211,266,505,257,504,503,502,257,501,363,257,257,257,257,343,209,
+211,266,273,257,257,257,257,257,257,257,257,257,257,257,344,209,
+211,266,500,257,499,498,497,257,496,362,257,257,257,257,345,209,
+211,266,273,257,257,257,257,257,257,257,257,257,257,257,346,209,
+211,266,495,257,494,493,492,257,491,361,257,257,257,257,268,209,
+211,274,275,275,275,275,275,275,275,275,275,262,257,257,268,209,
+228,194,194,194,194,194,194,194,194,194,195,266,257,257,268,209
+</data>
+ </layer>
+ <layer id="2" name="Attributes" width="16" height="11" opacity="0.2">
+  <data encoding="csv">
+289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,
+289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,
+289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,
+289,289,0,0,0,0,0,0,0,0,0,0,0,0,289,289,
+289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,
+289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,
+289,289,289,289,289,289,289,289,289,289,0,0,0,0,289,289,
+289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,
+289,289,289,0,0,289,289,289,0,0,0,289,289,289,289,289,
+289,289,289,289,289,0,0,0,0,289,289,289,289,289,289,289,
+289,289,289,289,289,289,289,289,289,289,289,289,289,289,289,289
+</data>
+ </layer>
+</map>

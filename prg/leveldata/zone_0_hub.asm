@@ -51,12 +51,114 @@ zone_hub_world:
 ; to any floor other than 1, but as we only have the one zone,
 ; we'll use that as a standin for the actual behavior later.
 zone_hub_exits:
-        .byte 5
-        .addr zone_hub_world ; this shouldn't generate. if it does, panic!
+        .byte 79
+        .addr zone_grasslands_floor_1 ; for now, use this to "start a normal run" ish
+        ; Debug Zone Exits follow
+
+        ; Debug 1:
+        ; Zone 1
         .addr zone_grasslands_floor_1
-        .addr zone_beach_floor_1
+        .addr zone_grasslands_floor_2
+        .addr zone_grasslands_floor_3
+        .addr zone_grasslands_floor_4
+        .addr zone_hub_world          ; unimplemented! :(
+
+        ; Debug 2:
+        ; Zone 2A
+        .addr zone_beach_floor_1      ; Sorta... it has machine music right now.
+        .addr zone_beach_floor_2      ; One thing at a time :D
+        .addr zone_beach_floor_3
+        .addr zone_beach_floor_4
+        .addr zone_hub_world          ; unimplemented! :(
+        ; Zone 2B
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        ; Zone 2C:
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        ; Zone 2W:
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+
+        ; Debug 3:
+        ; Zone 3A
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        ; Zone 3B
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        ; Zone 3C:
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        ; Zone 3W:
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+
+        ; Debug 4:
+        ; Zone 4A
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        ; Zone 4B
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        ; Zone 4C:
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        ; Zone 4W:
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+
+        ; Debug 5:
+        ; Zone 5S (normal run final challenge / boss)
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        ; Zone 5W (warp exclusive final challenge / boss)
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_hub_world          ; unimplemented! :(
+
+        ; Debug Miscellaneous
         .addr zone_grasslands_floor_2_but_fast
-        .addr zone_grasslands_floor_2 ; for quickly demoing normal caves
+        .addr zone_hub_world ; reserved for future use
+        .addr zone_hub_world ; reserved for future use
 
 zone_hub_world_mazes:
         .byte 1
