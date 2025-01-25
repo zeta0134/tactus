@@ -199,6 +199,7 @@ ROOM_POOL_HUB_WORLD_SET_DEBUG_5  = 11
         Exits .byte
         RasterEffect .byte
         ColorEmphasis .byte
+        BaseLogic .byte
         BgPalette .word
         ObjPalette .word
         OverlayList .word
@@ -235,3 +236,6 @@ OVERLAY_OPEN_NW = 4
 .global test_structure_set_small
 .global test_structure_set_big
 .global empty_structure_set
+
+ROOM_BASE_LOGIC_NONE     = 0
+ROOM_BASE_LOGIC_STANDARD = 1

@@ -1156,6 +1156,7 @@ FloorExitCount := R12
 MaxChallengeCount := R13
 ShopCount := R14
 MaxShopCount := R15
+MaxExitCount := R16
         jsr shuffle_room_order
 
         st16 floors_rerolled, 0
@@ -1169,6 +1170,9 @@ MaxShopCount := R15
         ldy #BigFloor::MaxShopRooms
         lda (BigFloorPtr), y
         sta MaxShopCount
+        ldy #BigFloor::MaxExitRooms ; some rooms shouldn't have exits! some have multiple, etc
+        lda (BigFloorPtr), y
+        sta MaxExitCount
 
 begin_floor_generation:
         ; initialize room flags and other state to a sensible starting value
@@ -1286,7 +1290,8 @@ done_with_player_spawning:
         ; bounds, and (c) is not a challenge room. Later we will be completely overhauling
         ; exit generation in general
         lda FloorExitCount
-        bne done_picking_exits ; only pick one exit
+        cmp MaxExitCount
+        bcs done_picking_exits ; only pick one exit
         cpx PlayerRoomIndex
         beq done_picking_exits ; (a) it isn't  the player's starting location
         ldy #Room::Properties
@@ -1310,6 +1315,9 @@ accept_this_room:
         ldy #Room::Properties
         lda (RoomPtr), y
         sta room_properties, x
+        ldy #Room::BaseLogic
+        lda (RoomPtr), y
+        sta room_base_beat_logic, x
         ; Also load in this room's base raster effect and color emphasis
         ; settings while we're in here. These might later get overridden by
         ; spell effects
@@ -1684,6 +1692,7 @@ done_with_torchlight:
 ; Yes it is very silly to have just one entry here, but we'll get around to
 ; expanding this when bosses need update functions.
 room_state_dispatch_lut:
+        .word no_room_logic
         .word room_clear_and_chest_spawn
 
 spell_state_dispatch_lut:
@@ -1756,6 +1765,15 @@ done:
 .proc _room_state_trampoline
 DispatchPtr := R0
         jmp (DispatchPtr)
+.endproc
+
+.proc no_room_logic
+        ; Flag this room as cleared all the time. Perform no other special logic.
+        lda #1
+        sta current_clear_status
+        sta previous_clear_status
+
+        rts
 .endproc
 
 .proc room_clear_and_chest_spawn

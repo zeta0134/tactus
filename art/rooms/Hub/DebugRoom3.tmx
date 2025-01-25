@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="16" height="11" tilewidth="16" tileheight="16" infinite="0" nextlayerid="66" nextobjectid="1">
  <properties>
+  <property name="base_logic" value="ROOM_BASE_LOGIC_NONE"/>
   <property name="category" value="exterior"/>
   <property name="dark" type="bool" value="false"/>
   <property name="exit_east" type="bool" value="true"/>
@@ -21,7 +22,7 @@
   <data encoding="csv">
 212,226,226,226,226,226,226,226,226,226,227,266,257,257,268,209,
 211,242,242,242,242,242,242,242,242,242,243,266,257,257,268,209,
-211,258,530,259,529,528,527,259,526,368,257,270,257,257,268,209,
+211,258,530,259,529,528,527,259,526,368,259,270,257,257,268,209,
 211,266,273,257,257,257,257,257,257,257,257,257,257,257,268,209,
 211,266,525,257,524,523,522,257,521,367,257,257,257,257,268,209,
 211,266,273,257,257,257,257,257,257,257,257,257,257,257,268,209,
