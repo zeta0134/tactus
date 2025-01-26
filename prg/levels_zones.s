@@ -109,7 +109,10 @@ zone_blocking_mazes:
 
         .include "leveldata/zone_0_hub.asm"
         .include "leveldata/zone_1_grasslands.asm"
-        .include "leveldata/zone_2_beach.asm"
+        .include "leveldata/zone_2a_beach.asm"
+        .include "leveldata/zone_2b.asm"
+        .include "leveldata/zone_2c.asm"
+        .include "leveldata/zone_2w.asm"
 
 
 ; ░▒▓███████▓▒░░▒▓████████▓▒░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░  
