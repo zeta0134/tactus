@@ -70,7 +70,7 @@
         .include "../build/floors/test_floor_wide_open.incs"
         .include "../build/floors/hub_world.incs"
 
-        .segment "DATA_3"
+        .segment "LEVEL_DATA_ZONE_DEFS"
 
 hud_base_pal:
         .incbin "../art/hud_base.pal"
@@ -108,11 +108,23 @@ zone_blocking_mazes:
         banked_addr floor_blocking_04
 
         .include "leveldata/zone_0_hub.asm"
+
         .include "leveldata/zone_1_grasslands.asm"
+
         .include "leveldata/zone_2a_beach.asm"
         .include "leveldata/zone_2b.asm"
         .include "leveldata/zone_2c.asm"
         .include "leveldata/zone_2w.asm"
+
+        .include "leveldata/zone_3a.asm"
+        .include "leveldata/zone_3b.asm"
+        .include "leveldata/zone_3c.asm"
+        .include "leveldata/zone_3w.asm"
+
+        .include "leveldata/zone_4a.asm"
+        .include "leveldata/zone_4b.asm"
+        .include "leveldata/zone_4c.asm"
+        .include "leveldata/zone_4w.asm"
 
 
 ; ░▒▓███████▓▒░░▒▓████████▓▒░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░  

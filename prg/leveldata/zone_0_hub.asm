@@ -65,80 +65,80 @@ zone_hub_exits:
 
         ; Debug 2:
         ; Zone 2A
-        .addr zone_2a_floor_1      ; Sorta... it has machine music right now.
-        .addr zone_2a_floor_2      ; One thing at a time :D
+        .addr zone_2a_floor_1
+        .addr zone_2a_floor_2
         .addr zone_2a_floor_3
         .addr zone_2a_floor_4
         .addr zone_hub_world          ; unimplemented! :(
         ; Zone 2B
-        .addr zone_2b_floor_1          ; unimplemented! :(
-        .addr zone_2b_floor_2          ; unimplemented! :(
-        .addr zone_2b_floor_3          ; unimplemented! :(
-        .addr zone_2b_floor_4          ; unimplemented! :(
+        .addr zone_2b_floor_1
+        .addr zone_2b_floor_2
+        .addr zone_2b_floor_3
+        .addr zone_2b_floor_4
         .addr zone_hub_world          ; unimplemented! :(
         ; Zone 2C:
-        .addr zone_2c_floor_1          ; unimplemented! :(
-        .addr zone_2c_floor_2          ; unimplemented! :(
-        .addr zone_2c_floor_3          ; unimplemented! :(
-        .addr zone_2c_floor_4          ; unimplemented! :(
+        .addr zone_2c_floor_1
+        .addr zone_2c_floor_2
+        .addr zone_2c_floor_3
+        .addr zone_2c_floor_4
         .addr zone_hub_world          ; unimplemented! :(
         ; Zone 2W:
-        .addr zone_2w_floor_1          ; unimplemented! :(
-        .addr zone_2w_floor_2          ; unimplemented! :(
-        .addr zone_2w_floor_3          ; unimplemented! :(
-        .addr zone_2w_floor_4          ; unimplemented! :(
+        .addr zone_2w_floor_1
+        .addr zone_2w_floor_2
+        .addr zone_2w_floor_3
+        .addr zone_2w_floor_4
         .addr zone_hub_world          ; unimplemented! :(
 
         ; Debug 3:
         ; Zone 3A
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_3a_floor_1
+        .addr zone_3a_floor_2
+        .addr zone_3a_floor_3
+        .addr zone_3a_floor_4
         .addr zone_hub_world          ; unimplemented! :(
         ; Zone 3B
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_3b_floor_1
+        .addr zone_3b_floor_2
+        .addr zone_3b_floor_3
+        .addr zone_3b_floor_4
         .addr zone_hub_world          ; unimplemented! :(
         ; Zone 3C:
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_3c_floor_1
+        .addr zone_3c_floor_2
+        .addr zone_3c_floor_3
+        .addr zone_3c_floor_4
         .addr zone_hub_world          ; unimplemented! :(
         ; Zone 3W:
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_3w_floor_1
+        .addr zone_3w_floor_2
+        .addr zone_3w_floor_3
+        .addr zone_3w_floor_4
         .addr zone_hub_world          ; unimplemented! :(
 
         ; Debug 4:
         ; Zone 4A
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_4a_floor_1
+        .addr zone_4a_floor_2
+        .addr zone_4a_floor_3
+        .addr zone_4a_floor_4
         .addr zone_hub_world          ; unimplemented! :(
         ; Zone 4B
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_4b_floor_1
+        .addr zone_4b_floor_2
+        .addr zone_4b_floor_3
+        .addr zone_4b_floor_4
         .addr zone_hub_world          ; unimplemented! :(
         ; Zone 4C:
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_4c_floor_1
+        .addr zone_4c_floor_2
+        .addr zone_4c_floor_3
+        .addr zone_4c_floor_4
         .addr zone_hub_world          ; unimplemented! :(
         ; Zone 4W:
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_4w_floor_1
+        .addr zone_4w_floor_2
+        .addr zone_4w_floor_3
+        .addr zone_4w_floor_4
         .addr zone_hub_world          ; unimplemented! :(
 
         ; Debug 5:
