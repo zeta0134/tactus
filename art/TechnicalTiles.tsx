@@ -49,6 +49,11 @@
    <property name="tile_id" value="BG_TILE_SPIKES_LOWERED"/>
   </properties>
  </tile>
+ <tile id="16">
+  <properties>
+   <property name="behavior" value="TILE_SEMISAFE_FLOOR"/>
+  </properties>
+ </tile>
  <tile id="17" type="detail">
   <properties>
    <property name="behavior" value="TILE_WALL"/>

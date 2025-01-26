@@ -146,6 +146,20 @@ def combine_tile_properties(graphics_tile, supplementary_tiles):
         combined_tile.string_properties = combined_tile.string_properties | supplementary_tile.string_properties
     return combined_tile
 
+def process_class_overrides(graphics_tile, supplementary_tiles):
+    combined_tile = TiledTile(
+        ordinal_index=graphics_tile.ordinal_index,
+        tiled_index=graphics_tile.tiled_index,
+        boolean_properties=dict(graphics_tile.boolean_properties),
+        integer_properties=dict(graphics_tile.integer_properties),
+        string_properties=dict(graphics_tile.string_properties),
+        type=graphics_tile.type
+    )
+    for supplementary_tile in supplementary_tiles:
+        if supplementary_tile.boolean_properties.get("class_override", False):
+            combined_tile.type = supplementary_tile.type
+    return combined_tile
+
 # Given a list of layer elements, parses the layer contents, then
 # combines common attributes, using the "Base" layer as a base.
 def read_and_combine_layers(layer_elements, tilesets):
@@ -162,7 +176,9 @@ def read_and_combine_layers(layer_elements, tilesets):
     for tile_index in range(0, len(graphics_layer)):
         graphics_tile = graphics_layer[tile_index]
         supplementary_tiles = [supplementary_layers[layer_name][tile_index] for layer_name in supplementary_layers]
-        combined_tiles.append(combine_tile_properties(graphics_tile, supplementary_tiles))
+        combined_tile = combine_tile_properties(graphics_tile, supplementary_tiles)
+        overridden_tile = process_class_overrides(combined_tile, supplementary_tiles)
+        combined_tiles.append(overridden_tile)
     return combined_tiles
 
 def read_room(map_filename):
