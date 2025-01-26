@@ -108,6 +108,16 @@
    <property name="behavior" value="ITEM_BOMB_STANDARD_X3"/>
   </properties>
  </tile>
+ <tile id="38" type="item">
+  <properties>
+   <property name="behavior" value="ITEM_BASIC_TORCH"/>
+  </properties>
+ </tile>
+ <tile id="39" type="item">
+  <properties>
+   <property name="behavior" value="ITEM_LARGE_TORCH"/>
+  </properties>
+ </tile>
  <tile id="48" type="item">
   <properties>
    <property name="behavior" value="ITEM_SPELL_FIRE"/>

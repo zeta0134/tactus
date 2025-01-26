@@ -158,6 +158,8 @@ def process_class_overrides(graphics_tile, supplementary_tiles):
     for supplementary_tile in supplementary_tiles:
         if supplementary_tile.boolean_properties.get("class_override", False):
             combined_tile.type = supplementary_tile.type
+            if supplementary_tile.type == "exit":
+                combined_tile.string_properties["behavior"] = str(supplementary_tile.tiled_index)
     return combined_tile
 
 # Given a list of layer elements, parses the layer contents, then
@@ -294,7 +296,7 @@ def tile_attr_bytes(tiles):
         elif tile.type == "detail":
             raw_bytes.append(f"${palette_index:02X}")
         elif tile.type == "item":
-            raw_bytes.append(f">BG_TILE_WEAPON_SHADOW")
+            raw_bytes.append(f">(BG_TILE_WEAPON_SHADOW) | ${palette_index:02X}")
         elif tile.type == "blank":
             raw_bytes.append(f"ERROR_BLANK_TILE")
         else:

@@ -88,16 +88,20 @@ sign_welcome_to_debug:
         ;     0123456789012345678901234567 ; 28-char width
         .byte D_ATTR, COLOR_MM_WHITE
         .byte "Rooms are sorted by order", D_NEWLINE
-        .byte "of appearance. This room is", D_NEWLINE
-        .byte "Zone 1, which is always the", D_WAIT, D_CLEAR
+        .byte "of appearance in a typical", D_NEWLINE
+        .byte "run.", D_WAIT, D_CLEAR
+        ;     0123456789012345678901234567 ; 28-char width        
+        .byte "This room is Zone 1, which", D_NEWLINE
+        .byte "is always the starting", D_NEWLINE
+        .byte "zone.", D_WAIT, D_CLEAR
         ;     0123456789012345678901234567 ; 28-char width
-        .byte "starting zone. Each room to", D_NEWLINE
-        .byte "the north has the potential", D_NEWLINE
-        .byte "zones that may follow.", D_WAIT, D_CLEAR
+        .byte "Rooms to the north have all", D_NEWLINE
+        .byte "zones that may randomly ", D_NEWLINE
+        .byte "appear after a boss.", D_WAIT, D_CLEAR
         ;     0123456789012345678901234567 ; 28-char width
-        .byte "Grab some items to gear up", D_NEWLINE
-        .byte "as needed. Nothing in here", D_NEWLINE
-        .byte "is sacred, etc.", D_WAIT, D_CLOSE
+        .byte "Zones marked W will only", D_NEWLINE
+        .byte "appear at the end of a", D_NEWLINE
+        .byte "hidden warp zone.", D_WAIT, D_CLOSE        
 
 ; SIGN_DEBUG_ZONE_1 = $03
 
@@ -239,8 +243,8 @@ sign_debug_misc_1:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 1-2 but fast!", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "An early speed, this is", D_NEWLINE
-        .byte "largely obsolte.", D_WAIT, D_CLOSE
+        .byte "An early speed test!  this", D_NEWLINE
+        .byte "is largely obsolete.", D_WAIT, D_CLOSE
 
 sign_debug_misc_2:
         .byte D_ATTR, COLOR_MM_WHITE
