@@ -1388,13 +1388,33 @@ item_bank_offset_lut:
 .proc FAR_allocate_item_bank
 ItemIndex := R1
 ItemPtr := R2
-BankOffset := R4
+
+BankId := R4     ; used during allocation checks
+BankOffset := R4 ; returned to the caller
+
+        ; We allocate by the bank ID, so we'll need that ready to go
+        access_data_bank #<.bank(item_table)
+
+        lda ItemIndex
+        asl ; index into the word table
+        tay
+        lda item_table+0, y
+        sta ItemPtr+0
+        lda item_table+1, y
+        sta ItemPtr+1
+
+        ldy #ItemDef::WorldSpriteTile+1
+        lda (ItemPtr), y
+        sta BankId
+
+        restore_previous_bank
+
         ldx #0
         ; First check for an existing allocation
         ; which matches this item
 existing_loop:
         lda item_bank_ids, x
-        cmp ItemIndex
+        cmp BankId
         beq increase_refs
         inx
         cpx #4
@@ -1417,7 +1437,7 @@ new_loop:
         rts
 
 allocate_new_slot:
-        lda ItemIndex
+        lda BankId
         sta item_bank_ids, x
         lda #1
         sta item_bank_refs, x
@@ -1428,10 +1448,23 @@ increase_refs:
         jmp set_bank_offset
 
 set_bank_offset:
+        ; Actually apply the bank ID we read earlier
+        lda BankId
+        sta SPRITE_BANK_ITEM_00, x
+
+        ; Now use the bank offset as the return value
         lda item_bank_offset_lut, x
         sta BankOffset
+        rts
+.endproc
 
-        ; And actually allocate that bank
+.proc FAR_free_item_bank
+ItemIndex := R1
+ItemPtr := R1
+BankId := R1
+; TODO: check to see if R2 is used anywhere in call sites
+
+        ; We allocate by the bank ID, so we'll need that ready to go
         access_data_bank #<.bank(item_table)
 
         lda ItemIndex
@@ -1444,21 +1477,14 @@ set_bank_offset:
 
         ldy #ItemDef::WorldSpriteTile+1
         lda (ItemPtr), y
-        sta SPRITE_BANK_ITEM_00, x
+        sta BankId
 
         restore_previous_bank
-        ; Use the BankOffset as the return code, just in case
-        ; the call site needs to clobber this or whatever
-        lda BankOffset
-        rts
-.endproc
 
-.proc FAR_free_item_bank
-ItemIndex := R1
         ldx #0
 loop:
         lda item_bank_ids, x
-        cmp ItemIndex
+        cmp BankId
         bne done_with_this_offset
         lda item_bank_refs, x
         beq clear_item_slot ; shouldn't ever be taken !?

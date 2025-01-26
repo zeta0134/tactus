@@ -1087,6 +1087,10 @@ ScratchPal := R14
         lda battlefield, y
         sta tile_data, y
 
+        ; So that we don't leave weird tile data behind, fix the detail to 0
+        lda #0
+        sta tile_detail, y
+
         ; TODO: what do we want to do about the purchase flag? right now we're
         ; leaving it unset, so forced item spawns in map data are free to pick up.
         ; Is that good enough?

@@ -83,10 +83,12 @@ sign_welcome_to_debug:
         ;     0123456789012345678901234567 ; 28-char width
         .byte D_ATTR, COLOR_MM_WHITE
         .byte "Welcome to Debug Zone!", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
         .byte "(Sorry, no fancy music.)", D_WAIT, D_CLEAR
         ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_WHITE
         .byte "Rooms are sorted by order", D_NEWLINE
-        .byte "of appearance. This room", D_NEWLINE
+        .byte "of appearance. This room is", D_NEWLINE
         .byte "Zone 1, which is always the", D_WAIT, D_CLEAR
         ;     0123456789012345678901234567 ; 28-char width
         .byte "starting zone. Each room to", D_NEWLINE
@@ -104,7 +106,7 @@ sign_debug_zone_1:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 1: Grasslands", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "1-B     1-4 1-3 1-2     1-1", D_WAIT, D_CLOSE
+        .byte "Boss         F4  F3  F2  F1", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_2A = $04
 
@@ -113,7 +115,7 @@ sign_debug_zone_2a:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 2A: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "2-B     2-4 2-3 2-2     2-1", D_WAIT, D_CLOSE
+        .byte "Boss         F4  F3  F2  F1", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_2B = $05
 
@@ -122,7 +124,7 @@ sign_debug_zone_2b:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 2B: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "2-B     2-4 2-3 2-2     2-1", D_WAIT, D_CLOSE
+        .byte "Boss         F4  F3  F2  F1", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_2C = $06
 
@@ -131,7 +133,7 @@ sign_debug_zone_2c:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 2C: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "2-B     2-4 2-3 2-2     2-1", D_WAIT, D_CLOSE
+        .byte "Boss         F4  F3  F2  F1", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_2W = $07
 
@@ -140,7 +142,7 @@ sign_debug_zone_2w:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 2W: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "2-B     2-4 2-3 2-2     2-1", D_WAIT, D_CLOSE
+        .byte "Boss         F4  F3  F2  F1", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_3A = $08
 
@@ -149,7 +151,7 @@ sign_debug_zone_3a:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 3A: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "3-B     3-4 3-3 3-2     3-1", D_WAIT, D_CLOSE
+        .byte "Boss         F4  F3  F2  F1", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_3B = $09
 
@@ -158,7 +160,7 @@ sign_debug_zone_3b:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 3B: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "3-B     3-4 3-3 3-2     3-1", D_WAIT, D_CLOSE
+        .byte "Boss         F4  F3  F2  F1", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_3C = $0A
 
@@ -167,7 +169,7 @@ sign_debug_zone_3c:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 3C: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "3-B     3-4 3-3 3-2     3-1", D_WAIT, D_CLOSE
+        .byte "Boss         F4  F3  F2  F1", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_3W = $0B
 
@@ -176,7 +178,7 @@ sign_debug_zone_3w:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 3W: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "3-B     3-4 3-3 3-2     3-1", D_WAIT, D_CLOSE
+        .byte "Boss         F4  F3  F2  F1", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_4A = $0C
 
@@ -185,7 +187,7 @@ sign_debug_zone_4a:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 4A: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "4-B     4-4 4-3 4-2     4-1", D_WAIT, D_CLOSE
+        .byte "Boss         F4  F3  F2  F1", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_4B = $0D
 
@@ -194,7 +196,7 @@ sign_debug_zone_4b:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 4B: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "4-B     4-4 4-3 4-2     4-1", D_WAIT, D_CLOSE
+        .byte "Boss         F4  F3  F2  F1", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_4C = $0E
 
@@ -203,7 +205,7 @@ sign_debug_zone_4c:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 4C: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "4-B     4-4 4-3 4-2     4-1", D_WAIT, D_CLOSE
+        .byte "Boss         F4  F3  F2  F1", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_4W = $0F
 
@@ -212,7 +214,7 @@ sign_debug_zone_4w:
         .byte D_ATTR, COLOR_MM_YELLOW
         .byte "Zone 4W: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "4-B     4-4 4-3 4-2     4-1", D_WAIT, D_CLOSE
+        .byte "Boss         F4  F3  F2  F1", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_5S = $10
 
@@ -221,7 +223,7 @@ sign_debug_zone_5s:
         .byte D_ATTR, COLOR_MM_RED
         .byte "Zone 5S: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "5-B     5-4 5-3 5-2     5-1", D_WAIT, D_CLOSE
+        .byte "F1  F2  F3  F4         Boss", D_WAIT, D_CLOSE
 
 ; SIGN_DEBUG_ZONE_5w = $11
 
@@ -230,7 +232,7 @@ sign_debug_zone_5w:
         .byte D_ATTR, COLOR_MM_RED
         .byte "Zone 5W: Placeholder", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "5-B     5-4 5-3 5-2     5-1", D_WAIT, D_CLOSE
+        .byte "F1  F2  F3  F4         Boss", D_WAIT, D_CLOSE
 
 sign_debug_misc_1:
         ;     0123456789012345678901234567 ; 28-char width
