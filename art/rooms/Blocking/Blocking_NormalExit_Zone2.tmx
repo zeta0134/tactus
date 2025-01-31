@@ -17,6 +17,8 @@
  <tileset firstgid="257" source="../../DiscoFloorTiles.tsx"/>
  <tileset firstgid="289" source="../../Attributes.tsx"/>
  <tileset firstgid="293" source="../../TechnicalTiles.tsx"/>
+ <tileset firstgid="357" source="../../ExitTiles.tsx"/>
+ <tileset firstgid="485" source="../../SignTiles.tsx"/>
  <layer id="1" name="Base" width="16" height="11" opacity="0.5">
   <data encoding="csv">
 6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,
@@ -24,7 +26,7 @@
 6,265,265,265,265,265,265,265,265,265,265,265,265,265,265,6,
 6,265,257,257,257,257,257,257,257,257,257,257,257,257,265,6,
 6,265,257,257,257,257,257,257,257,257,257,257,257,257,265,6,
-6,265,257,257,257,257,257,257,257,257,257,257,257,257,265,6,
+6,265,257,257,507,357,257,508,358,257,509,359,257,257,265,6,
 6,265,257,257,257,257,257,257,257,257,257,257,257,257,265,6,
 6,265,257,257,257,257,257,257,257,257,257,257,257,257,265,6,
 6,265,257,257,257,257,257,257,257,257,257,257,257,257,265,6,
@@ -359,7 +361,7 @@
 </data>
   </layer>
  </group>
- <group id="63" name="Shop - West" class="overlay">
+ <group id="63" name="Shop - West" class="overlay" visible="0">
   <properties>
    <property name="adjacent_challenge" type="bool" value="false"/>
    <property name="adjacent_exterior" type="bool" value="false"/>
@@ -398,7 +400,7 @@
 </data>
   </layer>
  </group>
- <group id="60" name="Shop - East" class="overlay">
+ <group id="60" name="Shop - East" class="overlay" visible="0">
   <properties>
    <property name="adjacent_challenge" type="bool" value="false"/>
    <property name="adjacent_exterior" type="bool" value="false"/>
@@ -437,7 +439,7 @@
 </data>
   </layer>
  </group>
- <group id="54" name="Shop - South" class="overlay">
+ <group id="54" name="Shop - South" class="overlay" visible="0">
   <properties>
    <property name="adjacent_challenge" type="bool" value="false"/>
    <property name="adjacent_exterior" type="bool" value="false"/>
@@ -476,7 +478,7 @@
 </data>
   </layer>
  </group>
- <group id="57" name="Shop - North" class="overlay">
+ <group id="57" name="Shop - North" class="overlay" visible="0">
   <properties>
    <property name="adjacent_challenge" type="bool" value="false"/>
    <property name="adjacent_exterior" type="bool" value="false"/>

@@ -247,12 +247,149 @@ sign_debug_misc_1:
         .byte "is largely obsolete.", D_WAIT, D_CLOSE
 
 sign_debug_misc_2:
+        ;     0123456789012345678901234567 ; 28-char width
         .byte D_ATTR, COLOR_MM_WHITE
         .byte "Reserved for future use.", D_WAIT, D_CLOSE
 
 sign_debug_misc_3:
+        ;     0123456789012345678901234567 ; 28-char width
         .byte D_ATTR, COLOR_MM_WHITE
         .byte "Reserved for future use.", D_WAIT, D_CLOSE
+
+;SIGN_THERE_SHOULD_BE_A_BOSS_HERE = $15
+
+sign_there_should_be_a_boss_here:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_RED
+        .byte "Yeah there's supposed to be", D_NEWLINE
+        .byte "a boss here eventually...", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_2A = $16
+
+sign_zone_2a_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_YELLOW
+        .byte "Entrance to Zone 2A", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_2B = $17
+
+sign_zone_2b_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_YELLOW
+        .byte "Entrance to Zone 2B", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_2C = $18
+
+sign_zone_2c_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_YELLOW
+        .byte "Entrance to Zone 2C", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_2W = $19
+
+sign_zone_2w_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_YELLOW
+        .byte "Entrance to Zone 2W", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_3A = $1A
+
+sign_zone_3a_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_YELLOW
+        .byte "Entrance to Zone 3A", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_3B = $1B
+
+sign_zone_3b_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_YELLOW
+        .byte "Entrance to Zone 3B", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_3C = $1C
+
+sign_zone_3c_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_YELLOW
+        .byte "Entrance to Zone 3C", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_3W = $1D
+
+sign_zone_3w_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_YELLOW
+        .byte "Entrance to Zone 3W", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_4A = $1E
+
+sign_zone_4a_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_YELLOW
+        .byte "Entrance to Zone 4A", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_4B = $1F
+
+sign_zone_4b_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_YELLOW
+        .byte "Entrance to Zone 4B", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_4C = $20
+
+sign_zone_4c_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_YELLOW
+        .byte "Entrance to Zone 4C", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_4W = $21
+
+sign_zone_4w_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_YELLOW
+        .byte "Entrance to Zone 4W", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_5S = $22
+
+sign_zone_5s_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_RED
+        .byte "Entrance to Zone 5S", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
+;SIGN_PLACEHOLDER_ZONE_1_5W = $23
+
+sign_zone_5w_entrance:
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_ATTR, COLOR_MM_RED
+        .byte "Entrance to Zone 5W", D_NEWLINE
+        .byte D_ATTR, COLOR_MM_GREY
+        .byte "Placeholder, WIP, etc", D_WAIT, D_CLOSE
+
 
         .segment "CODE_0"
 
@@ -278,6 +415,21 @@ sign_text_table:
         .word sign_debug_misc_1     ; SIGN_DEBUG_MISC_1     = $12
         .word sign_debug_misc_2     ; SIGN_DEBUG_MISC_2     = $13
         .word sign_debug_misc_3     ; SIGN_DEBUG_MISC_3     = $14
+        .word sign_there_should_be_a_boss_here ; SIGN_THERE_SHOULD_BE_A_BOSS_HERE = $15
+        .word sign_zone_2a_entrance ; SIGN_PLACEHOLDER_ZONE_1_2A = $16
+        .word sign_zone_2b_entrance ; SIGN_PLACEHOLDER_ZONE_1_2B = $17
+        .word sign_zone_2c_entrance ; SIGN_PLACEHOLDER_ZONE_1_2C = $18
+        .word sign_zone_2w_entrance ; SIGN_PLACEHOLDER_ZONE_1_2W = $19
+        .word sign_zone_3a_entrance ; SIGN_PLACEHOLDER_ZONE_1_3A = $1A
+        .word sign_zone_3b_entrance ; SIGN_PLACEHOLDER_ZONE_1_3B = $1B
+        .word sign_zone_3c_entrance ; SIGN_PLACEHOLDER_ZONE_1_3C = $1C
+        .word sign_zone_3w_entrance ; SIGN_PLACEHOLDER_ZONE_1_3W = $1D
+        .word sign_zone_4a_entrance ; SIGN_PLACEHOLDER_ZONE_1_4A = $1E
+        .word sign_zone_4b_entrance ; SIGN_PLACEHOLDER_ZONE_1_4B = $1F
+        .word sign_zone_4c_entrance ; SIGN_PLACEHOLDER_ZONE_1_4C = $20
+        .word sign_zone_4w_entrance ; SIGN_PLACEHOLDER_ZONE_1_4W = $21
+        .word sign_zone_5s_entrance ; SIGN_PLACEHOLDER_ZONE_1_5S = $22
+        .word sign_zone_5w_entrance ; SIGN_PLACEHOLDER_ZONE_1_5W = $23
 
 shop_text_table:
         .word sign_shop_generic

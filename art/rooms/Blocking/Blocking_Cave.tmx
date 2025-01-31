@@ -8,7 +8,7 @@
   <property name="exit_north" type="bool" value="true"/>
   <property name="exit_south" type="bool" value="true"/>
   <property name="exit_west" type="bool" value="true"/>
-  <property name="forbid_spawning" type="bool" value="false"/>
+  <property name="forbid_player_spawning" type="bool" value="false"/>
   <property name="raster_effect" value="RASTER_EFFECT_NONE"/>
   <property name="room_obj_palette" value="sprite_palette_overworld"/>
   <property name="room_palette" value="blocking_interior_palette"/>

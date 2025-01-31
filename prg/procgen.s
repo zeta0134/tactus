@@ -1282,7 +1282,7 @@ done_considering_shop_rooms:
         bne done_with_player_spawning
         ; can this floor tile handle player spawns?
         lda room_floorplan, x
-        and #ROOM_PROPERTIES_NOSPAWN
+        and #FLOOR_PROPERTIES_NOSPAWN
         bne done_with_player_spawning
         ; we've found a room that the player **could** spawn in, and we haven't already
         ; picked one. this one works. use this one!
