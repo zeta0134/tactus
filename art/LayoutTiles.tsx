@@ -50,7 +50,7 @@
  </tile>
  <tile id="15">
   <properties>
-   <property name="forbid_spawning" type="bool" value="true"/>
+   <property name="forbid_player_spawning" type="bool" value="true"/>
   </properties>
  </tile>
  <tile id="16">
