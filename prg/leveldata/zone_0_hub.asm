@@ -61,7 +61,7 @@ zone_hub_exits:
         .addr zone_grasslands_floor_2
         .addr zone_grasslands_floor_3
         .addr zone_grasslands_floor_4
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_grasslands_floor_boss
 
         ; Debug 2:
         ; Zone 2A

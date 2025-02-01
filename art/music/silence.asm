@@ -1,4 +1,4 @@
-; Dn-FamiTracker exported music data: tactus-vrc6.dnm
+; Dn-FamiTracker exported music data: silence.dnm
 ;
 
 ; Module header
@@ -38,7 +38,7 @@ ft_song_0:
 	.word ft_s0_frames
 	.byte 1	; frame count
 	.byte 64	; pattern length
-	.byte 6	; speed
+	.byte 3	; speed
 	.byte 120	; tempo
 	.byte 0	; groove position
 	.byte 0	; initial bank

@@ -13,6 +13,7 @@
         .include "rainbow.inc"
         .include "raster_table.inc"
         .include "signs.inc"
+        .include "word_util.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
 
@@ -40,6 +41,23 @@
         .include "../build/rooms/Hub/DebugRoom4.incs"
         .include "../build/rooms/Hub/DebugRoom5.incs"
 
+        .segment "LEVEL_DATA_ROOMS_3"
+
+        .include "../build/rooms/Blocking/Blocking_Boss.incs"
+
+        .include "../build/rooms/Blocking/Blocking_NormalExit_Zone2.incs"
+        .include "../build/rooms/Blocking/Blocking_NormalExit_Zone3.incs"
+        .include "../build/rooms/Blocking/Blocking_NormalExit_Zone4.incs"
+        .include "../build/rooms/Blocking/Blocking_NormalExit_Zone5.incs"
+
+        .include "../build/rooms/Blocking/Blocking_WarpExit_Zone2.incs"
+
+        .segment "LEVEL_DATA_ROOMS_4"
+
+        .include "../build/rooms/Blocking/Blocking_WarpExit_Zone3.incs"
+        .include "../build/rooms/Blocking/Blocking_WarpExit_Zone4.incs"
+        .include "../build/rooms/Blocking/Blocking_WarpExit_Zone5.incs"
+
         .segment "CODE_4"
 
 room_pools_lut:
@@ -55,6 +73,29 @@ room_pools_lut:
         .word room_pool_hub_world_set_debug3
         .word room_pool_hub_world_set_debug4
         .word room_pool_hub_world_set_debug5
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_1_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_2A_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_2B_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_2C_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_2W_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_3A_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_3B_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_3C_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_3W_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_4A_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_4B_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_4C_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_4W_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_5S_BOSS
+        .word room_pool_blocking_boss      ; ROOM_POOL_ZONE_5W_BOSS
+        .word room_pool_zone_2_normal_exit
+        .word room_pool_zone_3_normal_exit
+        .word room_pool_zone_4_normal_exit
+        .word room_pool_zone_5_normal_exit
+        .word room_pool_zone_2_warp_exit
+        .word room_pool_zone_3_warp_exit
+        .word room_pool_zone_4_warp_exit
+        .word room_pool_zone_5_warp_exit
 
 .macro room_entry room_label
         .addr room_label
@@ -69,86 +110,100 @@ room_pools_lut:
 ; 16 entries each
 
 room_pool_out_of_bounds:
-        ; You **really** shouldn't be here
-        .repeat 16
+        .byte 1 ; Length
         room_entry room_OutOfBounds
-        .endrepeat
 
 room_pool_grassy_exterior:
-        .repeat 4
+        .byte 4 ; Length
         room_entry room_Grasslands_Standard
-        .endrepeat
-        .repeat 4
         room_entry room_Grasslands_Round
-        .endrepeat
-        .repeat 4
         room_entry room_Shop_Standard
-        .endrepeat
-        .repeat 4
         room_entry room_ChallengeArena_Standard
-        .endrepeat
 
 room_pool_cave_interior:
-        .repeat 8
+        .byte 4 ; Length
         room_entry room_Caves_Standard
-        .endrepeat
-        .repeat 4
+        room_entry room_Caves_Standard
         room_entry room_Shop_Standard
-        .endrepeat
-        .repeat 4
         room_entry room_ChallengeArena_Standard
-        .endrepeat
 
 room_pool_hub_world_set_spawn:
-        .repeat 16
+        .byte 1 ; Length
         room_entry room_SpawnRoom
-        .endrepeat
+
 room_pool_hub_world_set_big_door:
-        .repeat 16
+        .byte 1 ; Length
         room_entry room_BigDoorRoom
-        .endrepeat
+
 room_pool_hub_world_set_debug1:
-        .repeat 16
+        .byte 1 ; Length
         room_entry room_DebugRoom1
-        .endrepeat
+        
 room_pool_hub_world_set_debug2:
-        .repeat 16
+        .byte 1 ; Length
         room_entry room_DebugRoom2
-        .endrepeat
+
 room_pool_hub_world_set_debug3:
-        .repeat 16
+        .byte 1 ; Length
         room_entry room_DebugRoom3
-        .endrepeat
+
 room_pool_hub_world_set_debug4:
-        .repeat 16
+        .byte 1 ; Length
         room_entry room_DebugRoom4
-        .endrepeat
+
 room_pool_hub_world_set_debug5:
-        .repeat 16
+        .byte 1 ; Length
         room_entry room_DebugRoom5
-        .endrepeat
 
 room_pool_blocking_chamber:
-        .repeat 8
+        .byte 4
         room_entry room_Blocking_Chamber
-        .endrepeat
-        .repeat 4
+        room_entry room_Blocking_Chamber
         room_entry room_Shop_Standard
-        .endrepeat
-        .repeat 4
         room_entry room_ChallengeArena_Standard
-        .endrepeat
 
 room_pool_blocking_cave:
-        .repeat 8
+        .byte 4
         room_entry room_Blocking_Cave
-        .endrepeat
-        .repeat 4
+        room_entry room_Blocking_Cave
         room_entry room_Shop_Standard
-        .endrepeat
-        .repeat 4
         room_entry room_ChallengeArena_Standard
-        .endrepeat
+
+room_pool_blocking_boss:
+        .byte 1 ; Length
+        room_entry room_Blocking_Boss
+
+room_pool_zone_2_normal_exit:
+        .byte 1 ; Length
+        room_entry room_Blocking_NormalExit_Zone2
+
+room_pool_zone_3_normal_exit:
+        .byte 1 ; Length
+        room_entry room_Blocking_NormalExit_Zone3
+
+room_pool_zone_4_normal_exit:
+        .byte 1 ; Length
+        room_entry room_Blocking_NormalExit_Zone4
+
+room_pool_zone_5_normal_exit:
+        .byte 1 ; Length
+        room_entry room_Blocking_NormalExit_Zone5
+
+room_pool_zone_2_warp_exit:
+        .byte 1 ; Length
+        room_entry room_Blocking_WarpExit_Zone2
+
+room_pool_zone_3_warp_exit:
+        .byte 1 ; Length
+        room_entry room_Blocking_WarpExit_Zone3
+
+room_pool_zone_4_warp_exit:
+        .byte 1 ; Length
+        room_entry room_Blocking_WarpExit_Zone4
+
+room_pool_zone_5_warp_exit:
+        .byte 1 ; Length
+        room_entry room_Blocking_WarpExit_Zone5
 
         sprite_palette_overworld:
                 .incbin "../art/sprite_palette_overworld.pal"
@@ -216,6 +271,12 @@ room_pool_blocking_cave:
                 .incbin "../art/palettes/blocking_interior/shocked.pal"
                 .incbin "../art/palettes/blocking_interior/overgrown.pal"
 
+        warp_palette:
+                .incbin "../art/palettes/warp_zone/base.pal"
+                .incbin "../art/palettes/warp_zone/scorched.pal"
+                .incbin "../art/palettes/warp_zone/frozen.pal"
+                .incbin "../art/palettes/warp_zone/shocked.pal"
+                .incbin "../art/palettes/warp_zone/overgrown.pal"
 
 ; more general variant: assumes nothing, sets thing up, etc etc
 .proc FAR_load_palette_for_current_room
@@ -299,12 +360,19 @@ obj_loop:
         rts
 .endproc
 
+; TODO: Rework this so that rooms can be drawn from a pool
+; of any length. Trying to cram everything into 16-length lists
+; was fine during the compo, but isn't flexible enough for the
+; final game we are heading towards.
 .proc FAR_roll_room_from_floorplan_at_current_index
 RoomPoolPtr := R2
 RoomPoolBank := R4
 CurrentRoomIndex := R5
 RoomPtr := R7
 RoomBank := R9
+
+ListLengthTemp := R9
+
         access_data_bank BigFloorBank
 
         perform_zpcm_inc
@@ -317,8 +385,14 @@ RoomBank := R9
         lda room_pools_lut+1, x
         sta RoomPoolPtr+1
 
-        jsr next_floor_rand
-        and #$0F ; 0-15
+        ; The first byte of every room pool denotes the number of entries,
+        ; which is the modulus we'll perform when rolling a chamber
+        ldy #0
+        lda (RoomPoolPtr), y
+        sta ListLengthTemp
+        inc16 RoomPoolPtr
+
+        in_range_smol next_floor_rand, ListLengthTemp
         asl
         asl
         tay

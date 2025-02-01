@@ -12,7 +12,7 @@
   <property name="forbid_player_spawning" type="bool" value="false"/>
   <property name="raster_effect" value="RASTER_EFFECT_NONE"/>
   <property name="room_obj_palette" value="sprite_palette_overworld"/>
-  <property name="room_palette" value="blocking_exterior_palette"/>
+  <property name="room_palette" value="warp_palette"/>
  </properties>
  <tileset firstgid="1" source="../../MapTiles.tsx"/>
  <tileset firstgid="257" source="../../DiscoFloorTiles.tsx"/>
@@ -26,9 +26,9 @@
 6,5,5,5,5,5,5,5,5,5,5,5,5,5,5,6,
 6,265,265,265,265,265,265,265,265,265,265,265,265,265,265,6,
 6,265,257,257,257,257,257,257,257,257,257,257,257,257,265,6,
+6,265,257,257,257,507,358,257,257,508,359,257,257,257,265,6,
 6,265,257,257,257,257,257,257,257,257,257,257,257,257,265,6,
-6,265,257,257,257,257,257,519,358,257,257,257,257,257,265,6,
-6,265,257,257,257,257,257,257,257,257,257,257,257,257,265,6,
+6,265,257,257,257,509,360,257,257,510,361,257,257,257,265,6,
 6,265,257,257,257,257,257,257,257,257,257,257,257,257,265,6,
 6,265,257,257,257,257,257,257,257,257,257,257,257,257,265,6,
 6,265,265,265,265,265,265,265,265,265,265,265,265,265,265,6,
@@ -206,7 +206,7 @@
 </data>
   </layer>
  </group>
- <group id="45" name="Challenge - West" class="overlay" visible="0">
+ <group id="45" name="Challenge - West" class="overlay">
   <properties>
    <property name="adjacent_challenge" type="bool" value="true"/>
    <property name="adjacent_exterior" type="bool" value="false"/>
@@ -221,8 +221,8 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,39,40,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,55,56,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,33,38,0,0,0,0,0,0,0,0,0,0,0,0,0,
+0,53,50,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -245,7 +245,7 @@
 </data>
   </layer>
  </group>
- <group id="42" name="Challenge - East" class="overlay" visible="0">
+ <group id="42" name="Challenge - East" class="overlay">
   <properties>
    <property name="adjacent_challenge" type="bool" value="true"/>
    <property name="adjacent_exterior" type="bool" value="false"/>
@@ -260,8 +260,8 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,35,36,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,51,52,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,37,34,0,
+0,0,0,0,0,0,0,0,0,0,0,0,0,49,54,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -284,7 +284,7 @@
 </data>
   </layer>
  </group>
- <group id="51" name="Challenge - South" class="overlay" visible="0">
+ <group id="51" name="Challenge - South" class="overlay">
   <properties>
    <property name="adjacent_challenge" type="bool" value="true"/>
    <property name="adjacent_exterior" type="bool" value="false"/>
@@ -302,8 +302,8 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,37,38,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,53,54,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,35,40,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,55,52,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
   </layer>
@@ -323,7 +323,7 @@
 </data>
   </layer>
  </group>
- <group id="48" name="Challenge - North" class="overlay" visible="0">
+ <group id="48" name="Challenge - North" class="overlay">
   <properties>
    <property name="adjacent_challenge" type="bool" value="true"/>
    <property name="adjacent_exterior" type="bool" value="false"/>
@@ -334,8 +334,8 @@
   <layer id="49" name="Base" width="16" height="11">
    <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,33,34,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,49,50,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,39,36,0,0,0,0,0,0,0,
+0,0,0,0,0,0,0,51,56,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -351,162 +351,6 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-</data>
-  </layer>
- </group>
- <group id="63" name="Shop - West" class="overlay" visible="0">
-  <properties>
-   <property name="adjacent_challenge" type="bool" value="false"/>
-   <property name="adjacent_exterior" type="bool" value="false"/>
-   <property name="adjacent_interior" type="bool" value="false"/>
-   <property name="adjacent_shop" type="bool" value="true"/>
-   <property name="direction" value="west"/>
-  </properties>
-  <layer id="64" name="Base" width="16" height="11">
-   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-6,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-5,14,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-6,16,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-</data>
-  </layer>
-  <layer id="65" name="Attributes" width="16" height="11" opacity="0.2">
-   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-291,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-291,291,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-291,291,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-</data>
-  </layer>
- </group>
- <group id="60" name="Shop - East" class="overlay" visible="0">
-  <properties>
-   <property name="adjacent_challenge" type="bool" value="false"/>
-   <property name="adjacent_exterior" type="bool" value="false"/>
-   <property name="adjacent_interior" type="bool" value="false"/>
-   <property name="adjacent_shop" type="bool" value="true"/>
-   <property name="direction" value="east"/>
-  </properties>
-  <layer id="61" name="Base" width="16" height="11">
-   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,6,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,14,5,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,16,6,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-</data>
-  </layer>
-  <layer id="62" name="Attributes" width="16" height="11" opacity="0.2">
-   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,291,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,291,291,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,291,291,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-</data>
-  </layer>
- </group>
- <group id="54" name="Shop - South" class="overlay" visible="0">
-  <properties>
-   <property name="adjacent_challenge" type="bool" value="false"/>
-   <property name="adjacent_exterior" type="bool" value="false"/>
-   <property name="adjacent_interior" type="bool" value="false"/>
-   <property name="adjacent_shop" type="bool" value="true"/>
-   <property name="direction" value="south"/>
-  </properties>
-  <layer id="55" name="Base" width="16" height="11">
-   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,14,0,0,0,0,0,0,16,0,0,0,0,
-0,0,0,0,6,0,0,0,0,0,0,6,0,0,0,0
-</data>
-  </layer>
-  <layer id="56" name="Attributes" width="16" height="11" opacity="0.2">
-   <data encoding="csv">
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,291,0,0,0,0,0,0,291,0,0,0,0,
-0,0,0,0,291,0,0,0,0,0,0,291,0,0,0,0
-</data>
-  </layer>
- </group>
- <group id="57" name="Shop - North" class="overlay" visible="0">
-  <properties>
-   <property name="adjacent_challenge" type="bool" value="false"/>
-   <property name="adjacent_exterior" type="bool" value="false"/>
-   <property name="adjacent_interior" type="bool" value="false"/>
-   <property name="adjacent_shop" type="bool" value="true"/>
-   <property name="direction" value="north"/>
-  </properties>
-  <layer id="58" name="Base" width="16" height="11">
-   <data encoding="csv">
-0,0,0,0,6,0,0,0,0,0,0,6,0,0,0,0,
-0,0,0,0,5,0,0,0,0,0,0,5,0,0,0,0,
-0,0,0,0,14,0,0,0,0,0,0,16,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
-</data>
-  </layer>
-  <layer id="59" name="Attributes" width="16" height="11" opacity="0.2">
-   <data encoding="csv">
-0,0,0,0,291,0,0,0,0,0,0,291,0,0,0,0,
-0,0,0,0,291,0,0,0,0,0,0,291,0,0,0,0,
-0,0,0,0,291,0,0,0,0,0,0,291,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,

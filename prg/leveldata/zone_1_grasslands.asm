@@ -186,23 +186,66 @@ zone_grasslands_floor_4:
         .addr test_structure_set_small ;ExteriorStructureSmallSet
         .byte 3                        ;ExteriorStructureSmallMaxMax
 
+zone_grasslands_floor_boss:
+        .addr spawn_pool_generic ; Spawn Pool (unused)
+        .addr spawnset_a53_z1_f4 ; Challenge Set (unused)
+        .byte 0                  ; SpawnPoolMin
+        .byte 128                ; SpawnPoolMax
+        .byte 0                  ; PopulationLimit (the boss chamber will already have what it needs)
+        .addr zone_grasslands_floor_boss_mazes ; Maze Pool
+        .addr zone_grasslands_floor_boss_exits ; Exit List
+        .byte TRACK_SILENCE      ; Music Track
+        .byte 0                  ; Added Tempo
+        .word zone_grasslands_banner_boss ; HudBanner
+        .addr hud_grasslands_pal
+        .addr rare_treasure_table       ; ShopLootPtr0 (unused?)
+        .addr rare_treasure_table       ; ShopLootPtr1
+        .addr common_treasure_table     ; ShopLootPtr2
+        .addr consumable_treasure_table ; ShopLootPtr3
+        .addr empty_structure_set ;InteriorStructureLargeSet
+        .byte 0                   ;InteriorStructureLargeMaxMax
+        .addr empty_structure_set ;InteriorStructureSmallSet
+        .byte 0                   ;InteriorStructureSmallMaxMax
+        .addr empty_structure_set ;ExteriorStructureLargeSet
+        .byte 0                   ;ExteriorStructureLargeMaxMax
+        .addr empty_structure_set ;ExteriorStructureSmallSet
+        .byte 0                   ;ExteriorStructureSmallMaxMax
+
 zone_grasslands_floor_1_exits:
         .byte 1 ; length
         .addr zone_grasslands_floor_2
 
 zone_grasslands_floor_2_exits:
-        .byte 1 ; length
+        .byte 5 ; length
         .addr zone_grasslands_floor_3
+        .addr zone_2a_floor_1 ; warp destinations
+        .addr zone_2b_floor_1
+        .addr zone_2c_floor_1
+        .addr zone_2w_floor_1
 
 zone_grasslands_floor_3_exits:
-        .byte 1 ; length
+        .byte 5 ; length
         .addr zone_grasslands_floor_4
+        .addr zone_2a_floor_1 ; warp destinations
+        .addr zone_2b_floor_1
+        .addr zone_2c_floor_1
+        .addr zone_2w_floor_1
 
-; DEBUG: for now, just go back to the hub world
-; (later we'll want a boss chamber, and a branching path)
 zone_grasslands_floor_4_exits:
-        .byte 1 ; length
-        .addr zone_hub_world
+        .byte 5 ; length
+        ; DEBUG: for now, just go back to the hub world
+        ; (later we'll want a boss chamber!)
+        .addr zone_grasslands_floor_boss
+        .addr zone_2a_floor_1 ; warp destinations
+        .addr zone_2b_floor_1
+        .addr zone_2c_floor_1
+        .addr zone_2w_floor_1
+
+zone_grasslands_floor_boss_exits:
+        .byte 3 ; length
+        .addr zone_2a_floor_1
+        .addr zone_2b_floor_1
+        .addr zone_2c_floor_1
 
 zone_grasslands_floor_1_mazes:
         .byte 10 ; length        
@@ -230,3 +273,7 @@ zone_grasslands_floor_234_mazes:
         banked_addr floor_grass_cave_mix_08
         banked_addr floor_grass_cave_mix_09
         banked_addr floor_grass_cave_mix_10
+
+zone_grasslands_floor_boss_mazes:
+        .byte 1 ; Length
+        banked_addr floor_zone_1_boss
