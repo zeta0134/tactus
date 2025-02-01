@@ -69,25 +69,25 @@ zone_hub_exits:
         .addr zone_2a_floor_2
         .addr zone_2a_floor_3
         .addr zone_2a_floor_4
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_2a_floor_boss
         ; Zone 2B
         .addr zone_2b_floor_1
         .addr zone_2b_floor_2
         .addr zone_2b_floor_3
         .addr zone_2b_floor_4
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_2b_floor_boss
         ; Zone 2C:
         .addr zone_2c_floor_1
         .addr zone_2c_floor_2
         .addr zone_2c_floor_3
         .addr zone_2c_floor_4
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_2c_floor_boss
         ; Zone 2W:
         .addr zone_2w_floor_1
         .addr zone_2w_floor_2
         .addr zone_2w_floor_3
         .addr zone_2w_floor_4
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_2w_floor_boss
 
         ; Debug 3:
         ; Zone 3A

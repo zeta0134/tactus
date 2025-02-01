@@ -212,8 +212,12 @@ zone_grasslands_floor_boss:
         .byte 0                   ;ExteriorStructureSmallMaxMax
 
 zone_grasslands_floor_1_exits:
-        .byte 1 ; length
+        .byte 5 ; length
         .addr zone_grasslands_floor_2
+        .addr zone_2a_floor_1 ; warp destinations
+        .addr zone_2b_floor_1
+        .addr zone_2c_floor_1
+        .addr zone_2w_floor_1
 
 zone_grasslands_floor_2_exits:
         .byte 5 ; length
@@ -233,8 +237,6 @@ zone_grasslands_floor_3_exits:
 
 zone_grasslands_floor_4_exits:
         .byte 5 ; length
-        ; DEBUG: for now, just go back to the hub world
-        ; (later we'll want a boss chamber!)
         .addr zone_grasslands_floor_boss
         .addr zone_2a_floor_1 ; warp destinations
         .addr zone_2b_floor_1

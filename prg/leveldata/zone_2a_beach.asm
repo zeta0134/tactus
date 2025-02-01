@@ -48,8 +48,12 @@ zone_2a_floor_1:
         .byte 0                   ;ExteriorStructureSmallMaxMax
 
 zone_2a_floor_1_exits:
-        .byte 1 ; length
+        .byte 5 ; length
         .addr zone_2a_floor_2
+        .addr zone_3a_floor_1 ; warp destinations
+        .addr zone_3b_floor_1
+        .addr zone_3c_floor_1
+        .addr zone_3w_floor_1
 
 zone_2a_banner_2:
         hud_banner_sprite SPRITE_BANNERS_01_BEACH_2_2, SPRITE_BANNERS_01_BEACH_LOWER
@@ -93,8 +97,12 @@ zone_2a_floor_2:
         .byte 0                   ;ExteriorStructureSmallMaxMax
 
 zone_2a_floor_2_exits:
-        .byte 1 ; length
+        .byte 2 ; length
         .addr zone_2a_floor_3
+        .addr zone_3a_floor_1 ; warp destinations
+        .addr zone_3b_floor_1
+        .addr zone_3c_floor_1
+        .addr zone_3w_floor_1
 
 zone_2a_banner_3:
         hud_banner_sprite SPRITE_BANNERS_01_BEACH_2_3, SPRITE_BANNERS_01_BEACH_LOWER
@@ -138,8 +146,12 @@ zone_2a_floor_3:
         .byte 0                   ;ExteriorStructureSmallMaxMax
 
 zone_2a_floor_3_exits:
-        .byte 1 ; length
+        .byte 5 ; length
         .addr zone_2a_floor_4
+        .addr zone_3a_floor_1 ; warp destinations
+        .addr zone_3b_floor_1
+        .addr zone_3c_floor_1
+        .addr zone_3w_floor_1
 
 zone_2a_banner_4:
         hud_banner_sprite SPRITE_BANNERS_01_BEACH_2_4, SPRITE_BANNERS_01_BEACH_LOWER
@@ -182,11 +194,13 @@ zone_2a_floor_4:
         .addr empty_structure_set ;ExteriorStructureSmallSet
         .byte 0                   ;ExteriorStructureSmallMaxMax
 
-; DEBUG: for now, just go back to the hub world
-; (later we'll want a boss chamber, and a branching path)
 zone_2a_floor_4_exits:
-        .byte 1 ; length
-        .addr zone_hub_world
+        .byte 5 ; length
+        .addr zone_2a_floor_boss
+        .addr zone_3a_floor_1 ; warp destinations
+        .addr zone_3b_floor_1
+        .addr zone_3c_floor_1
+        .addr zone_3w_floor_1
 
 zone_2a_banner_boss:
         hud_banner_sprite SPRITE_BANNERS_01_BEACH_BOSS, SPRITE_BANNERS_01_BEACH_LOWER
@@ -204,4 +218,37 @@ zone_2a_banner_boss:
         .byte (HUD_YELLOW_PAL | CHR_BANK_ZONES), (HUD_YELLOW_PAL | CHR_BANK_ZONES)
         .byte (HUD_YELLOW_PAL | CHR_BANK_ZONES), (HUD_YELLOW_PAL | CHR_BANK_ZONES)
 
-; TODO: a boss chamber here!
+zone_2a_floor_boss:
+        .addr spawn_pool_generic ; Spawn Pool (unused)
+        .addr spawnset_a53_z1_f4 ; Challenge Set (unused)
+        .byte 0                  ; SpawnPoolMin
+        .byte 128                ; SpawnPoolMax
+        .byte 0                  ; PopulationLimit (the boss chamber will already have what it needs)
+        .addr zone_2a_floor_boss_mazes ; Maze Pool
+        .addr zone_2a_floor_boss_exits ; Exit List
+        .byte TRACK_SILENCE      ; Music Track
+        .byte 0                  ; Added Tempo
+        .word zone_2a_banner_boss ; HudBanner
+        .addr hud_beach_pal
+        .addr rare_treasure_table       ; ShopLootPtr0 (unused?)
+        .addr rare_treasure_table       ; ShopLootPtr1
+        .addr common_treasure_table     ; ShopLootPtr2
+        .addr consumable_treasure_table ; ShopLootPtr3
+        .addr empty_structure_set ;InteriorStructureLargeSet
+        .byte 0                   ;InteriorStructureLargeMaxMax
+        .addr empty_structure_set ;InteriorStructureSmallSet
+        .byte 0                   ;InteriorStructureSmallMaxMax
+        .addr empty_structure_set ;ExteriorStructureLargeSet
+        .byte 0                   ;ExteriorStructureLargeMaxMax
+        .addr empty_structure_set ;ExteriorStructureSmallSet
+        .byte 0                   ;ExteriorStructureSmallMaxMax
+
+zone_2a_floor_boss_exits:
+        .byte 3 ; length
+        .addr zone_3a_floor_1
+        .addr zone_3b_floor_1
+        .addr zone_3c_floor_1
+
+zone_2a_floor_boss_mazes:
+        .byte 1 ; Length
+        banked_addr floor_zone_2a_boss
