@@ -17,11 +17,20 @@ zone_5w_banner_1:
         .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
 
 zone_5w_floor_1:
-        .addr spawn_pool_generic ; Spawn Pool
-        .addr spawnset_a53_z1_f1 ; Challenge Set
-        .byte 0                  ; SpawnPoolMin
-        .byte 32                 ; SpawnPoolMax
-        .byte 8                  ; PopulationLimit
+        .addr spawn_pool_generic   ; Interior Spawn Pool
+        .addr spawn_pool_generic   ; Exterior Spawn Pool
+        .addr spawn_pool_generic   ; Warp Spawn Pool
+        .addr spawnset_a53_z1_f1 ; General Challenge Set
+        .addr spawnset_a53_z1_f1 ; Warp Challenge Set
+        .byte 0                  ; InteriorSpawnPoolMin
+        .byte 32                 ; InteriorSpawnPoolMax
+        .byte 8                  ; InteriorPopulationLimit
+        .byte 0                  ; ExteriorSpawnPoolMin
+        .byte 32                 ; ExteriorSpawnPoolMax
+        .byte 8                  ; ExteriorPopulationLimit
+        .byte 0                  ; WarpSpawnPoolMin
+        .byte 32                 ; WarpSpawnPoolMax
+        .byte 8                  ; WarpPopulationLimit
         .addr zone_blocking_mazes ; Maze Pool
         .addr zone_5w_floor_1_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
@@ -40,6 +49,8 @@ zone_5w_floor_1:
         .byte 0                   ;ExteriorStructureLargeMaxMax
         .addr empty_structure_set ;ExteriorStructureSmallSet
         .byte 0                   ;ExteriorStructureSmallMaxMax
+        .addr blocking_warp_structure_set ;InteriorStructureWarpSet
+        .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
 
 zone_5w_floor_1_exits:
         .byte 1 ; length
@@ -62,29 +73,40 @@ zone_5w_banner_boss:
         .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
 
 zone_5w_floor_boss:
-        .addr spawn_pool_generic ; Spawn Pool (unused)
-        .addr spawnset_a53_z1_f4 ; Challenge Set (unused)
-        .byte 0                  ; SpawnPoolMin
-        .byte 128                ; SpawnPoolMax
-        .byte 0                  ; PopulationLimit (the boss chamber will already have what it needs)
+        .addr spawn_pool_generic   ; Interior Spawn Pool
+        .addr spawn_pool_generic   ; Exterior Spawn Pool
+        .addr spawn_pool_generic   ; Warp Spawn Pool
+        .addr spawnset_a53_z1_f4 ; General Challenge Set
+        .addr spawnset_a53_z1_f4 ; Warp Challenge Set
+        .byte 0                  ; InteriorSpawnPoolMin
+        .byte 128                ; InteriorSpawnPoolMax
+        .byte 0                  ; InteriorPopulationLimit
+        .byte 0                  ; ExteriorSpawnPoolMin
+        .byte 128                ; ExteriorSpawnPoolMax
+        .byte 0                  ; ExteriorPopulationLimit
+        .byte 0                  ; WarpSpawnPoolMin
+        .byte 128                ; WarpSpawnPoolMax
+        .byte 0                  ; WarpPopulationLimit
         .addr zone_5w_floor_boss_mazes ; Maze Pool
         .addr zone_5w_floor_boss_exits ; Exit List
         .byte TRACK_SILENCE      ; Music Track
         .byte 0                  ; Added Tempo
         .word zone_5w_banner_boss ; HudBanner
         .addr hud_hub_pal
-        .addr rare_treasure_table       ; ShopLootPtr0 (unused?)
-        .addr rare_treasure_table       ; ShopLootPtr1
-        .addr common_treasure_table     ; ShopLootPtr2
-        .addr consumable_treasure_table ; ShopLootPtr3
-        .addr empty_structure_set ;InteriorStructureLargeSet
-        .byte 0                   ;InteriorStructureLargeMaxMax
-        .addr empty_structure_set ;InteriorStructureSmallSet
-        .byte 0                   ;InteriorStructureSmallMaxMax
-        .addr empty_structure_set ;ExteriorStructureLargeSet
-        .byte 0                   ;ExteriorStructureLargeMaxMax
-        .addr empty_structure_set ;ExteriorStructureSmallSet
-        .byte 0                   ;ExteriorStructureSmallMaxMax
+        .addr rare_treasure_table         ; ShopLootPtr0 (unused?)
+        .addr rare_treasure_table         ; ShopLootPtr1
+        .addr common_treasure_table       ; ShopLootPtr2
+        .addr consumable_treasure_table   ; ShopLootPtr3
+        .addr empty_structure_set         ; InteriorStructureLargeSet
+        .byte 0                           ; InteriorStructureLargeMaxMax
+        .addr empty_structure_set         ; InteriorStructureSmallSet
+        .byte 0                           ; InteriorStructureSmallMaxMax
+        .addr empty_structure_set         ; ExteriorStructureLargeSet
+        .byte 0                           ; ExteriorStructureLargeMaxMax
+        .addr empty_structure_set         ; ExteriorStructureSmallSet
+        .byte 0                           ; ExteriorStructureSmallMaxMax
+        .addr blocking_warp_structure_set ; InteriorStructureWarpSet
+        .addr blocking_warp_structure_set ; ExteriorStructureWarpSet
 
 ; Unclear yet if these will be used. We may not ever spawn stairs, rather we'll
 ; probably trigger the game cleared / victory kernel state on success.

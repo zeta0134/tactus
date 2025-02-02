@@ -33,6 +33,13 @@
 
         .include "../build/structures/AbsolutelyNothing.incs"
 
+        .include "../build/structures/GrassyWarpWall.incs"
+        .include "../build/structures/GrassyWarpStructure.incs"
+        .include "../build/structures/CaveWarpWall.incs"
+        .include "../build/structures/CaveWarpStructure.incs"
+        .include "../build/structures/BlockingWarpWall.incs"
+        .include "../build/structures/BlockingWarpStructure.incs"
+
 .macro structure_entry structure_label
         .addr structure_label
         .byte <.bank(structure_label), >.bank(structure_label)
@@ -73,6 +80,27 @@ test_structure_set_big:
         structure_entry structure_BigGrassDoubleSquare_R0
         structure_entry structure_BigGrassDoubleSquare_R1
         structure_entry structure_BigGrassWideU 
+
+grassy_warp_structure_set:
+        .byte $F
+        .repeat 15
+        structure_entry structure_GrassyWarpWall ; we reeeeally want this to be picked
+        .endrepeat
+        structure_entry structure_GrassyWarpStructure ; but we'll settle for this on occasion. it's fine.
+
+cave_warp_structure_set:
+        .byte $F
+        .repeat 15
+        structure_entry structure_CaveWarpWall ; we reeeeally want this to be picked
+        .endrepeat
+        structure_entry structure_CaveWarpStructure ; but we'll settle for this if we have to
+
+blocking_warp_structure_set:
+        .byte $F
+        .repeat 15
+        structure_entry structure_BlockingWarpWall ; we reeeeally want this to be picked
+        .endrepeat
+        structure_entry structure_BlockingWarpStructure ; but we'll settle for this if we have to
 
 
         ; should match procgen.s! we rely on several of its functions, and the far call overhead

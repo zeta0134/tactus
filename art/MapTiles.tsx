@@ -247,6 +247,11 @@
  <tile id="217" type="map"/>
  <tile id="218" type="map"/>
  <tile id="219" type="map"/>
+ <tile id="223" type="map">
+  <properties>
+   <property name="behavior" value="TILE_CRACKED_WARP_WALL"/>
+  </properties>
+ </tile>
  <tile id="224" type="map"/>
  <tile id="225" type="map"/>
  <tile id="226" type="map"/>
@@ -259,6 +264,11 @@
  <tile id="233" type="map"/>
  <tile id="234" type="map"/>
  <tile id="235" type="map"/>
+ <tile id="239" type="map">
+  <properties>
+   <property name="behavior" value="TILE_CRACKED_WARP_WALL"/>
+  </properties>
+ </tile>
  <tile id="240" type="map"/>
  <tile id="241" type="map"/>
  <tile id="242" type="map"/>
@@ -271,4 +281,9 @@
  <tile id="249" type="map"/>
  <tile id="250" type="map"/>
  <tile id="251" type="map"/>
+ <tile id="255" type="map">
+  <properties>
+   <property name="behavior" value="TILE_CRACKED_WARP_WALL"/>
+  </properties>
+ </tile>
 </tileset>

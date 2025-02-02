@@ -1504,12 +1504,13 @@ not_dark:
         ldx RoomIndexToGenerate
 no_exit_stairs:        
 
-        ; Has the player already cleared this room?
-        ; TODO: this check is redundant now?
+        ; Is this room already "cleared"? This might be set for certain
+        ; special chambers, usually either peaceful areas, or boss rooms
+        ; with their own custom spawn logic
         ldx RoomIndexToGenerate
         lda room_flags, x
         and #ROOM_FLAG_CLEARED
-        bne room_cleared
+        jne room_cleared
 
         ; If this is a boss room, we need to use the boss pool
         lda room_flags, x
@@ -1518,14 +1519,36 @@ no_exit_stairs:
 spawn_basic_enemies:
         ; Basic rooms use the spawning pool defined in the player's
         ; current zone, and the difficulty settings therein
-        far_call FAR_setup_spawn_pool_for_current_zone
-        far_call FAR_spawn_entities_from_pool
 
+        ; There are several such pools based on the room's type, so differentiate here
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_INTERIOR
+        beq spawn_basic_interior_enemies
+        cmp #ROOM_CATEGORY_EXTERIOR
+        beq spawn_basic_exterior_enemies
+        ; TODO: check for warp zone here and spawn that set instead!
+        ; If we get here, we are somewhere that... frankly shouldn't exist. maybe a shop, or out of bounds?
+        ; anyway, spawn nothing!
         jmp room_cleared
+
+spawn_basic_interior_enemies:
+        far_call FAR_setup_interior_spawn_pool_for_current_zone
+        far_call FAR_spawn_entities_from_pool
+        jmp room_cleared
+
+spawn_basic_exterior_enemies:
+        far_call FAR_setup_exterior_spawn_pool_for_current_zone
+        far_call FAR_spawn_entities_from_pool
+        jmp room_cleared
+
 spawn_boss_enemies:
         ; Challenge rooms roll a fixed set of encounters from the
         ; player's current zone
-        far_call FAR_setup_spawn_set_for_current_zone
+
+        ; TODO: we need to check for the warp flag on the room and, if set,
+        ; use that challenge set instead!
+        far_call FAR_setup_general_spawn_set_for_current_zone
         far_call FAR_spawn_entities_from_spawn_set
 
         jmp room_cleared

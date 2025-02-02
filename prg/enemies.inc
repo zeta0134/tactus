@@ -27,6 +27,7 @@ TILE_BIG_KEY           = 22
 TILE_EXIT_BLOCK        = 23
 TILE_EXIT_STAIRS       = 24
 TILE_SIGN              = 25
+TILE_CRACKED_WARP_WALL = 26
 
 ; Actually in the fixed page
 .global draw_active_tile

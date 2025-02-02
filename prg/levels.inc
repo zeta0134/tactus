@@ -127,12 +127,21 @@
 .endmacro
 
 .struct ZoneDefinition
-        GeneralSpawnPool .addr
-        ChallengeSpawnSet .addr
+        InteriorSpawnPool .addr
+        ExteriorSpawnPool .addr
+        WarpSpawnPool     .addr
+        GeneralChallengeSpawnSet .addr
+        WarpChallengeSpawnSet .addr
 
-        SpawnPoolMin .byte
-        SpawnPoolMax .byte
-        PopulationLimit .byte
+        InteriorSpawnPoolMin .byte
+        InteriorSpawnPoolMax .byte
+        InteriorPopulationLimit .byte
+        ExteriorSpawnPoolMin .byte
+        ExteriorSpawnPoolMax .byte
+        ExteriorPopulationLimit .byte
+        WarpSpawnPoolMin .byte
+        WarpSpawnPoolMax .byte
+        WarpPopulationLimit .byte
 
         FloorList .addr
         ExitList .addr
@@ -156,6 +165,13 @@
         ExteriorStructureLargeMaxMax .byte
         ExteriorStructureSmallSet .word
         ExteriorStructureSmallMaxMax .byte
+
+        ; Warp structures don't have a max size. When we spawn these
+        ; we'll REQUIRE exactly one to succeed. (Be sure it is possible,
+        ; or level gen will lock up!)
+        InteriorStructureWarpSet .word
+        ExteriorStructureWarpSet .word
+
 .endstruct
 
 .global all_zones_data_page
@@ -169,8 +185,11 @@
 ; various utility functions for working with zones, since
 ; their data lives in a dedicated bank
 .global FAR_roll_floorplan_from_active_zone_pool
-.global FAR_setup_spawn_set_for_current_zone
-.global FAR_setup_spawn_pool_for_current_zone
+.global FAR_setup_general_spawn_set_for_current_zone
+.global FAR_setup_warp_spawn_set_for_current_zone
+.global FAR_setup_exterior_spawn_pool_for_current_zone
+.global FAR_setup_interior_spawn_pool_for_current_zone
+.global FAR_setup_warp_spawn_pool_for_current_zone
 .global FAR_setup_shop_loot_ptrs_for_current_zone
 .global FAR_draw_banner_for_current_zone
 .global FAR_load_hud_palette_for_current_zone
@@ -259,6 +278,10 @@ OVERLAY_OPEN_NW = 4
 .global test_structure_set_small
 .global test_structure_set_big
 .global empty_structure_set
+
+.global grassy_warp_structure_set
+.global cave_warp_structure_set
+.global blocking_warp_structure_set
 
 ROOM_BASE_LOGIC_NONE     = 0
 ROOM_BASE_LOGIC_STANDARD = 1

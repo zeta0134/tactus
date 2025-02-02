@@ -23,11 +23,20 @@ zone_hub_banner:
         .byte (HUD_YELLOW_PAL | CHR_BANK_ZONES), (HUD_YELLOW_PAL | CHR_BANK_ZONES)
 
 zone_hub_world:
-        .addr spawn_pool_generic   ; Spawn Pool (unused)
-        .addr spawnset_a53_z1_f1   ; Challenge Set (unused)
-        .byte 0                    ; SpawnPoolMin
-        .byte 128                  ; SpawnPoolMax
-        .byte 0                    ; PopulationLimit (do not spawn anything! it's the hub!)
+        .addr spawn_pool_generic   ; Interior Spawn Pool
+        .addr spawn_pool_generic   ; Exterior Spawn Pool
+        .addr spawn_pool_generic   ; Warp Spawn Pool
+        .addr spawnset_a53_z1_f1   ; General Challenge Set (unused)
+        .addr spawnset_a53_z1_f1   ; Warp Challenge Set (unused)
+        .byte 0                    ; InteriorSpawnPoolMin
+        .byte 128                  ; InteriorSpawnPoolMax
+        .byte 0                    ; InteriorPopulationLimit
+        .byte 0                    ; ExteriorSpawnPoolMin
+        .byte 128                  ; ExteriorSpawnPoolMax
+        .byte 0                    ; ExteriorPopulationLimit
+        .byte 0                    ; WarpSpawnPoolMin
+        .byte 128                  ; WarpSpawnPoolMax
+        .byte 0                    ; WarpPopulationLimit
         .addr zone_hub_world_mazes ; Maze Pool (TODO!!)
         .addr zone_hub_exits       ; Exit List
         .byte TRACK_OPTIONS        ; Music Track
@@ -46,6 +55,8 @@ zone_hub_world:
         .byte 0                   ;ExteriorStructureLargeMaxMax
         .addr empty_structure_set ;ExteriorStructureSmallSet
         .byte 0                   ;ExteriorStructureSmallMaxMax
+        .addr blocking_warp_structure_set ;InteriorStructureWarpSet
+        .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
 
 ; TODO: for the real hub there is very little point in going
 ; to any floor other than 1, but as we only have the one zone,

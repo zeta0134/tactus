@@ -155,11 +155,20 @@ zone_blocking_mazes:
 ; ░▒▓███████▓▒░░▒▓████████▓▒░▒▓███████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░  
 
 zone_grasslands_floor_2_but_fast:
-        .addr spawn_pool_generic ; Spawn Pool
-        .addr spawnset_a53_z1_f2 ; Challenge Set
-        .byte 0                  ; SpawnPoolMin
-        .byte 64                 ; SpawnPoolMax
-        .byte 10                 ; PopulationLimit
+        .addr spawn_pool_generic   ; Interior Spawn Pool
+        .addr spawn_pool_generic   ; Exterior Spawn Pool
+        .addr spawn_pool_generic   ; Warp Spawn Pool
+        .addr spawnset_a53_z1_f2 ; General Challenge Set
+        .addr spawnset_a53_z1_f2 ; Warp Challenge Set
+        .byte 0                  ; InteriorSpawnPoolMin
+        .byte 64                 ; InteriorSpawnPoolMax
+        .byte 10                 ; InteriorPopulationLimit
+        .byte 0                  ; ExteriorSpawnPoolMin
+        .byte 64                 ; ExteriorSpawnPoolMax
+        .byte 10                 ; ExteriorPopulationLimit
+        .byte 0                  ; WarpSpawnPoolMin
+        .byte 64                 ; WarpSpawnPoolMax
+        .byte 10                 ; WarpPopulationLimit
         .addr zone_grasslands_floor_234_mazes ; Maze Pool
         .addr zone_debug_exits   ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
@@ -178,6 +187,8 @@ zone_grasslands_floor_2_but_fast:
         .byte 1                        ;ExteriorStructureLargeMaxMax
         .addr test_structure_set_small ;ExteriorStructureSmallSet
         .byte 3                        ;ExteriorStructureSmallMaxMax
+        .addr blocking_warp_structure_set ;InteriorStructureWarpSet (unused)
+        .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
 
 ; After debugging one zone, return to the hub world
 ; (note: later to the debug world?)
@@ -230,23 +241,23 @@ FloorListLength := R2
         rts
 .endproc
 
-.proc FAR_setup_spawn_pool_for_current_zone
+.proc FAR_setup_interior_spawn_pool_for_current_zone
         access_data_bank #<.bank(all_zones_data_page)
 
-        ldy #ZoneDefinition::GeneralSpawnPool
+        ldy #ZoneDefinition::InteriorSpawnPool
         lda (PlayerZonePtr), y
         sta SpawnPoolPtr+0
         iny
         lda (PlayerZonePtr), y
         sta SpawnPoolPtr+1
 
-        ldy #ZoneDefinition::SpawnPoolMin
+        ldy #ZoneDefinition::InteriorSpawnPoolMin
         lda (PlayerZonePtr), y
         sta SpawnPoolMin
-        ldy #ZoneDefinition::SpawnPoolMax
+        ldy #ZoneDefinition::InteriorSpawnPoolMax
         lda (PlayerZonePtr), y
         sta SpawnPoolMax
-        ldy #ZoneDefinition::PopulationLimit
+        ldy #ZoneDefinition::InteriorPopulationLimit
         lda (PlayerZonePtr), y
         sta PopulationLimit
 
@@ -255,10 +266,75 @@ FloorListLength := R2
         rts
 .endproc
 
-.proc FAR_setup_spawn_set_for_current_zone
+.proc FAR_setup_exterior_spawn_pool_for_current_zone
         access_data_bank #<.bank(all_zones_data_page)
 
-        ldy #ZoneDefinition::ChallengeSpawnSet
+        ldy #ZoneDefinition::ExteriorSpawnPool
+        lda (PlayerZonePtr), y
+        sta SpawnPoolPtr+0
+        iny
+        lda (PlayerZonePtr), y
+        sta SpawnPoolPtr+1
+
+        ldy #ZoneDefinition::ExteriorSpawnPoolMin
+        lda (PlayerZonePtr), y
+        sta SpawnPoolMin
+        ldy #ZoneDefinition::ExteriorSpawnPoolMax
+        lda (PlayerZonePtr), y
+        sta SpawnPoolMax
+        ldy #ZoneDefinition::ExteriorPopulationLimit
+        lda (PlayerZonePtr), y
+        sta PopulationLimit
+
+        restore_previous_bank
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc FAR_setup_warp_spawn_pool_for_current_zone
+        access_data_bank #<.bank(all_zones_data_page)
+
+        ldy #ZoneDefinition::WarpSpawnPool
+        lda (PlayerZonePtr), y
+        sta SpawnPoolPtr+0
+        iny
+        lda (PlayerZonePtr), y
+        sta SpawnPoolPtr+1
+
+        ldy #ZoneDefinition::WarpSpawnPoolMin
+        lda (PlayerZonePtr), y
+        sta SpawnPoolMin
+        ldy #ZoneDefinition::WarpSpawnPoolMax
+        lda (PlayerZonePtr), y
+        sta SpawnPoolMax
+        ldy #ZoneDefinition::WarpPopulationLimit
+        lda (PlayerZonePtr), y
+        sta PopulationLimit
+
+        restore_previous_bank
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc FAR_setup_general_spawn_set_for_current_zone
+        access_data_bank #<.bank(all_zones_data_page)
+
+        ldy #ZoneDefinition::GeneralChallengeSpawnSet
+        lda (PlayerZonePtr), y
+        sta SpawnSetPtr+0
+        iny
+        lda (PlayerZonePtr), y
+        sta SpawnSetPtr+1
+
+        restore_previous_bank
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc FAR_setup_warp_spawn_set_for_current_zone
+        access_data_bank #<.bank(all_zones_data_page)
+
+        ldy #ZoneDefinition::WarpChallengeSpawnSet
         lda (PlayerZonePtr), y
         sta SpawnSetPtr+0
         iny
