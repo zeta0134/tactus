@@ -133,7 +133,7 @@ zone_hub_exits:
         .addr zone_4c_floor_2
         .addr zone_4c_floor_3
         .addr zone_4c_floor_4
-        .addr zone_4c_floor_boss          ; unimplemented! :(
+        .addr zone_4c_floor_boss
         ; Zone 4W:
         .addr zone_4w_floor_1
         .addr zone_4w_floor_2
@@ -143,17 +143,17 @@ zone_hub_exits:
 
         ; Debug 5:
         ; Zone 5S (normal run final challenge / boss)
+        .addr zone_5s_floor_1          ; unimplemented! :(
         .addr zone_hub_world          ; unimplemented! :(
         .addr zone_hub_world          ; unimplemented! :(
         .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_5s_floor_boss          ; unimplemented! :(
         ; Zone 5W (warp exclusive final challenge / boss)
+        .addr zone_5w_floor_1          ; unimplemented! :(
         .addr zone_hub_world          ; unimplemented! :(
         .addr zone_hub_world          ; unimplemented! :(
         .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_5w_floor_boss          ; unimplemented! :(
 
         ; Debug Miscellaneous
         .addr zone_grasslands_floor_2_but_fast

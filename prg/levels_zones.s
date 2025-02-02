@@ -142,6 +142,9 @@ zone_blocking_mazes:
         .include "leveldata/zone_4c.asm"
         .include "leveldata/zone_4w.asm"
 
+        .include "leveldata/zone_5s.asm"
+        .include "leveldata/zone_5w.asm"
+
 
 ; ░▒▓███████▓▒░░▒▓████████▓▒░▒▓███████▓▒░░▒▓█▓▒░░▒▓█▓▒░░▒▓██████▓▒░  
 ; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 

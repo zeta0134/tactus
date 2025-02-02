@@ -44,8 +44,8 @@ zone_4a_floor_1:
 zone_4a_floor_1_exits:
         .byte 3 ; length
         .addr zone_4a_floor_2
-        .addr zone_hub_world ; zone_5s_floor_1 ; warp destinations
-        .addr zone_hub_world ; zone_5w_floor_1
+        .addr zone_5s_floor_1 ; warp destinations
+        .addr zone_5w_floor_1
 
 zone_4a_banner_2:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -91,8 +91,8 @@ zone_4a_floor_2:
 zone_4a_floor_2_exits:
         .byte 3 ; length
         .addr zone_4a_floor_3
-        .addr zone_hub_world ; zone_5s_floor_1 ; warp destinations
-        .addr zone_hub_world ; zone_5w_floor_1
+        .addr zone_5s_floor_1 ; warp destinations
+        .addr zone_5w_floor_1
 
 zone_4a_banner_3:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -138,8 +138,8 @@ zone_4a_floor_3:
 zone_4a_floor_3_exits:
         .byte 3 ; length
         .addr zone_4a_floor_4
-        .addr zone_hub_world ; zone_5s_floor_1 ; warp destinations
-        .addr zone_hub_world ; zone_5w_floor_1
+        .addr zone_5s_floor_1 ; warp destinations
+        .addr zone_5w_floor_1
 
 zone_4a_banner_4:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -187,8 +187,8 @@ zone_4a_floor_4:
 zone_4a_floor_4_exits:
         .byte 3 ; length
         .addr zone_4a_floor_boss
-        .addr zone_hub_world ; zone_5s_floor_1 ; warp destinations
-        .addr zone_hub_world ; zone_5w_floor_1
+        .addr zone_5s_floor_1 ; warp destinations
+        .addr zone_5w_floor_1
 
 zone_4a_banner_boss:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -233,7 +233,7 @@ zone_4a_floor_boss:
 
 zone_4a_floor_boss_exits:
         .byte 1 ; length
-        .addr zone_hub_world ; zone_5s_floor_1
+        .addr zone_5s_floor_1
 
 zone_4a_floor_boss_mazes:
         .byte 1 ; Length
