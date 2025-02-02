@@ -95,25 +95,25 @@ zone_hub_exits:
         .addr zone_3a_floor_2
         .addr zone_3a_floor_3
         .addr zone_3a_floor_4
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_3a_floor_boss
         ; Zone 3B
         .addr zone_3b_floor_1
         .addr zone_3b_floor_2
         .addr zone_3b_floor_3
         .addr zone_3b_floor_4
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_3b_floor_boss
         ; Zone 3C:
         .addr zone_3c_floor_1
         .addr zone_3c_floor_2
         .addr zone_3c_floor_3
         .addr zone_3c_floor_4
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_3c_floor_boss
         ; Zone 3W:
         .addr zone_3w_floor_1
         .addr zone_3w_floor_2
         .addr zone_3w_floor_3
         .addr zone_3w_floor_4
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_3w_floor_boss
 
         ; Debug 4:
         ; Zone 4A
@@ -121,25 +121,25 @@ zone_hub_exits:
         .addr zone_4a_floor_2
         .addr zone_4a_floor_3
         .addr zone_4a_floor_4
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_4a_floor_boss
         ; Zone 4B
         .addr zone_4b_floor_1
         .addr zone_4b_floor_2
         .addr zone_4b_floor_3
         .addr zone_4b_floor_4
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_4b_floor_boss
         ; Zone 4C:
         .addr zone_4c_floor_1
         .addr zone_4c_floor_2
         .addr zone_4c_floor_3
         .addr zone_4c_floor_4
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_4c_floor_boss          ; unimplemented! :(
         ; Zone 4W:
         .addr zone_4w_floor_1
         .addr zone_4w_floor_2
         .addr zone_4w_floor_3
         .addr zone_4w_floor_4
-        .addr zone_hub_world          ; unimplemented! :(
+        .addr zone_4w_floor_boss
 
         ; Debug 5:
         ; Zone 5S (normal run final challenge / boss)

@@ -42,8 +42,10 @@ zone_4w_floor_1:
         .byte 0                   ;ExteriorStructureSmallMaxMax
 
 zone_4w_floor_1_exits:
-        .byte 1 ; length
+        .byte 3 ; length
         .addr zone_4w_floor_2
+        .addr zone_hub_world ; zone_5s_floor_1 ; warp destinations
+        .addr zone_hub_world ; zone_5w_floor_1
 
 zone_4w_banner_2:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -87,8 +89,10 @@ zone_4w_floor_2:
         .byte 0                   ;ExteriorStructureSmallMaxMax
 
 zone_4w_floor_2_exits:
-        .byte 1 ; length
+        .byte 3 ; length
         .addr zone_4w_floor_3
+        .addr zone_hub_world ; zone_5s_floor_1 ; warp destinations
+        .addr zone_hub_world ; zone_5w_floor_1
 
 zone_4w_banner_3:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -132,8 +136,10 @@ zone_4w_floor_3:
         .byte 0                   ;ExteriorStructureSmallMaxMax
 
 zone_4w_floor_3_exits:
-        .byte 1 ; length
+        .byte 3 ; length
         .addr zone_4w_floor_4
+        .addr zone_hub_world ; zone_5s_floor_1 ; warp destinations
+        .addr zone_hub_world ; zone_5w_floor_1
 
 zone_4w_banner_4:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -179,8 +185,10 @@ zone_4w_floor_4:
 ; DEBUG: for now, just go back to the hub world
 ; (later we'll want a boss chamber, and a branching path)
 zone_4w_floor_4_exits:
-        .byte 1 ; length
-        .addr zone_hub_world
+        .byte 3 ; length
+        .addr zone_4w_floor_boss
+        .addr zone_hub_world ; zone_5s_floor_1 ; warp destinations
+        .addr zone_hub_world ; zone_5w_floor_1
 
 zone_4w_banner_boss:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -198,4 +206,35 @@ zone_4w_banner_boss:
         .byte (HUD_YELLOW_PAL | CHR_BANK_ZONES), (HUD_YELLOW_PAL | CHR_BANK_ZONES)
         .byte (HUD_YELLOW_PAL | CHR_BANK_ZONES), (HUD_YELLOW_PAL | CHR_BANK_ZONES)
 
-; TODO: a boss chamber here!
+zone_4w_floor_boss:
+        .addr spawn_pool_generic ; Spawn Pool (unused)
+        .addr spawnset_a53_z1_f4 ; Challenge Set (unused)
+        .byte 0                  ; SpawnPoolMin
+        .byte 128                ; SpawnPoolMax
+        .byte 0                  ; PopulationLimit (the boss chamber will already have what it needs)
+        .addr zone_4w_floor_boss_mazes ; Maze Pool
+        .addr zone_4w_floor_boss_exits ; Exit List
+        .byte TRACK_SILENCE      ; Music Track
+        .byte 0                  ; Added Tempo
+        .word zone_4w_banner_boss ; HudBanner
+        .addr hud_hub_pal
+        .addr rare_treasure_table       ; ShopLootPtr0 (unused?)
+        .addr rare_treasure_table       ; ShopLootPtr1
+        .addr common_treasure_table     ; ShopLootPtr2
+        .addr consumable_treasure_table ; ShopLootPtr3
+        .addr empty_structure_set ;InteriorStructureLargeSet
+        .byte 0                   ;InteriorStructureLargeMaxMax
+        .addr empty_structure_set ;InteriorStructureSmallSet
+        .byte 0                   ;InteriorStructureSmallMaxMax
+        .addr empty_structure_set ;ExteriorStructureLargeSet
+        .byte 0                   ;ExteriorStructureLargeMaxMax
+        .addr empty_structure_set ;ExteriorStructureSmallSet
+        .byte 0                   ;ExteriorStructureSmallMaxMax
+
+zone_4w_floor_boss_exits:
+        .byte 1 ; length
+        .addr zone_hub_world ; zone_5s_floor_1
+
+zone_4w_floor_boss_mazes:
+        .byte 1 ; Length
+        banked_addr floor_zone_4w_boss
