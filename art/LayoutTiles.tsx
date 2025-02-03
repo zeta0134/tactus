@@ -90,6 +90,11 @@
    <property name="room_pool" value="ROOM_POOL_GRASSY_EXTERIOR"/>
   </properties>
  </tile>
+ <tile id="21">
+  <properties>
+   <property name="room_pool" value="ROOM_POOL_ZONE_2_WARP"/>
+  </properties>
+ </tile>
  <tile id="32">
   <properties>
    <property name="exit_east" type="bool" value="true"/>

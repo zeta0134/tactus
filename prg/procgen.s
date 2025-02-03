@@ -36,6 +36,7 @@ BigFloorPtr: .res 2
 .segment "PRGRAM"
 
 BigFloorBank: .res 1
+BigFloorProperties: .res 1
 
 room_ptr_low: .res ::FLOOR_SIZE
 room_ptr_high: .res ::FLOOR_SIZE
@@ -71,6 +72,10 @@ LoadedRoomIndex: .res 1
 ; one spell effective active at a time, and particles themselves
 ; don't reset between rooms
 SpellParticleSpawnCooldown: .res 1
+
+; Where should the warp entrance go on a given zone? Not all zones have these.
+WarpPortalRoomIndex: .res 1
+WarpEntranceRoomIndex: .res 1
 
         ; should match levels_structures.s! it relies on several of our functions,
         ; and the far-call overhead for those functions is significant
@@ -1161,6 +1166,10 @@ MaxChallengeCount := R13
 ShopCount := R14
 MaxShopCount := R15
 MaxExitCount := R16
+WarpChallengeCount := R17
+WarpShopCount := R18
+WarpExitCount := R19
+
         jsr shuffle_room_order
 
         st16 floors_rerolled, 0
@@ -1177,6 +1186,9 @@ MaxExitCount := R16
         ldy #BigFloor::MaxExitRooms ; some rooms shouldn't have exits! some have multiple, etc
         lda (BigFloorPtr), y
         sta MaxExitCount
+        ldy #BigFloor::FloorProperties
+        lda (BigFloorPtr), y
+        sta BigFloorProperties
 
 begin_floor_generation:
         ; initialize room flags and other state to a sensible starting value
@@ -1199,11 +1211,18 @@ room_setup_loop:
         ; we'll check for this and redo the whole floor if it's still nonsense
         lda #$FF
         sta PlayerRoomIndex
+        ; Same deal but it's warp indexes
+        sta WarpPortalRoomIndex
+        sta WarpEntranceRoomIndex
 
         lda #0
         sta ChallengeCount
         sta ShopCount
         sta FloorExitCount
+        ; same deal, but warp zones have their own totals
+        sta WarpChallengeCount
+        sta WarpShopCount
+        sta WarpExitCount
 
         lda #0
         sta CurrentRoomCounter
@@ -1229,7 +1248,7 @@ begin_room_selection:
         lda (RoomPtr), y
         and ExitTemp
         cmp ExitTemp
-        bne reject_this_room
+        jne reject_this_room
         
         ; If this is a challenge room...
         ldy #Room::Properties
@@ -1238,13 +1257,26 @@ begin_room_selection:
         cmp #ROOM_CATEGORY_CHALLENGE
         bne done_considering_challenge_rooms
         ; ... have we already satisfied the challenge maximum for this floor?
+        ; new: use the proper pool based on whether this is a warp room
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #ROOM_PROPERTIES_WARP
+        beq check_regular_challenge_count
+check_warp_challenge_count:
+        lda WarpChallengeCount
+        cmp #WARP_MAX_CHALLENGE_COUNT
+        jcs reject_this_room
+        ; this is definitely a warp challenge chamber; increment the counter
+        inc WarpChallengeCount
+        ; warp zones are intentionally not rendered on the map, so we're done
+        jmp done_considering_challenge_rooms
+check_regular_challenge_count:
         lda ChallengeCount
         cmp MaxChallengeCount
-        bcs reject_this_room
+        jcs reject_this_room
         ; this is definitely a challenge chamber; increment the counter
         inc ChallengeCount
-        ; TEMPORARY: also flag this as a "boss room" and, keeping with Action53 behavior,
-        ; automatically reveal this room
+        ; TEMPORARY: also flag this as a "boss room"
         lda #(ROOM_FLAG_BOSS)
         ora room_flags, x
         sta room_flags, x
@@ -1257,9 +1289,28 @@ done_considering_challenge_rooms:
         cmp #ROOM_CATEGORY_SHOP
         bne done_considering_shop_rooms
         ; ... have we already satisfied the shop maximum for this floor?
+        ; new: use the proper pool based on whether this is a warp room
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #ROOM_PROPERTIES_WARP
+        beq check_regular_shop_count
+check_warp_shop_count:
+        lda WarpShopCount
+        cmp #WARP_MAX_SHOP_COUNT
+        jcs reject_this_room
+        ; this is definitely a warp shop chamber; increment the counter
+        inc WarpShopCount
+        ; Shop rooms begin "cleared" as they should never spawn actual monsters
+        ; or enter disco mode. They also never spawn a treasure (TODO: which is an
+        ; old mechanic that should go away) 
+        lda #(ROOM_FLAG_CLEARED | ROOM_FLAG_TREASURE_SPAWNED)
+        ora room_flags, x
+        sta room_flags, x
+        jmp done_considering_shop_rooms
+check_regular_shop_count:
         lda ShopCount
         cmp MaxShopCount
-        bcs reject_this_room
+        jcs reject_this_room
         ; this is definitely a shop chamber; increment the counter
         inc ShopCount
         ; Shop rooms begin "cleared" as they should never spawn actual monsters
@@ -1278,11 +1329,12 @@ done_considering_shop_rooms:
         ; can this room handle player spawns?
         ldy #Room::Properties
         lda (RoomPtr), y
-        and #ROOM_PROPERTIES_NOSPAWN
+        ; new: do not spawn the player in a warp chamber!
+        and #(ROOM_PROPERTIES_NOSPAWN | ROOM_PROPERTIES_WARP)
         bne done_with_player_spawning
         ; can this floor tile handle player spawns?
         lda room_floorplan, x
-        and #FLOOR_PROPERTIES_NOSPAWN
+        and #FLOORPLAN_PROPERTIES_NOSPAWN
         bne done_with_player_spawning
         ; we've found a room that the player **could** spawn in, and we haven't already
         ; picked one. this one works. use this one!
@@ -1300,14 +1352,98 @@ done_with_player_spawning:
         beq done_picking_exits ; (a) it isn't  the player's starting location
         ldy #Room::Properties
         lda (RoomPtr), y
-        and #ROOM_PROPERTIES_NOSPAWN
-        bne done_picking_exits ; (b) it is otherwise "spawnable", which also (c) excludes challenge rooms
+        and #(ROOM_PROPERTIES_NOSPAWN | ROOM_PROPERTIES_WARP)
+        bne done_picking_exits ; (b) it is otherwise "spawnable", which also (c) excludes challenge rooms and (d) warps
         lda #ROOM_FLAG_EXIT_STAIRS
         ora room_flags, x
         sta room_flags, x
         inc FloorExitCount
 done_picking_exits:
 
+        ; NEW: if this FLOOR is a warp chamber, then roll for the warp portal location, the
+        ; player's spawn position within the warp, and the warp exit chamber
+        lda BigFloorProperties
+        and #(FLOOR_PROPERTIES_HAS_WARP_ZONE)
+        beq skip_picking_warps
+
+        ; Check for and reject excessive warp exit locations
+        ; (do this first, so we don't try to put rolled spots here later)
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #(ROOM_PROPERTIES_WARP | ROOM_PROPERTIES_EXIT_CHAMBER)
+        cmp #(ROOM_PROPERTIES_WARP | ROOM_PROPERTIES_EXIT_CHAMBER)
+        bne skip_considering_warp_exit
+        ; If we have exceeded the count for exits, reject this room
+        lda WarpExitCount
+        cmp #WARP_MAX_EXIT_COUNT
+        bcs reject_this_room
+        ; this is definitely a warp exit chamber; increment the counter
+        inc WarpExitCount
+        ; the warp exit room may not be the entrance (and it also really shouldn't
+        ; contain the portal) so we are done with warp considerations for this chamber
+        jmp skip_picking_warps
+skip_considering_warp_exit:
+
+        ; Check for and roll a warp portal location.
+        lda WarpPortalRoomIndex
+        cmp #$FF
+        bne skip_picking_warp_portal
+        ;  The warp portal must be somewhere other than:
+        ;   - The player's starting location
+        cpx PlayerRoomIndex
+        beq skip_picking_warp_portal
+        ;   - The level's normal exit chamber
+        lda room_flags, x
+        and #ROOM_FLAG_EXIT_STAIRS
+        bne skip_picking_warp_portal
+        ;   - A challenge or shop chamber
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_CHALLENGE
+        beq skip_picking_warp_portal
+        cmp #ROOM_CATEGORY_SHOP
+        beq skip_picking_warp_portal
+        ;   - Any chamber that is part of the warp zone
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #ROOM_PROPERTIES_WARP
+        bne skip_picking_warp_portal
+        ; Here it is, there it goes, etc
+        stx WarpPortalRoomIndex
+skip_picking_warp_portal:
+
+        ; Check for and roll a warp entrance.
+        ; TODO: we might want to disable structure spawning in the warp entrance, if warps ever
+        ; gain structures, so we can guarantee the center of the chamber is clear for the player to
+        ; start in.
+        lda WarpEntranceRoomIndex
+        cmp #$FF
+        bne skip_picking_warp_entrance
+        ; - Warp entrances must be inside the warp zone
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #ROOM_PROPERTIES_WARP
+        beq skip_picking_warp_entrance
+        ; - they cannot be the exit chamber
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #ROOM_PROPERTIES_EXIT_CHAMBER
+        bne skip_picking_warp_entrance
+        ; - they should not be a challenge or shop chamber
+        ldy #Room::Properties
+        lda (RoomPtr), y
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_CHALLENGE
+        beq skip_picking_warp_entrance
+        cmp #ROOM_CATEGORY_SHOP
+        beq skip_picking_warp_entrance
+        ; Here it is, there it goes, and so on
+        stx WarpEntranceRoomIndex
+skip_picking_warp_entrance:
+
+skip_picking_warps:
+        ; If we make it here, this room is acceptable. Onward!
         jmp accept_this_room
 reject_this_room:
         restore_previous_bank ; RoomBank

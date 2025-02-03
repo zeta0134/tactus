@@ -44,6 +44,7 @@ class Floor:
     max_shop_rooms: int
     min_exit_rooms: int
     max_exit_rooms: int
+    has_warp_zone: bool
     
 def read_boolean_properties(tile_element):
     boolean_properties = {}
@@ -175,15 +176,15 @@ def read_floor(map_filename):
     layers = map_element.findall("layer")
     combined_tiles = read_and_combine_layers(layers, tilesets)
 
-    # TODO: other global properties of the floor would go here
-    # (there aren't any yet)
     integer_properties = read_integer_properties(map_element)
+    boolean_properties = read_boolean_properties(map_element)
     min_challenge_rooms = integer_properties.get("min_challenge_rooms", 1)
     max_challenge_rooms = integer_properties.get("max_challenge_rooms", 1)
     min_shop_rooms = integer_properties.get("min_shop_rooms", 1)
     max_shop_rooms = integer_properties.get("max_shop_rooms", 1)
     min_exit_rooms = integer_properties.get("min_exit_rooms", 1)
     max_exit_rooms = integer_properties.get("max_exit_rooms", 1)
+    has_warp_zone = boolean_properties.get("has_warp_zone", False)
 
     # finally let's make the name something useful
     (_, plain_filename) = os.path.split(map_filename)
@@ -193,7 +194,8 @@ def read_floor(map_filename):
     return Floor(name=safe_label, width=map_width, height=map_height, tiles=combined_tiles,
         min_challenge_rooms=min_challenge_rooms, max_challenge_rooms=max_challenge_rooms,
         min_shop_rooms=min_shop_rooms, max_shop_rooms=max_shop_rooms,
-        min_exit_rooms=min_exit_rooms, max_exit_rooms=max_exit_rooms)
+        min_exit_rooms=min_exit_rooms, max_exit_rooms=max_exit_rooms,
+        has_warp_zone=has_warp_zone)
 
 def tile_exit_flag_bytes(tiles):
   raw_bytes = []
@@ -221,6 +223,9 @@ def tile_room_pool_bytes(tiles):
   return raw_bytes
 
 def write_floor(tilemap, output_file):
+    floor_properties_byte = 0
+    if tilemap.has_warp_zone:
+        floor_properties_byte |= 0x80
     output_file.write(ca65_label("floor_"+tilemap.name) + "\n")
     output_file.write("  ; Room Pools\n")
     pretty_print_table_str(tile_room_pool_bytes(tilemap.tiles), output_file, tilemap.width)
@@ -232,6 +237,7 @@ def write_floor(tilemap, output_file):
     output_file.write(f"  .byte {tilemap.max_shop_rooms} ; Max Shop Rooms\n")
     output_file.write(f"  .byte {tilemap.min_exit_rooms} ; Min Exit Rooms\n")
     output_file.write(f"  .byte {tilemap.max_exit_rooms} ; Max Exit Rooms\n")
+    output_file.write(f"  .byte {ca65_byte_literal(floor_properties_byte)} ; Floor Properties \n")
     output_file.write("\n")
     
 if __name__ == '__main__':

@@ -57,6 +57,7 @@
         .include "../build/rooms/Blocking/Blocking_WarpExit_Zone3.incs"
         .include "../build/rooms/Blocking/Blocking_WarpExit_Zone4.incs"
         .include "../build/rooms/Blocking/Blocking_WarpExit_Zone5.incs"
+        .include "../build/rooms/Blocking/Blocking_WarpChamber.incs"
 
         .segment "CODE_4"
 
@@ -92,10 +93,10 @@ room_pools_lut:
         .word room_pool_zone_3_normal_exit
         .word room_pool_zone_4_normal_exit
         .word room_pool_zone_5_normal_exit
-        .word room_pool_zone_2_warp_exit
-        .word room_pool_zone_3_warp_exit
-        .word room_pool_zone_4_warp_exit
-        .word room_pool_zone_5_warp_exit
+        .word room_pool_zone_2_warp
+        .word room_pool_zone_3_warp
+        .word room_pool_zone_4_warp
+        .word room_pool_zone_5_warp
 
 .macro room_entry room_label
         .addr room_label
@@ -189,20 +190,32 @@ room_pool_zone_5_normal_exit:
         .byte 1 ; Length
         room_entry room_Blocking_NormalExit_Zone5
 
-room_pool_zone_2_warp_exit:
-        .byte 1 ; Length
+room_pool_zone_2_warp:
+        .byte 4 ; Length
+        room_entry room_Blocking_WarpChamber
+        room_entry room_Blocking_WarpChamber
+        room_entry room_Blocking_WarpChamber
         room_entry room_Blocking_WarpExit_Zone2
 
-room_pool_zone_3_warp_exit:
-        .byte 1 ; Length
+room_pool_zone_3_warp:
+        .byte 4 ; Length
+        room_entry room_Blocking_WarpChamber
+        room_entry room_Blocking_WarpChamber
+        room_entry room_Blocking_WarpChamber
         room_entry room_Blocking_WarpExit_Zone3
 
-room_pool_zone_4_warp_exit:
-        .byte 1 ; Length
+room_pool_zone_4_warp:
+        .byte 4 ; Length
+        room_entry room_Blocking_WarpChamber
+        room_entry room_Blocking_WarpChamber
+        room_entry room_Blocking_WarpChamber
         room_entry room_Blocking_WarpExit_Zone4
 
-room_pool_zone_5_warp_exit:
-        .byte 1 ; Length
+room_pool_zone_5_warp:
+        .byte 4 ; Length
+        room_entry room_Blocking_WarpChamber
+        room_entry room_Blocking_WarpChamber
+        room_entry room_Blocking_WarpChamber
         room_entry room_Blocking_WarpExit_Zone5
 
         sprite_palette_overworld:

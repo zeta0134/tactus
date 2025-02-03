@@ -56,6 +56,8 @@ class Room:
     raster_effect: str
     color_emphasis: str
     base_logic: str
+    is_warp: bool
+    has_exit: bool
     
 def read_boolean_properties(tile_element):
     boolean_properties = {}
@@ -231,8 +233,10 @@ def read_room(map_filename):
         exit_id |= 0b0100 # Soggy
     if "exit_west" in flags and flags["exit_west"] == True:
         exit_id |= 0b1000 # Waffles
-    is_dark = flags.get("dark", False)
     forbid_player_spawning = flags.get("forbid_player_spawning", False)
+    is_dark = flags.get("dark", False)
+    is_warp = flags.get("is_warp", False)
+    has_exit = flags.get("has_exit", False)
     string_properties = read_string_properties(map_element)
     category = string_properties.get("category", "exterior")
 
@@ -251,7 +255,7 @@ def read_room(map_filename):
     return Room(name=safe_label, width=map_width, height=map_height, tiles=combined_tiles, overlays=overlays,
         exit_id=exit_id, bg_palette=room_bg_palette, obj_palette=room_obj_palette, dark=is_dark, category=category,
         forbid_player_spawning=forbid_player_spawning, raster_effect=raster_effect, color_emphasis=color_emphasis, 
-        base_logic=base_logic)
+        base_logic=base_logic, is_warp=is_warp, has_exit=has_exit)
 
 def tile_id_bytes(tiles):
   raw_bytes = []
@@ -453,10 +457,14 @@ def write_overlay_list(tilemap, output_file):
 
 def write_room(tilemap, output_file):
     properties_byte = 0
-    if tilemap.dark:
-        properties_byte |= 0x40
     if tilemap.forbid_player_spawning:
         properties_byte |= 0x80
+    if tilemap.dark:
+        properties_byte |= 0x40
+    if tilemap.is_warp:
+        properties_byte |= 0x08
+    if tilemap.has_exit:
+        properties_byte |= 0x04
     properties_byte |= (category_ids[tilemap.category] << 4)
     output_file.write(ca65_label("room_"+tilemap.name) + "\n")
     output_file.write("  .byte " + ca65_byte_literal(properties_byte) + " ; property flags\n")

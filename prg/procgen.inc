@@ -40,7 +40,10 @@ FLOOR_SIZE = (FLOOR_WIDTH*FLOOR_HEIGHT)
     MaxShopRooms .byte
     MinExitRooms .byte
     MaxExitRooms .byte
+    FloorProperties .byte
 .endstruct
+
+FLOOR_PROPERTIES_HAS_WARP_ZONE = %10000000
 
 ROOM_FLAG_VISITED            = %10000000 ; mostly for minimap purposes
 ROOM_FLAG_TREASURE_SPAWNED   = %01000000 ; so the player can't infinitely farm
@@ -49,16 +52,29 @@ ROOM_FLAG_BOSS               = %00010000 ; boss rooms have their treasure forced
 ROOM_FLAG_CLEARED            = %00001000 ; once cleared, a room will not respawn enemies when entered again
 ROOM_FLAG_REVEALED           = %00000100 ; more explicitly for minimap purposes
 ROOM_FLAG_DARK               = %00000010 ; activates torchlight radius effect. spookiness is optional
+ROOM_FLAG_WARP_PORTAL        = %00000001 ; this room contains (must generate) a portal to the warp zone
 
-FLOOR_PROPERTIES_NOSPAWN = %10000000 
+FLOORPLAN_PROPERTIES_NOSPAWN = %10000000 
 
-ROOM_PROPERTIES_NOSPAWN = %10000000
-ROOM_PROPERTIES_DARK    = %01000000
-ROOM_CATEGORY_EXTERIOR  = %00000000
-ROOM_CATEGORY_INTERIOR  = %00010000
-ROOM_CATEGORY_CHALLENGE = %00100000
-ROOM_CATEGORY_SHOP      = %00110000
-ROOM_CATEGORY_MASK      = %00110000
+ROOM_PROPERTIES_NOSPAWN      = %10000000
+ROOM_PROPERTIES_DARK         = %01000000
+ROOM_PROPERTIES_WARP         = %00001000 ; this room is part of the warp zone (don't put the player here)
+ROOM_PROPERTIES_EXIT_CHAMBER = %00000100 ; this chamber contains an exit (currently only used for warps)
+ROOM_CATEGORY_EXTERIOR       = %00000000
+ROOM_CATEGORY_INTERIOR       = %00010000
+ROOM_CATEGORY_CHALLENGE      = %00100000
+ROOM_CATEGORY_SHOP           = %00110000
+ROOM_CATEGORY_MASK           = %00110000
+
+; All warp zones share these settings, unlike the regular floors which may
+; differ depending on maze layout
+WARP_MIN_CHALLENGE_COUNT = 0 ; TODO: if challenges are required for alt. boss, increment this!
+WARP_MAX_CHALLENGE_COUNT = 3
+WARP_MIN_SHOP_COUNT = 0
+WARP_MAX_SHOP_COUNT = 1
+WARP_MIN_EXIT_COUNT = 1
+WARP_MAX_EXIT_COUNT = 1
+
 ROOM_EXIT_FLAG_NORTH    = %00000001 ; Never
 ROOM_EXIT_FLAG_EAST     = %00000010 ; Eat
 ROOM_EXIT_FLAG_SOUTH    = %00000100 ; Soggy
