@@ -24,6 +24,9 @@
 .global BigFloorBank
 .global RoomIndexToGenerate
 
+.global WarpPortalRoomIndex
+.global WarpEntranceRoomIndex
+
 .global current_clear_status
 .global previous_clear_status
 

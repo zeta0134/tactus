@@ -148,4 +148,9 @@
    <property name="behavior" value="ITEM_SPELL_LIFE"/>
   </properties>
  </tile>
+ <tile id="63" type="map">
+  <properties>
+   <property name="behavior" value="TILE_HIDDEN_WARP_FLOOR"/>
+  </properties>
+ </tile>
 </tileset>

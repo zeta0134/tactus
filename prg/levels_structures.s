@@ -39,6 +39,7 @@
         .include "../build/structures/CaveWarpStructure.incs"
         .include "../build/structures/BlockingWarpWall.incs"
         .include "../build/structures/BlockingWarpStructure.incs"
+        .include "../build/structures/FairyRingWarp.incs"
 
 .macro structure_entry structure_label
         .addr structure_label
@@ -83,17 +84,19 @@ test_structure_set_big:
 
 grassy_warp_structure_set:
         .byte $F
-        .repeat 15
+        .repeat 14
         structure_entry structure_GrassyWarpWall ; we reeeeally want this to be picked
         .endrepeat
-        structure_entry structure_GrassyWarpStructure ; but we'll settle for this on occasion. it's fine.
+        structure_entry structure_FairyRingWarp ; but we'll settle for one of these sometimes
+        structure_entry structure_GrassyWarpStructure
 
 cave_warp_structure_set:
         .byte $F
-        .repeat 15
+        .repeat 14
         structure_entry structure_CaveWarpWall ; we reeeeally want this to be picked
         .endrepeat
-        structure_entry structure_CaveWarpStructure ; but we'll settle for this if we have to
+        structure_entry structure_FairyRingWarp ; but we'll settle for one of these sometimes
+        structure_entry structure_CaveWarpStructure
 
 blocking_warp_structure_set:
         .byte $F
@@ -303,6 +306,14 @@ invalid_range:
         rts
 .endproc
 
+ ; somewhat arbitrary! for regular structures, we break out of structure gen
+ ; if we're spending too much time on placements, so the game doesn't lock up
+ ; for a long time between floors. Better to have the occasional sparse room
+ ; than to suffer long loads. If this is happening a lot, consider altering the
+ ; set of structures for a given area to include more things with a high chance
+ ; of succeeding in their spawn attempts.
+MAX_STRUCTURE_SPAWN_FAILURES = 32
+
 .proc roll_structures_from_list
 ; RoomPtr := R0 - from call site
 ; Inputs
@@ -314,6 +325,10 @@ StructurePtr := R5
 ; Scratch:
 StructureBank := R16
 FailedSpawnAttempts := R17
+
+        lda #0
+        sta FailedSpawnAttempts
+
         access_data_bank #<.bank(all_structure_lists)
 
         ; sanity
@@ -359,11 +374,38 @@ converge:
         lda MaxStructures
         beq done
         lda FailedSpawnAttempts
-        cmp #32 ; arbitrary!
+        cmp #MAX_STRUCTURE_SPAWN_FAILURES ; arbitrary!
         bcs done
         jmp loop
 done:
         restore_previous_bank ; StructureList
+        rts
+.endproc
+
+; Used to spawn warp points, and maybe in the future for reeeeally
+; important structures that we need to make absolutely sure don't fail
+; to spawn.
+; Obviously this is a lockup risk if we ever try to force a structure
+; set that, for whatever reason, CANNOT succeed. Try not to do that!
+.proc force_single_structure_from_list
+; RoomPtr := R0 - from call site
+; Inputs
+StructureList := R2
+MaxStructures := R4
+FailedSpawnAttempts := R17
+
+keep_looping_darn_it:
+        lda #1
+        sta MaxStructures
+        jsr roll_structures_from_list
+        perform_zpcm_inc
+        lda FailedSpawnAttempts
+        ; If ALL of the spawn attempts failed, keep trying
+        ; until they don't!
+        cmp #MAX_STRUCTURE_SPAWN_FAILURES
+        bcs keep_looping_darn_it
+        ; Otherwise, we know exactly one structure spawned from the list,
+        ; which is all we ever wanted.
         rts
 .endproc
 
@@ -425,6 +467,20 @@ done_with_interior_large_structures:
         sta StructureList+1
         jsr roll_structures_from_list
 done_with_interior_small_structures:
+        perform_zpcm_inc
+        ; If this room should have the warp portal, spawn that here
+        lda RoomIndexToGenerate
+        cmp WarpPortalRoomIndex
+        bne skip_interior_warp_structures
+        ; FORCE exactly one interior warp structure to spawn from the provided set
+        ldy #ZoneDefinition::InteriorStructureWarpSet
+        lda (PlayerZonePtr), y
+        sta StructureList+0
+        iny
+        lda (PlayerZonePtr), y
+        sta StructureList+1
+        jsr force_single_structure_from_list
+skip_interior_warp_structures:
         restore_previous_bank
         rts
 
@@ -462,6 +518,20 @@ done_with_exterior_large_structures:
         sta StructureList+1
         jsr roll_structures_from_list
 done_with_exterior_small_structures:
+        perform_zpcm_inc
+        ; If this room should have the warp portal, spawn that here
+        lda RoomIndexToGenerate
+        cmp WarpPortalRoomIndex
+        bne skip_exterior_warp_structures
+        ; FORCE exactly one interior warp structure to spawn from the provided set
+        ldy #ZoneDefinition::ExteriorStructureWarpSet
+        lda (PlayerZonePtr), y
+        sta StructureList+0
+        iny
+        lda (PlayerZonePtr), y
+        sta StructureList+1
+        jsr force_single_structure_from_list
+skip_exterior_warp_structures:
         restore_previous_bank
         rts
 .endproc
