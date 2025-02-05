@@ -73,9 +73,15 @@ AttackSquare := R3
         .segment "ENEMY_UPDATE"
 
 .proc ENEMY_UPDATE_draw_warp_portal
+CurrentRow := R14
+CurrentTile := R15
         ; Draw the fancy flickery palette thing! We do this every
         ; update because it resets when we switch rooms. Want the portal
         ; to still be here if the player decides to leave and then come back.
         ; TODO: also flag this on the minimap, yes yes!
+
+        lda CurrentTile
+        sta WarpTilePos
+
         rts
 .endproc

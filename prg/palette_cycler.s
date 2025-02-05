@@ -14,6 +14,9 @@ tiles_to_cycle: .res ::MAX_TILES_TO_CYCLE
 num_tiles_to_cycle: .res 1
 frames_remaining: .res 1
 
+WarpTilePos: .res 1
+WarpCycleCooldown: .res 1
+
         .segment "PRGFIXED_E000"
 
 ; this routine is tiny, and enemies will be calling it often-ish
@@ -82,6 +85,9 @@ done:
         sta num_tiles_to_cycle
         lda #FRAMES_TO_CYCLE
         sta frames_remaining
+        sta WarpCycleCooldown
+        lda #$FF
+        sta WarpTilePos
         rts
 .endproc
 
@@ -92,6 +98,20 @@ AttributeAddr := R2
 
 HighRowScratch := R4
 LowRowScratch := R5
+        lda WarpTilePos
+        cmp #$FF
+        beq skip_warp_tile_cycler
+        sta TargetIndex
+        lda WarpCycleCooldown
+        beq perform_warp_update
+        dec WarpCycleCooldown
+        jmp skip_warp_tile_cycler
+perform_warp_update:
+        lda #2
+        sta WarpCycleCooldown
+        jsr _cycle_target_tile
+skip_warp_tile_cycler:
+
         ; typically palette cycling should cease after 8 frames or so
         lda frames_remaining
         bne perform_update
@@ -109,6 +129,24 @@ loop:
         lda tiles_to_cycle, x
         sta TargetIndex
 
+        jsr _cycle_target_tile
+
+        ; onward!
+        inc CurrentTile
+        jmp loop
+
+done:
+        dec frames_remaining
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc _cycle_target_tile
+TargetIndex := R1
+AttributeAddr := R2
+
+HighRowScratch := R4
+LowRowScratch := R5
         ; we always cycle the active buffer. the initial setup looks very similar to
         ; drawing a tile, except we only care about the attribute pointer
 
@@ -165,13 +203,5 @@ set_high_byte:
         clc
         adc (AttributeAddr), y
         sta (AttributeAddr), y
-
-        ; onward!
-        inc CurrentTile
-        jmp loop
-
-done:
-        dec frames_remaining
-        perform_zpcm_inc
         rts
 .endproc
