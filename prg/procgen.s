@@ -1440,6 +1440,10 @@ skip_picking_warp_portal:
         beq skip_picking_warp_entrance
         ; Here it is, there it goes, and so on
         stx WarpEntranceRoomIndex
+        ; The warp entrance should begin cleared, with no monsters.
+        lda #(ROOM_FLAG_CLEARED | ROOM_FLAG_TREASURE_SPAWNED)
+        ora room_flags, x
+        sta room_flags, x
 skip_picking_warp_entrance:
 
 skip_picking_warps:

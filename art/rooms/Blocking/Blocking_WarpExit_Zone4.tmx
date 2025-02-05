@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="16" height="11" tilewidth="16" tileheight="16" infinite="0" nextlayerid="66" nextobjectid="1">
  <properties>
-  <property name="base_logic" value="ROOM_BASE_LOGIC_NONE"/>
   <property name="category" value="exterior"/>
   <property name="color_emphasis" value="0"/>
   <property name="dark" type="bool" value="false"/>

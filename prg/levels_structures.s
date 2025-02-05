@@ -500,6 +500,9 @@ MaxStructures := R4
         lda PlayerRoomIndex
         cmp RoomIndexToGenerate
         beq skip_structure_spawning
+        lda WarpEntranceRoomIndex
+        cmp RoomIndexToGenerate
+        beq skip_structure_spawning
 
         ldx RoomIndexToGenerate
         lda room_properties, x

@@ -47,6 +47,7 @@ AttackSquare := R3
         sta PlayerRoomIndex
 
         lda #ROOM_TRANSITION_NONE
+        sta RoomTransitionType
         st16 GameMode, room_transition
 
         ; mark the room as "busy", this prevents us clearing the next room prematurely
@@ -65,8 +66,6 @@ AttackSquare := R3
         lda #6
         sta PlayerRow
         sta PlayerCol
-
-
 
         rts
 .endproc
