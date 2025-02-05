@@ -76,6 +76,8 @@ SpellParticleSpawnCooldown: .res 1
 ; Where should the warp entrance go on a given zone? Not all zones have these.
 WarpPortalRoomIndex: .res 1
 WarpEntranceRoomIndex: .res 1
+WarpHueIndex: .res 1
+WarpHueCooldown: .res 1
 
         ; should match levels_structures.s! it relies on several of our functions,
         ; and the far-call overhead for those functions is significant
@@ -1915,6 +1917,15 @@ DispatchPtr := R0
         beq not_paused
         rts
 not_paused:
+        ; if we're in a warp chamber, do the hue cycling thing
+        ldx PlayerRoomIndex
+        lda room_properties, x
+        and #ROOM_PROPERTIES_WARP
+        beq skip_warp_processing
+        jsr perform_warp_hue_cycling
+skip_warp_processing:
+        ; now, run this room's baseline FX processor, which either does persistent
+        ; spell particles or temporary nonsense for spells that expire
         ldx PlayerRoomIndex
         lda room_spell_beat_logic, x
         ;beq done ; speed optimization once regular rooms don't have any fx
@@ -2353,6 +2364,69 @@ spawn_petal_particle:
         lda petal_particle_types+1, x
         sta ParticlePtr+1
         spawn_particle ParticlePtr, PosX, PosY
+        rts
+.endproc
+
+warp_hue_shift_lut:
+        .incbin "../art/warp_zone.pal"
+        .incbin "../art/warp_zone_hueshift_1.pal"
+        .incbin "../art/warp_zone_hueshift_2.pal"
+        .incbin "../art/warp_zone_hueshift_3.pal"
+        .incbin "../art/warp_zone_hueshift_4.pal"
+        .incbin "../art/warp_zone_hueshift_5.pal"
+        .incbin "../art/warp_zone_hueshift_6.pal"
+        .incbin "../art/warp_zone_hueshift_7.pal"
+        .incbin "../art/warp_zone_hueshift_8.pal"
+        .incbin "../art/warp_zone_hueshift_9.pal"
+        .incbin "../art/warp_zone_hueshift_10.pal"
+        .incbin "../art/warp_zone_hueshift_11.pal"
+
+.proc perform_warp_hue_cycling
+        perform_zpcm_inc
+        lda WarpHueCooldown
+        beq perform_cycle
+        dec WarpHueCooldown
+        rts
+perform_cycle:
+        lda #6
+        sta WarpHueCooldown
+
+        inc WarpHueIndex
+        lda WarpHueIndex
+        cmp #12
+        bcc index_in_range
+        lda #0
+        sta WarpHueIndex
+index_in_range:
+        perform_zpcm_inc
+        ; x16 to pick the base palette
+        .repeat 4
+        asl
+        .endrepeat
+        tax
+        ; copy those suckers in fast
+        lda warp_hue_shift_lut+5, x
+        sta BgPaletteBuffer+5
+        lda warp_hue_shift_lut+6, x
+        sta BgPaletteBuffer+6
+        lda warp_hue_shift_lut+7, x
+        sta BgPaletteBuffer+7
+        lda warp_hue_shift_lut+9, x
+        sta BgPaletteBuffer+9
+        lda warp_hue_shift_lut+10, x
+        sta BgPaletteBuffer+10
+        lda warp_hue_shift_lut+11, x
+        sta BgPaletteBuffer+11
+        lda warp_hue_shift_lut+13, x
+        sta BgPaletteBuffer+13
+        lda warp_hue_shift_lut+14, x
+        sta BgPaletteBuffer+14
+        lda warp_hue_shift_lut+15, x
+        sta BgPaletteBuffer+15
+        ; and flag the BG palette as dirty to force an update
+        lda #1
+        sta BgPaletteDirty
+        perform_zpcm_inc
         rts
 .endproc
 
