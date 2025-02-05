@@ -226,7 +226,7 @@ HeartCount := R2
 
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
-        lda #ITEM_DAGGER_L1
+        lda #ITEM_BROADSWORD_L3
         sta PlayerEquipmentWeapon
         lda #ITEM_LARGE_TORCH
         sta PlayerEquipmentTorch
@@ -238,7 +238,7 @@ HeartCount := R2
         sta PlayerEquipmentAccessory
         lda #ITEM_BOMB_STANDARD
         sta PlayerEquipmentBombs
-        lda #ITEM_SPELL_BOMB
+        lda #ITEM_SPELL_AIR
         sta PlayerEquipmentSpell
 
         lda #99
@@ -253,13 +253,13 @@ HeartCount := R2
         lda #HEART_TYPE_REGULAR_ARMORED
         sta NewHeartType
         near_call FAR_add_heart
-        lda #HEART_TYPE_REGULAR
+        lda #HEART_TYPE_REGULAR_ARMORED
         sta NewHeartType
         near_call FAR_add_heart
-        lda #HEART_TYPE_REGULAR
+        lda #HEART_TYPE_REGULAR_ARMORED
         sta NewHeartType
         near_call FAR_add_heart
-        lda #HEART_TYPE_TEMPORARY
+        lda #HEART_TYPE_TEMPORARY_ARMORED
         sta NewHeartType
         near_call FAR_add_heart
 

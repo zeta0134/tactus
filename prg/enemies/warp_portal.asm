@@ -9,6 +9,30 @@
         .segment "ENEMY_BOMB_SPELL"
 
 .proc ENEMY_BOMB_SPELL_become_warp_portal
+AttackSquare := R3
+        ; TODO: immediately start to palette cycle! (That's not built out yet)
+        ldx AttackSquare
+
+        ; First, preserve our old tile type. We'll use this when cleaning up the
+        ; entrance, as we need to know if we should replace it with a wall or a
+        ; disco floor among other stuff
+        lda battlefield, x
+        sta tile_data, x
+
+        ; Set ourselves to a warp portal!
+        lda #TILE_WARP_PORTAL
+        sta battlefield, x
+        ; TODO: if we have variants, decide on those and do that here
+        ; (optional todo: decorative nearby tile variants? sounds kinda complicated!)
+        lda #<BG_TILE_SPIRAL
+        sta tile_patterns, x
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>BG_TILE_SPIRAL
+        sta tile_attributes, x
+
+        ; TODO: play a real fancy SFX?
+
         rts
 .endproc
 
