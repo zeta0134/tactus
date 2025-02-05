@@ -483,10 +483,28 @@ LayoutPtr := R0
         ; copy the run seed before we use it to generate the game state
         ; (we'll display this in the debug HUD / game end screens, etc)
         ; TODO: if we're going to do fixed seed things, do that here?
+
+.if ::DEBUG_FORCE_SEED
+        lda #.lobyte(.loword(DEBUG_SEED))
+        sta initial_run_seed+3
+        sta run_seed+3
+        lda #.hibyte(.loword(DEBUG_SEED))
+        sta initial_run_seed+2
+        sta run_seed+2
+        lda #.lobyte(.hiword(DEBUG_SEED))
+        sta initial_run_seed+1
+        sta run_seed+1
+        lda #.hibyte(.hiword(DEBUG_SEED))
+        sta initial_run_seed+0
+        sta run_seed+0
+.else
         .repeat 4, i
         lda run_seed+i
         sta initial_run_seed+i
         .endrepeat
+.endif
+
+
 
         lda #0
         sta tempo_adjustment

@@ -29,6 +29,7 @@
         .include "signs.inc"
         .include "sound.inc"
         .include "sprites.inc"
+        .include "torchlight.inc"
         .include "weapons.inc"
         .include "word_util.inc"
         .include "zeropage.inc"

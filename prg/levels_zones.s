@@ -624,6 +624,23 @@ hud_zone_loop:
 .endproc
 
 .proc FAR_play_music_for_current_room
+        ; If the current room is a warp, play that music instead. 
+        ldy PlayerRoomIndex
+        lda room_properties, y
+        and #ROOM_PROPERTIES_WARP
+        beq not_a_warp_chamber
+play_warp_chamber_music:
+        ; Warp chambers always use the same base track, in its exterior
+        ; variant, with no stock tempo adjustment. (This track is plenty
+        ; tricky enough on its own.)
+        lda #TRACK_IN_ANOTHER_WORLD
+        ldy #TRACK_VARIANT_NORMAL
+        jsr play_track
+        lda #0
+        sta tempo_adjustment
+        rts
+
+not_a_warp_chamber:
         access_data_bank #<.bank(all_zones_data_page)
 
         ; the track number comes from the zone, of course

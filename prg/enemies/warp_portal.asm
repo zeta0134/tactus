@@ -32,6 +32,7 @@ AttackSquare := R3
         sta tile_attributes, x
 
         ; TODO: play a real fancy SFX?
+        ; TODO: draw right now? it's a bit unclear!
 
         rts
 .endproc
@@ -39,6 +40,34 @@ AttackSquare := R3
         .segment "ENEMY_COLLIDE"
 
 .proc ENEMY_COLLIDE_teleport_to_warp_entrance
+        ; TODO: we need to preserve the old position, and guard against the player
+        ; not actually moving onto this tile!
+
+        lda WarpEntranceRoomIndex
+        sta PlayerRoomIndex
+
+        lda #ROOM_TRANSITION_NONE
+        st16 GameMode, room_transition
+
+        ; mark the room as "busy", this prevents us clearing the next room prematurely
+        lda #1
+        sta first_beat_after_load
+        ; suppress torchlight updates over the transition (resolves minor visual jank)
+        lda #1
+        sta SuppressTorchlight
+        ; we may not PAUSE over the exit transition. this normally shouldn't occur, but
+        ; an enemy might have forced us to the screen edge or something, so be safe
+        lda #0
+        sta PlayerIntendsToPause
+
+        ; Just like spawning into place, force the player's new position to be 6,6
+        ; TODO: wait until AFTER the room transition to do this, and don't lerp!
+        lda #6
+        sta PlayerRow
+        sta PlayerCol
+
+
+
         rts
 .endproc
 
