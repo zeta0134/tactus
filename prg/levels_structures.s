@@ -2,6 +2,8 @@
 
         .include "../build/tile_defs.inc"
 
+        .include "_globals.inc"
+
         .include "battlefield.inc"
         .include "enemies.inc"
         .include "far_call.inc"
@@ -129,6 +131,9 @@ CurrentTileId := R10
 DetailTablePtr := R12
 ScratchPal := R14
 
+PatternTemp := R12
+AttrTemp := R13
+
         ldy #StructureDefinition::TileList
         lda (StructurePtr), y
         sta OverlayPtr+0
@@ -141,7 +146,7 @@ loop:
         ldy #0
         lda (OverlayPtr), y
         cmp #$FF
-        beq done
+        jeq done
 
         ; basically the only necessary change for structure gen
         clc
@@ -150,6 +155,12 @@ loop:
 
         sta CurrentTileId
         inc16 OverlayPtr
+
+        ; for warp tile reasons, preserve pattern/att for a sec
+        lda tile_patterns, x
+        sta PatternTemp
+        lda tile_attributes, x
+        sta AttrTemp
 
         lda (OverlayPtr), y
         sta tile_patterns, x
@@ -163,6 +174,20 @@ loop:
         lda (OverlayPtr), y
         sta battlefield, x
         inc16 OverlayPtr
+
+        ; If this was a warp tile write the preserved pattern/attr out
+        cmp #TILE_HIDDEN_WARP_FLOOR
+        beq preserve_warp
+        cmp #TILE_CRACKED_WARP_WALL
+        beq preserve_warp
+        jmp do_not_preserve_warp
+preserve_warp:
+        lda PatternTemp
+        sta WarpOverlayPattern
+        lda AttrTemp
+        sta WarpOverlayAttr
+        jsr _choose_warp_wall_tile
+do_not_preserve_warp:
 
         ; structures can have detail too, so we need to roll for that here
         ; as we draw the things. (generally, maps, structures, and overlays
@@ -406,6 +431,61 @@ keep_looping_darn_it:
         bcs keep_looping_darn_it
         ; Otherwise, we know exactly one structure spawned from the list,
         ; which is all we ever wanted.
+        rts
+.endproc
+
+; Used to camoflauge wall warp tiles properly, according
+; to the tile they displaced
+warp_equivalence_tile_lut:
+        ; Grasslands
+        .word BG_TILE_MAP_TILES_0176, BG_TILE_MAP_TILES_0239
+        .word BG_TILE_MAP_TILES_0177, BG_TILE_MAP_TILES_0239
+        .word BG_TILE_MAP_TILES_0178, BG_TILE_MAP_TILES_0239
+        .word BG_TILE_MAP_TILES_0179, BG_TILE_MAP_TILES_0239
+        ; Caves
+        .word BG_TILE_MAP_TILES_0246, BG_TILE_MAP_TILES_0255
+        .word BG_TILE_MAP_TILES_0247, BG_TILE_MAP_TILES_0255
+        .word BG_TILE_MAP_TILES_0248, BG_TILE_MAP_TILES_0255
+        .word BG_TILE_MAP_TILES_0249, BG_TILE_MAP_TILES_0255
+        ; For now, everything else uses basic bricks. Deal with it.
+MAX_EQUIVALENCE_TILE = 8
+DEFAULT_WARP_TILE = BG_TILE_MAP_TILES_0223
+
+; Because we can't choose which wall tile we displace, we also can't
+; predict what the replacement graphic needs to be. Here we fix it, yes!
+; Clobbers Y, expects X to be the target tile, etc
+.proc _choose_warp_wall_tile        
+        ldy #0
+loop:
+        lda WarpOverlayPattern+0
+        cmp warp_equivalence_tile_lut + 0, y
+        bne nope
+        lda WarpOverlayPattern+1
+        and #($FF - PAL_MASK)
+        cmp warp_equivalence_tile_lut + 1, y
+        bne nope
+yup:
+        lda warp_equivalence_tile_lut + 2, y
+        sta tile_patterns, x
+        lda WarpOverlayPattern+1
+        and #PAL_MASK
+        ora warp_equivalence_tile_lut + 3, y
+        sta tile_attributes, x
+        rts
+nope:
+        iny
+        iny
+        iny
+        iny
+        cpy #(MAX_EQUIVALENCE_TILE * 4)
+        bcc loop
+no_match:
+        lda #<DEFAULT_WARP_TILE
+        sta tile_patterns, x
+        lda WarpOverlayPattern+1
+        and #PAL_MASK
+        ora #>DEFAULT_WARP_TILE
+        sta tile_attributes, x
         rts
 .endproc
 

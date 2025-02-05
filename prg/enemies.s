@@ -50,6 +50,9 @@ SmokePuffRow: .res 1
 
 SmokePuffDirection: .res 1
 
+WarpOverlayPattern: .res 1
+WarpOverlayAttr: .res 1
+
 .segment "PRGFIXED_E000"
 
 PALETTE_MASK  := %11000000
@@ -226,6 +229,7 @@ tile_index_to_col_lut:
 .include "enemies/slimes.asm"
 .include "enemies/smoke_puff.asm"
 .include "enemies/treasure_chest.asm"
+.include "enemies/warp_portal.asm"
 
 .macro define_array name
     .macro .ident(.concat(.string(name), "_push_back")) value
@@ -485,7 +489,7 @@ tile_update  TILE_CRACKED_WARP_WALL, FIXED_no_behavior
 tile_attack  TILE_CRACKED_WARP_WALL, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_CRACKED_WARP_WALL, ENEMY_COLLIDE_solid_tile_forbids_movement
 tile_suspend TILE_CRACKED_WARP_WALL, FIXED_no_behavior
-tile_explode TILE_CRACKED_WARP_WALL, FIXED_no_behavior, FIXED_no_behavior
+tile_explode TILE_CRACKED_WARP_WALL, ENEMY_BOMB_SPELL_become_warp_portal, FIXED_no_behavior
 tile_spell   TILE_CRACKED_WARP_WALL, FIXED_no_behavior
 
 ; TODO: real behaviors. These should convert to warp portals when hit by a bomb,
@@ -494,8 +498,15 @@ tile_update  TILE_HIDDEN_WARP_FLOOR, ENEMY_UPDATE_draw_disco_tile
 tile_attack  TILE_HIDDEN_WARP_FLOOR, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_HIDDEN_WARP_FLOOR, FIXED_no_behavior
 tile_suspend TILE_HIDDEN_WARP_FLOOR, ENEMY_UTIL_draw_cleared_disco_tile
-tile_explode TILE_HIDDEN_WARP_FLOOR, ENEMY_BOMB_SPELL_become_one_beat_hazard, FIXED_no_behavior
+tile_explode TILE_HIDDEN_WARP_FLOOR, ENEMY_BOMB_SPELL_become_warp_portal, FIXED_no_behavior
 tile_spell   TILE_HIDDEN_WARP_FLOOR, FIXED_no_behavior
+
+tile_update  TILE_WARP_PORTAL, ENEMY_UPDATE_draw_warp_portal
+tile_attack  TILE_WARP_PORTAL, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_WARP_PORTAL, ENEMY_COLLIDE_teleport_to_warp_entrance
+tile_suspend TILE_WARP_PORTAL, ENEMY_UTIL_cleanup_warp_entrance
+tile_explode TILE_WARP_PORTAL, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_WARP_PORTAL, FIXED_no_behavior
 
 .segment "ENEMY_UPDATE"
 

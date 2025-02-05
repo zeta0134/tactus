@@ -29,12 +29,16 @@ TILE_EXIT_STAIRS       = 24
 TILE_SIGN              = 25
 TILE_CRACKED_WARP_WALL = 26
 TILE_HIDDEN_WARP_FLOOR = 27
+TILE_WARP_PORTAL       = 28
 
 ; Actually in the fixed page
 .global draw_active_tile
 .global tile_index_to_row_lut, tile_index_to_col_lut
 
 .globalzp ActiveDrawingScratch
+
+.global WarpOverlayPattern
+.global WarpOverlayAttr
 
 ; NOT in the fixed page
 .global FAR_update_static_enemy_row
