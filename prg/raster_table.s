@@ -56,18 +56,18 @@ HudAttr: .res 1
 
         .segment "PRGRAM"
 
-.align 32
-table_scanline_compare: .res 32
-table_ppuscroll_x:      .res 32
-table_ppuscroll_y:      .res 32
-table_ppuaddr_second:   .res 32
-table_ppumask:          .res 32
-table_irq_high:         .res 32
+.align 64
+table_scanline_compare: .res 64
+table_ppuscroll_x:      .res 64
+table_ppuscroll_y:      .res 64
+table_ppuaddr_second:   .res 64
+table_ppumask:          .res 64
+table_irq_high:         .res 64
 ; For raster effects to point to as a source for data to copy
 ; This is how we change the global ppumask for room-specific
 ; color emphasis and other effects. Be sure it is initialized
 ; to (and ORA'd with) $1E or the raster system may break entirely!
-room_global_ppumask:    .res 32
+room_global_ppumask:    .res 64
 
 RasterPlaybackSpeedHigh: .res 1
 RasterPlaybackSpeedLow: .res 1
@@ -84,6 +84,10 @@ RasterPlaybackSpeedLow: .res 1
         .segment "DATA_2"
 
         .include "raster/heat.incs"
+
+        .segment "DATA_RASTER_0"
+
+        .include "raster/warp_in.incs"
 
         .segment "CODE_1"
 
@@ -136,6 +140,9 @@ raster_effects_list:
         .addr heat_frames
         .byte <.bank(heat_frames) ; frame table bank
         .byte 128 ; duration in frames
+        .addr warp_in_frames
+        .byte <.bank(warp_in_frames) ; frame table bank
+        .byte 90 ; duration in frames
 
 nametable_lut_x:
         .repeat 256, i

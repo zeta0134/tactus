@@ -1411,8 +1411,14 @@ skip_considering_warp_exit:
         lda (RoomPtr), y
         and #ROOM_PROPERTIES_WARP
         bne skip_picking_warp_portal
+
+.if ::DEBUG_OVERRIDE_PORTAL_CHAMBER
+        lda PlayerRoomIndex
+        sta WarpPortalRoomIndex
+.else
         ; Here it is, there it goes, etc
         stx WarpPortalRoomIndex
+.endif
 skip_picking_warp_portal:
 
         ; Check for and roll a warp entrance.

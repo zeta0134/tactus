@@ -13,6 +13,9 @@ DEBUG_SEED = $BCD855CE
 DEBUG_SHOP_OVERRIDE = 0
 DEBUG_SHOP_ITEM = ITEM_SPELL_AIR
 
+; Force the portal to generate in the spawn chamber, for easier testing
+DEBUG_OVERRIDE_PORTAL_CHAMBER = 0
+
 .macro debug_color flags
         .if ::DEBUG_MODE
                 lda #(BG_ON | OBJ_ON | BG_CLIP | OBJ_CLIP | flags)

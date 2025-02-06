@@ -19,6 +19,8 @@ def next_scroll_x(current_scroll):
 def next_scroll_y(current_scroll):
     return (current_scroll+1) % 240
 
+# emit a difference only on scanlines where an actual change needs to occur. this
+# is efficient and fine for low-amplitude distortions
 def difference_pairs(distorted_pattern, next_value_func, initial=0):
     pairs = []
     for i in range(0, len(distorted_pattern)):
@@ -29,6 +31,24 @@ def difference_pairs(distorted_pattern, next_value_func, initial=0):
             actual_variance = distorted_pattern[i] - distorted_pattern[i-1]
             if expected_variance != actual_variance:
                 pairs.append((distorted_pattern[i], i+initial))
+    return pairs
+
+# same as above, but refuses to emit a difference pair immediately following
+# a previous output. ideal for stronger effects where a slightly glitchy realization
+# is preferable to overloading the raster engine
+def safe_difference_pairs(distorted_pattern, next_value_func, initial=0, min_gap=1):
+    pairs = []
+    last_i = 0
+    for i in range(0, len(distorted_pattern)):
+        if i == 0:
+            pairs.append((distorted_pattern[i], i+initial))
+            last_i = 0
+        else:
+            expected_variance = next_value_func(distorted_pattern[last_i]) - distorted_pattern[last_i]
+            actual_variance = distorted_pattern[i] - distorted_pattern[last_i]
+            if expected_variance != actual_variance and i - last_i > min_gap:
+                pairs.append((distorted_pattern[i], i+initial))
+                last_i = i
     return pairs
 
 def distorted_x_pairs(period, amplitude, step_count, offset=0, initial=0):
@@ -44,21 +64,28 @@ def distorted_y_pairs(period, amplitude, step_count, offset=0, initial=0):
     dpairs = difference_pairs(clamped_distortion, next_scroll_y, initial)
     return dpairs
 
+def safe_distorted_y_pairs(period, amplitude, step_count, offset=0, initial=0, min_gap=1):
+    light_distortion = pixel_sine_with(period, amplitude, step_count, offset) 
+    distorted_scroll = [i + light_distortion[i] for i in range(0, step_count)]
+    clamped_distortion = [min(175, max(0, distorted_scroll[i])) for i in range(0, step_count)]
+    dpairs = safe_difference_pairs(clamped_distortion, next_scroll_y, initial, min_gap)
+    return dpairs
+
 def print_common_tables(effect_name, output_file):
     print(ca65_label(f"{effect_name}_ppumask_common"), file=output_file)
-    print("  .repeat 32", file=output_file)
+    print("  .repeat 64", file=output_file)
     print("  .byte $1E", file=output_file)
     print("  .endrepeat", file=output_file)
     print("", file=output_file)
     print(ca65_label(f"{effect_name}_irq_common"), file=output_file)
-    print("  .repeat 32", file=output_file)
+    print("  .repeat 64", file=output_file)
     print("  .byte >full_scroll_and_ppumask_irq", file=output_file)
     print("  .endrepeat", file=output_file)
     print("", file=output_file)
 
 def print_common_x_table(effect_name, output_file):
     print(ca65_label(f"{effect_name}_scrollx_common"), file=output_file)
-    print("  .repeat 32", file=output_file)
+    print("  .repeat 64", file=output_file)
     print("  .byte 0", file=output_file)
     print("  .endrepeat", file=output_file)
     print("", file=output_file)
@@ -91,20 +118,24 @@ def print_frame_list(effect_name, framesets):
         print(f"  .byte <.bank({effect_name}_frame_{i})", file=output_file)
     print("", file=output_file)
 
-effect_name = "heat"
-period = 128     # height of the sine wave, also playback frames/duration
-amplitude = 1    # strength of the distortion
+effect_name = "warp_in"
+period = 20     # height of the sine wave
+effect_duration = 90 # playback frames/duration (should usually match height for looping)
+start_amplitude = 1
+end_amplitude = 32    # strength of the distortion
 step_count = 176 # height of the playfield
 initial_scanline = 4 # because we can't start at the top of the screen
 
 with open(f"../prg/raster/{effect_name}.incs", "w") as output_file:
     # todo: effect header, frame table, etc
-    print_y_distortion_frames(effect_name, period, output_file)
+    print_y_distortion_frames(effect_name, effect_duration, output_file)
     print_common_tables(effect_name, output_file)
     print_common_x_table(effect_name, output_file)
     framesets = []
-    for i in range(0, period):
-        dypairs = distorted_y_pairs(period, amplitude, step_count, initial=initial_scanline, offset=i)
+    for i in range(0, effect_duration):
+        progression = i / effect_duration
+        amplitude = (start_amplitude * (1.0 - progression)) + (end_amplitude *  progression)
+        dypairs = safe_distorted_y_pairs(period, amplitude, step_count, initial=initial_scanline, offset=i, min_gap=4)
         print_scrolly_distortion_table(effect_name, i, dypairs, output_file)
         framesets.append(dypairs)
     print_frame_list(effect_name, framesets)

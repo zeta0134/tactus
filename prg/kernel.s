@@ -888,7 +888,7 @@ setup_warp_entrance:
         lda #0
         sta WarpTransitionTimer
         ; TODO: something fancier than this
-        set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #30
+        set_raster_effect_safely #RASTER_EFFECT_WARP_IN, #RASTER_FINALIZER_PLAIN_HUD, #30
         st16 GameMode, wait_for_warp_entrance_room_transition
         rts
 
