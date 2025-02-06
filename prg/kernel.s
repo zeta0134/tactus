@@ -677,6 +677,8 @@ LayoutPtr := R0
 
         jsr set_color_emphasis_for_room
 
+        far_call FAR_reset_palette_warp_tile
+
         st16 GameMode, beat_frame_1
         rts
 .endproc
@@ -797,6 +799,8 @@ not_too_high:
         far_call FAR_init_bomb_state
 
         far_call FAR_reset_price_tracker
+
+        far_call FAR_reset_palette_warp_tile
 
         ; Draw the entire target floor right now!
         ; This will cause a couple of frames of lag. We should

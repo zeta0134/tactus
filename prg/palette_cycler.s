@@ -85,6 +85,15 @@ done:
         sta num_tiles_to_cycle
         lda #FRAMES_TO_CYCLE
         sta frames_remaining
+        rts
+.endproc
+
+; Generally call this when switching rooms, to clear out the
+; previously-known warp tile. If there is a tile active, it'll
+; set its index on its first update, which is typically immediately
+; following the slide-in transition. That's good enough to fool the eye.
+.proc FAR_reset_palette_warp_tile
+        lda #0
         sta WarpCycleCooldown
         lda #$FF
         sta WarpTilePos

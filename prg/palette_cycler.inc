@@ -3,3 +3,4 @@
 .global WarpTilePos
 .global FAR_reset_palette_cycler
 .global FAR_update_palette_cycler
+.global FAR_reset_palette_warp_tile
