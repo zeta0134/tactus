@@ -880,9 +880,10 @@ setup_warp_entrance:
         ; Over the warp transition we'll fade slowly to white!
         lda #8
         sta TargetBrightness
-        lda #10
-        sta BrightnessDelay
+        lda #12
         sta GlobalFadeSpeed
+        lda #24
+        sta BrightnessDelay
         ; reset our delay counter, etc
         lda #0
         sta WarpTransitionTimer
@@ -925,7 +926,7 @@ setup_default_transition:
 .proc wait_for_warp_entrance_room_transition
         inc WarpTransitionTimer
         lda WarpTransitionTimer
-        cmp #80
+        cmp #90
         bne continue_waiting
 
         ; Force the player's position to the center of the new room
