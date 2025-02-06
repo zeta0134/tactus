@@ -36,6 +36,9 @@
 .global PlayerCurrentX
 .global PlayerCurrentY
 
+.global PlayerWarpEjectCol
+.global PlayerWarpEjectRow
+
 .global EnemyDiedThisFrame
 .global PlayerCombo
 .global PlayerChain

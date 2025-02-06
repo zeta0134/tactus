@@ -959,15 +959,24 @@ continue_waiting:
 .endproc
 
 .proc wait_for_warp_eject_room_transition
+HealingAmount := R0
+
         inc WarpTransitionTimer
         lda WarpTransitionTimer
         cmp #30
         bne continue_waiting
 
-        ; Force the player's position to the center of the new room
-        lda #6
+        ; Force the player's position to the tile before they stepped into the warp portal
+        lda PlayerWarpEjectCol
         sta PlayerCol
+        lda PlayerWarpEjectRow
         sta PlayerRow
+
+        ; Heal the player to full health, otherwise they may insta-die in the new location
+        ; depending on what kicked them out
+        lda #128
+        sta HealingAmount
+        far_call FAR_receive_healing
 
         ; Fade back up to regular brightness, and also reset the global fade speed
         lda #4

@@ -69,6 +69,9 @@ PlayerSpriteIndex: .res 1
 PlayerRow: .res 1
 PlayerCol: .res 1
 
+PlayerWarpEjectCol: .res 1
+PlayerWarpEjectRow: .res 1
+
 PlayerNextDirection: .res 1
 PlayerHeldDirection: .res 1
 
@@ -247,19 +250,23 @@ HeartCount := R2
         near_call FAR_initialize_hearts_for_game
         
         ; All the heart types, yes!
-        lda #HEART_TYPE_REGULAR_ARMORED
-        sta NewHeartType
-        near_call FAR_add_heart
-        lda #HEART_TYPE_REGULAR_ARMORED
-        sta NewHeartType
-        near_call FAR_add_heart
-        lda #HEART_TYPE_REGULAR_ARMORED
-        sta NewHeartType
-        near_call FAR_add_heart
-        lda #HEART_TYPE_REGULAR_ARMORED
-        sta NewHeartType
-        near_call FAR_add_heart
-        lda #HEART_TYPE_TEMPORARY_ARMORED
+        ;lda #HEART_TYPE_REGULAR_ARMORED
+        ;sta NewHeartType
+        ;near_call FAR_add_heart
+        ;lda #HEART_TYPE_REGULAR_ARMORED
+        ;sta NewHeartType
+        ;near_call FAR_add_heart
+        ;lda #HEART_TYPE_REGULAR_ARMORED
+        ;sta NewHeartType
+        ;near_call FAR_add_heart
+        ;lda #HEART_TYPE_REGULAR_ARMORED
+        ;sta NewHeartType
+        ;near_call FAR_add_heart
+        ;lda #HEART_TYPE_TEMPORARY_ARMORED
+        ;sta NewHeartType
+        ;near_call FAR_add_heart
+
+        lda #HEART_TYPE_REGULAR
         sta NewHeartType
         near_call FAR_add_heart
 
@@ -2201,6 +2208,14 @@ converge:
         jsr FIXED_is_player_considered_dead
         beq existence_proven
 
+        ; If we are currently in a warp zone, proceed to EJECT out of the warp zone, followed
+        ; by a full heal. Oops! It could be worse though.
+        lda PlayerRoomIndex
+        lda room_properties, x
+        and #ROOM_PROPERTIES_WARP
+        bne eject_player_from_warp_zone
+        ; Otherwise, proceed to actually die
+
         ; If we wanted to pause to avoid our fate, **TOO BAD.**
         ; (yes, this means an activating on-death item can eat a pause
         ; input; deal with it.)
@@ -2226,6 +2241,32 @@ converge:
         queue_sfx_pulse1 sfx_death_spin_pulse
         queue_sfx_triangle sfx_death_spin_tri
 existence_proven:
+        rts
+
+eject_player_from_warp_zone:
+        ; No pausing to avoid ejection. Please keep all hands and arms inside the vehicle
+        ; while the ride is in motion.
+        lda #0
+        sta PlayerIntendsToPause
+        ; mark the room as "busy", this prevents us clearing the next room prematurely
+        lda #1
+        sta first_beat_after_load
+        ; suppress torchlight updates over the transition (resolves minor visual jank)
+        lda #1
+        sta SuppressTorchlight
+
+        lda WarpPortalRoomIndex
+        sta PlayerRoomIndex
+
+        ; TODO: if we're going to queue up a fancy "you got spat out of the warp" SFX,
+        ; this would be the place to do it.
+        ; For now, just a death spin will do
+        queue_sfx_pulse1 sfx_death_spin_pulse
+        queue_sfx_triangle sfx_death_spin_tri
+
+        lda #ROOM_TRANSITION_WARP_EJECT
+        sta RoomTransitionType
+        st16 GameMode, room_transition
         rts
 .endproc
 

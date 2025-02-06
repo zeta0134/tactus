@@ -40,8 +40,24 @@ AttackSquare := R3
         .segment "ENEMY_COLLIDE"
 
 .proc ENEMY_COLLIDE_teleport_to_warp_entrance
-        ; TODO: we need to preserve the old position, and guard against the player
-        ; not actually moving onto this tile!
+TargetRow := R14
+TargetCol := R15
+        ; if our current and target position is already the same, bail!
+        ; this prevents two separate issues:
+        ;  - players revealing a warp tile they're currently standing on
+        ;  - players getting ejected into a cracked warp tile, which reverts to an actual wall
+        lda PlayerCol
+        cmp TargetCol
+        bne proceed_to_warp
+        lda PlayerRow
+        cmp TargetRow
+        bne proceed_to_warp
+        rts        
+proceed_to_warp:
+        lda PlayerCol
+        sta PlayerWarpEjectCol
+        lda PlayerRow
+        sta PlayerWarpEjectRow
 
         lda WarpEntranceRoomIndex
         sta PlayerRoomIndex
