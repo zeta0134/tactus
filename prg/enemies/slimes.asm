@@ -416,5 +416,8 @@ EffectiveAttackSquare := R10
         ; because we updated ourselves this frame, but we are no longer, decrement ourselves again
         dec enemies_active
 
+        ; Increase the player's warp stability any time they kill a common foe (via any means)
+        increase_warp_stability
+
         rts
 .endproc

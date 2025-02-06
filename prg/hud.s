@@ -211,6 +211,7 @@ HEART_STATE_BEATING = $08
 CurrentBeat := R0
 TargetHealth := R1
         ; if the player has more than 4 hearts, use an 8-beat pattern
+        ; TODO: this logic just breaks completely with shorter patterns :(
         lda heart_type+4
         cmp #HEART_TYPE_NONE
         bne use_8_beats

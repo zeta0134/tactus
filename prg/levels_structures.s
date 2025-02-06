@@ -86,18 +86,20 @@ test_structure_set_big:
 
 grassy_warp_structure_set:
         .byte $F
-        .repeat 14
+        .repeat 13
         structure_entry structure_GrassyWarpWall ; we reeeeally want this to be picked
         .endrepeat
         structure_entry structure_FairyRingWarp ; but we'll settle for one of these sometimes
+        structure_entry structure_FairyRingWarp
         structure_entry structure_GrassyWarpStructure
 
 cave_warp_structure_set:
         .byte $F
-        .repeat 14
+        .repeat 13
         structure_entry structure_CaveWarpWall ; we reeeeally want this to be picked
         .endrepeat
         structure_entry structure_FairyRingWarp ; but we'll settle for one of these sometimes
+        structure_entry structure_FairyRingWarp
         structure_entry structure_CaveWarpStructure
 
 blocking_warp_structure_set:

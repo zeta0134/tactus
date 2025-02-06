@@ -61,6 +61,11 @@ proceed_to_warp:
         lda PlayerRow
         sta PlayerWarpEjectRow
 
+        lda #29
+        sta WarpStability
+        lda #0
+        sta MusicalWarpStabilityCooldown
+
         lda WarpEntranceRoomIndex
         sta PlayerRoomIndex
 

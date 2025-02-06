@@ -124,6 +124,9 @@ PlayerHeldBombIndex: .res 1
 
 WeaponSingleTargetIndex: .res 1
 
+WarpStability: .res 1
+MusicalWarpStabilityCooldown: .res 1
+
 .segment "PRGFIXED_E000"
 
 ; For rapidly computing the tile row
@@ -250,25 +253,25 @@ HeartCount := R2
         near_call FAR_initialize_hearts_for_game
         
         ; All the heart types, yes!
-        ;lda #HEART_TYPE_REGULAR_ARMORED
-        ;sta NewHeartType
-        ;near_call FAR_add_heart
-        ;lda #HEART_TYPE_REGULAR_ARMORED
-        ;sta NewHeartType
-        ;near_call FAR_add_heart
-        ;lda #HEART_TYPE_REGULAR_ARMORED
-        ;sta NewHeartType
-        ;near_call FAR_add_heart
-        ;lda #HEART_TYPE_REGULAR_ARMORED
-        ;sta NewHeartType
-        ;near_call FAR_add_heart
-        ;lda #HEART_TYPE_TEMPORARY_ARMORED
-        ;sta NewHeartType
-        ;near_call FAR_add_heart
-
-        lda #HEART_TYPE_REGULAR
+        lda #HEART_TYPE_REGULAR_ARMORED
         sta NewHeartType
         near_call FAR_add_heart
+        lda #HEART_TYPE_REGULAR_ARMORED
+        sta NewHeartType
+        near_call FAR_add_heart
+        lda #HEART_TYPE_REGULAR_ARMORED
+        sta NewHeartType
+        near_call FAR_add_heart
+        lda #HEART_TYPE_REGULAR_ARMORED
+        sta NewHeartType
+        near_call FAR_add_heart
+        lda #HEART_TYPE_TEMPORARY_ARMORED
+        sta NewHeartType
+        near_call FAR_add_heart
+
+        ;lda #HEART_TYPE_REGULAR
+        ;sta NewHeartType
+        ;near_call FAR_add_heart
 
         ; Heal the player to full! (regular hearts start empty)
         lda #128
@@ -354,6 +357,11 @@ heart_loop:
         lda #0
         sta DeferLootProcessing
         sta SpellDefeatsEnemy
+
+        lda #30
+        sta WarpStability
+        lda #0
+        sta MusicalWarpStabilityCooldown
 
         rts
 
@@ -946,6 +954,12 @@ PlayerStatePtr := R0
 
 .proc apply_player_torchlight
 TorchlightTotal := R0
+        ; If we are in a warp zone, we need to apply stability to torchlight instead
+        ldx PlayerRoomIndex
+        lda room_properties, x
+        and #ROOM_PROPERTIES_WARP
+        bne apply_stability_as_torchlight
+
         ; Detect equipment changes and update static player stats as necessary
         ; (this needs to happen BEFORE our exit changes, to facilitate room transition logic)
         far_call FAR_equipment_torchlight
@@ -959,6 +973,16 @@ TorchlightTotal := R0
         lda PlayerTorchlightRadius
         sta target_torchlight_radius
 no_darkness:
+        rts
+
+apply_stability_as_torchlight:
+        lda WarpStability
+        cmp #29
+        bcc stability_in_range
+        lda #29
+stability_in_range:
+        sta PlayerTorchlightRadius
+        sta target_torchlight_radius
         rts
 .endproc
 
@@ -2067,6 +2091,9 @@ damage_amount_okay:
         sta PlayerChain
         sta PlayerChainGrace
 
+        ; If we're in a warp zone, it also decreases warp stability
+        decrease_warp_stability
+
         ; yup, we got hit. X_X
         ; setup the juice portion of the animation, these flags and timers
         ; will drive a lot of that.
@@ -2205,6 +2232,17 @@ converge:
 .endproc
 
 .proc detect_critical_existence_failure
+        ; If we are currently in a warp zone and our stability has reached 0,
+        ; eject the player!
+        lda PlayerRoomIndex
+        lda room_properties, x
+        and #ROOM_PROPERTIES_WARP
+        beq perform_health_check
+        lda WarpStability
+        bne perform_health_check
+        jmp eject_player_from_warp_zone
+
+perform_health_check:
         jsr FIXED_is_player_considered_dead
         beq existence_proven
 

@@ -664,6 +664,9 @@ die:
         ; because we updated ourselves this frame, but we are no longer, decrement ourselves again
         dec enemies_active
 
+        ; Increase the player's warp stability any time they kill a common foe (via any means)
+        increase_warp_stability
+
         rts
 .endproc
 
@@ -731,6 +734,9 @@ die:
         ; and whether we consider this to be a game-breaking flaw if it would
         ; occur near the clearing of the room?)
         dec enemies_active
+
+        ; DO increase the player's warp stability, if applicable
+        increase_warp_stability
 
         rts
 .endproc
@@ -904,6 +910,9 @@ die:
         ; Play an appropriately crunchy death sound, but not until later :D
         lda #1
         sta SpellDefeatsEnemy
+
+        ; Increase the player's warp stability any time they kill a common foe (via any means)
+        increase_warp_stability
 
         ; and that should be it for this path
         rts

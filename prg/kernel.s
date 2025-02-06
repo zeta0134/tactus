@@ -1141,6 +1141,8 @@ continue_waiting:
         ; - Queue up any changed squares to the **active** buffer
         ; - Begin playback of any sprite animations (?)
 
+        decrease_warp_stability_each_beat
+
         perform_zpcm_inc
         far_call FAR_age_sprites
         perform_zpcm_inc

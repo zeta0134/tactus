@@ -3,7 +3,7 @@
  <properties>
   <property name="category" value="exterior"/>
   <property name="color_emphasis" value="0"/>
-  <property name="dark" type="bool" value="false"/>
+  <property name="dark" type="bool" value="true"/>
   <property name="exit_east" type="bool" value="true"/>
   <property name="exit_north" type="bool" value="true"/>
   <property name="exit_south" type="bool" value="true"/>

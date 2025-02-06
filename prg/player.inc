@@ -67,6 +67,9 @@
 .global SpellDefeatsEnemy
 .global DeferLootProcessing
 
+.global WarpStability
+.global MusicalWarpStabilityCooldown
+
 MAX_HEARTS = 5
 MAX_GOLD = 9999
 
@@ -83,3 +86,46 @@ PLAYER_STATE_CASTING = 2
 ; grave. This state will transition out of gameplay once
 ; entered!
 PLAYER_STATE_DEAD = 3
+
+MAX_WARP_STABILITY = 30
+BEATS_BETWEEN_NATURAL_STABILITY_DECAY = 4
+
+.macro increase_warp_stability
+.scope
+    lda WarpStability
+    cmp #MAX_WARP_STABILITY
+    bcs done
+    clc
+    adc #2
+    sta WarpStability
+done:
+.endscope
+.endmacro
+
+.macro decrease_warp_stability
+.scope
+    lda WarpStability
+    beq done
+    dec WarpStability
+    beq done
+    dec WarpStability
+done:
+.endscope
+.endmacro
+
+.macro decrease_warp_stability_each_beat
+.scope
+    lda MusicalWarpStabilityCooldown
+    beq perform_decrease
+    dec MusicalWarpStabilityCooldown
+    jmp done
+perform_decrease:
+    lda WarpStability
+    beq already_zero
+    dec WarpStability
+already_zero:
+    lda #(BEATS_BETWEEN_NATURAL_STABILITY_DECAY-1)
+    sta MusicalWarpStabilityCooldown
+done:
+.endscope
+.endmacro
