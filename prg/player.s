@@ -2258,12 +2258,6 @@ eject_player_from_warp_zone:
         lda WarpPortalRoomIndex
         sta PlayerRoomIndex
 
-        ; TODO: if we're going to queue up a fancy "you got spat out of the warp" SFX,
-        ; this would be the place to do it.
-        ; For now, just a death spin will do
-        queue_sfx_pulse1 sfx_death_spin_pulse
-        queue_sfx_triangle sfx_death_spin_tri
-
         lda #ROOM_TRANSITION_WARP_EJECT
         sta RoomTransitionType
         st16 GameMode, room_transition
