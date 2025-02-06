@@ -92,6 +92,15 @@ chr_tile_offset SPELL_A_ENABLED,    2, 14
 chr_tile_offset SPELL_B_ENABLED,    2, 15
 chr_tile_offset SPELL_DISABLED_BL_CORNER, 1, 14
 
+chr_tile_offset STATIC_0,  4, 7
+chr_tile_offset STATIC_1,  5, 7
+chr_tile_offset STATIC_2,  4, 8
+chr_tile_offset STATIC_3,  5, 8
+chr_tile_offset STATIC_4,  9, 7
+chr_tile_offset STATIC_5, 10, 7
+chr_tile_offset STATIC_6,  9, 8
+chr_tile_offset STATIC_7, 10, 8
+
 TILE_COL_OFFSET = 1
 TILE_ROW_OFFSET = 16
 
@@ -647,6 +656,24 @@ room_index_to_draw_index_lut:
         .endrepeat
         .endrepeat
 
+warp_static_tiles_lut:
+        .byte STATIC_0
+        .byte STATIC_1
+        .byte STATIC_2
+        .byte STATIC_3
+        .byte STATIC_4
+        .byte STATIC_5
+        .byte STATIC_6
+        .byte STATIC_7
+        .byte BLANK_TILE
+        .byte BLANK_TILE
+        .byte BLANK_TILE
+        .byte BLANK_TILE
+        .byte BLANK_TILE
+        .byte BLANK_TILE
+        .byte BLANK_TILE
+        .byte BLANK_TILE
+
 .proc draw_minimap_tile
 RoomIndex := R0
 DrawIndex := R1
@@ -658,12 +685,33 @@ AttributeAddr := R14
         lda room_index_to_draw_index_lut, x
         sta DrawIndex
 
+        ; If the player is *currently* in a warp room, draw static instead of any of this fancy logic
+        ldx PlayerRoomIndex
+        lda room_properties, x
+        and #(ROOM_PROPERTIES_WARP)
+        beq draw_regular_minimap_here
+draw_warp_static_here:
+        prng_from_table_y
+        and #$F
+        tay
+        lda warp_static_tiles_lut, y
+        sta DrawTile
+        ldx DrawIndex
+        draw_tile_at_x MINIMAP_BASE, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        rts
+
+draw_regular_minimap_here:
         ; Figure out what tile we should draw here
         ldx RoomIndex
-        lda room_flags, x
         
+        ; If this is a warp chamber, we should never draw it!
+        lda room_properties, x
+        and #(ROOM_PROPERTIES_WARP)
+        jne room_hidden
+
         ; can we see this room at all? any room that has been either
         ; visited OR revealed should be displayed
+        lda room_flags, x
         and #(ROOM_FLAG_VISITED | ROOM_FLAG_REVEALED)
         
         ; DEBUG: all rooms start at least 'revealed' for testing
@@ -824,12 +872,17 @@ begin_to_draw:
 proceed_to_draw:
         ; TODO: this does one tile per update, which is a bit slow. we could probably
         ; call this in a loop, tuned for performance
+
+; yeah just keep going until it's all done. eat the lag, it's fine, this happens
+; really infrequently!
+draw_loop:
+        lda CurrentMapIndex
         sta RoomIndex
         jsr draw_minimap_tile
         inc CurrentMapIndex
         lda CurrentMapIndex
         cmp #::FLOOR_SIZE
-        bne done
+        bne draw_loop
         lda #0
         sta CurrentMapIndex
 done:
