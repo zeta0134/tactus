@@ -46,7 +46,7 @@ AttackSquare := R3
         lda WarpEntranceRoomIndex
         sta PlayerRoomIndex
 
-        lda #ROOM_TRANSITION_NONE
+        lda #ROOM_TRANSITION_WARP_ENTRANCE
         sta RoomTransitionType
         st16 GameMode, room_transition
 
@@ -61,11 +61,8 @@ AttackSquare := R3
         lda #0
         sta PlayerIntendsToPause
 
-        ; Just like spawning into place, force the player's new position to be 6,6
-        ; TODO: wait until AFTER the room transition to do this, and don't lerp!
-        lda #6
-        sta PlayerRow
-        sta PlayerCol
+        ; TODO: flag the warp portal so that it vanishes (on suspend) if the player is later ejected!
+        ; (since we aren't going to draw+active this tile, maybe we can do that now?)
 
         rts
 .endproc

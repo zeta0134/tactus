@@ -86,6 +86,11 @@
         .include "../build/floors/test_floor_wide_open.incs"
         .include "../build/floors/hub_world.incs"
 
+        .include "../build/floors/blocking_01_warp.incs"
+        .include "../build/floors/blocking_02_warp.incs"
+        .include "../build/floors/blocking_03_warp.incs"
+        .include "../build/floors/blocking_04_warp.incs"
+
         .segment "LEVEL_DATA_ZONE_DEFS"
 
 hud_base_pal:
@@ -122,6 +127,13 @@ zone_blocking_mazes:
         banked_addr floor_blocking_02
         banked_addr floor_blocking_03
         banked_addr floor_blocking_04
+
+zone_blocking_with_warps_mazes:
+        .byte 4 ; length        
+        banked_addr floor_blocking_01_warp
+        banked_addr floor_blocking_02_warp
+        banked_addr floor_blocking_03_warp
+        banked_addr floor_blocking_04_warp
 
         .include "leveldata/zone_0_hub.asm"
 

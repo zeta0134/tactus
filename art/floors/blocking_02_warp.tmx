@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="6" height="4" tilewidth="16" tileheight="16" infinite="0" nextlayerid="4" nextobjectid="1">
+ <properties>
+  <property name="has_warp_zone" type="bool" value="true"/>
+ </properties>
+ <tileset firstgid="1" source="../LayoutTiles.tsx"/>
+ <layer id="1" name="Maze Shape" width="6" height="4">
+  <data encoding="csv">
+33,19,20,35,20,51,
+50,35,33,18,19,36,
+35,18,52,34,2,50,
+51,49,19,52,51,36
+</data>
+ </layer>
+ <layer id="2" name="Room Properties" width="6" height="4">
+  <data encoding="csv">
+22,22,22,7,7,22,
+22,6,6,7,7,7,
+6,6,6,7,22,7,
+6,6,7,7,22,22
+</data>
+ </layer>
+ <layer id="3" name="Restrictions" width="6" height="4">
+  <data encoding="csv">
+0,0,0,16,16,0,
+0,0,0,16,16,16,
+0,0,0,16,0,16,
+0,0,16,16,0,0
+</data>
+ </layer>
+</map>

@@ -72,6 +72,7 @@ PlayfieldObjBanks: .res 16
 HudObjBanks: .res 8
 
 HeldInputCooldown: .res 1
+WarpTransitionTimer: .res 1
 
 .segment "CODE_1"
 
@@ -827,6 +828,10 @@ detect_transition_type:
         jeq setup_slide_down
         cmp #ROOM_TRANSITION_SLIDE_UP
         jeq setup_slide_up
+        cmp #ROOM_TRANSITION_WARP_ENTRANCE
+        jeq setup_warp_entrance
+        cmp #ROOM_TRANSITION_WARP_EJECT
+        jeq setup_warp_eject
         ; This is an unrecognized transition type! Fall back to a standard init and
         ; do not attempt any bespoke transition. (Later: can we choose a default here
         ; anyway? a fade to black would be less awful than intentional jank)
@@ -839,7 +844,7 @@ setup_slide_right:
         jsr setup_nametables_for_slide_transition
         jsr set_slide_speed
         set_raster_effect_safely #RASTER_EFFECT_SLIDE_RIGHT, #RASTER_FINALIZER_PLAIN_HUD, #30
-        st16 GameMode, wait_for_room_transition
+        st16 GameMode, wait_for_sliding_room_transition
         rts
 setup_slide_left:
         far_call FAR_reset_torchlight_raster_slide_updater
@@ -847,7 +852,7 @@ setup_slide_left:
         jsr setup_nametables_for_slide_transition
         jsr set_slide_speed
         set_raster_effect_safely #RASTER_EFFECT_SLIDE_LEFT, #RASTER_FINALIZER_PLAIN_HUD, #30
-        st16 GameMode, wait_for_room_transition
+        st16 GameMode, wait_for_sliding_room_transition
         rts
 setup_slide_down:
         far_call FAR_reset_torchlight_raster_slide_updater
@@ -855,7 +860,7 @@ setup_slide_down:
         jsr setup_nametables_for_slide_transition
         jsr set_slide_speed
         set_raster_effect_safely #RASTER_EFFECT_SLIDE_DOWN, #RASTER_FINALIZER_PLAIN_HUD, #30
-        st16 GameMode, wait_for_room_transition
+        st16 GameMode, wait_for_sliding_room_transition
         rts
 setup_slide_up:
         far_call FAR_reset_torchlight_raster_slide_updater
@@ -863,7 +868,48 @@ setup_slide_up:
         jsr setup_nametables_for_slide_transition
         jsr set_slide_speed
         set_raster_effect_safely #RASTER_EFFECT_SLIDE_UP, #RASTER_FINALIZER_PLAIN_HUD, #30
-        st16 GameMode, wait_for_room_transition
+        st16 GameMode, wait_for_sliding_room_transition
+        rts
+setup_warp_entrance:
+        ; We'll be doing a fancy distortion but not showing the new screen right away.
+        ; Also the target lighting mode is fully lit, so don't fuss about torchlight over
+        ; the seam. If we get some glitchy jank for THESE transitions it kinda helps more
+        ; than it hinders.
+        lda #0
+        sta SuppressTorchlight
+        ; Over the warp transition we'll fade slowly to white!
+        lda #8
+        sta TargetBrightness
+        lda #10
+        sta BrightnessDelay
+        sta GlobalFadeSpeed
+        ; reset our delay counter, etc
+        lda #0
+        sta WarpTransitionTimer
+        ; TODO: something fancier than this
+        set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #30
+        st16 GameMode, wait_for_warp_entrance_room_transition
+        rts
+
+setup_warp_eject:
+        ; We'll be doing a fancy distortion but not showing the new screen right away.
+        ; Also the target lighting mode is fully lit, so don't fuss about torchlight over
+        ; the seam. If we get some glitchy jank for THESE transitions it kinda helps more
+        ; than it hinders.
+        lda #0
+        sta SuppressTorchlight
+        ; When being ejected from the warp, we'll fade to black somewhat more quickly
+        lda #0
+        sta TargetBrightness
+        lda #6
+        sta BrightnessDelay
+        sta GlobalFadeSpeed
+        ; reset our delay counter, etc
+        lda #0
+        sta WarpTransitionTimer
+        ; TODO: something fancier than this
+        set_raster_effect_safely #RASTER_EFFECT_UNDERWATER, #RASTER_FINALIZER_PLAIN_HUD, #30
+        st16 GameMode, wait_for_warp_eject_room_transition
         rts
 
 setup_default_transition:
@@ -876,8 +922,70 @@ setup_default_transition:
         rts
 .endproc
 
+.proc wait_for_warp_entrance_room_transition
+        inc WarpTransitionTimer
+        lda WarpTransitionTimer
+        cmp #80
+        bne continue_waiting
+
+        ; Force the player's position to the center of the new room
+        lda #6
+        sta PlayerCol
+        sta PlayerRow
+
+        ; Fade back down to regular brightness, and also reset the global fade speed
+        lda #4
+        sta TargetBrightness
+        lda #4
+        sta BrightnessDelay
+        sta GlobalFadeSpeed
+
+        jsr set_raster_effect_for_room
+
+        set_raster_playback_speed #1, #0
+        lda #0
+        sta SuppressTorchlight
+        st16 GameMode, beat_frame_1
+        rts
+continue_waiting:
+        jmp _wait_for_transition_common
+
+        rts
+.endproc
+
+.proc wait_for_warp_eject_room_transition
+        inc WarpTransitionTimer
+        lda WarpTransitionTimer
+        cmp #30
+        bne continue_waiting
+
+        ; Force the player's position to the center of the new room
+        lda #6
+        sta PlayerCol
+        sta PlayerRow
+
+        ; Fade back up to regular brightness, and also reset the global fade speed
+        lda #4
+        sta TargetBrightness
+        lda #4
+        sta BrightnessDelay
+        sta GlobalFadeSpeed
+
+        jsr set_raster_effect_for_room
+
+        set_raster_playback_speed #1, #0
+        lda #0
+        sta SuppressTorchlight
+        st16 GameMode, beat_frame_1
+        rts
+continue_waiting:
+        jmp _wait_for_transition_common
+
+        rts
+.endproc
+
 ; Ha, this needs to do a dozen other things too, but ignore all that for now
-.proc wait_for_room_transition
+.proc wait_for_sliding_room_transition
         lda RasterEffectFrame
         cmp #30
         bne continue_waiting
@@ -907,7 +1015,10 @@ continue_waiting:
         far_call FAR_update_torchlight_over_raster_slide_updater
         far_call FAR_update_torchlight_over_raster_slide_updater
         debug_color LIGHTGRAY
+        jmp _wait_for_transition_common
+.endproc
 
+.proc _wait_for_transition_common
         ; This is most of every_gameloop, but with some alterations and omissions to help the transition out
         jsr poll_input
 

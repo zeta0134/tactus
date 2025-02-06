@@ -22,6 +22,8 @@ Brightness: .res 1
 TargetBrightness: .res 1
 BrightnessDelay: .res 1
 
+GlobalFadeSpeed: .res 1
+
 ; not sure I'll use all of this, but we'll allocate the whole 32 bytes just in case
 HudPaletteBuffer: .res 32
 ; Copied in during a raster effect which needs lots of delay anyway, so regular RAM
@@ -145,6 +147,9 @@ loop:
         inx
         cpx #16
         bne loop
+
+        lda #4
+        sta GlobalFadeSpeed
 
         rts
 .endproc
@@ -287,7 +292,7 @@ converge:
         sta BgPaletteDirty
         sta ObjPaletteDirty
         sta HudPaletteDirty
-        lda #GLOBAL_PALETTE_FADE_SPEED
+        lda GlobalFadeSpeed
         sta BrightnessDelay
 done:
         rts

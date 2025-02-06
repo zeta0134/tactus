@@ -91,7 +91,7 @@ zone_3c_floor_2:
         .byte 0                  ; WarpSpawnPoolMin
         .byte 64                 ; WarpSpawnPoolMax
         .byte 10                 ; WarpPopulationLimit
-        .addr zone_blocking_mazes ; Maze Pool
+        .addr zone_blocking_with_warps_mazes ; Maze Pool
         .addr zone_3c_floor_2_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
         .byte 5   ; Added Tempo
@@ -151,7 +151,7 @@ zone_3c_floor_3:
         .byte 16                 ; WarpSpawnPoolMin
         .byte 96                 ; WarpSpawnPoolMax
         .byte 12                 ; WarpPopulationLimit
-        .addr zone_blocking_mazes ; Maze Pool
+        .addr zone_blocking_with_warps_mazes ; Maze Pool
         .addr zone_3c_floor_3_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
         .byte 10   ; Added Tempo
@@ -211,7 +211,7 @@ zone_3c_floor_4:
         .byte 48                 ; WarpSpawnPoolMin
         .byte 128                ; WarpSpawnPoolMax
         .byte 16                 ; WarpPopulationLimit
-        .addr zone_blocking_mazes ; Maze Pool
+        .addr zone_blocking_with_warps_mazes ; Maze Pool
         .addr zone_3c_floor_4_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
         .byte 15   ; Added Tempo

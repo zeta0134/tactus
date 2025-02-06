@@ -51,12 +51,14 @@
 .globalzp ScreenShakeDecayCounter
 
 ; current default: no transition, instantly pop into the new room
-ROOM_TRANSITION_NONE        = 0
+ROOM_TRANSITION_NONE          = 0
 ; a quick, eased camera slide between adjacent rooms
-ROOM_TRANSITION_SLIDE_RIGHT = 1
-ROOM_TRANSITION_SLIDE_LEFT  = 2
-ROOM_TRANSITION_SLIDE_UP    = 3
-ROOM_TRANSITION_SLIDE_DOWN  = 4
+ROOM_TRANSITION_SLIDE_RIGHT   = 1
+ROOM_TRANSITION_SLIDE_LEFT    = 2
+ROOM_TRANSITION_SLIDE_UP      = 3
+ROOM_TRANSITION_SLIDE_DOWN    = 4
+ROOM_TRANSITION_WARP_ENTRANCE = 5
+ROOM_TRANSITION_WARP_EJECT    = 6
 ; TODO: more!
 
 SPRITE_BANK_PLAYER    = PlayfieldObjBanks+0

@@ -7,6 +7,8 @@
 .global HudStagingPalette
 .global Brightness
 .global TargetBrightness
+.global BrightnessDelay
+.global GlobalFadeSpeed
 
 .global FAR_refresh_palettes_gameloop
 .global FAR_update_brightness
@@ -14,8 +16,6 @@
 .global set_brightness
 .globalzp staging_palette
 .global refresh_palettes_nmi
-
-GLOBAL_PALETTE_FADE_SPEED = 4
 
 .macro INLINE_refresh_palettes_nmi 
     lda #$3F
