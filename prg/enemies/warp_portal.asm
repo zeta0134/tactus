@@ -40,6 +40,8 @@ AttackSquare := R3
         .segment "ENEMY_COLLIDE"
 
 .proc ENEMY_COLLIDE_teleport_to_warp_entrance
+TargetSquare := R13
+
 TargetRow := R14
 TargetCol := R15
         ; if our current and target position is already the same, bail!
@@ -79,6 +81,13 @@ proceed_to_warp:
 
         ; TODO: flag the warp portal so that it vanishes (on suspend) if the player is later ejected!
         ; (since we aren't going to draw+active this tile, maybe we can do that now?)
+        ldx TargetSquare
+        lda tile_data, x
+        sta battlefield, x
+        lda WarpOverlayPattern
+        sta tile_patterns, x
+        lda WarpOverlayAttr
+        sta tile_attributes, x
 
         rts
 .endproc

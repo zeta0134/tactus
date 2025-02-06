@@ -457,17 +457,17 @@ DEFAULT_WARP_TILE = BG_TILE_MAP_TILES_0223
 .proc _choose_warp_wall_tile        
         ldy #0
 loop:
-        lda WarpOverlayPattern+0
+        lda WarpOverlayPattern
         cmp warp_equivalence_tile_lut + 0, y
         bne nope
-        lda WarpOverlayPattern+1
+        lda WarpOverlayAttr
         and #($FF - PAL_MASK)
         cmp warp_equivalence_tile_lut + 1, y
         bne nope
 yup:
         lda warp_equivalence_tile_lut + 2, y
         sta tile_patterns, x
-        lda WarpOverlayPattern+1
+        lda WarpOverlayAttr
         and #PAL_MASK
         ora warp_equivalence_tile_lut + 3, y
         sta tile_attributes, x
@@ -482,7 +482,7 @@ nope:
 no_match:
         lda #<DEFAULT_WARP_TILE
         sta tile_patterns, x
-        lda WarpOverlayPattern+1
+        lda WarpOverlayAttr
         and #PAL_MASK
         ora #>DEFAULT_WARP_TILE
         sta tile_attributes, x
