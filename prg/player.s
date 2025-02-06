@@ -264,7 +264,7 @@ HeartCount := R2
         near_call FAR_add_heart
 
         ; Heal the player to full! (regular hearts start empty)
-        lda #255
+        lda #128
         sta HealingAmount
         near_call FAR_receive_healing
 
@@ -302,7 +302,7 @@ heart_loop:
         bne heart_loop
 
         ; Heal the player to full! (regular hearts start empty)
-        lda #255
+        lda #128
         sta HealingAmount
         near_call FAR_receive_healing
 

@@ -1212,7 +1212,7 @@ done_with_this_room:
 .endproc
 
 .proc heal_all_hp
-        lda #255 ; all of it!
+        lda #128 ; all of it! (but not enough to overflow)
         jmp _heal_player_common
 .endproc
 
