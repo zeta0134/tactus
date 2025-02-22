@@ -11,7 +11,7 @@
 
 .global room_layouts, room_flags, room_floorplan, room_properties, room_bank, room_ptr_high, room_ptr_low
 .global room_raster_effect, room_color_emphasis, room_base_beat_logic, room_spell_beat_logic, room_spell_data0, room_spell_data1
-.global room_palette_variant
+.global room_palette_variant, room_minimap_state
 .global first_beat_after_load, enemies_active
 
 ; layouts
@@ -48,14 +48,18 @@ FLOOR_SIZE = (FLOOR_WIDTH*FLOOR_HEIGHT)
 
 FLOOR_PROPERTIES_HAS_WARP_ZONE = %10000000
 
-ROOM_FLAG_VISITED            = %10000000 ; mostly for minimap purposes
+;ROOM_FLAG_VISITED            = %10000000 ; mostly for minimap purposes
 ROOM_FLAG_TREASURE_SPAWNED   = %01000000 ; so the player can't infinitely farm
 ROOM_FLAG_EXIT_STAIRS        = %00100000 ; shows on the minimap, also tells the game engine when to spawn these
 ROOM_FLAG_BOSS               = %00010000 ; boss rooms have their treasure forced to a key (and, y'know, also spawn tougher enemies)
 ROOM_FLAG_CLEARED            = %00001000 ; once cleared, a room will not respawn enemies when entered again
-ROOM_FLAG_REVEALED           = %00000100 ; more explicitly for minimap purposes
+;ROOM_FLAG_REVEALED           = %00000100 ; more explicitly for minimap purposes
 ROOM_FLAG_DARK               = %00000010 ; activates torchlight radius effect. spookiness is optional
 ROOM_FLAG_WARP_PORTAL        = %00000001 ; this room contains (must generate) a portal to the warp zone
+
+ROOM_MINIMAP_FLAG_VISITED    = %10000000
+ROOM_MINIMAP_FLAG_MAPPED     = %01000000
+ROOM_MINIMAP_FLAG_IDENTIFIED = %00100000
 
 FLOORPLAN_PROPERTIES_NOSPAWN = %10000000 
 

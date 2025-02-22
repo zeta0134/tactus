@@ -48,6 +48,26 @@
    <property name="room_pool" value="ROOM_POOL_BLOCKING_INTERIOR"/>
   </properties>
  </tile>
+ <tile id="11">
+  <properties>
+   <property name="minimap_shape" value="structure"/>
+  </properties>
+ </tile>
+ <tile id="12">
+  <properties>
+   <property name="minimap_shape" value="interior"/>
+  </properties>
+ </tile>
+ <tile id="13">
+  <properties>
+   <property name="minimap_shape" value="exterior"/>
+  </properties>
+ </tile>
+ <tile id="14">
+  <properties>
+   <property name="forbid_monster_spawning" type="bool" value="true"/>
+  </properties>
+ </tile>
  <tile id="15">
   <properties>
    <property name="forbid_player_spawning" type="bool" value="true"/>

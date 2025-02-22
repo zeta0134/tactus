@@ -203,15 +203,23 @@ def tile_exit_flag_bytes(tiles):
     exit_flags = 0
     flags = tile.boolean_properties
     if tile.boolean_properties.get("exit_north", False):
-        exit_flags |= 0b0001 # Never
+        exit_flags |= 0b0000_0001 # Never
     if tile.boolean_properties.get("exit_east", False):
-        exit_flags |= 0b0010 # Eat
+        exit_flags |= 0b0000_0010 # Eat
     if tile.boolean_properties.get("exit_south", False):
-        exit_flags |= 0b0100 # Soggy
+        exit_flags |= 0b0000_0100 # Soggy
     if tile.boolean_properties.get("exit_west", False):
-        exit_flags |= 0b1000 # Waffles
+        exit_flags |= 0b0000_1000 # Waffles
     if tile.boolean_properties.get("forbid_player_spawning", False):
         exit_flags |= 0b1000_0000
+    if tile.boolean_properties.get("forbid_monster_spawning", False):
+        exit_flags |= 0b0100_0000
+    if tile.string_properties.get("minimap_shape") == "exterior":
+        exit_flags |= 0b0000_0000 # yes it's the null case, but I want to be explicit
+    if tile.string_properties.get("minimap_shape") == "interior":
+        exit_flags |= 0b0001_0000
+    if tile.string_properties.get("minimap_shape") == "structure":
+        exit_flags |= 0b0010_0000
     # TODO: if there are other flags, check for those here
     raw_bytes.append(ca65_byte_literal(exit_flags))
   return raw_bytes

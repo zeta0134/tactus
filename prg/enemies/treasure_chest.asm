@@ -190,9 +190,9 @@ find_exit_loop:
         lda room_flags, x
         and #ROOM_FLAG_EXIT_STAIRS
         beq next_room
-        lda room_flags, x
-        ora #ROOM_FLAG_REVEALED
-        sta room_flags, x
+        lda room_minimap_state, x
+        ora #ROOM_MINIMAP_FLAG_IDENTIFIED
+        sta room_minimap_state, x
 next_room:
         inx
         cpx #::FLOOR_SIZE

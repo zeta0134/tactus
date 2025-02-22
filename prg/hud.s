@@ -712,8 +712,8 @@ draw_regular_minimap_here:
 
         ; can we see this room at all? any room that has been either
         ; visited OR revealed should be displayed
-        lda room_flags, x
-        and #(ROOM_FLAG_VISITED | ROOM_FLAG_REVEALED)
+        lda room_minimap_state, x
+        and #(ROOM_MINIMAP_FLAG_VISITED | ROOM_MINIMAP_FLAG_MAPPED | ROOM_MINIMAP_FLAG_IDENTIFIED)
         
         ; DEBUG: all rooms start at least 'revealed' for testing
         jeq room_hidden
@@ -818,8 +818,8 @@ normal_room:
 done_with_interior_offset:
 
         ; If the player hasn't visited this room, we're done
-        lda room_flags, x
-        and #ROOM_FLAG_VISITED
+        lda room_minimap_state, x
+        and #ROOM_MINIMAP_FLAG_VISITED
         beq draw_tile
         ; If the player HAS visited the room, start by moving to the "visited" row
         lda DrawTile

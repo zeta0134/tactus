@@ -45,6 +45,7 @@ room_flags: .res ::FLOOR_SIZE ; what did we spawn in here? what is the current s
 room_floorplan: .res ::FLOOR_SIZE ; properties of this cell in the floor's maze layout
 room_properties: .res ::FLOOR_SIZE ; properties of the selected room that populates this cell
 room_population_order: .res ::FLOOR_SIZE
+room_minimap_state: .res ::FLOOR_SIZE
 
 room_color_emphasis: .res ::FLOOR_SIZE
 room_raster_effect: .res ::FLOOR_SIZE
@@ -1528,12 +1529,13 @@ reject_floor:
         jsr generate_floor_seed
         far_call FAR_reset_shop_tracker
 
-        ; clear out the room flags entirely
+        ; clear out the room flags and other state entirely
         lda #0
         ldx #0
 flag_loop:
         perform_zpcm_inc
         sta room_flags, x
+        sta room_minimap_state, x
         inx
         cpx #::FLOOR_SIZE
         bne flag_loop
@@ -1849,11 +1851,11 @@ done_with_torchlight:
 
         restore_previous_bank
 
-        ; Mark this room as visited
+        ; Mark this room as visited (and mapped and identified, etc)
         ldx PlayerRoomIndex
-        lda room_flags, x
-        ora #ROOM_FLAG_VISITED
-        sta room_flags, x
+        lda room_minimap_state, x
+        ora #(ROOM_MINIMAP_FLAG_VISITED | ROOM_MINIMAP_FLAG_IDENTIFIED | ROOM_MINIMAP_FLAG_MAPPED)
+        sta room_minimap_state, x
         lda #1
         sta HudMapDirty
 

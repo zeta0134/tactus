@@ -640,7 +640,7 @@ compass:
         .byte WEAPON_DAGGER                   ; WeaponShape    (unused)
         .addr no_effect                       ; DamageFunc     (unused)
         .addr no_effect                       ; TorchlightFunc (unused)
-        .addr reveal_special_rooms            ; UseFunc
+        .addr identify_special_rooms          ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr compass_description             ; DescriptionStringPtr
         .byte <.bank(compass_description)      ; DescriptionStringBank
@@ -657,7 +657,7 @@ map:
         .byte WEAPON_DAGGER                   ; WeaponShape    (unused)
         .addr no_effect                       ; DamageFunc     (unused)
         .addr no_effect                       ; TorchlightFunc (unused)
-        .addr reveal_all_rooms                ; UseFunc
+        .addr map_all_rooms                   ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr map_description                 ; DescriptionStringPtr
         .byte <.bank(map_description)          ; DescriptionStringBank
@@ -1133,7 +1133,7 @@ spell_healing:
 .endproc
 
 ; Reveal just "special" chambers! Meant for the compass
-.proc reveal_special_rooms
+.proc identify_special_rooms
         ldx #0
 loop:
         perform_zpcm_inc
@@ -1153,9 +1153,9 @@ loop:
         beq reveal_room
         jmp done_with_this_room
 reveal_room:
-        lda room_flags, x
-        ora #ROOM_FLAG_REVEALED
-        sta room_flags, x
+        lda room_minimap_state, x
+        ora #ROOM_MINIMAP_FLAG_IDENTIFIED
+        sta room_minimap_state, x
 done_with_this_room:
         inx
         cpx #::FLOOR_SIZE
@@ -1173,13 +1173,13 @@ done_with_this_room:
 .endproc
 
 ; Same deal but it's not picky; reveal the *entire* map!
-.proc reveal_all_rooms
+.proc map_all_rooms
         ldx #0
 loop:
         perform_zpcm_inc
-        lda room_flags, x
-        ora #ROOM_FLAG_REVEALED
-        sta room_flags, x
+        lda room_minimap_state, x
+        ora #ROOM_MINIMAP_FLAG_MAPPED
+        sta room_minimap_state, x
 done_with_this_room:
         inx
         cpx #::FLOOR_SIZE
