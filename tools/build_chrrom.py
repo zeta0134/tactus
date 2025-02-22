@@ -25,8 +25,7 @@ from ca65 import ca65_byte_literal, ca65_word_literal
 # other tomfoolery. Not sure yet if they can be animated, I'm working that out.
 
 SPRITE_BANKS_BASE             = 0x000
-SPRITE_REGION_BASE            = 0x030
-RAW_CHR_UI_REGION_BASE        = 0x038
+RAW_CHR_UI_REGION_BASE        = 0x020
 
 BACKGROUND_REGION_BASE        = 0x100
 RAW_CHR_PLAYFIELD_REGION_BASE = 0x138
@@ -527,7 +526,6 @@ with open('build/tile_defs.inc', 'w') as definitions:
   print("; segment definitions", file=definitions)
   print("SPRITE_BANKS_BASE = %s" % (ca65_byte_literal(SPRITE_BANKS_BASE)), file=definitions)
   print("BACKGROUND_REGION_BASE = %s" % (ca65_byte_literal(BACKGROUND_REGION_BASE)), file=definitions)
-  print("SPRITE_REGION_BASE = %s" % (ca65_byte_literal(SPRITE_REGION_BASE)), file=definitions)
   print("RAW_CHR_PLAYFIELD_REGION_BASE = %s" % (ca65_byte_literal(RAW_CHR_PLAYFIELD_REGION_BASE)), file=definitions)
   print("RAW_CHR_UI_REGION_BASE = %s" % (ca65_byte_literal(RAW_CHR_UI_REGION_BASE)), file=definitions)
   print("", file=definitions)
@@ -547,15 +545,6 @@ with open('build/tile_defs.inc', 'w') as definitions:
       metatile_id = j * 4
       tiledef = (bank_id << 8) + metatile_id
       print("SPRITE_%s_%s = %s" % (raw_sprite_banks[i]["folder"], raw_sprite_banks[i]["filenames"][j], ca65_word_literal(tiledef)), file=definitions)
-  print("", file=definitions)
-
-  # Old system which restricts sprite tiles to just 8k of space
-  print("; sprite tiles", file=definitions)
-  for i in range(0, len(sprite_filenames)):
-    metatile_id = (i % 64) * 4
-    bank_id = math.floor(i / 64)
-    tiledef = (bank_id & 0x01) + (metatile_id & 0xFE)
-    print("SPRITE_TILE_%s = %s" % (constant_name(sprite_filenames[i]), ca65_byte_literal(tiledef)), file=definitions)
   print("", file=definitions)
 
   print("; raw_chr playfield banks", file=definitions)
