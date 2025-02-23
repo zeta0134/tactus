@@ -21,6 +21,7 @@
         .include "prng.inc"
         .include "procgen.inc"
         .include "rainbow.inc"
+        .include "saves.inc"
         .include "slowam.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -36,6 +37,7 @@ HudState: .res 2
 HeartDisplayTarget: .res 6
 HeartDisplayCurrent: .res 6
 
+HudBorderDirty: .res 1
 HudMapDirty: .res 1
 CurrentMapIndex: .res 1
 ZonePtrCurrent: .res 2
@@ -92,14 +94,7 @@ chr_tile_offset SPELL_A_ENABLED,    2, 14
 chr_tile_offset SPELL_B_ENABLED,    2, 15
 chr_tile_offset SPELL_DISABLED_BL_CORNER, 1, 14
 
-chr_tile_offset STATIC_0,  4, 7
-chr_tile_offset STATIC_1,  5, 7
-chr_tile_offset STATIC_2,  4, 8
-chr_tile_offset STATIC_3,  5, 8
-chr_tile_offset STATIC_4,  9, 7
-chr_tile_offset STATIC_5, 10, 7
-chr_tile_offset STATIC_6,  9, 8
-chr_tile_offset STATIC_7, 10, 8
+chr_tile_offset WARP_STATIC, 0, 12
 
 TILE_COL_OFFSET = 1
 TILE_ROW_OFFSET = 16
@@ -657,28 +652,94 @@ room_index_to_draw_index_lut:
         .endrepeat
         .endrepeat
 
-warp_static_tiles_lut:
-        .byte STATIC_0
-        .byte STATIC_1
-        .byte STATIC_2
-        .byte STATIC_3
-        .byte STATIC_4
-        .byte STATIC_5
-        .byte STATIC_6
-        .byte STATIC_7
-        .byte BLANK_TILE
-        .byte BLANK_TILE
-        .byte BLANK_TILE
-        .byte BLANK_TILE
-        .byte BLANK_TILE
-        .byte BLANK_TILE
-        .byte BLANK_TILE
-        .byte BLANK_TILE
+room_border_to_draw_index_lut:
+        .repeat ::FLOOR_HEIGHT, h
+        .byte (h*32)+0
+        .byte (h*32)+::FLOOR_WIDTH+1
+        .endrepeat
+
+color_lut_by_setting_index:
+        .byte HUD_TEXT_PAL
+        .byte HUD_YELLOW_PAL
+        .byte HUD_PURPLE_PAL
+        .byte HUD_RED_PAL
+        .byte HUD_TEXT_PAL
+        .byte HUD_YELLOW_PAL
+        .byte HUD_PURPLE_PAL
+        .byte HUD_RED_PAL
+
+minimap_hud_banks_lut:
+        .byte CHR_BANK_MAP_ICONS_EXTERIOR_DARK
+        .byte CHR_BANK_MAP_ICONS_INTERIOR_DARK
+        .byte CHR_BANK_MAP_ICONS_THICK_DARK
+        .byte CHR_BANK_MAP_ICONS_EXTERIOR_LIGHT
+        .byte CHR_BANK_MAP_ICONS_INTERIOR_LIGHT
+        .byte CHR_BANK_MAP_ICONS_THICK_LIGHT
+
+minimap_starting_bank_lut_by_setting_index:
+        .byte 0
+        .byte 0
+        .byte 0
+        .byte 0
+        .byte 3
+        .byte 3
+        .byte 3
+        .byte 3
+
+; the two little side columns, so we don't have ugly black bars
+; for our light themes
+.proc draw_minimap_borders
+DrawIndex := R1
+DrawTile := R2
+DrawAttr := R3
+        ldx PlayerRoomIndex
+        lda room_properties, x
+        and #(ROOM_PROPERTIES_WARP)
+        bne draw_warp_border
+draw_regular_border:
+        ldy current_save + SaveFile::OptionMinimapTheme
+        clc
+        adc minimap_starting_bank_lut_by_setting_index, y
+        tax
+        lda minimap_hud_banks_lut, x
+        ora color_lut_by_setting_index, y
+        sta DrawAttr 
+        
+        lda #0
+        sta DrawTile
+        ldy #0
+loop:
+        ldx room_border_to_draw_index_lut, y
+        draw_tile_at_x MINIMAP_BASE-1, DrawTile, DrawAttr
+        iny
+        cpy #(::FLOOR_HEIGHT * 2)
+        bne loop
+        rts
+draw_warp_border:
+        lda #(CHR_BANK_HUD)
+        ldy current_save + SaveFile::OptionMinimapTheme
+        ora color_lut_by_setting_index, y
+        sta DrawAttr
+        ldy #0
+warp_loop:
+        prng_from_table_x
+        and #$3F
+        clc
+        adc #WARP_STATIC
+        sta DrawTile
+        ldx room_border_to_draw_index_lut, y
+        draw_tile_at_x MINIMAP_BASE-1, DrawTile, DrawAttr
+        iny
+        cpy #(::FLOOR_HEIGHT * 2)
+        bne warp_loop
+        rts
+.endproc
 
 .proc draw_minimap_tile
 RoomIndex := R0
 DrawIndex := R1
 DrawTile := R2
+DrawAttr := R3
 NametableAddr := R12
 AttributeAddr := R14
 
@@ -692,166 +753,122 @@ AttributeAddr := R14
         and #(ROOM_PROPERTIES_WARP)
         beq draw_regular_minimap_here
 draw_warp_static_here:
+        lda #(CHR_BANK_HUD)
+        ldy current_save + SaveFile::OptionMinimapTheme
+        ora color_lut_by_setting_index, y
+        sta DrawAttr
         prng_from_table_y
-        and #$F
-        tay
-        lda warp_static_tiles_lut, y
+        and #$3F
+        clc
+        adc #WARP_STATIC
         sta DrawTile
         ldx DrawIndex
-        draw_tile_at_x MINIMAP_BASE, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x MINIMAP_BASE, DrawTile, DrawAttr
         rts
 
 draw_regular_minimap_here:
-        ; Figure out what tile we should draw here
+        ; First work out the base CHR table we're going to draw from. This is the same no
+        ; matter what logic we use to choose the specific tile
         ldx RoomIndex
-        
-        ; If this is a warp chamber, we should never draw it!
+        lda room_floorplan, x
+        and #FLOORPLAN_MINIMAP_SHAPE_MASK ; 00xx....
+        lsr                               ; 000xx...
+        lsr                               ; 0000xx..
+        lsr                               ; 00000xx.
+        lsr                               ; 000000xx
+        ldy current_save + SaveFile::OptionMinimapTheme
+        clc
+        adc minimap_starting_bank_lut_by_setting_index, y
+        tax
+        lda minimap_hud_banks_lut, x
+        ora color_lut_by_setting_index, y
+        sta DrawAttr
+
+        ; Our starting tile is 0, top-left
+        lda #0
+        sta DrawTile
+        ; If this tile is a warp chamber, we are done! Never draw warp chambers.
+        ldx RoomIndex
         lda room_properties, x
         and #(ROOM_PROPERTIES_WARP)
-        jne room_hidden
-
-        ; can we see this room at all? any room that has been either
-        ; visited OR revealed should be displayed
+        jne draw_tile
+        ; Otherwise work out which tile to draw based on things we currently know.
+        ; If this is a mapped tile, add the exit index to the draw tile:
         lda room_minimap_state, x
-        and #(ROOM_MINIMAP_FLAG_VISITED | ROOM_MINIMAP_FLAG_MAPPED | ROOM_MINIMAP_FLAG_IDENTIFIED)
-        
-        ; DEBUG: all rooms start at least 'revealed' for testing
-        jeq room_hidden
-
-        ; check for special room types, which right now include boss
-        ; rooms and exit doors
+        and #ROOM_MINIMAP_FLAG_MAPPED
+        beq done_considering_exits
+        lda room_floorplan, x
+        and #%00001111
+        clc
+        adc DrawTile
+        sta DrawTile
+done_considering_exits:
+        ; If this is an identified tile, AND it's a special tile type, add the appropriate
+        ; row offset
+        lda room_minimap_state, x
+        and #ROOM_MINIMAP_FLAG_IDENTIFIED
+        beq done_with_special_tiles
         lda room_flags, x
         and #ROOM_FLAG_BOSS
-        bne boss_room
+        bne add_boss_offset
         lda room_flags, x
         and #ROOM_FLAG_EXIT_STAIRS
-        bne door_room
+        bne add_door_offset
         lda room_properties, x
         and #ROOM_CATEGORY_MASK
         cmp #ROOM_CATEGORY_SHOP
-        beq shop_room
-        jmp normal_room
-
-boss_room:
-        ; If the boss has been cleared, draw this like a normal room instead
+        beq add_shop_offset
+        jmp done_with_special_tiles
+add_boss_offset:
+        ; If the boss has been cleared, treat this like a normal room instead
         lda room_flags, x
         and #ROOM_FLAG_CLEARED
-        bne cleared_room
-
-        ; load the appropriate boss tile, based on whether the player is
-        ; currently in this room or not
-        lda PlayerRoomIndex
-        cmp RoomIndex
-        beq current_boss_room
-regular_boss_room:
-        lda #BOSS_ROOM
-        sta DrawTile
-        jmp draw_tile
-current_boss_room:
-        lda #BOSS_ROOM_CURRENT
-        sta DrawTile
-        jmp draw_tile
-
-door_room:
-        ; load the appropriate door tile, based on whether the player is
-        ; currently in this room or not
-        lda PlayerRoomIndex
-        cmp RoomIndex
-        beq current_door_room
-regular_door_room:
-        lda #DOOR_ROOM
-        sta DrawTile
-        jmp draw_tile
-current_door_room:
-        lda #DOOR_ROOM_CURRENT
-        sta DrawTile
-        jmp draw_tile
-
-shop_room:
-        ; load the appropriate shop tile, based on whether the player is
-        ; currently in this room or not
-        lda PlayerRoomIndex
-        cmp RoomIndex
-        beq current_shop_room
-regular_shop_room:
-        lda #SHOP_ROOM
-        sta DrawTile
-        jmp draw_tile
-current_shop_room:
-        lda #SHOP_ROOM_CURRENT
-        sta DrawTile
-        jmp draw_tile
-
-cleared_room:
-        ; Start with an interior room's "revealed" tile
-        lda room_floorplan, x
-        and #%00001111
-        ; if there are 0 exits, treat this as a "hidden" tile instead (we may be out of bounds, or otherwise
-        ; in a special room that we forgot to handle)
-        beq room_hidden
-        sta DrawTile
-        ; this is a cleared room, so use that offset and then merge with the below code
+        bne done_with_special_tiles
+        ; Otherwise, draw the correct spooky skeleton
         lda DrawTile
         clc
-        adc #CLEAREED_ROOM_SET
+        adc #16
         sta DrawTile
-        jmp done_with_interior_offset
-
-normal_room:
-        ; Start with an interior room's "revealed" tile
-        lda room_floorplan, x
-        and #%00001111
-        ; if there are 0 exits, treat this as a "hidden" tile instead (we may be out of bounds, or otherwise
-        ; in a special room that we forgot to handle)
-        beq room_hidden
-        sta DrawTile
-
-        ; if this is an exterior room, move to that map offset (keep the exit configuration)
-        lda room_properties, x
-        and #ROOM_CATEGORY_MASK
-        cmp #ROOM_CATEGORY_EXTERIOR
-        bne done_with_interior_offset
-        clc
+        jmp done_with_special_tiles
+add_door_offset:
         lda DrawTile
-        adc #EXTERIOR_SET
+        clc
+        adc #32
         sta DrawTile
-done_with_interior_offset:
-
-        ; If the player hasn't visited this room, we're done
+        jmp done_with_special_tiles
+add_shop_offset:
+        lda DrawTile
+        clc
+        adc #48
+        sta DrawTile
+        jmp done_with_special_tiles
+done_with_special_tiles:
+        ; If we are currently here, add the "here" offset
+        lda PlayerRoomIndex
+        cmp RoomIndex
+        beq add_here_offset
+        ; If this is merely visited, add the visited previously offset
         lda room_minimap_state, x
         and #ROOM_MINIMAP_FLAG_VISITED
-        beq draw_tile
-        ; If the player HAS visited the room, start by moving to the "visited" row
+        bne add_visited_offset
+        jmp done_with_visitation_offsets
+add_here_offset:
         lda DrawTile
         clc
-        adc #16
+        adc #(8*16)
         sta DrawTile
-        ; finally, if this is our current room, then we need to jump to the "flashing cursor" tile
-        lda PlayerRoomIndex
-        cmp RoomIndex
-        bne draw_tile
+        jmp done_with_visitation_offsets
+add_visited_offset:
         lda DrawTile
         clc
-        adc #16
+        adc #(4*16)
         sta DrawTile
-
-        jmp draw_tile
-
-room_hidden:
-        lda #BLANK_TILE
-        sta DrawTile
-        ; if the player is somehow inside an otherwise "hidden" room, pick a special tile to still
-        ; show their "here" location, floating in an empty void. (we might use this behavior for
-        ; warp zones, but until then, it's mostly useful for debugging out-of-bounds areas)
-        lda PlayerRoomIndex
-        cmp RoomIndex
-        bne draw_tile
-        lda #HERE_ICON_IN_THE_VOID
-        sta DrawTile
-        ; fall through
+        jmp done_with_visitation_offsets
+done_with_visitation_offsets:
+        ; Finally, draw the tile!
 draw_tile:
         ldx DrawIndex
-        draw_tile_at_x MINIMAP_BASE, DrawTile, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x MINIMAP_BASE, DrawTile, DrawAttr
 
         rts
 .endproc
@@ -873,6 +890,7 @@ begin_to_draw:
 proceed_to_draw:
         ; TODO: this does one tile per update, which is a bit slow. we could probably
         ; call this in a loop, tuned for performance
+        jsr draw_minimap_borders
 
 ; yeah just keep going until it's all done. eat the lag, it's fine, this happens
 ; really infrequently!

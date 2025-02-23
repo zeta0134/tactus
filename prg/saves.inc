@@ -28,7 +28,8 @@ TACTUS_SAVE_VERSION_NUMBER = 1
     ; OPTIONS
     OptionDiscoFloor .byte
     OptionRhythmMode .byte
-    OptionsReserved .byte 14 ; pad out to 16 bytes total
+    OptionMinimapTheme .byte
+    OptionsReserved .byte 13 ; pad out to 16 bytes total
     ; FUTURE
     GeneralReserved .byte 24
 .endstruct ; total size should be 128 bytes

@@ -9,6 +9,7 @@
         .include "debug.inc"
         .include "enemies.inc"
         .include "far_call.inc"
+        .include "hud.inc"
         .include "hearts.inc"
         .include "input.inc"
         .include "items.inc"
@@ -621,6 +622,21 @@ correct_slide_up:
 check_pause_state:
         lda PlayerIsPaused
         beq check_direction_release
+
+        ; ... sortof. Check for a SELECT press here and, if found, advance the minimap
+        ; theme. This lets the player tweak this during gameplay if they like.
+        lda #KEY_SELECT
+        bit ButtonsDown
+        beq done_with_pause_inputs
+        inc current_save + SaveFile::OptionMinimapTheme
+        lda current_save + SaveFile::OptionMinimapTheme
+        and #7
+        sta current_save + SaveFile::OptionMinimapTheme
+        lda #1
+        sta HudMapDirty
+        queue_sfx_pulse2 sfx_select_cursor
+
+done_with_pause_inputs:
         rts
 
         ; If any button on the D-Pad is ever released, clear the hold action
