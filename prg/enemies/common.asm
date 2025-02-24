@@ -778,7 +778,7 @@ CurrentTile := R15
         ; spell effects
         inc enemies_active
 
-        lda PlayerEquipmentSpell
+        lda current_save + SaveFile::PlayerEquipmentSpell
         cmp #ITEM_SPELL_FIRE
         beq choose_fire
         cmp #ITEM_SPELL_AIR
@@ -823,7 +823,7 @@ DispatchPtr := R0
 ;Length := R13
 CurrentRow := R14
 CurrentTile := R15
-        lda PlayerEquipmentSpell
+        lda current_save + SaveFile::PlayerEquipmentSpell
         sec
         sbc #FIRST_SPELL_IN_ITEM_LIST
         ; Safety: don't call a spell effect that doesn't exist
@@ -862,7 +862,7 @@ EnemyHealth := R12
 
 CurrentRow := R14
 CurrentTile := R15
-        lda PlayerEquipmentSpell
+        lda current_save + SaveFile::PlayerEquipmentSpell
         sec
         sbc #FIRST_SPELL_IN_ITEM_LIST
         sta SpellIndex

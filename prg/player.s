@@ -52,15 +52,6 @@ WeaponDrawFunc: .res 2
 
 DestinationZonePtr: .res 2
 
-player_equipment_by_index: ; for indexing into this like a list
-        PlayerEquipmentWeapon: .res 1
-        PlayerEquipmentTorch: .res 1
-        PlayerEquipmentArmor: .res 1
-        PlayerEquipmentBoots: .res 1
-        PlayerEquipmentAccessory: .res 1
-        PlayerEquipmentBombs: .res 1
-        PlayerEquipmentSpell: .res 1
-
 PlayerState: .res 1
 PlayerBeatsInThisState: .res 1
 
@@ -234,22 +225,22 @@ HeartCount := R2
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
         lda #ITEM_BROADSWORD_L3
-        sta PlayerEquipmentWeapon
+        sta current_save + SaveFile::PlayerEquipmentWeapon
         lda #ITEM_LARGE_TORCH
-        sta PlayerEquipmentTorch
+        sta current_save + SaveFile::PlayerEquipmentTorch
         lda #ITEM_SHIELD
-        sta PlayerEquipmentArmor
+        sta current_save + SaveFile::PlayerEquipmentArmor
         lda #ITEM_GO_GO_BOOTS
-        sta PlayerEquipmentBoots
+        sta current_save + SaveFile::PlayerEquipmentBoots
         lda #ITEM_CHAIN_LINK
-        sta PlayerEquipmentAccessory
+        sta current_save + SaveFile::PlayerEquipmentAccessory
         lda #ITEM_BOMB_STANDARD
-        sta PlayerEquipmentBombs
+        sta current_save + SaveFile::PlayerEquipmentBombs
         lda #ITEM_SPELL_AIR
-        sta PlayerEquipmentSpell
+        sta current_save + SaveFile::PlayerEquipmentSpell
 
         lda #99
-        sta PlayerBombCount
+        sta current_save + SaveFile::PlayerBombCount
 
         near_call FAR_initialize_hearts_for_game
         
@@ -283,18 +274,18 @@ HeartCount := R2
 .else
         ; The player should start with a standard L1-DAGGER
         lda #PLAYER_NORMAL_WEAPON
-        sta PlayerEquipmentWeapon
+        sta current_save + SaveFile::PlayerEquipmentWeapon
         lda #PLAYER_NORMAL_LIGHT
-        sta PlayerEquipmentTorch
+        sta current_save + SaveFile::PlayerEquipmentTorch
         lda #PLAYER_NORMAL_ARMOR
-        sta PlayerEquipmentArmor
+        sta current_save + SaveFile::PlayerEquipmentArmor
         lda #PLAYER_NORMAL_BOOTS
-        sta PlayerEquipmentBoots
+        sta current_save + SaveFile::PlayerEquipmentBoots
         lda #PLAYER_NORMAL_ACCESSORY
-        sta PlayerEquipmentAccessory
+        sta current_save + SaveFile::PlayerEquipmentAccessory
         lda #ITEM_NONE
-        sta PlayerEquipmentBombs
-        sta PlayerEquipmentSpell
+        sta current_save + SaveFile::PlayerEquipmentBombs
+        sta current_save + SaveFile::PlayerEquipmentSpell
 
         ; 2 regular hearts makes the starting player *quite* squishy.
         ; that's the point!
@@ -303,8 +294,6 @@ HeartCount := R2
         lda #3
         sta HeartCount
 
-        lda #0
-        sta PlayerBombCount
 heart_loop:
         lda #HEART_TYPE_REGULAR
         sta NewHeartType
@@ -320,7 +309,7 @@ heart_loop:
         st16 PlayerGold, 0
 
         lda #0
-        sta PlayerBombCount
+        sta current_save + SaveFile::PlayerBombCount
 .endif
 
         lda #0
@@ -1210,7 +1199,7 @@ check_bomb_in_hand:
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_02_PLAYER_HOLD
         ; If we are now holding a standard bomb and we are on beat 3, PANIC
-        lda PlayerEquipmentBombs
+        lda current_save + SaveFile::PlayerEquipmentBombs
         cmp #ITEM_BOMB_STANDARD
         bne done_panicking
         lda PlayerBeatsInThisState
@@ -1391,7 +1380,7 @@ done_with_held_inputs:
         ; We must actually cast the spell, yes yes!
         ; We do this bit last, so that any spell effects aren't clobbered by
         ; the above default-resolution behavior, etc etc.
-        lda PlayerEquipmentSpell
+        lda current_save + SaveFile::PlayerEquipmentSpell
         sec
         sbc #FIRST_SPELL_IN_ITEM_LIST
         ; Safety: don't call a spell effect that doesn't exist
@@ -1650,7 +1639,7 @@ TargetCol := R15
         ; AND the previous move succeeded,
         ; AND this is their second successful move,
         ; then attempt a move again!
-        lda PlayerEquipmentBoots
+        lda current_save + SaveFile::PlayerEquipmentBoots
         cmp #ITEM_GO_GO_BOOTS
         jne done_with_go_go_boots
 
@@ -1778,7 +1767,7 @@ done_choosing_target:
 .proc load_weapon_ptr
 ItemPtr := R0
         access_data_bank #<.bank(item_table)
-        lda PlayerEquipmentWeapon
+        lda current_save + SaveFile::PlayerEquipmentWeapon
         asl
         tay
         lda item_table+0, y
@@ -2018,7 +2007,7 @@ ChainGraceThreshold := R0
         lda #1
         sta ChainGraceThreshold
         ; If the player has a chain effecting item equipped, increase their chain threshold accordingly
-        lda PlayerEquipmentAccessory
+        lda current_save + SaveFile::PlayerEquipmentAccessory
         cmp #ITEM_CHAIN_LINK
         bne chain_threshold_finalized
         lda #3
@@ -2453,7 +2442,7 @@ not_paused:
         bne check_equipped_spell
         rts
 check_equipped_spell:
-        lda PlayerEquipmentSpell
+        lda current_save + SaveFile::PlayerEquipmentSpell
         cmp #ITEM_NONE
         bne proceed_to_cast
         rts
@@ -2465,7 +2454,7 @@ proceed_to_cast:
 
         ; A few spells need to affect the room, so we'll signal to the kernel that this should happen
         ; on the next beat (the kernel will consume and clear this flag)
-        lda PlayerEquipmentSpell
+        lda current_save + SaveFile::PlayerEquipmentSpell
         cmp #ITEM_SPELL_FIRE
         beq full_room_spell
         cmp #ITEM_SPELL_AIR
@@ -2532,7 +2521,7 @@ done_with_full_room_prep:
         sbc #12 ; start it fairly above the player
         sta sprite_table + MetaSpriteState::PositionY, x
 
-        lda PlayerEquipmentSpell
+        lda current_save + SaveFile::PlayerEquipmentSpell
         sec
         sbc #FIRST_SPELL_IN_ITEM_LIST
         tay

@@ -441,7 +441,7 @@ DispatchPtr := R0
 ;Length := R13
 CurrentRow := R14
 CurrentTile := R15
-        lda PlayerEquipmentSpell
+        lda current_save + SaveFile::PlayerEquipmentSpell
         sec
         sbc #FIRST_SPELL_IN_ITEM_LIST
         ; Safety: don't call a spell effect that doesn't exist

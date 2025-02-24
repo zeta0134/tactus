@@ -2,7 +2,7 @@
 ; break the save file. We'll probably do this fairly often :(
 ; We might want to reserve some bytes ahead of time to be kind
 ; to playtesters once we have some real state to save.
-TACTUS_SAVE_VERSION_NUMBER = 1
+TACTUS_SAVE_VERSION_NUMBER = 2
 
 ; Big giant def containing *everything* that
 ; bears weight in a typical save file.
@@ -32,7 +32,53 @@ TACTUS_SAVE_VERSION_NUMBER = 1
     OptionsReserved .byte 13 ; pad out to 16 bytes total
     ; FUTURE
     GeneralReserved .byte 24
-.endstruct ; total size should be 128 bytes
+    ; CURRENT RUN STATE (that which persists, anyway) (current: 31 bytes)
+    RunFlags                 .byte
+    RunSeed                  .byte 4
+    HeartSlotTypes           .byte 6
+    HeartSlotHp              .byte 6
+    PlayerEquipmentWeapon    .byte
+    PlayerEquipmentTorch     .byte
+    PlayerEquipmentArmor     .byte
+    PlayerEquipmentBoots     .byte
+    PlayerEquipmentAccessory .byte
+    PlayerEquipmentBombs     .byte
+    PlayerEquipmentSpell     .byte
+    PlayerBombCount          .byte
+    PlayerFirstUpgradeSlot   .byte
+    PlayerSecondUpgradeSlot  .byte
+    PlayerGold               .byte 2
+    CurrentZonePtr           .byte 2
+    RunStateReserved         .byte 17 ; bring total up to 48 bytes
+    ; STUFF WE TRACK DURING A RUN, FOR THE END SCREEN MOSTLY (current: 33 bytes)
+    RunTimeFrames            .byte
+    RunTimeSeconds           .byte
+    RunTimeMinutes           .byte
+    RunTimeHours             .byte
+    RunBeatsElapsed          .byte 2
+    ZonesVisited             .byte 5
+    LastDamageSource         .byte 2
+    TimesResurrected         .byte
+    DamageDealt              .byte 2
+    DamageHealed             .byte 2
+    DamageTaken              .byte 2
+    GoldSpent                .byte 2
+    ItemsPurchased           .byte 1
+    ItemsFound               .byte 1
+    EnemiesDefeated          .byte 2
+    WarpsTaken               .byte
+    BombsThrown              .byte
+    SpellsCast               .byte
+    StepsTaken               .byte 2
+    LastDamageDealtWith      .byte ; item / weapon used to deliver the final blow, basically
+    RunTrackerReserved       .byte 47 ; bring the total up to 80 bytes
+.endstruct ; total size should be 256 bytes
+
+; When set: do not roll a new run seed upon entering the big door
+RUN_FLAGS_FIXED_SEED   = %10000000 ; TODO: make an interface to set the seed
+RUN_FLAGS_GLASS_HEARTS = %01000000 ; TODO: make this selectable
+RUN_FLAGS_SINGLE_ZONE  = %00100000 ; TODO: when set, return to the HUD after bosses
+RUN_FLAGS_SUSPENDED    = %00000001 ; TODO: when this save file is selected, restore this run (and clear the flag!)
 
 PLAYER_NAME_FIELD_LENGTH = 16
 PLAYER_NAME_MAX_LENGTH = 15
@@ -49,6 +95,7 @@ FILE_IN_USE = 1
     SaveSlot2 .byte .sizeof(SaveFile)
     SaveSlot3 .byte .sizeof(SaveFile)
     ; BASICS
+    GameSeed .byte 4         ; Must be nonzero!
     GenerationalIndex .dword ; ignored for active, used during save/load
     Nonce .dword             ; might as well; helps to detect save file corruption
     SaveVersion .byte        ; if we change saves in a byte incompatible way, increment this version

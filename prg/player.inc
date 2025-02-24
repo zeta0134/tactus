@@ -10,17 +10,6 @@
 
 .global row_number_to_tile_index_lut
 
-.global player_equipment_by_index
-
-.global PlayerEquipmentWeapon
-.global PlayerEquipmentTorch
-.global PlayerEquipmentArmor
-.global PlayerEquipmentBoots
-.global PlayerEquipmentAccessory
-.global PlayerEquipmentBombs
-.global PlayerEquipmentSpell
-.global PlayerBombCount
-
 .global PlayerRow
 .global PlayerCol
 .global PlayerMaxHealth

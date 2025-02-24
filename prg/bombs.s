@@ -13,6 +13,7 @@
         .include "player.inc"
         .include "prng.inc"
         .include "rainbow.inc"
+        .include "saves.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "word_util.inc"
@@ -58,7 +59,7 @@ LastPartyBombRow: .res 1
 MetaSpriteIndex := R0
 NewBombIndex := R8
         ; If the player has no bombs, fail right away
-        lda PlayerBombCount
+        lda current_save + SaveFile::PlayerBombCount
         bne player_has_bombs
         lda #$FF
         rts
@@ -101,7 +102,7 @@ bomb_sprite_allocation_succeeded:
         ldx NewBombIndex
 
         ; Based on the bomb type, set the initial state
-        lda PlayerEquipmentBombs
+        lda current_save + SaveFile::PlayerEquipmentBombs
         cmp #ITEM_BOMB_STANDARD
         beq standard
         ; TODO: other bomb types here

@@ -1235,7 +1235,7 @@ TileAddr  := R2
         access_data_bank #<.bank(item_table)
 
 check_weapon:
-        lda PlayerEquipmentWeapon
+        lda current_save + SaveFile::PlayerEquipmentWeapon
         cmp WeaponDisplayCurrent
         beq check_torch
         sta WeaponDisplayCurrent
@@ -1245,7 +1245,7 @@ check_weapon:
         perform_zpcm_inc
 
 check_torch:
-        lda PlayerEquipmentTorch
+        lda current_save + SaveFile::PlayerEquipmentTorch
         cmp TorchDisplayCurrent
         beq check_armor
         sta TorchDisplayCurrent
@@ -1255,7 +1255,7 @@ check_torch:
         perform_zpcm_inc
 
 check_armor:
-        lda PlayerEquipmentArmor
+        lda current_save + SaveFile::PlayerEquipmentArmor
         cmp ArmorDisplayCurrent
         beq check_boots
         sta ArmorDisplayCurrent
@@ -1265,7 +1265,7 @@ check_armor:
         perform_zpcm_inc
 
 check_boots:
-        lda PlayerEquipmentBoots
+        lda current_save + SaveFile::PlayerEquipmentBoots
         cmp BootsDisplayCurrent
         beq check_accessory
         sta BootsDisplayCurrent        
@@ -1275,7 +1275,7 @@ check_boots:
         perform_zpcm_inc
 
 check_accessory:
-        lda PlayerEquipmentAccessory
+        lda current_save + SaveFile::PlayerEquipmentAccessory
         cmp AccessoryDisplayCurrent
         beq check_item
         sta AccessoryDisplayCurrent
@@ -1285,7 +1285,7 @@ check_accessory:
         perform_zpcm_inc
 
 check_item:
-        lda PlayerEquipmentBombs
+        lda current_save + SaveFile::PlayerEquipmentBombs
         cmp ItemDisplayCurrent
         beq check_item_count
         sta ItemDisplayCurrent
@@ -1295,7 +1295,7 @@ check_item:
         perform_zpcm_inc
 
 check_item_count:
-        lda PlayerBombCount
+        lda current_save + SaveFile::PlayerBombCount
         cmp ItemCountCurrent
         beq check_spell
         sta ItemCountCurrent
@@ -1303,7 +1303,7 @@ check_item_count:
         perform_zpcm_inc
 
 check_spell:
-        lda PlayerEquipmentSpell
+        lda current_save + SaveFile::PlayerEquipmentSpell
         cmp SpellDisplayCurrent
         jeq done
         sta SpellDisplayCurrent
@@ -1430,7 +1430,7 @@ TenThousandsDigit := T6
 
 SpritePtr := R0
 
-        lda PlayerBombCount
+        lda current_save + SaveFile::PlayerBombCount
         bne draw_counter
         
 clear_counter:

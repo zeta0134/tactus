@@ -26,15 +26,12 @@ current_block: .res .sizeof(SaveBlock)
 
     .segment "LEVEL_RAM_0"
 persisted_block_0: .res .sizeof(SaveBlock)
-persisted_block_3: .res .sizeof(SaveBlock)
 
     .segment "LEVEL_RAM_1"
 persisted_block_1: .res .sizeof(SaveBlock)
-persisted_block_4: .res .sizeof(SaveBlock)
 
     .segment "LEVEL_RAM_2"
 persisted_block_2: .res .sizeof(SaveBlock)
-persisted_block_5: .res .sizeof(SaveBlock)
 
     .segment "PRGFIXED_E000"
 
@@ -104,8 +101,8 @@ FlagsPtr := R0
 
     .segment "CODE_4"
 
-.define SavePersistencePtrs persisted_block_0, persisted_block_1, persisted_block_2, persisted_block_3, persisted_block_4, persisted_block_5
-PERSISTENCE_TABLE_LENGTH = 6
+.define SavePersistencePtrs persisted_block_0, persisted_block_1, persisted_block_2
+PERSISTENCE_TABLE_LENGTH = 3
 
 persistence_table_low: .lobytes SavePersistencePtrs
 persistence_table_high: .hibytes SavePersistencePtrs
@@ -113,9 +110,6 @@ persistence_table_banks: ; .bankbytes SavePersistencePtrs well no, we can't do t
     .byte <.bank(persisted_block_0)
     .byte <.bank(persisted_block_1)
     .byte <.bank(persisted_block_2)
-    .byte <.bank(persisted_block_3)
-    .byte <.bank(persisted_block_4)
-    .byte <.bank(persisted_block_5)
 
 ; An extremely simple checksum: just sum all of the
 ; bytes in this memory area and return the 16bit result.

@@ -13,6 +13,7 @@
         .include "procgen.inc"
         .include "player.inc"
         .include "rainbow.inc"
+        .include "saves.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "torchlight.inc"
@@ -1566,12 +1567,16 @@ ItemPtr := R2
         jmp (ItemFuncPtr)
 .endproc
 
+
 ; TODO: maybe rework this to accept an item ID, to make it more generic?
 .proc FAR_pickup_item
 InputNewItem := R0
 OutputOldItem := R0
 ItemPtr := R16
 NewItem := R18
+
+player_equipment_by_index := current_save + SaveFile::PlayerEquipmentWeapon
+
         perform_zpcm_inc
         access_data_bank #<.bank(item_table)
 
@@ -1673,19 +1678,19 @@ DmgTotal := R0
         lda #0
         sta DmgTotal
 
-        lda PlayerEquipmentWeapon
+        lda current_save + SaveFile::PlayerEquipmentWeapon
         jsr item_damage_common
         perform_zpcm_inc
-        lda PlayerEquipmentTorch
+        lda current_save + SaveFile::PlayerEquipmentTorch
         jsr item_damage_common
         perform_zpcm_inc
-        lda PlayerEquipmentArmor
+        lda current_save + SaveFile::PlayerEquipmentArmor
         jsr item_damage_common
         perform_zpcm_inc
-        lda PlayerEquipmentBoots
+        lda current_save + SaveFile::PlayerEquipmentBoots
         jsr item_damage_common
         perform_zpcm_inc
-        lda PlayerEquipmentAccessory
+        lda current_save + SaveFile::PlayerEquipmentAccessory
         jsr item_damage_common
         perform_zpcm_inc
 
@@ -1728,19 +1733,19 @@ TorchlightTotal := R0
         lda #0
         sta TorchlightTotal
 
-        lda PlayerEquipmentWeapon
+        lda current_save + SaveFile::PlayerEquipmentWeapon
         jsr item_torchlight_common
         perform_zpcm_inc
-        lda PlayerEquipmentTorch
+        lda current_save + SaveFile::PlayerEquipmentTorch
         jsr item_torchlight_common
         perform_zpcm_inc
-        lda PlayerEquipmentArmor
+        lda current_save + SaveFile::PlayerEquipmentArmor
         jsr item_torchlight_common
         perform_zpcm_inc
-        lda PlayerEquipmentBoots
+        lda current_save + SaveFile::PlayerEquipmentBoots
         jsr item_torchlight_common
         perform_zpcm_inc
-        lda PlayerEquipmentAccessory
+        lda current_save + SaveFile::PlayerEquipmentAccessory
         jsr item_torchlight_common
         perform_zpcm_inc
 
@@ -1800,19 +1805,19 @@ DmgReductionTotal := R0
         lda #0
         sta DmgReductionTotal
 
-        lda PlayerEquipmentWeapon
+        lda current_save + SaveFile::PlayerEquipmentWeapon
         jsr item_damage_reduction_common
         perform_zpcm_inc
-        lda PlayerEquipmentTorch
+        lda current_save + SaveFile::PlayerEquipmentTorch
         jsr item_damage_reduction_common
         perform_zpcm_inc
-        lda PlayerEquipmentArmor
+        lda current_save + SaveFile::PlayerEquipmentArmor
         jsr item_damage_reduction_common
         perform_zpcm_inc
-        lda PlayerEquipmentBoots
+        lda current_save + SaveFile::PlayerEquipmentBoots
         jsr item_damage_reduction_common
         perform_zpcm_inc
-        lda PlayerEquipmentAccessory
+        lda current_save + SaveFile::PlayerEquipmentAccessory
         jsr item_damage_reduction_common
         perform_zpcm_inc
 
@@ -1858,18 +1863,18 @@ done_with_display:
 .endproc
 
 .proc award_1_standard_bomb
-        lda PlayerEquipmentBombs
+        lda current_save + SaveFile::PlayerEquipmentBombs
         cmp #ITEM_BOMB_STANDARD
         beq not_newly_acquired
 
         lda #0
-        sta PlayerBombCount
+        sta current_save + SaveFile::PlayerBombCount
         lda #ITEM_BOMB_STANDARD
-        sta PlayerEquipmentBombs
+        sta current_save + SaveFile::PlayerEquipmentBombs
         near_call FAR_display_item_description
 
 not_newly_acquired:
-        lda PlayerBombCount
+        lda current_save + SaveFile::PlayerBombCount
         clc
         adc #1 ; The only byte in this whole function that is different
         cmp #99
@@ -1877,24 +1882,24 @@ not_newly_acquired:
 max_exceeded:
         lda #99
 max_not_exceeded:
-        sta PlayerBombCount
+        sta current_save + SaveFile::PlayerBombCount
         lda #0 ; return success
         rts
 .endproc
 
 .proc award_3_standard_bombs
-        lda PlayerEquipmentBombs
+        lda current_save + SaveFile::PlayerEquipmentBombs
         cmp #ITEM_BOMB_STANDARD
         beq not_newly_acquired
 
         lda #0
-        sta PlayerBombCount
+        sta current_save + SaveFile::PlayerBombCount
         lda #ITEM_BOMB_STANDARD
-        sta PlayerEquipmentBombs
+        sta current_save + SaveFile::PlayerEquipmentBombs
         near_call FAR_display_item_description
 
 not_newly_acquired:
-        lda PlayerBombCount
+        lda current_save + SaveFile::PlayerBombCount
         clc
         adc #3 ; The only byte in this whole function that is different
         cmp #99
@@ -1902,7 +1907,7 @@ not_newly_acquired:
 max_exceeded:
         lda #99
 max_not_exceeded:
-        sta PlayerBombCount
+        sta current_save + SaveFile::PlayerBombCount
         lda #0 ; return success
         rts
 .endproc

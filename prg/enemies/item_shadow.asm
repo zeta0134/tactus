@@ -100,7 +100,7 @@ CurrentTile := R15
 
         ; If the player is carrying an Aloha T-Shirt, penalize them by **doubling** the list
         ; price for all items
-        lda PlayerEquipmentArmor
+        lda current_save + SaveFile::PlayerEquipmentArmor
         cmp #ITEM_ALOHA_TSHIRT_1
         beq doubled_price
         cmp #ITEM_ALOHA_TSHIRT_2
@@ -247,7 +247,7 @@ try_item_collection:
 
         ; If the player is carrying an Aloha T-Shirt, penalize them by **doubling** the list
         ; price for all items
-        lda PlayerEquipmentArmor
+        lda current_save + SaveFile::PlayerEquipmentArmor
         cmp #ITEM_ALOHA_TSHIRT_1
         beq doubled_price
         cmp #ITEM_ALOHA_TSHIRT_2

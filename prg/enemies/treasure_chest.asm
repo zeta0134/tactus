@@ -90,17 +90,17 @@ ItemId := R18
         ; Sanity check: is the player currently carrying equipment matching this loot?
         ; If so, revert to a gold sack instead
         lda ItemId
-        cmp PlayerEquipmentWeapon
+        cmp current_save + SaveFile::PlayerEquipmentWeapon
         beq reject_item
-        cmp PlayerEquipmentTorch
+        cmp current_save + SaveFile::PlayerEquipmentTorch
         beq reject_item
-        cmp PlayerEquipmentArmor
+        cmp current_save + SaveFile::PlayerEquipmentArmor
         beq reject_item
-        cmp PlayerEquipmentBoots
+        cmp current_save + SaveFile::PlayerEquipmentBoots
         beq reject_item
-        cmp PlayerEquipmentAccessory
+        cmp current_save + SaveFile::PlayerEquipmentAccessory
         beq reject_item
-        cmp PlayerEquipmentSpell
+        cmp current_save + SaveFile::PlayerEquipmentSpell
         beq reject_item
 accept_item:
         ldx AttackSquare
