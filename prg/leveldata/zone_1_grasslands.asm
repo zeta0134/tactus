@@ -6,6 +6,8 @@
 ;   ##    ##  ##    ##  ##     ## ##    ## ##    ## ##       ##     ## ##   ### ##     ## ##    ## 
 ;    ######   ##     ## ##     ##  ######   ######  ######## ##     ## ##    ## ########   ######  
 
+zone_1_name_str: .asciiz "Grasslands"
+
 zone_grasslands_banner_1_1:
         hud_banner_sprite SPRITE_BANNERS_00_GRASSLANDS_1_1, SPRITE_BANNERS_00_GRASSLANDS_LOWER
         ; 8x16 sprite attributes
@@ -121,6 +123,10 @@ zone_grasslands_floor_1:
         .byte 3                         ;ExteriorStructureSmallMaxMax
         .addr cave_warp_structure_set   ;InteriorStructureWarpSet
         .addr grassy_warp_structure_set ;ExteriorStructureWarpSet
+        .word zone_1_name_str             ; NameStr
+        .word zone_sequence_str_1_1       ; SequenceStr
+        rng_index_for_zone 1, 1           ; RngIndex
+        .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
 
 
 zone_grasslands_floor_2:
@@ -158,6 +164,10 @@ zone_grasslands_floor_2:
         .byte 3                        ;ExteriorStructureSmallMaxMax
         .addr cave_warp_structure_set   ;InteriorStructureWarpSet
         .addr grassy_warp_structure_set ;ExteriorStructureWarpSet
+        .word zone_1_name_str             ; NameStr
+        .word zone_sequence_str_1_2       ; SequenceStr
+        rng_index_for_zone 1, 2           ; RngIndex
+        .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
 
 zone_grasslands_floor_3:
         .addr spawn_pool_generic   ; Interior Spawn Pool
@@ -194,6 +204,10 @@ zone_grasslands_floor_3:
         .byte 3                        ;ExteriorStructureSmallMaxMax
         .addr cave_warp_structure_set   ;InteriorStructureWarpSet
         .addr grassy_warp_structure_set ;ExteriorStructureWarpSet
+        .word zone_1_name_str             ; NameStr
+        .word zone_sequence_str_1_3       ; SequenceStr
+        rng_index_for_zone 1, 3           ; RngIndex
+        .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
 
 zone_grasslands_floor_4:
         .addr spawn_pool_generic   ; Interior Spawn Pool
@@ -230,6 +244,10 @@ zone_grasslands_floor_4:
         .byte 3                        ;ExteriorStructureSmallMaxMax
         .addr cave_warp_structure_set   ;InteriorStructureWarpSet
         .addr grassy_warp_structure_set ;ExteriorStructureWarpSet
+        .word zone_1_name_str             ; NameStr
+        .word zone_sequence_str_1_4       ; SequenceStr
+        rng_index_for_zone 1, 4           ; RngIndex
+        .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
 
 zone_grasslands_floor_boss:
         .addr spawn_pool_generic   ; Interior Spawn Pool
@@ -266,6 +284,10 @@ zone_grasslands_floor_boss:
         .byte 0                   ;ExteriorStructureSmallMaxMax
         .addr cave_warp_structure_set   ;InteriorStructureWarpSet (unused)
         .addr grassy_warp_structure_set ;ExteriorStructureWarpSet
+        .word zone_1_name_str             ; NameStr
+        .word zone_sequence_str_1_B       ; SequenceStr
+        rng_index_for_zone 1, 5           ; RngIndex
+        .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
 
 zone_grasslands_floor_1_exits:
         .byte 5 ; length

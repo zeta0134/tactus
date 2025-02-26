@@ -6,6 +6,8 @@
 ;  ##     ## ##       ##     ## ##    ## ##     ## 
 ;  ########  ######## ##     ##  ######  ##     ## 
 
+zone_2a_name_str: .asciiz "Beach"
+
 zone_2a_banner_1:
         hud_banner_sprite SPRITE_BANNERS_01_BEACH_2_1, SPRITE_BANNERS_01_BEACH_LOWER
         ; 8x16 sprite attributes
@@ -57,6 +59,10 @@ zone_2a_floor_1:
         .byte 0                   ;ExteriorStructureSmallMaxMax
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
+        .word zone_2a_name_str            ; NameStr
+        .word zone_sequence_str_2_1       ; SequenceStr
+        rng_index_for_zone 2, 1           ; RngIndex
+        .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
 
 zone_2a_floor_1_exits:
         .byte 5 ; length
@@ -117,6 +123,10 @@ zone_2a_floor_2:
         .byte 0                   ;ExteriorStructureSmallMaxMax
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
+        .word zone_2a_name_str            ; NameStr
+        .word zone_sequence_str_2_2       ; SequenceStr
+        rng_index_for_zone 2, 2           ; RngIndex
+        .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
 
 zone_2a_floor_2_exits:
         .byte 2 ; length
@@ -177,6 +187,10 @@ zone_2a_floor_3:
         .byte 0                   ;ExteriorStructureSmallMaxMax
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
+        .word zone_2a_name_str            ; NameStr
+        .word zone_sequence_str_2_3       ; SequenceStr
+        rng_index_for_zone 1, 3           ; RngIndex
+        .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
 
 zone_2a_floor_3_exits:
         .byte 5 ; length
@@ -237,6 +251,10 @@ zone_2a_floor_4:
         .byte 0                   ;ExteriorStructureSmallMaxMax
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
+        .word zone_2a_name_str            ; NameStr
+        .word zone_sequence_str_2_4       ; SequenceStr
+        rng_index_for_zone 2, 4           ; RngIndex
+        .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
 
 zone_2a_floor_4_exits:
         .byte 5 ; length
@@ -297,6 +315,10 @@ zone_2a_floor_boss:
         .byte 0                   ;ExteriorStructureSmallMaxMax
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
+        .word zone_2a_name_str            ; NameStr
+        .word zone_sequence_str_2_B       ; SequenceStr
+        rng_index_for_zone 2, 5           ; RngIndex
+        .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
 
 zone_2a_floor_boss_exits:
         .byte 3 ; length

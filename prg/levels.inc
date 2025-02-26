@@ -172,7 +172,18 @@
         InteriorStructureWarpSet .word
         ExteriorStructureWarpSet .word
 
+        NameStr .word        ; "Grasslands"
+        SequenceStr .word    ; "1-1"
+        RngIndex .byte       ; so zones use different-ish seeds
+        OnLoadBehavior .byte ; some zones need special setup logic, mostly the HUB        
 .endstruct
+
+ZONE_ONLOAD_NONE = 0
+ZONE_ONLOAD_HUB  = 1
+
+.macro rng_index_for_zone zone_id, floor_id
+        .byte (5*zone_id)+floor_id
+.endmacro
 
 .global all_zones_data_page
 

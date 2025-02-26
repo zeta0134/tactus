@@ -19,6 +19,7 @@
         .include "prng.inc"
         .include "procgen.inc"
         .include "rainbow.inc"
+        .include "saves.inc"
         .include "slowam.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -92,6 +93,36 @@
         .include "../build/floors/blocking_04_warp.incs"
 
         .segment "LEVEL_DATA_ZONE_DEFS"
+
+zone_sequence_str_1_1: .asciiz "1-1"
+zone_sequence_str_1_2: .asciiz "1-2"
+zone_sequence_str_1_3: .asciiz "1-3"
+zone_sequence_str_1_4: .asciiz "1-4"
+zone_sequence_str_1_B: .asciiz "1-B"
+
+zone_sequence_str_2_1: .asciiz "2-1"
+zone_sequence_str_2_2: .asciiz "2-2"
+zone_sequence_str_2_3: .asciiz "2-3"
+zone_sequence_str_2_4: .asciiz "2-4"
+zone_sequence_str_2_B: .asciiz "2-B"
+
+zone_sequence_str_3_1: .asciiz "3-1"
+zone_sequence_str_3_2: .asciiz "3-2"
+zone_sequence_str_3_3: .asciiz "3-3"
+zone_sequence_str_3_4: .asciiz "3-4"
+zone_sequence_str_3_B: .asciiz "3-B"
+
+zone_sequence_str_4_1: .asciiz "4-1"
+zone_sequence_str_4_2: .asciiz "4-2"
+zone_sequence_str_4_3: .asciiz "4-3"
+zone_sequence_str_4_4: .asciiz "4-4"
+zone_sequence_str_4_B: .asciiz "4-B"
+
+zone_sequence_str_5_1: .asciiz "5-1"
+zone_sequence_str_5_F: .asciiz "5-F"
+
+zone_name_str_debug: .asciiz "Debug"
+zone_sequence_str_debug: .asciiz "DBG"
 
 hud_base_pal:
         .incbin "../art/hud_base.pal"
@@ -187,20 +218,24 @@ zone_grasslands_floor_2_but_fast:
         .byte 80   ; Added Tempo
         .word zone_grasslands_banner_1_1 ; HudBanner
         .addr hud_grasslands_pal
-        .addr rare_treasure_table       ; ShopLootPtr0
-        .addr rare_treasure_table       ; ShopLootPtr1
-        .addr common_treasure_table     ; ShopLootPtr2
-        .addr consumable_treasure_table ; ShopLootPtr3
-        .addr test_structure_set_big   ;InteriorStructureLargeSet
-        .byte 1                        ;InteriorStructureLargeMaxMax
-        .addr test_structure_set_small ;InteriorStructureSmallSet
-        .byte 1                        ;InteriorStructureSmallMaxMax
-        .addr test_structure_set_big   ;ExteriorStructureLargeSet
-        .byte 1                        ;ExteriorStructureLargeMaxMax
-        .addr test_structure_set_small ;ExteriorStructureSmallSet
-        .byte 3                        ;ExteriorStructureSmallMaxMax
-        .addr blocking_warp_structure_set ;InteriorStructureWarpSet (unused)
-        .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
+        .addr rare_treasure_table         ; ShopLootPtr0
+        .addr rare_treasure_table         ; ShopLootPtr1
+        .addr common_treasure_table       ; ShopLootPtr2
+        .addr consumable_treasure_table   ; ShopLootPtr3
+        .addr test_structure_set_big      ; InteriorStructureLargeSet
+        .byte 1                           ; InteriorStructureLargeMaxMax
+        .addr test_structure_set_small    ; InteriorStructureSmallSet
+        .byte 1                           ; InteriorStructureSmallMaxMax
+        .addr test_structure_set_big      ; ExteriorStructureLargeSet
+        .byte 1                           ; ExteriorStructureLargeMaxMax
+        .addr test_structure_set_small    ; ExteriorStructureSmallSet
+        .byte 3                           ; ExteriorStructureSmallMaxMax
+        .addr blocking_warp_structure_set ; InteriorStructureWarpSet (unused)
+        .addr blocking_warp_structure_set ; ExteriorStructureWarpSet
+        .word zone_name_str_debug         ; NameStr
+        .word zone_sequence_str_debug     ; SequenceStr
+        rng_index_for_zone 1, 1           ; RngIndex
+        .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
 
 ; After debugging one zone, return to the hub world
 ; (note: later to the debug world?)
@@ -717,5 +752,32 @@ exit_in_bounds:
 
         restore_previous_bank
         perform_zpcm_inc
+        rts
+.endproc
+
+.proc FAR_setup_prng_seeds_from_current_save_and_current_zone
+RngIndex := R0
+        ; First, initialize the floor RNG from the run seed in
+        ; the current save. this is always our starting point
+        .repeat 4, i
+        lda current_save + SaveFile::RunSeed + i
+        sta floor_seed + i
+        .endrepeat
+        ; We shouldn't use the *same* seed for every floor, as
+        ; several floors share maze pools and would otherwise end
+        ; up with eerily similar generation. So each floor has an
+        ; index, and we use this to run the RNG a few times to skip
+        ; ahead some amount of its sequence
+        ldy #ZoneDefinition::RngIndex
+        lda (PlayerZonePtr), y
+        sta RngIndex
+        ; Now simply clock the floor seed that many times
+rng_setup_loop:
+        jsr next_floor_rand ; and throw it away
+        dec RngIndex
+        bne rng_setup_loop
+        ; et voila: a floor seed for *this* floor, based on the
+        ; run seed, which will be consistent every time regargless
+        ; of what other floors the player visits.
         rts
 .endproc

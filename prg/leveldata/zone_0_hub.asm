@@ -6,6 +6,9 @@
 ;  ##     ## ##     ## ##     ## 
 ;  ##     ##  #######  ########  
 
+zone_hub_name_str: .asciiz "Home"
+zone_hub_sequence_str: .asciiz "HUB"
+
 zone_hub_banner:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_BANNERS_00_HUD_LOWER
         ; 8x16 sprite attributes
@@ -57,6 +60,10 @@ zone_hub_world:
         .byte 0                   ;ExteriorStructureSmallMaxMax
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
+        .word zone_hub_name_str           ; NameStr
+        .word zone_hub_sequence_str       ; SequenceStr
+        rng_index_for_zone 1, 1           ; RngIndex
+        .byte ZONE_ONLOAD_HUB             ; OnLoadBehavior
 
 ; TODO: for the real hub there is very little point in going
 ; to any floor other than 1, but as we only have the one zone,
