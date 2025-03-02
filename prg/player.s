@@ -78,7 +78,6 @@ PlayerMovementBlocked: .res 1
 PlayerTorchlightRadius: .res 1
 
 PlayerKeys: .res 1
-PlayerGold: .res 2
 
 PlayerRoomIndex: .res 1
 
@@ -270,7 +269,7 @@ HeartCount := R2
         sta HealingAmount
         near_call FAR_receive_healing
 
-        st16 PlayerGold, 500
+        st16 current_save + SaveFile::PlayerGold, 500
 .else
         ; The player should start with a standard L1-DAGGER
         lda #PLAYER_NORMAL_WEAPON
@@ -306,7 +305,7 @@ heart_loop:
         sta HealingAmount
         near_call FAR_receive_healing
 
-        st16 PlayerGold, 0
+        st16 current_save + SaveFile::PlayerGold, 0
 
         lda #0
         sta current_save + SaveFile::PlayerBombCount

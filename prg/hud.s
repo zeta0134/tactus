@@ -156,7 +156,7 @@ weapon_palette_table:
 
         jsr clear_hud_canvas
         jsr draw_static_hud_elements
-        mov16 DisplayedGold, PlayerGold
+        mov16 DisplayedGold, current_save + SaveFile::PlayerGold
         jsr draw_coin_counter
 
         jsr init_dialog
@@ -964,7 +964,7 @@ ThousandsDigit := R5
 TenThousandsDigit := R6
         ; always perform the visual update, so we increase/decrease the counter
         ; at 1 gold / frame
-        cmp16 PlayerGold, DisplayedGold
+        cmp16 current_save + SaveFile::PlayerGold, DisplayedGold
         beq done
         bcc decrease_needed
 increase_needed:

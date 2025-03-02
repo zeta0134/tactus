@@ -15,6 +15,7 @@
         .include "player.inc"
         .include "ppu.inc"
         .include "rainbow.inc"
+        .include "saves.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "static_screens.inc"
@@ -303,10 +304,10 @@ converge:
 
         ; Gold Counter
         set_ppuaddr #($2000 + $0216)
-        mov16 NumberWord, PlayerGold
+        mov16 NumberWord, current_save + SaveFile::PlayerGold
         jsr draw_16bit_number_imm
         set_ppuaddr #($2400 + $0216)
-        mov16 NumberWord, PlayerGold
+        mov16 NumberWord, current_save + SaveFile::PlayerGold
         jsr draw_16bit_number_imm
 
         ; Step Counter

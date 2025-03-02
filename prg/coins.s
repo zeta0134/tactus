@@ -6,6 +6,7 @@
     .include "coins.inc"
     .include "kernel.inc"
     .include "player.inc"
+    .include "saves.inc"
     .include "sprites.inc"
     .include "slowam.inc"
     .include "word_util.inc"
@@ -585,8 +586,8 @@ CoinIndex := R15
     bcc done
 
     ; collect our value into the player's purse
-    add16b PlayerGold, {coin_value, x}
-    clamp16 PlayerGold, #MAX_GOLD
+    add16b current_save + SaveFile::PlayerGold, {coin_value, x}
+    clamp16 current_save + SaveFile::PlayerGold, #MAX_GOLD
 
     ; set ourselves to inactive; we're done!
     lda #COIN_STATE_INACTIVE

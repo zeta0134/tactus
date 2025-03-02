@@ -1361,8 +1361,8 @@ upgrade_to_temporary_armored:
 .endproc
 
 .proc give_100_gold
-        add16w PlayerGold, #100
-        clamp16 PlayerGold, #MAX_GOLD
+        add16w current_save + SaveFile::PlayerGold, #100
+        clamp16 current_save + SaveFile::PlayerGold, #MAX_GOLD
 
         lda #0
         rts

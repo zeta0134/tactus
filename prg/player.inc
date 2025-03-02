@@ -16,7 +16,6 @@
 .global PlayerHealth
 .global PlayerRoomIndex
 .global PlayerKeys
-.global PlayerGold
 .global PlayerSpriteIndex
 .global PlayerNextDirection
 .global PlayerHeldDirection

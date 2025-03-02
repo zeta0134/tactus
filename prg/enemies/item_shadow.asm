@@ -115,7 +115,7 @@ normal_price:
 
         ; if the player can afford this item, draw it in white. otherwise, draw it in red
 
-        cmp16 PlayerGold, ItemCost
+        cmp16 current_save + SaveFile::PlayerGold, ItemCost
         jcc thats_too_expensive ; Can't afford it. Sorry!
 
 sell_it_to_meeeeeee:
@@ -266,7 +266,7 @@ normal_price:
         and #ITEM_FOR_PURCHASE
         beq player_can_afford_item        
 
-        cmp16 PlayerGold, ItemCost
+        cmp16 current_save + SaveFile::PlayerGold, ItemCost
         jcc deny_collection ; Can't afford it. Sorry!
 
 player_can_afford_item:
@@ -288,12 +288,12 @@ player_can_afford_item:
 item_is_for_sale:
         ; "We take Visa."
         sec
-        lda PlayerGold+0
+        lda current_save + SaveFile::PlayerGold+0
         sbc ItemCost+0
-        sta PlayerGold+0
-        lda PlayerGold+1
+        sta current_save + SaveFile::PlayerGold+0
+        lda current_save + SaveFile::PlayerGold+1
         sbc ItemCost+1
-        sta PlayerGold+1
+        sta current_save + SaveFile::PlayerGold+1
 
         ; It turns out that the detail is clobbered during level gen, since this square was not
         ; originally a disco tile. Zero it out here so that the newly drawn disco tile doesn't
