@@ -487,22 +487,15 @@ LayoutPtr := R0
 
 .if ::DEBUG_FORCE_SEED
         lda #.lobyte(.loword(DEBUG_SEED))
-        sta initial_run_seed+3
-        sta run_seed+3
+        sta current_save + SaveFile::RunSeed + 3
         lda #.hibyte(.loword(DEBUG_SEED))
-        sta initial_run_seed+2
-        sta run_seed+2
+        sta current_save + SaveFile::RunSeed + 2
         lda #.lobyte(.hiword(DEBUG_SEED))
-        sta initial_run_seed+1
-        sta run_seed+1
+        sta current_save + SaveFile::RunSeed + 1
         lda #.hibyte(.hiword(DEBUG_SEED))
-        sta initial_run_seed+0
-        sta run_seed+0
+        sta current_save + SaveFile::RunSeed + 0
 .else
-        .repeat 4, i
-        lda run_seed+i
-        sta initial_run_seed+i
-        .endrepeat
+        jsr generate_run_seed_for_save
 .endif
 
 

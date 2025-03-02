@@ -1,5 +1,3 @@
-.global heart_hp
-.global heart_type
 
 ; Resets all heart slots to NONE with 0 HP. Warning: the player
 ; will immediately be considered dead! Generally call this just

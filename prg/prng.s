@@ -1,41 +1,73 @@
         .setcpu "6502"
+        .include "saves.inc"
         .include "prng.inc"
         .include "player.inc"
         .include "zpcm.inc"
 
 	.zeropage
+; Fast LQ seed for realtime decision making
 gameplay_seed: .res 2 ; seed can be 2-4 bytes
 
-run_seed: .res 4
+; Slower HQ seeds for level generation
 floor_seed: .res 4
 room_seed: .res 4
 
 	.segment "RNGRAM"
+; Cached LQ source, for very quick decision making in otherwise
+; expensive routines. Mostly used for pathfinding to keep costs down.
 prng_table: .res 256
 
 	.segment "RAM"
-
-; For preserving this to display at various points. Once the run gets going,
-; the real run seed is of course advanced repeatedly. For debugging purposes,
-; it can be handy to know this seed to reproduce glitch setups.
-initial_run_seed: .res 4
 prng_generation_index: .res 1
 prng_entity_start_index: .res 1
 
         .segment "PRGFIXED_E000"
 
+; Quick implementation notes for future zeta:
+; GameSeed is stored in the save block and shared between all files, just so it
+; persists. This is our "boot time entropy" which is basically clocked continuously
+; as long as the battery doesn't run dry. We should try to clock this on UI screens
+; when we otherwise have nothing to do.
+
+; RunSeed is stored with the currently loaded file, and usually generated from the
+; GameSeed, though it may be fixed in place by a player-facing feature. This is set
+; at the start of a run and remains the same throughout that run. We used this to
+; initialize all level generation tasks.
+
+; floor_seed is generated based on the RunSeed, and clocked some initial number of
+; times based on the level's sequence index, which gives each floor its own unique
+; starting point in the LFSR sequence. The hope is that this is sufficient to keep
+; generation feeling fresh without being a tremendous performance burden.
+
+; room_seed is generated based on the floor_seed after the floor layout is finalized.
+; In effect, all 24 rooms will have a known starting seed, but may clock their personal
+; seed a variable number of times based on generation choices, like shop items or
+; structures that need to re-roll. This ensures that deterministic rooms stay deterministic,
+; even if a few rooms need to fudge their generation in response to what the player is
+; carrying or some other condition.
+
 ; this just performs some quick sanity checks at game start
 ; call this at startup, and again each time the run seed or gameplay
 ; seed are modified (by, say, loading them from the save file)
 .proc initialize_prng
-	lda run_seed+0
-	ora run_seed+1
-	ora run_seed+2
-	ora run_seed+3
+	lda current_save + SaveFile::RunSeed + 0
+	ora current_save + SaveFile::RunSeed + 1
+	ora current_save + SaveFile::RunSeed + 2
+	ora current_save + SaveFile::RunSeed + 3
 	bne run_seed_valid
 	lda #$FF
-	sta run_seed+0
+	sta current_save + SaveFile::RunSeed + 0
 run_seed_valid:
+	
+	lda current_block + SaveBlock::GameSeed + 0
+	ora current_block + SaveBlock::GameSeed + 1
+	ora current_block + SaveBlock::GameSeed + 2
+	ora current_block + SaveBlock::GameSeed + 3
+	bne game_seed_valid
+	lda #$FF
+	sta current_block + SaveBlock::GameSeed + 0
+game_seed_valid:
+
 	lda #$FF
 	sta gameplay_seed+0
 	rts
@@ -108,54 +140,109 @@ run_seed_valid:
 
 ; $C5 is chosen
 
-.proc next_run_rand
+; Very HQ RNG source stored in the loaded save block. Mostly used to generate
+; the run seed from game to game. Clock this continuously so it is difficult
+; to predict. Note that this sorta makes the nonse redundant...
+.proc next_global_rand
 	perform_zpcm_inc
 	; rotate the middle bytes left
-	ldy run_seed+2 ; will move to run_seed+3 at the end
-	lda run_seed+1
-	sta run_seed+2
-	; compute run_seed+1 ($C5>>1 = %1100010)
-	lda run_seed+3 ; original high byte
+	ldy current_block + SaveBlock::GameSeed+2 ; will move to current_block + SaveBlock::GameSeed+3 at the end
+	lda current_block + SaveBlock::GameSeed+1
+	sta current_block + SaveBlock::GameSeed+2
+	; compute current_block + SaveBlock::GameSeed+1 ($C5>>1 = %1100010)
+	lda current_block + SaveBlock::GameSeed+3 ; original high byte
 	lsr
-	sta run_seed+1 ; reverse: 100011
-	lsr
-	lsr
+	sta current_block + SaveBlock::GameSeed+1 ; reverse: 100011
 	lsr
 	lsr
-	eor run_seed+1
 	lsr
-	eor run_seed+1
-	eor run_seed+0 ; combine with original low byte
-	sta run_seed+1
-	; compute run_seed+0 ($C5 = %11000101)
-	lda run_seed+3 ; original high byte
+	lsr
+	eor current_block + SaveBlock::GameSeed+1
+	lsr
+	eor current_block + SaveBlock::GameSeed+1
+	eor current_block + SaveBlock::GameSeed+0 ; combine with original low byte
+	sta current_block + SaveBlock::GameSeed+1
+	; compute current_block + SaveBlock::GameSeed+0 ($C5 = %11000101)
+	lda current_block + SaveBlock::GameSeed+3 ; original high byte
 	asl
-	eor run_seed+3
-	asl
-	asl
-	asl
-	asl
-	eor run_seed+3
+	eor current_block + SaveBlock::GameSeed+3
 	asl
 	asl
-	eor run_seed+3
-	sty run_seed+3 ; finish rotating byte 2 into 3
-	sta run_seed+0
+	asl
+	asl
+	eor current_block + SaveBlock::GameSeed+3
+	asl
+	asl
+	eor current_block + SaveBlock::GameSeed+3
+	sty current_block + SaveBlock::GameSeed+3 ; finish rotating byte 2 into 3
+	sta current_block + SaveBlock::GameSeed+0
 	perform_zpcm_inc
 	rts
 .endproc
 
-.proc generate_floor_seed
-	jsr next_run_rand
-	sta floor_seed+0
-	jsr next_run_rand
-	sta floor_seed+1
-	jsr next_run_rand
-	sta floor_seed+2
-	jsr next_run_rand
+.proc generate_run_seed_for_save
+	jsr next_global_rand
+	sta current_save + SaveFile::RunSeed + 0
+	jsr next_global_rand
+	sta current_save + SaveFile::RunSeed + 1
+	jsr next_global_rand
+	sta current_save + SaveFile::RunSeed + 2
+	jsr next_global_rand
 	; ensure seed is not 0, which will lock up the LFSR
 	ora #$80
-	sta floor_seed+3
+	sta current_save + SaveFile::RunSeed + 3
+	rts
+.endproc
+
+;
+; 6502 LFSR PRNG - 32-bit
+; Brad Smith, 2019
+; http://rainwarrior.ca
+;
+
+; A 32-bit Galois LFSR
+
+; Possible feedback values that generate a full 4294967295 step sequence:
+; $AF = %10101111
+; $C5 = %11000101
+; $F5 = %11110101
+
+; $C5 is chosen
+
+.proc next_run_rand
+	perform_zpcm_inc
+	; rotate the middle bytes left
+	ldy current_save + SaveFile::RunSeed+2 ; will move to run_seed+3 at the end
+	lda current_save + SaveFile::RunSeed+1
+	sta current_save + SaveFile::RunSeed+2
+	; compute run_seed+1 ($C5>>1 = %1100010)
+	lda current_save + SaveFile::RunSeed+3 ; original high byte
+	lsr
+	sta current_save + SaveFile::RunSeed+1 ; reverse: 100011
+	lsr
+	lsr
+	lsr
+	lsr
+	eor current_save + SaveFile::RunSeed+1
+	lsr
+	eor current_save + SaveFile::RunSeed+1
+	eor current_save + SaveFile::RunSeed+0 ; combine with original low byte
+	sta current_save + SaveFile::RunSeed+1
+	; compute run_seed+0 ($C5 = %11000101)
+	lda current_save + SaveFile::RunSeed+3 ; original high byte
+	asl
+	eor current_save + SaveFile::RunSeed+3
+	asl
+	asl
+	asl
+	asl
+	eor current_save + SaveFile::RunSeed+3
+	asl
+	asl
+	eor current_save + SaveFile::RunSeed+3
+	sty current_save + SaveFile::RunSeed+3 ; finish rotating byte 2 into 3
+	sta current_save + SaveFile::RunSeed+0
+	perform_zpcm_inc
 	rts
 .endproc
 

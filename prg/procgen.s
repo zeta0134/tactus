@@ -1526,7 +1526,7 @@ reject_floor:
 
         ; We are about to kick off floor generation, so grab a fresh floor PRNG
         ; seed based on the current run seed
-        jsr generate_floor_seed
+        far_call FAR_setup_prng_seeds_from_current_save_and_current_zone
         far_call FAR_reset_shop_tracker
 
         ; clear out the room flags and other state entirely

@@ -206,6 +206,7 @@ ZONE_ONLOAD_HUB  = 1
 .global FAR_load_hud_palette_for_current_zone
 .global FAR_play_music_for_current_room
 .global FAR_load_exit_pointer_from_current_zone
+.global FAR_setup_prng_seeds_from_current_save_and_current_zone
 
 ROOM_POOL_OUT_OF_BOUNDS          =  0
 ROOM_POOL_GRASSY_EXTERIOR        =  1

@@ -207,7 +207,7 @@ CurrentBeat := R0
 TargetHealth := R1
         ; if the player has more than 4 hearts, use an 8-beat pattern
         ; TODO: this logic just breaks completely with shorter patterns :(
-        lda heart_type+4
+        lda current_save + SaveFile::HeartSlotType+4
         cmp #HEART_TYPE_NONE
         bne use_8_beats
 use_4_beats:
@@ -241,7 +241,7 @@ done_picking_beat_length:
 loop:
         perform_zpcm_inc
         ; grab the type of this particular heart
-        lda heart_type, x
+        lda current_save + SaveFile::HeartSlotType, x
         ; move this into the top 4 bits, to conform with the drawing code
         asl
         asl
@@ -249,7 +249,7 @@ loop:
         asl
         sta HeartDisplayTarget, x
         ; grab its health and get that in place
-        lda heart_hp, x
+        lda current_save + SaveFile::HeartSlotHp, x
         ; if this heart is beating, get that flag in place
         cpx CurrentBeat
         bne done_applying_beat
@@ -1323,7 +1323,7 @@ done:
 Numeral := R0     
         perform_zpcm_inc   
 
-        lda initial_run_seed+0
+        lda current_save + SaveFile::RunSeed + 0
         lsr
         lsr
         lsr
@@ -1333,14 +1333,14 @@ Numeral := R0
         sta Numeral
         ldx #2
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
-        lda initial_run_seed+0
+        lda current_save + SaveFile::RunSeed + 0
         and #$0F
         ora #$40
         sta Numeral
         ldx #3
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
-        lda initial_run_seed+1
+        lda current_save + SaveFile::RunSeed + 1
         lsr
         lsr
         lsr
@@ -1350,14 +1350,14 @@ Numeral := R0
         sta Numeral
         ldx #4
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
-        lda initial_run_seed+1
+        lda current_save + SaveFile::RunSeed + 1
         and #$0F
         ora #$40
         sta Numeral
         ldx #5
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
-        lda initial_run_seed+2
+        lda current_save + SaveFile::RunSeed + 2
         lsr
         lsr
         lsr
@@ -1367,14 +1367,14 @@ Numeral := R0
         sta Numeral
         ldx #6
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
-        lda initial_run_seed+2
+        lda current_save + SaveFile::RunSeed + 2
         and #$0F
         ora #$40
         sta Numeral
         ldx #7
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
-        lda initial_run_seed+3
+        lda current_save + SaveFile::RunSeed + 3
         lsr
         lsr
         lsr
@@ -1384,7 +1384,7 @@ Numeral := R0
         sta Numeral
         ldx #8
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
-        lda initial_run_seed+3
+        lda current_save + SaveFile::RunSeed + 3
         and #$0F
         ora #$40
         sta Numeral

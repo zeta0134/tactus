@@ -1244,7 +1244,7 @@ NewHeartType := R0
 HealingAmount := R0
         ; Can the player actually hold an additional heart?
         ldx #(MAX_REGULAR_HEARTS-1)
-        lda heart_type, x
+        lda current_save + SaveFile::HeartSlotType, x
         cmp #HEART_TYPE_NONE      ; empty containers are fine
         beq okay_to_increase
         cmp #HEART_TYPE_TEMPORARY ; temporary containers are also fine
@@ -1284,7 +1284,7 @@ NewHeartType := R0
         ; Starting from the left, examime each heart we find
         ldx #0
 find_heart_loop:
-        lda heart_type, x
+        lda current_save + SaveFile::HeartSlotType, x
         ; If we encounter an empty heart slot, we can spawn
         ; a temporary heart here
         cmp #HEART_TYPE_NONE
@@ -1317,12 +1317,12 @@ okay_to_add:
 okay_to_heal:
         ; At this stage, X is pointing at the temporary heart
         ; If the temporary heart is full, we fail!
-        lda heart_hp, x
+        lda current_save + SaveFile::HeartSlotHp, x
         cmp #4
         beq fail_to_collect
         ; Otherwise, top it up.
         lda #4
-        sta heart_hp, x
+        sta current_save + SaveFile::HeartSlotHp, x
         ; Success!
         lda #0 ; return success
         rts
@@ -1333,7 +1333,7 @@ okay_to_heal:
         ; normal/temporary heart that is unarmored
         ldx #0
 find_heart_loop:
-        lda heart_type, x
+        lda current_save + SaveFile::HeartSlotType, x
         cmp #HEART_TYPE_REGULAR
         beq upgrade_to_armored
         cmp #HEART_TYPE_TEMPORARY
@@ -1349,13 +1349,13 @@ fail_to_collect:
 
 upgrade_to_armored:
         lda #HEART_TYPE_REGULAR_ARMORED
-        sta heart_type, x
+        sta current_save + SaveFile::HeartSlotType, x
         lda #0 ; return success
         rts
 
 upgrade_to_temporary_armored:
         lda #HEART_TYPE_TEMPORARY_ARMORED
-        sta heart_type, x
+        sta current_save + SaveFile::HeartSlotType, x
         lda #0 ; return success
         rts
 .endproc

@@ -1,22 +1,20 @@
         .include "_globals.inc"
 
+        .include "saves.inc"
         .include "hearts.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
 
         .segment "RAM"
 
-heart_hp: .res ::TOTAL_HEART_SLOTS
-heart_type: .res ::TOTAL_HEART_SLOTS
-
 already_damaged: .res 1
 
         .segment "PRGFIXED_E000"
 
 .proc FIXED_is_player_considered_dead
-        lda heart_hp+0
+        lda current_save + SaveFile::HeartSlotHp + 0
         .repeat ::TOTAL_HEART_SLOTS-1, i
-        ora heart_hp+i+1
+        ora current_save + SaveFile::HeartSlotHp + i + 1
         .endrepeat
         beq hes_dead_jim
         lda #0
@@ -40,8 +38,8 @@ initial_heart_hp:
         lda #HEART_TYPE_NONE
         ldy #0
         .repeat ::TOTAL_HEART_SLOTS, i
-        sta heart_type+i
-        sty heart_hp+i
+        sta current_save + SaveFile::HeartSlotType + i
+        sty current_save + SaveFile::HeartSlotHp + i
         .endrepeat
         rts
 .endproc
@@ -59,18 +57,18 @@ CurrentHeartIndex := R1
 loop:
         cpx #TOTAL_HEART_SLOTS-1
         beq done_shifting_hearts
-        lda heart_hp+1, x
-        sta heart_hp, x
-        lda heart_type+1, x
-        sta heart_type, x
+        lda current_save + SaveFile::HeartSlotHp + 1, x
+        sta current_save + SaveFile::HeartSlotHp, x
+        lda current_save + SaveFile::HeartSlotType + 1, x
+        sta current_save + SaveFile::HeartSlotType, x
         inx
         jmp loop
 done_shifting_hearts:
         ; replace the last heart slot with nothing
         lda #HEART_TYPE_NONE
-        sta heart_type, x
+        sta current_save + SaveFile::HeartSlotType, x
         lda #0
-        sta heart_hp, x
+        sta current_save + SaveFile::HeartSlotHp, x
         rts
 .endproc
 
@@ -81,7 +79,7 @@ ReturnStatus := R0
 DestinationSlot := R1
         perform_zpcm_inc
         ; sanity check: is there room for another heart?
-        lda heart_type+TOTAL_HEART_SLOTS-1
+        lda current_save + SaveFile::HeartSlotType + TOTAL_HEART_SLOTS-1
         cmp #HEART_TYPE_NONE
         ; TODO: should non-temp hearts be allowed to replace temp hearts?
         beq safe_to_add
@@ -93,7 +91,7 @@ safe_to_add:
         ldx #0
 find_destination_slot_loop:
         perform_zpcm_inc
-        lda heart_type, x
+        lda current_save + SaveFile::HeartSlotType, x
         cmp #HEART_TYPE_NONE
         beq found_slot
         ; if we are spawning a non-temporary heart...
@@ -105,10 +103,10 @@ find_destination_slot_loop:
         ; and this slot IS a temporary heart...
         ; ... then select it, and we'll shift the temporary
         ; hearts over by 1 later
-        lda heart_type, x
+        lda current_save + SaveFile::HeartSlotType, x
         cmp #HEART_TYPE_TEMPORARY
         beq found_slot
-        lda heart_type, x
+        lda current_save + SaveFile::HeartSlotType, x
         cmp #HEART_TYPE_TEMPORARY_ARMORED
         beq found_slot
 try_next_slot:
@@ -125,18 +123,18 @@ shift_loop:
         perform_zpcm_inc
         cpx DestinationSlot
         beq done_shifting
-        lda heart_hp-1, x
-        sta heart_hp, x
-        lda heart_type-1, x
-        sta heart_type, x
+        lda current_save + SaveFile::HeartSlotHp-1, x
+        sta current_save + SaveFile::HeartSlotHp, x
+        lda current_save + SaveFile::HeartSlotType-1, x
+        sta current_save + SaveFile::HeartSlotType, x
         dex
         jmp shift_loop
 done_shifting:
         lda NewHeartType
-        sta heart_type, x
+        sta current_save + SaveFile::HeartSlotType, x
         tay
         lda initial_heart_hp, y
-        sta heart_hp, x
+        sta current_save + SaveFile::HeartSlotHp, x
 
         lda #0
         sta ReturnStatus
@@ -154,7 +152,7 @@ HeartDmgProc := R2
 loop:
         perform_zpcm_inc
         ldx CurrentHeartIndex
-        lda heart_type, x
+        lda current_save + SaveFile::HeartSlotType, x
         asl
         tay
         lda heart_damage_functions+0, y
@@ -199,7 +197,7 @@ CurrentHeartIndex := R1
         bne cancel_incoming_damage
 
         ldx CurrentHeartIndex
-        lda heart_hp, x
+        lda current_save + SaveFile::HeartSlotHp, x
         sec
         sbc RemainingDamage
         bpl took_all_damage
@@ -211,10 +209,10 @@ some_damage_remains:
         adc #1
         sta RemainingDamage
         lda #0
-        sta heart_hp, x
+        sta current_save + SaveFile::HeartSlotHp, x
         jmp FAR_receive_damage::return_from_dmg
 took_all_damage:
-        sta heart_hp, x
+        sta current_save + SaveFile::HeartSlotHp, x
 cancel_incoming_damage:
         lda #0
         sta RemainingDamage
@@ -279,13 +277,13 @@ process_reduced_damage:
         ; Reduce!
         ldx CurrentHeartIndex
         sec
-        lda heart_hp, x
+        lda current_save + SaveFile::HeartSlotHp, x
         sbc RemainingDamage
         ; if we hit zero or we went negative, the heart armor breaks!
         beq break_heart_armor
         bmi break_heart_armor
         ; otherwise, keep the new value
-        sta heart_hp, x
+        sta current_save + SaveFile::HeartSlotHp, x
         ; zero out remaining damage and exit; we're done here.
         lda #0
         sta RemainingDamage
@@ -296,7 +294,7 @@ break_heart_armor:
         lda #1
         sta already_damaged
         lda #HEART_TYPE_REGULAR
-        sta heart_type, x
+        sta current_save + SaveFile::HeartSlotType, x
         ; TODO: play a SFX, maybe spawn some heart armor particles, etc.
         ; Special mercy rule: if this is the player's last heart, heal
         ; it back to 1 HP
@@ -304,13 +302,13 @@ break_heart_armor:
         beq last_heart
         ; otherise, the now-regular heart is left fully depleted
         lda #0
-        sta heart_hp, x
+        sta current_save + SaveFile::HeartSlotHp, x
         lda #0
         sta RemainingDamage
         jmp FAR_receive_damage::return_from_dmg
 last_heart:
         lda #1
-        sta heart_hp, x
+        sta current_save + SaveFile::HeartSlotHp, x
         lda #0
         sta RemainingDamage
         jmp FAR_receive_damage::return_from_dmg
@@ -327,7 +325,7 @@ CurrentHeartIndex := R1
         bne cancel_incoming_damage
 
         ldx CurrentHeartIndex
-        lda heart_hp, x
+        lda current_save + SaveFile::HeartSlotHp, x
         sec
         sbc RemainingDamage
         bpl took_all_damage
@@ -339,15 +337,15 @@ some_damage_remains:
         adc #1
         sta RemainingDamage
         lda #0
-        sta heart_hp, x
+        sta current_save + SaveFile::HeartSlotHp, x
         jmp check_vanish
 took_all_damage:
-        sta heart_hp, x
+        sta current_save + SaveFile::HeartSlotHp, x
         lda #0
         sta RemainingDamage
 check_vanish:
         ; if we depleted ourselves to 0, then go away!
-        lda heart_hp, x
+        lda current_save + SaveFile::HeartSlotHp, x
         beq destroy_self
         jmp FAR_receive_damage::return_from_dmg
 destroy_self:
@@ -385,13 +383,13 @@ process_reduced_damage:
         ; Reduce!
         ldx CurrentHeartIndex
         sec
-        lda heart_hp, x
+        lda current_save + SaveFile::HeartSlotHp, x
         sbc RemainingDamage
         ; if we hit zero or we went negative, the heart armor breaks!
         beq break_heart_armor
         bmi break_heart_armor
         ; otherwise, keep the new value
-        sta heart_hp, x
+        sta current_save + SaveFile::HeartSlotHp, x
         ; zero out remaining damage and exit; we're done here.
 cancel_incoming_damage:
         lda #0
@@ -422,7 +420,7 @@ HeartHealingProc := R2
 loop:
         perform_zpcm_inc
         ldx CurrentHeartIndex
-        lda heart_type, x
+        lda current_save + SaveFile::HeartSlotType, x
         asl
         tay
         lda heart_healing_functions+0, y
@@ -464,17 +462,17 @@ RemainingHealing := R0
 CurrentHeartIndex := R1
         ldx CurrentHeartIndex
         ; if we're already at full, bail
-        lda heart_hp, x
+        lda current_save + SaveFile::HeartSlotHp, x
         cmp #4
         bcc apply_healing
         jmp FAR_receive_healing::return_from_healing
 apply_healing:
-        lda heart_hp, x
+        lda current_save + SaveFile::HeartSlotHp, x
         clc
         adc RemainingHealing
         cmp #4
         bcs handle_overflow
-        sta heart_hp, x
+        sta current_save + SaveFile::HeartSlotHp, x
         lda #0
         sta RemainingHealing
         jmp FAR_receive_healing::return_from_healing
@@ -483,7 +481,7 @@ handle_overflow:
         sbc #4
         sta RemainingHealing
         lda #4
-        sta heart_hp, x
+        sta current_save + SaveFile::HeartSlotHp, x
         jmp FAR_receive_healing::return_from_healing
 .endproc
 
@@ -497,7 +495,7 @@ HealableCurrent := R1
         stx HealableMax
         stx HealableCurrent
 loop:
-        lda heart_type, x
+        lda current_save + SaveFile::HeartSlotType, x
         cmp #HEART_TYPE_REGULAR
         beq consider_this_heart
         cmp #HEART_TYPE_REGULAR_ARMORED
@@ -506,7 +504,7 @@ loop:
 consider_this_heart:
         clc
         lda HealableCurrent
-        adc heart_hp, x
+        adc current_save + SaveFile::HeartSlotHp, x
         sta HealableCurrent
         clc
         lda HealableMax

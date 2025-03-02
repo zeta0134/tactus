@@ -35,7 +35,7 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     ; CURRENT RUN STATE (that which persists, anyway) (current: 31 bytes)
     RunFlags                 .byte
     RunSeed                  .byte 4
-    HeartSlotTypes           .byte 6
+    HeartSlotType            .byte 6
     HeartSlotHp              .byte 6
     PlayerEquipmentWeapon    .byte
     PlayerEquipmentTorch     .byte
