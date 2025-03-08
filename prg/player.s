@@ -221,6 +221,64 @@ HeartCount := R2
         lda #PLAYER_BASE_TORCHLIGHT
         sta PlayerTorchlightRadius
 
+        lda #0
+        sta PlayerKeys
+        sta PlayerRoomIndex
+
+        lda #0
+        sta PlayerIdleBeats
+
+        lda #0
+        sta PlayerCombo
+        sta PlayerChain
+        sta PlayerChainGrace
+
+        lda #0
+        sta PlayerIntendsToBomb
+        sta PlayerIntendsToCast
+        sta PlayerIntendsToWait
+        sta PlayerIntendsToPause
+        sta PlayerNextDirection
+        sta PlayerHeldDirection
+
+        lda #0
+        sta PlayerTookDamageThisBeat
+        sta PlayerDamageAnimCounter
+
+        lda #$FF
+        sta PlayerHeldBombIndex
+
+        lda #PLAYER_STATE_NORMAL
+        sta PlayerState
+        lda #0
+        sta PlayerBeatsInThisState
+
+        lda #0
+        sta DeferLootProcessing
+        sta SpellDefeatsEnemy
+
+        lda #30
+        sta WarpStability
+        lda #0
+        sta MusicalWarpStabilityCooldown
+
+        rts
+
+sprite_failed:
+        ; what? this should never happen...
+        rts
+.endproc
+
+.proc FAR_init_player_inventory_new_game
+NewHeartType := R0
+HealingAmount := R0
+HeartCount := R2
+        ; TODO: This really ought to be an in-game option. File it under
+        ; assist mode or whatever.
+
+        ; TODO: We might want a special "return to HUD" option for players
+        ; that win the game? Or win a specific zone, etc. I guess we're still
+        ; not really sure how weapon obelisks are going to work.
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
         lda #ITEM_BROADSWORD_L3
@@ -310,52 +368,6 @@ heart_loop:
         lda #0
         sta current_save + SaveFile::PlayerBombCount
 .endif
-
-        lda #0
-        sta PlayerKeys
-        sta PlayerRoomIndex
-
-        lda #0
-        sta PlayerIdleBeats
-
-        lda #0
-        sta PlayerCombo
-        sta PlayerChain
-        sta PlayerChainGrace
-
-        lda #0
-        sta PlayerIntendsToBomb
-        sta PlayerIntendsToCast
-        sta PlayerIntendsToWait
-        sta PlayerIntendsToPause
-        sta PlayerNextDirection
-        sta PlayerHeldDirection
-
-        lda #0
-        sta PlayerTookDamageThisBeat
-        sta PlayerDamageAnimCounter
-
-        lda #$FF
-        sta PlayerHeldBombIndex
-
-        lda #PLAYER_STATE_NORMAL
-        sta PlayerState
-        lda #0
-        sta PlayerBeatsInThisState
-
-        lda #0
-        sta DeferLootProcessing
-        sta SpellDefeatsEnemy
-
-        lda #30
-        sta WarpStability
-        lda #0
-        sta MusicalWarpStabilityCooldown
-
-        rts
-
-sprite_failed:
-        ; what? this should never happen...
         rts
 .endproc
 

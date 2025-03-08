@@ -187,11 +187,77 @@ ZONE_ONLOAD_HUB  = 1
 
 .global all_zones_data_page
 
-.global zone_grasslands_floor_1
-.global zone_grasslands_floor_2
-.global zone_grasslands_floor_3
-.global zone_grasslands_floor_4
-.global zone_hub_world
+ZONE_HUB_WORLD             = 00
+ZONE_GRASSLANDS_FLOOR_1    = 01
+ZONE_GRASSLANDS_FLOOR_2    = 02
+ZONE_GRASSLANDS_FLOOR_3    = 03
+ZONE_GRASSLANDS_FLOOR_4    = 04
+ZONE_GRASSLANDS_FLOOR_BOSS = 05
+ZONE_2A_FLOOR_1            = 06
+ZONE_2A_FLOOR_2            = 07
+ZONE_2A_FLOOR_3            = 08
+ZONE_2A_FLOOR_4            = 09
+ZONE_2A_FLOOR_BOSS         = 10
+ZONE_2B_FLOOR_1            = 11
+ZONE_2B_FLOOR_2            = 12
+ZONE_2B_FLOOR_3            = 13
+ZONE_2B_FLOOR_4            = 14
+ZONE_2B_FLOOR_BOSS         = 15
+ZONE_2C_FLOOR_1            = 16
+ZONE_2C_FLOOR_2            = 17
+ZONE_2C_FLOOR_3            = 18
+ZONE_2C_FLOOR_4            = 19
+ZONE_2C_FLOOR_BOSS         = 20
+ZONE_2W_FLOOR_1            = 21
+ZONE_2W_FLOOR_2            = 22
+ZONE_2W_FLOOR_3            = 23
+ZONE_2W_FLOOR_4            = 24
+ZONE_2W_FLOOR_BOSS         = 25
+ZONE_3A_FLOOR_1            = 26
+ZONE_3A_FLOOR_2            = 27
+ZONE_3A_FLOOR_3            = 28
+ZONE_3A_FLOOR_4            = 29
+ZONE_3A_FLOOR_BOSS         = 30
+ZONE_3B_FLOOR_1            = 31
+ZONE_3B_FLOOR_2            = 32
+ZONE_3B_FLOOR_3            = 33
+ZONE_3B_FLOOR_4            = 34
+ZONE_3B_FLOOR_BOSS         = 35
+ZONE_3C_FLOOR_1            = 36
+ZONE_3C_FLOOR_2            = 37
+ZONE_3C_FLOOR_3            = 38
+ZONE_3C_FLOOR_4            = 39
+ZONE_3C_FLOOR_BOSS         = 40
+ZONE_3W_FLOOR_1            = 41
+ZONE_3W_FLOOR_2            = 42
+ZONE_3W_FLOOR_3            = 43
+ZONE_3W_FLOOR_4            = 44
+ZONE_3W_FLOOR_BOSS         = 45
+ZONE_4A_FLOOR_1            = 46
+ZONE_4A_FLOOR_2            = 47
+ZONE_4A_FLOOR_3            = 48
+ZONE_4A_FLOOR_4            = 49
+ZONE_4A_FLOOR_BOSS         = 50
+ZONE_4B_FLOOR_1            = 51
+ZONE_4B_FLOOR_2            = 52
+ZONE_4B_FLOOR_3            = 53
+ZONE_4B_FLOOR_4            = 54
+ZONE_4B_FLOOR_BOSS         = 55
+ZONE_4C_FLOOR_1            = 56
+ZONE_4C_FLOOR_2            = 57
+ZONE_4C_FLOOR_3            = 58
+ZONE_4C_FLOOR_4            = 59
+ZONE_4C_FLOOR_BOSS         = 60
+ZONE_4W_FLOOR_1            = 61
+ZONE_4W_FLOOR_2            = 62
+ZONE_4W_FLOOR_3            = 63
+ZONE_4W_FLOOR_4            = 64
+ZONE_4W_FLOOR_BOSS         = 65
+ZONE_5S_FLOOR_1            = 66
+ZONE_5S_FLOOR_BOSS         = 67
+ZONE_5W_FLOOR_1            = 68
+ZONE_5W_FLOOR_BOSS         = 69
+ZONE_TOTAL_COUNT = 70
 
 ; various utility functions for working with zones, since
 ; their data lives in a dedicated bank
@@ -207,6 +273,7 @@ ZONE_ONLOAD_HUB  = 1
 .global FAR_play_music_for_current_room
 .global FAR_load_exit_pointer_from_current_zone
 .global FAR_setup_prng_seeds_from_current_save_and_current_zone
+.global FAR_set_zone_ptr_from_id
 
 ROOM_POOL_OUT_OF_BOUNDS          =  0
 ROOM_POOL_GRASSY_EXTERIOR        =  1

@@ -84,6 +84,8 @@
 .global Pulse1DelayCounter
 .global Pulse2DelayCounter
 
+.global UpdateBeatTrackerDuringNmi
+
 TRACK_SILENCE          = 0
 TRACK_CLICK            = 1
 TRACK_TITLE            = 2

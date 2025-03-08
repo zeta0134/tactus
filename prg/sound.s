@@ -42,6 +42,8 @@ FadeCounter: .res 1
 CandidateSfxPtr: .res 2
 CandidateSfxPriority: .res 1
 
+UpdateBeatTrackerDuringNmi: .res 1
+
         .zeropage
 Pulse1SfxPtr: .res 2
 Pulse2SfxPtr: .res 2
@@ -158,6 +160,28 @@ track_table_num_variants:
         .byte 3 ; in another world (warp zone)
         .byte 3 ; bouncy
         .byte 3 ; echoes
+
+track_table_heartbeat_offset:
+        .byte 0 ; silence 
+        .byte 0 ; click_track
+        .byte 0 ; title music
+        .byte 0 ; options music
+        .byte 0 ; gameover music
+        .byte 0 ; level music
+        .byte 4 ; in another world (warp zone)
+        .byte 0 ; bouncy
+        .byte 0 ; echoes
+
+track_table_heartbeat_period:
+        .byte 0 ; silence 
+        .byte 8 ; click_track
+        .byte 8 ; title music
+        .byte 8 ; options music
+        .byte 8 ; gameover music
+        .byte 8 ; level music
+        .byte 8 ; in another world (initial, switches to 6 partway through)
+        .byte 8 ; bouncy
+        .byte 8 ; echoes
 
 ; bhop calls these functions for bank swapping and ZPCM tomfoolery
 .proc bhop_enable_zpcm
@@ -516,6 +540,9 @@ done_picking_sfx_bank:
         lda #0
         sta global_attenuation
 
+        lda #0
+        sta UpdateBeatTrackerDuringNmi
+
         restore_previous_bank
 
         rts
@@ -544,8 +571,14 @@ done_picking_sfx_bank:
 
         near_call update_sfx
         restore_previous_bank_nmi
-
         perform_zpcm_inc
+
+        lda UpdateBeatTrackerDuringNmi
+        beq skip_beat_tracker
+        jsr update_beat_tracker
+        perform_zpcm_inc
+skip_beat_tracker:
+
         rts
 .endproc
 

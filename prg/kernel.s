@@ -481,25 +481,6 @@ LayoutPtr := R0
 .endproc
 
 .proc game_prep
-        ; copy the run seed before we use it to generate the game state
-        ; (we'll display this in the debug HUD / game end screens, etc)
-        ; TODO: if we're going to do fixed seed things, do that here?
-
-.if ::DEBUG_FORCE_SEED
-        lda #.lobyte(.loword(DEBUG_SEED))
-        sta current_save + SaveFile::RunSeed + 3
-        lda #.hibyte(.loword(DEBUG_SEED))
-        sta current_save + SaveFile::RunSeed + 2
-        lda #.lobyte(.hiword(DEBUG_SEED))
-        sta current_save + SaveFile::RunSeed + 1
-        lda #.hibyte(.hiword(DEBUG_SEED))
-        sta current_save + SaveFile::RunSeed + 0
-.else
-        jsr generate_run_seed_for_save
-.endif
-
-
-
         lda #0
         sta tempo_adjustment
         lda #0
@@ -590,14 +571,40 @@ LayoutPtr := R0
         
         ;st16 PlayerZonePtr, zone_grasslands_floor_1
         ;st16 DestinationZonePtr, zone_grasslands_floor_1
-        st16 PlayerZonePtr, zone_hub_world
-        st16 DestinationZonePtr, zone_hub_world
 
-        ; TODO: if we are in fixed seed mode, set that here.
+        ; TODO: Respect the "suspend" flag. If the suspend condition fails, force-load into
+        ; the HUB world instead, throwing away the current run state.
+        ; (for now, just trust what's in the file somewhat blindly; the function we call here
+        ; is smart enough not to load a garbage pointer if the data is out of range)
+
+        lda current_save + SaveFile::PlayerZoneId
+        far_call FAR_set_zone_ptr_from_id
+        mov16 DestinationZonePtr, PlayerZonePtr
 
         far_call FAR_initialize_sprites
-        far_call FAR_init_hud
         far_call FAR_init_player
+        ; TODO: pick which one of these to call based on which zone we're in?
+        ; Or I guess zone setup logic could do it...
+        far_call FAR_init_player_inventory_new_game
+
+        ; copy the run seed before we use it to generate the game state
+        ; (we'll display this in the debug HUD / game end screens, etc)
+        ; TODO: if we're going to do fixed seed things, do that here?
+.if ::DEBUG_FORCE_SEED
+        lda #.lobyte(.loword(DEBUG_SEED))
+        sta current_save + SaveFile::RunSeed + 3
+        lda #.hibyte(.loword(DEBUG_SEED))
+        sta current_save + SaveFile::RunSeed + 2
+        lda #.lobyte(.hiword(DEBUG_SEED))
+        sta current_save + SaveFile::RunSeed + 1
+        lda #.hibyte(.hiword(DEBUG_SEED))
+        sta current_save + SaveFile::RunSeed + 0
+.else
+        jsr generate_run_seed_for_save
+.endif
+        ; (The HUD depends on the seed we just generated, though it may not necessarily
+        ; actually display it.)
+        far_call FAR_init_hud
 
         st16 GameMode, zone_init
         rts
@@ -614,8 +621,21 @@ LayoutPtr := R0
         sta PlayerHeldDirection
 
         ; Generate proper mazes and randomize player, exit, and boss
+        ; This **will** lag badly, so switch our beat tracker to update during NMI
+        ; while we're busy with level gen. If we don't do this we get a strangely wrong
+        ; first beat and break the heart counter.
+        lda #1
+        sta UpdateBeatTrackerDuringNmi
         far_call FAR_init_floor
         far_call FAR_generate_rooms_for_floor
+        lda #0
+        sta UpdateBeatTrackerDuringNmi
+
+        ; Now that we've generated this floor, go ahead and save right here, as it is convenient
+        ; to do so. This will be the "commit point" for any gameplay state unlocked during a given
+        ; run, including in-game options the player might have tweaked. This includes loading into
+        ; the game for the first time, as the HUB is a "floor" from the engine's point of view.
+        far_call FAR_save_current_file
 
         ; We faded out to get here, so fade right back in
         lda #0

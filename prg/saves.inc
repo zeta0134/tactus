@@ -48,8 +48,8 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     PlayerFirstUpgradeSlot   .byte
     PlayerSecondUpgradeSlot  .byte
     PlayerGold               .byte 2
-    CurrentZonePtr           .byte 2
-    RunStateReserved         .byte 17 ; bring total up to 48 bytes
+    PlayerZoneId             .byte 1  ; index into a LUT, since pointers may move around
+    RunStateReserved         .byte 18 ; bring total up to 48 bytes
     ; STUFF WE TRACK DURING A RUN, FOR THE END SCREEN MOSTLY (current: 33 bytes)
     RunTimeFrames            .byte
     RunTimeSeconds           .byte

@@ -245,6 +245,125 @@ zone_debug_exits:
 
         .segment "CODE_4"
 
+zone_ptr_by_id_lut:
+        .word zone_hub_world
+        .word zone_grasslands_floor_1
+        .word zone_grasslands_floor_2
+        .word zone_grasslands_floor_3
+        .word zone_grasslands_floor_4
+        .word zone_grasslands_floor_boss
+        .word zone_2a_floor_1
+        .word zone_2a_floor_2
+        .word zone_2a_floor_3
+        .word zone_2a_floor_4
+        .word zone_2a_floor_boss
+        .word zone_2b_floor_1
+        .word zone_2b_floor_2
+        .word zone_2b_floor_3
+        .word zone_2b_floor_4
+        .word zone_2b_floor_boss
+        .word zone_2c_floor_1
+        .word zone_2c_floor_2
+        .word zone_2c_floor_3
+        .word zone_2c_floor_4
+        .word zone_2c_floor_boss
+        .word zone_2w_floor_1
+        .word zone_2w_floor_2
+        .word zone_2w_floor_3
+        .word zone_2w_floor_4
+        .word zone_2w_floor_boss
+        .word zone_3a_floor_1
+        .word zone_3a_floor_2
+        .word zone_3a_floor_3
+        .word zone_3a_floor_4
+        .word zone_3a_floor_boss
+        .word zone_3b_floor_1
+        .word zone_3b_floor_2
+        .word zone_3b_floor_3
+        .word zone_3b_floor_4
+        .word zone_3b_floor_boss
+        .word zone_3c_floor_1
+        .word zone_3c_floor_2
+        .word zone_3c_floor_3
+        .word zone_3c_floor_4
+        .word zone_3c_floor_boss
+        .word zone_3w_floor_1
+        .word zone_3w_floor_2
+        .word zone_3w_floor_3
+        .word zone_3w_floor_4
+        .word zone_3w_floor_boss
+        .word zone_4a_floor_1
+        .word zone_4a_floor_2
+        .word zone_4a_floor_3
+        .word zone_4a_floor_4
+        .word zone_4a_floor_boss
+        .word zone_4b_floor_1
+        .word zone_4b_floor_2
+        .word zone_4b_floor_3
+        .word zone_4b_floor_4
+        .word zone_4b_floor_boss
+        .word zone_4c_floor_1
+        .word zone_4c_floor_2
+        .word zone_4c_floor_3
+        .word zone_4c_floor_4
+        .word zone_4c_floor_boss
+        .word zone_4w_floor_1
+        .word zone_4w_floor_2
+        .word zone_4w_floor_3
+        .word zone_4w_floor_4
+        .word zone_4w_floor_boss
+        .word zone_5s_floor_1
+        .word zone_5s_floor_boss
+        .word zone_5w_floor_1
+        .word zone_5w_floor_boss
+
+; Target ID in A please. Clobbers X, Y
+.proc FAR_set_zone_ptr_from_id
+        ; Safety dance, yes
+        cmp #ZONE_TOTAL_COUNT
+        bcc zone_id_in_range
+        lda #0
+zone_id_in_range:
+        sta current_save + SaveFile::PlayerZoneId
+
+        asl
+        tax
+        lda zone_ptr_by_id_lut+0, x
+        sta PlayerZonePtr+0
+        lda zone_ptr_by_id_lut+1, x
+        sta PlayerZonePtr+1
+
+        rts
+.endproc
+
+; The inverse, for when we need to go in the other direction. Mostly
+; used during suspending the game, but can also be used to track progress
+; through a run. (Yes this is stupid, it was all pointer-based originally
+; and I don't feel like editing 70+ zones **AGAIN.** Deal.)
+.proc FAR_get_zone_id_from_zone_ptr
+        ldx #0        
+loop:
+        lda zone_ptr_by_id_lut+0, x
+        cmp PlayerZonePtr+0
+        bne not_this_one
+        lda zone_ptr_by_id_lut+1, x
+        cmp PlayerZonePtr+1
+        beq found
+not_this_one:
+        inx
+        inx
+        cpx #(ZONE_TOTAL_COUNT * 2)
+        bne loop
+not_found:
+        ; uhh?
+        lda #ZONE_HUB_WORLD
+        rts
+found:
+        txa
+        lsr
+        rts
+.endproc
+
 .proc FAR_roll_floorplan_from_active_zone_pool
 FloorListPtr := R0
 FloorListLength := R2

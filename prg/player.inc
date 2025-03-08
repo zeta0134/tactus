@@ -1,4 +1,5 @@
 .global FAR_init_player
+.global FAR_init_player_inventory_new_game
 .global FAR_draw_player
 .global FAR_determine_player_intent
 .global FAR_update_player
