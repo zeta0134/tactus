@@ -147,7 +147,7 @@ done_shifting:
 RemainingDamage := R0
 CurrentHeartIndex := R1
 HeartDmgProc := R2
-        lda #TOTAL_HEART_SLOTS
+        lda #TOTAL_HEART_SLOTS-1
         sta CurrentHeartIndex
 loop:
         perform_zpcm_inc
