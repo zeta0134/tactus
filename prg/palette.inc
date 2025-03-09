@@ -14,23 +14,4 @@
 .global FAR_update_brightness
 .global FAR_init_palettes
 .global set_brightness
-.globalzp staging_palette
 .global refresh_palettes_nmi
-
-.macro INLINE_refresh_palettes_nmi 
-    lda #$3F
-    sta PPUADDR
-    lda #$00
-    sta PPUADDR
-    perform_zpcm_inc
-    .repeat 16,i
-    lda staging_palette+i
-    sta PPUDATA
-    .endrepeat
-    perform_zpcm_inc
-    .repeat 16,i
-    lda staging_palette+i+16
-    sta PPUDATA
-    .endrepeat
-    perform_zpcm_inc
-.endmacro

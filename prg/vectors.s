@@ -11,6 +11,7 @@
 .include "bhop/bhop.inc"
 .include "chr.inc"
 .include "debug.inc"
+.include "dynamic_palette.inc"
 .include "far_call.inc"
 .include "kernel.inc"
 .include "input.inc"

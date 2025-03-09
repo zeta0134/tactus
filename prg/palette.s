@@ -1,5 +1,7 @@
         .setcpu "6502"
 
+        .include "dynamic_palette.inc"
+
         .include "battlefield.inc" ; for queued bytes counter
         .include "branch_util.inc"
         .include "nes.inc"
@@ -7,10 +9,6 @@
         .include "ppu.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
-
-        .zeropage
-; Copied in during NMI where every cycle is precious. Spare no expense!
-staging_palette: .res 32
 
         .segment "RAM"
 BgPaletteDirty: .res 1

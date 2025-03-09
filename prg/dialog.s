@@ -2,6 +2,7 @@
         .include "_globals.inc"
 
         .include "dialog.inc"
+        .include "dynamic_palette.inc"
         .include "far_call.inc"
         .include "hud.inc"
         .include "input.inc"
