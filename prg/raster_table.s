@@ -2,11 +2,11 @@
         .include "_globals.inc"
 
         .include "dialog.inc"
+        .include "dynamic_palette.inc"
         .include "far_call.inc"
         .include "kernel.inc"
         .include "nes.inc"
         .include "pal.inc"
-        .include "palette.inc"
         .include "rainbow.inc"
         .include "raster_table.inc"
         .include "zpcm.inc"

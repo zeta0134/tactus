@@ -414,13 +414,13 @@ draw_existing_file:
         tax
         ; and transfer!
         lda player_ingame_palette_phones
-        sta ObjPaletteBuffer+1, x
+        sta PlayfieldObjPal0+0, x
         lda player_ingame_palette_pajamas
-        sta ObjPaletteBuffer+2, x
+        sta PlayfieldObjPal0+1, x
         lda player_ingame_palette_pigment
-        sta ObjPaletteBuffer+3, x
+        sta PlayfieldObjPal0+2, x
         lda #1
-        sta ObjPaletteDirty
+        sta StagingObjPaletteDirty
         ; Now move the sprite into position
         ldy CurrentWidgetIndex
         lda widgets_cursor_pos_y, y

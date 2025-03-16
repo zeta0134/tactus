@@ -89,21 +89,33 @@ CurrentWidgetIndex := R20
 
 
         ; Get the file select palettes loaded in
+        ; TODO: use file select palette here!
         ldy #0
 bg_loop:
         perform_zpcm_inc
-        ; TODO: use file select palette here!
         lda options_battlefield_bg_palette, y
-        sta BgPaletteBuffer, y
-        lda options_obj_palette, y
-        sta ObjPaletteBuffer, y
+        sta IncomingHwPalette, y
         iny
         cpy #16
         bne bg_loop
 
-        lda #0
+        far_call FAR_set_bg_target_palette_from_hw
+        far_call FAR_set_bg_current_palette_from_target
+
+        ldy #0
+obj_loop:
+        perform_zpcm_inc        
+        lda options_obj_palette, y
+        sta IncomingHwPalette, y
+        iny
+        cpy #16
+        bne obj_loop
+
+        far_call FAR_set_obj_palette_from_hw
+
+        lda #BRIGHTNESS_FULLY_DARK
         jsr set_brightness
-        lda #4
+        lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
 
         ldy CurrentWidgetIndex

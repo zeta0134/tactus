@@ -35,7 +35,7 @@ title_ui_layout:
         ; used, for consistency (and so we don't have a "preferred" skin tone)
         far_call FAR_apply_player_palette
         lda #1
-        sta ObjPaletteDirty
+        sta StagingObjPaletteDirty
 
         ; Play the title track on the title screen
         lda #TRACK_TITLE
@@ -43,9 +43,9 @@ title_ui_layout:
         jsr play_track
 
         ; NOW we may safely begin to fade in
-        lda #0
+        lda #BRIGHTNESS_FULLY_DARK
         jsr set_brightness
-        lda #4
+        lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
 
         ldy CurrentWidgetIndex

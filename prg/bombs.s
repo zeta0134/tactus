@@ -124,12 +124,12 @@ done_picking_state:
 .else
         ; At this point the bomb *definitely* succeeded in spawning.
         ; Hoist the bomb! Decrement the counter and initialize all the things
-        dec PlayerBombCount
+        dec current_save + SaveFile::PlayerBombCount
         ; If this was our last bomb, clear the item slot
-        lda PlayerBombCount
+        lda current_save + SaveFile::PlayerBombCount
         bne more_bombs_remain
         lda #ITEM_NONE
-        sta PlayerEquipmentBombs
+        sta current_save + SaveFile::PlayerEquipmentBombs
 more_bombs_remain:
 .endif
 

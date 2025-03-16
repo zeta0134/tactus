@@ -2,11 +2,11 @@
 
         .include "_globals.inc"
 
+        .include "dynamic_palette.inc"
         .include "enemies.inc"
         .include "far_call.inc"
         .include "levels.inc"
         .include "nes.inc"
-        .include "palette.inc"
         .include "player.inc"
         .include "procgen.inc"
         .include "prng.inc"
@@ -338,10 +338,12 @@ PalettePtr := R2
 bg_loop:
         perform_zpcm_inc
         lda (PalettePtr), y
-        sta BgPaletteBuffer, y
+        sta IncomingHwPalette, y
         iny
         cpy #16
         bne bg_loop
+
+        far_call FAR_set_bg_target_palette_from_hw
 
         ldy #Room::ObjPalette
         lda (RoomPtr), y
@@ -354,20 +356,12 @@ bg_loop:
 obj_loop:
         perform_zpcm_inc
         lda (PalettePtr), y
-        sta ObjPaletteBuffer, y
+        sta IncomingHwPalette, y
         iny
         cpy #16
         bne obj_loop
 
-        lda #1
-        sta BgPaletteDirty
-        sta ObjPaletteDirty
-
-        ; dirty fix: copy $0F into all three HUD colors, for parking between the raster split
-        lda #$0F
-        sta BgPaletteBuffer+4
-        sta BgPaletteBuffer+8
-        sta BgPaletteBuffer+12
+        far_call FAR_set_obj_palette_from_hw
 
         perform_zpcm_inc
         rts

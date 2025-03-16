@@ -1,7 +1,7 @@
         .setcpu "6502"
+        .include "dynamic_palette.inc"
         .include "far_call.inc"
         .include "nes.inc"
-        .include "palette.inc"
         .include "ppu.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
@@ -13,8 +13,9 @@ bg_palette:
         .incbin "../art/test_palette.pal"
 obj_palette:
         .incbin "../art/sprite_palette.pal"
-hud_palette:
+hud_palette_bg:
         .incbin "../art/hud_bg.pal"
+hud_palette_obj:
         .incbin "../art/hud_obj.pal"
 
 title_palette:
@@ -54,9 +55,9 @@ loop:
         near_call FAR_initialize_title_palettes        
 
         ; Initialize brightness to 0 (fully black) so we can fade it in
-        lda #0
+        lda #BRIGHTNESS_FULLY_DARK
         jsr set_brightness
-        lda #4
+        lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
 
         rts
@@ -69,31 +70,49 @@ loop:
         ldx #0
 obj_loop:
         lda obj_palette, x
-        sta ObjPaletteBuffer, x
+        sta IncomingHwPalette, x
         inx
         cpx #16
         bne obj_loop
 
         perform_zpcm_inc
+        far_call FAR_set_obj_palette_from_hw
 
         ldx #0
 bg_loop:
         lda bg_palette, x
-        sta BgPaletteBuffer, x
+        sta IncomingHwPalette, x
         inx
         cpx #16
         bne bg_loop
 
-        ldx #0
-hud_loop:
         perform_zpcm_inc
-        lda hud_palette, x
-        sta HudPaletteBuffer, x
+        far_call FAR_set_bg_target_palette_from_hw
+        far_call FAR_set_bg_current_palette_from_target
+
+        ldx #0
+hud_bg_loop:
+        perform_zpcm_inc
+        lda hud_palette_bg, x
+        sta IncomingHwPalette, x
         inx
-        cpx #32
-        bne hud_loop
+        cpx #16
+        bne hud_bg_loop
 
         perform_zpcm_inc
+        far_call FAR_set_hud_bg_palette_from_hw
+
+        ldx #0
+hud_obj_loop:
+        perform_zpcm_inc
+        lda hud_palette_obj, x
+        sta IncomingHwPalette, x
+        inx
+        cpx #16
+        bne hud_obj_loop
+
+        perform_zpcm_inc
+        far_call FAR_set_hud_obj_palette_from_hw
 
         rts
 .endproc
@@ -105,22 +124,25 @@ hud_loop:
         ldx #0
 obj_loop:
         lda obj_palette, x
-        sta ObjPaletteBuffer, x
+        sta IncomingHwPalette, x
         inx
         cpx #16
         bne obj_loop
 
         perform_zpcm_inc
+        far_call FAR_set_obj_palette_from_hw
 
         ldx #0
 bg_loop:
         lda title_palette, x
-        sta BgPaletteBuffer, x
+        sta IncomingHwPalette, x
         inx
         cpx #16
         bne bg_loop
 
         perform_zpcm_inc
+        far_call FAR_set_bg_target_palette_from_hw
+        far_call FAR_set_bg_current_palette_from_target
 
         rts
 .endproc

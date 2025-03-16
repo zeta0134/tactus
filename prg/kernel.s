@@ -13,6 +13,7 @@
         .include "coins.inc"
         .include "chr.inc"
         .include "debug.inc"
+        .include "dynamic_palette.inc"
         .include "enemies.inc"
         .include "far_call.inc"
         .include "hearts.inc"
@@ -24,7 +25,6 @@
         .include "levels.inc"
         .include "loot.inc"
         .include "nes.inc"
-        .include "palette.inc"
         .include "palette_cycler.inc"
         .include "particles.inc"
         .include "player.inc"
@@ -108,9 +108,10 @@ main_loop:
         sta ScreenShakeX
         sta ScreenShakeY
 
-        lda #0
+        lda #BRIGHTNESS_FULLY_DARK
         sta TargetBrightness
         lda Brightness
+        cmp #BRIGHTNESS_FULLY_DARK
         bne continue_waiting
 
         lda FadeToGameMode
@@ -119,8 +120,6 @@ main_loop:
         sta GameMode+1
 
 continue_waiting:
-        perform_zpcm_inc
-        far_call FAR_update_brightness
         perform_zpcm_inc
         far_call FAR_refresh_palettes_gameloop
         perform_zpcm_inc
@@ -136,9 +135,10 @@ continue_waiting:
         sta ScreenShakeX
         sta ScreenShakeY
 
-        lda #0
+        lda #BRIGHTNESS_FULLY_DARK
         sta TargetBrightness
         lda Brightness
+        cmp #BRIGHTNESS_FULLY_DARK
         bne continue_waiting
 
         lda FadeToGameMode
@@ -147,8 +147,6 @@ continue_waiting:
         sta GameMode+1
 
 continue_waiting:
-        perform_zpcm_inc
-        far_call FAR_update_brightness
         perform_zpcm_inc
         far_call FAR_refresh_palettes_gameloop
         perform_zpcm_inc
@@ -161,9 +159,9 @@ continue_waiting:
 ; === Game Mode Functions Follow ===
 
 .proc init_engine
-        lda #0
+        lda #BRIGHTNESS_FULLY_DARK
         jsr set_brightness
-        lda #0
+        lda #BRIGHTNESS_FULLY_DARK
         sta TargetBrightness
 
         lda #0
@@ -313,8 +311,6 @@ LayoutPtr := R0
         perform_zpcm_inc
         far_call FAR_draw_sprites
         perform_zpcm_inc
-        far_call FAR_update_brightness
-        perform_zpcm_inc
         far_call FAR_refresh_palettes_gameloop
 
         jsr update_beat_counters_title
@@ -340,9 +336,9 @@ LayoutPtr := R0
         lda #1
         sta NmiSoftDisable
 
-        lda #0
+        lda #BRIGHTNESS_FULLY_DARK
         jsr set_brightness
-        lda #4
+        lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
 
         ; the end screens use typical 16x16 attributes for now, so set those up again
@@ -401,7 +397,6 @@ LayoutPtr := R0
         jsr poll_input
         jsr update_beat_counters_title
         far_call FAR_draw_sprites
-        far_call FAR_update_brightness
         far_call FAR_refresh_palettes_gameloop
 
         far_call FAR_update_game_end_screen
@@ -512,9 +507,9 @@ LayoutPtr := R0
 
         ; set the game palette
         far_call FAR_initialize_game_palettes
-        lda #0
+        lda #BRIGHTNESS_FULLY_DARK
         jsr set_brightness
-        lda #4
+        lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
 
         ; copy the initial batch of graphics into CHR RAM
@@ -638,9 +633,9 @@ LayoutPtr := R0
         far_call FAR_save_current_file
 
         ; We faded out to get here, so fade right back in
-        lda #0
+        lda #BRIGHTNESS_FULLY_DARK
         jsr set_brightness
-        lda #4
+        lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
 
         st16 GameMode, room_init
@@ -895,7 +890,7 @@ setup_warp_entrance:
         lda #0
         sta SuppressTorchlight
         ; Over the warp transition we'll fade slowly to white!
-        lda #8
+        lda #BRIGHTNESS_FULLY_BRIGHT
         sta TargetBrightness
         lda #12
         sta GlobalFadeSpeed
@@ -917,7 +912,7 @@ setup_warp_eject:
         lda #0
         sta SuppressTorchlight
         ; When being ejected from the warp, we'll fade to black somewhat more quickly
-        lda #0
+        lda #BRIGHTNESS_FULLY_DARK
         sta TargetBrightness
         lda #6
         sta BrightnessDelay
@@ -957,9 +952,9 @@ setup_default_transition:
         sta PlayerRow
 
         ; Fade back down to regular brightness, and also reset the global fade speed
-        lda #4
+        lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
-        lda #4
+        lda #3
         sta BrightnessDelay
         sta GlobalFadeSpeed
 
@@ -997,9 +992,9 @@ HealingAmount := R0
         far_call FAR_receive_healing
 
         ; Fade back up to regular brightness, and also reset the global fade speed
-        lda #4
+        lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
-        lda #4
+        lda #3
         sta BrightnessDelay
         sta GlobalFadeSpeed
 
@@ -1072,9 +1067,6 @@ continue_waiting:
         far_call FAR_draw_particles
 
         perform_zpcm_inc
-        far_call FAR_update_brightness
-        perform_zpcm_inc
-
         far_call FAR_refresh_palettes_gameloop
         perform_zpcm_inc
 
@@ -1103,9 +1095,9 @@ continue_waiting:
         lda #0
         sta PlayerKeys
         ; We faded out to get here, so fade back in
-        lda #0
+        lda #BRIGHTNESS_FULLY_DARK
         sta set_brightness
-        lda #4
+        lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
 
         ; Now run the regular zone init logic from here
@@ -1801,8 +1793,6 @@ continue_waiting:
         far_call FAR_update_room_effects
         far_call FAR_draw_particles
 
-        perform_zpcm_inc
-        far_call FAR_update_brightness
         perform_zpcm_inc
         far_call FAR_refresh_palettes_gameloop
         perform_zpcm_inc

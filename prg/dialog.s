@@ -7,7 +7,6 @@
         .include "hud.inc"
         .include "input.inc"
         .include "nes.inc"
-        .include "palette.inc"
         .include "prng.inc"
         .include "rainbow.inc"
         .include "sound.inc"
@@ -131,12 +130,21 @@ border_loop:
 .endproc
 
 .proc state_wait_for_activation
-        lda HudStagingPalette+0
-        sta staging_palette+16+4
-        sta staging_palette+16+8
-        sta staging_palette+16+12
-        sta ObjPaletteBuffer+8
-        sta BgPaletteBuffer+8
+        ; Old, hacky nonsense
+        ;lda HudStagingPalette+0
+        ;sta staging_palette+16+4
+        ;sta staging_palette+16+8
+        ;sta staging_palette+16+12
+        ;sta ObjPaletteBuffer+8
+        ;sta BgPaletteBuffer+8
+
+        ; Now the separator has real brightness, so we can just write a colorspace
+        ; to it directly
+        lda #$00
+        sta HudSeparatorPal+0
+        sta HudSeparatorPal+1
+        sta HudSeparatorPal+2
+        sta StagingHudPaletteDirty
 
         perform_zpcm_inc
 
@@ -216,10 +224,20 @@ done:
         lda #0
         sta DialogChirpTimer
 
-        lda HudStagingPalette+5
-        sta staging_palette+16+8
-        sta ObjPaletteBuffer+8
-        sta BgPaletteBuffer+8
+        ; Old hack from before the separator had brightness applied
+        ;lda HudStagingPalette+5
+        ;sta staging_palette+16+8
+        ;sta ObjPaletteBuffer+8
+        ;sta BgPaletteBuffer+8
+
+        ; Now the separator has real brightness, so we can just write a colorspace
+        ; to it directly
+        lda #$00
+        sta HudSeparatorPal+0
+        sta HudSeparatorPal+2
+        lda #$01
+        sta HudSeparatorPal+1
+        sta StagingHudPaletteDirty
 
         inc DialogOpenClosePos
         ldx DialogOpenClosePos

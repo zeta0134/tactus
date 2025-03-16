@@ -5,14 +5,13 @@
         .include "battlefield.inc"
         .include "beat_tracker.inc"
         .include "chr.inc"
-        ;.include "charmap.inc"
+        .include "dynamic_palette.inc"
         .include "enemies.inc"
         .include "far_call.inc"
         .include "kernel.inc"
         .include "nes.inc"
         .include "input.inc"
         .include "math_util.inc"
-        .include "palette.inc"
         .include "player.inc"
         .include "prng.inc"
         .include "procgen.inc"
@@ -91,7 +90,7 @@ empty_string: .asciiz ""
         .include "ui/name_entry_screen.incs"
         .include "ui/file_details_screen.incs"
 
-        .segment "CODE_UI_WIDGETS"
+        .segment "CODE_UI_UTIL"
 
 ; ======================================================================
 ;                         Kernel Functions
@@ -189,6 +188,8 @@ done:
         restore_previous_bank
         rts
 .endproc
+
+.segment "CODE_UI_WIDGETS"
 
 .proc __widget_trampoline
 WidgetUpdatePtr := R18

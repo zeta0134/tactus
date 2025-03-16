@@ -8,13 +8,13 @@
 
         .include "bhop/bhop.inc"
         .include "battlefield.inc"
+        .include "dynamic_palette.inc"
         .include "enemies.inc"
         .include "far_call.inc"
         .include "hud.inc"
         .include "kernel.inc"
         .include "levels.inc"
         .include "loot.inc"
-        .include "palette.inc"
         .include "player.inc"
         .include "prng.inc"
         .include "procgen.inc"
@@ -770,19 +770,23 @@ HudPalPtr := R0
 hud_base_loop:
         perform_zpcm_inc
         lda hud_base_pal, y
-        sta HudPaletteBuffer, y
+        sta IncomingHwPalette, y
         iny
         cpy #16
         bne hud_base_loop
+
+        far_call FAR_set_hud_bg_palette_from_hw
 
         ldy #0
 hud_zone_loop:
         perform_zpcm_inc
         lda (HudPalPtr), y
-        sta HudPaletteBuffer+16, y
+        sta IncomingHwPalette, y
         iny
-        cpy #16
+        cpy #16 ; TODO: we don't actually use all of these, should we shorten this?
         bne hud_zone_loop
+
+        far_call FAR_set_hud_obj_palette_from_hw
 
         restore_previous_bank
         perform_zpcm_inc

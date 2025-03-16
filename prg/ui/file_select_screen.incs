@@ -95,50 +95,56 @@ tile_converge:
 .segment "CODE_UI_WIDGETS"
 
 .proc apply_standard_ui_palette
-        ; Get the file select palettes loaded in
         ldy #0
 bg_loop:
         perform_zpcm_inc
         lda checkerboard_ui_palette_normal, y
-        sta BgPaletteBuffer, y
+        sta IncomingHwPalette, y
         iny
         cpy #16
         bne bg_loop
 
-        lda options_obj_palette+5
-        sta ObjPaletteBuffer+5
-        lda options_obj_palette+6
-        sta ObjPaletteBuffer+6
-        lda options_obj_palette+7
-        sta ObjPaletteBuffer+7
+        far_call FAR_set_bg_target_palette_from_hw
+        far_call FAR_set_bg_current_palette_from_target
 
-        lda #1
-        sta BgPaletteDirty
-        sta ObjPaletteDirty
+        ldy #0
+obj_loop:
+        perform_zpcm_inc        
+        lda options_obj_palette, y
+        sta IncomingHwPalette, y
+        iny
+        cpy #16
+        bne obj_loop
+
+        far_call FAR_set_obj_palette_from_hw
+
         rts
 .endproc
 
 .proc apply_danger_ui_palette
-        ; Get the file select palettes loaded in
         ldy #0
 bg_loop:
         perform_zpcm_inc
         lda checkerboard_ui_palette_danger, y
-        sta BgPaletteBuffer, y
+        sta IncomingHwPalette, y
         iny
         cpy #16
         bne bg_loop
 
-        lda options_obj_palette+5
-        sta ObjPaletteBuffer+5
-        lda options_obj_palette+6
-        sta ObjPaletteBuffer+6
-        lda options_obj_palette+7
-        sta ObjPaletteBuffer+7
-        
-        lda #1
-        sta BgPaletteDirty
-        sta ObjPaletteDirty
+        far_call FAR_set_bg_target_palette_from_hw
+        far_call FAR_set_bg_current_palette_from_target
+
+        ldy #0
+obj_loop:
+        perform_zpcm_inc        
+        lda options_obj_palette, y
+        sta IncomingHwPalette, y
+        iny
+        cpy #16
+        bne obj_loop
+
+        far_call FAR_set_obj_palette_from_hw
+
         rts
 .endproc
 
@@ -195,9 +201,9 @@ widget_file_select_mode := widgets_data0
 
         jsr apply_standard_ui_palette
 
-        lda #0
+        lda #BRIGHTNESS_FULLY_DARK
         jsr set_brightness
-        lda #4
+        lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
 
         ldy CurrentWidgetIndex

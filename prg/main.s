@@ -5,13 +5,13 @@
         .include "battlefield.inc"
         .include "chr.inc"
         .include "debug.inc"
+        .include "dynamic_palette.inc"
         .include "far_call.inc"
         .include "kernel.inc"
         .include "main.inc"
         .include "memory_util.inc"
         .include "nes.inc"
         .include "pal.inc"
-        .include "palette.inc"
         .include "ppu.inc"
         .include "prng.inc"
         .include "raster_table.inc"
@@ -56,10 +56,11 @@ start:
         jsr clear_memory
 
         jsr detect_system_type
+        jsr detect_ppu_type
 
         jsr init_far_calls
 
-        far_call FAR_init_palettes
+        far_call FAR_init_dynamic_palettes
         far_call FAR_initialize_palettes
         far_call FAR_initialize_ppu
         ;jsr init_irq_subsystem

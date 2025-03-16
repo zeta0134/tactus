@@ -8,6 +8,7 @@
         .include "chr.inc"
         .include "bombs.inc"
         .include "debug.inc"
+        .include "dynamic_palette.inc"
         .include "enemies.inc"
         .include "far_call.inc"
         .include "floor_preservation.inc"
@@ -17,7 +18,6 @@
         .include "levels.inc"
         .include "loot.inc"
         .include "nes.inc"
-        .include "palette.inc"
         .include "particles.inc"
         .include "player.inc"
         .include "ppu.inc"
@@ -77,7 +77,6 @@ SpellParticleSpawnCooldown: .res 1
 ; Where should the warp entrance go on a given zone? Not all zones have these.
 WarpPortalRoomIndex: .res 1
 WarpEntranceRoomIndex: .res 1
-WarpHueIndex: .res 1
 WarpHueCooldown: .res 1
 
         ; should match levels_structures.s! it relies on several of our functions,
@@ -2128,13 +2127,13 @@ previous_room_effect := room_spell_data1
         lda #0
         sta ScreenShakeDepth
         ; Brighten the screen at this point, like we do when other spell effects apply
-        lda #8
+        lda #BRIGHTNESS_FULLY_BRIGHT
         sta Brightness
-        lda #4
+        lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
         lda #1
-        sta BgPaletteDirty
-        sta ObjPaletteDirty
+        sta StagingBgPaletteDirty
+        sta StagingObjPaletteDirty
         ; Signal the oncoming, unavoidable approach of JOYOUS EXCITEMENT
         queue_sfx_pulse1 sfx_party_pulse1
         queue_sfx_pulse2 sfx_party_pulse2
@@ -2375,19 +2374,14 @@ spawn_petal_particle:
         rts
 .endproc
 
-warp_hue_shift_lut:
-        .incbin "../art/warp_zone.pal"
-        .incbin "../art/warp_zone_hueshift_1.pal"
-        .incbin "../art/warp_zone_hueshift_2.pal"
-        .incbin "../art/warp_zone_hueshift_3.pal"
-        .incbin "../art/warp_zone_hueshift_4.pal"
-        .incbin "../art/warp_zone_hueshift_5.pal"
-        .incbin "../art/warp_zone_hueshift_6.pal"
-        .incbin "../art/warp_zone_hueshift_7.pal"
-        .incbin "../art/warp_zone_hueshift_8.pal"
-        .incbin "../art/warp_zone_hueshift_9.pal"
-        .incbin "../art/warp_zone_hueshift_10.pal"
-        .incbin "../art/warp_zone_hueshift_11.pal"
+; From wherever we are in the expanded colorspace to that same location -> over that way
+hue_rotate_lut:
+        .byte $00, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $01, $00, $00, $00
+        .byte $10, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $11, $00, $00, $00
+        .byte $20, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $21, $00, $00, $00
+        .byte $30, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $31, $00, $00, $00
+        .byte $40, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $41, $00, $00, $00
+        .byte $50, $52, $53, $54, $55, $56, $57, $58, $59, $5A, $5B, $5C, $51, $00, $00, $00
 
 .proc perform_warp_hue_cycling
         perform_zpcm_inc
@@ -2399,41 +2393,36 @@ perform_cycle:
         lda #6
         sta WarpHueCooldown
 
-        inc WarpHueIndex
-        lda WarpHueIndex
-        cmp #12
-        bcc index_in_range
-        lda #0
-        sta WarpHueIndex
-index_in_range:
-        perform_zpcm_inc
-        ; x16 to pick the base palette
-        .repeat 4
-        asl
-        .endrepeat
-        tax
-        ; copy those suckers in fast
-        lda warp_hue_shift_lut+5, x
-        sta BgPaletteBuffer+5
-        lda warp_hue_shift_lut+6, x
-        sta BgPaletteBuffer+6
-        lda warp_hue_shift_lut+7, x
-        sta BgPaletteBuffer+7
-        lda warp_hue_shift_lut+9, x
-        sta BgPaletteBuffer+9
-        lda warp_hue_shift_lut+10, x
-        sta BgPaletteBuffer+10
-        lda warp_hue_shift_lut+11, x
-        sta BgPaletteBuffer+11
-        lda warp_hue_shift_lut+13, x
-        sta BgPaletteBuffer+13
-        lda warp_hue_shift_lut+14, x
-        sta BgPaletteBuffer+14
-        lda warp_hue_shift_lut+15, x
-        sta BgPaletteBuffer+15
-        ; and flag the BG palette as dirty to force an update
-        lda #1
-        sta BgPaletteDirty
+        ldx TargetPlayfieldBgPal1+0
+        lda hue_rotate_lut, x
+        sta TargetPlayfieldBgPal1+0
+        ldx TargetPlayfieldBgPal1+1
+        lda hue_rotate_lut, x
+        sta TargetPlayfieldBgPal1+1
+        ldx TargetPlayfieldBgPal1+2
+        lda hue_rotate_lut, x
+        sta TargetPlayfieldBgPal1+2
+
+        ldx TargetPlayfieldBgPal2+0
+        lda hue_rotate_lut, x
+        sta TargetPlayfieldBgPal2+0
+        ldx TargetPlayfieldBgPal2+1
+        lda hue_rotate_lut, x
+        sta TargetPlayfieldBgPal2+1
+        ldx TargetPlayfieldBgPal2+2
+        lda hue_rotate_lut, x
+        sta TargetPlayfieldBgPal2+2
+
+        ldx TargetPlayfieldBgPal3+0
+        lda hue_rotate_lut, x
+        sta TargetPlayfieldBgPal3+0
+        ldx TargetPlayfieldBgPal3+1
+        lda hue_rotate_lut, x
+        sta TargetPlayfieldBgPal3+1
+        ldx TargetPlayfieldBgPal3+2
+        lda hue_rotate_lut, x
+        sta TargetPlayfieldBgPal3+2
+
         perform_zpcm_inc
         rts
 .endproc

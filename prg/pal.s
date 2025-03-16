@@ -4,6 +4,7 @@
 
     .segment "RAM"
 system_type: .res 1
+ppu_type: .res 1
 
     .segment "PRGFIXED_E000"
 
@@ -47,5 +48,12 @@ system_type: .res 1
 @noclip3:
 ;;; Right now, A contains 0,1,2,3 for NTSC,PAL,Dendy,Bad
         sta system_type
+        rts
+.endproc
+
+.proc detect_ppu_type
+        ; TODO: this properly!
+        lda #0
+        sta ppu_type
         rts
 .endproc

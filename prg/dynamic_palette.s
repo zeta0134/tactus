@@ -3,13 +3,16 @@
     .include "far_call.inc"
     .include "rainbow.inc"
     .include "zeropage.inc"
+    .include "word_util.inc"
     .include "zpcm.inc"
 
 .zeropage
 ; Copied in during NMI where every cycle is precious. Spare no expense!
 staging_palette: .res 32
 
+
         .segment "RAM"
+PaletteStateFunc: .res 2
 
 ; For setting a base palette when the original is in hw format. We need to
 ; convert it to our intermediate format. How this gets used depends on the
@@ -41,10 +44,30 @@ HudBgPal3: .res 3
 HudObjPal0: .res 3 ; Note: the HUD swap only changes OBJ0, we leave 1-3 alone
 HudSeparatorPal: .res 3 ; Displayed DURING the hud palette swap, as thin lines
 
-PpuModeOffset: .res 1
+StagingBgPaletteDirty: .res 1
+StagingObjPaletteDirty: .res 1
+StagingHudPaletteDirty: .res 1
 
-StagingPaletteDirty: .res 1
-CurrentBrightness: .res 1
+; Copied in during a raster effect which needs lots of delay anyway, so regular RAM
+; is just fine. 
+HudStagingPalette: .res 32
+
+Brightness: .res 1
+TargetBrightness: .res 1
+BrightnessDelay: .res 1
+GlobalFadeSpeed: .res 1
+
+.segment "PRGFIXED_E000"
+
+; call with desired brightness in a
+.proc set_brightness
+        sta Brightness
+        lda #1
+        sta StagingBgPaletteDirty
+        sta StagingObjPaletteDirty
+        sta StagingHudPaletteDirty
+        rts
+.endproc
 
         .segment "CODE_PALETTES"
 
@@ -61,13 +84,13 @@ dynamic_palette_brightness_minus_1:
 dynamic_palette_brightness_normal:
     .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
 dynamic_palette_brightness_plus_1:
-    .byte $2D, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $00, $0F, $0F
+    .byte $2D, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0F, $0F, $0F
 dynamic_palette_brightness_plus_2:
-    .byte $00, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $00, $0F, $0F
+    .byte $00, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $0F, $0F, $0F
 dynamic_palette_brightness_plus_3:
-    .byte $10, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $10, $0F, $0F
+    .byte $10, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $0F, $0F, $0F
 dynamic_palette_brightness_plus_4:
-    .byte $3D, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $10, $0F, $0F
+    .byte $3D, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $0F, $0F, $0F
 dynamic_palette_brightness_plus_5:
     .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
     .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
@@ -81,23 +104,22 @@ dynamic_palette_brightness_plus_5:
 ; Format of entries:
 ; index: XY where X is the target hue, Y is the current hue
 ; value: target hue + 1 step towards current hue
-; note: this table prefers hue=0 for greyscale steps
 hue_shift_lut:
-    ;Src: GSC   x1   x2,  x3   x4   x5   x6   x7   x8   x9   xA   xB   xC  RGB, ---, --- 
+    ;Src: GSC   x1   x2,  x3   x4   x5   x6   x7   x8   x9   xA   xB   xC  ---, ---, --- 
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00 ; Dest: GSC
     .byte $01, $01, $01, $02, $03, $04, $05, $06, $09, $0A, $0B, $0C, $01, $01, $01, $01 ; Dest: x1
-    .byte $02, $02, $02, $02, $03, $04, $05, $06, $07, $0A, $0B, $0C, $01, $02, $02, $02 ; Dest: x2
-    .byte $03, $02, $03, $03, $03, $04, $05, $06, $07, $08, $0B, $0C, $01, $03, $03, $03 ; Dest: x3
-    .byte $04, $02, $03, $04, $04, $04, $05, $06, $07, $08, $09, $0C, $01, $04, $04, $04 ; Dest: x4
+    .byte $02, $02, $02, $02, $03, $04, $05, $06, $09, $0A, $0B, $0C, $01, $02, $02, $02 ; Dest: x2
+    .byte $03, $02, $03, $03, $03, $04, $05, $06, $07, $0A, $0B, $0C, $01, $03, $03, $03 ; Dest: x3
+    .byte $04, $02, $03, $04, $04, $04, $05, $06, $07, $08, $0B, $0C, $01, $04, $04, $04 ; Dest: x4
     .byte $05, $02, $03, $04, $05, $05, $05, $06, $07, $08, $09, $0A, $01, $05, $05, $05 ; Dest: x5
-    .byte $06, $02, $03, $04, $05, $06, $06, $06, $07, $08, $09, $0A, $0B, $06, $06, $06 ; Dest: x6
-    .byte $07, $0C, $03, $04, $05, $06, $07, $07, $07, $08, $09, $0A, $0B, $07, $07, $07 ; Dest: x7
+    .byte $06, $02, $03, $04, $05, $06, $06, $06, $07, $08, $09, $0A, $01, $06, $06, $06 ; Dest: x6
+    .byte $07, $02, $03, $04, $05, $06, $07, $07, $07, $08, $09, $0A, $0B, $07, $07, $07 ; Dest: x7
     .byte $08, $0C, $01, $04, $05, $06, $07, $08, $08, $08, $09, $0A, $0B, $08, $08, $08 ; Dest: x8
     .byte $09, $0C, $01, $02, $05, $06, $07, $08, $09, $09, $09, $0A, $0B, $09, $09, $09 ; Dest: x9
     .byte $0A, $0C, $01, $02, $03, $06, $07, $08, $09, $0A, $0A, $0A, $0B, $0A, $0A, $0A ; Dest: xA
-    .byte $0B, $0C, $01, $02, $03, $04, $07, $08, $09, $0A, $0B, $0B, $0B, $0B, $0B, $0B ; Dest: xB
+    .byte $0B, $0C, $01, $02, $03, $06, $07, $08, $09, $0A, $0B, $0B, $0B, $0B, $0B, $0B ; Dest: xB
     .byte $0C, $0C, $01, $02, $03, $04, $05, $08, $09, $0A, $0B, $0C, $0C, $0C, $0C, $0C ; Dest: xC
-    .byte $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D, $0D ; Dest: RGB
+    .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00 ; Dest: ---
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00 ; Dest: ---
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00 ; Dest: ---
 
@@ -107,11 +129,63 @@ hw_to_intermediate_equivalence_lut:
     .byte $30, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $00, $00, $00
     .byte $50, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $10, $00, $00
     .byte $50, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $40, $00, $00
-    ; RGB PPU (uses $xD for greyscale)
-    .byte $2D, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $0D, $0D, $0D
-    .byte $3D, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $0D, $0D, $0D
-    .byte $5D, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $1D, $0D, $0D
-    .byte $5D, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $4D, $0D, $0D
+
+.proc FAR_init_dynamic_palettes
+        ; Initialize all hardware palettes to solid black
+        lda #$0F
+        ldx #0
+hw_pal_loop:
+        perform_zpcm_inc
+        sta staging_palette+0, x
+        sta staging_palette+16, x
+        sta HudStagingPalette+0, x
+        sta HudStagingPalette+16, x
+        inx
+        cpx #16
+        bne hw_pal_loop
+
+        ; Initialize all colorspace palettes to solid black, greyscale hue
+        lda #0
+        sta CurrentPlayfieldBackdrop
+        sta TargetPlayfieldBackdrop
+        sta HudBackdrop
+        ldx #0
+intermediate_pal_loop:
+        sta CurrentPlayfieldBgPal0, x
+        sta CurrentPlayfieldBgPal1, x
+        sta CurrentPlayfieldBgPal2, x
+        sta CurrentPlayfieldBgPal3, x
+        sta TargetPlayfieldBgPal0, x
+        sta TargetPlayfieldBgPal1, x
+        sta TargetPlayfieldBgPal2, x
+        sta TargetPlayfieldBgPal3, x
+        sta PlayfieldObjPal0, x
+        sta PlayfieldObjPal1, x
+        sta PlayfieldObjPal2, x
+        sta PlayfieldObjPal3, x
+        sta HudBgPal0, x
+        sta HudBgPal1, x
+        sta HudBgPal2, x
+        sta HudBgPal3, x
+        sta HudObjPal0, x
+        sta HudSeparatorPal, x
+        inx
+        cpx #3
+        bne intermediate_pal_loop
+
+        sta BrightnessDelay
+        lda #BRIGHTNESS_FULLY_DARK
+        sta Brightness
+        sta TargetBrightness
+
+        lda #3
+        sta GlobalFadeSpeed
+
+        st16 PaletteStateFunc, palette_state_bgstep_01
+
+        rts
+.endproc
+
 
 ; For these, we assume the hardware palette has been preloaded into the RAM location.
 ; We do this to make bank switching saner, and because we don't really care too much
@@ -120,82 +194,55 @@ hw_to_intermediate_equivalence_lut:
 ; Set the target when you want to smoothly fade from the current palette
 .proc FAR_set_bg_target_palette_from_hw
     lda IncomingHwPalette+0
-    ora PpuModeOffset
     tax
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBackdrop
 
-    lda IncomingHwPalette+1
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+1
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal0+0
-    lda IncomingHwPalette+2
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+2
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal0+1
-    lda IncomingHwPalette+3
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+3
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal0+2
 
-    lda IncomingHwPalette+5
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+5
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal1+0
-    lda IncomingHwPalette+6
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+6
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal1+1
-    lda IncomingHwPalette+7
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+7
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal1+2
 
-    lda IncomingHwPalette+9
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+9
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal2+0
-    lda IncomingHwPalette+10
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+10
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal2+1
-    lda IncomingHwPalette+11
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+11
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal2+2
 
-    lda IncomingHwPalette+13
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+13
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal3+0
-    lda IncomingHwPalette+14
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+14    
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal3+1
-    lda IncomingHwPalette+15
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+15
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal3+2
 
-    inc StagingPaletteDirty
     rts
 .endproc
 
 ; Set both when you need the change to be instant (ish)
-.proc FAR_set_bg_current_palette_from_hw
-    near_call FAR_set_bg_target_palette_from_hw
+.proc FAR_set_bg_current_palette_from_target
     lda TargetPlayfieldBackdrop
     sta CurrentPlayfieldBackdrop
     lda TargetPlayfieldBgPal0+0
@@ -223,191 +270,131 @@ hw_to_intermediate_equivalence_lut:
     lda TargetPlayfieldBgPal3+2
     sta CurrentPlayfieldBgPal3+2
 
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
     rts
 .endproc
 
 ; Obj and HUD palettes don't have a current/target setup, it's too expensive
 .proc FAR_set_obj_palette_from_hw
-    lda IncomingHwPalette+1
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+1
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal0+0
-    lda IncomingHwPalette+2
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+2
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal0+1
-    lda IncomingHwPalette+3
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+3
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal0+2
 
-    lda IncomingHwPalette+5
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+5
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal1+0
-    lda IncomingHwPalette+6
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+6
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal1+1
-    lda IncomingHwPalette+7
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+7
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal1+2
 
-    lda IncomingHwPalette+9
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+9
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal2+0
-    lda IncomingHwPalette+10
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+10    
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal2+1
-    lda IncomingHwPalette+11
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+11
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal2+2
 
-    lda IncomingHwPalette+13
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+13    
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal3+0
-    lda IncomingHwPalette+14
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+14
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal3+1
-    lda IncomingHwPalette+15
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+15
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal3+2
 
-    inc StagingPaletteDirty
+    inc StagingObjPaletteDirty
     rts
 .endproc
 
 .proc FAR_set_hud_bg_palette_from_hw
-    lda IncomingHwPalette+0
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+0
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBackdrop
 
-    lda IncomingHwPalette+1
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+1
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal0+0
-    lda IncomingHwPalette+2
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+2
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal0+1
-    lda IncomingHwPalette+3
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+3
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal0+2
 
-    lda IncomingHwPalette+5
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+5
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal1+0
-    lda IncomingHwPalette+6
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+6
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal1+1
-    lda IncomingHwPalette+7
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+7
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal1+2
 
-    lda IncomingHwPalette+9
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+9
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal2+0
-    lda IncomingHwPalette+10
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+10
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal2+1
-    lda IncomingHwPalette+11
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+11
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal2+2
 
-    lda IncomingHwPalette+13
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+13    
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal3+0
-    lda IncomingHwPalette+14
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+14
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal3+1
-    lda IncomingHwPalette+15
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+15    
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal3+2
-    inc StagingPaletteDirty
+
+    inc StagingHudPaletteDirty
     rts
 .endproc
 
 .proc FAR_set_hud_obj_palette_from_hw
-    lda IncomingHwPalette+1
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+1
     lda hw_to_intermediate_equivalence_lut, x
     sta HudObjPal0+0
-    lda IncomingHwPalette+2
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+2
     lda hw_to_intermediate_equivalence_lut, x
     sta HudObjPal0+1
-    lda IncomingHwPalette+3
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+3    
     lda hw_to_intermediate_equivalence_lut, x
     sta HudObjPal0+2
-    inc StagingPaletteDirty
+
+    inc StagingHudPaletteDirty
     rts
 .endproc
 
 .proc FAR_set_hud_separator_palette_from_hw
-    lda IncomingHwPalette+1
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+1
     lda hw_to_intermediate_equivalence_lut, x
     sta HudSeparatorPal+0
-    lda IncomingHwPalette+2
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+2
     lda hw_to_intermediate_equivalence_lut, x
     sta HudSeparatorPal+1
-    lda IncomingHwPalette+3
-    ora PpuModeOffset
-    tax
+    ldx IncomingHwPalette+3
     lda hw_to_intermediate_equivalence_lut, x
     sta HudSeparatorPal+2
-    inc StagingPaletteDirty
+    inc StagingHudPaletteDirty
     rts
 .endproc
 
@@ -477,7 +464,7 @@ TargetColor := R1
     jsr step_luminence
     lda CurrentColor
     sta CurrentPlayfieldBackdrop
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
 done_with_backdrop:
     
     lda CurrentPlayfieldBgPal0+0
@@ -490,7 +477,7 @@ done_with_backdrop:
     jsr step_luminence
     lda CurrentColor
     sta CurrentPlayfieldBgPal0+0
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
 done_with_entry_0:
 
     lda CurrentPlayfieldBgPal0+1
@@ -503,7 +490,7 @@ done_with_entry_0:
     jsr step_luminence
     lda CurrentColor
     sta CurrentPlayfieldBgPal0+1
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
 done_with_entry_1:
 
     lda CurrentPlayfieldBgPal0+2
@@ -516,7 +503,7 @@ done_with_entry_1:
     jsr step_luminence
     lda CurrentColor
     sta CurrentPlayfieldBgPal0+2
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
 done_with_entry_2:
     
     rts
@@ -535,7 +522,7 @@ TargetColor := R1
     jsr step_luminence
     lda CurrentColor
     sta CurrentPlayfieldBgPal1+0
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
 done_with_entry_0:
 
     lda CurrentPlayfieldBgPal1+1
@@ -548,7 +535,7 @@ done_with_entry_0:
     jsr step_luminence
     lda CurrentColor
     sta CurrentPlayfieldBgPal1+1
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
 done_with_entry_1:
 
     lda CurrentPlayfieldBgPal1+2
@@ -561,7 +548,7 @@ done_with_entry_1:
     jsr step_luminence
     lda CurrentColor
     sta CurrentPlayfieldBgPal1+2
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
 done_with_entry_2:
     
     rts
@@ -580,7 +567,7 @@ TargetColor := R1
     jsr step_luminence
     lda CurrentColor
     sta CurrentPlayfieldBgPal2+0
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
 done_with_entry_0:
 
     lda CurrentPlayfieldBgPal2+1
@@ -593,7 +580,7 @@ done_with_entry_0:
     jsr step_luminence
     lda CurrentColor
     sta CurrentPlayfieldBgPal2+1
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
 done_with_entry_1:
 
     lda CurrentPlayfieldBgPal2+2
@@ -606,7 +593,7 @@ done_with_entry_1:
     jsr step_luminence
     lda CurrentColor
     sta CurrentPlayfieldBgPal2+2
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
 done_with_entry_2:
     
     rts
@@ -625,7 +612,7 @@ TargetColor := R1
     jsr step_luminence
     lda CurrentColor
     sta CurrentPlayfieldBgPal3+0
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
 done_with_entry_0:
 
     lda CurrentPlayfieldBgPal3+1
@@ -638,7 +625,7 @@ done_with_entry_0:
     jsr step_luminence
     lda CurrentColor
     sta CurrentPlayfieldBgPal3+1
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
 done_with_entry_1:
 
     lda CurrentPlayfieldBgPal3+2
@@ -651,26 +638,26 @@ done_with_entry_1:
     jsr step_luminence
     lda CurrentColor
     sta CurrentPlayfieldBgPal3+2
-    inc StagingPaletteDirty
+    inc StagingBgPaletteDirty
 done_with_entry_2:
     
     rts
 .endproc
 
-.proc compute_staging_palette
+.proc compute_staging_bg_palette
 HardwarePalLutPtr := R0
-    lda StagingPaletteDirty
+    lda StagingBgPaletteDirty
     bne do_the_work
     rts
 do_the_work:
     lda #0
-    sta StagingPaletteDirty
+    sta StagingBgPaletteDirty
     
     ; The current brightness is specified in 16-entry rows, so we
     ; just need to add it to our base pointer here
     clc
     lda #<dynamic_palette_brightness_minus_5
-    adc CurrentBrightness
+    adc Brightness
     sta HardwarePalLutPtr+0
     lda #>dynamic_palette_brightness_minus_5
     adc #0
@@ -684,9 +671,9 @@ do_the_work:
     lda (HardwarePalLutPtr), y
     sta staging_palette+0  ; TODO: redundant?
     sta staging_palette+16
-    ldy CurrentPlayfieldBgPal0+0
-    lda (HardwarePalLutPtr), y
-    sta staging_palette+1
+    ldy CurrentPlayfieldBgPal0+0 ; 4
+    lda (HardwarePalLutPtr), y   ; 5
+    sta staging_palette+1        ; 3
     ldy CurrentPlayfieldBgPal0+1
     lda (HardwarePalLutPtr), y
     sta staging_palette+2
@@ -694,10 +681,6 @@ do_the_work:
     lda (HardwarePalLutPtr), y
     sta staging_palette+3
 
-    ldy HudSeparatorPal+0
-    lda (HardwarePalLutPtr), y
-    sta staging_palette+4  ; TODO: redundant?
-    sta staging_palette+20
     ldy CurrentPlayfieldBgPal1+0
     lda (HardwarePalLutPtr), y
     sta staging_palette+5
@@ -708,10 +691,6 @@ do_the_work:
     lda (HardwarePalLutPtr), y
     sta staging_palette+7
 
-    ldy HudSeparatorPal+1
-    lda (HardwarePalLutPtr), y
-    sta staging_palette+8  ; TODO: redundant?
-    sta staging_palette+24
     ldy CurrentPlayfieldBgPal2+0
     lda (HardwarePalLutPtr), y
     sta staging_palette+9
@@ -722,10 +701,6 @@ do_the_work:
     lda (HardwarePalLutPtr), y
     sta staging_palette+11
 
-    ldy HudSeparatorPal+2
-    lda (HardwarePalLutPtr), y
-    sta staging_palette+12 ; TODO: redundant?
-    sta staging_palette+28
     ldy CurrentPlayfieldBgPal3+0
     lda (HardwarePalLutPtr), y
     sta staging_palette+13
@@ -735,6 +710,33 @@ do_the_work:
     ldy CurrentPlayfieldBgPal3+2
     lda (HardwarePalLutPtr), y
     sta staging_palette+15
+
+    rts
+.endproc
+
+; Separated out because the HUD often doesn't need to
+.proc compute_staging_obj_palette
+HardwarePalLutPtr := R0
+    lda StagingObjPaletteDirty
+    bne do_the_work
+    rts
+do_the_work:
+    lda #0
+    sta StagingObjPaletteDirty
+    
+    ; The current brightness is specified in 16-entry rows, so we
+    ; just need to add it to our base pointer here
+    clc
+    lda #<dynamic_palette_brightness_minus_5
+    adc Brightness
+    sta HardwarePalLutPtr+0
+    lda #>dynamic_palette_brightness_minus_5
+    adc #0
+    sta HardwarePalLutPtr+1
+
+    ; Now run through and work out what the staging palette should be for
+    ; the entire set of colors. Don't overcomplicate this, just do the whole
+    ; thing reeeeally fast.
 
     ldy PlayfieldObjPal0+0
     lda (HardwarePalLutPtr), y
@@ -777,4 +779,155 @@ do_the_work:
     sta staging_palette+31
 
     rts
+.endproc
+
+.proc compute_staging_hud_palette
+HardwarePalLutPtr := R0
+    lda StagingHudPaletteDirty
+    bne do_the_work
+    rts
+do_the_work:
+    lda #0
+    sta StagingHudPaletteDirty
+    
+    ; The current brightness is specified in 16-entry rows, so we
+    ; just need to add it to our base pointer here
+    clc
+    lda #<dynamic_palette_brightness_minus_5
+    adc Brightness
+    sta HardwarePalLutPtr+0
+    lda #>dynamic_palette_brightness_minus_5
+    adc #0
+    sta HardwarePalLutPtr+1
+
+    ; Now run through and work out what the staging palette should be for
+    ; the entire set of colors. Don't overcomplicate this, just do the whole
+    ; thing reeeeally fast.
+
+    ldy HudBackdrop
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+0  ; TODO: redundant?
+    sta HudStagingPalette+16
+    ldy HudBgPal0+0 ; 4
+    lda (HardwarePalLutPtr), y   ; 5
+    sta HudStagingPalette+1        ; 3
+    ldy HudBgPal0+1
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+2
+    ldy HudBgPal0+2
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+3
+
+    ldy HudBgPal1+0
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+5
+    ldy HudBgPal1+1
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+6
+    ldy HudBgPal1+2
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+7
+
+    ldy HudBgPal2+0
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+9
+    ldy HudBgPal2+1
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+10
+    ldy HudBgPal2+2
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+11
+
+    ldy HudBgPal3+0
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+13
+    ldy HudBgPal3+1
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+14
+    ldy HudBgPal3+2
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+15
+
+    ldy HudObjPal0+0
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+17
+    ldy HudObjPal0+1
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+18
+    ldy HudObjPal0+2
+    lda (HardwarePalLutPtr), y
+    sta HudStagingPalette+19
+
+    ldy HudSeparatorPal+0
+    lda (HardwarePalLutPtr), y
+    sta staging_palette+4  ; TODO: redundant?
+    sta staging_palette+20
+    ldy HudSeparatorPal+1
+    lda (HardwarePalLutPtr), y
+    sta staging_palette+8  ; TODO: redundant?
+    sta staging_palette+24
+    ldy HudSeparatorPal+2
+    lda (HardwarePalLutPtr), y
+    sta staging_palette+12 ; TODO: redundant?
+    sta staging_palette+28
+
+    rts
+.endproc
+
+.proc update_brightness
+        lda BrightnessDelay
+        beq continue
+        dec BrightnessDelay
+        rts
+continue:        
+        lda TargetBrightness
+        cmp Brightness
+        beq done ; nothing to do
+        bcc target_lower
+target_higher:
+        lda Brightness
+        clc
+        adc #$10
+        sta Brightness
+        jmp converge
+target_lower:
+        lda Brightness
+        sec
+        sbc #$10
+        sta Brightness
+converge:
+        lda #1
+        sta StagingBgPaletteDirty
+        sta StagingObjPaletteDirty
+        sta StagingHudPaletteDirty
+        lda GlobalFadeSpeed
+        sta BrightnessDelay
+done:
+        rts
+.endproc
+
+.proc palette_state_bgstep_01
+    jsr step_bg0_color
+    jsr step_bg1_color
+    jsr update_brightness
+    jsr compute_staging_bg_palette
+    jsr compute_staging_obj_palette
+    jsr compute_staging_hud_palette
+    st16 PaletteStateFunc, palette_state_bgstep_23
+    rts
+.endproc
+
+.proc palette_state_bgstep_23
+    jsr step_bg2_color
+    jsr step_bg3_color
+    jsr update_brightness
+    jsr compute_staging_bg_palette
+    jsr compute_staging_obj_palette
+    jsr compute_staging_hud_palette
+    st16 PaletteStateFunc, palette_state_bgstep_01
+    rts
+.endproc
+
+.proc FAR_refresh_palettes_gameloop
+        jmp (PaletteStateFunc)
 .endproc

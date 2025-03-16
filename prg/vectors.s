@@ -17,7 +17,6 @@
 .include "input.inc"
 .include "main.inc"
 .include "memory_util.inc"
-.include "palette.inc"
 .include "prng.inc"
 .include "rainbow.inc"
 .include "raster_table.inc"

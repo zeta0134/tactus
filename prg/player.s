@@ -7,6 +7,7 @@
         .include "bombs.inc"
         .include "dialog.inc"
         .include "debug.inc"
+        .include "dynamic_palette.inc"
         .include "enemies.inc"
         .include "far_call.inc"
         .include "hud.inc"
@@ -19,7 +20,6 @@
         .include "nes.inc"
         .include "player.inc"
         .include "player_distance.inc"
-        .include "palette.inc"
         .include "procgen.inc"
         .include "rainbow.inc"
         .include "raster_table.inc"
@@ -396,7 +396,7 @@ damage_flash_lut:
         lda PlayerTookDamageThisBeat
         beq normal_palette
         lda #1
-        sta ObjPaletteDirty
+        sta StagingObjPaletteDirty
         ldx PlayerDamageAnimCounter
         lda damage_flash_lut, x
         cmp #DMG_DARK_PAL
@@ -406,27 +406,27 @@ damage_flash_lut:
         ; fall through to normal pal
 normal_palette:
         lda player_ingame_palette_phones
-        sta ObjPaletteBuffer+1
+        sta PlayfieldObjPal0+0
         lda player_ingame_palette_pajamas
-        sta ObjPaletteBuffer+2
+        sta PlayfieldObjPal0+1
         lda player_ingame_palette_pigment
-        sta ObjPaletteBuffer+3
+        sta PlayfieldObjPal0+2
         rts
 dark_palette:
         lda player_damage_dark_palette_phones
-        sta ObjPaletteBuffer+1
+        sta PlayfieldObjPal0+0
         lda player_damage_dark_palette_pajamas
-        sta ObjPaletteBuffer+2
+        sta PlayfieldObjPal0+1
         lda player_damage_dark_palette_pigment
-        sta ObjPaletteBuffer+3
+        sta PlayfieldObjPal0+2
         rts
 light_palette:
         lda player_damage_light_palette_phones
-        sta ObjPaletteBuffer+1
+        sta PlayfieldObjPal0+0
         lda player_damage_light_palette_pajamas
-        sta ObjPaletteBuffer+2
+        sta PlayfieldObjPal0+1
         lda player_damage_light_palette_pigment
-        sta ObjPaletteBuffer+3
+        sta PlayfieldObjPal0+2
         rts
 .endproc
 
@@ -950,7 +950,7 @@ PlayerStatePtr := R0
         ; Every beat we'll by default be in our generic palette. We need to recover from whatever
         ; the previous beat's effect was doing, so flag that here.
         lda #1
-        sta ObjPaletteDirty
+        sta StagingObjPaletteDirty
 
         ; Always reset the player's palette back to 0 at the start of the beat
         ; (in case some other state changed it for an effect)
@@ -1176,7 +1176,7 @@ TargetCol := R15
         ; Every beat we'll by default be in our generic palette. We need to recover from whatever
         ; the previous beat's effect was doing, so flag that here.
         lda #1
-        sta ObjPaletteDirty
+        sta StagingObjPaletteDirty
 
         ; Always try to throw the bomb. Whether this does anything depends on the
         ; bomb's internal logic; most require a directional input.
@@ -1319,7 +1319,7 @@ TargetCol := R15
         ; Every beat we'll by default be in our generic palette. We need to recover from whatever
         ; the previous beat's effect was doing, so flag that here.
         lda #1
-        sta ObjPaletteDirty
+        sta StagingObjPaletteDirty
 
         ; There is nothing fancy to do at the end of spellcasting, just revert to the normal state
         lda #PLAYER_STATE_NORMAL
@@ -1428,7 +1428,7 @@ no_defeat_sfx:
         ; Nope! Keep the spell so we can easily re-cast it
 .else
         lda #ITEM_NONE
-        sta PlayerEquipmentSpell
+        sta current_save + SaveFile::PlayerEquipmentSpell
 .endif
 
         rts
@@ -1440,14 +1440,14 @@ SpellCastPtr := R0
 .endproc
 
 .proc brighten_room
-        ; This is a room-effecting shenanigan! Brighten almost all the way and fade back down
-        lda #8
+        ; This is a room-effecting shenanigan! Brighten all the way and fade back down
+        lda #BRIGHTNESS_FULLY_BRIGHT
         sta Brightness
-        lda #4
+        lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
         lda #1
-        sta BgPaletteDirty
-        sta ObjPaletteDirty
+        sta StagingBgPaletteDirty
+        sta StagingObjPaletteDirty
         rts
 .endproc
 
@@ -2343,7 +2343,7 @@ not_holding_a_bomb:
 perform_unpause:
         lda #0
         sta PlayerIsPaused
-        lda #4
+        lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
 
         far_call FAR_play_music_for_current_room
@@ -2354,7 +2354,7 @@ perform_unpause:
 perform_pause:
         lda #1
         sta PlayerIsPaused
-        lda #3
+        lda #BRIGHTNESS_MINUS_1
         sta TargetBrightness
 
         lda #TRACK_VARIANT_PAUSE
