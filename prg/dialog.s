@@ -235,7 +235,7 @@ done:
         lda #$00
         sta HudSeparatorPal+0
         sta HudSeparatorPal+2
-        lda #$01
+        lda #$10
         sta HudSeparatorPal+1
         sta StagingHudPaletteDirty
 
