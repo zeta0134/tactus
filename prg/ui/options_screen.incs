@@ -18,11 +18,11 @@ options_ui_layout:
         widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor},    4, 16
         widget_text_label player_options_str, 2, 18
         widget_text_options player_palette_preset_str, player_palette_preset_types, {current_save + SaveFile::PlayerPalettePreset}, 4, 20
-        widget_numeric_slider player_palette_outfit_str, 15, 39, {current_save + SaveFile::PlayerPalettePajamasIndex}, 4, 22
+        widget_numeric_slider player_palette_outfit_str, 15, 52, {current_save + SaveFile::PlayerPalettePajamasIndex}, 4, 22
         widget_numeric_viewer {current_save + SaveFile::PlayerPalettePajamasIndex}, 11, 22
         widget_numeric_slider player_palette_shoes_str,  15, 52, {current_save + SaveFile::PlayerPalettePhonesIndex},  4, 23
         widget_numeric_viewer {current_save + SaveFile::PlayerPalettePhonesIndex},  11, 23
-        widget_numeric_slider player_palette_face_str,   15, 39, {current_save + SaveFile::PlayerPalettePigmentIndex}, 4, 24
+        widget_numeric_slider player_palette_face_str,   15, 52, {current_save + SaveFile::PlayerPalettePigmentIndex}, 4, 24
         widget_numeric_viewer {current_save + SaveFile::PlayerPalettePigmentIndex}, 11, 24
         widget_text_button save_options_str, save_and_return_to_file_details, 9, 26
         widget_options_battlefield

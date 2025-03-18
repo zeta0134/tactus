@@ -44,53 +44,45 @@ player_title_palette_pajamas_light: .res 1
 ;    .byte 0, 23, 10, 20 ; orig: $0f,$05,$23,$16  ; Petunia
 ;    .byte 0, 26, 22, 15 ; orig: $0f,$16,$27,$35  ; Protea
 ; Indexing into the above tables as appropriate, we obtain:
-palette_preset_lut_pajamas: .byte 0, 18, 37, 15, 19, 13
-palette_preset_lut_phones:  .byte 0, 14, 24,  5, 18, 17
-palette_preset_lut_pigment: .byte 0, 32, 19,  5, 30, 31
 
-;palette_preset_lut_phones:  .byte 10, 50, 23, 26
-;palette_preset_lut_pajamas: .byte 19, 36, 10, 22
-;palette_preset_lut_pigment: .byte 21, 22, 20, 15
+; new, with a shared lut
+palette_preset_lut_phones:  .byte  0, 14, 24,  5, 18, 17
+palette_preset_lut_pajamas: .byte  0, 31, 50, 28, 32, 26
+palette_preset_lut_pigment: .byte  0, 45, 32, 18, 43, 44
+
+; old, pre-condensing of the lut
+; palette_preset_lut_pajamas: .byte 0, 18, 37, 15, 19, 13
+; palette_preset_lut_phones:  .byte 0, 14, 24,  5, 18, 17
+; palette_preset_lut_pigment: .byte 0, 32, 19,  5, 30, 31
+
+
+
 
     .segment "CODE_2"
 
-player_colors_shoes_accessories_lut:
+player_colors_lut:
     .byte $00, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C ;  (-)  (0)
-player_colors_face_clothing_lut:
     .byte $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $20 ;  (0) (13)
     .byte $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30 ; (13) (26)
     .byte $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $50 ; (26) (39)
 
-player_dmg_dark_colors_shoes_accessories_lut:
+player_dmg_dark_colors_lut:
     .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00 
-player_dmg_dark_colors_face_clothing_lut:
     .byte $15, $15, $15, $15, $15, $15, $15, $15, $15, $15, $15, $15, $15 ;  (-)  (0)
     .byte $25, $25, $25, $25, $25, $25, $25, $25, $25, $25, $25, $25, $25 ;  (0) (13)
     .byte $35, $35, $35, $35, $35, $35, $35, $35, $35, $35, $35, $35, $35 ; (13) (26)
 
 ; New: +2 stages
-player_dmg_light_colors_shoes_accessories_lut:
+player_dmg_light_colors_lut:
     .byte $36, $36, $36, $36, $36, $36, $36, $36, $36, $36, $36, $36, $36 ;  (-)  (0)
-player_dmg_light_colors_face_clothing_lut:
     .byte $46, $46, $46, $46, $46, $46, $46, $46, $46, $46, $46, $46, $46 ;  (0) (13)
     .byte $50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50 ; (13) (26)
     .byte $50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50 ; (26) (39)
 
-; Each of these is a two-tone ramp. We prefer to darken the lower shade by one stage
-player_title_colors_face_lut:
-    .byte $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $10, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $20, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30
-    .byte $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $20, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $50
-
-; Clothing uses the same ramp as the face but with an added light shade
-player_title_colors_clothing_lut:
-    .byte $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $10, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $20, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30
-    .byte $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $20, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $50
-    .byte $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $50, $51, $52, $53, $54, $55, $56, $57, $58, $59, $5A, $5B, $5C, $50
-
 ; Accessories span the full range. For the very lowest shade we run with solid black,
 ; and for black itself we lose some detail so that it reads as intended.
 ; (eventually we can replace this whole lookup table with the "step luminence up/down" functions, I think)
-player_title_colors_accessories_lut:
+player_title_colors_lut:
     .byte $00, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $10, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $20, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30
     .byte $00, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $20, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $50
     .byte $10, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $50, $51, $52, $53, $54, $55, $56, $57, $58, $59, $5A, $5B, $5C, $50
@@ -266,27 +258,27 @@ compute_file_3:
 .proc _set_phones_color
     perform_zpcm_inc
     ; normal colors for gameplay sprites
-    lda player_colors_shoes_accessories_lut, y
+    lda player_colors_lut, y
     sta player_ingame_palette_phones
-    lda player_dmg_dark_colors_shoes_accessories_lut, y
+    lda player_dmg_dark_colors_lut, y
     sta player_damage_dark_palette_phones
-    lda player_dmg_light_colors_shoes_accessories_lut, y
+    lda player_dmg_light_colors_lut, y
     sta player_damage_light_palette_phones
     ; title colors have several shading variants and we need to
     ; skip ahead between rows
-    lda player_title_colors_accessories_lut, y
+    lda player_title_colors_lut, y
     sta player_title_palette_phones_dark
     tya
     clc
     adc #13
     tay
-    lda player_title_colors_accessories_lut, y
+    lda player_title_colors_lut, y
     sta player_title_palette_phones_medium
     tya
     clc
     adc #13
     tay
-    lda player_title_colors_accessories_lut, y
+    lda player_title_colors_lut, y
     sta player_title_palette_phones_light
     perform_zpcm_inc
     rts
@@ -296,27 +288,27 @@ compute_file_3:
 .proc _set_pajamas_color
     perform_zpcm_inc
     ; normal colors for gameplay sprites
-    lda player_colors_face_clothing_lut, y
+    lda player_colors_lut, y
     sta player_ingame_palette_pajamas
-    lda player_dmg_dark_colors_face_clothing_lut, y
+    lda player_dmg_dark_colors_lut, y
     sta player_damage_dark_palette_pajamas
-    lda player_dmg_light_colors_face_clothing_lut, y
+    lda player_dmg_light_colors_lut, y
     sta player_damage_light_palette_pajamas
     ; title colors have several shading variants and we need to
     ; skip ahead between rows
-    lda player_title_colors_clothing_lut, y
+    lda player_title_colors_lut, y
     sta player_title_palette_pajamas_dark
     tya
     clc
     adc #13
     tay
-    lda player_title_colors_clothing_lut, y
+    lda player_title_colors_lut, y
     sta player_title_palette_pajamas_medium
     tya
     clc
     adc #13
     tay
-    lda player_title_colors_clothing_lut, y
+    lda player_title_colors_lut, y
     sta player_title_palette_pajamas_light
     perform_zpcm_inc
     rts
@@ -326,22 +318,22 @@ compute_file_3:
 .proc _set_pigment_color
     perform_zpcm_inc
     ; normal colors for gameplay sprites
-    lda player_colors_face_clothing_lut, y
+    lda player_colors_lut, y
     sta player_ingame_palette_pigment
-    lda player_dmg_dark_colors_face_clothing_lut, y
+    lda player_dmg_dark_colors_lut, y
     sta player_damage_dark_palette_pigment
-    lda player_dmg_light_colors_face_clothing_lut, y
+    lda player_dmg_light_colors_lut, y
     sta player_damage_light_palette_pigment
     ; title colors have several shading variants and we need to
     ; skip ahead between rows
-    lda player_title_colors_face_lut, y
-    sta player_title_palette_pajamas_dark
+    lda player_title_colors_lut, y
+    sta player_title_palette_pigment_dark
     tya
     clc
     adc #13
     tay
-    lda player_title_colors_face_lut, y
-    sta player_title_palette_pajamas_medium
+    lda player_title_colors_lut, y
+    sta player_title_palette_pigment_medium
     ; face ramp doesn't have a light shade, it's used for the whites of eyes instead
     perform_zpcm_inc
     rts
