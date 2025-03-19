@@ -130,14 +130,6 @@ border_loop:
 .endproc
 
 .proc state_wait_for_activation
-        ; Old, hacky nonsense
-        ;lda HudStagingPalette+0
-        ;sta staging_palette+16+4
-        ;sta staging_palette+16+8
-        ;sta staging_palette+16+12
-        ;sta ObjPaletteBuffer+8
-        ;sta BgPaletteBuffer+8
-
         ; Now the separator has real brightness, so we can just write a colorspace
         ; to it directly
         lda #$00
@@ -223,12 +215,6 @@ done:
 .proc state_open_dialog_animation
         lda #0
         sta DialogChirpTimer
-
-        ; Old hack from before the separator had brightness applied
-        ;lda HudStagingPalette+5
-        ;sta staging_palette+16+8
-        ;sta ObjPaletteBuffer+8
-        ;sta BgPaletteBuffer+8
 
         ; Now the separator has real brightness, so we can just write a colorspace
         ; to it directly

@@ -1,5 +1,6 @@
 .macro widget_file_select_box file_index, tile_x, tile_y
-        .addr widget_file_select_box_init
+        .addr FAR_widget_file_select_box_init
+        .byte <.bank(FAR_widget_file_select_box_init)
         .byte tile_x, tile_y
         .addr file_index
         .byte 0, 0, 0, 0
@@ -42,7 +43,7 @@ new_file_str: .asciiz "- NEW FILE -"
 
 .segment "CODE_UI_WIDGETS"
 
-.proc compute_top_left_corner_addr
+.proc FAR_compute_top_left_corner_addr
 Top := R0
 Left := R1
 Width := R2
@@ -76,7 +77,7 @@ AttributeAddr := R6
         rts
 .endproc
 
-.proc draw_box_outline_light
+.proc FAR_draw_box_outline_light
 ShadowAttr := R9
 BoxOutlineAttr := R10
         lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG3)
@@ -86,7 +87,7 @@ BoxOutlineAttr := R10
         jmp _draw_box_outline_common
 .endproc
 
-.proc draw_box_outline_dark
+.proc FAR_draw_box_outline_dark
 ShadowAttr := R9
 BoxOutlineAttr := R10
         lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG3)
@@ -106,7 +107,7 @@ AttributeAddr := R6
 RowCounter := R8
 ShadowAttr := R9
 BoxOutlineAttr := R10
-        jsr compute_top_left_corner_addr
+        near_call FAR_compute_top_left_corner_addr
 
         ; top row
         ldy #0
@@ -179,7 +180,7 @@ bottom_col_loop:
         rts
 .endproc
 
-.proc draw_box_shadow
+.proc FAR_draw_box_shadow
 Top := R0
 Left := R1
 Width := R2
@@ -189,7 +190,7 @@ AttributeAddr := R6
 RowCounter := R8
 ShadowAttr := R9
 BoxOutlineAttr := R10
-        jsr compute_top_left_corner_addr   
+        near_call FAR_compute_top_left_corner_addr   
         ; top row
         ldy Width
         iny
@@ -286,7 +287,7 @@ done_picking_bottom_corner_shadow:
         rts
 .endproc
 
-.proc draw_box_fill
+.proc FAR_draw_box_fill
 Top := R0
 Left := R1
 Width := R2
@@ -294,7 +295,7 @@ Height := R3
 NametableAddr := R4
 AttributeAddr := R6
 RowCounter := R8
-        jsr compute_top_left_corner_addr
+        near_call FAR_compute_top_left_corner_addr
         add16b NametableAddr, #32
         add16b AttributeAddr, #32
 
@@ -325,7 +326,7 @@ col_loop:
 .endproc
 
 ; file index in A
-.proc prepare_file_pointer
+.proc FAR_prepare_file_pointer
 FilePtr := R0
         cmp #0
         beq file_0
@@ -351,7 +352,7 @@ player_palette_offset_by_file_id:
 player_palette_by_file_id:
         .byte SPRITE_PAL_0, SPRITE_PAL_2, SPRITE_PAL_3
 
-.proc draw_file_contents
+.proc FAR_draw_file_contents
 ; FIXED_draw_string
 NametableAddr := T0
 AttributeAddr := T2
@@ -387,7 +388,7 @@ widget_sprite_index := widgets_data4
 
         ldy CurrentWidgetIndex
         lda widget_file_index, y
-        jsr prepare_file_pointer
+        near_call FAR_prepare_file_pointer
         far_call FAR_is_new_file
         cmp #FILE_NEW
         beq draw_new_file
@@ -448,7 +449,7 @@ draw_new_file:
         rts
 .endproc
 
-.proc widget_file_select_box_init
+.proc FAR_widget_file_select_box_init
 MetaSpriteIndex := R0
 
 Top := R0
@@ -473,9 +474,9 @@ widget_sprite_index := widgets_data4
         sta Width
         lda #4
         sta Height
-        jsr draw_box_outline_dark
-        jsr draw_box_fill
-        jsr draw_box_shadow
+        near_call FAR_draw_box_outline_dark
+        near_call FAR_draw_box_fill
+        near_call FAR_draw_box_shadow
 
         ; set our cursor position based on the leftmost tile position
         ; TODO: offset this as required!
@@ -528,14 +529,14 @@ widget_sprite_index := widgets_data4
 
         ; populate this box's contents (which manipulates that sprite
         ; up there)
-        jsr draw_file_contents
+        near_call FAR_draw_file_contents
 
         ldy CurrentWidgetIndex
-        set_widget_state_y widget_file_select_box_update
+        set_widget_state_y FAR_widget_file_select_box_update
         rts
 .endproc
 
-.proc redraw_border_if_needed
+.proc FAR_redraw_border_if_needed
 Top := R0
 Left := R1
 Width := R2
@@ -568,7 +569,7 @@ we_are_not_hovered:
         sta Width
         lda #4
         sta Height
-        jsr draw_box_outline_dark
+        near_call FAR_draw_box_outline_dark
         ; and set accordingly
         ldy CurrentWidgetIndex
         lda #0
@@ -593,7 +594,7 @@ we_are_hovered:
         sta Width
         lda #4
         sta Height
-        jsr draw_box_outline_light
+        near_call FAR_draw_box_outline_light
         ; and set accordingly
         ldy CurrentWidgetIndex
         lda #1
@@ -610,13 +611,13 @@ nothing_to_do:
         rts
 .endproc
 
-.proc widget_file_select_box_update
+.proc FAR_widget_file_select_box_update
 CurrentWidgetIndex := R20
 
 ; rename the data labels to something more readable
 widget_file_index := widgets_data2
 
-        jsr redraw_border_if_needed
+        near_call FAR_redraw_border_if_needed
 
         ; if we aren't even hovered, do nothing
         ldy CurrentWidgetIndex
@@ -629,13 +630,13 @@ check_for_action_input:
         and ButtonsDown
         beq do_nothing
 
-        jsr with_file_perform_action
+        near_call FAR_with_file_perform_action
 
 do_nothing:
         rts
 .endproc
 
-.proc widget_file_select_box_refresh
+.proc FAR_widget_file_select_box_refresh
 Top := R0
 Left := R1
 Width := R2
@@ -656,12 +657,12 @@ widget_tile_y := widgets_data1
         sta Width
         lda #4
         sta Height
-        jsr draw_box_fill
+        near_call FAR_draw_box_fill
 
         ; populate this box's contents
-        jsr draw_file_contents
+        near_call FAR_draw_file_contents
 
         ldy CurrentWidgetIndex
-        set_widget_state_y widget_file_select_box_update
+        set_widget_state_y FAR_widget_file_select_box_update
         rts
 .endproc

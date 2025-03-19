@@ -1,7 +1,8 @@
 ; Given a position and a data target, displays one byte of data
 ; in base 10. Mostly meant as a helper widget next to other controls
 .macro widget_numeric_viewer data_target, tile_x, tile_y
-    .addr widget_numeric_viewer_init
+    .addr FAR_widget_numeric_viewer_init
+    .byte <.bank(FAR_widget_numeric_viewer_init)
     .byte tile_x, tile_y
     .addr data_target
     .byte 0, 0, 0, 0
@@ -9,16 +10,16 @@
 
 .segment "CODE_UI_WIDGETS"
 
-.proc widget_numeric_viewer_init
+.proc FAR_widget_numeric_viewer_init
 CurrentWidgetIndex := R20
         jsr _draw_number_here
 
         ldy CurrentWidgetIndex
-        set_widget_state_y widget_numeric_viewer_update
+        set_widget_state_y FAR_widget_numeric_viewer_update
         rts
 .endproc
 
-.proc widget_numeric_viewer_update
+.proc FAR_widget_numeric_viewer_update
 DataValuePtr := R0
 CurrentWidgetIndex := R20
 ; rename the data labels to something more readable

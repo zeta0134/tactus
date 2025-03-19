@@ -1,12 +1,14 @@
 .macro widget_text_label text_string, tile_x, tile_y
-    .addr widget_text_label_init
+    .addr FAR_widget_text_label_init
+    .byte <.bank(FAR_widget_text_label_init)
     .byte tile_x, tile_y
     .addr text_string
     .byte 0, 0, 0, UI_PAL_BG0
 .endmacro
 
 .macro widget_text_label_attr text_string, tile_x, tile_y, text_attr
-    .addr widget_text_label_init
+    .addr FAR_widget_text_label_init
+    .byte <.bank(FAR_widget_text_label_init)
     .byte tile_x, tile_y
     .addr text_string
     .byte 0, 0, 0, text_attr
@@ -14,7 +16,7 @@
 
 .segment "CODE_UI_WIDGETS"
 
-.proc widget_text_label_init
+.proc FAR_widget_text_label_init
 CurrentWidgetIndex := R20
 
 ; rename the data labels to something more readable
@@ -31,10 +33,10 @@ TileY := T5
 StringPtr := T4
 TileBase := T6
 PaletteIndex := T7
-        jsr _draw_widget_label_pal
+        near_call FAR_draw_widget_label_pal
 
         ldy CurrentWidgetIndex
-        set_widget_state_y widget_no_behavior
+        set_widget_state_y FAR_widget_no_behavior
 
         rts
 .endproc

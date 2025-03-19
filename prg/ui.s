@@ -38,6 +38,7 @@ MAX_WIDGETS = 24 ; just how many do we need!? (more than expected!)
 
 widgets_onupdate_low: .res ::MAX_WIDGETS
 widgets_onupdate_high: .res ::MAX_WIDGETS
+widgets_onupdate_bank: .res ::MAX_WIDGETS
 widgets_cursor_pos_x: .res ::MAX_WIDGETS
 widgets_cursor_pos_y: .res ::MAX_WIDGETS
 widgets_state_flags: .res ::MAX_WIDGETS
@@ -115,6 +116,7 @@ memclr_loop:
         perform_zpcm_inc
         sta widgets_onupdate_low, y
         sta widgets_onupdate_high, y
+        sta widgets_onupdate_bank, y
         sta widgets_cursor_pos_x, y
         sta widgets_cursor_pos_y, y
         sta widgets_state_flags, y
@@ -150,6 +152,10 @@ widget_loop:
         sta widgets_onupdate_low, x
         lda PtrStash+1
         sta widgets_onupdate_high, x
+        ; Copy the routine's bank into place, we'll use this during dispatch
+        lda (WidgetListPtr), y
+        sta widgets_onupdate_bank, x
+        iny
         ; copy the next 8 bytes we find into the widget starting data
         ; (this is how reusable widgets specify things like their position,
         ; strings of text, etc)
@@ -191,16 +197,15 @@ done:
 
 .segment "CODE_UI_WIDGETS"
 
-.proc __widget_trampoline
-WidgetUpdatePtr := R18
-        jmp (WidgetUpdatePtr)
-        ; rts (implied)
-.endproc
+;.proc __widget_trampoline
+;WidgetUpdatePtr := R18
+;        jmp (WidgetUpdatePtr)
+;        ; rts (implied)
+;.endproc
 
 .proc FAR_update_widgets
 ; put our own variables near the end of scratch, so 
 ; widget logic can use the low end without conflict
-WidgetUpdatePtr := R18
 CurrentWidgetIndex := R20
         access_data_bank #<.bank(ui_data_bank)
 
@@ -213,10 +218,23 @@ loop:
         ; if the high byte is 0, this widget doesn't exist
         ; (widget code really shouldn't live in zeropage)
         beq widget_inactive
-        sta WidgetUpdatePtr+1
+
+        ; at this point, do a manual far call. (don't worry
+        ; about A, we don't care)
+        ; this allows our widgets to be bank switched safely
+        sta JumpTarget+1
         lda widgets_onupdate_low, y
-        sta WidgetUpdatePtr+0
-        jsr __widget_trampoline
+        sta JumpTarget+0
+        lda widgets_onupdate_bank, y
+        sta TargetBank
+        jsr launch_far_call
+
+        ;sta WidgetUpdatePtr+1
+        ;lda widgets_onupdate_low, y
+        ;sta WidgetUpdatePtr+0
+        ;jsr __widget_trampoline
+
+
 widget_inactive:
         inc CurrentWidgetIndex
         lda CurrentWidgetIndex
@@ -234,7 +252,7 @@ done:
 ; ======================================================================
 
 ; Teleports to various game modes, including other UI subscreens
-.proc go_to_file_select
+.proc FAR_go_to_file_select
         queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, file_select_prep
@@ -242,7 +260,7 @@ done:
         rts
 .endproc
 
-.proc go_to_options
+.proc FAR_go_to_options
         queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, options_prep
@@ -250,7 +268,7 @@ done:
         rts
 .endproc
 
-.proc go_to_gameplay
+.proc FAR_go_to_gameplay
         queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, game_prep
@@ -258,7 +276,7 @@ done:
         rts
 .endproc
 
-.proc go_to_name_entry
+.proc FAR_go_to_name_entry
         queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, name_entry_prep
@@ -266,7 +284,7 @@ done:
         rts
 .endproc
 
-.proc go_to_file_details
+.proc FAR_go_to_file_details
         queue_sfx_pulse2 sfx_teleport
 
         st16 FadeToGameMode, file_details_prep
@@ -274,7 +292,7 @@ done:
         rts
 .endproc
 
-.proc return_to_title
+.proc FAR_return_to_title
         queue_sfx_pulse1 sfx_teleport
 
         st16 FadeToGameMode, title_prep
@@ -282,14 +300,14 @@ done:
         rts
 .endproc
 
-.proc widget_no_behavior
+.proc FAR_widget_no_behavior
         ; exactly that. used by all static elements that are done with initial setup
         ; (we don't clean these up because we might need other widgets to manipulate
         ; their state, and we also aren't performance bound at all)
         rts
 .endproc
 
-.proc _draw_widget_label
+.proc FAR_draw_widget_label
 CurrentWidgetIndex := R20
 
 ; rename the data labels to something more readable
@@ -330,7 +348,7 @@ PaletteIndex := T7
         rts
 .endproc
 
-.proc _draw_widget_label_pal
+.proc FAR_draw_widget_label_pal
 CurrentWidgetIndex := R20
 
 ; rename the data labels to something more readable

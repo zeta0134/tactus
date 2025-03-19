@@ -1,12 +1,14 @@
 ; These are fixed on the screen, and I'm not going to waste effort
 ; trying to make them relocatable. Deal.
 .macro widget_string_entry page_table, destination_str
-        .addr widget_string_entry_init
+        .addr FAR_widget_string_entry_init
+        .byte <.bank(FAR_widget_string_entry_init)
         .addr page_table
         .addr destination_str
         .byte 0, 0, 0, 0
         ; the string entry thing comes with its own cursor
-        .addr widget_string_entry_cursor_init
+        .addr FAR_widget_string_entry_cursor_init
+        .byte <.bank(FAR_widget_string_entry_cursor_init)
         .byte 0, 0, 0, 0
         .byte 0, 0, 0, 0
 .endmacro
@@ -24,7 +26,7 @@ PAGE_NAME_ROW = 13
 DEL_ROW       = 15
 CONFIRM_ROW   = 17
 
-.proc draw_letter_grid
+.proc FAR_draw_letter_grid
 PagePtr := R0
 NametableAddr := R2
 AttributeAddr := R4
@@ -88,7 +90,7 @@ highlight_converge:
 string_entry_del_str: .asciiz "Delete"
 string_entry_accept_str: .asciiz "Accept"
 
-.proc draw_controls
+.proc FAR_draw_controls
 ; FIXED_draw_string
 NametableAddr := T0
 AttributeAddr := T2
@@ -194,7 +196,7 @@ accept_highlight_converge:
         rts
 .endproc
 
-.proc advance_page
+.proc FAR_advance_page
 PagePtr := R0
 PageTablePtr := R2
 
@@ -231,13 +233,13 @@ widget_current_page := widgets_data4
         sta widget_current_page, y
 page_in_range:
         ; draw the letter grid and refresh the controls
-        jsr draw_current_page
-        jsr draw_controls
+        near_call FAR_draw_current_page
+        near_call FAR_draw_controls
         queue_sfx_pulse2 sfx_dialog_advance
         rts
 .endproc
 
-.proc draw_current_page
+.proc FAR_draw_current_page
 PagePtr := R0
 PageTablePtr := R2
 
@@ -263,7 +265,7 @@ widget_current_page := widgets_data4
         iny
         lda (PageTablePtr), y
         sta PagePtr+1
-        jsr draw_letter_grid
+        near_call FAR_draw_letter_grid
         rts
 .endproc
 
@@ -271,7 +273,7 @@ NAME_ENTRY_UNDERLINE_TILE = $E4
 NAME_ENTRY_TEXT_CURSOR    = $E3
 NAME_ENTRY_END_CURSOR     = $E1
 
-.proc draw_string_ui
+.proc FAR_draw_string_ui
 
 NametableAddr := T0
 AttributeAddr := T2
@@ -296,7 +298,7 @@ loop:
         rts
 .endproc
 
-.proc draw_target_string
+.proc FAR_draw_target_string
 ; FIXED_draw_string
 NametableAddr := T0
 AttributeAddr := T2
@@ -354,7 +356,7 @@ done:
         rts
 .endproc
 
-.proc add_to_string
+.proc FAR_add_to_string
 StringPtr := T0
 Length := T2
 
@@ -418,7 +420,7 @@ widget_grid_pos_y   := widgets_data6
         lda #0
         sta (StringPtr), y
         ; finally, draw the string again
-        jsr draw_target_string
+        near_call FAR_draw_target_string
         queue_sfx_pulse1 sfx_select_cursor
         rts
 fail_to_add:
@@ -426,7 +428,7 @@ fail_to_add:
         rts
 .endproc
 
-.proc delete_from_string
+.proc FAR_delete_from_string
 StringPtr := T0
 Length := T2
 
@@ -450,7 +452,7 @@ widget_target_string_high := widgets_data3
         dey
         sta (StringPtr), y
         ; finally, draw the string again
-        jsr draw_target_string
+        near_call FAR_draw_target_string
         queue_sfx_pulse1 sfx_select_cursor
         rts
 fail_to_add:
@@ -458,7 +460,7 @@ fail_to_add:
         rts
 .endproc
 
-.proc move_cursor_right
+.proc FAR_move_cursor_right
 CurrentWidgetIndex := R20
 
 widget_grid_pos_x   := widgets_data5
@@ -481,14 +483,14 @@ widget_grid_pos_y   := widgets_data6
         lda #2
         sta widget_grid_pos_y, y
 position_is_fine:
-        jsr draw_current_page
-        jsr draw_controls
+        near_call FAR_draw_current_page
+        near_call FAR_draw_controls
         queue_sfx_pulse2 sfx_move_cursor
 cancel_move:
         rts
 .endproc
 
-.proc move_cursor_left
+.proc FAR_move_cursor_left
 CurrentWidgetIndex := R20
 
 widget_grid_pos_x   := widgets_data5
@@ -500,14 +502,14 @@ widget_grid_pos_y   := widgets_data6
         sec
         sbc #1
         sta widget_grid_pos_x, y
-        jsr draw_current_page
-        jsr draw_controls
+        near_call FAR_draw_current_page
+        near_call FAR_draw_controls
         queue_sfx_pulse2 sfx_move_cursor
 cancel_move:
         rts
 .endproc
 
-.proc move_cursor_up
+.proc FAR_move_cursor_up
 CurrentWidgetIndex := R20
 
 widget_grid_pos_x   := widgets_data5
@@ -519,14 +521,14 @@ widget_grid_pos_y   := widgets_data6
         sec
         sbc #1
         sta widget_grid_pos_y, y
-        jsr draw_current_page
-        jsr draw_controls
+        near_call FAR_draw_current_page
+        near_call FAR_draw_controls
         queue_sfx_pulse2 sfx_move_cursor
 cancel_move:
         rts
 .endproc
 
-.proc move_cursor_down
+.proc FAR_move_cursor_down
 CurrentWidgetIndex := R20
 
 widget_grid_pos_x   := widgets_data5
@@ -550,14 +552,14 @@ allow_move:
         clc
         adc #1
         sta widget_grid_pos_y, y
-        jsr draw_current_page
-        jsr draw_controls
+        near_call FAR_draw_current_page
+        near_call FAR_draw_controls
         queue_sfx_pulse2 sfx_move_cursor
 cancel_move:
         rts
 .endproc
 
-.proc jump_to_confirm
+.proc FAR_jump_to_confirm
 CurrentWidgetIndex := R20
 widget_grid_pos_x   := widgets_data5
 widget_grid_pos_y   := widgets_data6  
@@ -566,12 +568,12 @@ widget_grid_pos_y   := widgets_data6
         sta widget_grid_pos_x, y
         lda #2
         sta widget_grid_pos_y, y
-        jsr draw_current_page
-        jsr draw_controls
+        near_call FAR_draw_current_page
+        near_call FAR_draw_controls
         rts
 .endproc
 
-.proc perform_action_at_cursor
+.proc FAR_perform_action_at_cursor
 CurrentWidgetIndex := R20
 widget_grid_pos_x   := widgets_data5
 widget_grid_pos_y   := widgets_data6
@@ -580,24 +582,24 @@ widget_grid_pos_y   := widgets_data6
         lda widget_grid_pos_x, y
         cmp #8
         bcs check_buttons
-        jsr add_to_string
+        near_call FAR_add_to_string
         rts
 check_buttons:
         lda widget_grid_pos_y, y
         beq perform_page_advance
         cmp #1
         beq perform_deletion
-        jsr accept_string
+        near_call FAR_accept_string
         rts
 perform_page_advance:
-        jsr advance_page
+        near_call FAR_advance_page
         rts
 perform_deletion:
-        jsr delete_from_string
+        near_call FAR_delete_from_string
         rts
 .endproc
 
-.proc accept_string
+.proc FAR_accept_string
 StringPtr := T0
 Length := T2
 
@@ -619,7 +621,7 @@ widget_target_string_high := widgets_data3
         ; go to the options screen to allow the player
         ; to personalize their preferences
         far_call FAR_save_current_file
-        jsr go_to_options
+        near_call FAR_go_to_options
         rts
 
 buzz_and_fail:
@@ -628,7 +630,7 @@ buzz_and_fail:
         rts
 .endproc
 
-.proc widget_string_entry_init
+.proc FAR_widget_string_entry_init
 CurrentWidgetIndex := R20
 
 widget_page_table_low := widgets_data0
@@ -647,72 +649,72 @@ widget_grid_pos_y   := widgets_data6
         sta widget_grid_pos_x, y
         sta widget_grid_pos_y, y
 
-        jsr draw_current_page
-        jsr draw_controls
-        jsr draw_string_ui
-        jsr draw_target_string
+        near_call FAR_draw_current_page
+        near_call FAR_draw_controls
+        near_call FAR_draw_string_ui
+        near_call FAR_draw_target_string
 
         ldy CurrentWidgetIndex
-        set_widget_state_y widget_string_entry_update
+        set_widget_state_y FAR_widget_string_entry_update
         rts
 .endproc
 
-.proc widget_string_entry_update
+.proc FAR_widget_string_entry_update
 
 check_left:
         lda #(KEY_LEFT)
         bit ButtonsDown
         beq left_not_pressed
-        jsr move_cursor_left
+        near_call FAR_move_cursor_left
 left_not_pressed:
 
 check_right:
         lda #(KEY_RIGHT)
         bit ButtonsDown
         beq right_not_pressed
-        jsr move_cursor_right
+        near_call FAR_move_cursor_right
 right_not_pressed:
 
 check_up:
         lda #(KEY_UP)
         bit ButtonsDown
         beq up_not_pressed
-        jsr move_cursor_up
+        near_call FAR_move_cursor_up
 up_not_pressed:
 
 check_down:
         lda #(KEY_DOWN)
         bit ButtonsDown
         beq down_not_pressed
-        jsr move_cursor_down
+        near_call FAR_move_cursor_down
 down_not_pressed:
 
 check_a:
         lda #(KEY_A)
         bit ButtonsDown
         beq a_not_pressed
-        jsr perform_action_at_cursor
+        near_call FAR_perform_action_at_cursor
 a_not_pressed:
 
 check_b:
         lda #(KEY_B)
         bit ButtonsDown
         beq b_not_pressed
-        jsr delete_from_string
+        near_call FAR_delete_from_string
 b_not_pressed:
 
 check_start:
         lda #(KEY_START)
         bit ButtonsDown
         beq start_not_pressed
-        jsr jump_to_confirm
+        near_call FAR_jump_to_confirm
 start_not_pressed:
 
 check_select:
         lda #(KEY_SELECT)
         bit ButtonsDown
         beq select_not_pressed
-        jsr advance_page
+        near_call FAR_advance_page
 select_not_pressed:
 
         ; TODO: update the fancy cursor box thing here!
@@ -723,7 +725,7 @@ select_not_pressed:
 STRING_ENTRY_LEFT_OAM_INDEX = PAUSE_INDICATOR_OAM_INDEX
 STRING_ENTRY_RIGHT_OAM_INDEX = PAUSE_INDICATOR_OAM_INDEX+1
 
-.proc compute_grid_left_pos
+.proc FAR_compute_grid_left_pos
 PreviousWidgetIndex := R19
 previous_widget_grid_pos_x   := widgets_data5
 previous_widget_grid_pos_y   := widgets_data6
@@ -751,11 +753,11 @@ regular_offset:
         rts
 .endproc
 
-.proc compute_grid_right_pos
+.proc FAR_compute_grid_right_pos
 PreviousWidgetIndex := R19
 previous_widget_grid_pos_x   := widgets_data5
 previous_widget_grid_pos_y   := widgets_data6
-        jsr compute_grid_left_pos
+        near_call FAR_compute_grid_left_pos
         pha
         lda previous_widget_grid_pos_x, y
         cmp #8
@@ -772,7 +774,7 @@ regular_offset:
         rts
 .endproc
 
-.proc compute_grid_top_pos
+.proc FAR_compute_grid_top_pos
 PreviousWidgetIndex := R19
 previous_widget_grid_pos_x   := widgets_data5
 previous_widget_grid_pos_y   := widgets_data6
@@ -789,7 +791,7 @@ previous_widget_grid_pos_y   := widgets_data6
         rts
 .endproc
 
-.proc widget_string_entry_cursor_init
+.proc FAR_widget_string_entry_cursor_init
 PreviousWidgetIndex := R19
 CurrentWidgetIndex := R20
 
@@ -815,26 +817,26 @@ widget_right_pos_y_subpixel  := widgets_data7
         dey
         sty PreviousWidgetIndex
 
-        jsr compute_grid_left_pos
+        near_call FAR_compute_grid_left_pos
         ldy CurrentWidgetIndex
         sta widget_left_pos_x_pixel, y
-        jsr compute_grid_right_pos
+        near_call FAR_compute_grid_right_pos
         ldy CurrentWidgetIndex
         sta widget_right_pos_x_pixel, y
 
-        jsr compute_grid_top_pos
+        near_call FAR_compute_grid_top_pos
         ldy CurrentWidgetIndex
         sta widget_left_pos_y_pixel, y
         sta widget_right_pos_y_pixel, y
 
-        jsr draw_name_entry_cursor
+        near_call FAR_draw_name_entry_cursor
 
         ldy CurrentWidgetIndex
-        set_widget_state_y widget_string_entry_cursor_update
+        set_widget_state_y FAR_widget_string_entry_cursor_update
         rts
 .endproc
 
-.proc widget_string_entry_cursor_update
+.proc FAR_widget_string_entry_cursor_update
 PreviousWidgetIndex := R19
 
 ; lerp coordinate
@@ -863,7 +865,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         perform_zpcm_inc
         
         ; left cursor, X lerp
-        jsr compute_grid_left_pos
+        near_call FAR_compute_grid_left_pos
         sta TargetPos+1
         lda #0
         sta TargetPos+0
@@ -872,7 +874,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         sta CurrentPos+1
         lda widget_left_pos_x_subpixel, y
         sta CurrentPos+0
-        jsr lerp_coordinate
+        near_call FAR_lerp_coordinate
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda CurrentPos+1
@@ -881,7 +883,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         sta widget_left_pos_x_subpixel, y
 
         ; right cursor, X lerp
-        jsr compute_grid_right_pos
+        near_call FAR_compute_grid_right_pos
         sta TargetPos+1
         lda #0
         sta TargetPos+0
@@ -890,7 +892,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         sta CurrentPos+1
         lda widget_right_pos_x_subpixel, y
         sta CurrentPos+0
-        jsr lerp_coordinate
+        near_call FAR_lerp_coordinate
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda CurrentPos+1
@@ -899,7 +901,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         sta widget_right_pos_x_subpixel, y
 
         ; both cursor halves, Y lerp
-        jsr compute_grid_top_pos
+        near_call FAR_compute_grid_top_pos
         sta TargetPos+1
         lda #0
         sta TargetPos+0
@@ -908,7 +910,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         sta CurrentPos+1
         lda widget_left_pos_y_subpixel, y
         sta CurrentPos+0
-        jsr lerp_coordinate
+        near_call FAR_lerp_coordinate
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda CurrentPos+1
@@ -920,11 +922,11 @@ widget_right_pos_y_subpixel  := widgets_data7
 
         perform_zpcm_inc
 
-        jsr draw_name_entry_cursor
+        near_call FAR_draw_name_entry_cursor
         rts
 .endproc
 
-.proc draw_name_entry_cursor
+.proc FAR_draw_name_entry_cursor
 SpritePtr := R0
 CurrentWidgetIndex := R20
 

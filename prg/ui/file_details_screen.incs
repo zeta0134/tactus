@@ -5,12 +5,12 @@
 .segment "DATA_UI_LAYOUTS"
 
 file_details_ui_layout:
-        widget_controller file_details_controller_init
+        widget_controller FAR_file_details_controller_init
         widget_cursor
         widget_text_label file_details_str, 5, 3
         widget_text_label {current_save + SaveFile::PlayerName}, 13, 3
-        widget_text_button_attr start_game_str, go_to_gameplay, 7, 7, UI_PAL_BG1
-        widget_text_button_attr options_str, go_to_options, 7, 11, UI_PAL_BG1
+        widget_text_button_attr start_game_str, FAR_go_to_gameplay, 7, 7, UI_PAL_BG1
+        widget_text_button_attr options_str, FAR_go_to_options, 7, 11, UI_PAL_BG1
         .addr $0000 ; end of list
 
 FILE_DETAILS_CURSOR_INDEX = 1
@@ -23,7 +23,7 @@ options_str: .asciiz " OPTIONS"
 
 .segment "CODE_UI_WIDGETS"
 
-.proc file_details_controller_init
+.proc FAR_file_details_controller_init
 Top := R0
 Left := R1
 Width := R2
@@ -50,7 +50,7 @@ widget_last_cursor_pos := widgets_data0
         ; draw an initial checkerboard background (no nametable for now)
         far_call FAR_draw_checkerboard_base
 
-        jsr file_details_draw_buttons
+        near_call FAR_file_details_draw_buttons
 
         ; Draw a small box up top for the title / player name
         lda #3
@@ -61,12 +61,12 @@ widget_last_cursor_pos := widgets_data0
         sta Width
         lda #3
         sta Height
-        jsr draw_box_outline_light
-        jsr draw_box_fill
-        jsr draw_box_shadow
+        near_call FAR_draw_box_outline_light
+        near_call FAR_draw_box_fill
+        near_call FAR_draw_box_shadow
 
         ; Get the file select palettes loaded in
-        jsr apply_standard_ui_palette
+        near_call FAR_apply_standard_ui_palette
 
         lda #BRIGHTNESS_FULLY_DARK
         jsr set_brightness
@@ -77,11 +77,11 @@ widget_last_cursor_pos := widgets_data0
         lda #$FF
         sta widget_last_cursor_pos, y
 
-        set_widget_state_y file_details_controller_update
+        set_widget_state_y FAR_file_details_controller_update
         rts
 .endproc
 
-.proc file_details_draw_buttons
+.proc FAR_file_details_draw_buttons
 Top := R0
 Left := R1
 Width := R2
@@ -95,19 +95,19 @@ Height := R3
         sta Width
         lda #3
         sta Height
-        jsr draw_box_outline_dark
-        jsr draw_box_fill
-        jsr draw_box_shadow
+        near_call FAR_draw_box_outline_dark
+        near_call FAR_draw_box_fill
+        near_call FAR_draw_box_shadow
 
         lda #10
         sta Top
-        jsr draw_box_outline_dark
-        jsr draw_box_fill
-        jsr draw_box_shadow
+        near_call FAR_draw_box_outline_dark
+        near_call FAR_draw_box_fill
+        near_call FAR_draw_box_shadow
         rts  
 .endproc
 
-.proc file_details_draw_dark_outlines
+.proc FAR_file_details_draw_dark_outlines
 Top := R0
 Left := R1
 Width := R2
@@ -121,15 +121,15 @@ Height := R3
         sta Width
         lda #3
         sta Height
-        jsr draw_box_outline_dark
+        near_call FAR_draw_box_outline_dark
 
         lda #10
         sta Top
-        jsr draw_box_outline_dark
+        near_call FAR_draw_box_outline_dark
         rts
 .endproc
 
-.proc file_details_draw_selected_outline
+.proc FAR_file_details_draw_selected_outline
 Top := R0
 Left := R1
 Width := R2
@@ -165,11 +165,11 @@ options_index:
         jmp perform_draw
         
 perform_draw:
-        jsr draw_box_outline_light
+        near_call FAR_draw_box_outline_light
         rts
 .endproc
 
-.proc file_details_controller_update
+.proc FAR_file_details_controller_update
 CursorCurrentHighlight := R12
 CurrentWidgetIndex := R20
 
@@ -185,8 +185,8 @@ widget_cursor_nav_index := widgets_data1
         beq done
         sta widget_last_cursor_pos, y
 
-        jsr file_details_draw_dark_outlines
-        jsr file_details_draw_selected_outline
+        near_call FAR_file_details_draw_dark_outlines
+        near_call FAR_file_details_draw_selected_outline
 done:
 
         ; If the B button is pressed, we should return to File Select
@@ -194,7 +194,7 @@ done:
         and ButtonsDown
         beq stay_here
         ; What we do very much depends on our current state
-        jsr go_to_file_select
+        near_call FAR_go_to_file_select
 stay_here:
 
         rts

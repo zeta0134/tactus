@@ -1,5 +1,6 @@
 .macro widget_text_options label_string, option_list, data_target, tile_x, tile_y
-    .addr widget_text_options_init
+    .addr FAR_widget_text_options_init
+    .byte <.bank(FAR_widget_text_options_init)
     .byte tile_x, tile_y
     .addr label_string
     .addr option_list
@@ -8,7 +9,7 @@
 
 .segment "CODE_UI_WIDGETS"
 
-.proc widget_text_options_init
+.proc FAR_widget_text_options_init
 CurrentWidgetIndex := R20
 
 ; rename the data labels to something more readable
@@ -44,16 +45,16 @@ widget_data_target_high := widgets_data7
         sta widgets_state_flags, y
 
         ; draw the initial label and options for this widget
-        jsr _draw_widget_label
+        near_call FAR_draw_widget_label
         jsr _draw_option
 
         ; now switch to the update function
         ldy CurrentWidgetIndex
-        set_widget_state_y widget_text_options_update
+        set_widget_state_y FAR_widget_text_options_update
         rts
 .endproc
 
-.proc widget_text_options_update
+.proc FAR_widget_text_options_update
 DataValuePtr := R0
 CurrentWidgetIndex := R20
 widget_data_target_low := widgets_data6
@@ -69,13 +70,13 @@ check_for_forward_input:
         lda #(KEY_RIGHT | KEY_A)
         bit ButtonsDown
         beq check_for_reverse_input
-        jsr cycle_to_next_option
+        near_call FAR_cycle_to_next_option
         jmp redraw_self
 check_for_reverse_input:
         lda #(KEY_LEFT)
         bit ButtonsDown
         beq nothing_to_do
-        jsr cycle_to_previous_option
+        near_call FAR_cycle_to_previous_option
         jmp redraw_self
 nothing_to_do:
         ; if we have changed value since our last update, we still need
@@ -93,12 +94,12 @@ nothing_to_do:
         ; otherwise we're done
         rts
 redraw_self:
-        jsr _draw_widget_label
+        near_call FAR_draw_widget_label
         jsr _draw_option
         rts
 .endproc
 
-.proc cycle_to_next_option
+.proc FAR_cycle_to_next_option
 OptionsTablePtr := R0
 DataValuePtr := R2
 CurrentWidgetIndex := R20
@@ -137,7 +138,7 @@ wraparound:
         rts
 .endproc
 
-.proc cycle_to_previous_option
+.proc FAR_cycle_to_previous_option
 OptionsTablePtr := R0
 DataValuePtr := R2
 CurrentWidgetIndex := R20

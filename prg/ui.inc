@@ -19,6 +19,8 @@
     sta widgets_onupdate_low, y
     lda #>func_ptr
     sta widgets_onupdate_high, y
+    lda #<.bank(func_ptr)
+    sta widgets_onupdate_bank, y
 .endmacro
 
 ; convenient macros to build the layout list, largely
@@ -26,6 +28,7 @@
 
 .macro widget_controller init_function_ptr ; no parameters needed
     .addr init_function_ptr
+    .byte <.bank(init_function_ptr)
     .byte 0, 0, 0, 0, 0, 0, 0, 0
 .endmacro
 

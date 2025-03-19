@@ -1,5 +1,6 @@
 .macro widget_numeric_slider label_string, tile_width, range_max, data_target, tile_x, tile_y
-    .addr widget_numeric_slider_init
+    .addr FAR_widget_numeric_slider_init
+    .byte <.bank(FAR_widget_numeric_slider_init)
     .byte tile_x, tile_y
     .addr label_string
     .byte tile_width, range_max
@@ -8,7 +9,7 @@
 
 .segment "CODE_UI_WIDGETS"
 
-.proc widget_numeric_slider_init
+.proc FAR_widget_numeric_slider_init
 MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
 
@@ -54,7 +55,7 @@ AttributeAddr := T2
         sta widgets_state_flags, y
 
         ; draw the initial label and options for this widget
-        jsr _draw_widget_label
+        near_call FAR_draw_widget_label
 
         ; The slider graphics come immediately after the label. The string
         ; drawing routine has left NametableAddr and AttrAddr, and Y is the
@@ -118,7 +119,7 @@ done_with_mid_segments:
         perform_zpcm_inc
 
         ; Position the sprite properly
-        jsr apply_ui_slider_position
+        near_call FAR_apply_ui_slider_position
 
         ldy CurrentWidgetIndex
         lda #0
@@ -126,13 +127,13 @@ done_with_mid_segments:
 
         ; now switch to the update function
         ldy CurrentWidgetIndex
-        set_widget_state_y widget_numeric_slider_update
+        set_widget_state_y FAR_widget_numeric_slider_update
 
         perform_zpcm_inc
         rts
 .endproc
 
-.proc apply_ui_slider_position
+.proc FAR_apply_ui_slider_position
 MinPixelX := R0
 MaxPixelX := R1
 WidthInPixels := R2
@@ -238,7 +239,7 @@ widget_data_target_high := widgets_data7
         rts
 .endproc
 
-.proc widget_numeric_slider_update
+.proc FAR_widget_numeric_slider_update
 DataValuePtr := R0
 CurrentWidgetIndex := R20
 widget_displayed_value := widgets_data3
@@ -273,13 +274,13 @@ check_for_forward_input:
         lda #(KEY_RIGHT)
         bit ButtonsDown
         beq check_for_reverse_input
-        jsr increase_slider_position
+        near_call FAR_increase_slider_position
         jmp redraw_self
 check_for_reverse_input:
         lda #(KEY_LEFT)
         bit ButtonsDown
         beq check_for_held_inputs
-        jsr decrease_slider_position
+        near_call FAR_decrease_slider_position
         jmp redraw_self
 check_for_held_inputs:
         ldy CurrentWidgetIndex
@@ -293,13 +294,13 @@ check_for_forward_held_input:
         lda #(KEY_RIGHT)
         bit ButtonsHeld
         beq check_for_reverse_held_input
-        jsr increase_slider_position
+        near_call FAR_increase_slider_position
         jmp redraw_self
 check_for_reverse_held_input:
         lda #(KEY_LEFT)
         bit ButtonsHeld
         beq nothing_to_do
-        jsr decrease_slider_position
+        near_call FAR_decrease_slider_position
         jmp redraw_self
 
 nothing_to_do:
@@ -318,11 +319,11 @@ nothing_to_do:
         ; otherwise we're done
         rts
 redraw_self:
-        jsr apply_ui_slider_position
+        near_call FAR_apply_ui_slider_position
         rts
 .endproc
 
-.proc increase_slider_position
+.proc FAR_increase_slider_position
 DataValuePtr := R0
 CurrentWidgetIndex := R20
 widget_range_max := widgets_data5
@@ -348,7 +349,7 @@ cancel_change:
         rts
 .endproc
 
-.proc decrease_slider_position
+.proc FAR_decrease_slider_position
 DataValuePtr := R0
 CurrentWidgetIndex := R20
 widget_range_max := widgets_data5

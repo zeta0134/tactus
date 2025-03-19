@@ -4,14 +4,15 @@
 
 
 .macro widget_options_battlefield
-    .addr options_battlefield_init
+    .addr FAR_options_battlefield_init
+    .byte <.bank(FAR_options_battlefield_init)
     .byte 0, 0, 0, 0, 0, 0, 0, 0
 .endmacro
 
 .segment "DATA_UI_LAYOUTS"
 
 options_ui_layout:
-        widget_controller options_controller_init
+        widget_controller FAR_options_controller_init
         widget_cursor
         widget_text_label game_options_str, 2, 13
         widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode},      4, 15
@@ -24,9 +25,9 @@ options_ui_layout:
         widget_numeric_viewer {current_save + SaveFile::PlayerPalettePhonesIndex},  11, 23
         widget_numeric_slider player_palette_face_str,   15, 52, {current_save + SaveFile::PlayerPalettePigmentIndex}, 4, 24
         widget_numeric_viewer {current_save + SaveFile::PlayerPalettePigmentIndex}, 11, 24
-        widget_text_button save_options_str, save_and_return_to_file_details, 9, 26
+        widget_text_button save_options_str, FAR_save_and_return_to_file_details, 9, 26
         widget_options_battlefield
-        widget_controller apply_fancy_color_shenanigans
+        widget_controller FAR_apply_fancy_color_shenanigans
         .addr $0000 ; end of list
 
 PRESET_PERSONALIZED_VALUE = 0
@@ -211,18 +212,13 @@ obj_loop:
         sta TargetBrightness
 
         ldy CurrentWidgetIndex
-        set_widget_state_y options_controller_update
+        set_widget_state_y FAR_options_controller_update
         rts
 .endproc
 
         .segment "CODE_UI_WIDGETS"
 
-.proc options_controller_init
-        far_call FAR_options_controller_init
-        rts
-.endproc
-
-.proc options_controller_update
+.proc FAR_options_controller_update
 widget_cursor_nav_index := widgets_data1
 
         ; We need the playfield to start in CHR 1M mode, to display
@@ -237,7 +233,7 @@ widget_cursor_nav_index := widgets_data1
         lda #KEY_B
         and ButtonsDown
         beq stay_here
-        jsr save_and_return_to_file_details
+        near_call FAR_save_and_return_to_file_details
         rts
 stay_here:
 
@@ -255,9 +251,9 @@ leave_that_cursor_alone:
         rts
 .endproc
 
-.proc save_and_return_to_file_details
+.proc FAR_save_and_return_to_file_details
         far_call FAR_save_current_file
-        jsr go_to_file_details
+        near_call FAR_go_to_file_details
         rts
 .endproc
 
@@ -271,7 +267,7 @@ OPTIONS_DISCO_STATE_DISAPPEARING := 2
 ; no need to preserve anything else; the options battlefield
 ; is extremely lightweight and will manage the rest of its state.
 ; We just want the battlefield to apply disco logic for the most part.
-.proc options_battlefield_init
+.proc FAR_options_battlefield_init
 MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
 widget_last_beat := widgets_data0
@@ -451,7 +447,7 @@ disco_floor_bottom:
         perform_zpcm_inc
 
         ldy CurrentWidgetIndex
-        set_widget_state_y options_battlefield_draw
+        set_widget_state_y FAR_options_battlefield_draw
 
         perform_zpcm_inc
         rts
@@ -459,7 +455,7 @@ disco_floor_bottom:
 
 ; todo: if necessary, break this out into several states
 ; (but ideally we do it all in one go and skip the dual-nametable thing)
-.proc options_battlefield_draw
+.proc FAR_options_battlefield_draw
 CurrentWidgetIndex := R20
         ; we want to draw to the LEFT battlefield, so we set "active" to
         ; the RIGHT battlefield (we're cheating a bit here)
@@ -471,13 +467,13 @@ CurrentWidgetIndex := R20
         far_call FAR_draw_battlefield_block_C_inline
 
         ldy CurrentWidgetIndex
-        set_widget_state_y options_battlefield_update
+        set_widget_state_y FAR_options_battlefield_update
 
         rts
 .endproc
 
 ; TODO: if necessary, break this out into several states
-.proc options_battlefield_update
+.proc FAR_options_battlefield_update
 StartingRow := R14
 StartingTile := R15
 CurrentWidgetIndex := R20
@@ -574,12 +570,12 @@ converge:
         ; and we... should be set?
 
         ldy CurrentWidgetIndex
-        set_widget_state_y options_battlefield_wait_for_beat
+        set_widget_state_y FAR_options_battlefield_wait_for_beat
 
         rts
 .endproc
 
-.proc options_battlefield_wait_for_beat
+.proc FAR_options_battlefield_wait_for_beat
 CurrentWidgetIndex := R20
 widget_last_beat := widgets_data0
         
@@ -598,12 +594,12 @@ advance:
 
         ;set_widget_state_y options_battlefield_draw
         ; draw right now!
-        jsr options_battlefield_draw
+        near_call FAR_options_battlefield_draw
 
         rts
 .endproc
 
-.proc apply_fancy_color_shenanigans
+.proc FAR_apply_fancy_color_shenanigans
         ; When left/right are pressed, if we are currently on the Preset
         ; field, apply the preset colors to the sliders. If we're currently
         ; on any of the other fields, apply the slider values to the preset instead.
@@ -634,16 +630,16 @@ perform_shenanigans:
         rts
         
 slider_is_hovered:
-        jsr sync_sliders_to_preset
-        jsr update_player_color_values
+        near_call FAR_sync_sliders_to_preset
+        near_call FAR_update_player_color_values
         rts
 preset_is_hovered:
-        jsr sync_preset_to_sliders
-        jsr update_player_color_values
+        near_call FAR_sync_preset_to_sliders
+        near_call FAR_update_player_color_values
         rts
 .endproc
 
-.proc sync_preset_to_sliders
+.proc FAR_sync_preset_to_sliders
         ; If the preset value is anything other than "Personalized", then
         ; read the preset and apply the colors to the sliders
         ldx current_save + SaveFile::PlayerPalettePreset
@@ -661,7 +657,7 @@ change_nothing:
         rts
 .endproc
 
-.proc sync_sliders_to_preset
+.proc FAR_sync_sliders_to_preset
         ; If the sliders don't currently equal the preset value, switch
         ; the preset value to "Personalized"
         ldx current_save + SaveFile::PlayerPalettePreset
@@ -685,7 +681,7 @@ perform_sync:
         rts
 .endproc
 
-.proc update_player_color_values
+.proc FAR_update_player_color_values
         ; Read the color index values, work out the PPU values from the global LUT,
         ; and load those colors into the player sprite for preview
         far_call FAR_compute_player_colors

@@ -5,7 +5,7 @@
 .segment "DATA_UI_LAYOUTS"
 
 game_over_screen_ui_layout:
-        widget_controller game_over_controller_init
+        widget_controller FAR_game_over_controller_init
         widget_cursor
         widget_text_button empty_string, game_over_str, 12, 10        
         .addr $0000 ; end of list
@@ -14,7 +14,7 @@ game_over_str:   .asciiz "GAME OVER (WIP)"
 
 .segment "CODE_UI_WIDGETS"
 
-.proc game_over_controller_init
+.proc FAR_game_over_controller_init
 CurrentWidgetIndex := R20
 
         lda #BRIGHTNESS_FULLY_DARK
@@ -23,15 +23,15 @@ CurrentWidgetIndex := R20
         sta TargetBrightness
 
         ldy CurrentWidgetIndex
-        set_widget_state_y game_over_controller_update
+        set_widget_state_y FAR_game_over_controller_update
         rts
 .endproc
 
-.proc game_over_controller_update
+.proc FAR_game_over_controller_update
         lda #(KEY_A | KEY_B | KEY_START)
         and ButtonsDown
         beq stay_here
-        jsr return_to_title
+        near_call FAR_return_to_title
         rts
 stay_here:
         rts

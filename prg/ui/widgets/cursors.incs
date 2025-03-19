@@ -1,10 +1,12 @@
 .macro widget_cursor ; no parameters needed
-    .addr widget_cursor_init
+    .addr FAR_widget_cursor_init
+    .byte <.bank(FAR_widget_cursor_init)
     .byte 0, 0, 0, 0, 0, 0, 0, 0
 .endmacro
 
 .macro widget_player_cursor ; the player is the cursor. purely visual
-    .addr widget_player_cursor_init
+    .addr FAR_widget_player_cursor_init
+    .byte <.bank(FAR_widget_player_cursor_init)
     .byte 0, 0, 0, 0, 0, 0, 0, 0
 .endmacro
 
@@ -153,7 +155,7 @@ found_one:
 
 .segment "CODE_UI_WIDGETS"
 
-.proc widget_cursor_init
+.proc FAR_widget_cursor_init
 MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
         
@@ -201,19 +203,19 @@ widget_frames_at_this_location := widgets_data7
         set_ui_00_sprite_x SPRITE_UI_00_MENU_CURSOR_SPIN
 
         ldy CurrentWidgetIndex
-        set_widget_state_y widget_cursor_update
+        set_widget_state_y FAR_widget_cursor_update
 
         rts
 .endproc
 
-.proc widget_cursor_update
+.proc FAR_widget_cursor_update
 TargetWidgetIndex := R0
 CurrentWidgetIndex := R20
 
 widget_sprite_index := widgets_data0
 widget_cursor_nav_index := widgets_data1
 
-        jsr clear_hover_states
+        near_call FAR_clear_hover_states
 
         ldy CurrentWidgetIndex
         lda widget_cursor_nav_index, y
@@ -248,7 +250,7 @@ new_target_acquired:
         perform_zpcm_inc
         ; initialize our position to the target's position
         ; with no lerping
-        jsr snap_to_widget_position
+        near_call FAR_snap_to_widget_position
         jmp update_at_active_position
 target_valid:
         ; if the user has pressed the UP or DOWN buttons,
@@ -277,17 +279,17 @@ handle_move_up:
 update_at_active_position:
         perform_zpcm_inc
         ; smoothly lerp the cursor to its current position
-        jsr lerp_to_widget_position
-        jsr apply_cursor_position_to_sprite
+        near_call FAR_lerp_to_widget_position
+        near_call FAR_apply_cursor_position_to_sprite
         ; tell the widget we're pointing at that it should become
         ; "hovered", whatever that widget thinks that means
-        jsr set_hover_state
+        near_call FAR_set_hover_state
         rts
 .endproc
 
 ; Just like the regular cursor widget, but with the player sprite
 ; as the active tile
-.proc widget_player_cursor_init
+.proc FAR_widget_player_cursor_init
 MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
         
@@ -341,12 +343,12 @@ widget_frames_at_this_location := widgets_data7
         set_ui_00_sprite_x SPRITE_UI_00_PLAYER
         
         ldy CurrentWidgetIndex
-        set_widget_state_y widget_player_cursor_update
+        set_widget_state_y FAR_widget_player_cursor_update
 
         rts
 .endproc
 
-.proc widget_player_cursor_update
+.proc FAR_widget_player_cursor_update
 HeightOffsetScratch := R0
 
 CurrentWidgetIndex := R20
@@ -357,7 +359,7 @@ widget_sprite_position_high_y := widgets_data5
 widget_beats_at_this_location := widgets_data6
 widget_frames_at_this_location := widgets_data7
         ; first off, do everything the original cursor update does, more or less
-        jsr widget_cursor_update
+        near_call FAR_widget_cursor_update
         perform_zpcm_inc
         ; now adjust the player's position based on how long we've been here
         ldy CurrentWidgetIndex
@@ -402,7 +404,7 @@ use_idle_pose:
         rts
 .endproc
 
-.proc snap_to_widget_position
+.proc FAR_snap_to_widget_position
 TargetWidgetIndex := R0
 CurrentWidgetIndex := R20
 
@@ -427,7 +429,7 @@ widget_sprite_position_high_y := widgets_data5
         rts
 .endproc
 
-.proc lerp_to_widget_position
+.proc FAR_lerp_to_widget_position
 TargetWidgetIndex := R0
 CurrentWidgetIndex := R20
 
@@ -452,7 +454,7 @@ widget_sprite_position_high_y := widgets_data5
         ldy TargetWidgetIndex
         lda widgets_cursor_pos_x, y
         sta LerpTargetPos+1
-        jsr lerp_coordinate ; clobbers A, preserves X and Y
+        near_call FAR_lerp_coordinate ; clobbers A, preserves X and Y
         ldy CurrentWidgetIndex
         lda LerpCurrentPos
         sta widget_sprite_position_low_x, y
@@ -469,7 +471,7 @@ widget_sprite_position_high_y := widgets_data5
         ldy TargetWidgetIndex
         lda widgets_cursor_pos_y, y
         sta LerpTargetPos+1
-        jsr lerp_coordinate ; clobbers A, preserves X and Y
+        near_call FAR_lerp_coordinate ; clobbers A, preserves X and Y
         ldy CurrentWidgetIndex
         lda LerpCurrentPos
         sta widget_sprite_position_low_y, y
@@ -479,7 +481,7 @@ widget_sprite_position_high_y := widgets_data5
         rts
 .endproc
 
-.proc apply_cursor_position_to_sprite
+.proc FAR_apply_cursor_position_to_sprite
 CurrentWidgetIndex := R20
 
 widget_sprite_index := widgets_data0
@@ -499,7 +501,7 @@ widget_sprite_position_high_y := widgets_data5
         rts
 .endproc
 
-.proc clear_hover_states
+.proc FAR_clear_hover_states
         ldy #0
 loop:
         perform_zpcm_inc
@@ -512,7 +514,7 @@ loop:
         rts
 .endproc
 
-.proc set_hover_state
+.proc FAR_set_hover_state
 TargetWidgetIndex := R0
         ldx TargetWidgetIndex
         lda widgets_state_flags, x
@@ -522,7 +524,7 @@ TargetWidgetIndex := R0
 .endproc
 
 ; lifted straight from dungeon game, with little to no modification
-.proc lerp_coordinate
+.proc FAR_lerp_coordinate
 CurrentPos := R2
 TargetPos := R4
 Distance := R6

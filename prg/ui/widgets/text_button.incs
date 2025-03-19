@@ -1,5 +1,6 @@
 .macro widget_text_button text_string, action_func_ptr, tile_x, tile_y
-    .addr widget_text_button_init
+    .addr FAR_widget_text_button_init
+    .byte <.bank(FAR_widget_text_button_init)
     .byte tile_x, tile_y
     .addr text_string
     .addr action_func_ptr
@@ -7,7 +8,8 @@
 .endmacro
 
 .macro widget_text_button_attr text_string, action_func_ptr, tile_x, tile_y, text_attr
-    .addr widget_text_button_init
+    .addr FAR_widget_text_button_init
+    .byte <.bank(FAR_widget_text_button_init)
     .byte tile_x, tile_y
     .addr text_string
     .addr action_func_ptr
@@ -16,7 +18,7 @@
 
 .segment "CODE_UI_WIDGETS"
 
-.proc widget_text_button_init
+.proc FAR_widget_text_button_init
 CurrentWidgetIndex := R20
 
 ; rename the data labels to something more readable
@@ -48,11 +50,11 @@ widget_label_string_high := widgets_data3
         sta widgets_state_flags, y
 
         ; draw the initial label and options for this widget
-        jsr _draw_widget_label_pal
+        near_call FAR_draw_widget_label_pal
 
         ; now switch to the update function
         ldy CurrentWidgetIndex
-        set_widget_state_y widget_text_button_update
+        set_widget_state_y FAR_widget_text_button_update
         rts
 .endproc
 
@@ -62,7 +64,7 @@ ActionFuncPtr := R0
         ; rts (implied)
 .endproc
 
-.proc widget_text_button_update
+.proc FAR_widget_text_button_update
 ActionFuncPtr := R0
 CurrentWidgetIndex := R20
 
