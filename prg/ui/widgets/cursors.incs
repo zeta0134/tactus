@@ -1,14 +1,16 @@
 .macro widget_cursor ; no parameters needed
-    .addr FAR_widget_cursor_init
-    .byte <.bank(FAR_widget_cursor_init)
+    .addr widget_cursor::FAR_widget_cursor_init
+    .byte <.bank(widget_cursor::FAR_widget_cursor_init)
     .byte 0, 0, 0, 0, 0, 0, 0, 0
 .endmacro
 
 .macro widget_player_cursor ; the player is the cursor. purely visual
-    .addr FAR_widget_player_cursor_init
-    .byte <.bank(FAR_widget_player_cursor_init)
+    .addr widget_cursor::FAR_widget_player_cursor_init
+    .byte <.bank(widget_cursor::FAR_widget_player_cursor_init)
     .byte 0, 0, 0, 0, 0, 0, 0, 0
 .endmacro
+
+.scope widget_cursor
 
 .segment "DATA_UI_LAYOUTS"
 
@@ -592,3 +594,5 @@ arrived_at_target:
         sta CurrentPos
         rts
 .endproc
+
+.endscope ; widget_cursor

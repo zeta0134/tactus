@@ -183,9 +183,9 @@ widget_file_select_mode := widgets_data0
         sta Width
         lda #3
         sta Height
-        near_call FAR_draw_box_outline_light
-        near_call FAR_draw_box_fill
-        near_call FAR_draw_box_shadow
+        near_call widget_file_select_box::FAR_draw_box_outline_light
+        near_call widget_file_select_box::FAR_draw_box_fill
+        near_call widget_file_select_box::FAR_draw_box_shadow
 
         lda #8
         sta Left
@@ -195,9 +195,9 @@ widget_file_select_mode := widgets_data0
         sta Width
         lda #5
         sta Height
-        near_call FAR_draw_box_outline_light
-        near_call FAR_draw_box_fill
-        near_call FAR_draw_box_shadow
+        near_call widget_file_select_box::FAR_draw_box_outline_light
+        near_call widget_file_select_box::FAR_draw_box_fill
+        near_call widget_file_select_box::FAR_draw_box_shadow
 
         near_call FAR_apply_standard_ui_palette
 
@@ -320,7 +320,7 @@ widget_file_index := widgets_data2
 
         ldy WidgetIndexUnderCursor
         lda widget_file_index, y
-        near_call FAR_prepare_file_pointer
+        near_call widget_file_select_box::FAR_prepare_file_pointer
         far_call FAR_is_new_file
         cmp #FILE_NEW
         beq open_new_file
@@ -361,7 +361,7 @@ widget_copy_source_index := widgets_data1
         ; if the source selected is a new file. let's check for that
         ldy WidgetIndexUnderCursor
         lda widget_file_index, y
-        near_call FAR_prepare_file_pointer
+        near_call widget_file_select_box::FAR_prepare_file_pointer
         far_call FAR_is_new_file
         cmp #FILE_NEW
         bne perform_erase_confirm
@@ -386,14 +386,14 @@ widget_file_index := widgets_data2
         ; so do that
         ldy WidgetIndexUnderCursor
         lda widget_file_index, y
-        near_call FAR_prepare_file_pointer
+        near_call widget_file_select_box::FAR_prepare_file_pointer
         far_call FAR_create_new_file
         ; Persist those changes!
         far_call FAR_persist_block_to_storage
         ; This has invalidated the displayed contents of this file
         ; block, so have it refresh its contents accordingly
         ldy WidgetIndexUnderCursor
-        set_widget_state_y FAR_widget_file_select_box_refresh
+        set_widget_state_y widget_file_select_box::FAR_widget_file_select_box_refresh
         ; play a suitable "file erased" SFX, which is also the death sound
         queue_sfx_pulse1 sfx_death_spin_pulse
         queue_sfx_triangle sfx_death_spin_tri
@@ -414,7 +414,7 @@ widget_copy_source_index := widgets_data1
         ; if the source selected is a new file. let's check for that
         ldy WidgetIndexUnderCursor
         lda widget_file_index, y
-        near_call FAR_prepare_file_pointer
+        near_call widget_file_select_box::FAR_prepare_file_pointer
         far_call FAR_is_new_file
         cmp #FILE_NEW
         bne perform_copy_source_select
@@ -461,7 +461,7 @@ copy_dest_is_valid:
         ; right away
         ldy WidgetIndexUnderCursor
         lda widget_file_index, y
-        near_call FAR_prepare_file_pointer
+        near_call widget_file_select_box::FAR_prepare_file_pointer
         far_call FAR_is_new_file
         cmp #FILE_NEW
         beq dest_slot_is_new_file
@@ -493,7 +493,7 @@ widget_copy_source_index := widgets_data1
         ; Similar to erasures, this invalidates the displayed contents of the
         ; destination widget, so refresh that here
         ldy WidgetIndexUnderCursor
-        set_widget_state_y FAR_widget_file_select_box_refresh
+        set_widget_state_y widget_file_select_box::FAR_widget_file_select_box_refresh
 
         ; Play some sort of chime for a successful copy. I dunno, pause?
         queue_sfx_pulse1 sfx_pause
@@ -575,7 +575,7 @@ widget_text_string_high := widgets_data3
         sta widget_text_string_low, y
         lda #>file_select_str
         sta widget_text_string_high, y
-        set_widget_state_y FAR_widget_text_label_init
+        set_widget_state_y widget_text_label::FAR_widget_text_label_init
 
         ; Re-enable all nav buttons (incl. file boxes!)
         jsr _enable_copy_erase_buttons
@@ -608,7 +608,7 @@ widget_text_string_high := widgets_data3
         sta widget_text_string_low, y
         lda #>erase_which_str
         sta widget_text_string_high, y
-        set_widget_state_y FAR_widget_text_label_init
+        set_widget_state_y widget_text_label::FAR_widget_text_label_init
 
         ; Disable navigation for the two mode buttons
         jsr _disable_copy_erase_buttons
@@ -640,7 +640,7 @@ widget_text_string_high := widgets_data3
         sta widget_text_string_low, y
         lda #>erase_confirm_str
         sta widget_text_string_high, y
-        set_widget_state_y FAR_widget_text_label_init
+        set_widget_state_y widget_text_label::FAR_widget_text_label_init
 
         ; Disable nav for every box other than the one we're pointing to
         ; the lazy way: disable all 3
@@ -682,7 +682,7 @@ widget_text_string_high := widgets_data3
         sta widget_text_string_low, y
         lda #>copy_source_str
         sta widget_text_string_high, y
-        set_widget_state_y FAR_widget_text_label_init
+        set_widget_state_y widget_text_label::FAR_widget_text_label_init
 
         ; Disable navigation for the two mode buttons
         jsr _disable_copy_erase_buttons
@@ -717,7 +717,7 @@ widget_copy_source_index := widgets_data1
         sta widget_text_string_low, y
         lda #>copy_dest_str
         sta widget_text_string_high, y
-        set_widget_state_y FAR_widget_text_label_init
+        set_widget_state_y widget_text_label::FAR_widget_text_label_init
 
         ; Enable nav for all 3 boxes 
         jsr _enable_all_file_boxes
@@ -760,7 +760,7 @@ widget_copy_source_index := widgets_data1
         sta widget_text_string_low, y
         lda #>copy_confirm_str
         sta widget_text_string_high, y
-        set_widget_state_y FAR_widget_text_label_init
+        set_widget_state_y widget_text_label::FAR_widget_text_label_init
 
         ; disable nav for everything that isn't the thing we're pointed at
         jsr _disable_all_file_boxes

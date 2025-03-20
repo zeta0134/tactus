@@ -71,9 +71,9 @@ CurrentWidgetIndex := R20
         sta Width
         lda #20
         sta Height
-        near_call FAR_draw_box_outline_light
-        near_call FAR_draw_box_fill
-        near_call FAR_draw_box_shadow
+        near_call widget_file_select_box::FAR_draw_box_outline_light
+        near_call widget_file_select_box::FAR_draw_box_fill
+        near_call widget_file_select_box::FAR_draw_box_shadow
         ; And a smaller box up top for the title / instruction
         lda #8
         sta Left
@@ -83,9 +83,9 @@ CurrentWidgetIndex := R20
         sta Width
         lda #3
         sta Height
-        near_call FAR_draw_box_outline_light
-        near_call FAR_draw_box_fill
-        near_call FAR_draw_box_shadow
+        near_call widget_file_select_box::FAR_draw_box_outline_light
+        near_call widget_file_select_box::FAR_draw_box_fill
+        near_call widget_file_select_box::FAR_draw_box_shadow
 
 
         ; Get the file select palettes loaded in

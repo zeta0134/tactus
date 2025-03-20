@@ -1,12 +1,14 @@
 ; Given a position and a data target, displays one byte of data
 ; in base 10. Mostly meant as a helper widget next to other controls
 .macro widget_numeric_viewer data_target, tile_x, tile_y
-    .addr FAR_widget_numeric_viewer_init
-    .byte <.bank(FAR_widget_numeric_viewer_init)
+    .addr widget_numeric_viewer::FAR_widget_numeric_viewer_init
+    .byte <.bank(widget_numeric_viewer::FAR_widget_numeric_viewer_init)
     .byte tile_x, tile_y
     .addr data_target
     .byte 0, 0, 0, 0
 .endmacro
+
+.scope widget_numeric_viewer
 
 .segment "CODE_UI_WIDGETS"
 
@@ -144,3 +146,5 @@ done_with_leading_spaces:
     perform_zpcm_inc
     rts
 .endproc
+
+.endscope ; widget_numeric_viewer

@@ -6,3 +6,10 @@ build
 audiodump.raw
 *.pyc
 *.DS_Store
+
+vendor/*.so
+vendor/*.txt
+vendor/*/*.bin
+vendor/*/*.rgd
+vendor/*.lock
+vendor/*.json

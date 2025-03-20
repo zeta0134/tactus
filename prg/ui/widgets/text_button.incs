@@ -1,6 +1,6 @@
 .macro widget_text_button text_string, action_func_ptr, tile_x, tile_y
-    .addr FAR_widget_text_button_init
-    .byte <.bank(FAR_widget_text_button_init)
+    .addr widget_text_button::FAR_widget_text_button_init
+    .byte <.bank(widget_text_button::FAR_widget_text_button_init)
     .byte tile_x, tile_y
     .addr text_string
     .addr action_func_ptr
@@ -8,13 +8,15 @@
 .endmacro
 
 .macro widget_text_button_attr text_string, action_func_ptr, tile_x, tile_y, text_attr
-    .addr FAR_widget_text_button_init
-    .byte <.bank(FAR_widget_text_button_init)
+    .addr widget_text_button::FAR_widget_text_button_init
+    .byte <.bank(widget_text_button::FAR_widget_text_button_init)
     .byte tile_x, tile_y
     .addr text_string
     .addr action_func_ptr
     .byte 0, text_attr
 .endmacro
+
+.scope widget_text_button
 
 .segment "CODE_UI_WIDGETS"
 
@@ -95,3 +97,4 @@ do_nothing:
         rts
 .endproc
 
+.endscope ; .scope widget_text_button

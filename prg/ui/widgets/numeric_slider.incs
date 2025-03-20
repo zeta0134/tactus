@@ -1,11 +1,13 @@
 .macro widget_numeric_slider label_string, tile_width, range_max, data_target, tile_x, tile_y
-    .addr FAR_widget_numeric_slider_init
-    .byte <.bank(FAR_widget_numeric_slider_init)
+    .addr widget_numeric_slider::FAR_widget_numeric_slider_init
+    .byte <.bank(widget_numeric_slider::FAR_widget_numeric_slider_init)
     .byte tile_x, tile_y
     .addr label_string
     .byte tile_width, range_max
     .addr data_target
 .endmacro
+
+.scope widget_numeric_slider
 
 .segment "CODE_UI_WIDGETS"
 
@@ -372,3 +374,5 @@ widget_data_target_high := widgets_data7
 cancel_change:
         rts
 .endproc
+
+.endscope ; widget_numeric_slider

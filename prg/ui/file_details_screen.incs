@@ -61,9 +61,9 @@ widget_last_cursor_pos := widgets_data0
         sta Width
         lda #3
         sta Height
-        near_call FAR_draw_box_outline_light
-        near_call FAR_draw_box_fill
-        near_call FAR_draw_box_shadow
+        near_call widget_file_select_box::FAR_draw_box_outline_light
+        near_call widget_file_select_box::FAR_draw_box_fill
+        near_call widget_file_select_box::FAR_draw_box_shadow
 
         ; Get the file select palettes loaded in
         near_call FAR_apply_standard_ui_palette
@@ -95,15 +95,15 @@ Height := R3
         sta Width
         lda #3
         sta Height
-        near_call FAR_draw_box_outline_dark
-        near_call FAR_draw_box_fill
-        near_call FAR_draw_box_shadow
+        near_call widget_file_select_box::FAR_draw_box_outline_dark
+        near_call widget_file_select_box::FAR_draw_box_fill
+        near_call widget_file_select_box::FAR_draw_box_shadow
 
         lda #10
         sta Top
-        near_call FAR_draw_box_outline_dark
-        near_call FAR_draw_box_fill
-        near_call FAR_draw_box_shadow
+        near_call widget_file_select_box::FAR_draw_box_outline_dark
+        near_call widget_file_select_box::FAR_draw_box_fill
+        near_call widget_file_select_box::FAR_draw_box_shadow
         rts  
 .endproc
 
@@ -121,11 +121,11 @@ Height := R3
         sta Width
         lda #3
         sta Height
-        near_call FAR_draw_box_outline_dark
+        near_call widget_file_select_box::FAR_draw_box_outline_dark
 
         lda #10
         sta Top
-        near_call FAR_draw_box_outline_dark
+        near_call widget_file_select_box::FAR_draw_box_outline_dark
         rts
 .endproc
 
@@ -165,7 +165,7 @@ options_index:
         jmp perform_draw
         
 perform_draw:
-        near_call FAR_draw_box_outline_light
+        near_call widget_file_select_box::FAR_draw_box_outline_light
         rts
 .endproc
 

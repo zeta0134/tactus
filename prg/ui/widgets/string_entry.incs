@@ -1,17 +1,19 @@
 ; These are fixed on the screen, and I'm not going to waste effort
 ; trying to make them relocatable. Deal.
 .macro widget_string_entry page_table, destination_str
-        .addr FAR_widget_string_entry_init
-        .byte <.bank(FAR_widget_string_entry_init)
+        .addr widget_string_entry::FAR_widget_string_entry_init
+        .byte <.bank(widget_string_entry::FAR_widget_string_entry_init)
         .addr page_table
         .addr destination_str
         .byte 0, 0, 0, 0
         ; the string entry thing comes with its own cursor
-        .addr FAR_widget_string_entry_cursor_init
-        .byte <.bank(FAR_widget_string_entry_cursor_init)
+        .addr widget_string_entry::FAR_widget_string_entry_cursor_init
+        .byte <.bank(widget_string_entry::FAR_widget_string_entry_cursor_init)
         .byte 0, 0, 0, 0
         .byte 0, 0, 0, 0
 .endmacro
+
+.scope widget_string_entry
 
 .segment "CODE_UI_WIDGETS"
 
@@ -874,7 +876,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         sta CurrentPos+1
         lda widget_left_pos_x_subpixel, y
         sta CurrentPos+0
-        near_call FAR_lerp_coordinate
+        near_call widget_cursor::FAR_lerp_coordinate
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda CurrentPos+1
@@ -892,7 +894,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         sta CurrentPos+1
         lda widget_right_pos_x_subpixel, y
         sta CurrentPos+0
-        near_call FAR_lerp_coordinate
+        near_call widget_cursor::FAR_lerp_coordinate
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda CurrentPos+1
@@ -910,7 +912,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         sta CurrentPos+1
         lda widget_left_pos_y_subpixel, y
         sta CurrentPos+0
-        near_call FAR_lerp_coordinate
+        near_call widget_cursor::FAR_lerp_coordinate
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda CurrentPos+1
@@ -981,3 +983,5 @@ widget_right_pos_y_pixel     := widgets_data6
         perform_zpcm_inc
         rts
 .endproc
+
+.endscope ; widget_string_entry

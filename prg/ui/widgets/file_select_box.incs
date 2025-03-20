@@ -1,10 +1,12 @@
 .macro widget_file_select_box file_index, tile_x, tile_y
-        .addr FAR_widget_file_select_box_init
-        .byte <.bank(FAR_widget_file_select_box_init)
+        .addr widget_file_select_box::FAR_widget_file_select_box_init
+        .byte <.bank(widget_file_select_box::FAR_widget_file_select_box_init)
         .byte tile_x, tile_y
         .addr file_index
         .byte 0, 0, 0, 0
 .endmacro
+
+.scope widget_file_select_box
 
 CORNER_TL_LIGHT   = $0E
 CORNER_TR_LIGHT   = $0F
@@ -666,3 +668,5 @@ widget_tile_y := widgets_data1
         set_widget_state_y FAR_widget_file_select_box_update
         rts
 .endproc
+
+.endscope ; widget_file_select_box
