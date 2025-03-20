@@ -46,7 +46,7 @@ FILE_SELECT_MODE_COPY_SOURCE   = 3
 FILE_SELECT_MODE_COPY_DEST     = 4
 FILE_SELECT_MODE_COPY_CONFIRM  = 5
 
-.segment "CODE_UI_UTIL"
+.segment "CODE_UI_LAYOUTS"
 
 .proc FAR_draw_checkerboard_base
 NametableAddr := R0
@@ -91,8 +91,6 @@ tile_converge:
         perform_zpcm_inc
         rts
 .endproc
-
-.segment "CODE_UI_WIDGETS"
 
 .proc FAR_apply_standard_ui_palette
         ldy #0
@@ -173,7 +171,7 @@ widget_file_select_mode := widgets_data0
         sta RightNametableAttr
 
         ; draw an initial checkerboard background (no nametable for now)
-        far_call FAR_draw_checkerboard_base
+        near_call FAR_draw_checkerboard_base
         ; draw boxes for the "File Select" top thing, and the "erase/copy" options down below
         lda #7
         sta Left
@@ -183,9 +181,9 @@ widget_file_select_mode := widgets_data0
         sta Width
         lda #3
         sta Height
-        near_call widget_file_select_box::FAR_draw_box_outline_light
-        near_call widget_file_select_box::FAR_draw_box_fill
-        near_call widget_file_select_box::FAR_draw_box_shadow
+        far_call widget_file_select_box::FAR_draw_box_outline_light
+        far_call widget_file_select_box::FAR_draw_box_fill
+        far_call widget_file_select_box::FAR_draw_box_shadow
 
         lda #8
         sta Left
@@ -195,9 +193,9 @@ widget_file_select_mode := widgets_data0
         sta Width
         lda #5
         sta Height
-        near_call widget_file_select_box::FAR_draw_box_outline_light
-        near_call widget_file_select_box::FAR_draw_box_fill
-        near_call widget_file_select_box::FAR_draw_box_shadow
+        far_call widget_file_select_box::FAR_draw_box_outline_light
+        far_call widget_file_select_box::FAR_draw_box_fill
+        far_call widget_file_select_box::FAR_draw_box_shadow
 
         near_call FAR_apply_standard_ui_palette
 
@@ -257,12 +255,17 @@ stay_here:
 .endproc
 
 file_cancel_dispatch_table:
-        .addr FAR_return_to_title      ; FILE_SELECT_MODE_NORMAL
-        .addr FAR_enter_normal_mode    ; FILE_SELECT_MODE_ERASE
-        .addr FAR_enter_erase_mode     ; FILE_SELECT_MODE_ERASE_CONFIRM
-        .addr FAR_enter_normal_mode    ; FILE_SELECT_MODE_COPY_SOURCE
-        .addr FAR_enter_copy_mode      ; FILE_SELECT_MODE_COPY_DEST
-        .addr FAR_enter_copy_dest_mode ; FILE_SELECT_MODE_COPY_CONFIRM
+        .addr FAR_from_file_select_return_to_title ; FILE_SELECT_MODE_NORMAL
+        .addr FAR_enter_normal_mode                ; FILE_SELECT_MODE_ERASE
+        .addr FAR_enter_erase_mode                 ; FILE_SELECT_MODE_ERASE_CONFIRM
+        .addr FAR_enter_normal_mode                ; FILE_SELECT_MODE_COPY_SOURCE
+        .addr FAR_enter_copy_mode                  ; FILE_SELECT_MODE_COPY_DEST
+        .addr FAR_enter_copy_dest_mode             ; FILE_SELECT_MODE_COPY_CONFIRM
+
+.proc FAR_from_file_select_return_to_title
+        far_call FAR_return_to_title
+        rts
+.endproc
 
 .proc FAR_file_select_b_button_dispatch
 DispatchPtr := R0
@@ -320,7 +323,7 @@ widget_file_index := widgets_data2
 
         ldy WidgetIndexUnderCursor
         lda widget_file_index, y
-        near_call widget_file_select_box::FAR_prepare_file_pointer
+        far_call widget_file_select_box::FAR_prepare_file_pointer
         far_call FAR_is_new_file
         cmp #FILE_NEW
         beq open_new_file
@@ -335,7 +338,7 @@ open_existing_file:
         ldy WidgetIndexUnderCursor
         lda widget_file_index, y
         far_call FAR_update_last_accessed_file
-        near_call FAR_go_to_file_details
+        far_call FAR_go_to_file_details
         rts
 
 open_new_file:
@@ -347,7 +350,7 @@ open_new_file:
         ldy WidgetIndexUnderCursor
         lda widget_file_index, y
         far_call FAR_update_last_accessed_file
-        near_call FAR_go_to_name_entry
+        far_call FAR_go_to_name_entry
         rts
 .endproc
 
@@ -361,7 +364,7 @@ widget_copy_source_index := widgets_data1
         ; if the source selected is a new file. let's check for that
         ldy WidgetIndexUnderCursor
         lda widget_file_index, y
-        near_call widget_file_select_box::FAR_prepare_file_pointer
+        far_call widget_file_select_box::FAR_prepare_file_pointer
         far_call FAR_is_new_file
         cmp #FILE_NEW
         bne perform_erase_confirm
@@ -386,7 +389,7 @@ widget_file_index := widgets_data2
         ; so do that
         ldy WidgetIndexUnderCursor
         lda widget_file_index, y
-        near_call widget_file_select_box::FAR_prepare_file_pointer
+        far_call widget_file_select_box::FAR_prepare_file_pointer
         far_call FAR_create_new_file
         ; Persist those changes!
         far_call FAR_persist_block_to_storage
@@ -414,7 +417,7 @@ widget_copy_source_index := widgets_data1
         ; if the source selected is a new file. let's check for that
         ldy WidgetIndexUnderCursor
         lda widget_file_index, y
-        near_call widget_file_select_box::FAR_prepare_file_pointer
+        far_call widget_file_select_box::FAR_prepare_file_pointer
         far_call FAR_is_new_file
         cmp #FILE_NEW
         bne perform_copy_source_select
@@ -461,7 +464,7 @@ copy_dest_is_valid:
         ; right away
         ldy WidgetIndexUnderCursor
         lda widget_file_index, y
-        near_call widget_file_select_box::FAR_prepare_file_pointer
+        far_call widget_file_select_box::FAR_prepare_file_pointer
         far_call FAR_is_new_file
         cmp #FILE_NEW
         beq dest_slot_is_new_file
@@ -777,5 +780,4 @@ widget_copy_source_index := widgets_data1
 
         rts
 .endproc
-
 

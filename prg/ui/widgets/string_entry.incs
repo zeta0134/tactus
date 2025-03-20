@@ -15,7 +15,12 @@
 
 .scope widget_string_entry
 
-.segment "CODE_UI_WIDGETS"
+.segment "DATA_UI_LAYOUTS"
+
+string_entry_del_str: .asciiz "Delete"
+string_entry_accept_str: .asciiz "Accept"
+
+.segment "CODE_UI_WIDGETS_1"
 
 TARGET_STRING_TOP_TILE  = 9
 TARGET_STRING_LEFT_TILE = 8
@@ -88,9 +93,6 @@ highlight_converge:
         perform_zpcm_inc
         rts
 .endproc
-
-string_entry_del_str: .asciiz "Delete"
-string_entry_accept_str: .asciiz "Accept"
 
 .proc FAR_draw_controls
 ; FIXED_draw_string
@@ -623,7 +625,7 @@ widget_target_string_high := widgets_data3
         ; go to the options screen to allow the player
         ; to personalize their preferences
         far_call FAR_save_current_file
-        near_call FAR_go_to_options
+        far_call FAR_go_to_options
         rts
 
 buzz_and_fail:
@@ -876,7 +878,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         sta CurrentPos+1
         lda widget_left_pos_x_subpixel, y
         sta CurrentPos+0
-        near_call widget_cursor::FAR_lerp_coordinate
+        far_call widget_cursor::FAR_lerp_coordinate
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda CurrentPos+1
@@ -894,7 +896,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         sta CurrentPos+1
         lda widget_right_pos_x_subpixel, y
         sta CurrentPos+0
-        near_call widget_cursor::FAR_lerp_coordinate
+        far_call widget_cursor::FAR_lerp_coordinate
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda CurrentPos+1
@@ -912,7 +914,7 @@ widget_right_pos_y_subpixel  := widgets_data7
         sta CurrentPos+1
         lda widget_left_pos_y_subpixel, y
         sta CurrentPos+0
-        near_call widget_cursor::FAR_lerp_coordinate
+        far_call widget_cursor::FAR_lerp_coordinate
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda CurrentPos+1

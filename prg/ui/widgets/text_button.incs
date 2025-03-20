@@ -4,7 +4,8 @@
     .byte tile_x, tile_y
     .addr text_string
     .addr action_func_ptr
-    .byte 0, UI_PAL_BG0
+    .byte <.bank(action_func_ptr)
+    .byte UI_PAL_BG0
 .endmacro
 
 .macro widget_text_button_attr text_string, action_func_ptr, tile_x, tile_y, text_attr
@@ -13,12 +14,13 @@
     .byte tile_x, tile_y
     .addr text_string
     .addr action_func_ptr
-    .byte 0, text_attr
+    .byte <.bank(action_func_ptr)
+    .byte text_attr
 .endmacro
 
 .scope widget_text_button
 
-.segment "CODE_UI_WIDGETS"
+.segment "CODE_UI_WIDGETS_0"
 
 .proc FAR_widget_text_button_init
 CurrentWidgetIndex := R20
@@ -60,12 +62,6 @@ widget_label_string_high := widgets_data3
         rts
 .endproc
 
-.proc __action_trampoline
-ActionFuncPtr := R0
-        jmp (ActionFuncPtr)
-        ; rts (implied)
-.endproc
-
 .proc FAR_widget_text_button_update
 ActionFuncPtr := R0
 CurrentWidgetIndex := R20
@@ -75,6 +71,7 @@ widget_tile_x := widgets_data0
 widget_tile_y := widgets_data1
 widget_action_func_low := widgets_data4
 widget_action_func_high := widgets_data5
+widget_action_func_bank := widgets_data6
         ; if we aren't even hovered, do nothing
         ldy CurrentWidgetIndex
         lda widgets_state_flags, y
@@ -88,10 +85,12 @@ check_for_action_input:
 
         ; load up our pointer and call into it
         lda widget_action_func_low, y
-        sta ActionFuncPtr+0
+        sta JumpTarget+0
         lda widget_action_func_high, y
-        sta ActionFuncPtr+1
-        jsr __action_trampoline
+        sta JumpTarget+1
+        lda widget_action_func_bank, y
+        sta TargetBank
+        jsr launch_far_call
 
 do_nothing:
         rts

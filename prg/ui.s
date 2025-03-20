@@ -69,8 +69,11 @@ checkerboard_ui_palette_normal:
 checkerboard_ui_palette_danger:
         .incbin "art/ui_danger_palette.pal"
 
+; some common strings and utilities shared by many layouts
+empty_string: .asciiz ""
+
         ; Also sortof our "default UI code" for the moment
-        .segment "CODE_UI_WIDGETS"
+        .segment "CODE_UI_WIDGETS_0"
 
         .include "ui/widgets/cursors.incs"
         .include "ui/widgets/file_select_box.incs"
@@ -80,9 +83,6 @@ checkerboard_ui_palette_danger:
         .include "ui/widgets/text_label.incs"
         .include "ui/widgets/text_options.incs"
         .include "ui/widgets/text_button.incs"
-
-; some common strings and utilities shared by many layouts
-empty_string: .asciiz ""
 
         .include "ui/title_screen.incs"
         .include "ui/options_screen.incs"
@@ -195,7 +195,7 @@ done:
         rts
 .endproc
 
-.segment "CODE_UI_WIDGETS"
+.segment "CODE_UI_WIDGETS_0"
 
 ;.proc __widget_trampoline
 ;WidgetUpdatePtr := R18

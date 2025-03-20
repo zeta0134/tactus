@@ -10,7 +10,7 @@ title_ui_layout:
         widget_text_button empty_string, FAR_go_to_file_select, 12, 10
         .addr $0000 ; end of list
 
-.segment "CODE_UI_WIDGETS"
+.segment "CODE_UI_LAYOUTS"
 
 ; ======================================================================
 ;                       Screen Specific Logic
@@ -64,7 +64,7 @@ CurrentWidgetIndex := R20
         lda #KEY_START
         and ButtonsDown
         beq stay_here
-        near_call FAR_go_to_file_select
+        far_call FAR_go_to_file_select
 
 stay_here:
         rts

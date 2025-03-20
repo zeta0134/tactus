@@ -35,7 +35,7 @@ english_page_table:
         .addr english_lower_str, letter_grid_english_lower
         .addr $0000
 
-.segment "CODE_UI_WIDGETS"
+.segment "CODE_UI_LAYOUTS"
 
 .proc FAR_name_entry_controller_init
 Top := R0
@@ -61,7 +61,7 @@ CurrentWidgetIndex := R20
         sta RightNametableAttr
 
         ; draw an initial checkerboard background (no nametable for now)
-        far_call FAR_draw_checkerboard_base
+        near_call FAR_draw_checkerboard_base
         ; Draw a big ol' box to house the name picker
         lda #3
         sta Left
@@ -71,9 +71,9 @@ CurrentWidgetIndex := R20
         sta Width
         lda #20
         sta Height
-        near_call widget_file_select_box::FAR_draw_box_outline_light
-        near_call widget_file_select_box::FAR_draw_box_fill
-        near_call widget_file_select_box::FAR_draw_box_shadow
+        far_call widget_file_select_box::FAR_draw_box_outline_light
+        far_call widget_file_select_box::FAR_draw_box_fill
+        far_call widget_file_select_box::FAR_draw_box_shadow
         ; And a smaller box up top for the title / instruction
         lda #8
         sta Left
@@ -83,9 +83,9 @@ CurrentWidgetIndex := R20
         sta Width
         lda #3
         sta Height
-        near_call widget_file_select_box::FAR_draw_box_outline_light
-        near_call widget_file_select_box::FAR_draw_box_fill
-        near_call widget_file_select_box::FAR_draw_box_shadow
+        far_call widget_file_select_box::FAR_draw_box_outline_light
+        far_call widget_file_select_box::FAR_draw_box_fill
+        far_call widget_file_select_box::FAR_draw_box_shadow
 
 
         ; Get the file select palettes loaded in

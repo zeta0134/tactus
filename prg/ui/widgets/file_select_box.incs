@@ -43,7 +43,7 @@ SHADOW_CORNER_DARK = $10
 
 new_file_str: .asciiz "- NEW FILE -"
 
-.segment "CODE_UI_WIDGETS"
+.segment "CODE_UI_WIDGETS_1"
 
 .proc FAR_compute_top_left_corner_addr
 Top := R0
@@ -632,7 +632,7 @@ check_for_action_input:
         and ButtonsDown
         beq do_nothing
 
-        near_call FAR_with_file_perform_action
+        far_call FAR_with_file_perform_action
 
 do_nothing:
         rts

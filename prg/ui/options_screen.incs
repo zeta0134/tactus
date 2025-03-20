@@ -100,7 +100,7 @@ options_obj_palette:
 ;                       Screen Specific Logic
 ; ======================================================================
 
-.segment "CODE_UI_UTIL"
+.segment "CODE_UI_LAYOUTS"
 
 .proc FAR_options_controller_init
 MetaSpriteIndex := R0
@@ -216,8 +216,6 @@ obj_loop:
         rts
 .endproc
 
-        .segment "CODE_UI_WIDGETS"
-
 .proc FAR_options_controller_update
 widget_cursor_nav_index := widgets_data1
 
@@ -253,7 +251,7 @@ leave_that_cursor_alone:
 
 .proc FAR_save_and_return_to_file_details
         far_call FAR_save_current_file
-        near_call FAR_go_to_file_details
+        far_call FAR_go_to_file_details
         rts
 .endproc
 

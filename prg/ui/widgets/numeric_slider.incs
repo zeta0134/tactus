@@ -9,7 +9,7 @@
 
 .scope widget_numeric_slider
 
-.segment "CODE_UI_WIDGETS"
+.segment "CODE_UI_WIDGETS_0"
 
 .proc FAR_widget_numeric_slider_init
 MetaSpriteIndex := R0

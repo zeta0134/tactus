@@ -21,7 +21,8 @@ file_details_str:   .asciiz "Welcome " ; shouldn't this be the player name?
 start_game_str: .asciiz " GET GROOVIN'"
 options_str: .asciiz " OPTIONS"
 
-.segment "CODE_UI_WIDGETS"
+
+.segment "CODE_UI_LAYOUTS"
 
 .proc FAR_file_details_controller_init
 Top := R0
@@ -48,7 +49,7 @@ widget_last_cursor_pos := widgets_data0
         sta RightNametableAttr
 
         ; draw an initial checkerboard background (no nametable for now)
-        far_call FAR_draw_checkerboard_base
+        near_call FAR_draw_checkerboard_base
 
         near_call FAR_file_details_draw_buttons
 
@@ -61,9 +62,9 @@ widget_last_cursor_pos := widgets_data0
         sta Width
         lda #3
         sta Height
-        near_call widget_file_select_box::FAR_draw_box_outline_light
-        near_call widget_file_select_box::FAR_draw_box_fill
-        near_call widget_file_select_box::FAR_draw_box_shadow
+        far_call widget_file_select_box::FAR_draw_box_outline_light
+        far_call widget_file_select_box::FAR_draw_box_fill
+        far_call widget_file_select_box::FAR_draw_box_shadow
 
         ; Get the file select palettes loaded in
         near_call FAR_apply_standard_ui_palette
@@ -95,15 +96,15 @@ Height := R3
         sta Width
         lda #3
         sta Height
-        near_call widget_file_select_box::FAR_draw_box_outline_dark
-        near_call widget_file_select_box::FAR_draw_box_fill
-        near_call widget_file_select_box::FAR_draw_box_shadow
+        far_call widget_file_select_box::FAR_draw_box_outline_dark
+        far_call widget_file_select_box::FAR_draw_box_fill
+        far_call widget_file_select_box::FAR_draw_box_shadow
 
         lda #10
         sta Top
-        near_call widget_file_select_box::FAR_draw_box_outline_dark
-        near_call widget_file_select_box::FAR_draw_box_fill
-        near_call widget_file_select_box::FAR_draw_box_shadow
+        far_call widget_file_select_box::FAR_draw_box_outline_dark
+        far_call widget_file_select_box::FAR_draw_box_fill
+        far_call widget_file_select_box::FAR_draw_box_shadow
         rts  
 .endproc
 
@@ -121,11 +122,11 @@ Height := R3
         sta Width
         lda #3
         sta Height
-        near_call widget_file_select_box::FAR_draw_box_outline_dark
+        far_call widget_file_select_box::FAR_draw_box_outline_dark
 
         lda #10
         sta Top
-        near_call widget_file_select_box::FAR_draw_box_outline_dark
+        far_call widget_file_select_box::FAR_draw_box_outline_dark
         rts
 .endproc
 
@@ -165,7 +166,7 @@ options_index:
         jmp perform_draw
         
 perform_draw:
-        near_call widget_file_select_box::FAR_draw_box_outline_light
+        far_call widget_file_select_box::FAR_draw_box_outline_light
         rts
 .endproc
 
@@ -194,7 +195,7 @@ done:
         and ButtonsDown
         beq stay_here
         ; What we do very much depends on our current state
-        near_call FAR_go_to_file_select
+        far_call FAR_go_to_file_select
 stay_here:
 
         rts

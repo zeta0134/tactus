@@ -12,13 +12,7 @@
 
 .scope widget_cursor
 
-.segment "DATA_UI_LAYOUTS"
-
-JUMP_HEIGHT_END = 5
-jump_height_table:
-        .byte 14, 14, 11, 7, 2, 0
-
-.segment "CODE_UI_UTIL"
+.segment "CODE_UI_WIDGETS_0"
 
 .proc FAR_count_beats
 CurrentWidgetIndex := R20
@@ -155,8 +149,6 @@ found_one:
         rts
 .endproc
 
-.segment "CODE_UI_WIDGETS"
-
 .proc FAR_widget_cursor_init
 MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
@@ -236,7 +228,7 @@ continue_considering:
         bne target_valid
 find_new_widget:
         perform_zpcm_inc
-        far_call FAR_find_first_active_widget
+        near_call FAR_find_first_active_widget
         ldy CurrentWidgetIndex
         lda TargetWidgetIndex
         sta widget_cursor_nav_index, y
@@ -265,14 +257,14 @@ target_valid:
         bne handle_move_up
         jmp update_at_active_position
 handle_move_down:
-        far_call FAR_move_to_next_active_widget
+        near_call FAR_move_to_next_active_widget
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda TargetWidgetIndex
         sta widget_cursor_nav_index, y
         jmp update_at_active_position
 handle_move_up:
-        far_call FAR_move_to_previous_active_widget
+        near_call FAR_move_to_previous_active_widget
         perform_zpcm_inc
         ldy CurrentWidgetIndex
         lda TargetWidgetIndex
@@ -350,6 +342,10 @@ widget_frames_at_this_location := widgets_data7
         rts
 .endproc
 
+JUMP_HEIGHT_END = 5
+jump_height_table:
+        .byte 14, 14, 11, 7, 2, 0
+
 .proc FAR_widget_player_cursor_update
 HeightOffsetScratch := R0
 
@@ -392,7 +388,7 @@ no_adjustment:
 
         perform_zpcm_inc
 
-        far_call FAR_count_beats ; preserves X
+        near_call FAR_count_beats ; preserves X
         ; if we've been at this position for long enough, switch to the idle fidget
         ldy CurrentWidgetIndex
         lda widget_beats_at_this_location, y
