@@ -14,6 +14,15 @@
 .global file_details_ui_layout
 
 ; convenient macros to tweak widget state
+.macro set_widget_state_x func_ptr
+    lda #<func_ptr
+    sta widgets_onupdate_low, x
+    lda #>func_ptr
+    sta widgets_onupdate_high, x
+    lda #<.bank(func_ptr)
+    sta widgets_onupdate_bank, x
+.endmacro
+
 .macro set_widget_state_y func_ptr
     lda #<func_ptr
     sta widgets_onupdate_low, y

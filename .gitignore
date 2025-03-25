@@ -13,3 +13,6 @@ vendor/*/*.bin
 vendor/*/*.rgd
 vendor/*.lock
 vendor/*.json
+vendor/Debugger/*
+vendor/Saves/*
+vendor/SaveStates/*

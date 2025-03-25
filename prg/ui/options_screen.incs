@@ -11,9 +11,14 @@
 
 .segment "DATA_UI_LAYOUTS"
 
+options_tab_bar_graphics:
+        .include "ui/widgets/tab_bar_nametable.asm"
+
 options_ui_layout:
         widget_controller FAR_options_controller_init
         widget_cursor
+        widget_options_battlefield
+        widget_tab_bar 0, 8
         widget_text_label game_options_str, 2, 13
         widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode},      4, 15
         widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor},    4, 16
@@ -26,18 +31,17 @@ options_ui_layout:
         widget_numeric_slider player_palette_face_str,   15, 52, {current_save + SaveFile::PlayerPalettePigmentIndex}, 4, 24
         widget_numeric_viewer {current_save + SaveFile::PlayerPalettePigmentIndex}, 11, 24
         widget_text_button save_options_str, FAR_save_and_return_to_file_details, 9, 26
-        widget_options_battlefield
         widget_controller FAR_apply_fancy_color_shenanigans
         .addr $0000 ; end of list
 
 PRESET_PERSONALIZED_VALUE = 0
 ; Used for manual tweaking of the values
 OPTIONS_CURSOR_INDEX = 1
-PRESET_FIELD_INDEX = 6
-PALETTE_SLIDER_INDEX_1 = 7
-PALETTE_SLIDER_INDEX_2 = 9
-PALETTE_SLIDER_INDEX_3 = 11
-OPTIONS_SAVE_BUTTON_INDEX = 13
+PRESET_FIELD_INDEX        = 2 + 6
+PALETTE_SLIDER_INDEX_1    = 2 + 7
+PALETTE_SLIDER_INDEX_2    = 2 + 9
+PALETTE_SLIDER_INDEX_3    = 2 + 11
+OPTIONS_SAVE_BUTTON_INDEX = 2 + 13
 
 game_options_str:   .asciiz "GAMEPLAY OPTIONS"
 game_mode_str:      .asciiz "Rhythm "
@@ -124,7 +128,7 @@ widget_color_bottom_metasprite_index := widgets_data1
         ; Initialize with a totally blank nametable
         far_call FAR_draw_blank_nametable
 
-        ; Now we need to zero out the first 6 metatiles, for the pseudo background
+        ; Now we need to zero out the first 4 metatiles, for the pseudo background
         ; to use the correct torchlight (as we aren't actually doing torchlight)
         ; (I guess we could load in a static torchlight pattern if we really wanted to?)
         lda #0
@@ -134,12 +138,6 @@ torchlight_loop_a:
         sta $5800, y
         iny
         bne torchlight_loop_a
-torchlight_loop_b:
-        perform_zpcm_inc
-        sta $5900, y
-        iny
-        cpy #128
-        bne torchlight_loop_b
 
         ; we need a fancy mid-frame split to switch from the battlefield preview
         ; to the hud set instead
@@ -292,7 +290,7 @@ widget_disco_active_setting := widgets_data3
         sta sprite_table + MetaSpriteState::LifetimeBeats, x
         lda #80
         sta sprite_table + MetaSpriteState::PositionX, x
-        lda #64
+        lda #32
         sta sprite_table + MetaSpriteState::PositionY, x
         set_ui_00_sprite_x SPRITE_UI_00_PLAYER
 
@@ -301,22 +299,6 @@ widget_disco_active_setting := widgets_data3
         sta widget_last_beat, x
 
         ldx #0
-top_wall_loop:
-        perform_zpcm_inc
-        lda #TILE_WALL
-        sta battlefield, x
-        lda #<BG_TILE_MAP_TILES_0231 ; cave wall, lower midsection
-        sta tile_patterns, x
-        sta tile_detail, x
-        lda #((>BG_TILE_MAP_TILES_0231) | PAL_AIR) ; cave wall, lower midsection
-        sta tile_attributes, x
-        lda #0
-        sta tile_flags, x
-        sta tile_data, x
-        inx
-        cpx #16
-        bne top_wall_loop
-
 bottom_wall_loop:
         perform_zpcm_inc
         lda #TILE_WALL
@@ -330,7 +312,7 @@ bottom_wall_loop:
         sta tile_flags, x
         sta tile_data, x
         inx
-        cpx #32
+        cpx #16
         bne bottom_wall_loop
 
 disco_floor_top:
@@ -346,7 +328,7 @@ disco_floor_top:
         sta tile_flags, x
         sta tile_data, x
         inx
-        cpx #48
+        cpx #32
         bne disco_floor_top
 
 disco_floor_mid:
@@ -362,7 +344,7 @@ disco_floor_mid:
         sta tile_flags, x
         sta tile_data, x
         inx
-        cpx #80
+        cpx #48
         bne disco_floor_mid
 
 disco_floor_bottom:
@@ -378,14 +360,14 @@ disco_floor_bottom:
         sta tile_flags, x
         sta tile_data, x
         inx
-        cpx #96
+        cpx #64
         bne disco_floor_bottom
 
         ; draw some colored enemies so the battlefield isn't empty
         ; (and we can preview the color thing)
         ; these will still use WALL logic, so they don't actually update
 
-        ldx #(3 * BATTLEFIELD_WIDTH + 2)
+        ldx #(2 * BATTLEFIELD_WIDTH + 2)
         lda #TILE_WALL
         sta battlefield, x
         lda #<BG_TILE_MUSHROOM_IDLE
@@ -393,7 +375,7 @@ disco_floor_bottom:
         lda #(>BG_TILE_MUSHROOM_IDLE | PAL_FIRE)
         sta tile_attributes, x
 
-        ldx #(2 * BATTLEFIELD_WIDTH + 7)
+        ldx #(1 * BATTLEFIELD_WIDTH + 7)
         lda #TILE_WALL
         sta battlefield, x
         lda #<BG_TILE_MUSHROOM_IDLE
@@ -403,7 +385,7 @@ disco_floor_bottom:
 
         perform_zpcm_inc
 
-        ldx #(4 * BATTLEFIELD_WIDTH + 9)
+        ldx #(3 * BATTLEFIELD_WIDTH + 9)
         lda #TILE_WALL
         sta battlefield, x
         lda #<BG_TILE_MUSHROOM_IDLE
@@ -411,7 +393,7 @@ disco_floor_bottom:
         lda #(>BG_TILE_MUSHROOM_IDLE | PAL_AIR)
         sta tile_attributes, x
 
-        ldx #(3 * BATTLEFIELD_WIDTH + 12)
+        ldx #(2 * BATTLEFIELD_WIDTH + 12)
         lda #TILE_WALL
         sta battlefield, x
         lda #<BG_TILE_MUSHROOM_IDLE
@@ -420,24 +402,16 @@ disco_floor_bottom:
         sta tile_attributes, x
 
         ; finally draw in some bouncy floor mushrooms, to demonstrate the groovement setting
-        ldx #(3 * BATTLEFIELD_WIDTH + 4)
+        ldx #(2 * BATTLEFIELD_WIDTH + 4)
         lda #<BG_TILE_DISCO_FLOOR_TILES_0006 ; plain mushroom
         sta tile_patterns, x
         sta tile_detail, x
-        ldx #(3 * BATTLEFIELD_WIDTH + 11)
-        lda #<BG_TILE_DISCO_FLOOR_TILES_0006 ; plain mushroom
-        sta tile_patterns, x
-        sta tile_detail, x
-        ldx #(4 * BATTLEFIELD_WIDTH + 14)
+        ldx #(2 * BATTLEFIELD_WIDTH + 11)
         lda #<BG_TILE_DISCO_FLOOR_TILES_0006 ; plain mushroom
         sta tile_patterns, x
         sta tile_detail, x
 
-        ldx #(3 * BATTLEFIELD_WIDTH + 8)
-        lda #<BG_TILE_DISCO_FLOOR_TILES_0007 ; tall mushroom
-        sta tile_patterns, x
-        sta tile_detail, x
-        ldx #(4 * BATTLEFIELD_WIDTH + 3)
+        ldx #(2 * BATTLEFIELD_WIDTH + 8)
         lda #<BG_TILE_DISCO_FLOOR_TILES_0007 ; tall mushroom
         sta tile_patterns, x
         sta tile_detail, x
@@ -462,7 +436,6 @@ CurrentWidgetIndex := R20
 
         far_call FAR_draw_battlefield_block_A_inline
         far_call FAR_draw_battlefield_block_B_inline
-        far_call FAR_draw_battlefield_block_C_inline
 
         ldy CurrentWidgetIndex
         set_widget_state_y FAR_options_battlefield_update
@@ -537,6 +510,12 @@ converge:
         lda CurrentBeat
         sta CurrentBeatCounter
 
+        lda #1
+        sta StartingRow
+        lda #(::BATTLEFIELD_WIDTH * 1)
+        sta StartingTile
+        far_call FAR_update_static_enemy_row
+
         lda #2
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 2)
@@ -546,18 +525,6 @@ converge:
         lda #3
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 3)
-        sta StartingTile
-        far_call FAR_update_static_enemy_row
-
-        lda #4
-        sta StartingRow
-        lda #(::BATTLEFIELD_WIDTH * 4)
-        sta StartingTile
-        far_call FAR_update_static_enemy_row
-
-        lda #5
-        sta StartingRow
-        lda #(::BATTLEFIELD_WIDTH * 5)
         sta StartingTile
         far_call FAR_update_static_enemy_row
 

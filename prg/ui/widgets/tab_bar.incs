@@ -1,0 +1,132 @@
+; really very much hard-coded for the options screen atm. where else would
+; I even put this?
+.macro widget_tab_bar tile_x, tile_y
+        .addr widget_tab_bar::FAR_widget_tab_bar_init
+        .byte <.bank(widget_tab_bar::FAR_widget_tab_bar_init)
+        .byte tile_x, tile_y
+        .byte 0, 0, 0, 0, 0, 0
+.endmacro
+
+.scope widget_tab_bar
+
+tab_bar_tile_ptr_lut_low:
+        .byte <(tab_bar_nametable + (128 * 0))
+        .byte <(tab_bar_nametable + (128 * 1))
+        .byte <(tab_bar_nametable + (128 * 2))
+        .byte <(tab_bar_nametable + (128 * 3))
+        .byte <(tab_bar_nametable + (128 * 4))
+        .byte <(tab_bar_nametable + (128 * 5))
+        .byte <(tab_bar_nametable + (128 * 6))
+
+tab_bar_tile_ptr_lut_high:
+        .byte >(tab_bar_nametable + (128 * 0))
+        .byte >(tab_bar_nametable + (128 * 1))
+        .byte >(tab_bar_nametable + (128 * 2))
+        .byte >(tab_bar_nametable + (128 * 3))
+        .byte >(tab_bar_nametable + (128 * 4))
+        .byte >(tab_bar_nametable + (128 * 5))
+        .byte >(tab_bar_nametable + (128 * 6))
+
+tab_bar_cursor_pos_x_lut:
+        .byte  4 ; palette page 1
+        .byte  4 ; palette page 2
+        .byte  7 ; gameplay
+        .byte 10 ; input
+        .byte 13 ; sound
+        .byte 16 ; compatibility tweaks
+        .byte 19 ; debug
+
+.proc draw_tab_bar
+TilePtr := R0
+CurrentWidgetIndex := R20
+
+NametableAddr := T0
+AttributeAddr := T2
+TileX := T4
+TileY := T5
+
+widget_tile_x            := widgets_data0
+widget_tile_y            := widgets_data1
+widget_current_tab_index := widgets_data2
+
+        ldx CurrentWidgetIndex
+        ldy widget_current_tab_index, x
+        lda tab_bar_tile_ptr_lut_low, y
+        sta TilePtr+0
+        lda tab_bar_tile_ptr_lut_high, y
+        sta TilePtr+1
+
+        lda widget_tile_x, x
+        sta TileX
+        lda widget_tile_y, x
+        sta TileY
+        st16 NametableAddr, $5000
+        st16 AttributeAddr, $5800
+        far_call FAR_nametable_from_coordinates
+
+        ldy #0
+draw_loop:
+        lda (TilePtr), y
+        sta (NametableAddr), y
+        ; TODO: color?
+        lda #CHR_BANK_FONT_MARSHMALLOW
+        sta (AttributeAddr), y
+        iny
+        cpy #128
+        bne draw_loop
+
+        ; set our cursor position based on the leftmost tile position
+        ldx CurrentWidgetIndex
+        ldy widget_current_tab_index, x
+        lda tab_bar_cursor_pos_x_lut, y
+        asl ; x2
+        asl ; x4
+        asl ; x8
+        sec
+        sbc #18
+        sta widgets_cursor_pos_x, x
+        lda widget_tile_y, x
+        asl ; x2
+        asl ; x4
+        asl ; x8
+        clc
+        adc #9
+        sta widgets_cursor_pos_y, x
+
+        rts        
+.endproc
+
+.proc FAR_widget_tab_bar_init
+CurrentWidgetIndex := R20
+widget_tile_x            := widgets_data0
+widget_tile_y            := widgets_data1
+widget_current_tab_index := widgets_data2
+
+        ldy CurrentWidgetIndex
+        lda #0
+        sta widget_current_tab_index, y
+
+        ; Draw ourselves once, yes!
+        jsr draw_tab_bar
+        ; flag this widget as active for cursor navigation purposes
+        ldy CurrentWidgetIndex
+        lda widgets_state_flags, y
+        ora #WIDGET_STATE_NAVIGABLE
+        sta widgets_state_flags, y
+
+        set_widget_state_y FAR_widget_tab_bar_update
+        rts
+.endproc
+
+.proc FAR_widget_tab_bar_update
+CurrentWidgetIndex := R20
+widget_tile_x            := widgets_data0
+widget_tile_y            := widgets_data1
+widget_current_tab_index := widgets_data2
+
+        ; TODO: yes yes!
+
+        rts
+.endproc
+
+.endscope

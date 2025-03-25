@@ -18,7 +18,7 @@ options_scrolly_common:
 
 options_scanline_common:
   .byte 4
-  .byte 100
+  .byte 68
 
 options_frames:
   .addr options_frame_0
