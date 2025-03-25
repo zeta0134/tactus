@@ -36,6 +36,8 @@ tab_bar_cursor_pos_x_lut:
         .byte 16 ; compatibility tweaks
         .byte 19 ; debug
 
+TAB_BAR_LAST_INDEX = 6
+
 .proc draw_tab_bar
 TilePtr := R0
 CurrentWidgetIndex := R20
@@ -69,7 +71,7 @@ draw_loop:
         lda (TilePtr), y
         sta (NametableAddr), y
         ; TODO: color?
-        lda #CHR_BANK_FONT_MARSHMALLOW
+        lda #(CHR_BANK_FONT_MARSHMALLOW | PAL_ICE)
         sta (AttributeAddr), y
         iny
         cpy #128
@@ -124,8 +126,37 @@ widget_tile_x            := widgets_data0
 widget_tile_y            := widgets_data1
 widget_current_tab_index := widgets_data2
 
-        ; TODO: yes yes!
+        ; if we aren't even hovered, do nothing
+        ldx CurrentWidgetIndex
+        lda widgets_state_flags, x
+        and #WIDGET_STATE_HOVER
+        bne check_for_forward_input
+        rts
 
+check_for_forward_input:
+        lda #(KEY_RIGHT | KEY_A)
+        bit ButtonsDown
+        beq check_for_reverse_input
+
+        ldx CurrentWidgetIndex
+        lda widget_current_tab_index, x
+        cmp #TAB_BAR_LAST_INDEX
+        beq nothing_to_do
+        inc widget_current_tab_index, x
+        jmp redraw_self
+check_for_reverse_input:
+        lda #(KEY_LEFT)
+        bit ButtonsDown
+        beq nothing_to_do
+        ldx CurrentWidgetIndex
+        lda widget_current_tab_index, x
+        beq nothing_to_do
+        dec widget_current_tab_index, x
+        ; fall through to redraw self
+redraw_self:
+        jsr draw_tab_bar
+        queue_sfx_pulse1 sfx_select_cursor
+nothing_to_do:
         rts
 .endproc
 
