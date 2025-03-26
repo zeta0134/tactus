@@ -60,6 +60,10 @@ widgets_data8: .res ::MAX_WIDGETS
 ; beat counting effects
 LastBeat: .res 1
 
+SubLayoutRequested: .res 1
+SubLayoutPtr: .res 2
+SubLayoutIndex: .res 1
+
 
         .segment "DATA_UI_LAYOUTS"
 ui_data_bank:
@@ -107,6 +111,10 @@ empty_string: .asciiz ""
 WidgetListPtr := R0
 PtrStash := R2
         access_data_bank #<.bank(ui_data_bank)
+
+        ; Perform initial basic state setup
+        lda #0
+        sta SubLayoutRequested
 
         perform_zpcm_inc
         ; firstly, for sanity, completely zero out all of widget memory
@@ -196,6 +204,133 @@ done:
         rts
 .endproc
 
+; When calling this, prepopulate the SubLayoutPtr
+; and SubLayoutIndex. This flags all sublayout widgets
+; for the update and manages the state switch. Note
+; that the requesting widget should be EARLIER in the
+; set. Generally manage this with a controller, rather
+; than some widget that will be replaced when the switch
+; happens.
+.proc FAR_request_sublayout
+WidgetIndex := R0
+        ldx SubLayoutIndex
+cleanup_flag_loop:
+        lda widgets_state_flags, x
+        ora #WIDGET_STATE_CLEANUP_REQUESTED
+        sta widgets_state_flags, x
+        inx
+        cpx #::MAX_WIDGETS
+        bne cleanup_flag_loop
+
+        lda #1
+        sta SubLayoutRequested
+        
+        rts
+.endproc
+
+; Just like regular init, except we start at some index other than 0
+; to preserve the earlier widgets. By this point, any widgets we are
+; going to replace have had a chance to run their cleanup routine
+; one time.
+.proc FAR_initialize_sublayout
+WidgetListPtr := R0
+PtrStash := R2
+        access_data_bank #<.bank(ui_data_bank)
+        perform_zpcm_inc
+
+        ; first clear out all of the widgets we are about to load
+        lda #0
+        ldy SubLayoutIndex
+memclr_loop:
+        perform_zpcm_inc
+        sta widgets_onupdate_low, y
+        sta widgets_onupdate_high, y
+        sta widgets_onupdate_bank, y
+        sta widgets_cursor_pos_x, y
+        sta widgets_cursor_pos_y, y
+        sta widgets_state_flags, y
+        sta widgets_data0, y
+        sta widgets_data1, y
+        sta widgets_data2, y
+        sta widgets_data3, y
+        sta widgets_data4, y
+        sta widgets_data5, y
+        sta widgets_data6, y
+        sta widgets_data7, y
+        iny
+        cpy #::MAX_WIDGETS
+        bne memclr_loop
+
+        ; and now load in the new widgets:
+
+        lda SubLayoutPtr+0
+        sta WidgetListPtr+0
+        lda SubLayoutPtr+1
+        sta WidgetListPtr+1
+
+        ; Now, until we hit a $0000 entry or run out of space, 
+        ; continue to initialize widgets
+        ldx SubLayoutIndex ; current widget index
+        ldy #0             ; list index
+widget_loop:
+        perform_zpcm_inc
+        lda (WidgetListPtr), y
+        sta PtrStash+0
+        iny
+        lda (WidgetListPtr), y
+        sta PtrStash+1
+        iny
+        ; sanity: are both of our pointer bytes $00? if so, exit!
+        ora PtrStash+0
+        beq done
+        ; write the read pointer into the widget struct
+        lda PtrStash+0
+        sta widgets_onupdate_low, x
+        lda PtrStash+1
+        sta widgets_onupdate_high, x
+        ; Copy the routine's bank into place, we'll use this during dispatch
+        lda (WidgetListPtr), y
+        sta widgets_onupdate_bank, x
+        iny
+        ; copy the next 8 bytes we find into the widget starting data
+        ; (this is how reusable widgets specify things like their position,
+        ; strings of text, etc)
+        lda (WidgetListPtr), y
+        sta widgets_data0, x
+        iny
+        lda (WidgetListPtr), y
+        sta widgets_data1, x
+        iny
+        lda (WidgetListPtr), y
+        sta widgets_data2, x
+        iny
+        lda (WidgetListPtr), y
+        sta widgets_data3, x
+        iny
+        lda (WidgetListPtr), y
+        sta widgets_data4, x
+        iny
+        lda (WidgetListPtr), y
+        sta widgets_data5, x
+        iny
+        lda (WidgetListPtr), y
+        sta widgets_data6, x
+        iny
+        lda (WidgetListPtr), y
+        sta widgets_data7, x
+        iny
+
+        ; advance!
+        inx
+        cpx #::MAX_WIDGETS
+        beq done
+        jmp widget_loop
+done:
+        perform_zpcm_inc
+        restore_previous_bank
+        rts
+.endproc
+
 .segment "CODE_UI_WIDGETS_0"
 
 ;.proc __widget_trampoline
@@ -209,6 +344,13 @@ done:
 ; widget logic can use the low end without conflict
 CurrentWidgetIndex := R20
         access_data_bank #<.bank(ui_data_bank)
+
+        lda SubLayoutRequested
+        beq no_sublayout_requested
+        far_call FAR_initialize_sublayout
+        lda #0
+        sta SubLayoutRequested
+no_sublayout_requested:
 
         lda #0
         sta CurrentWidgetIndex

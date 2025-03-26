@@ -19,6 +19,7 @@ options_ui_layout:
         widget_cursor
         widget_options_battlefield
         widget_tab_bar 0, 8
+options_sublayout_palette_page_1:
         widget_text_label game_options_str, 2, 13
         widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode},      4, 15
         widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor},    4, 16
@@ -33,6 +34,28 @@ options_ui_layout:
         widget_text_button save_options_str, FAR_save_and_return_to_file_details, 9, 26
         widget_controller FAR_apply_fancy_color_shenanigans
         .addr $0000 ; end of list
+options_sublayout_palette_page_2:
+        widget_text_label placeholder_palette_page_2_str, 2, 13
+        .addr $0000 ; end of list
+options_sublayout_gameplay_page_1:
+        widget_text_label placeholder_gameplay_str, 2, 13
+        .addr $0000 ; end of list
+options_sublayout_input_page_1:
+        widget_text_label placeholder_input_str, 2, 13
+        .addr $0000 ; end of list
+options_sublayout_audio_page_1:
+        widget_text_label placeholder_audio_str, 2, 13
+        .addr $0000 ; end of list
+options_sublayout_compatibility_tweaks_page_1:
+        widget_text_label placeholder_compatibility_str, 2, 13
+        .addr $0000 ; end of list
+options_sublayout_debug_page_1:
+        widget_text_label placeholder_debug_str, 2, 13
+        widget_text_label debug_silly_1_str, 2, 20
+        widget_text_label debug_silly_2_str, 2, 21
+        widget_text_label debug_silly_3_str, 2, 22
+        widget_text_label debug_silly_4_str, 2, 23
+        .addr $0000 ; end of list
 
 PRESET_PERSONALIZED_VALUE = 0
 ; Used for manual tweaking of the values
@@ -42,6 +65,8 @@ PALETTE_SLIDER_INDEX_1    = 2 + 7
 PALETTE_SLIDER_INDEX_2    = 2 + 9
 PALETTE_SLIDER_INDEX_3    = 2 + 11
 OPTIONS_SAVE_BUTTON_INDEX = 2 + 13
+
+OPTIONS_SCREEN_SUBLAYOUT_INDEX = 4
 
 game_options_str:   .asciiz "GAMEPLAY OPTIONS"
 game_mode_str:      .asciiz "Rhythm "
@@ -99,6 +124,19 @@ options_battlefield_bg_palette:
         .incbin "../art/dank_cave.pal"
 options_obj_palette:
         .incbin "../art/options_sprite_palette.pal"
+
+placeholder_palette_page_2_str: .asciiz "PALETTE PAGE 2"
+placeholder_gameplay_str:       .asciiz "GAMEPLAY TAB"
+placeholder_input_str:          .asciiz "INPUT TAB"
+placeholder_audio_str:          .asciiz "AUDIO TAB"
+placeholder_compatibility_str:  .asciiz "COMPATIBILITY TWEAKS TAB"
+placeholder_debug_str:          .asciiz "DEBUG TAB"
+
+;                           0123456789012345678901234567
+debug_silly_1_str: .asciiz "Yes yes, hello tcrf.net :)"
+debug_silly_2_str: .asciiz "I see you've found my debug"
+debug_silly_3_str: .asciiz "options! Come right on in,"
+debug_silly_4_str: .asciiz "have some coffee, etc."
 
 ; ======================================================================
 ;                       Screen Specific Logic

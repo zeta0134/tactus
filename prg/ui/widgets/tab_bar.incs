@@ -32,9 +32,27 @@ tab_bar_cursor_pos_x_lut:
         .byte  4 ; palette page 2
         .byte  7 ; gameplay
         .byte 10 ; input
-        .byte 13 ; sound
+        .byte 13 ; audio
         .byte 16 ; compatibility tweaks
         .byte 19 ; debug
+
+tab_bar_target_sublayout_lut_low:
+        .byte <options_sublayout_palette_page_1
+        .byte <options_sublayout_palette_page_2
+        .byte <options_sublayout_gameplay_page_1
+        .byte <options_sublayout_input_page_1
+        .byte <options_sublayout_audio_page_1
+        .byte <options_sublayout_compatibility_tweaks_page_1
+        .byte <options_sublayout_debug_page_1
+
+tab_bar_target_sublayout_lut_high:
+        .byte >options_sublayout_palette_page_1
+        .byte >options_sublayout_palette_page_2
+        .byte >options_sublayout_gameplay_page_1
+        .byte >options_sublayout_input_page_1
+        .byte >options_sublayout_audio_page_1
+        .byte >options_sublayout_compatibility_tweaks_page_1
+        .byte >options_sublayout_debug_page_1
 
 TAB_BAR_LAST_INDEX = 6
 
@@ -156,6 +174,17 @@ check_for_reverse_input:
 redraw_self:
         jsr draw_tab_bar
         queue_sfx_pulse1 sfx_select_cursor
+        ; request the sublayout belonging to this tab
+        lda #OPTIONS_SCREEN_SUBLAYOUT_INDEX
+        sta SubLayoutIndex
+        ldx CurrentWidgetIndex
+        lda widget_current_tab_index, x
+        tay
+        lda tab_bar_target_sublayout_lut_low, y
+        sta SubLayoutPtr+0
+        lda tab_bar_target_sublayout_lut_high, y
+        sta SubLayoutPtr+1
+        far_call FAR_request_sublayout
 nothing_to_do:
         rts
 .endproc

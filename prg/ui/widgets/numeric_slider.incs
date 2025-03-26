@@ -248,6 +248,16 @@ widget_displayed_value := widgets_data3
 widget_data_target_low := widgets_data6
 widget_data_target_high := widgets_data7
 widget_repeat_cooldown := widgets_data8
+
+        ; If a cleanup is requested, do that
+        ldy CurrentWidgetIndex
+        lda widgets_state_flags, y
+        and #WIDGET_STATE_CLEANUP_REQUESTED
+        beq no_cleanup
+        jsr _perform_cleanup
+        rts
+no_cleanup:
+
         ; handle hold-to-repeat, as a nice feature
         ldy CurrentWidgetIndex
         lda ButtonsHeld
@@ -372,6 +382,26 @@ widget_data_target_high := widgets_data7
         sbc #1
         sta (DataValuePtr), y
 cancel_change:
+        rts
+.endproc
+
+.proc _perform_cleanup
+CurrentWidgetIndex := R20
+widget_metasprite_index := widgets_data2
+        ; we need to despawn our metasprite (the player's going to occupy this square, it should vanish)
+        ldx CurrentWidgetIndex
+        lda widget_metasprite_index, x
+        tay
+        lda #0
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
+
+        ; now switch to the update function
+        ldy CurrentWidgetIndex
+        set_widget_state_y FAR_widget_numeric_slider_update
+        rts
+.endproc
+
+.proc FAR_wait_for_cleanup
         rts
 .endproc
 

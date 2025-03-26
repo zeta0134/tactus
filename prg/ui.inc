@@ -42,6 +42,8 @@
 .endmacro
 
 ; mostly for the cursor
-WIDGET_STATE_NAVIGABLE  = %10000000
+WIDGET_STATE_NAVIGABLE          = %10000000
+; for when we are about to switch sublayouts
+WIDGET_STATE_CLEANUP_REQUESTED  = %00000010
 ; to tell the widget what the cursor is doing
-WIDGET_STATE_HOVER      = %00000001
+WIDGET_STATE_HOVER              = %00000001
