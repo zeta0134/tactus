@@ -39,8 +39,9 @@ options_sublayout_palette_page_2:
 options_sublayout_gameplay_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_gameplay_str, 2, 13
-        widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode},      4, 15
-        widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor},    4, 16
+        widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode  },      4, 15
+        widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor  },      4, 16
+        widget_text_options minimap_flavor_str, minimap_themes,       {current_save + SaveFile::OptionMinimapTheme},      4, 17
         .addr $0000 ; end of list
 options_sublayout_input_page_1:
         widget_controller FAR_options_page_clear_controller_init
@@ -73,15 +74,15 @@ PALETTE_SLIDER_INDEX_3    = 4 + 8
 
 OPTIONS_SCREEN_SUBLAYOUT_INDEX = 4
 
-game_options_str:   .asciiz "GAMEPLAY OPTIONS"
-game_mode_str:      .asciiz "Rhythm "
-disco_floor_str:    .asciiz "Floor  "
+game_mode_str:      .asciiz "Rhythm  "
+disco_floor_str:    .asciiz "Floor   "
+minimap_flavor_str: .asciiz "Minimap "
+
 player_options_str: .asciiz "PLAYER PALETTE"
 player_palette_preset_str: .asciiz "Preset  "
 player_palette_outfit_str: .asciiz "Pajamas    "
 player_palette_shoes_str:  .asciiz "Phones     "
 player_palette_face_str:   .asciiz "Pigment    "
-save_options_str:  .asciiz "SAVE AND EXIT"
 
 disco_types:
         .byte 6 ; length of option set
@@ -124,6 +125,26 @@ game_mode_types:
 game_mode_standard_str:   .asciiz "STANDARD"
 game_mode_patient_str:    .asciiz "PATIENT"
 game_mode_doubletime_str: .asciiz "DOUBLETIME"
+
+minimap_themes:
+        .byte 8
+        .addr minimap_dark_grey_str
+        .addr minimap_dark_yellow_str
+        .addr minimap_dark_purple_str
+        .addr minimap_dark_red_str
+        .addr minimap_light_grey_str
+        .addr minimap_light_yellow_str
+        .addr minimap_light_purple_str
+        .addr minimap_light_red_str
+
+minimap_dark_grey_str:    .asciiz "DARK GREY"
+minimap_dark_yellow_str:  .asciiz "DARK YELLOW"
+minimap_dark_purple_str:  .asciiz "DARK BLUE"
+minimap_dark_red_str:     .asciiz "DARK RED"
+minimap_light_grey_str:   .asciiz "LIGHT GREY"
+minimap_light_yellow_str: .asciiz "LIGHT YELLOW"
+minimap_light_purple_str: .asciiz "LIGHT BLUE"
+minimap_light_red_str:    .asciiz "LIGHT RED"
 
 options_battlefield_bg_palette:
         .incbin "../art/dank_cave.pal"
