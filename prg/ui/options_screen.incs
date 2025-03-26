@@ -20,6 +20,7 @@ options_ui_layout:
         widget_options_battlefield
         widget_tab_bar 0, 8
 options_sublayout_palette_page_1:
+        widget_controller FAR_options_page_clear_controller_init
         widget_text_label game_options_str, 2, 13
         widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode},      4, 15
         widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor},    4, 16
@@ -35,21 +36,27 @@ options_sublayout_palette_page_1:
         widget_controller FAR_apply_fancy_color_shenanigans
         .addr $0000 ; end of list
 options_sublayout_palette_page_2:
+        widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_palette_page_2_str, 2, 13
         .addr $0000 ; end of list
 options_sublayout_gameplay_page_1:
+        widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_gameplay_str, 2, 13
         .addr $0000 ; end of list
 options_sublayout_input_page_1:
+        widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_input_str, 2, 13
         .addr $0000 ; end of list
 options_sublayout_audio_page_1:
+        widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_audio_str, 2, 13
         .addr $0000 ; end of list
 options_sublayout_compatibility_tweaks_page_1:
+        widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_compatibility_str, 2, 13
         .addr $0000 ; end of list
 options_sublayout_debug_page_1:
+        widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_debug_str, 2, 13
         widget_text_label debug_silly_1_str, 2, 20
         widget_text_label debug_silly_2_str, 2, 21
@@ -282,6 +289,41 @@ stay_here:
         queue_sfx_pulse2 sfx_move_cursor
 
 leave_that_cursor_alone:
+        rts
+.endproc
+
+.proc FAR_options_page_clear_controller_init
+NametableAddr := R0
+AttributeAddr := R2
+Length := R4
+
+CurrentWidgetIndex := R20
+        ; Just clear out everything below the tab bar, back to a blank
+        ; slate. Don't overthink this.
+        st16 NametableAddr, ($5000 + 32 * 12)
+        st16 AttributeAddr, ($5800 + 32 * 12)
+        st16 Length, (32 * (30 - 12))
+
+        ldy #0
+loop:
+        lda #' '
+        sta (NametableAddr), y
+        lda #CHR_BANK_FONT_MARSHMALLOW
+        sta (AttributeAddr), y
+        inc16 NametableAddr
+        inc16 AttributeAddr
+        dec16 Length
+        lda Length+0
+        ora Length+1
+        bne loop
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y FAR_options_page_clear_controller_update
+
+        rts
+.endproc
+
+.proc FAR_options_page_clear_controller_update
         rts
 .endproc
 
