@@ -22,18 +22,14 @@ options_ui_layout:
 options_sublayout_palette_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_controller FAR_options_color_preview_controller_init
-        widget_text_label game_options_str, 2, 13
-        widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode},      4, 15
-        widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor},    4, 16
-        widget_text_label player_options_str, 2, 18
-        widget_text_options player_palette_preset_str, player_palette_preset_types, {current_save + SaveFile::PlayerPalettePreset}, 4, 20
-        widget_numeric_slider player_palette_outfit_str, 15, 52, {current_save + SaveFile::PlayerPalettePajamasIndex}, 4, 22
-        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePajamasIndex}, 11, 22
-        widget_numeric_slider player_palette_shoes_str,  15, 52, {current_save + SaveFile::PlayerPalettePhonesIndex},  4, 23
-        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePhonesIndex},  11, 23
-        widget_numeric_slider player_palette_face_str,   15, 52, {current_save + SaveFile::PlayerPalettePigmentIndex}, 4, 24
-        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePigmentIndex}, 11, 24
-        widget_text_button save_options_str, FAR_save_and_return_to_file_details, 9, 26
+        widget_text_label player_options_str, 2, 13
+        widget_text_options player_palette_preset_str, player_palette_preset_types, {current_save + SaveFile::PlayerPalettePreset}, 4, 15
+        widget_numeric_slider player_palette_outfit_str, 15, 52, {current_save + SaveFile::PlayerPalettePajamasIndex}, 4, 17
+        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePajamasIndex}, 11, 17
+        widget_numeric_slider player_palette_shoes_str,  15, 52, {current_save + SaveFile::PlayerPalettePhonesIndex},  4, 18
+        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePhonesIndex},  11, 18
+        widget_numeric_slider player_palette_face_str,   15, 52, {current_save + SaveFile::PlayerPalettePigmentIndex}, 4, 19
+        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePigmentIndex}, 11, 19
         widget_controller FAR_apply_fancy_color_shenanigans
         .addr $0000 ; end of list
 options_sublayout_palette_page_2:
@@ -43,6 +39,8 @@ options_sublayout_palette_page_2:
 options_sublayout_gameplay_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_gameplay_str, 2, 13
+        widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode},      4, 15
+        widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor},    4, 16
         .addr $0000 ; end of list
 options_sublayout_input_page_1:
         widget_controller FAR_options_page_clear_controller_init
@@ -68,11 +66,10 @@ options_sublayout_debug_page_1:
 PRESET_PERSONALIZED_VALUE = 0
 ; Used for manual tweaking of the values
 OPTIONS_CURSOR_INDEX = 1
-PRESET_FIELD_INDEX        = 2 + 6
-PALETTE_SLIDER_INDEX_1    = 2 + 7
-PALETTE_SLIDER_INDEX_2    = 2 + 9
-PALETTE_SLIDER_INDEX_3    = 2 + 11
-OPTIONS_SAVE_BUTTON_INDEX = 2 + 13
+PRESET_FIELD_INDEX        = 4 + 3
+PALETTE_SLIDER_INDEX_1    = 4 + 4
+PALETTE_SLIDER_INDEX_2    = 4 + 6
+PALETTE_SLIDER_INDEX_3    = 4 + 8
 
 OPTIONS_SCREEN_SUBLAYOUT_INDEX = 4
 
@@ -134,11 +131,11 @@ options_obj_palette:
         .incbin "../art/options_sprite_palette.pal"
 
 placeholder_palette_page_2_str: .asciiz "PALETTE PAGE 2"
-placeholder_gameplay_str:       .asciiz "GAMEPLAY TAB"
-placeholder_input_str:          .asciiz "INPUT TAB"
-placeholder_audio_str:          .asciiz "AUDIO TAB"
-placeholder_compatibility_str:  .asciiz "COMPATIBILITY TWEAKS TAB"
-placeholder_debug_str:          .asciiz "DEBUG TAB"
+placeholder_gameplay_str:       .asciiz "GAMEPLAY"
+placeholder_input_str:          .asciiz "INPUT"
+placeholder_audio_str:          .asciiz "AUDIO"
+placeholder_compatibility_str:  .asciiz "COMPATIBILITY TWEAKS"
+placeholder_debug_str:          .asciiz "DEBUG"
 
 ;                           0123456789012345678901234567
 debug_silly_1_str: .asciiz "Yes yes, hello tcrf.net :)"
@@ -242,17 +239,6 @@ widget_cursor_nav_index := widgets_data1
         rts
 stay_here:
 
-        lda #KEY_START
-        and ButtonsDown
-        beq leave_that_cursor_alone
-
-        ldy #OPTIONS_CURSOR_INDEX
-        lda #OPTIONS_SAVE_BUTTON_INDEX
-        sta widget_cursor_nav_index, y
-
-        queue_sfx_pulse2 sfx_move_cursor
-
-leave_that_cursor_alone:
         rts
 .endproc
 
@@ -311,7 +297,7 @@ widget_color_bottom_metasprite_index := widgets_data1
         sta sprite_table + MetaSpriteState::LifetimeBeats, x
         lda #113
         sta sprite_table + MetaSpriteState::PositionX, x
-        lda #168
+        lda #128
         sta sprite_table + MetaSpriteState::PositionY, x
         set_ui_00_sprite_x SPRITE_UI_00_PLAIN_SQUARES_LEFT
 
@@ -328,7 +314,7 @@ widget_color_bottom_metasprite_index := widgets_data1
         sta sprite_table + MetaSpriteState::LifetimeBeats, x
         lda #113
         sta sprite_table + MetaSpriteState::PositionX, x
-        lda #184
+        lda #144
         sta sprite_table + MetaSpriteState::PositionY, x
         set_ui_00_sprite_x SPRITE_UI_00_PLAIN_SQUARES_RIGHT
 
