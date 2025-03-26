@@ -395,13 +395,14 @@ widget_metasprite_index := widgets_data2
         lda #0
         sta sprite_table + MetaSpriteState::BehaviorFlags, y
 
-        ; now switch to the update function
+        ; now switch to the cleanup stall function and wait for the end of the world
         ldy CurrentWidgetIndex
-        set_widget_state_y FAR_widget_numeric_slider_update
+        set_widget_state_y FAR_wait_for_cleanup
         rts
 .endproc
 
 .proc FAR_wait_for_cleanup
+        ; (in theory this shouldn't ever be called, but just in case)
         rts
 .endproc
 
