@@ -321,8 +321,10 @@ ROOM_POOL_ZONE_5_WARP            = 34
         RasterEffect .byte
         ColorEmphasis .byte
         BaseLogic .byte
-        BgPalette .word
-        ObjPalette .word
+        BgPaletteTablePtr .word
+        BgPaletteTableBank .byte
+        ObjPaletteTablePtr .word
+        ObjPaletteTableBank .byte
         OverlayList .word
         TileIDsLow .byte 176
         TileAttrsHigh .byte 176

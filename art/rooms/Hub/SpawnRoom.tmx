@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="16" height="11" tilewidth="16" tileheight="16" infinite="0" nextlayerid="68" nextobjectid="1">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="16" height="11" tilewidth="16" tileheight="16" infinite="0" nextlayerid="68" nextobjectid="1">
  <properties>
   <property name="base_logic" value="ROOM_BASE_LOGIC_NONE"/>
   <property name="category" value="exterior"/>
@@ -9,8 +9,8 @@
   <property name="exit_south" type="bool" value="true"/>
   <property name="exit_west" type="bool" value="true"/>
   <property name="forbid_player_spawning" type="bool" value="false"/>
-  <property name="room_obj_palette" value="sprite_palette_overworld"/>
-  <property name="room_palette" value="hub_world_palette"/>
+  <property name="room_obj_palette" value="sprite_palette_overworld_table"/>
+  <property name="room_palette" value="hub_world_palette_table"/>
  </properties>
  <tileset firstgid="1" source="../../MapTiles.tsx"/>
  <tileset firstgid="257" source="../../DiscoFloorTiles.tsx"/>

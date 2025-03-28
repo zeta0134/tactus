@@ -12,6 +12,7 @@
         .include "prng.inc"
         .include "rainbow.inc"
         .include "raster_table.inc"
+        .include "saves.inc"
         .include "signs.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
@@ -218,78 +219,166 @@ room_pool_zone_5_warp:
         room_entry room_Blocking_WarpChamber
         room_entry room_Blocking_WarpExit_Zone5
 
-        sprite_palette_overworld:
+        sprite_palette_overworld_pal:
                 .incbin "../art/sprite_palette_overworld.pal"
-        sprite_palette_underworld:
+        sprite_palette_underworld_pal:
                 .incbin "../art/sprite_palette.pal"
 
         oob_palette:
-                .incbin "../art/oob_palette.pal"
-                .incbin "../art/oob_palette.pal"
-                .incbin "../art/oob_palette.pal"
-                .incbin "../art/oob_palette.pal"
-                .incbin "../art/oob_palette.pal"
+oob_pal_default_base:      .incbin "../art/oob_palette.pal"
+oob_pal_default_scorched:  .incbin "../art/oob_palette.pal"
+oob_pal_default_frozen:    .incbin "../art/oob_palette.pal"
+oob_pal_default_shocked:   .incbin "../art/oob_palette.pal"
+oob_pal_default_overgrown: .incbin "../art/oob_palette.pal"
+
         test_palette:
                 .incbin "../art/test_palette.pal"
                 .incbin "../art/test_palette.pal"
                 .incbin "../art/test_palette.pal"
                 .incbin "../art/test_palette.pal"
                 .incbin "../art/test_palette.pal"
-        grassy_palette:
-                .incbin "../art/palettes/grasslands/base.pal"
-                .incbin "../art/palettes/grasslands/scorched.pal"
-                .incbin "../art/palettes/grasslands/frozen.pal"
-                .incbin "../art/palettes/grasslands/shocked.pal"
-                .incbin "../art/palettes/grasslands/overgrown.pal"
-        dank_cave_palette:
-                .incbin "../art/palettes/caves/base.pal"
-                .incbin "../art/palettes/caves/scorched.pal"
-                .incbin "../art/palettes/caves/frozen.pal"
-                .incbin "../art/palettes/caves/shocked.pal"
-                .incbin "../art/palettes/caves/overgrown.pal"
-        challenge_pit_darkblue:
-                .incbin "../art/challenge_pit_darkblue.pal"
-                .incbin "../art/challenge_pit_darkblue.pal"
-                .incbin "../art/challenge_pit_darkblue.pal"
-                .incbin "../art/challenge_pit_darkblue.pal"
-                .incbin "../art/challenge_pit_darkblue.pal"
-        challenge_pit_darkred:
-                .incbin "../art/palettes/challenge_darkred/base.pal"
-                .incbin "../art/palettes/challenge_darkred/scorched.pal"
-                .incbin "../art/palettes/challenge_darkred/frozen.pal"
-                .incbin "../art/palettes/challenge_darkred/shocked.pal"
-                .incbin "../art/palettes/challenge_darkred/overgrown.pal"
-        shop_palette:
-                .incbin "../art/shop_palette.pal"
-                .incbin "../art/shop_palette.pal"
-                .incbin "../art/shop_palette.pal"
-                .incbin "../art/shop_palette.pal"
-                .incbin "../art/shop_palette.pal"
-        hub_world_palette:
-                .incbin "../art/hub_world_palette.pal"
-                .incbin "../art/hub_world_palette.pal"
-                .incbin "../art/hub_world_palette.pal"
-                .incbin "../art/hub_world_palette.pal"
-                .incbin "../art/hub_world_palette.pal"
-        blocking_exterior_palette:
-                .incbin "../art/palettes/blocking_exterior/base.pal"
-                .incbin "../art/palettes/blocking_exterior/scorched.pal"
-                .incbin "../art/palettes/blocking_exterior/frozen.pal"
-                .incbin "../art/palettes/blocking_exterior/shocked.pal"
-                .incbin "../art/palettes/blocking_exterior/overgrown.pal"
-        blocking_interior_palette:
-                .incbin "../art/palettes/blocking_interior/base.pal"
-                .incbin "../art/palettes/blocking_interior/scorched.pal"
-                .incbin "../art/palettes/blocking_interior/frozen.pal"
-                .incbin "../art/palettes/blocking_interior/shocked.pal"
-                .incbin "../art/palettes/blocking_interior/overgrown.pal"
 
-        warp_palette:
-                .incbin "../art/palettes/warp_zone/base.pal"
-                .incbin "../art/palettes/warp_zone/scorched.pal"
-                .incbin "../art/palettes/warp_zone/frozen.pal"
-                .incbin "../art/palettes/warp_zone/shocked.pal"
-                .incbin "../art/palettes/warp_zone/overgrown.pal"
+
+; common palettes shared by many rooms, mostly monochrome
+greyscale_pal:  .incbin "../art/palettes/greyscale.pal"
+greenscale_pal: .incbin "../art/palettes/greenscale.pal"
+
+; TODO: Remove unused palettes, and especially duplicates, since we're migrating to a table.
+; Also, make sure the table entry supports a bank specification, we may end up with more than
+; 8k of palette data :/
+
+grasslands_pal_default_base:      .incbin "../art/palettes/grasslands/base.pal"
+grasslands_pal_default_scorched:  .incbin "../art/palettes/grasslands/scorched.pal"
+grasslands_pal_default_frozen:    .incbin "../art/palettes/grasslands/frozen.pal"
+grasslands_pal_default_shocked:   .incbin "../art/palettes/grasslands/shocked.pal"
+grasslands_pal_default_overgrown: .incbin "../art/palettes/grasslands/overgrown.pal"
+grasslands_pal_protan_base: .incbin "../art/palettes/grasslands/protan.pal"
+grasslands_pal_tritan_base: .incbin "../art/palettes/grasslands/tritan.pal"
+
+cave_pal_default_base:      .incbin "../art/palettes/caves/base.pal"
+cave_pal_default_scorched:  .incbin "../art/palettes/caves/scorched.pal"
+cave_pal_default_frozen:    .incbin "../art/palettes/caves/frozen.pal"
+cave_pal_default_shocked:   .incbin "../art/palettes/caves/shocked.pal"
+cave_pal_default_overgrown: .incbin "../art/palettes/caves/overgrown.pal"
+
+challenge_pit_darkblue_pal_default_base:      .incbin "../art/challenge_pit_darkblue.pal"
+challenge_pit_darkblue_pal_default_scorched:  .incbin "../art/challenge_pit_darkblue.pal"
+challenge_pit_darkblue_pal_default_frozen:    .incbin "../art/challenge_pit_darkblue.pal"
+challenge_pit_darkblue_pal_default_shocked:   .incbin "../art/challenge_pit_darkblue.pal"
+challenge_pit_darkblue_pal_default_overgrown: .incbin "../art/challenge_pit_darkblue.pal"
+
+challenge_pit_darkred_pal_default_base:      .incbin "../art/palettes/challenge_darkred/base.pal"
+challenge_pit_darkred_pal_default_scorched:  .incbin "../art/palettes/challenge_darkred/scorched.pal"
+challenge_pit_darkred_pal_default_frozen:    .incbin "../art/palettes/challenge_darkred/frozen.pal"
+challenge_pit_darkred_pal_default_shocked:   .incbin "../art/palettes/challenge_darkred/shocked.pal"
+challenge_pit_darkred_pal_default_overgrown: .incbin "../art/palettes/challenge_darkred/overgrown.pal"
+
+shop_pal_default_base:      .incbin "../art/shop_palette.pal"
+shop_pal_default_scorched:  .incbin "../art/shop_palette.pal"
+shop_pal_default_frozen:    .incbin "../art/shop_palette.pal"
+shop_pal_default_shocked:   .incbin "../art/shop_palette.pal"
+shop_pal_default_overgrown: .incbin "../art/shop_palette.pal"
+
+hub_world_pal_default_base:      .incbin "../art/hub_world_palette.pal"
+hub_world_pal_default_scorched:  .incbin "../art/hub_world_palette.pal"
+hub_world_pal_default_frozen:    .incbin "../art/hub_world_palette.pal"
+hub_world_pal_default_shocked:   .incbin "../art/hub_world_palette.pal"
+hub_world_pal_default_overgrown: .incbin "../art/hub_world_palette.pal"
+
+blocking_exterior_pal_default_base:      .incbin "../art/palettes/blocking_exterior/base.pal"
+blocking_exterior_pal_default_scorched:  .incbin "../art/palettes/blocking_exterior/scorched.pal"
+blocking_exterior_pal_default_frozen:    .incbin "../art/palettes/blocking_exterior/frozen.pal"
+blocking_exterior_pal_default_shocked:   .incbin "../art/palettes/blocking_exterior/shocked.pal"
+blocking_exterior_pal_default_overgrown: .incbin "../art/palettes/blocking_exterior/overgrown.pal"
+        
+blocking_interior_pal_default_base:      .incbin "../art/palettes/blocking_interior/base.pal"
+blocking_interior_pal_default_scorched:  .incbin "../art/palettes/blocking_interior/scorched.pal"
+blocking_interior_pal_default_frozen:    .incbin "../art/palettes/blocking_interior/frozen.pal"
+blocking_interior_pal_default_shocked:   .incbin "../art/palettes/blocking_interior/shocked.pal"
+blocking_interior_pal_default_overgrown: .incbin "../art/palettes/blocking_interior/overgrown.pal"
+
+warp_pal_default_base:      .incbin "../art/palettes/warp_zone/base.pal"
+warp_pal_default_scorched:  .incbin "../art/palettes/warp_zone/scorched.pal"
+warp_pal_default_frozen:    .incbin "../art/palettes/warp_zone/frozen.pal"
+warp_pal_default_shocked:   .incbin "../art/palettes/warp_zone/shocked.pal"
+warp_pal_default_overgrown: .incbin "../art/palettes/warp_zone/overgrown.pal"
+
+; TODO: Right now, only grasslands is accessible, and only in the room's default state. Make all the other palettes!
+grasslands_exterior_palette_table:
+        .addr grasslands_pal_default_base,      grasslands_pal_protan_base,       grasslands_pal_tritan_base,       greenscale_pal, greyscale_pal
+        .addr grasslands_pal_default_scorched,  grasslands_pal_default_scorched,  grasslands_pal_default_scorched,  greenscale_pal, greyscale_pal
+        .addr grasslands_pal_default_frozen,    grasslands_pal_default_frozen,    grasslands_pal_default_frozen,    greenscale_pal, greyscale_pal
+        .addr grasslands_pal_default_shocked,   grasslands_pal_default_shocked,   grasslands_pal_default_shocked,   greenscale_pal, greyscale_pal
+        .addr grasslands_pal_default_overgrown, grasslands_pal_default_overgrown, grasslands_pal_default_overgrown, greenscale_pal, greyscale_pal
+
+cave_interior_palette_table:
+        .addr cave_pal_default_base,      cave_pal_default_base,      cave_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr cave_pal_default_scorched,  cave_pal_default_scorched,  cave_pal_default_scorched,  greenscale_pal, greyscale_pal
+        .addr cave_pal_default_frozen,    cave_pal_default_frozen,    cave_pal_default_frozen,    greenscale_pal, greyscale_pal
+        .addr cave_pal_default_shocked,   cave_pal_default_shocked,   cave_pal_default_shocked,   greenscale_pal, greyscale_pal
+        .addr cave_pal_default_overgrown, cave_pal_default_overgrown, cave_pal_default_overgrown, greenscale_pal, greyscale_pal
+
+challenge_pit_darkred_palette_table:
+        .addr challenge_pit_darkred_pal_default_base,      challenge_pit_darkred_pal_default_base,      challenge_pit_darkred_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr challenge_pit_darkred_pal_default_scorched,  challenge_pit_darkred_pal_default_scorched,  challenge_pit_darkred_pal_default_scorched,  greenscale_pal, greyscale_pal
+        .addr challenge_pit_darkred_pal_default_frozen,    challenge_pit_darkred_pal_default_frozen,    challenge_pit_darkred_pal_default_frozen,    greenscale_pal, greyscale_pal
+        .addr challenge_pit_darkred_pal_default_shocked,   challenge_pit_darkred_pal_default_shocked,   challenge_pit_darkred_pal_default_shocked,   greenscale_pal, greyscale_pal
+        .addr challenge_pit_darkred_pal_default_overgrown, challenge_pit_darkred_pal_default_overgrown, challenge_pit_darkred_pal_default_overgrown, greenscale_pal, greyscale_pal
+
+challenge_pit_darkblue_palette_table:
+        .addr challenge_pit_darkblue_pal_default_base,      challenge_pit_darkblue_pal_default_base,      challenge_pit_darkblue_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr challenge_pit_darkblue_pal_default_scorched,  challenge_pit_darkblue_pal_default_scorched,  challenge_pit_darkblue_pal_default_scorched,  greenscale_pal, greyscale_pal
+        .addr challenge_pit_darkblue_pal_default_frozen,    challenge_pit_darkblue_pal_default_frozen,    challenge_pit_darkblue_pal_default_frozen,    greenscale_pal, greyscale_pal
+        .addr challenge_pit_darkblue_pal_default_shocked,   challenge_pit_darkblue_pal_default_shocked,   challenge_pit_darkblue_pal_default_shocked,   greenscale_pal, greyscale_pal
+        .addr challenge_pit_darkblue_pal_default_overgrown, challenge_pit_darkblue_pal_default_overgrown, challenge_pit_darkblue_pal_default_overgrown, greenscale_pal, greyscale_pal
+
+shop_palette_table:
+        .addr shop_pal_default_base,      shop_pal_default_base,      shop_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr shop_pal_default_scorched,  shop_pal_default_scorched,  shop_pal_default_scorched,  greenscale_pal, greyscale_pal
+        .addr shop_pal_default_frozen,    shop_pal_default_frozen,    shop_pal_default_frozen,    greenscale_pal, greyscale_pal
+        .addr shop_pal_default_shocked,   shop_pal_default_shocked,   shop_pal_default_shocked,   greenscale_pal, greyscale_pal
+        .addr shop_pal_default_overgrown, shop_pal_default_overgrown, shop_pal_default_overgrown, greenscale_pal, greyscale_pal
+
+hub_world_palette_table:
+        .addr hub_world_pal_default_base,      hub_world_pal_default_base,      hub_world_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr hub_world_pal_default_scorched,  hub_world_pal_default_scorched,  hub_world_pal_default_scorched,  greenscale_pal, greyscale_pal
+        .addr hub_world_pal_default_frozen,    hub_world_pal_default_frozen,    hub_world_pal_default_frozen,    greenscale_pal, greyscale_pal
+        .addr hub_world_pal_default_shocked,   hub_world_pal_default_shocked,   hub_world_pal_default_shocked,   greenscale_pal, greyscale_pal
+        .addr hub_world_pal_default_overgrown, hub_world_pal_default_overgrown, hub_world_pal_default_overgrown, greenscale_pal, greyscale_pal
+
+blocking_exterior_palette_table:
+        .addr blocking_exterior_pal_default_base,      blocking_exterior_pal_default_base,      blocking_exterior_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr blocking_exterior_pal_default_scorched,  blocking_exterior_pal_default_scorched,  blocking_exterior_pal_default_scorched,  greenscale_pal, greyscale_pal
+        .addr blocking_exterior_pal_default_frozen,    blocking_exterior_pal_default_frozen,    blocking_exterior_pal_default_frozen,    greenscale_pal, greyscale_pal
+        .addr blocking_exterior_pal_default_shocked,   blocking_exterior_pal_default_shocked,   blocking_exterior_pal_default_shocked,   greenscale_pal, greyscale_pal
+        .addr blocking_exterior_pal_default_overgrown, blocking_exterior_pal_default_overgrown, blocking_exterior_pal_default_overgrown, greenscale_pal, greyscale_pal
+
+blocking_interior_palette_table:
+        .addr blocking_interior_pal_default_base,      blocking_interior_pal_default_base,      blocking_interior_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr blocking_interior_pal_default_scorched,  blocking_interior_pal_default_scorched,  blocking_interior_pal_default_scorched,  greenscale_pal, greyscale_pal
+        .addr blocking_interior_pal_default_frozen,    blocking_interior_pal_default_frozen,    blocking_interior_pal_default_frozen,    greenscale_pal, greyscale_pal
+        .addr blocking_interior_pal_default_shocked,   blocking_interior_pal_default_shocked,   blocking_interior_pal_default_shocked,   greenscale_pal, greyscale_pal
+        .addr blocking_interior_pal_default_overgrown, blocking_interior_pal_default_overgrown, blocking_interior_pal_default_overgrown, greenscale_pal, greyscale_pal
+
+warp_palette_table:
+        .addr warp_pal_default_base,      warp_pal_default_base,      warp_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr warp_pal_default_scorched,  warp_pal_default_scorched,  warp_pal_default_scorched,  greenscale_pal, greyscale_pal
+        .addr warp_pal_default_frozen,    warp_pal_default_frozen,    warp_pal_default_frozen,    greenscale_pal, greyscale_pal
+        .addr warp_pal_default_shocked,   warp_pal_default_shocked,   warp_pal_default_shocked,   greenscale_pal, greyscale_pal
+        .addr warp_pal_default_overgrown, warp_pal_default_overgrown, warp_pal_default_overgrown, greenscale_pal, greyscale_pal
+
+oob_palette_table:
+        .addr oob_pal_default_base,      oob_pal_default_base,      oob_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr oob_pal_default_scorched,  oob_pal_default_scorched,  oob_pal_default_scorched,  greenscale_pal, greyscale_pal
+        .addr oob_pal_default_frozen,    oob_pal_default_frozen,    oob_pal_default_frozen,    greenscale_pal, greyscale_pal
+        .addr oob_pal_default_shocked,   oob_pal_default_shocked,   oob_pal_default_shocked,   greenscale_pal, greyscale_pal
+        .addr oob_pal_default_overgrown, oob_pal_default_overgrown, oob_pal_default_overgrown, greenscale_pal, greyscale_pal
+
+; TODO: this, properly!
+sprite_palette_overworld_table:
+        .addr sprite_palette_overworld_pal, sprite_palette_overworld_pal, sprite_palette_overworld_pal, greenscale_pal, greyscale_pal
+sprite_palette_underworld_table:
+        .addr sprite_palette_underworld_pal, sprite_palette_underworld_pal, sprite_palette_underworld_pal, greenscale_pal, greyscale_pal
 
 ; more general variant: assumes nothing, sets thing up, etc etc
 .proc FAR_load_palette_for_current_room
@@ -312,31 +401,56 @@ RoomBank := R2
 ; this code is colocated with the palettes so a simple far call is all that
 ; is needed to operate it
 
+palette_offset_by_room_variant_lut:
+        .repeat 8, i
+        .byte i * 2 * 5 ; two bytes per address, 5 colorspaces total
+        .endrepeat
+
 .proc FAR_load_room_palette
 RoomPtr := R0
 PalettePtr := R2
-        ldy #Room::BgPalette
+PaletteTablePtr := R4
+PaletteTableBank := R6
+PaletteOffset := R8
+
+        ; Prep the table pointer from the room data structure
+        ldy #Room::BgPaletteTablePtr
         lda (RoomPtr), y
-        sta PalettePtr+0
+        sta PaletteTablePtr+0
         iny
         lda (RoomPtr), y
-        sta PalettePtr+1
+        sta PaletteTablePtr+1
 
-        ; TODO: use the variant table. (not implemented yet)
-load_variant_from_room:
+        ldy #Room::BgPaletteTableBank
+        lda (RoomPtr), y
+        sta PaletteTableBank+0
+        iny
+        lda (RoomPtr), y
+        sta PaletteTableBank+1
+
+        ; Use the current colorspace as the initial variant index
+        lda current_save + SaveFile::OptionColorspace
+        asl
+        sta PaletteOffset
+        ; Now use the room index to shift ahead in this table for magic spells and stuff
         ldy PlayerRoomIndex
         lda room_palette_variant, y
-variant_converge:
-
-        .repeat 4
-        asl
-        .endrepeat
+        tay
+        lda palette_offset_by_room_variant_lut, y
         clc
-        adc PalettePtr+0
+        adc PaletteOffset
+        sta PaletteOffset
+
+        ; Now we're ready to bank in the data table and read the palette pointer
+        access_data_bank PaletteTableBank
+        ldy PaletteOffset
+        lda (PaletteTablePtr), y
         sta PalettePtr+0
-        lda #0
-        adc PalettePtr+1
+        iny
+        lda (PaletteTablePtr), y
         sta PalettePtr+1
+        
+        ; The palette data is always colocated with its table, so copy that into place here:
 
         ldy #0
 bg_loop:
@@ -349,11 +463,38 @@ bg_loop:
 
         far_call FAR_set_bg_target_palette_from_hw
 
-        ldy #Room::ObjPalette
+        restore_previous_bank
+
+        ; Do it all again for the obj palette
+        ; Prep the table pointer from the room data structure
+        ldy #Room::ObjPaletteTablePtr
         lda (RoomPtr), y
-        sta PalettePtr+0
+        sta PaletteTablePtr+0
         iny
         lda (RoomPtr), y
+        sta PaletteTablePtr+1
+
+        ldy #Room::ObjPaletteTableBank
+        lda (RoomPtr), y
+        sta PaletteTableBank+0
+        iny
+        lda (RoomPtr), y
+        sta PaletteTableBank+1
+
+        ; Use the current colorspace as the initial variant index
+        lda current_save + SaveFile::OptionColorspace
+        asl
+        sta PaletteOffset
+        ; The object palette isn't affected by magic spells, so we're done with that.
+        ; Proceed to load the data
+
+        ; Now we're ready to bank in the data table and read the palette pointer
+        access_data_bank PaletteTableBank
+        ldy PaletteOffset
+        lda (PaletteTablePtr), y
+        sta PalettePtr+0
+        iny
+        lda (PaletteTablePtr), y
         sta PalettePtr+1
 
         ldy #0
@@ -366,6 +507,8 @@ obj_loop:
         bne obj_loop
 
         far_call FAR_set_obj_palette_from_hw
+
+        restore_previous_bank
 
         perform_zpcm_inc
         rts
