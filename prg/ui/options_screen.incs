@@ -34,14 +34,15 @@ options_sublayout_palette_page_1:
         .addr $0000 ; end of list
 options_sublayout_palette_page_2:
         widget_controller FAR_options_page_clear_controller_init
-        widget_text_label placeholder_palette_page_2_str, 2, 13
+        widget_text_label palette_page_2_str, 2, 13
+        widget_text_options colorspace_options_str, colorspace_options, {current_save + SaveFile::OptionColorspace},      4, 15
+        widget_text_options minimap_flavor_str, minimap_themes,       {current_save + SaveFile::OptionMinimapTheme},      4, 16
         .addr $0000 ; end of list
 options_sublayout_gameplay_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_gameplay_str, 2, 13
         widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode  },      4, 15
         widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor  },      4, 16
-        widget_text_options minimap_flavor_str, minimap_themes,       {current_save + SaveFile::OptionMinimapTheme},      4, 17
         .addr $0000 ; end of list
 options_sublayout_input_page_1:
         widget_controller FAR_options_page_clear_controller_init
@@ -58,10 +59,10 @@ options_sublayout_compatibility_tweaks_page_1:
 options_sublayout_debug_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_debug_str, 2, 13
-        widget_text_label debug_silly_1_str, 2, 25
-        widget_text_label debug_silly_2_str, 2, 26
-        widget_text_label debug_silly_3_str, 2, 27
-        widget_text_label debug_silly_4_str, 2, 28
+        widget_text_label debug_silly_1_str, 2, 24
+        widget_text_label debug_silly_2_str, 2, 25
+        widget_text_label debug_silly_3_str, 2, 26
+        widget_text_label debug_silly_4_str, 2, 27
         .addr $0000 ; end of list
 
 PRESET_PERSONALIZED_VALUE = 0
@@ -76,7 +77,7 @@ OPTIONS_SCREEN_SUBLAYOUT_INDEX = 4
 
 game_mode_str:      .asciiz "Rhythm  "
 disco_floor_str:    .asciiz "Floor   "
-minimap_flavor_str: .asciiz "Minimap "
+minimap_flavor_str: .asciiz "Minimap    "
 
 player_options_str: .asciiz "PLAYER PALETTE"
 player_palette_preset_str: .asciiz "Preset  "
@@ -146,12 +147,28 @@ minimap_light_yellow_str: .asciiz "LIGHT YELLOW"
 minimap_light_purple_str: .asciiz "LIGHT BLUE"
 minimap_light_red_str:    .asciiz "LIGHT RED"
 
+colorspace_options_str: .asciiz "Colorspace "
+
+colorspace_options:
+        .byte 5
+        .addr default_colorspace_str
+        .addr red_green_colorspace_str
+        .addr blue_yellow_colorspace_str
+        .addr greenscale_colorspace_str
+        .addr greyscale_colorspace_str
+
+default_colorspace_str:     .asciiz "DEFAULT"
+red_green_colorspace_str:   .asciiz "DEUTERAN/PROTAN"
+blue_yellow_colorspace_str: .asciiz "TRITAN"
+greenscale_colorspace_str:  .asciiz "DOT MATRIX GAME"
+greyscale_colorspace_str:   .asciiz "CLASSIC FILM"
+
 options_battlefield_bg_palette:
         .incbin "../art/dank_cave.pal"
 options_obj_palette:
         .incbin "../art/options_sprite_palette.pal"
 
-placeholder_palette_page_2_str: .asciiz "PALETTE PAGE 2"
+palette_page_2_str: .asciiz "WORLD PALETTE"
 placeholder_gameplay_str:       .asciiz "GAMEPLAY"
 placeholder_input_str:          .asciiz "INPUT"
 placeholder_audio_str:          .asciiz "AUDIO"

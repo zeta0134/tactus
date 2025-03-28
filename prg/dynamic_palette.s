@@ -2,6 +2,7 @@
 
     .include "far_call.inc"
     .include "rainbow.inc"
+    .include "saves.inc"
     .include "zeropage.inc"
     .include "word_util.inc"
     .include "zpcm.inc"
@@ -71,27 +72,17 @@ GlobalFadeSpeed: .res 1
 
         .segment "CODE_PALETTES"
 
-dynamic_palette_brightness_minus_5:
+dynamic_palette_normal:
     .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
-dynamic_palette_brightness_minus_4:
     .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
-dynamic_palette_brightness_minus_3:
     .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
-dynamic_palette_brightness_minus_2:
     .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
-dynamic_palette_brightness_minus_1:
     .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
-dynamic_palette_brightness_normal:
     .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
-dynamic_palette_brightness_plus_1:
     .byte $2D, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $0F, $0F, $0F
-dynamic_palette_brightness_plus_2:
     .byte $00, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $0F, $0F, $0F
-dynamic_palette_brightness_plus_3:
     .byte $10, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $0F, $0F, $0F
-dynamic_palette_brightness_plus_4:
     .byte $3D, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $0F, $0F, $0F
-dynamic_palette_brightness_plus_5:
     .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
     .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
     .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
@@ -99,7 +90,41 @@ dynamic_palette_brightness_plus_5:
     .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
     .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
 
+dynamic_palette_greyscale:
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $2D, $2D, $2D, $2D, $2D, $2D, $2D, $2D, $2D, $2D, $2D, $2D, $2D, $0F, $0F, $0F
+    .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $0F, $0F, $0F
+    .byte $10, $10, $10, $10, $10, $10, $10, $10, $10, $10, $10, $10, $10, $0F, $0F, $0F
+    .byte $3D, $3D, $3D, $3D, $3D, $3D, $3D, $3D, $3D, $3D, $3D, $3D, $3D, $0F, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
 
+dynamic_palette_greenscale:
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0F, $0F, $0F
+    .byte $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $0F, $0F, $0F
+    .byte $29, $29, $29, $29, $29, $29, $29, $29, $29, $29, $29, $29, $29, $0F, $0F, $0F
+    .byte $38, $38, $38, $38, $38, $38, $38, $38, $38, $38, $38, $38, $38, $0F, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
 
 ; Format of entries:
 ; index: XY where X is the target hue, Y is the current hue
@@ -644,6 +669,45 @@ done_with_entry_2:
     rts
 .endproc
 
+.proc _compute_palette_ptr
+HardwarePalLutPtr := R0
+    ; The current brightness is specified in 16-entry rows, so we
+    ; just need to add it to our base pointer here. Which base pointer
+    ; we use depends on the current colorspace
+    lda current_save + SaveFile::OptionColorspace
+    cmp #COLORSPACE_GREENSCALE
+    beq use_greenscale
+    cmp #COLORSPACE_GREYSCALE
+    beq use_greyscale
+use_normal:
+    clc
+    lda #<dynamic_palette_normal
+    adc Brightness
+    sta HardwarePalLutPtr+0
+    lda #>dynamic_palette_normal
+    adc #0
+    sta HardwarePalLutPtr+1
+    rts
+use_greenscale:
+    clc
+    lda #<dynamic_palette_greenscale
+    adc Brightness
+    sta HardwarePalLutPtr+0
+    lda #>dynamic_palette_greenscale
+    adc #0
+    sta HardwarePalLutPtr+1
+    rts
+use_greyscale:
+    clc
+    lda #<dynamic_palette_greyscale
+    adc Brightness
+    sta HardwarePalLutPtr+0
+    lda #>dynamic_palette_greyscale
+    adc #0
+    sta HardwarePalLutPtr+1
+    rts
+.endproc
+
 .proc compute_staging_bg_palette
 HardwarePalLutPtr := R0
     lda StagingBgPaletteDirty
@@ -652,16 +716,8 @@ HardwarePalLutPtr := R0
 do_the_work:
     lda #0
     sta StagingBgPaletteDirty
-    
-    ; The current brightness is specified in 16-entry rows, so we
-    ; just need to add it to our base pointer here
-    clc
-    lda #<dynamic_palette_brightness_minus_5
-    adc Brightness
-    sta HardwarePalLutPtr+0
-    lda #>dynamic_palette_brightness_minus_5
-    adc #0
-    sta HardwarePalLutPtr+1
+
+    jsr _compute_palette_ptr
 
     ; Now run through and work out what the staging palette should be for
     ; the entire set of colors. Don't overcomplicate this, just do the whole
@@ -724,15 +780,7 @@ do_the_work:
     lda #0
     sta StagingObjPaletteDirty
     
-    ; The current brightness is specified in 16-entry rows, so we
-    ; just need to add it to our base pointer here
-    clc
-    lda #<dynamic_palette_brightness_minus_5
-    adc Brightness
-    sta HardwarePalLutPtr+0
-    lda #>dynamic_palette_brightness_minus_5
-    adc #0
-    sta HardwarePalLutPtr+1
+    jsr _compute_palette_ptr
 
     ; Now run through and work out what the staging palette should be for
     ; the entire set of colors. Don't overcomplicate this, just do the whole
@@ -790,15 +838,7 @@ do_the_work:
     lda #0
     sta StagingHudPaletteDirty
     
-    ; The current brightness is specified in 16-entry rows, so we
-    ; just need to add it to our base pointer here
-    clc
-    lda #<dynamic_palette_brightness_minus_5
-    adc Brightness
-    sta HardwarePalLutPtr+0
-    lda #>dynamic_palette_brightness_minus_5
-    adc #0
-    sta HardwarePalLutPtr+1
+    jsr _compute_palette_ptr
 
     ; Now run through and work out what the staging palette should be for
     ; the entire set of colors. Don't overcomplicate this, just do the whole

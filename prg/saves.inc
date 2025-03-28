@@ -29,7 +29,10 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     OptionDiscoFloor .byte
     OptionRhythmMode .byte
     OptionMinimapTheme .byte
-    OptionsReserved .byte 13 ; pad out to 16 bytes total
+    OptionColorspace .byte
+    OptionRhythmFlashBar .byte
+    OptionRhythmFlashPlayer .byte
+    OptionsReserved .byte 10 ; pad out to 16 bytes total
     ; FUTURE
     GeneralReserved .byte 24
     ; CURRENT RUN STATE (that which persists, anyway) (current: 31 bytes)
@@ -88,6 +91,12 @@ FILE_INVALID = 1
 
 FILE_NEW = 0
 FILE_IN_USE = 1
+
+COLORSPACE_NORMAL      = 0
+COLORSPACE_PROTANOMALY = 1
+COLORSPACE_TRITANOMALY = 2
+COLORSPACE_GREENSCALE  = 3
+COLORSPACE_GREYSCALE   = 4
 
 ; 
 .struct SaveBlock

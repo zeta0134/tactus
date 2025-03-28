@@ -322,8 +322,12 @@ PalettePtr := R2
         lda (RoomPtr), y
         sta PalettePtr+1
 
+        ; TODO: use the variant table. (not implemented yet)
+load_variant_from_room:
         ldy PlayerRoomIndex
         lda room_palette_variant, y
+variant_converge:
+
         .repeat 4
         asl
         .endrepeat
