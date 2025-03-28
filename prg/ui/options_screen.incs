@@ -37,6 +37,7 @@ options_sublayout_palette_page_2:
         widget_text_label palette_page_2_str, 2, 13
         widget_text_options colorspace_options_str, colorspace_options, {current_save + SaveFile::OptionColorspace},      4, 15
         widget_text_options minimap_flavor_str, minimap_themes,       {current_save + SaveFile::OptionMinimapTheme},      4, 16
+        widget_controller FAR_apply_colormap_shenanigans
         .addr $0000 ; end of list
 options_sublayout_gameplay_page_1:
         widget_controller FAR_options_page_clear_controller_init
@@ -158,7 +159,7 @@ colorspace_options:
         .addr greyscale_colorspace_str
 
 default_colorspace_str:     .asciiz "DEFAULT"
-red_green_colorspace_str:   .asciiz "DEUTERAN/PROTAN"
+red_green_colorspace_str:   .asciiz "PROTAN/DEUTERAN"
 blue_yellow_colorspace_str: .asciiz "TRITAN"
 greenscale_colorspace_str:  .asciiz "DOT MATRIX GAME"
 greyscale_colorspace_str:   .asciiz "CLASSIC FILM"
@@ -802,6 +803,18 @@ perform_sync:
         ; Read the color index values, work out the PPU values from the global LUT,
         ; and load those colors into the player sprite for preview
         far_call FAR_compute_player_colors
+
+        rts
+.endproc
+
+.proc FAR_apply_colormap_shenanigans
+        ; The page where this widget runs is dedicated to screwing around with color, and doesn't
+        ; have much else going on. Just continually invalidate all of the palettes, all the time,
+        ; so that changes instantly take effect when applied.
+        lda #1
+        sta StagingBgPaletteDirty
+        sta StagingObjPaletteDirty
+        sta StagingHudPaletteDirty
 
         rts
 .endproc
