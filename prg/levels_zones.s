@@ -23,6 +23,7 @@
         .include "slowam.inc"
         .include "sound.inc"
         .include "sprites.inc"
+        .include "word_util.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
 
@@ -124,8 +125,14 @@ zone_sequence_str_5_F: .asciiz "5-F"
 zone_name_str_debug: .asciiz "Debug"
 zone_sequence_str_debug: .asciiz "DBG"
 
-hud_base_pal:
-        .incbin "../art/hud_base.pal"
+hud_base_pal:       .incbin "../art/palettes/hud/base.pal"
+hud_protan_pal:     .incbin "../art/palettes/hud/protan.pal"
+hud_tritan_pal:     .incbin "../art/palettes/hud/tritan.pal"
+hud_greenscale_pal: .incbin "../art/palettes/hud/greenscale.pal"
+hud_greyscale_pal:  .incbin "../art/palettes/hud/greyscale.pal"
+
+hud_bg_palette_table:
+        .addr hud_base_pal, hud_protan_pal, hud_tritan_pal, hud_greenscale_pal, hud_greyscale_pal
 
 hud_grasslands_pal:
         .incbin "../art/zone_1_banner.pal"
@@ -757,6 +764,22 @@ SpritePtr := R8
 ; is needed to operate it
 .proc FAR_load_hud_palette_for_current_zone
 HudPalPtr := R0
+
+PaletteTablePtr  := R4
+PaletteTableBank := R6
+
+        ; For the background layer, we use a fixed set based on the current colorspace.
+        ; We need overrides to ensure that especially permanent/temporary health units
+        ; are distinguishable despite sharing tiles. The rest is just polish.
+        st16 PaletteTablePtr, hud_bg_palette_table
+        st16 PaletteTableBank, .bank(hud_bg_palette_table)
+        far_call FAR_load_palette_by_colorspace
+        far_call FAR_set_hud_bg_palette_from_hw
+
+        ; For the banner, we'll use the old system and just load it manually.
+        ; If this is a problem we'll just have to catch it in test. We CAN switch
+        ; these to a table eventually, I just don't feel like today and I also am
+        ; not that worried about readability for these.
         access_data_bank #<.bank(all_zones_data_page)
 
         ldy #ZoneDefinition::HudPal
@@ -765,17 +788,6 @@ HudPalPtr := R0
         iny
         lda (PlayerZonePtr), y
         sta HudPalPtr+1
-
-        ldy #0
-hud_base_loop:
-        perform_zpcm_inc
-        lda hud_base_pal, y
-        sta IncomingHwPalette, y
-        iny
-        cpy #16
-        bne hud_base_loop
-
-        far_call FAR_set_hud_bg_palette_from_hw
 
         ldy #0
 hud_zone_loop:
