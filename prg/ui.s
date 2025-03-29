@@ -68,11 +68,6 @@ SubLayoutIndex: .res 1
         .segment "DATA_UI_LAYOUTS"
 ui_data_bank:
 
-checkerboard_ui_palette_normal:
-        .incbin "art/ui_bg_palette.pal"
-checkerboard_ui_palette_danger:
-        .incbin "art/ui_danger_palette.pal"
-
 ; some common strings and utilities shared by many layouts
 empty_string: .asciiz ""
 

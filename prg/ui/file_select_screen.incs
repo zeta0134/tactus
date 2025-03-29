@@ -15,6 +15,19 @@ file_select_ui_layout:
         widget_text_button copy_file_str, FAR_play_sfx_and_enter_copy_mode, 10, 24
         .addr $0000 ; end of list
 
+
+checkerboard_ui_normal_base: .incbin "art/ui_bg_palette.pal"
+checkerboard_ui_danger_base: .incbin "art/ui_danger_palette.pal"
+; TODO: give this its own separate palette data
+file_select_pal_sprite:          .incbin "../art/options_sprite_palette.pal"
+
+checkerboard_normal_palette_table:
+        .addr checkerboard_ui_normal_base, checkerboard_ui_normal_base, checkerboard_ui_normal_base, checkerboard_ui_normal_base, checkerboard_ui_normal_base
+checkerboard_danger_palette_table:
+        .addr checkerboard_ui_danger_base, checkerboard_ui_danger_base, checkerboard_ui_danger_base, checkerboard_ui_danger_base, checkerboard_ui_danger_base
+file_select_obj_palette_table:
+        .addr file_select_pal_sprite, file_select_pal_sprite, file_select_pal_sprite, file_select_pal_sprite, file_select_pal_sprite
+
 ; Because on this screen we need to reach in and manipulate... everything
 FILE_SELECT_CONTROLLER_INDEX = 0
 FILE_SELECT_CURSOR_INDEX = 1
@@ -93,56 +106,38 @@ tile_converge:
 .endproc
 
 .proc FAR_apply_standard_ui_palette
-        ldy #0
-bg_loop:
-        perform_zpcm_inc
-        lda checkerboard_ui_palette_normal, y
-        sta IncomingHwPalette, y
-        iny
-        cpy #16
-        bne bg_loop
+; Used when setting up palettes
+PaletteTablePtr  := R4
+PaletteTableBank := R6
 
+        st16 PaletteTablePtr, checkerboard_normal_palette_table
+        st16 PaletteTableBank, .bank(checkerboard_normal_palette_table)
+        far_call FAR_load_palette_by_colorspace
         far_call FAR_set_bg_target_palette_from_hw
         far_call FAR_set_bg_current_palette_from_target
 
-        ldy #0
-obj_loop:
-        perform_zpcm_inc        
-        lda options_obj_palette, y
-        sta IncomingHwPalette, y
-        iny
-        cpy #16
-        bne obj_loop
-
+        st16 PaletteTablePtr, name_entry_obj_palette_table
+        st16 PaletteTableBank, .bank(name_entry_obj_palette_table)
+        far_call FAR_load_palette_by_colorspace
         far_call FAR_set_obj_palette_from_hw
-
         rts
 .endproc
 
 .proc FAR_apply_danger_ui_palette
-        ldy #0
-bg_loop:
-        perform_zpcm_inc
-        lda checkerboard_ui_palette_danger, y
-        sta IncomingHwPalette, y
-        iny
-        cpy #16
-        bne bg_loop
+; Used when setting up palettes
+PaletteTablePtr  := R4
+PaletteTableBank := R6
 
+        st16 PaletteTablePtr, checkerboard_danger_palette_table
+        st16 PaletteTableBank, .bank(checkerboard_danger_palette_table)
+        far_call FAR_load_palette_by_colorspace
         far_call FAR_set_bg_target_palette_from_hw
         far_call FAR_set_bg_current_palette_from_target
 
-        ldy #0
-obj_loop:
-        perform_zpcm_inc        
-        lda options_obj_palette, y
-        sta IncomingHwPalette, y
-        iny
-        cpy #16
-        bne obj_loop
-
+        st16 PaletteTablePtr, name_entry_obj_palette_table
+        st16 PaletteTableBank, .bank(name_entry_obj_palette_table)
+        far_call FAR_load_palette_by_colorspace
         far_call FAR_set_obj_palette_from_hw
-
         rts
 .endproc
 

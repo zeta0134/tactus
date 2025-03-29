@@ -35,6 +35,15 @@ english_page_table:
         .addr english_lower_str, letter_grid_english_lower
         .addr $0000
 
+; TODO: give this its own separate palette data
+name_entry_pal_default_base:    .incbin "../art/palettes/options/base.pal"
+name_entry_pal_sprite:          .incbin "../art/options_sprite_palette.pal"
+
+name_entry_bg_palette_table:
+        .addr name_entry_pal_default_base, name_entry_pal_default_base, name_entry_pal_default_base, name_entry_pal_default_base, name_entry_pal_default_base
+name_entry_obj_palette_table:
+        .addr name_entry_pal_sprite, name_entry_pal_sprite, name_entry_pal_sprite, name_entry_pal_sprite, name_entry_pal_sprite
+
 .segment "CODE_UI_LAYOUTS"
 
 .proc FAR_name_entry_controller_init
@@ -42,6 +51,10 @@ Top := R0
 Left := R1
 Width := R2
 Height := R3
+
+; Used when setting up palettes
+PaletteTablePtr  := R4
+PaletteTableBank := R6
 
 CurrentWidgetIndex := R20
         perform_zpcm_inc
@@ -87,30 +100,15 @@ CurrentWidgetIndex := R20
         far_call widget_file_select_box::FAR_draw_box_fill
         far_call widget_file_select_box::FAR_draw_box_shadow
 
-
-        ; Get the file select palettes loaded in
-        ; TODO: use file select palette here!
-        ldy #0
-bg_loop:
-        perform_zpcm_inc
-        lda options_battlefield_bg_palette, y
-        sta IncomingHwPalette, y
-        iny
-        cpy #16
-        bne bg_loop
-
+        st16 PaletteTablePtr, name_entry_bg_palette_table
+        st16 PaletteTableBank, .bank(name_entry_bg_palette_table)
+        far_call FAR_load_palette_by_colorspace
         far_call FAR_set_bg_target_palette_from_hw
         far_call FAR_set_bg_current_palette_from_target
 
-        ldy #0
-obj_loop:
-        perform_zpcm_inc        
-        lda options_obj_palette, y
-        sta IncomingHwPalette, y
-        iny
-        cpy #16
-        bne obj_loop
-
+        st16 PaletteTablePtr, name_entry_obj_palette_table
+        st16 PaletteTableBank, .bank(name_entry_obj_palette_table)
+        far_call FAR_load_palette_by_colorspace
         far_call FAR_set_obj_palette_from_hw
 
         lda #BRIGHTNESS_FULLY_DARK

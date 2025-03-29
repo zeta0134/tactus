@@ -971,3 +971,39 @@ done:
 .proc FAR_refresh_palettes_gameloop
         jmp (PaletteStateFunc)
 .endproc
+
+; To use: preload PaletteTablePtr/PaletteTableBank with the desired palette
+; table. This preps IncomingHwPalette, which should then be followed by
+; one of the region specific loading routines. Note that this does not
+; handle room variants, for that use the level_rooms routine.
+.proc FAR_load_palette_by_colorspace
+PaletteOffset    := R0
+PalettePtr       := R2
+PaletteTablePtr  := R4
+PaletteTableBank := R6
+
+        lda current_save + SaveFile::OptionColorspace
+        asl
+        sta PaletteOffset
+
+        access_data_bank PaletteTableBank
+        ldy PaletteOffset
+        lda (PaletteTablePtr), y
+        sta PalettePtr+0
+        iny
+        lda (PaletteTablePtr), y
+        sta PalettePtr+1
+
+        ldy #0
+bg_loop:
+        perform_zpcm_inc
+        lda (PalettePtr), y
+        sta IncomingHwPalette, y
+        iny
+        cpy #16
+        bne bg_loop
+
+        restore_previous_bank
+
+        rts
+.endproc

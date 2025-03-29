@@ -164,10 +164,19 @@ blue_yellow_colorspace_str: .asciiz "TRITAN"
 greenscale_colorspace_str:  .asciiz "DOT MATRIX GAME"
 greyscale_colorspace_str:   .asciiz "CLASSIC FILM"
 
-options_battlefield_bg_palette:
-        .incbin "../art/dank_cave.pal"
-options_obj_palette:
-        .incbin "../art/options_sprite_palette.pal"
+
+options_pal_default_base:    .incbin "../art/palettes/options/base.pal"
+options_pal_protan_base:     .incbin "../art/palettes/options/base.pal"
+options_pal_tritan_base:     .incbin "../art/palettes/options/base.pal"
+options_pal_greenscale_base: .incbin "../art/palettes/greenscale.pal"
+options_pal_greyscale_base:  .incbin "../art/palettes/greyscale.pal"
+
+options_pal_sprite:          .incbin "../art/options_sprite_palette.pal"
+
+options_battlefield_palette_table:
+        .addr options_pal_default_base, options_pal_protan_base, options_pal_tritan_base, options_pal_greenscale_base, options_pal_greyscale_base
+options_obj_palette_table:
+        .addr options_pal_sprite, options_pal_sprite, options_pal_sprite, options_pal_sprite, options_pal_sprite
 
 palette_page_2_str: .asciiz "WORLD PALETTE"
 placeholder_gameplay_str:       .asciiz "GAMEPLAY"
@@ -189,8 +198,12 @@ debug_silly_4_str: .asciiz "have some coffee, etc."
 .segment "CODE_UI_LAYOUTS"
 
 .proc FAR_options_controller_init
-MetaSpriteIndex := R0
 CurrentWidgetIndex := R20
+
+; Used when setting up palettes
+PaletteTablePtr  := R4
+PaletteTableBank := R6
+
         perform_zpcm_inc
         ; Play the options track on the options screen
         lda #TRACK_OPTIONS
@@ -224,29 +237,15 @@ torchlight_loop_a:
         set_raster_effect_safely #RASTER_EFFECT_OPTIONS, #RASTER_FINALIZER_NONE, #0
         set_raster_playback_speed #1, #0
 
-        ; Get the file select palettes loaded in
-        ; TODO: use file select palette here!
-        ldy #0
-bg_loop:
-        perform_zpcm_inc
-        lda options_battlefield_bg_palette, y
-        sta IncomingHwPalette, y
-        iny
-        cpy #16
-        bne bg_loop
-
+        st16 PaletteTablePtr, options_battlefield_palette_table
+        st16 PaletteTableBank, .bank(options_battlefield_palette_table)
+        far_call FAR_load_palette_by_colorspace
         far_call FAR_set_bg_target_palette_from_hw
         far_call FAR_set_bg_current_palette_from_target
 
-        ldy #0
-obj_loop:
-        perform_zpcm_inc        
-        lda options_obj_palette, y
-        sta IncomingHwPalette, y
-        iny
-        cpy #16
-        bne obj_loop
-
+        st16 PaletteTablePtr, options_obj_palette_table
+        st16 PaletteTableBank, .bank(options_obj_palette_table)
+        far_call FAR_load_palette_by_colorspace
         far_call FAR_set_obj_palette_from_hw
 
         lda #BRIGHTNESS_FULLY_DARK
