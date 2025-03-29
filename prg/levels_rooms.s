@@ -370,9 +370,9 @@ oob_palette_table:
 
 ; TODO: this, properly!
 sprite_palette_overworld_table:
-        .addr sprite_palette_overworld_pal, sprite_palette_overworld_pal, sprite_palette_overworld_pal, greenscale_pal, greyscale_pal
+        .addr sprite_palette_overworld_pal, sprite_palette_overworld_pal, sprite_palette_overworld_pal, sprite_palette_overworld_pal, sprite_palette_overworld_pal
 sprite_palette_underworld_table:
-        .addr sprite_palette_underworld_pal, sprite_palette_underworld_pal, sprite_palette_underworld_pal, greenscale_pal, greyscale_pal
+        .addr sprite_palette_underworld_pal, sprite_palette_underworld_pal, sprite_palette_underworld_pal, sprite_palette_underworld_pal, sprite_palette_underworld_pal
 
 ; more general variant: assumes nothing, sets thing up, etc etc
 .proc FAR_load_palette_for_current_room
