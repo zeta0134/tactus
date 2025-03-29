@@ -166,8 +166,8 @@ greyscale_colorspace_str:   .asciiz "CLASSIC FILM"
 
 
 options_pal_default_base:    .incbin "../art/palettes/options/base.pal"
-options_pal_protan_base:     .incbin "../art/palettes/options/base.pal"
-options_pal_tritan_base:     .incbin "../art/palettes/options/base.pal"
+options_pal_protan_base:     .incbin "../art/palettes/options/protan.pal"
+options_pal_tritan_base:     .incbin "../art/palettes/options/tritan.pal"
 options_pal_greenscale_base: .incbin "../art/palettes/greenscale.pal"
 options_pal_greyscale_base:  .incbin "../art/palettes/greyscale.pal"
 
@@ -197,12 +197,28 @@ debug_silly_4_str: .asciiz "have some coffee, etc."
 
 .segment "CODE_UI_LAYOUTS"
 
-.proc FAR_options_controller_init
-CurrentWidgetIndex := R20
-
+; Call this any time the palette data would become stale, usually by
+; changing the colorspace option. Or just continually, I guess. It's not
+; THAT expensive.
+.proc _apply_options_palettes
 ; Used when setting up palettes
 PaletteTablePtr  := R4
 PaletteTableBank := R6
+        st16 PaletteTablePtr, options_battlefield_palette_table
+        st16 PaletteTableBank, .bank(options_battlefield_palette_table)
+        far_call FAR_load_palette_by_colorspace
+        far_call FAR_set_bg_target_palette_from_hw
+        far_call FAR_set_bg_current_palette_from_target
+
+        st16 PaletteTablePtr, options_obj_palette_table
+        st16 PaletteTableBank, .bank(options_obj_palette_table)
+        far_call FAR_load_palette_by_colorspace
+        far_call FAR_set_obj_palette_from_hw
+        rts
+.endproc
+
+.proc FAR_options_controller_init
+CurrentWidgetIndex := R20
 
         perform_zpcm_inc
         ; Play the options track on the options screen
@@ -237,16 +253,7 @@ torchlight_loop_a:
         set_raster_effect_safely #RASTER_EFFECT_OPTIONS, #RASTER_FINALIZER_NONE, #0
         set_raster_playback_speed #1, #0
 
-        st16 PaletteTablePtr, options_battlefield_palette_table
-        st16 PaletteTableBank, .bank(options_battlefield_palette_table)
-        far_call FAR_load_palette_by_colorspace
-        far_call FAR_set_bg_target_palette_from_hw
-        far_call FAR_set_bg_current_palette_from_target
-
-        st16 PaletteTablePtr, options_obj_palette_table
-        st16 PaletteTableBank, .bank(options_obj_palette_table)
-        far_call FAR_load_palette_by_colorspace
-        far_call FAR_set_obj_palette_from_hw
+        jsr _apply_options_palettes
 
         lda #BRIGHTNESS_FULLY_DARK
         jsr set_brightness
@@ -810,6 +817,10 @@ perform_sync:
         ; The page where this widget runs is dedicated to screwing around with color, and doesn't
         ; have much else going on. Just continually invalidate all of the palettes, all the time,
         ; so that changes instantly take effect when applied.
+        jsr _apply_options_palettes
+        far_call FAR_compute_player_colors
+        far_call FAR_apply_player_palette
+
         lda #1
         sta StagingBgPaletteDirty
         sta StagingObjPaletteDirty
