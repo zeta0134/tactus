@@ -24,6 +24,7 @@
         .include "prng.inc"
         .include "procgen.inc"
         .include "rainbow.inc"
+        .include "saves.inc"
         .include "sound.inc"
         .include "torchlight.inc"
         .include "word_util.inc"
@@ -78,6 +79,7 @@ SpellParticleSpawnCooldown: .res 1
 WarpPortalRoomIndex: .res 1
 WarpEntranceRoomIndex: .res 1
 WarpHueCooldown: .res 1
+WarpLuminenceOffset: .res 1
 
         ; should match levels_structures.s! it relies on several of our functions,
         ; and the far-call overhead for those functions is significant
@@ -1216,6 +1218,10 @@ room_setup_loop:
         ; Same deal but it's warp indexes
         sta WarpPortalRoomIndex
         sta WarpEntranceRoomIndex
+        ; Initialize warp effect state while we're here
+        lda #0
+        sta WarpHueCooldown
+        sta WarpLuminenceOffset
 
         lda #0
         sta ChallengeCount
@@ -2383,6 +2389,33 @@ hue_rotate_lut:
         .byte $40, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $41, $00, $00, $00
         .byte $50, $52, $53, $54, $55, $56, $57, $58, $59, $5A, $5B, $5C, $51, $00, $00, $00
 
+luminence_rotate_lut:
+        ; note: these are LUT entries, not hardware palettes!
+        .byte $10, $20, $30 ; darkest
+        .byte $10, $20, $40
+        .byte $10, $30, $40
+        .byte $10, $30, $50
+        .byte $20, $30, $50
+        .byte $20, $40, $50
+        .byte $30, $40, $50 ; lightest
+        .byte $20, $40, $50
+        .byte $20, $30, $50
+        .byte $10, $30, $50
+        .byte $10, $30, $40
+        .byte $10, $20, $40
+        .byte $10, $20, $30 ; darkest
+        .byte $10, $20, $40
+        .byte $10, $30, $40
+        .byte $10, $30, $50
+        .byte $20, $30, $50
+        .byte $20, $40, $50
+        .byte $30, $40, $50 ; lightest
+        .byte $20, $40, $50
+        .byte $20, $30, $50
+        .byte $10, $30, $50
+        .byte $10, $30, $40
+        .byte $10, $20, $40
+
 .proc perform_warp_hue_cycling
         perform_zpcm_inc
         lda WarpHueCooldown
@@ -2393,6 +2426,13 @@ perform_cycle:
         lda #6
         sta WarpHueCooldown
 
+        ; if we're in monochrome mode, we need to do this completely differently
+        lda current_save + SaveFile::OptionColorspace
+        cmp #COLORSPACE_GREENSCALE
+        beq perform_luminence_rotate
+        cmp #COLORSPACE_GREYSCALE
+        beq perform_luminence_rotate
+perform_hue_rotate:
         ldx TargetPlayfieldBgPal1+0
         lda hue_rotate_lut, x
         sta TargetPlayfieldBgPal1+0
@@ -2425,7 +2465,44 @@ perform_cycle:
 
         perform_zpcm_inc
         rts
+
+perform_luminence_rotate:
+        ; bookkeeping
+        lda WarpLuminenceOffset
+        clc
+        adc #3
+        cmp #(12 * 3)
+        bcc okay_to_store
+        lda #0
+okay_to_store:
+        sta WarpLuminenceOffset
+        tax
+
+        lda luminence_rotate_lut + 0, x
+        sta TargetPlayfieldBgPal1 + 0
+        lda luminence_rotate_lut + 1, x
+        sta TargetPlayfieldBgPal1 + 1
+        lda luminence_rotate_lut + 2, x
+        sta TargetPlayfieldBgPal1 + 2
+
+        lda luminence_rotate_lut + 12, x
+        sta TargetPlayfieldBgPal2 + 0
+        lda luminence_rotate_lut + 13, x
+        sta TargetPlayfieldBgPal2 + 1
+        lda luminence_rotate_lut + 14, x
+        sta TargetPlayfieldBgPal2 + 2
+
+        lda luminence_rotate_lut + 24, x
+        sta TargetPlayfieldBgPal3 + 0
+        lda luminence_rotate_lut + 25, x
+        sta TargetPlayfieldBgPal3 + 1
+        lda luminence_rotate_lut + 26, x
+        sta TargetPlayfieldBgPal3 + 2
+
+        perform_zpcm_inc
+        rts
 .endproc
+
 
 ; These are used to take a 5bit random number and pick something "in bounds" coordinate wise,
 ; with reasonable speed and fairness
