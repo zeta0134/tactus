@@ -2,6 +2,7 @@
 
     .include "far_call.inc"
     .include "rainbow.inc"
+    .include "pal.inc"
     .include "saves.inc"
     .include "zeropage.inc"
     .include "word_util.inc"
@@ -116,6 +117,61 @@ dynamic_palette_greenscale:
     .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
     .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
     .byte $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0B, $0F, $0F, $0F
+    .byte $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $0F, $0F, $0F
+    .byte $29, $29, $29, $29, $29, $29, $29, $29, $29, $29, $29, $29, $29, $0F, $0F, $0F
+    .byte $38, $38, $38, $38, $38, $38, $38, $38, $38, $38, $38, $38, $38, $0F, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+
+dynamic_palette_rgbppu:
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $01, $02, $02, $04, $05, $16, $07, $08, $09, $09, $0A, $0C, $0F, $0F, $0F
+    .byte $00, $11, $12, $13, $24, $15, $06, $17, $18, $19, $1A, $1B, $1C, $0F, $0F, $0F
+    .byte $10, $21, $22, $23, $23, $25, $26, $27, $28, $29, $2A, $2C, $2C, $0F, $0F, $0F
+    .byte $30, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $2B, $3C, $0F, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+
+; it's kinda blue, but whatever. I'd rather it be blue than _broken._
+dynamic_palette_rgbppu_greyscale:
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $01, $01, $01, $01, $01, $01, $01, $01, $01, $01, $01, $01, $01, $0F, $0F, $0F
+    .byte $11, $11, $11, $11, $11, $11, $11, $11, $11, $11, $11, $11, $11, $0F, $0F, $0F
+    .byte $21, $21, $21, $21, $21, $21, $21, $21, $21, $21, $21, $21, $21, $0F, $0F, $0F
+    .byte $31, $31, $31, $31, $31, $31, $31, $31, $31, $31, $31, $31, $31, $0F, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+    .byte $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $30, $0F, $0F
+
+dynamic_palette_rgbppu_greenscale:
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F, $0F
+    .byte $0A, $0A, $0A, $0A, $0A, $0A, $0A, $0A, $0A, $0A, $0A, $0A, $0A, $0F, $0F, $0F
     .byte $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $1A, $0F, $0F, $0F
     .byte $29, $29, $29, $29, $29, $29, $29, $29, $29, $29, $29, $29, $29, $0F, $0F, $0F
     .byte $38, $38, $38, $38, $38, $38, $38, $38, $38, $38, $38, $38, $38, $0F, $0F, $0F
@@ -674,6 +730,51 @@ HardwarePalLutPtr := R0
     ; The current brightness is specified in 16-entry rows, so we
     ; just need to add it to our base pointer here. Which base pointer
     ; we use depends on the current colorspace
+
+    lda current_save + SaveFile::OptionPpuType
+    cmp #OPTION_PPU_TYPE_COMPOSITE
+    beq composite_colorspaces
+    cmp #OPTION_PPU_TYPE_RGB
+    beq rgb_colorspaces
+    lda ppu_type
+    cmp #PPU_TYPE_COMPOSITE
+    beq composite_colorspaces
+    ; fall through to rgb
+rgb_colorspaces:
+    lda current_save + SaveFile::OptionColorspace
+    cmp #COLORSPACE_GREENSCALE
+    beq use_rgb_greenscale
+    cmp #COLORSPACE_GREYSCALE
+    beq use_rgb_greyscale
+use_rgb_normal:
+    clc
+    lda #<dynamic_palette_rgbppu
+    adc Brightness
+    sta HardwarePalLutPtr+0
+    lda #>dynamic_palette_rgbppu
+    adc #0
+    sta HardwarePalLutPtr+1
+    rts
+use_rgb_greenscale:
+    clc
+    lda #<dynamic_palette_rgbppu_greenscale
+    adc Brightness
+    sta HardwarePalLutPtr+0
+    lda #>dynamic_palette_rgbppu_greenscale
+    adc #0
+    sta HardwarePalLutPtr+1
+    rts
+use_rgb_greyscale:
+    clc
+    lda #<dynamic_palette_rgbppu_greyscale
+    adc Brightness
+    sta HardwarePalLutPtr+0
+    lda #>dynamic_palette_rgbppu_greyscale
+    adc #0
+    sta HardwarePalLutPtr+1
+    rts
+
+composite_colorspaces:
     lda current_save + SaveFile::OptionColorspace
     cmp #COLORSPACE_GREENSCALE
     beq use_greenscale

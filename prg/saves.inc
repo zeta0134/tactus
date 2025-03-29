@@ -32,7 +32,9 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     OptionColorspace .byte
     OptionRhythmFlashBar .byte
     OptionRhythmFlashPlayer .byte
-    OptionsReserved .byte 10 ; pad out to 16 bytes total
+    OptionPpuType .byte
+    OptionColorEmphasis .byte
+    OptionsReserved .byte 8 ; pad out to 16 bytes total
     ; FUTURE
     GeneralReserved .byte 24
     ; CURRENT RUN STATE (that which persists, anyway) (current: 31 bytes)
@@ -97,6 +99,10 @@ COLORSPACE_PROTANOMALY = 1
 COLORSPACE_TRITANOMALY = 2
 COLORSPACE_GREENSCALE  = 3
 COLORSPACE_GREYSCALE   = 4
+
+OPTION_PPU_TYPE_AUTO      = 0
+OPTION_PPU_TYPE_COMPOSITE = 1
+OPTION_PPU_TYPE_RGB       = 2
 
 ; 
 .struct SaveBlock

@@ -15,6 +15,7 @@
         .include "kernel.inc"
         .include "levels.inc"
         .include "loot.inc"
+        .include "pal.inc"
         .include "player.inc"
         .include "prng.inc"
         .include "procgen.inc"
@@ -131,8 +132,14 @@ hud_tritan_pal:     .incbin "../art/palettes/hud/tritan.pal"
 hud_greenscale_pal: .incbin "../art/palettes/hud/greenscale.pal"
 hud_greyscale_pal:  .incbin "../art/palettes/hud/greyscale.pal"
 
+hud_base_rgb_pal:       .incbin "../art/palettes/hud/base_rgb.pal"
+hud_protan_rgb_pal:     .incbin "../art/palettes/hud/protan_rgb.pal"
+hud_tritan_rgb_pal:     .incbin "../art/palettes/hud/tritan_rgb.pal"
+
 hud_bg_palette_table:
         .addr hud_base_pal, hud_protan_pal, hud_tritan_pal, hud_greenscale_pal, hud_greyscale_pal
+hud_bg_palette_table_rgb:
+        .addr hud_base_rgb_pal, hud_protan_rgb_pal, hud_tritan_rgb_pal, hud_greenscale_pal, hud_greyscale_pal
 
 hud_grasslands_pal:
         .incbin "../art/zone_1_banner.pal"
@@ -771,8 +778,24 @@ PaletteTableBank := R6
         ; For the background layer, we use a fixed set based on the current colorspace.
         ; We need overrides to ensure that especially permanent/temporary health units
         ; are distinguishable despite sharing tiles. The rest is just polish.
+
+        lda current_save + SaveFile::OptionPpuType
+        cmp #OPTION_PPU_TYPE_COMPOSITE
+        beq composite_colorspaces
+        cmp #OPTION_PPU_TYPE_RGB
+        beq rgb_colorspaces
+        lda ppu_type
+        cmp #PPU_TYPE_COMPOSITE
+        beq composite_colorspaces
+        ; fall through to rgb
+rgb_colorspaces:
+        st16 PaletteTablePtr, hud_bg_palette_table_rgb
+        st16 PaletteTableBank, .bank(hud_bg_palette_table_rgb)
+        jmp converge
+composite_colorspaces:
         st16 PaletteTablePtr, hud_bg_palette_table
         st16 PaletteTableBank, .bank(hud_bg_palette_table)
+converge:
         far_call FAR_load_palette_by_colorspace
         far_call FAR_set_hud_bg_palette_from_hw
 

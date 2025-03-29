@@ -35,8 +35,8 @@ options_sublayout_palette_page_1:
 options_sublayout_palette_page_2:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label palette_page_2_str, 2, 13
-        widget_text_options colorspace_options_str, colorspace_options, {current_save + SaveFile::OptionColorspace},      4, 15
-        widget_text_options minimap_flavor_str, minimap_themes,       {current_save + SaveFile::OptionMinimapTheme},      4, 16
+        widget_text_options colorspace_options_str, colorspace_options, {current_save + SaveFile::OptionColorspace  },      4, 15
+        widget_text_options minimap_flavor_str,     minimap_themes,     {current_save + SaveFile::OptionMinimapTheme},      4, 16
         widget_controller FAR_apply_colormap_shenanigans
         .addr $0000 ; end of list
 options_sublayout_gameplay_page_1:
@@ -56,6 +56,9 @@ options_sublayout_audio_page_1:
 options_sublayout_compatibility_tweaks_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_compatibility_str, 2, 13
+        widget_text_options pputype_str,      pputype_options,      {current_save + SaveFile::OptionPpuType      },      4, 15
+        widget_text_options ppuemphasis_str,  emphasis_options,     {current_save + SaveFile::OptionColorEmphasis},      4, 16
+        widget_controller FAR_apply_colormap_shenanigans
         .addr $0000 ; end of list
 options_sublayout_debug_page_1:
         widget_controller FAR_options_page_clear_controller_init
@@ -164,6 +167,23 @@ blue_yellow_colorspace_str: .asciiz "TRITAN"
 greenscale_colorspace_str:  .asciiz "DOT MATRIX GAME"
 greyscale_colorspace_str:   .asciiz "CLASSIC FILM"
 
+pputype_str:     .asciiz "PPU "
+pputype_options:
+        .byte 3
+        .addr pputype_auto_str
+        .addr pputype_composite_str
+        .addr pputype_rgb_str
+pputype_auto_str: .asciiz "AUTO"
+pputype_composite_str: .asciiz "COMPOSITE (2C02,2C07)"
+pputype_rgb_str:       .asciiz "RGB (2C03,2C05)"
+
+ppuemphasis_str: .asciiz "Color Emphasis "
+emphasis_options:
+        .byte 2
+        .addr emphasis_enabled_str
+        .addr emphasis_disabled_str
+emphasis_enabled_str:  .asciiz "ENABLED"
+emphasis_disabled_str: .asciiz "DISABLED"
 
 options_pal_default_base:    .incbin "../art/palettes/options/base.pal"
 options_pal_protan_base:     .incbin "../art/palettes/options/protan.pal"
