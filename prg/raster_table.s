@@ -9,6 +9,7 @@
         .include "pal.inc"
         .include "rainbow.inc"
         .include "raster_table.inc"
+        .include "saves.inc"
         .include "zpcm.inc"
 
         .zeropage
@@ -71,6 +72,7 @@ room_global_ppumask:    .res 64
 
 RasterPlaybackSpeedHigh: .res 1
 RasterPlaybackSpeedLow: .res 1
+PpuMaskScratch: .res 1
 
 
         .segment "DATA_4"
@@ -217,20 +219,61 @@ scroll_y_wraparound_lut:
         rts
 .endproc
 
+; these emphasis tables are indexed by the high 3 bits of emphasis, remember to preshift
+
+; invert the meaning of bits R and G
+ntsc_to_pal_equivalence:
+        .byte $1E | %00000000 ; ...
+        .byte $1E | %01000000 ; ..r
+        .byte $1E | %00100000 ; .g.
+        .byte $1E | %01100000 ; .gr
+        .byte $1E | %10000000 ; b..
+        .byte $1E | %11000000 ; b.r
+        .byte $1E | %10100000 ; bg.
+        .byte $1E | %11100000 ; bgr
+
 ; Desired color emphasis bits in A
 ; (we'll ORA with the other flags as needed)
 .proc FAR_apply_room_global_color_emphasis
-        ; TODO: if we're going to disable emphasis effects with an option,
-        ; do it right here!
-        ; TODO: if we're running on PAL we need to xor the emphasis bits
-        ; to fix the wrong coloration!
-
+        sta PpuMaskScratch
+        lda current_save + SaveFile::OptionColorEmphasis
+        cmp #OPTION_EMPHASIS_DISABLED
+        beq emphasis_disabled
+        lda current_save + SaveFile::OptionPpuType
+        cmp #OPTION_PPU_TYPE_RGB
+        beq emphasis_disabled
+        cmp #OPTION_PPU_TYPE_AUTO
+        bne check_pal
+        lda ppu_type
+        cmp #PPU_TYPE_RGB
+        beq emphasis_disabled
+check_pal:
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq pal_emphasis
+        cmp #SYSTEM_TYPE_DENDY
+        beq pal_emphasis
+        ; fall through to normal
+normal_emphasis:
+        lda PpuMaskScratch
         ; First for safety, mask the input byte
         ; to include only the color emphasis properties
         and #(TINT_R|TINT_G|TINT_B|LIGHTGRAY)
         ; now set the rendering enable bits
         ora #(BG_ON|OBJ_ON)
-
+        jmp converge
+pal_emphasis:
+        lda PpuMaskScratch
+        .repeat 5
+        lsr
+        .endrepeat
+        tay
+        lda ntsc_to_pal_equivalence, y
+        jmp converge
+emphasis_disabled:
+        lda #$1E
+        ; fall through to converge
+converge:
         ; and finally, write this into place. we can be a little
         ; slow here for size reasons, this won't be called all
         ; that often

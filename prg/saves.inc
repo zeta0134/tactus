@@ -104,6 +104,9 @@ OPTION_PPU_TYPE_AUTO      = 0
 OPTION_PPU_TYPE_COMPOSITE = 1
 OPTION_PPU_TYPE_RGB       = 2
 
+OPTION_EMPHASIS_ENABLED = 0
+OPTION_EMPHASIS_DISABLED = 1
+
 ; 
 .struct SaveBlock
     SaveSlot1 .byte .sizeof(SaveFile)
