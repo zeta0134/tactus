@@ -257,6 +257,7 @@ cave_pal_default_frozen:    .incbin "../art/palettes/caves/frozen.pal"
 cave_pal_default_shocked:   .incbin "../art/palettes/caves/shocked.pal"
 cave_pal_default_overgrown: .incbin "../art/palettes/caves/overgrown.pal"
 cave_pal_protan_base:       .incbin "../art/palettes/caves/protan.pal"
+cave_pal_tritan_base:       .incbin "../art/palettes/caves/tritan.pal"
 
 challenge_pit_darkred_pal_default_base:      .incbin "../art/palettes/challenge_darkred/base.pal"
 challenge_pit_darkred_pal_default_scorched:  .incbin "../art/palettes/challenge_darkred/scorched.pal"
@@ -264,6 +265,7 @@ challenge_pit_darkred_pal_default_frozen:    .incbin "../art/palettes/challenge_
 challenge_pit_darkred_pal_default_shocked:   .incbin "../art/palettes/challenge_darkred/shocked.pal"
 challenge_pit_darkred_pal_default_overgrown: .incbin "../art/palettes/challenge_darkred/overgrown.pal"
 challenge_pit_darkred_pal_protan_base:       .incbin "../art/palettes/challenge_darkred/protan.pal"
+challenge_pit_darkred_pal_tritan_base:       .incbin "../art/palettes/challenge_darkred/tritan.pal"
 
 shop_pal_default_base:      .incbin "../art/palettes/shop/base.pal"
 shop_pal_default_scorched:  .incbin "../art/palettes/shop/base.pal"
@@ -271,6 +273,7 @@ shop_pal_default_frozen:    .incbin "../art/palettes/shop/base.pal"
 shop_pal_default_shocked:   .incbin "../art/palettes/shop/base.pal"
 shop_pal_default_overgrown: .incbin "../art/palettes/shop/base.pal"
 shop_pal_protan_base:       .incbin "../art/palettes/shop/protan.pal"
+shop_pal_tritan_base:       .incbin "../art/palettes/shop/tritan.pal"
 
 hub_world_pal_default_base:      .incbin "../art/hub_world_palette.pal"
 hub_world_pal_default_scorched:  .incbin "../art/hub_world_palette.pal"
@@ -284,6 +287,7 @@ blocking_exterior_pal_default_frozen:    .incbin "../art/palettes/blocking_exter
 blocking_exterior_pal_default_shocked:   .incbin "../art/palettes/blocking_exterior/shocked.pal"
 blocking_exterior_pal_default_overgrown: .incbin "../art/palettes/blocking_exterior/overgrown.pal"
 blocking_exterior_pal_protan_base:       .incbin "../art/palettes/blocking_exterior/protan.pal"
+blocking_exterior_pal_tritan_base:       .incbin "../art/palettes/blocking_exterior/tritan.pal"
         
 blocking_interior_pal_default_base:      .incbin "../art/palettes/blocking_interior/base.pal"
 blocking_interior_pal_default_scorched:  .incbin "../art/palettes/blocking_interior/scorched.pal"
@@ -291,6 +295,7 @@ blocking_interior_pal_default_frozen:    .incbin "../art/palettes/blocking_inter
 blocking_interior_pal_default_shocked:   .incbin "../art/palettes/blocking_interior/shocked.pal"
 blocking_interior_pal_default_overgrown: .incbin "../art/palettes/blocking_interior/overgrown.pal"
 blocking_interior_pal_protan_base:       .incbin "../art/palettes/blocking_interior/protan.pal"
+blocking_interior_pal_tritan_base:       .incbin "../art/palettes/blocking_interior/tritan.pal"
 
 warp_pal_default_base:       .incbin "../art/palettes/warp_zone/base.pal"
 warp_pal_default_scorched:   .incbin "../art/palettes/warp_zone/scorched.pal"
@@ -308,21 +313,21 @@ grasslands_exterior_palette_table:
         .addr grasslands_pal_default_overgrown, grasslands_pal_default_overgrown, grasslands_pal_default_overgrown, greenscale_pal, greyscale_pal
 
 cave_interior_palette_table:
-        .addr cave_pal_default_base,      cave_pal_protan_base ,      cave_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr cave_pal_default_base,      cave_pal_protan_base ,      cave_pal_tritan_base,       greenscale_pal, greyscale_pal
         .addr cave_pal_default_scorched,  cave_pal_default_scorched,  cave_pal_default_scorched,  greenscale_pal, greyscale_pal
         .addr cave_pal_default_frozen,    cave_pal_default_frozen,    cave_pal_default_frozen,    greenscale_pal, greyscale_pal
         .addr cave_pal_default_shocked,   cave_pal_default_shocked,   cave_pal_default_shocked,   greenscale_pal, greyscale_pal
         .addr cave_pal_default_overgrown, cave_pal_default_overgrown, cave_pal_default_overgrown, greenscale_pal, greyscale_pal
 
 challenge_pit_darkred_palette_table:
-        .addr challenge_pit_darkred_pal_default_base,      challenge_pit_darkred_pal_protan_base,       challenge_pit_darkred_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr challenge_pit_darkred_pal_default_base,      challenge_pit_darkred_pal_protan_base,       challenge_pit_darkred_pal_tritan_base,       greenscale_pal, greyscale_pal
         .addr challenge_pit_darkred_pal_default_scorched,  challenge_pit_darkred_pal_default_scorched,  challenge_pit_darkred_pal_default_scorched,  greenscale_pal, greyscale_pal
         .addr challenge_pit_darkred_pal_default_frozen,    challenge_pit_darkred_pal_default_frozen,    challenge_pit_darkred_pal_default_frozen,    greenscale_pal, greyscale_pal
         .addr challenge_pit_darkred_pal_default_shocked,   challenge_pit_darkred_pal_default_shocked,   challenge_pit_darkred_pal_default_shocked,   greenscale_pal, greyscale_pal
         .addr challenge_pit_darkred_pal_default_overgrown, challenge_pit_darkred_pal_default_overgrown, challenge_pit_darkred_pal_default_overgrown, greenscale_pal, greyscale_pal
 
 shop_palette_table:
-        .addr shop_pal_default_base,      shop_pal_protan_base,       shop_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr shop_pal_default_base,      shop_pal_protan_base,       shop_pal_tritan_base,       greenscale_pal, greyscale_pal
         .addr shop_pal_default_scorched,  shop_pal_default_scorched,  shop_pal_default_scorched,  greenscale_pal, greyscale_pal
         .addr shop_pal_default_frozen,    shop_pal_default_frozen,    shop_pal_default_frozen,    greenscale_pal, greyscale_pal
         .addr shop_pal_default_shocked,   shop_pal_default_shocked,   shop_pal_default_shocked,   greenscale_pal, greyscale_pal
@@ -336,14 +341,14 @@ hub_world_palette_table:
         .addr hub_world_pal_default_overgrown, hub_world_pal_default_overgrown, hub_world_pal_default_overgrown, greenscale_pal, greyscale_pal
 
 blocking_exterior_palette_table:
-        .addr blocking_exterior_pal_default_base,      blocking_exterior_pal_protan_base,       blocking_exterior_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr blocking_exterior_pal_default_base,      blocking_exterior_pal_protan_base,       blocking_exterior_pal_tritan_base,       greenscale_pal, greyscale_pal
         .addr blocking_exterior_pal_default_scorched,  blocking_exterior_pal_default_scorched,  blocking_exterior_pal_default_scorched,  greenscale_pal, greyscale_pal
         .addr blocking_exterior_pal_default_frozen,    blocking_exterior_pal_default_frozen,    blocking_exterior_pal_default_frozen,    greenscale_pal, greyscale_pal
         .addr blocking_exterior_pal_default_shocked,   blocking_exterior_pal_default_shocked,   blocking_exterior_pal_default_shocked,   greenscale_pal, greyscale_pal
         .addr blocking_exterior_pal_default_overgrown, blocking_exterior_pal_default_overgrown, blocking_exterior_pal_default_overgrown, greenscale_pal, greyscale_pal
 
 blocking_interior_palette_table:
-        .addr blocking_interior_pal_default_base,      blocking_interior_pal_protan_base,       blocking_interior_pal_default_base,      greenscale_pal, greyscale_pal
+        .addr blocking_interior_pal_default_base,      blocking_interior_pal_protan_base,       blocking_interior_pal_tritan_base,       greenscale_pal, greyscale_pal
         .addr blocking_interior_pal_default_scorched,  blocking_interior_pal_default_scorched,  blocking_interior_pal_default_scorched,  greenscale_pal, greyscale_pal
         .addr blocking_interior_pal_default_frozen,    blocking_interior_pal_default_frozen,    blocking_interior_pal_default_frozen,    greenscale_pal, greyscale_pal
         .addr blocking_interior_pal_default_shocked,   blocking_interior_pal_default_shocked,   blocking_interior_pal_default_shocked,   greenscale_pal, greyscale_pal
