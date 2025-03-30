@@ -72,6 +72,7 @@ options_sublayout_debug_page_1:
 PRESET_PERSONALIZED_VALUE = 0
 ; Used for manual tweaking of the values
 OPTIONS_CURSOR_INDEX = 1
+OPTIONS_TAB_BAR_INDEX = 3
 PRESET_FIELD_INDEX        = 4 + 3
 PALETTE_SLIDER_INDEX_1    = 4 + 4
 PALETTE_SLIDER_INDEX_2    = 4 + 6
@@ -198,6 +199,14 @@ options_battlefield_palette_table:
 options_obj_palette_table:
         .addr options_pal_sprite, options_pal_sprite, options_pal_sprite, options_pal_sprite, options_pal_sprite
 
+options_pal_tab_palette:       .incbin "../art/palettes/options/tab_palette.pal"
+options_pal_tab_gameplay:      .incbin "../art/palettes/options/tab_gameplay.pal"
+options_pal_tab_input:         .incbin "../art/palettes/options/tab_input.pal"
+options_pal_tab_audio:         .incbin "../art/palettes/options/tab_audio.pal"
+options_pal_tab_compatibility: .incbin "../art/palettes/options/tab_compatibility.pal"
+options_pal_tab_debug:         .incbin "../art/palettes/options/tab_debug.pal"
+options_pal_tab_greyscale:     .incbin "../art/palettes/options/tab_greyscale.pal"
+
 palette_page_2_str: .asciiz "WORLD PALETTE"
 placeholder_gameplay_str:       .asciiz "GAMEPLAY"
 placeholder_input_str:          .asciiz "INPUT"
@@ -217,13 +226,29 @@ debug_silly_4_str: .asciiz "have some coffee, etc."
 
 .segment "CODE_UI_LAYOUTS"
 
+option_palettes_by_tab_index:
+        .addr options_pal_tab_palette
+        .addr options_pal_tab_palette
+        .addr options_pal_tab_gameplay
+        .addr options_pal_tab_input
+        .addr options_pal_tab_audio
+        .addr options_pal_tab_compatibility
+        .addr options_pal_tab_debug
+
+
 ; Call this any time the palette data would become stale, usually by
 ; changing the colorspace option. Or just continually, I guess. It's not
 ; THAT expensive.
 .proc _apply_options_palettes
+OptionsHudPalPtr := R0
+
 ; Used when setting up palettes
 PaletteTablePtr  := R4
 PaletteTableBank := R6
+
+; For reading the current tab index
+widget_current_tab_index := widgets_data2
+
         st16 PaletteTablePtr, options_battlefield_palette_table
         st16 PaletteTableBank, .bank(options_battlefield_palette_table)
         far_call FAR_load_palette_by_colorspace
@@ -235,7 +260,29 @@ PaletteTableBank := R6
         far_call FAR_load_palette_by_colorspace
         far_call FAR_set_obj_palette_from_hw
 
-        far_call FAR_load_hud_palette_bg
+        ; if we're in either of the greyscale modes, apply that hud palette
+
+apply_indexed_hud_palette:
+        ldy #OPTIONS_TAB_BAR_INDEX
+        lda widget_current_tab_index, y
+        asl
+        tay
+        lda option_palettes_by_tab_index+0, y
+        sta OptionsHudPalPtr+0
+        lda option_palettes_by_tab_index+1, y
+        sta OptionsHudPalPtr+1
+        jmp apply_hud_palette_converge
+apply_greyscale_hud_palette:
+        st16 OptionsHudPalPtr, options_pal_tab_greyscale
+apply_hud_palette_converge:
+        ldy #0
+hud_pal_loop:
+        lda (OptionsHudPalPtr), y
+        sta IncomingHwPalette, y
+        iny
+        cpy #16
+        bne hud_pal_loop
+        far_call FAR_set_hud_bg_palette_from_hw
 
         lda PlayfieldObjPal0+0
         sta HudObjPal0+0
@@ -341,6 +388,8 @@ loop:
         lda Length+0
         ora Length+1
         bne loop
+
+        jsr _apply_options_palettes
 
         ldy CurrentWidgetIndex
         set_widget_state_y FAR_options_page_clear_controller_update
