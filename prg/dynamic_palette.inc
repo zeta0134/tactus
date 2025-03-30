@@ -57,6 +57,7 @@ BRIGHTNESS_FULLY_BRIGHT = $A0
 .global FAR_set_hud_bg_palette_from_hw
 .global FAR_set_hud_obj_palette_from_hw
 .global FAR_load_palette_by_colorspace
+.global FAR_step_towards_target
 
 .macro INLINE_refresh_palettes_nmi 
     lda #$3F

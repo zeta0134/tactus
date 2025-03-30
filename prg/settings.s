@@ -2,15 +2,20 @@
 
     .include "_globals.inc"
 
+    .include "dynamic_palette.inc"
     .include "far_call.inc"
     .include "prng.inc"
     .include "rainbow.inc"
     .include "saves.inc"
     .include "settings.inc"
+    .include "zeropage.inc"
     .include "zpcm.inc"
 
     .segment "RAM"
 
+; Computed from the slider lookup tables. Our "base" palette
+; to which most states return. Everything else is derived from
+; this as a starting point.
 player_ingame_palette_pigment: .res 1
 player_ingame_palette_phones: .res 1
 player_ingame_palette_pajamas: .res 1
@@ -31,6 +36,7 @@ player_title_palette_phones_light: .res 1
 player_title_palette_pajamas_dark: .res 1
 player_title_palette_pajamas_medium: .res 1
 player_title_palette_pajamas_light: .res 1
+
 
     .segment "PRGFIXED_E000"
 
@@ -132,8 +138,10 @@ use_preset_palette:
     ldx current_save + SaveFile::PlayerPalettePreset
     ldy palette_preset_lut_phones, x
     jsr _set_phones_color
+    ldx current_save + SaveFile::PlayerPalettePreset
     ldy palette_preset_lut_pajamas, x
     jsr _set_pajamas_color
+    ldx current_save + SaveFile::PlayerPalettePreset
     ldy palette_preset_lut_pigment, x
     jsr _set_pigment_color
     perform_zpcm_inc
@@ -160,8 +168,10 @@ use_preset_palette:
     ldx current_block + SaveBlock::SaveSlot1 + SaveFile::PlayerPalettePreset
     ldy palette_preset_lut_phones, x
     jsr _set_phones_color
+    ldx current_block + SaveBlock::SaveSlot1 + SaveFile::PlayerPalettePreset
     ldy palette_preset_lut_pajamas, x
     jsr _set_pajamas_color
+    ldx current_block + SaveBlock::SaveSlot1 + SaveFile::PlayerPalettePreset
     ldy palette_preset_lut_pigment, x
     jsr _set_pigment_color
     perform_zpcm_inc
@@ -188,8 +198,10 @@ use_preset_palette:
     ldx current_block + SaveBlock::SaveSlot2 + SaveFile::PlayerPalettePreset
     ldy palette_preset_lut_phones, x
     jsr _set_phones_color
+    ldx current_block + SaveBlock::SaveSlot2 + SaveFile::PlayerPalettePreset
     ldy palette_preset_lut_pajamas, x
     jsr _set_pajamas_color
+    ldx current_block + SaveBlock::SaveSlot2 + SaveFile::PlayerPalettePreset
     ldy palette_preset_lut_pigment, x
     jsr _set_pigment_color
     perform_zpcm_inc
@@ -216,8 +228,10 @@ use_preset_palette:
     ldx current_block + SaveBlock::SaveSlot3 + SaveFile::PlayerPalettePreset
     ldy palette_preset_lut_phones, x
     jsr _set_phones_color
+    ldx current_block + SaveBlock::SaveSlot3 + SaveFile::PlayerPalettePreset
     ldy palette_preset_lut_pajamas, x
     jsr _set_pajamas_color
+    ldx current_block + SaveBlock::SaveSlot3 + SaveFile::PlayerPalettePreset
     ldy palette_preset_lut_pigment, x
     jsr _set_pigment_color
     perform_zpcm_inc
@@ -254,33 +268,88 @@ compute_file_3:
     rts
 .endproc
 
+; this is gon' be real repetitive otherwise
+.macro tweak_color source_byte, target_byte, target_hue, hue_steps, target_lum, lum_steps
+.scope
+CurrentColor := R0
+TargetColor := R1
+HueSteps := R2
+LuminenceSteps := R3
+    lda source_byte
+    sta CurrentColor
+    lda #(target_hue | target_lum)
+    sta TargetColor
+    lda #hue_steps
+    sta HueSteps
+    lda #lum_steps
+    sta LuminenceSteps
+    far_call FAR_step_towards_target
+    lda TargetColor
+    sta target_byte
+.endscope
+.endmacro
+
+COLOR_0_BY = $00
+COLOR_1_BY = $01
+COLOR_2_BY = $02
+COLOR_3_BY = $03
+COLOR_4_BY = $04
+COLOR_5_BY = $05
+COLOR_6_BY = $06
+COLOR_7_BY = $07
+COLOR_8_BY = $08
+COLOR_9_BY = $09
+COLOR_A_BY = $0A
+COLOR_B_BY = $0B
+COLOR_C_BY = $0C
+
+LUM_0 = $00
+LUM_1 = $10
+LUM_2 = $20
+LUM_3 = $30
+LUM_4 = $40
+LUM_5 = $50
+
+DARKEN_BY  = $00
+LIGHTEN_BY = $50
+
 ; LUT index in Y
 .proc _set_phones_color
     perform_zpcm_inc
     ; normal colors for gameplay sprites
     lda player_colors_lut, y
     sta player_ingame_palette_phones
-    lda player_dmg_dark_colors_lut, y
-    sta player_damage_dark_palette_phones
-    lda player_dmg_light_colors_lut, y
-    sta player_damage_light_palette_phones
+
+    ; damage (todo: this differently, for great animation?)
+    tweak_color player_ingame_palette_phones, player_damage_dark_palette_phones,  DARKEN_BY,  1, COLOR_5_BY,  6
+    tweak_color player_ingame_palette_phones, player_damage_light_palette_phones, LIGHTEN_BY, 2, COLOR_5_BY,  6
+    ; title variants
+    tweak_color player_ingame_palette_phones, player_title_palette_phones_dark,  DARKEN_BY,  1, COLOR_0_BY, 0
+    tweak_color player_ingame_palette_phones, player_title_palette_phones_light, LIGHTEN_BY, 1, COLOR_0_BY, 0
+
+
+
+    ;lda player_dmg_dark_colors_lut, y
+    ;sta player_damage_dark_palette_phones
+    ;lda player_dmg_light_colors_lut, y
+    ;sta player_damage_light_palette_phones
     ; title colors have several shading variants and we need to
     ; skip ahead between rows
-    lda player_title_colors_lut, y
-    sta player_title_palette_phones_dark
-    tya
-    clc
-    adc #13
-    tay
-    lda player_title_colors_lut, y
-    sta player_title_palette_phones_medium
-    tya
-    clc
-    adc #13
-    tay
-    lda player_title_colors_lut, y
-    sta player_title_palette_phones_light
-    perform_zpcm_inc
+    ;lda player_title_colors_lut, y
+    ;sta player_title_palette_phones_dark
+    ;tya
+    ;clc
+    ;adc #13
+    ;tay
+    ;lda player_title_colors_lut, y
+    ;sta player_title_palette_phones_medium
+    ;tya
+    ;clc
+    ;adc #13
+    ;tay
+    ;lda player_title_colors_lut, y
+    ;sta player_title_palette_phones_light
+    ;perform_zpcm_inc
     rts
 .endproc
 
@@ -290,27 +359,35 @@ compute_file_3:
     ; normal colors for gameplay sprites
     lda player_colors_lut, y
     sta player_ingame_palette_pajamas
-    lda player_dmg_dark_colors_lut, y
-    sta player_damage_dark_palette_pajamas
-    lda player_dmg_light_colors_lut, y
-    sta player_damage_light_palette_pajamas
+
+    ; damage (todo: this differently, for great animation?)
+    tweak_color player_ingame_palette_pajamas, player_damage_dark_palette_pajamas,  DARKEN_BY,  1, COLOR_5_BY,  6
+    tweak_color player_ingame_palette_pajamas, player_damage_light_palette_pajamas, LIGHTEN_BY, 2, COLOR_5_BY,  6
+    ; title variants
+    tweak_color player_ingame_palette_pajamas, player_title_palette_pajamas_dark,  DARKEN_BY,  1, COLOR_0_BY, 0
+    tweak_color player_ingame_palette_pajamas, player_title_palette_pajamas_light, LIGHTEN_BY, 1, COLOR_0_BY, 0
+
+    ;lda player_dmg_dark_colors_lut, y
+    ;sta player_damage_dark_palette_pajamas
+    ;lda player_dmg_light_colors_lut, y
+    ;sta player_damage_light_palette_pajamas
     ; title colors have several shading variants and we need to
     ; skip ahead between rows
-    lda player_title_colors_lut, y
-    sta player_title_palette_pajamas_dark
-    tya
-    clc
-    adc #13
-    tay
-    lda player_title_colors_lut, y
-    sta player_title_palette_pajamas_medium
-    tya
-    clc
-    adc #13
-    tay
-    lda player_title_colors_lut, y
-    sta player_title_palette_pajamas_light
-    perform_zpcm_inc
+    ;lda player_title_colors_lut, y
+    ;sta player_title_palette_pajamas_dark
+    ;tya
+    ;clc
+    ;adc #13
+    ;tay
+    ;lda player_title_colors_lut, y
+    ;sta player_title_palette_pajamas_medium
+    ;tya
+    ;clc
+    ;adc #13
+    ;tay
+    ;lda player_title_colors_lut, y
+    ;sta player_title_palette_pajamas_light
+    ;perform_zpcm_inc
     rts
 .endproc
 
@@ -320,21 +397,31 @@ compute_file_3:
     ; normal colors for gameplay sprites
     lda player_colors_lut, y
     sta player_ingame_palette_pigment
-    lda player_dmg_dark_colors_lut, y
-    sta player_damage_dark_palette_pigment
-    lda player_dmg_light_colors_lut, y
-    sta player_damage_light_palette_pigment
+    
+    ; damage (todo: this differently, for great animation?)
+    tweak_color player_ingame_palette_pigment, player_damage_dark_palette_pigment,  DARKEN_BY,  1, COLOR_5_BY,  6
+    tweak_color player_ingame_palette_pigment, player_damage_light_palette_pigment, LIGHTEN_BY, 2, COLOR_5_BY,  6
+    ; title variants
+    tweak_color player_ingame_palette_pigment, player_title_palette_pigment_dark,  DARKEN_BY,  1, COLOR_0_BY, 0
+    ;tweak_color player_ingame_palette_pigment, player_title_palette_pigment_light, LIGHTEN_BY, 1, COLOR_0_BY, 0
+
+    ;lda player_dmg_dark_colors_lut, y
+    ;sta player_damage_dark_palette_pigment
+    ;lda player_dmg_light_colors_lut, y
+    ;sta player_damage_light_palette_pigment
     ; title colors have several shading variants and we need to
     ; skip ahead between rows
-    lda player_title_colors_lut, y
-    sta player_title_palette_pigment_dark
-    tya
-    clc
-    adc #13
-    tay
-    lda player_title_colors_lut, y
-    sta player_title_palette_pigment_medium
+    ;lda player_title_colors_lut, y
+    ;sta player_title_palette_pigment_dark
+    ;tya
+    ;clc
+    ;adc #13
+    ;tay
+    ;lda player_title_colors_lut, y
+    ;sta player_title_palette_pigment_medium
     ; face ramp doesn't have a light shade, it's used for the whites of eyes instead
-    perform_zpcm_inc
+    ;perform_zpcm_inc
     rts
 .endproc
+
+

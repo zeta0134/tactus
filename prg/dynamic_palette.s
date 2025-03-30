@@ -529,6 +529,34 @@ no_change:
     rts
 .endproc
 
+; Utility function for arbitrary color manipulation, mostly used when
+; working out the player's effect colors while loading their save.
+.proc FAR_step_towards_target
+; used by hue/luminence stepping functions
+CurrentColor := R0
+TargetColor := R1
+HueSteps := R2
+LuminenceSteps := R3
+
+; clobbered by those functions
+Scratch := R15
+
+hue_loop:
+    lda HueSteps
+    beq done_with_hue
+    jsr step_hue
+    dec HueSteps
+done_with_hue:
+
+luminence_loop:
+    lda LuminenceSteps
+    beq done_with_luminence
+    jsr step_luminence
+    dec LuminenceSteps
+done_with_luminence:
+    rts
+.endproc
+
 ; these are used by the per-frame palette update routine, itself a state machine,
 ; to eventually step all regions of the screen towards the desired target colors. note
 ; that brightness is handled in a later step (and applied instantly)
