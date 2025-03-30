@@ -446,20 +446,28 @@ LayoutPtr := R0
         ; to "blank" to simplify raster splits if those are needed
         lda #>SPRITE_UI_00_MENU_CURSOR_SPIN
         sta SPRITE_BANK_UI_00
+        sta SPRITE_BANK_UI_HUD_00
         lda #>SPRITE_000_BLANK_NOTHING
         sta SPRITE_BANK_UI_01
+        sta SPRITE_BANK_UI_HUD_01
         lda #>SPRITE_000_BLANK_NOTHING
         sta SPRITE_BANK_UI_02
+        sta SPRITE_BANK_UI_HUD_02
         lda #>SPRITE_000_BLANK_NOTHING
         sta SPRITE_BANK_UI_03
+        sta SPRITE_BANK_UI_HUD_03
         lda #>SPRITE_000_BLANK_NOTHING
         sta SPRITE_BANK_UI_04
+        sta SPRITE_BANK_UI_HUD_04
         lda #>SPRITE_000_BLANK_NOTHING
         sta SPRITE_BANK_UI_05
+        sta SPRITE_BANK_UI_HUD_05
         lda #>SPRITE_000_BLANK_NOTHING
         sta SPRITE_BANK_UI_06
+        sta SPRITE_BANK_UI_HUD_06
         lda #>SPRITE_000_BLANK_NOTHING
         sta SPRITE_BANK_UI_07
+        sta SPRITE_BANK_UI_HUD_07
 
         ; The UI shouldn't use the $1000 table at all, so blank
         ; that out entirely.

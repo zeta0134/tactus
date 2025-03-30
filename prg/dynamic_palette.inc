@@ -35,6 +35,8 @@ BRIGHTNESS_FULLY_BRIGHT = $A0
 .global PlayfieldObjPal2
 .global PlayfieldObjPal3
 
+.global HudObjPal0
+
 .global Brightness
 .global TargetBrightness
 .global BrightnessDelay

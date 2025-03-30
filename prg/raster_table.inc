@@ -56,5 +56,6 @@ RASTER_EFFECT_SCORCHED    = $38
 RASTER_EFFECT_WARP_IN     = $3C
 
 ; note: 2-indexed!
-RASTER_FINALIZER_NONE = 0
-RASTER_FINALIZER_PLAIN_HUD = 2
+RASTER_FINALIZER_NONE      = 0 ; For most standard UI screens
+RASTER_FINALIZER_PLAIN_HUD = 2 ; For standard gameplay (incl. dialog)
+RASTER_FINALIZER_OPTIONS   = 4 ; The options screen, just below the battlefield preview

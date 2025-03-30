@@ -234,6 +234,16 @@ PaletteTableBank := R6
         st16 PaletteTableBank, .bank(options_obj_palette_table)
         far_call FAR_load_palette_by_colorspace
         far_call FAR_set_obj_palette_from_hw
+
+        far_call FAR_load_hud_palette_bg
+
+        lda PlayfieldObjPal0+0
+        sta HudObjPal0+0
+        lda PlayfieldObjPal0+1
+        sta HudObjPal0+1
+        lda PlayfieldObjPal0+2
+        sta HudObjPal0+2
+
         rts
 .endproc
 
@@ -270,7 +280,7 @@ torchlight_loop_a:
 
         ; we need a fancy mid-frame split to switch from the battlefield preview
         ; to the hud set instead
-        set_raster_effect_safely #RASTER_EFFECT_OPTIONS, #RASTER_FINALIZER_NONE, #0
+        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_OPTIONS, #0
         set_raster_playback_speed #1, #0
 
         jsr _apply_options_palettes
@@ -829,6 +839,14 @@ perform_sync:
         ; Read the color index values, work out the PPU values from the global LUT,
         ; and load those colors into the player sprite for preview
         far_call FAR_compute_player_colors
+        ; Also copy these colors into the first hud palette, so that the preview sprite
+        ; uses the same set
+        lda PlayfieldObjPal0+0
+        sta HudObjPal0+0
+        lda PlayfieldObjPal0+1
+        sta HudObjPal0+1
+        lda PlayfieldObjPal0+2
+        sta HudObjPal0+2
 
         rts
 .endproc
@@ -840,6 +858,13 @@ perform_sync:
         jsr _apply_options_palettes
         far_call FAR_compute_player_colors
         far_call FAR_apply_player_palette
+
+        lda PlayfieldObjPal0+0
+        sta HudObjPal0+0
+        lda PlayfieldObjPal0+1
+        sta HudObjPal0+1
+        lda PlayfieldObjPal0+2
+        sta HudObjPal0+2
 
         lda #1
         sta StagingBgPaletteDirty

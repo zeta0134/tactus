@@ -11,6 +11,7 @@
         .include "kernel.inc"
         .include "nes.inc"
         .include "input.inc"
+        .include "levels.inc"
         .include "math_util.inc"
         .include "player.inc"
         .include "prng.inc"

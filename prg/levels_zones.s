@@ -766,15 +766,12 @@ SpritePtr := R8
         rts
 .endproc
 
-; note: utility function, assumes the room data is already banked in, etc
-; this code is colocated with the palettes so a simple far call is all that
-; is needed to operate it
-.proc FAR_load_hud_palette_for_current_zone
+.proc FAR_load_hud_palette_bg
 HudPalPtr := R0
 
 PaletteTablePtr  := R4
 PaletteTableBank := R6
-
+        
         ; For the background layer, we use a fixed set based on the current colorspace.
         ; We need overrides to ensure that especially permanent/temporary health units
         ; are distinguishable despite sharing tiles. The rest is just polish.
@@ -798,6 +795,21 @@ composite_colorspaces:
 converge:
         far_call FAR_load_palette_by_colorspace
         far_call FAR_set_hud_bg_palette_from_hw
+        rts
+.endproc
+
+; note: utility function, assumes the room data is already banked in, etc
+; this code is colocated with the palettes so a simple far call is all that
+; is needed to operate it
+.proc FAR_load_hud_palette_for_current_zone
+HudPalPtr := R0
+
+PaletteTablePtr  := R4
+PaletteTableBank := R6
+
+        ; First load in the background set, which is fixed-ish (but varies based
+        ; on player options)
+        near_call FAR_load_hud_palette_bg
 
         ; For the banner, we'll use the old system and just load it manually.
         ; If this is a problem we'll just have to catch it in test. We CAN switch

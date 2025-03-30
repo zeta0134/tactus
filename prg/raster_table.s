@@ -55,6 +55,11 @@ RightNametableAttr: .res 1
 HudNametable: .res 1
 HudAttr: .res 1
 
+HudSplitScrollX: .res 1
+HudSplitScrollY: .res 1
+HudSplitNametable: .res 1
+HudSplitFunny2006: .res 1
+
         .segment "PRGRAM"
 
 .align 64
@@ -482,6 +487,7 @@ FinalizerPtr := RasterScratch+0
 finalizer_table:
         .addr finalizer_none
         .addr finalizer_hud
+        .addr finalizer_options
 
 ; just clears out the very last entry, no additional work needed
 ; Note: Y still holds the final entry in the table
@@ -495,6 +501,14 @@ finalizer_table:
 .endproc
 
 .proc finalizer_hud
+        lda #0
+        sta HudSplitScrollX
+        sta HudNametable
+        lda #176
+        sta HudSplitScrollY
+        lda #((((176 & $F8) << 2) | (0 >> 3)) & $FF)
+        sta HudSplitFunny2006
+
         lda DialogHeight
         beq finalizer_hud_alone
         jmp finalizer_hud_with_dialog
@@ -618,6 +632,58 @@ done_picking_routine:
         sta table_irq_high, y
         ; the final split doesn't use any of the other settings, and disables IRQ, so
         ; we should be finished. yay?
+
+        perform_zpcm_inc
+        rts
+.endproc
+
+; Note: Y still holds the final entry in the table
+.proc finalizer_options
+        lda #0
+        sta HudSplitScrollX
+        sta HudNametable
+        lda #70
+        sta HudSplitScrollY
+        lda #((((70 & $F8) << 2) | (0 >> 3)) & $FF)
+        sta HudSplitFunny2006
+
+        lda #0
+        sta table_ppuscroll_x, y
+        lda #70
+        sta table_ppuscroll_y, y
+        lda #68
+        sta table_scanline_compare, y
+
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq use_pal_routine
+use_ntsc_routine:
+        lda #>irq_hud_palette_swap_ntsc
+        sta table_irq_high, y
+        jmp done_picking_routine
+use_pal_routine:
+        lda #>irq_hud_palette_swap_pal
+        sta table_irq_high, y
+done_picking_routine:
+
+        lda #(BG_ON | OBJ_ON)
+        sta table_ppumask, y
+
+        ; do this during NMI, so we don't get a race condition and flickery beat transitions
+        lda HudBgHighBank
+        sta HudBgActual
+        lda HudObjHighBank
+        sta HudObjActual
+
+        lda #0
+        sta HudNametable
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta HudAttr
+
+        ; We don't use any splits after this, but we're going to have the palette swap
+        ; set them up anyway, so make sure our last split is unreachable / no effect
+        iny
+        jsr finalizer_none
 
         perform_zpcm_inc
         rts
@@ -981,23 +1047,14 @@ return_from_delay:
         ; We are parked on #$3F10, which mirrors BG0.0, so we can set up to re-enable rendering
 
         ; Draw the left-side nametable, starting at the top of the HUD graphics
-HUD_SCROLL_X = 0
-;HUD_SCROLL_Y = 182
-
-;HUD_SCROLL_Y = 175 ; does not cause jitter (does cause a visible glitch)
-HUD_SCROLL_Y = 176 ; the value I want, but this causes jitter
-;HUD_SCROLL_Y = 177 ; causes neither jitter nor a visible glitch
-
-HUD_NAMETABLE = 0
-HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
-        lda #HUD_NAMETABLE  ; 2
-        sta $2006           ; 4
-        lda #HUD_SCROLL_Y   ; 2
-        sta $2005           ; 4
-        lda #HUD_SCROLL_X   ; 2
-        sta $2005           ; 4
-        lda #HUD_FUNNY_2006 ; 2
-        sta $2006           ; 4
+        lda HudSplitNametable ; 4
+        sta $2006             ; 4
+        lda HudSplitScrollY   ; 4
+        sta $2005             ; 4
+        lda HudSplitScrollX   ; 4
+        sta $2005             ; 4
+        lda HudSplitFunny2006 ; 4
+        sta $2006             ; 4
 
         ; ppu dot here: 39
 
@@ -1021,9 +1078,6 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         ; new delay: 15
         php ; 3
         plp ; 4
-        .repeat 4 ; 8
-        nop
-        .endrepeat
 
         lda #BG_ON ; 2
 
@@ -1295,23 +1349,14 @@ return_from_delay:
         ; We are parked on #$3F10, which mirrors BG0.0, so we can set up to re-enable rendering
 
         ; Draw the left-side nametable, starting at the top of the HUD graphics
-HUD_SCROLL_X = 0
-;HUD_SCROLL_Y = 182
-
-;HUD_SCROLL_Y = 175 ; does not cause jitter (does cause a visible glitch)
-HUD_SCROLL_Y = 176 ; the value I want, but this causes jitter
-;HUD_SCROLL_Y = 177 ; causes neither jitter nor a visible glitch
-
-HUD_NAMETABLE = 0
-HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
-        lda #HUD_NAMETABLE  ; 2
-        sta $2006           ; 4
-        lda #HUD_SCROLL_Y   ; 2
-        sta $2005           ; 4
-        lda #HUD_SCROLL_X   ; 2
-        sta $2005           ; 4
-        lda #HUD_FUNNY_2006 ; 2
-        sta $2006           ; 4
+        lda HudSplitNametable ; 4
+        sta $2006             ; 4
+        lda HudSplitScrollY   ; 4
+        sta $2005             ; 4
+        lda HudSplitScrollX   ; 4
+        sta $2005             ; 4
+        lda HudSplitFunny2006 ; 4
+        sta $2006             ; 4
 
         ; ppu dot here: 39
 
@@ -1346,10 +1391,7 @@ HUD_FUNNY_2006 = ((((HUD_SCROLL_Y & $F8) << 2) | (HUD_SCROLL_X >> 3)) & $FF)
         ; ppu dot here: 117
 
         ; now we simply wait for hblank (256), then re-enable backgrounds:
-        ; PAL: should be 8
-        .repeat 4
-        nop
-        .endrepeat
+        ; PAL: should be 0
 
         lda #BG_ON ; 2
         ; ppu dot here: 261
