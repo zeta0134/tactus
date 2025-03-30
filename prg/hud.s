@@ -183,6 +183,7 @@ weapon_palette_table:
         .endif
         perform_zpcm_inc
         jsr update_dialog
+        jsr update_rhythm_assist
         perform_zpcm_inc
         rts
 .endproc

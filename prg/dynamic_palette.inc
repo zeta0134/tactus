@@ -35,6 +35,11 @@ BRIGHTNESS_FULLY_BRIGHT = $A0
 .global PlayfieldObjPal2
 .global PlayfieldObjPal3
 
+.global HudBackdrop
+.global HudBgPal0
+.global HudBgPal1
+.global HudBgPal2
+.global HudBgPal3
 .global HudObjPal0
 
 .global Brightness

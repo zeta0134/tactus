@@ -1,5 +1,6 @@
 .global init_dialog
 .global update_dialog
+.global update_rhythm_assist
 
 .global DialogHeight
 

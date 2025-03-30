@@ -44,6 +44,9 @@ options_sublayout_gameplay_page_1:
         widget_text_label placeholder_gameplay_str, 2, 13
         widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode  },      4, 15
         widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor  },      4, 16
+        widget_text_label rhythm_assist_str, 2, 18
+        widget_text_options flash_separator_str,  flash_separator_options, {current_save + SaveFile::OptionRhythmFlashBar   },  4, 20
+        widget_text_options flash_player_str,     flash_player_options,    {current_save + SaveFile::OptionRhythmFlashPlayer},  4, 21
         .addr $0000 ; end of list
 options_sublayout_input_page_1:
         widget_controller FAR_options_page_clear_controller_init
@@ -181,10 +184,25 @@ pputype_rgb_str:       .asciiz "RGB (2C03,2C05)"
 ppuemphasis_str: .asciiz "Color Emphasis "
 emphasis_options:
         .byte 2
-        .addr emphasis_enabled_str
-        .addr emphasis_disabled_str
-emphasis_enabled_str:  .asciiz "ENABLED"
-emphasis_disabled_str: .asciiz "DISABLED"
+        .addr enabled_str
+        .addr disabled_str
+enabled_str:  .asciiz "ENABLED"
+disabled_str: .asciiz "DISABLED"
+
+rhythm_assist_str: .asciiz "Rhythm Assistance"
+flash_separator_str: .asciiz "Flash Separator "
+flash_separator_options:
+        .byte 2
+        .addr off_str
+        .addr on_str
+off_str: .asciiz "OFF"
+on_str: .asciiz "ON"
+
+flash_player_str:    .asciiz "Flash Player    "
+flash_player_options:
+        .byte 2
+        .addr off_str
+        .addr on_str
 
 options_pal_default_base:    .incbin "../art/palettes/options/base.pal"
 options_pal_protan_base:     .incbin "../art/palettes/options/protan.pal"

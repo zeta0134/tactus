@@ -1,6 +1,7 @@
         .include "../build/tile_defs.inc"        
         .include "_globals.inc"
 
+        .include "beat_tracker.inc"
         .include "dialog.inc"
         .include "dynamic_palette.inc"
         .include "far_call.inc"
@@ -9,6 +10,7 @@
         .include "nes.inc"
         .include "prng.inc"
         .include "rainbow.inc"
+        .include "saves.inc"
         .include "sound.inc"
         .include "sprites.inc"
         .include "word_util.inc"
@@ -129,6 +131,46 @@ border_loop:
         rts
 .endproc
 
+separator_inner_rhythm_lut:
+        .byte $50
+        .byte $40
+        .byte $30
+        .byte $20
+        .byte $10
+        .byte $00
+        .byte $00
+        .byte $00
+
+separator_outer_rhythm_lut:
+        .byte $40
+        .byte $30
+        .byte $20
+        .byte $10
+        .byte $00
+        .byte $00
+        .byte $00
+        .byte $00
+
+.proc update_rhythm_assist
+        lda current_save + SaveFile::OptionRhythmFlashBar
+        beq no_rhythm_separator
+
+        ; For the rhythm separator, we ignore the dialog state entirely and
+        ; instead render the CURRENT musical beat, just like the rest of the hud
+        ldx TrackedMusicPos
+        lda tracked_row_buffer, x
+        tax
+        lda separator_inner_rhythm_lut, x
+        sta HudSeparatorPal+1
+        lda separator_outer_rhythm_lut, x
+        sta HudSeparatorPal+0
+        sta HudSeparatorPal+2
+        lda #1
+        sta StagingHudPaletteDirty
+no_rhythm_separator:
+        rts
+.endproc
+
 .proc state_wait_for_activation
         ; Now the separator has real brightness, so we can just write a colorspace
         ; to it directly
@@ -221,7 +263,7 @@ done:
         lda #$00
         sta HudSeparatorPal+0
         sta HudSeparatorPal+2
-        lda #$10
+        lda HudBgPal1+0       ; darkest grey shade in the hud area, works around colorspace issues
         sta HudSeparatorPal+1
         sta StagingHudPaletteDirty
 
