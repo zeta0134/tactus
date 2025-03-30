@@ -5,6 +5,7 @@
         .include "battlefield.inc"
         .include "beat_tracker.inc"
         .include "chr.inc"
+        .include "dialog.inc"
         .include "dynamic_palette.inc"
         .include "enemies.inc"
         .include "far_call.inc"

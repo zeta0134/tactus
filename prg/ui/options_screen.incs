@@ -379,6 +379,16 @@ widget_cursor_nav_index := widgets_data1
         rts
 stay_here:
 
+        ; Update the separator colors, just like we do during standard gameplay,
+        ; but use "off" as the resting state
+        lda #$00
+        sta HudSeparatorPal+0
+        sta HudSeparatorPal+1
+        sta HudSeparatorPal+2
+        lda #1
+        sta StagingHudPaletteDirty
+        far_call update_rhythm_assist
+
         rts
 .endproc
 
