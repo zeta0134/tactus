@@ -212,6 +212,7 @@ done:
 WidgetIndex := R0
         ldx SubLayoutIndex
 cleanup_flag_loop:
+        perform_zpcm_inc
         lda widgets_state_flags, x
         ora #WIDGET_STATE_CLEANUP_REQUESTED
         sta widgets_state_flags, x
@@ -222,6 +223,7 @@ cleanup_flag_loop:
         lda #1
         sta SubLayoutRequested
         
+        perform_zpcm_inc
         rts
 .endproc
 

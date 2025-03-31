@@ -32,8 +32,14 @@ title_ui_layout:
         far_call FAR_set_title_exbg
 
         ; The title screen should apply the last player palette that was
-        ; used, for consistency (and so we don't have a "preferred" skin tone)
-        far_call FAR_apply_player_palette
+        ; used, for consistency (and so we don't have a "preferred" skin tone)        
+        lda player_palettes_phones+PLAYER_PALETTE_NORMAL
+        sta PlayfieldObjPal0+0, x
+        lda player_palettes_pajamas+PLAYER_PALETTE_NORMAL
+        sta PlayfieldObjPal0+1, x
+        lda player_palettes_pigment+PLAYER_PALETTE_NORMAL
+        sta PlayfieldObjPal0+2, x
+
         lda #1
         sta StagingObjPaletteDirty
 

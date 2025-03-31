@@ -804,6 +804,9 @@ draw_regular_minimap_here:
         adc DrawTile
         sta DrawTile
 done_considering_exits:
+
+        perform_zpcm_inc
+
         ; If this is an identified tile, AND it's a special tile type, add the appropriate
         ; row offset
         lda room_minimap_state, x
@@ -844,6 +847,9 @@ add_shop_offset:
         sta DrawTile
         jmp done_with_special_tiles
 done_with_special_tiles:
+
+        perform_zpcm_inc
+
         ; If we are currently here, add the "here" offset
         lda PlayerRoomIndex
         cmp RoomIndex
@@ -896,6 +902,7 @@ proceed_to_draw:
 ; yeah just keep going until it's all done. eat the lag, it's fine, this happens
 ; really infrequently!
 draw_loop:
+        perform_zpcm_inc
         lda CurrentMapIndex
         sta RoomIndex
         jsr draw_minimap_tile

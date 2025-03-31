@@ -406,6 +406,7 @@ PalettePtr := R2
 PaletteTablePtr := R4
 PaletteTableBank := R6
 PaletteOffset := R8
+        perform_zpcm_inc
 
         ; Prep the table pointer from the room data structure
         ldy #Room::BgPaletteTablePtr
@@ -443,6 +444,8 @@ PaletteOffset := R8
         iny
         lda (PaletteTablePtr), y
         sta PalettePtr+1
+
+        perform_zpcm_inc
         
         ; The palette data is always colocated with its table, so copy that into place here:
 
@@ -458,6 +461,8 @@ bg_loop:
         far_call FAR_set_bg_target_palette_from_hw
 
         restore_previous_bank
+
+        perform_zpcm_inc
 
         ; Do it all again for the obj palette
         ; Prep the table pointer from the room data structure
@@ -481,6 +486,8 @@ bg_loop:
         sta PaletteOffset
         ; The object palette isn't affected by magic spells, so we're done with that.
         ; Proceed to load the data
+
+        perform_zpcm_inc
 
         ; Now we're ready to bank in the data table and read the palette pointer
         access_data_bank PaletteTableBank

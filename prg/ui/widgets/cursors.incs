@@ -278,6 +278,7 @@ update_at_active_position:
         ; tell the widget we're pointing at that it should become
         ; "hovered", whatever that widget thinks that means
         near_call FAR_set_hover_state
+        perform_zpcm_inc
         rts
 .endproc
 

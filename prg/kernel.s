@@ -673,6 +673,7 @@ LayoutPtr := R0
 
         ; Clear out any other lingering state
         far_call FAR_init_bomb_state
+        perform_zpcm_inc
 
         ; As a hack, draw the entire floor right now (we don't have
         ; the usual active_queue to draw for us)
@@ -813,10 +814,13 @@ not_too_high:
 
         ; Clear out any other lingering state
         far_call FAR_init_bomb_state
+        perform_zpcm_inc
 
         far_call FAR_reset_price_tracker
+        perform_zpcm_inc
 
         far_call FAR_reset_palette_warp_tile
+        perform_zpcm_inc
 
         ; Draw the entire target floor right now!
         ; This will cause a couple of frames of lag. We should

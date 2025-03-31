@@ -77,6 +77,7 @@ obj_loop:
 
         perform_zpcm_inc
         far_call FAR_set_obj_palette_from_hw
+        perform_zpcm_inc
 
         ldx #0
 bg_loop:
@@ -89,6 +90,7 @@ bg_loop:
         perform_zpcm_inc
         far_call FAR_set_bg_target_palette_from_hw
         far_call FAR_set_bg_current_palette_from_target
+        perform_zpcm_inc
 
         ldx #0
 hud_bg_loop:
@@ -101,6 +103,7 @@ hud_bg_loop:
 
         perform_zpcm_inc
         far_call FAR_set_hud_bg_palette_from_hw
+        perform_zpcm_inc
 
         ldx #0
 hud_obj_loop:
@@ -113,6 +116,7 @@ hud_obj_loop:
 
         perform_zpcm_inc
         far_call FAR_set_hud_obj_palette_from_hw
+        perform_zpcm_inc
 
         rts
 .endproc
@@ -131,6 +135,7 @@ obj_loop:
 
         perform_zpcm_inc
         far_call FAR_set_obj_palette_from_hw
+        perform_zpcm_inc
 
         ldx #0
 bg_loop:
@@ -143,6 +148,7 @@ bg_loop:
         perform_zpcm_inc
         far_call FAR_set_bg_target_palette_from_hw
         far_call FAR_set_bg_current_palette_from_target
+        perform_zpcm_inc
 
         rts
 .endproc

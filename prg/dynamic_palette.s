@@ -232,6 +232,7 @@ hw_pal_loop:
         sta HudBackdrop
         ldx #0
 intermediate_pal_loop:
+        perform_zpcm_inc
         sta CurrentPlayfieldBgPal0, x
         sta CurrentPlayfieldBgPal1, x
         sta CurrentPlayfieldBgPal2, x
@@ -253,6 +254,7 @@ intermediate_pal_loop:
         inx
         cpx #3
         bne intermediate_pal_loop
+        perform_zpcm_inc
 
         sta BrightnessDelay
         lda #BRIGHTNESS_FULLY_DARK
@@ -264,6 +266,7 @@ intermediate_pal_loop:
 
         st16 PaletteStateFunc, palette_state_bgstep_01
 
+        perform_zpcm_inc
         rts
 .endproc
 
@@ -274,6 +277,7 @@ intermediate_pal_loop:
 
 ; Set the target when you want to smoothly fade from the current palette
 .proc FAR_set_bg_target_palette_from_hw
+    perform_zpcm_inc
     lda IncomingHwPalette+0
     tax
     lda hw_to_intermediate_equivalence_lut, x
@@ -299,6 +303,8 @@ intermediate_pal_loop:
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal1+2
 
+    perform_zpcm_inc
+
     ldx IncomingHwPalette+9
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal2+0
@@ -319,11 +325,13 @@ intermediate_pal_loop:
     lda hw_to_intermediate_equivalence_lut, x
     sta TargetPlayfieldBgPal3+2
 
+    perform_zpcm_inc
     rts
 .endproc
 
 ; Set both when you need the change to be instant (ish)
 .proc FAR_set_bg_current_palette_from_target
+    perform_zpcm_inc
     lda TargetPlayfieldBackdrop
     sta CurrentPlayfieldBackdrop
     lda TargetPlayfieldBgPal0+0
@@ -336,6 +344,7 @@ intermediate_pal_loop:
     sta CurrentPlayfieldBgPal1+0
     lda TargetPlayfieldBgPal1+1
     sta CurrentPlayfieldBgPal1+1
+    perform_zpcm_inc
     lda TargetPlayfieldBgPal1+2
     sta CurrentPlayfieldBgPal1+2
     lda TargetPlayfieldBgPal2+0
@@ -352,11 +361,13 @@ intermediate_pal_loop:
     sta CurrentPlayfieldBgPal3+2
 
     inc StagingBgPaletteDirty
+    perform_zpcm_inc
     rts
 .endproc
 
 ; Obj and HUD palettes don't have a current/target setup, it's too expensive
 .proc FAR_set_obj_palette_from_hw
+    perform_zpcm_inc
     ldx IncomingHwPalette+1
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal0+0
@@ -376,6 +387,8 @@ intermediate_pal_loop:
     ldx IncomingHwPalette+7
     lda hw_to_intermediate_equivalence_lut, x
     sta PlayfieldObjPal1+2
+
+    perform_zpcm_inc
 
     ldx IncomingHwPalette+9
     lda hw_to_intermediate_equivalence_lut, x
@@ -398,10 +411,12 @@ intermediate_pal_loop:
     sta PlayfieldObjPal3+2
 
     inc StagingObjPaletteDirty
+    perform_zpcm_inc
     rts
 .endproc
 
 .proc FAR_set_hud_bg_palette_from_hw
+    perform_zpcm_inc
     ldx IncomingHwPalette+0
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBackdrop
@@ -426,6 +441,8 @@ intermediate_pal_loop:
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal1+2
 
+    perform_zpcm_inc
+
     ldx IncomingHwPalette+9
     lda hw_to_intermediate_equivalence_lut, x
     sta HudBgPal2+0
@@ -447,10 +464,12 @@ intermediate_pal_loop:
     sta HudBgPal3+2
 
     inc StagingHudPaletteDirty
+    perform_zpcm_inc
     rts
 .endproc
 
 .proc FAR_set_hud_obj_palette_from_hw
+    perform_zpcm_inc
     ldx IncomingHwPalette+1
     lda hw_to_intermediate_equivalence_lut, x
     sta HudObjPal0+0
@@ -462,10 +481,12 @@ intermediate_pal_loop:
     sta HudObjPal0+2
 
     inc StagingHudPaletteDirty
+    perform_zpcm_inc
     rts
 .endproc
 
 .proc FAR_set_hud_separator_palette_from_hw
+    perform_zpcm_inc
     ldx IncomingHwPalette+1
     lda hw_to_intermediate_equivalence_lut, x
     sta HudSeparatorPal+0
@@ -476,6 +497,7 @@ intermediate_pal_loop:
     lda hw_to_intermediate_equivalence_lut, x
     sta HudSeparatorPal+2
     inc StagingHudPaletteDirty
+    perform_zpcm_inc
     rts
 .endproc
 
@@ -542,6 +564,7 @@ LuminenceSteps := R3
 Scratch := R15
 
 hue_loop:
+    perform_zpcm_inc
     lda HueSteps
     beq done_with_hue
     jsr step_hue
@@ -550,12 +573,15 @@ hue_loop:
 done_with_hue:
 
 luminence_loop:
+    perform_zpcm_inc
     lda LuminenceSteps
     beq done_with_luminence
     jsr step_luminence
     dec LuminenceSteps
     jmp luminence_loop
 done_with_luminence:
+
+    perform_zpcm_inc
     rts
 .endproc
 
@@ -590,6 +616,8 @@ done_with_backdrop:
     sta CurrentPlayfieldBgPal0+0
     inc StagingBgPaletteDirty
 done_with_entry_0:
+
+    perform_zpcm_inc
 
     lda CurrentPlayfieldBgPal0+1
     cmp TargetPlayfieldBgPal0+1
@@ -649,6 +677,8 @@ done_with_entry_0:
     inc StagingBgPaletteDirty
 done_with_entry_1:
 
+    perform_zpcm_inc
+
     lda CurrentPlayfieldBgPal1+2
     cmp TargetPlayfieldBgPal1+2
     beq done_with_entry_2
@@ -694,6 +724,8 @@ done_with_entry_0:
     inc StagingBgPaletteDirty
 done_with_entry_1:
 
+    perform_zpcm_inc
+
     lda CurrentPlayfieldBgPal2+2
     cmp TargetPlayfieldBgPal2+2
     beq done_with_entry_2
@@ -738,6 +770,8 @@ done_with_entry_0:
     sta CurrentPlayfieldBgPal3+1
     inc StagingBgPaletteDirty
 done_with_entry_1:
+
+    perform_zpcm_inc
 
     lda CurrentPlayfieldBgPal3+2
     cmp TargetPlayfieldBgPal3+2
@@ -841,6 +875,8 @@ use_greyscale:
 
 .proc compute_staging_bg_palette
 HardwarePalLutPtr := R0
+    perform_zpcm_inc
+
     lda StagingBgPaletteDirty
     bne do_the_work
     rts
@@ -878,6 +914,9 @@ do_the_work:
     lda (HardwarePalLutPtr), y
     sta staging_palette+7
 
+    perform_zpcm_inc
+
+
     ldy CurrentPlayfieldBgPal2+0
     lda (HardwarePalLutPtr), y
     sta staging_palette+9
@@ -898,12 +937,14 @@ do_the_work:
     lda (HardwarePalLutPtr), y
     sta staging_palette+15
 
+    perform_zpcm_inc
     rts
 .endproc
 
 ; Separated out because the HUD often doesn't need to
 .proc compute_staging_obj_palette
 HardwarePalLutPtr := R0
+    perform_zpcm_inc
     lda StagingObjPaletteDirty
     bne do_the_work
     rts
@@ -937,6 +978,8 @@ do_the_work:
     lda (HardwarePalLutPtr), y
     sta staging_palette+23
 
+    perform_zpcm_inc
+
     ldy PlayfieldObjPal2+0
     lda (HardwarePalLutPtr), y
     sta staging_palette+25
@@ -957,11 +1000,15 @@ do_the_work:
     lda (HardwarePalLutPtr), y
     sta staging_palette+31
 
+    perform_zpcm_inc
+
     rts
 .endproc
 
 .proc compute_staging_hud_palette
 HardwarePalLutPtr := R0
+    perform_zpcm_inc
+
     lda StagingHudPaletteDirty
     bne do_the_work
     rts
@@ -998,6 +1045,8 @@ do_the_work:
     ldy HudBgPal1+2
     lda (HardwarePalLutPtr), y
     sta HudStagingPalette+7
+
+    perform_zpcm_inc
 
     ldy HudBgPal2+0
     lda (HardwarePalLutPtr), y
@@ -1042,6 +1091,7 @@ do_the_work:
     sta staging_palette+12 ; TODO: redundant?
     sta staging_palette+28
 
+    perform_zpcm_inc
     rts
 .endproc
 
@@ -1078,24 +1128,34 @@ done:
 .endproc
 
 .proc palette_state_bgstep_01
+    perform_zpcm_inc
     jsr step_bg0_color
+    perform_zpcm_inc
     jsr step_bg1_color
+    perform_zpcm_inc
     jsr update_brightness
+    perform_zpcm_inc
     jsr compute_staging_bg_palette
     jsr compute_staging_obj_palette
     jsr compute_staging_hud_palette
     st16 PaletteStateFunc, palette_state_bgstep_23
+    perform_zpcm_inc
     rts
 .endproc
 
 .proc palette_state_bgstep_23
+    perform_zpcm_inc
     jsr step_bg2_color
+    perform_zpcm_inc
     jsr step_bg3_color
+    perform_zpcm_inc
     jsr update_brightness
+    perform_zpcm_inc
     jsr compute_staging_bg_palette
     jsr compute_staging_obj_palette
     jsr compute_staging_hud_palette
     st16 PaletteStateFunc, palette_state_bgstep_01
+    perform_zpcm_inc
     rts
 .endproc
 

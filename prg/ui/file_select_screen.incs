@@ -304,6 +304,7 @@ widget_file_select_mode := widgets_data0
         lda widget_file_select_mode, y
         asl
         tay
+        perform_zpcm_inc
         lda file_action_dispatch_table+0, y
         sta DispatchPtr+0
         lda file_action_dispatch_table+1, y

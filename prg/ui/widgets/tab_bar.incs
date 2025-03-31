@@ -69,6 +69,7 @@ widget_tile_x            := widgets_data0
 widget_tile_y            := widgets_data1
 widget_current_tab_index := widgets_data2
 
+        perform_zpcm_inc
         ldx CurrentWidgetIndex
         ldy widget_current_tab_index, x
         lda tab_bar_tile_ptr_lut_low, y
@@ -86,6 +87,7 @@ widget_current_tab_index := widgets_data2
 
         ldy #0
 draw_loop:
+        perform_zpcm_inc
         lda (TilePtr), y
         sta (NametableAddr), y
         ; TODO: color?
@@ -94,6 +96,8 @@ draw_loop:
         iny
         cpy #128
         bne draw_loop
+
+        perform_zpcm_inc
 
         ; set our cursor position based on the leftmost tile position
         ldx CurrentWidgetIndex
@@ -113,6 +117,7 @@ draw_loop:
         adc #9
         sta widgets_cursor_pos_y, x
 
+        perform_zpcm_inc
         rts        
 .endproc
 
