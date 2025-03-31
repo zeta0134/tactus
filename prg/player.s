@@ -4,6 +4,7 @@
         .include "_globals.inc"
 
         .include "battlefield.inc"
+        .include "beat_tracker.inc"
         .include "bombs.inc"
         .include "dialog.inc"
         .include "debug.inc"
@@ -406,6 +407,9 @@ damage_flash_lut:
         beq light_palette
         ; fall through to normal pal
 normal_palette:
+        ; If we are in rhythm assist mode, then do the flash thing
+        lda current_save + SaveFile::OptionRhythmFlashPlayer
+        bne apply_rhythm_assist
         lda player_palettes_phones+PLAYER_PALETTE_NORMAL
         sta PlayfieldObjPal0+0
         lda player_palettes_pajamas+PLAYER_PALETTE_NORMAL
@@ -428,6 +432,21 @@ light_palette:
         sta PlayfieldObjPal0+1
         lda player_palettes_pigment+PLAYER_PALETTE_DAMAGE_LIGHT
         sta PlayfieldObjPal0+2
+        rts
+apply_rhythm_assist:
+        ; rhythm assist always uses the current tracked beat's animation frame, out of the
+        ; 8 possible rows
+        ldx TrackedMusicPos
+        lda tracked_row_buffer, x
+        tax
+        lda player_palettes_phones+PLAYER_PALETTE_RHYTHM_ASSIST, x
+        sta PlayfieldObjPal0+0
+        lda player_palettes_pajamas+PLAYER_PALETTE_RHYTHM_ASSIST, x
+        sta PlayfieldObjPal0+1
+        lda player_palettes_pigment+PLAYER_PALETTE_RHYTHM_ASSIST, x
+        sta PlayfieldObjPal0+2
+        lda #1
+        sta StagingObjPaletteDirty
         rts
 .endproc
 

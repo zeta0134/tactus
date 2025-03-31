@@ -546,6 +546,7 @@ hue_loop:
     beq done_with_hue
     jsr step_hue
     dec HueSteps
+    jmp hue_loop
 done_with_hue:
 
 luminence_loop:
@@ -553,6 +554,7 @@ luminence_loop:
     beq done_with_luminence
     jsr step_luminence
     dec LuminenceSteps
+    jmp luminence_loop
 done_with_luminence:
     rts
 .endproc

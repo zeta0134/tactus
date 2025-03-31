@@ -296,12 +296,13 @@ derived_color_mod_table:
     .byte             $00,      0,      1,           $00,      0,      1,            $00,      0,      1 ; Title Dark
     .byte             $55,      6,      2,           $55,      6,      2,            $55,      6,      2 ; Damage Light ; TODO: should this be an 8-step ramp also?
     .byte             $05,      6,      1,           $05,      6,      1,            $05,      6,      1 ; Damage Dark
-    .byte             $50,      0,      2,           $50,      0,      2,            $50,      0,      2 ; Rhythm Assist - 0
-    .byte             $50,      0,      2,           $50,      0,      2,            $50,      0,      1 ; Rhythm Assist - 1
-    .byte             $50,      0,      2,           $50,      0,      1,            $50,      0,      1 ; Rhythm Assist - 2
+
+    .byte             $50,      0,      3,           $50,      0,      3,            $50,      0,      3 ; Rhythm Assist - 0
+    .byte             $50,      0,      2,           $50,      0,      2,            $50,      0,      2 ; Rhythm Assist - 1
+    .byte             $50,      0,      1,           $50,      0,      1,            $50,      0,      1 ; Rhythm Assist - 2
     .byte             $50,      0,      1,           $50,      0,      1,            $50,      0,      1 ; Rhythm Assist - 3
-    .byte             $50,      0,      1,           $50,      0,      1,            $50,      0,      0 ; Rhythm Assist - 4
-    .byte             $50,      0,      1,           $50,      0,      0,            $50,      0,      0 ; Rhythm Assist - 5
+    .byte             $50,      0,      0,           $50,      0,      0,            $50,      0,      0 ; Rhythm Assist - 4
+    .byte             $50,      0,      0,           $50,      0,      0,            $50,      0,      0 ; Rhythm Assist - 5
     .byte             $50,      0,      0,           $50,      0,      0,            $50,      0,      0 ; Rhythm Assist - 6
     .byte             $50,      0,      0,           $50,      0,      0,            $50,      0,      0 ; Rhythm Assist - 7
     .byte $FF ; end of list
@@ -335,9 +336,9 @@ loop:
     lda (TablePtr), y
     sta LuminenceSteps
     far_call FAR_step_towards_target
-    lda TargetColor
+    lda CurrentColor
     ldx PaletteIndex
-    lda player_palettes_phones, x
+    sta player_palettes_phones, x
     ; Pajamas!
     lda player_palettes_pajamas+0
     sta CurrentColor
@@ -351,9 +352,9 @@ loop:
     lda (TablePtr), y
     sta LuminenceSteps
     far_call FAR_step_towards_target
-    lda TargetColor
+    lda CurrentColor
     ldx PaletteIndex
-    lda player_palettes_pajamas, x
+    sta player_palettes_pajamas, x
     ; Pigment!
     lda player_palettes_pigment+0
     sta CurrentColor
@@ -367,9 +368,9 @@ loop:
     lda (TablePtr), y
     sta LuminenceSteps
     far_call FAR_step_towards_target
-    lda TargetColor
+    lda CurrentColor
     ldx PaletteIndex
-    lda player_palettes_pigment, x
+    sta player_palettes_pigment, x
     ; Looping!
     add16b TablePtr, #9
     inc PaletteIndex
