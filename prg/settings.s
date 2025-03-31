@@ -291,20 +291,20 @@ DARKEN_BY  = $00
 LIGHTEN_BY = $50
 
 derived_color_mod_table:
-          ; PHONES target, h.step, l.step PAJAMAS target, h.step, l.step PIGMENT  target, h.step, l.step
-    .byte             $50,      0,      1,           $50,      0,      1,            $50,      0,      1 ; Title Light
-    .byte             $00,      0,      1,           $00,      0,      1,            $00,      0,      1 ; Title Dark
-    .byte             $55,      6,      2,           $55,      6,      2,            $55,      6,      2 ; Damage Light ; TODO: should this be an 8-step ramp also?
-    .byte             $05,      6,      1,           $05,      6,      1,            $05,      6,      1 ; Damage Dark
-
-    .byte             $50,      0,      3,           $50,      0,      3,            $50,      0,      3 ; Rhythm Assist - 0
-    .byte             $50,      0,      2,           $50,      0,      2,            $50,      0,      2 ; Rhythm Assist - 1
-    .byte             $50,      0,      1,           $50,      0,      1,            $50,      0,      1 ; Rhythm Assist - 2
-    .byte             $50,      0,      1,           $50,      0,      1,            $50,      0,      1 ; Rhythm Assist - 3
-    .byte             $50,      0,      0,           $50,      0,      0,            $50,      0,      0 ; Rhythm Assist - 4
-    .byte             $50,      0,      0,           $50,      0,      0,            $50,      0,      0 ; Rhythm Assist - 5
-    .byte             $50,      0,      0,           $50,      0,      0,            $50,      0,      0 ; Rhythm Assist - 6
-    .byte             $50,      0,      0,           $50,      0,      0,            $50,      0,      0 ; Rhythm Assist - 7
+          ; PHONES                  PAJAMAS                  PIGMENT
+          ; target, h.step, l.step  target, h.step, l.step   target, h.step, l.step
+    .byte      $50,      0,      1,    $50,      0,      1,     $50,      0,      1 ; Title Light
+    .byte      $00,      0,      1,    $00,      0,      1,     $00,      0,      1 ; Title Dark
+    .byte      $55,      6,      2,    $55,      6,      2,     $55,      6,      2 ; Damage Light
+    .byte      $05,      6,      1,    $05,      6,      1,     $05,      6,      1 ; Damage Dark
+    .byte      $50,      0,      3,    $50,      0,      3,     $50,      0,      3 ; Rhythm Assist - 0
+    .byte      $50,      0,      2,    $50,      0,      2,     $50,      0,      2 ; Rhythm Assist - 1
+    .byte      $50,      0,      1,    $50,      0,      1,     $50,      0,      1 ; Rhythm Assist - 2
+    .byte      $50,      0,      1,    $50,      0,      1,     $50,      0,      1 ; Rhythm Assist - 3
+    .byte      $50,      0,      0,    $50,      0,      0,     $50,      0,      0 ; Rhythm Assist - 4
+    .byte      $50,      0,      0,    $50,      0,      0,     $50,      0,      0 ; Rhythm Assist - 5
+    .byte      $50,      0,      0,    $50,      0,      0,     $50,      0,      0 ; Rhythm Assist - 6
+    .byte      $50,      0,      0,    $50,      0,      0,     $50,      0,      0 ; Rhythm Assist - 7
     .byte $FF ; end of list
 
 
