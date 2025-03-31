@@ -178,6 +178,7 @@ no_rhythm_separator:
         sta HudSeparatorPal+0
         sta HudSeparatorPal+1
         sta HudSeparatorPal+2
+        lda #1
         sta StagingHudPaletteDirty
 
         perform_zpcm_inc

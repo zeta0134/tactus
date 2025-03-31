@@ -1,3 +1,5 @@
+    .macpack longbranch
+
     .include "../build/tile_defs.inc"
 
     .include "_globals.inc"
@@ -8,6 +10,7 @@
     .include "rainbow.inc"
     .include "saves.inc"
     .include "settings.inc"
+    .include "word_util.inc"
     .include "zeropage.inc"
     .include "zpcm.inc"
 
@@ -17,40 +20,8 @@
 ; to which most states return. Everything else is derived from
 ; this as a starting point.
 
-;player_ingame_palette_pigment: .res 1
-;player_ingame_palette_phones: .res 1
-;player_ingame_palette_pajamas: .res 1
-
-;player_damage_light_palette_pigment: .res 1
-;player_damage_light_palette_phones: .res 1
-;player_damage_light_palette_pajamas: .res 1
-
-;player_damage_dark_palette_pigment: .res 1
-;player_damage_dark_palette_phones: .res 1
-;player_damage_dark_palette_pajamas: .res 1
-
-;player_title_palette_pigment_dark: .res 1
-;player_title_palette_pigment_medium: .res 1
-;player_title_palette_phones_dark: .res 1
-;player_title_palette_phones_medium: .res 1
-;player_title_palette_phones_light: .res 1
-;player_title_palette_pajamas_dark: .res 1
-;player_title_palette_pajamas_medium: .res 1
-;player_title_palette_pajamas_light: .res 1
-
-player_ingame_palette_pigment:
-player_damage_light_palette_pigment:
-player_damage_dark_palette_pigment:
 player_palettes_pigment: .res 64
-
-player_ingame_palette_phones:
-player_damage_light_palette_phones:
-player_damage_dark_palette_phones:
 player_palettes_phones:  .res 64
-
-player_ingame_palette_pajamas:
-player_damage_light_palette_pajamas:
-player_damage_dark_palette_pajamas:
 player_palettes_pajamas: .res 64
 
     .segment "PRGFIXED_E000"
@@ -59,25 +30,10 @@ player_palettes_pajamas: .res 64
 ; and they are not large
 ; TODO okay that is a lie, can we move these to a data segment?
 
-; From this original set:
-;    .byte 0, 10, 19, 21 ; orig: $0f,$12,$26,$37  ; Peony
-;    .byte 0, 50, 36, 22 ; orig: $0f,$1c,$3c,$27  ; Periwinkle
-;    .byte 0, 23, 10, 20 ; orig: $0f,$05,$23,$16  ; Petunia
-;    .byte 0, 26, 22, 15 ; orig: $0f,$16,$27,$35  ; Protea
-; Indexing into the above tables as appropriate, we obtain:
-
 ; new, with a shared lut
 palette_preset_lut_phones:  .byte  0, 14, 24,  5, 18, 17
 palette_preset_lut_pajamas: .byte  0, 31, 50, 28, 32, 26
 palette_preset_lut_pigment: .byte  0, 45, 32, 18, 43, 44
-
-; old, pre-condensing of the lut
-; palette_preset_lut_pajamas: .byte 0, 18, 37, 15, 19, 13
-; palette_preset_lut_phones:  .byte 0, 14, 24,  5, 18, 17
-; palette_preset_lut_pigment: .byte 0, 32, 19,  5, 30, 31
-
-
-
 
     .segment "CODE_2"
 
@@ -86,27 +42,6 @@ player_colors_lut:
     .byte $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $20 ;  (0) (13)
     .byte $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30 ; (13) (26)
     .byte $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $50 ; (26) (39)
-
-player_dmg_dark_colors_lut:
-    .byte $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00, $00 
-    .byte $15, $15, $15, $15, $15, $15, $15, $15, $15, $15, $15, $15, $15 ;  (-)  (0)
-    .byte $25, $25, $25, $25, $25, $25, $25, $25, $25, $25, $25, $25, $25 ;  (0) (13)
-    .byte $35, $35, $35, $35, $35, $35, $35, $35, $35, $35, $35, $35, $35 ; (13) (26)
-
-; New: +2 stages
-player_dmg_light_colors_lut:
-    .byte $36, $36, $36, $36, $36, $36, $36, $36, $36, $36, $36, $36, $36 ;  (-)  (0)
-    .byte $46, $46, $46, $46, $46, $46, $46, $46, $46, $46, $46, $46, $46 ;  (0) (13)
-    .byte $50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50 ; (13) (26)
-    .byte $50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50, $50 ; (26) (39)
-
-; Accessories span the full range. For the very lowest shade we run with solid black,
-; and for black itself we lose some detail so that it reads as intended.
-; (eventually we can replace this whole lookup table with the "step luminence up/down" functions, I think)
-player_title_colors_lut:
-    .byte $00, $01, $02, $03, $04, $05, $06, $07, $08, $09, $0A, $0B, $0C, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C, $10, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $20, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30
-    .byte $00, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $21, $22, $23, $24, $25, $26, $27, $28, $29, $2A, $2B, $2C, $20, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $50
-    .byte $10, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $31, $32, $33, $34, $35, $36, $37, $38, $39, $3A, $3B, $3C, $30, $41, $42, $43, $44, $45, $46, $47, $48, $49, $4A, $4B, $4C, $50, $51, $52, $53, $54, $55, $56, $57, $58, $59, $5A, $5B, $5C, $50
 
 ; For the actively loaded file, initialize all options to their
 ; default values. This is meant to be used just after clicking
@@ -331,27 +266,6 @@ compute_file_3:
     rts
 .endproc
 
-; this is gon' be real repetitive otherwise
-.macro tweak_color source_byte, target_byte, target_hue, hue_steps, target_lum, lum_steps
-.scope
-CurrentColor := R0
-TargetColor := R1
-HueSteps := R2
-LuminenceSteps := R3
-    lda source_byte
-    sta CurrentColor
-    lda #(target_hue | target_lum)
-    sta TargetColor
-    lda #hue_steps
-    sta HueSteps
-    lda #lum_steps
-    sta LuminenceSteps
-    far_call FAR_step_towards_target
-    lda TargetColor
-    sta target_byte
-.endscope
-.endmacro
-
 COLOR_0_BY = $00
 COLOR_1_BY = $01
 COLOR_2_BY = $02
@@ -377,10 +291,95 @@ DARKEN_BY  = $00
 LIGHTEN_BY = $50
 
 derived_color_mod_table:
-          ; target, hue steps, luminence steps
-    .byte $00
+          ; PHONES target, h.step, l.step PAJAMAS target, h.step, l.step PIGMENT  target, h.step, l.step
+    .byte             $50,      0,      1,           $50,      0,      1,            $50,      0,      1 ; Title Light
+    .byte             $00,      0,      1,           $00,      0,      1,            $00,      0,      1 ; Title Dark
+    .byte             $55,      6,      2,           $55,      6,      2,            $55,      6,      2 ; Damage Light ; TODO: should this be an 8-step ramp also?
+    .byte             $05,      6,      1,           $05,      6,      1,            $05,      6,      1 ; Damage Dark
+    .byte             $50,      0,      2,           $50,      0,      2,            $50,      0,      2 ; Rhythm Assist - 0
+    .byte             $50,      0,      2,           $50,      0,      2,            $50,      0,      1 ; Rhythm Assist - 1
+    .byte             $50,      0,      2,           $50,      0,      1,            $50,      0,      1 ; Rhythm Assist - 2
+    .byte             $50,      0,      1,           $50,      0,      1,            $50,      0,      1 ; Rhythm Assist - 3
+    .byte             $50,      0,      1,           $50,      0,      1,            $50,      0,      0 ; Rhythm Assist - 4
+    .byte             $50,      0,      1,           $50,      0,      0,            $50,      0,      0 ; Rhythm Assist - 5
+    .byte             $50,      0,      0,           $50,      0,      0,            $50,      0,      0 ; Rhythm Assist - 6
+    .byte             $50,      0,      0,           $50,      0,      0,            $50,      0,      0 ; Rhythm Assist - 7
+    .byte $FF ; end of list
+
 
 .proc _compute_derived_colors
+; used by hue/luminence stepping functions
+CurrentColor := R0
+TargetColor := R1
+HueSteps := R2
+LuminenceSteps := R3
+
+TablePtr   := R4
+PaletteIndex := R6
+; R15 is used/clobbered by hue stepping routines
+
+    st16 TablePtr, derived_color_mod_table
+    lda #1 ; skip past entry 0, which is our "normal" palette upon which all others are based
+    sta PaletteIndex
+loop:
+    ; Phones!
+    lda player_palettes_phones+0
+    sta CurrentColor
+    ldy #0
+    lda (TablePtr), y
+    sta TargetColor
+    iny
+    lda (TablePtr), y
+    sta HueSteps
+    iny
+    lda (TablePtr), y
+    sta LuminenceSteps
+    far_call FAR_step_towards_target
+    lda TargetColor
+    ldx PaletteIndex
+    lda player_palettes_phones, x
+    ; Pajamas!
+    lda player_palettes_pajamas+0
+    sta CurrentColor
+    ldy #3
+    lda (TablePtr), y
+    sta TargetColor
+    iny
+    lda (TablePtr), y
+    sta HueSteps
+    iny
+    lda (TablePtr), y
+    sta LuminenceSteps
+    far_call FAR_step_towards_target
+    lda TargetColor
+    ldx PaletteIndex
+    lda player_palettes_pajamas, x
+    ; Pigment!
+    lda player_palettes_pigment+0
+    sta CurrentColor
+    ldy #6
+    lda (TablePtr), y
+    sta TargetColor
+    iny
+    lda (TablePtr), y
+    sta HueSteps
+    iny
+    lda (TablePtr), y
+    sta LuminenceSteps
+    far_call FAR_step_towards_target
+    lda TargetColor
+    ldx PaletteIndex
+    lda player_palettes_pigment, x
+    ; Looping!
+    add16b TablePtr, #9
+    inc PaletteIndex
+    ldy #0
+    lda (TablePtr), y
+    cmp #$FF
+    jne loop
+
+    ; Whew!
+
     rts
 .endproc
 

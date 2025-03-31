@@ -416,11 +416,11 @@ draw_existing_file:
         lda player_palette_offset_by_file_id, x
         tax
         ; and transfer!
-        lda player_ingame_palette_phones
+        lda player_palettes_phones+PLAYER_PALETTE_NORMAL
         sta PlayfieldObjPal0+0, x
-        lda player_ingame_palette_pajamas
+        lda player_palettes_pajamas+PLAYER_PALETTE_NORMAL
         sta PlayfieldObjPal0+1, x
-        lda player_ingame_palette_pigment
+        lda player_palettes_pigment+PLAYER_PALETTE_NORMAL
         sta PlayfieldObjPal0+2, x
         lda #1
         sta StagingObjPaletteDirty

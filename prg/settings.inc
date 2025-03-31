@@ -7,25 +7,18 @@
 .global palette_preset_lut_pajamas
 .global palette_preset_lut_pigment
 
-; the actual palette colors, which are expensive to compute
-; so we do it way ahead of gameplay
-.global player_ingame_palette_pigment
-.global player_ingame_palette_phones
-.global player_ingame_palette_pajamas
-.global player_damage_light_palette_pigment
-.global player_damage_light_palette_phones
-.global player_damage_light_palette_pajamas
-.global player_damage_dark_palette_pigment
-.global player_damage_dark_palette_phones
-.global player_damage_dark_palette_pajamas
-.global player_title_palette_pigment_dark
-.global player_title_palette_pigment_medium
-.global player_title_palette_phones_dark
-.global player_title_palette_phones_medium
-.global player_title_palette_phones_light
-.global player_title_palette_pajamas_dark
-.global player_title_palette_pajamas_medium
-.global player_title_palette_pajamas_light
+; The computed palette data for each sprite index, in a big lovely list
+.global player_palettes_pigment
+.global player_palettes_phones
+.global player_palettes_pajamas
+
+; And the indices into the list for various effects and whatnot
+
+PLAYER_PALETTE_NORMAL       = 0
+PLAYER_PALETTE_TITLE_LIGHT  = 1
+PLAYER_PALETTE_TITLE_DARK   = 2
+PLAYER_PALETTE_DAMAGE_LIGHT = 3
+PLAYER_PALETTE_DAMAGE_DARK  = 4
 
 DISCO_FLOOR_SOLID_INSTANT_SQUARES   = 0
 DISCO_FLOOR_SOLID_FROZEN_SQUARES    = 1

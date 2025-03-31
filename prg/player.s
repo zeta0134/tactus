@@ -392,6 +392,7 @@ damage_flash_lut:
 
 ; So things other than main gameplay can do this, mostly for
 ; the title screen and eventual save screen, etc etc
+; TODO: completely rethink this in light of lingering effects and rhythm assist mode
 .proc FAR_apply_player_palette
         lda PlayerTookDamageThisBeat
         beq normal_palette
@@ -405,27 +406,27 @@ damage_flash_lut:
         beq light_palette
         ; fall through to normal pal
 normal_palette:
-        lda player_ingame_palette_phones
+        lda player_palettes_phones+PLAYER_PALETTE_NORMAL
         sta PlayfieldObjPal0+0
-        lda player_ingame_palette_pajamas
+        lda player_palettes_pajamas+PLAYER_PALETTE_NORMAL
         sta PlayfieldObjPal0+1
-        lda player_ingame_palette_pigment
+        lda player_palettes_pigment+PLAYER_PALETTE_NORMAL
         sta PlayfieldObjPal0+2
         rts
 dark_palette:
-        lda player_damage_dark_palette_phones
+        lda player_palettes_phones+PLAYER_PALETTE_DAMAGE_DARK
         sta PlayfieldObjPal0+0
-        lda player_damage_dark_palette_pajamas
+        lda player_palettes_pajamas+PLAYER_PALETTE_DAMAGE_DARK
         sta PlayfieldObjPal0+1
-        lda player_damage_dark_palette_pigment
+        lda player_palettes_pigment+PLAYER_PALETTE_DAMAGE_DARK
         sta PlayfieldObjPal0+2
         rts
 light_palette:
-        lda player_damage_light_palette_phones
+        lda player_palettes_phones+PLAYER_PALETTE_DAMAGE_LIGHT
         sta PlayfieldObjPal0+0
-        lda player_damage_light_palette_pajamas
+        lda player_palettes_pajamas+PLAYER_PALETTE_DAMAGE_LIGHT
         sta PlayfieldObjPal0+1
-        lda player_damage_light_palette_pigment
+        lda player_palettes_pigment+PLAYER_PALETTE_DAMAGE_LIGHT
         sta PlayfieldObjPal0+2
         rts
 .endproc
