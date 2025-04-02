@@ -116,6 +116,7 @@ PlayerHeldBombIndex: .res 1
 
 PlayerLingeringStatusType: .res 1
 PlayerLingeringStatusDuration: .res 1 ; in beats
+PlayerLingeringStatusFrame: .res 1
 
 WeaponSingleTargetIndex: .res 1
 
@@ -479,6 +480,35 @@ PaletteBase := R0
         ; and apply those as necessary
 
         ldx PlayerLingeringStatusType
+        cpx #PlAYER_STATUS_SHOCKED
+        bne no_zap_zaps
+check_for_zap_zaps:
+        lda PlayerLingeringStatusFrame
+        beq dark_zap
+        cmp #1
+        beq light_zap
+        cmp #4
+        beq dark_zap
+        cmp #5
+        beq light_zap
+        jmp no_zap_zaps
+dark_zap:
+        lda #$00
+        sta PlayfieldObjPal0+0
+        sta PlayfieldObjPal0+1
+        sta PlayfieldObjPal0+2
+        lda #1
+        sta StagingObjPaletteDirty
+        rts
+light_zap:
+        lda #$50
+        sta PlayfieldObjPal0+0
+        sta PlayfieldObjPal0+1
+        sta PlayfieldObjPal0+2
+        lda #1
+        sta StagingObjPaletteDirty
+        rts
+no_zap_zaps:
         lda lingering_effect_palette_offset_lut, x
         sta PaletteBase
         lda current_save + SaveFile::OptionRhythmFlashPlayer
@@ -565,6 +595,15 @@ done_with_damage_offset:
         bcs done_with_damage
         inc PlayerDamageAnimCounter
 done_with_damage:
+
+        ; Update lingering status animations every frame
+        lda PlayerLingeringStatusType
+        beq done_with_lingering_status
+        lda PlayerLingeringStatusFrame
+        cmp #DAMAGE_ANIM_MAX ; sure, why not
+        bcs done_with_lingering_status
+        inc PlayerLingeringStatusFrame
+done_with_lingering_status:
 
         ; Draw weapon effects every frame! Most weapons will spawn sprites only
         ; on their first frame, but some may have additional behavior
@@ -1018,6 +1057,7 @@ PlayerStatePtr := R0
         lda #0
         sta PlayerTookDamageThisBeat
         sta PlayerDamageAnimCounter
+        sta PlayerLingeringStatusFrame
         ; If no damage direction is set, default to a kinda random-circle-y lookin' thing.
         sta PlayerIncomingDamageDirection
 

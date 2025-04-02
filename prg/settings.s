@@ -351,12 +351,12 @@ derived_color_mod_table:
     ; On fire! Deep red all the way down to ashen soot, very high contrast
     .byte      $46,      6,      1,    $46,      6,      1,     $46,      6,      1 ; Burned - 0
     .byte      $46,      6,      0,    $46,      6,      0,     $46,      6,      0 ; Burned - 1
-    .byte      $46,      5,      0,    $46,      5,      0,     $46,      5,      0 ; Burned - 2
-    .byte      $06,      5,      1,    $06,      5,      1,     $06,      5,      1 ; Burned - 3
-    .byte      $06,      4,      1,    $06,      4,      1,     $06,      4,      1 ; Burned - 4
-    .byte      $06,      3,      1,    $06,      3,      1,     $06,      3,      1 ; Burned - 5
-    .byte      $06,      2,      1,    $06,      2,      1,     $06,      2,      1 ; Burned - 6
-    .byte      $06,      1,      1,    $06,      1,      1,     $06,      1,      1 ; Burned - 7
+    .byte      $46,      6,      0,    $46,      6,      0,     $46,      6,      0 ; Burned - 2
+    .byte      $06,      6,      1,    $06,      6,      1,     $06,      6,      1 ; Burned - 3
+    .byte      $06,      5,      1,    $06,      5,      1,     $06,      5,      1 ; Burned - 4
+    .byte      $06,      5,      1,    $06,      5,      1,     $06,      5,      1 ; Burned - 5
+    .byte      $06,      4,      1,    $06,      4,      1,     $06,      4,      1 ; Burned - 6
+    .byte      $06,      4,      1,    $06,      4,      1,     $06,      4,      1 ; Burned - 7
 
     .byte $FF ; end of list
 
