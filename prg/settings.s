@@ -297,6 +297,8 @@ derived_color_mod_table:
     .byte      $00,      0,      1,    $00,      0,      1,     $00,      0,      1 ; Title Dark
     .byte      $55,      6,      2,    $55,      6,      2,     $55,      6,      2 ; Damage Light
     .byte      $05,      6,      1,    $05,      6,      1,     $05,      6,      1 ; Damage Dark
+
+    ; A basic pulse to the beat. We allow this to fade all the way down to nothing.
     .byte      $50,      0,      3,    $50,      0,      3,     $50,      0,      3 ; Rhythm Assist - 0
     .byte      $50,      0,      2,    $50,      0,      2,     $50,      0,      2 ; Rhythm Assist - 1
     .byte      $50,      0,      1,    $50,      0,      1,     $50,      0,      1 ; Rhythm Assist - 2
@@ -305,6 +307,57 @@ derived_color_mod_table:
     .byte      $50,      0,      0,    $50,      0,      0,     $50,      0,      0 ; Rhythm Assist - 5
     .byte      $50,      0,      0,    $50,      0,      0,     $50,      0,      0 ; Rhythm Assist - 6
     .byte      $50,      0,      0,    $50,      0,      0,     $50,      0,      0 ; Rhythm Assist - 7
+
+    ; Delightful pink strawberries. This status doesn't linger so it can fade to nothing.
+    .byte      $45,      6,      3,    $45,      6,      3,     $45,      6,      3 ; Just Healed - 0
+    .byte      $45,      6,      2,    $45,      6,      2,     $45,      6,      2 ; Just Healed - 1
+    .byte      $45,      5,      1,    $45,      5,      1,     $45,      5,      1 ; Just Healed - 2
+    .byte      $45,      4,      1,    $45,      4,      1,     $45,      4,      1 ; Just Healed - 3
+    .byte      $45,      3,      0,    $45,      3,      0,     $45,      3,      0 ; Just Healed - 4
+    .byte      $45,      2,      0,    $45,      2,      0,     $45,      2,      0 ; Just Healed - 5
+    .byte      $45,      1,      0,    $45,      1,      0,     $45,      1,      0 ; Just Healed - 6
+    .byte      $45,      0,      0,    $45,      0,      0,     $45,      0,      0 ; Just Healed - 7
+
+    ; Sickly Lime Green. Gross! This lingers, so we'll stay off-color and quite green
+    .byte      $4A,      6,      2,    $4A,      6,      2,     $4A,      6,      2 ; Poisoned - 0
+    .byte      $4A,      6,      1,    $4A,      6,      1,     $4A,      6,      1 ; Poisoned - 1
+    .byte      $4A,      6,      0,    $4A,      6,      0,     $4A,      6,      0 ; Poisoned - 2
+    .byte      $4A,      6,      0,    $4A,      6,      0,     $4A,      6,      0 ; Poisoned - 3
+    .byte      $4A,      5,      0,    $4A,      5,      0,     $4A,      5,      0 ; Poisoned - 4
+    .byte      $0A,      5,      1,    $0A,      5,      1,     $0A,      5,      1 ; Poisoned - 5
+    .byte      $0A,      4,      1,    $0A,      4,      1,     $0A,      4,      1 ; Poisoned - 6
+    .byte      $0A,      4,      1,    $0A,      4,      1,     $0A,      4,      1 ; Poisoned - 7
+
+    ; Frozen solid! A mix of blue, and purple shades, with the lightest little flash right on the beat
+    .byte      $42,      6,      3,    $51,      6,      3,     $5C,      6,      3 ; Frozen - 0
+    .byte      $42,      6,      1,    $51,      6,      1,     $5C,      6,      1 ; Frozen - 1
+    .byte      $42,      6,      1,    $51,      6,      1,     $5C,      6,      1 ; Frozen - 2
+    .byte      $42,      6,      1,    $51,      6,      1,     $5C,      6,      1 ; Frozen - 3
+    .byte      $42,      6,      1,    $51,      5,      1,     $5C,      6,      1 ; Frozen - 4
+    .byte      $42,      6,      1,    $51,      5,      1,     $5C,      6,      1 ; Frozen - 5
+    .byte      $42,      6,      1,    $51,      4,      1,     $5C,      6,      1 ; Frozen - 6
+    .byte      $42,      6,      1,    $51,      4,      1,     $5C,      6,      1 ; Frozen - 7
+
+    ; Shocked! This is the ramp down from very bright yellow, the flashes are applied separately
+    .byte      $47,      6,      3,    $47,      6,      3,     $47,      6,      3 ; Shocked - 0
+    .byte      $47,      6,      2,    $47,      6,      2,     $47,      6,      2 ; Shocked - 1
+    .byte      $47,      5,      1,    $47,      5,      1,     $47,      5,      1 ; Shocked - 2
+    .byte      $47,      4,      0,    $47,      4,      0,     $47,      4,      0 ; Shocked - 3
+    .byte      $47,      3,      0,    $47,      3,      0,     $47,      3,      0 ; Shocked - 4
+    .byte      $07,      2,      0,    $07,      2,      0,     $07,      2,      0 ; Shocked - 5
+    .byte      $07,      1,      1,    $07,      1,      1,     $07,      1,      1 ; Shocked - 6
+    .byte      $07,      1,      1,    $07,      1,      1,     $07,      1,      1 ; Shocked - 7
+
+    ; On fire! Deep red all the way down to ashen soot, very high contrast
+    .byte      $46,      6,      1,    $46,      6,      1,     $46,      6,      1 ; Burned - 0
+    .byte      $46,      6,      0,    $46,      6,      0,     $46,      6,      0 ; Burned - 1
+    .byte      $46,      5,      0,    $46,      5,      0,     $46,      5,      0 ; Burned - 2
+    .byte      $06,      5,      1,    $06,      5,      1,     $06,      5,      1 ; Burned - 3
+    .byte      $06,      4,      1,    $06,      4,      1,     $06,      4,      1 ; Burned - 4
+    .byte      $06,      3,      1,    $06,      3,      1,     $06,      3,      1 ; Burned - 5
+    .byte      $06,      2,      1,    $06,      2,      1,     $06,      2,      1 ; Burned - 6
+    .byte      $06,      1,      1,    $06,      1,      1,     $06,      1,      1 ; Burned - 7
+
     .byte $FF ; end of list
 
 

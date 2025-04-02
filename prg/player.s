@@ -410,6 +410,12 @@ damage_flash_lut:
         beq light_palette
         ; fall through to normal pal
 normal_palette:
+        ; If we are in some lingering status, call that status's update function instead
+        lda PlayerLingeringStatusType
+        beq draw_palette_normally
+        jsr _draw_lingering_effect_palette
+        rts
+draw_palette_normally:
         ; If we are in rhythm assist mode, then do the flash thing
         lda current_save + SaveFile::OptionRhythmFlashPlayer
         bne apply_rhythm_assist
@@ -447,6 +453,51 @@ apply_rhythm_assist:
         lda player_palettes_pajamas+PLAYER_PALETTE_RHYTHM_ASSIST, x
         sta PlayfieldObjPal0+1
         lda player_palettes_pigment+PLAYER_PALETTE_RHYTHM_ASSIST, x
+        sta PlayfieldObjPal0+2
+        lda #1
+        sta StagingObjPaletteDirty
+        rts
+.endproc
+
+lingering_effect_palette_offset_lut:
+        .byte PLAYER_PALETTE_RHYTHM_ASSIST ; not actually used, though... it could be?
+        .byte PLAYER_PALETTE_POISONED
+        .byte PLAYER_PALETTE_FROZEN
+        .byte PLAYER_PALETTE_SHOCKED
+        .byte PLAYER_PALETTE_BURNED
+        .byte PLAYER_PALETTE_JUST_HEALED
+
+.proc _draw_lingering_effect_palette
+PaletteBase := R0
+        ; If we got here, we aren't in a higher priority palette state (mostly damage), so we
+        ; need to set up the lingering effect table and use that as our base. The timing
+        ; will be different in normal and rhythm assist mode; all lingering effects are a little
+        ; bit flashy with a long decay, and so we'll pulse them to the beat if requested. That'll
+        ; offset the application of color a little bit, which we accept as a glitch.
+
+        ; TODO: some of these states might have single-frame overrides? we still need to check for
+        ; and apply those as necessary
+
+        ldx PlayerLingeringStatusType
+        lda lingering_effect_palette_offset_lut, x
+        sta PaletteBase
+        lda current_save + SaveFile::OptionRhythmFlashPlayer
+        bne use_rhythm_assist_timing
+use_standard_timing:
+        ldx TrackedGameplayPos
+        jmp timing_converge
+use_rhythm_assist_timing:
+        ldx TrackedMusicPos
+timing_converge:
+        lda tracked_row_buffer, x
+        clc
+        adc PaletteBase
+        tax
+        lda player_palettes_phones, x
+        sta PlayfieldObjPal0+0
+        lda player_palettes_pajamas, x
+        sta PlayfieldObjPal0+1
+        lda player_palettes_pigment, x
         sta PlayfieldObjPal0+2
         lda #1
         sta StagingObjPaletteDirty
