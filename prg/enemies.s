@@ -221,6 +221,7 @@ tile_index_to_col_lut:
 .include "enemies/diagonal_chaser.asm"
 .include "enemies/disco_tile.asm"
 .include "enemies/exit_block.asm"
+.include "enemies/hazard_tile.asm"
 .include "enemies/item_shadow.asm"
 .include "enemies/mole.asm"
 .include "enemies/mushroom.asm"
@@ -507,6 +508,41 @@ tile_collide TILE_WARP_PORTAL, ENEMY_COLLIDE_teleport_to_warp_entrance
 tile_suspend TILE_WARP_PORTAL, ENEMY_UTIL_cleanup_warp_entrance
 tile_explode TILE_WARP_PORTAL, FIXED_no_behavior, FIXED_no_behavior
 tile_spell   TILE_WARP_PORTAL, FIXED_no_behavior
+
+tile_update  TILE_HAZARD_HEAL, ENEMY_UPDATE_update_hazard_tile
+tile_attack  TILE_HAZARD_HEAL, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_HAZARD_HEAL, ENEMY_COLLIDE_activate_hazard_healing
+tile_suspend TILE_HAZARD_HEAL, FIXED_no_behavior
+tile_explode TILE_HAZARD_HEAL, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_HAZARD_HEAL, FIXED_no_behavior
+
+tile_update  TILE_HAZARD_POISON, ENEMY_UPDATE_update_hazard_tile
+tile_attack  TILE_HAZARD_POISON, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_HAZARD_POISON, ENEMY_COLLIDE_activate_hazard_poison
+tile_suspend TILE_HAZARD_POISON, FIXED_no_behavior
+tile_explode TILE_HAZARD_POISON, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_HAZARD_POISON, FIXED_no_behavior
+
+tile_update  TILE_HAZARD_FREEZE, ENEMY_UPDATE_update_hazard_tile
+tile_attack  TILE_HAZARD_FREEZE, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_HAZARD_FREEZE, ENEMY_COLLIDE_activate_hazard_freeze
+tile_suspend TILE_HAZARD_FREEZE, FIXED_no_behavior
+tile_explode TILE_HAZARD_FREEZE, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_HAZARD_FREEZE, FIXED_no_behavior
+
+tile_update  TILE_HAZARD_SHOCK, ENEMY_UPDATE_update_hazard_tile
+tile_attack  TILE_HAZARD_SHOCK, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_HAZARD_SHOCK, ENEMY_COLLIDE_activate_hazard_shock
+tile_suspend TILE_HAZARD_SHOCK, FIXED_no_behavior
+tile_explode TILE_HAZARD_SHOCK, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_HAZARD_SHOCK, FIXED_no_behavior
+
+tile_update  TILE_HAZARD_BURN, ENEMY_UPDATE_update_hazard_tile
+tile_attack  TILE_HAZARD_BURN, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_HAZARD_BURN, ENEMY_COLLIDE_activate_hazard_burn
+tile_suspend TILE_HAZARD_BURN, FIXED_no_behavior
+tile_explode TILE_HAZARD_BURN, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_HAZARD_BURN, FIXED_no_behavior
 
 .segment "ENEMY_UPDATE"
 

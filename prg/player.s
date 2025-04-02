@@ -114,6 +114,9 @@ PlayerIncomingDamageDirection: .res 1
 
 PlayerHeldBombIndex: .res 1
 
+PlayerLingeringStatusType: .res 1
+PlayerLingeringStatusDuration: .res 1 ; in beats
+
 WeaponSingleTargetIndex: .res 1
 
 WarpStability: .res 1

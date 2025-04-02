@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.0" name="TechnicalTiles" tilewidth="16" tileheight="16" tilecount="64" columns="16">
+<tileset version="1.10" tiledversion="1.11.2" name="TechnicalTiles" tilewidth="16" tileheight="16" tilecount="64" columns="16">
  <image source="tilesets/technical_tiles_tiled.png" width="256" height="64"/>
  <tile id="1" type="detail">
   <properties>
@@ -146,6 +146,36 @@
  <tile id="53" type="item">
   <properties>
    <property name="behavior" value="ITEM_SPELL_LIFE"/>
+  </properties>
+ </tile>
+ <tile id="54" type="map">
+  <properties>
+   <property name="behavior" value="TILE_HAZARD_HEAL"/>
+   <property name="tile_id" value="BG_TILE_HAZARD_TILE_HEART"/>
+  </properties>
+ </tile>
+ <tile id="55" type="map">
+  <properties>
+   <property name="behavior" value="TILE_HAZARD_POISON"/>
+   <property name="tile_id" value="BG_TILE_HAZARD_TILE_POISON"/>
+  </properties>
+ </tile>
+ <tile id="56" type="map">
+  <properties>
+   <property name="behavior" value="TILE_HAZARD_FREEZE"/>
+   <property name="tile_id" value="BG_TILE_HAZARD_TILE_FREEZE"/>
+  </properties>
+ </tile>
+ <tile id="57" type="map">
+  <properties>
+   <property name="behavior" value="TILE_HAZARD_SHOCK"/>
+   <property name="tile_id" value="BG_TILE_HAZARD_TILE_SHOCK"/>
+  </properties>
+ </tile>
+ <tile id="58" type="map">
+  <properties>
+   <property name="behavior" value="TILE_HAZARD_BURN"/>
+   <property name="tile_id" value="BG_TILE_HAZARD_TILE_BURN"/>
   </properties>
  </tile>
  <tile id="63" type="map">

@@ -30,6 +30,11 @@ TILE_SIGN              = 25
 TILE_CRACKED_WARP_WALL = 26
 TILE_HIDDEN_WARP_FLOOR = 27
 TILE_WARP_PORTAL       = 28
+TILE_HAZARD_HEAL       = 29
+TILE_HAZARD_POISON     = 30
+TILE_HAZARD_FREEZE     = 31
+TILE_HAZARD_SHOCK      = 32
+TILE_HAZARD_BURN       = 33
 
 ; Actually in the fixed page
 .global draw_active_tile

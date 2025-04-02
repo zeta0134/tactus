@@ -49,6 +49,9 @@
 .global PlayerHeldBombIndex
 .global PlayerRequestsSpellBehavior
 
+.global PlayerLingeringStatusType
+.global PlayerLingeringStatusDuration
+
 .globalzp WeaponAnimPtr
 .global WeaponDrawFunc
 .global WeaponSingleTargetIndex
@@ -75,6 +78,13 @@ PLAYER_STATE_CASTING = 2
 ; grave. This state will transition out of gameplay once
 ; entered!
 PLAYER_STATE_DEAD = 3
+
+PLAYER_STATUS_NORMAL      = 0
+PlAYER_STATUS_FROZEN      = 1
+PlAYER_STATUS_SHOCKED     = 2
+PLAYER_STATUS_BURNED      = 3
+PLAYER_STATUS_POISONED    = 4
+PlAYER_STAUTS_JUST_HEALED = 5
 
 MAX_WARP_STABILITY = 30
 BEATS_BETWEEN_NATURAL_STABILITY_DECAY = 4
