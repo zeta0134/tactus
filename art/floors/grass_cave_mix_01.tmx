@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.0" orientation="orthogonal" renderorder="right-down" width="6" height="4" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="1">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="6" height="4" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="1">
  <properties>
   <property name="has_warp_zone" type="bool" value="true"/>
  </properties>
@@ -9,7 +9,7 @@
 4,35,19,19,36,3,
 52,34,35,36,34,51,
 17,49,49,18,18,20,
-33,33,36,51,52,35
+33,19,20,51,52,35
 </data>
  </layer>
  <layer id="2" name="Room Properties" width="6" height="4">

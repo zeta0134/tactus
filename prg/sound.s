@@ -157,9 +157,9 @@ track_table_num_variants:
         .byte 5 ; options music
         .byte 5 ; gameover music
         .byte 5 ; shower groove
-        .byte 3 ; in another world (warp zone)
+        .byte 5 ; in another world (warp zone)
         .byte 5 ; bouncy
-        .byte 3 ; echoes
+        .byte 5 ; echoes
 
 track_table_heartbeat_offset:
         .byte 0 ; silence 

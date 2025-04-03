@@ -53,6 +53,7 @@ current_music_bank: .byte $00
 .endif
 song_ptr: .word $0000
 frame_ptr: .word $0000
+song_initial_bank: .byte $00
 
 shadow_pulse1_freq_hi: .byte $00
 shadow_pulse2_freq_hi: .byte $00
@@ -726,6 +727,9 @@ song_uses_groove:
         ldy #SongInfo::pattern_length
         lda (bhop_ptr), y
         sta row_cmp
+        ldy #SongInfo::initial_bank
+        lda (bhop_ptr), y
+        sta song_initial_bank
 
         perform_zpcm_inc
 
@@ -958,6 +962,10 @@ done:
         iny
         lda (bhop_ptr), y
         sta frame_ptr+1
+        ldy #SongInfo::initial_bank
+        lda (bhop_ptr), y
+        sta song_initial_bank
+
         ; now add our target frame number to that
         txa
         clc
@@ -966,6 +974,20 @@ done:
         txa
         clc
         add16a frame_ptr
+
+        lda module_flags
+        and #MODULE_FLAGS_PATTERN_BANKING
+        beq banking_not_enabled
+
+        ; The frame list pointer lives in the initial bank, so get that loaded in. (We're done
+        ; with the song ptr at this point)
+        lda song_initial_bank
+        clc
+        adc module_bank
+        switch_music_bank
+
+banking_not_enabled:
+
         ; now use this to load the actual frame pointer from the list
         prepare_ptr frame_ptr
         ldy #0
@@ -975,11 +997,36 @@ done:
         lda (bhop_ptr), y
         sta frame_ptr+1
         perform_zpcm_inc
+
+        lda module_flags
+        and #MODULE_FLAGS_PATTERN_BANKING
+        beq banking_still_not_enabled
+
+        ; Restore the music bank (just in case)
+        lda module_bank
+        switch_music_bank
+
+banking_still_not_enabled:
+
         rts
 .endproc
 
 .proc load_frame_patterns
         perform_zpcm_inc
+
+        lda module_flags
+        and #MODULE_FLAGS_PATTERN_BANKING
+        beq frame_header_banking_not_enabled
+
+        ; The frame list pointer lives in the initial bank, so get that loaded in. (We're done
+        ; with the song ptr at this point)
+        lda song_initial_bank
+        clc
+        adc module_bank
+        switch_music_bank
+
+frame_header_banking_not_enabled:
+
         ;initialize all the pattern rows from the current frame pointer
         prepare_ptr frame_ptr
         ldy #0
@@ -1165,6 +1212,16 @@ done_with_banks:
         sta channel_row_delay_counter + VRC6_SAWTOOTH_INDEX
         .endif
         sta channel_row_delay_counter + DPCM_INDEX
+
+        lda module_flags
+        and #MODULE_FLAGS_PATTERN_BANKING
+        beq banking_still_not_enabled
+
+        ; Restore the music bank (just in case)
+        lda module_bank
+        switch_music_bank
+
+banking_still_not_enabled:
 
         perform_zpcm_inc
 
