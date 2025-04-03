@@ -70,11 +70,6 @@ FADE_SPEED = 8
         .endproc
 
         .segment "MUSIC_0"
-        .proc zeta_options
-        .include "../art/music/options.asm"
-        .endproc
-
-        .segment "MUSIC_0"
         .proc zeta_game_over
         .include "../art/music/game_over.asm"
         .endproc
@@ -100,6 +95,11 @@ FADE_SPEED = 8
         ; and MUSIC_7
         .proc zeta_echoes
         .include "../art/music/echoes.asm"
+        .endproc
+
+        .segment "MUSIC_8"
+        .proc zeta_options
+        .include "../art/music/options.asm"
         .endproc
 
         .segment "PRGFIXED_E000"

@@ -25,6 +25,7 @@ ft_instrument_list:
 	.word ft_inst_9
 	.word ft_inst_10
 	.word ft_inst_11
+	.word ft_inst_12
 
 ; Instruments
 ft_inst_0:
@@ -55,43 +56,49 @@ ft_inst_4:
 ft_inst_5:
 	.byte 0
 	.byte $11
+	.word ft_seq_2a03_15
+	.word ft_seq_2a03_9
+
+ft_inst_6:
+	.byte 0
+	.byte $11
 	.word ft_seq_2a03_10
 	.word ft_seq_2a03_4
 
-ft_inst_6:
+ft_inst_7:
 	.byte 0
 	.byte $13
 	.word ft_seq_2a03_65
 	.word ft_seq_2a03_56
 	.word ft_seq_2a03_29
 
-ft_inst_7:
+ft_inst_8:
 	.byte 0
 	.byte $13
 	.word ft_seq_2a03_70
 	.word ft_seq_2a03_61
 	.word ft_seq_2a03_34
 
-ft_inst_8:
+ft_inst_9:
 	.byte 0
 	.byte $07
 	.word ft_seq_2a03_90
 	.word ft_seq_2a03_71
 	.word ft_seq_2a03_2
 
-ft_inst_9:
+ft_inst_10:
 	.byte 0
 	.byte $03
 	.word ft_seq_2a03_95
 	.word ft_seq_2a03_76
 
-ft_inst_10:
+ft_inst_11:
 	.byte 4
 	.byte $11
 	.word ft_seq_vrc6_5
 	.word ft_seq_vrc6_4
 
-ft_inst_11:
+ft_inst_12:
 	.byte 0
 	.byte $13
 	.word ft_seq_2a03_125
@@ -110,8 +117,12 @@ ft_seq_2a03_5:
 	.byte $38, $FF, $00, $00, $02, $02, $02, $03, $03, $04, $04, $04, $04, $04, $03, $03, $03, $03, $03, $03
 	.byte $03, $03, $03, $03, $03, $03, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02
 	.byte $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $02, $01, $01, $01, $01, $01, $00
+ft_seq_2a03_9:
+	.byte $01, $FF, $00, $00, $02
 ft_seq_2a03_10:
 	.byte $01, $FF, $00, $00, $0F
+ft_seq_2a03_15:
+	.byte $04, $FF, $00, $00, $0B, $01, $00, $00
 ft_seq_2a03_24:
 	.byte $03, $FF, $00, $00, $01, $01, $00
 ft_seq_2a03_29:
@@ -166,6 +177,8 @@ ft_song_list:
 	.word ft_song_0
 	.word ft_song_1
 	.word ft_song_2
+	.word ft_song_3
+	.word ft_song_4
 
 ; Song info
 ft_song_0:
@@ -179,7 +192,7 @@ ft_song_0:
 
 ft_song_1:
 	.word ft_s1_frames
-	.byte 1	; frame count
+	.byte 11	; frame count
 	.byte 64	; pattern length
 	.byte 6	; speed
 	.byte 150	; tempo
@@ -188,6 +201,24 @@ ft_song_1:
 
 ft_song_2:
 	.word ft_s2_frames
+	.byte 11	; frame count
+	.byte 64	; pattern length
+	.byte 0	; speed
+	.byte 120	; tempo
+	.byte 1	; groove position
+	.byte 0	; initial bank
+
+ft_song_3:
+	.word ft_s3_frames
+	.byte 11	; frame count
+	.byte 64	; pattern length
+	.byte 0	; speed
+	.byte 120	; tempo
+	.byte 1	; groove position
+	.byte 0	; initial bank
+
+ft_song_4:
+	.word ft_s4_frames
 	.byte 11	; frame count
 	.byte 64	; pattern length
 	.byte 0	; speed
@@ -241,20 +272,20 @@ ft_s0p0c0:
 
 ; Bank 0
 ft_s0p0c2:
-	.byte $E8, $0D, $07, $E9, $0D, $0B, $E8, $0D, $03, $E9, $0D, $07, $E8, $0D, $07, $E9, $0D, $09, $0D, $01
-	.byte $E8, $0D, $03, $E9, $0D, $05, $0D, $01
+	.byte $E9, $0D, $07, $EA, $0D, $0B, $E9, $0D, $03, $EA, $0D, $07, $E9, $0D, $07, $EA, $0D, $09, $0D, $01
+	.byte $E9, $0D, $03, $EA, $0D, $05, $0D, $01
 
 ; Bank 0
 ft_s0p0c3:
-	.byte $E4, $F7, $11, $01, $E6, $F5, $11, $01, $E7, $F7, $11, $03, $82, $01, $EB, $FB, $11, $E6, $F1, $11
-	.byte $F6, $11, $F4, $11, $F6, $11, $F6, $11, $83, $E7, $F7, $11, $03, $EB, $FB, $11, $03, $82, $01, $E6
-	.byte $F6, $11, $F4, $11, $E4, $F7, $11, $E6, $F5, $11, $83, $E7, $F7, $11, $03, $82, $01, $EB, $FB, $11
-	.byte $E6, $F1, $11, $F6, $11, $F4, $11, $F6, $11, $F6, $11, $83, $E7, $F7, $11, $03, $EB, $FB, $11, $03
-	.byte $E6, $F4, $11, $01, $EB, $F9, $11, $01
+	.byte $E4, $F7, $11, $01, $E7, $F5, $11, $01, $E8, $F7, $11, $03, $82, $01, $EC, $FB, $11, $E7, $F1, $11
+	.byte $F6, $11, $F4, $11, $F6, $11, $F6, $11, $83, $E8, $F7, $11, $03, $EC, $FB, $11, $03, $82, $01, $E7
+	.byte $F6, $11, $F4, $11, $E4, $F7, $11, $E7, $F5, $11, $83, $E8, $F7, $11, $03, $82, $01, $EC, $FB, $11
+	.byte $E7, $F1, $11, $F6, $11, $F4, $11, $F6, $11, $F6, $11, $83, $E8, $F7, $11, $03, $EC, $FB, $11, $03
+	.byte $E7, $F4, $11, $01, $EC, $F9, $11, $01
 
 ; Bank 0
 ft_s0p0c6:
-	.byte $EA, $91, $88, $FB, $0A, $03, $7F, $01, $0A, $01, $7F, $03, $0A, $01, $7F, $03, $0A, $00, $7F, $00
+	.byte $EB, $91, $88, $FB, $0A, $03, $7F, $01, $0A, $01, $7F, $03, $0A, $01, $7F, $03, $0A, $00, $7F, $00
 	.byte $0F, $02, $7F, $00, $82, $01, $10, $7F, $11, $7F, $83, $0A, $03, $7F, $01, $0A, $01, $7F, $03, $0A
 	.byte $01, $7F, $03, $16, $00, $7F, $00, $82, $01, $0A, $7F, $0F, $7F, $11, $83, $7F, $01
 
@@ -276,16 +307,16 @@ ft_s0p1c1:
 
 ; Bank 0
 ft_s0p1c2:
-	.byte $E8, $0D, $07, $E9, $0D, $0B, $E8, $0D, $03, $E9, $0D, $07, $E8, $0D, $07, $E9, $0D, $05, $E8, $0D
-	.byte $03, $E9, $0D, $01, $E8, $0D, $03, $E9, $0D, $07
+	.byte $E9, $0D, $07, $EA, $0D, $0B, $E9, $0D, $03, $EA, $0D, $07, $E9, $0D, $07, $EA, $0D, $05, $E9, $0D
+	.byte $03, $EA, $0D, $01, $E9, $0D, $03, $EA, $0D, $07
 
 ; Bank 0
 ft_s0p1c3:
-	.byte $E4, $F7, $11, $01, $E6, $F5, $11, $01, $E7, $F7, $11, $03, $82, $01, $EB, $FB, $11, $E6, $F1, $11
-	.byte $F6, $11, $F4, $11, $F6, $11, $F6, $11, $83, $E7, $F7, $11, $03, $EB, $FB, $11, $03, $82, $01, $E6
-	.byte $F6, $11, $F4, $11, $E4, $F7, $11, $E6, $F5, $11, $83, $E7, $F7, $11, $03, $82, $01, $EB, $FB, $11
-	.byte $E6, $F1, $11, $F6, $11, $E4, $F7, $11, $E6, $F6, $11, $EB, $F9, $11, $E6, $F6, $11, $F4, $11, $EB
-	.byte $FB, $11, $E6, $F5, $11, $83, $E7, $F7, $11, $03
+	.byte $E4, $F7, $11, $01, $E7, $F5, $11, $01, $E8, $F7, $11, $03, $82, $01, $EC, $FB, $11, $E7, $F1, $11
+	.byte $F6, $11, $F4, $11, $F6, $11, $F6, $11, $83, $E8, $F7, $11, $03, $EC, $FB, $11, $03, $82, $01, $E7
+	.byte $F6, $11, $F4, $11, $E4, $F7, $11, $E7, $F5, $11, $83, $E8, $F7, $11, $03, $82, $01, $EC, $FB, $11
+	.byte $E7, $F1, $11, $F6, $11, $E4, $F7, $11, $E7, $F6, $11, $EC, $F9, $11, $E7, $F6, $11, $F4, $11, $EC
+	.byte $FB, $11, $E7, $F5, $11, $83, $E8, $F7, $11, $03
 
 ; Bank 0
 ft_s0p1c5:
@@ -294,7 +325,7 @@ ft_s0p1c5:
 
 ; Bank 0
 ft_s0p1c6:
-	.byte $EA, $05, $03, $7F, $01, $05, $01, $7F, $03, $05, $01, $7F, $03, $05, $00, $7F, $00, $09, $02, $7F
+	.byte $EB, $05, $03, $7F, $01, $05, $01, $7F, $03, $05, $01, $7F, $03, $05, $00, $7F, $00, $09, $02, $7F
 	.byte $00, $82, $01, $0A, $7F, $0B, $7F, $0C, $05, $7F, $83, $05, $03, $7F, $01, $05, $01, $7F, $03, $82
 	.byte $01, $05, $11, $7F, $05, $7F, $09, $83, $7F, $01
 
@@ -316,14 +347,14 @@ ft_s0p2c1:
 
 ; Bank 0
 ft_s0p2c2:
-	.byte $E8, $0D, $07, $E9, $0D, $0B, $E8, $0D, $03, $E9, $0D, $07, $E8, $0D, $07, $E9, $0D, $09, $0D, $01
-	.byte $E8, $0D, $03, $E9, $0D, $07
+	.byte $E9, $0D, $07, $EA, $0D, $0B, $E9, $0D, $03, $EA, $0D, $07, $E9, $0D, $07, $EA, $0D, $09, $0D, $01
+	.byte $E9, $0D, $03, $EA, $0D, $07
 
 ; Bank 0
 ft_s0p2c3:
-	.byte $E4, $F7, $11, $07, $EB, $FB, $11, $0B, $E4, $F7, $11, $03, $EB, $FB, $11, $07, $E4, $F7, $11, $07
-	.byte $EB, $FB, $11, $09, $FB, $11, $01, $E4, $F7, $11, $03, $EB, $FB, $11, $03, $E6, $F7, $11, $00, $94
-	.byte $01, $F4, $11, $00, $94, $02, $E7, $F6, $11, $01
+	.byte $E4, $F7, $11, $07, $EC, $FB, $11, $0B, $E4, $F7, $11, $03, $EC, $FB, $11, $07, $E4, $F7, $11, $07
+	.byte $EC, $FB, $11, $09, $FB, $11, $01, $E4, $F7, $11, $03, $EC, $FB, $11, $03, $E7, $F7, $11, $00, $94
+	.byte $01, $F4, $11, $00, $94, $02, $E8, $F6, $11, $01
 
 ; Bank 0
 ft_s0p2c5:
@@ -447,8 +478,46 @@ ft_s0p8c5:
 ; Bank 0
 ft_s1_frames:
 	.word ft_s1f0
+	.word ft_s1f1
+	.word ft_s1f2
+	.word ft_s1f3
+	.word ft_s1f4
+	.word ft_s1f5
+	.word ft_s1f6
+	.word ft_s1f7
+	.word ft_s1f8
+	.word ft_s1f9
+	.word ft_s1f10
 ft_s1f0:
-	.word ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f1:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f2:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f3:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f4:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f5:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f6:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f7:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f8:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f9:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f10:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+; Bank 0
+ft_s1p0c0:
+	.byte $7F, $3F
+
+; Bank 0
+ft_s1p0c4:
+	.byte $7E, $3F
+
 ; Bank 0
 ft_s2_frames:
 	.word ft_s2f0
@@ -463,36 +532,32 @@ ft_s2_frames:
 	.word ft_s2f9
 	.word ft_s2f10
 ft_s2f0:
-	.word ft_s2p0c0, ft_s2p0c1, ft_s2p0c2, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s0p0c0
+	.word ft_s2p0c0, ft_s1p0c0, ft_s2p0c2, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s0p0c0
 ft_s2f1:
-	.word ft_s2p1c0, ft_s2p0c1, ft_s2p1c2, ft_s0p0c0, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s0p0c0
+	.word ft_s2p1c0, ft_s1p0c0, ft_s2p1c2, ft_s0p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s0p0c0
 ft_s2f2:
-	.word ft_s2p0c0, ft_s2p1c1, ft_s2p0c2, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s0p0c0
+	.word ft_s2p0c0, ft_s2p1c1, ft_s2p0c2, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s0p0c0
 ft_s2f3:
-	.word ft_s2p1c0, ft_s2p2c1, ft_s2p1c2, ft_s0p0c0, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s0p0c0
+	.word ft_s2p1c0, ft_s2p2c1, ft_s2p1c2, ft_s0p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s0p0c0
 ft_s2f4:
-	.word ft_s2p0c0, ft_s2p1c1, ft_s2p0c2, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s0p0c0
+	.word ft_s2p0c0, ft_s2p1c1, ft_s2p0c2, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s0p0c0
 ft_s2f5:
-	.word ft_s2p1c0, ft_s2p2c1, ft_s2p1c2, ft_s0p0c0, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s0p0c0
+	.word ft_s2p1c0, ft_s2p2c1, ft_s2p1c2, ft_s0p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s0p0c0
 ft_s2f6:
-	.word ft_s2p0c0, ft_s2p1c1, ft_s2p0c2, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s0p0c0
+	.word ft_s2p0c0, ft_s2p1c1, ft_s2p0c2, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s0p0c0
 ft_s2f7:
-	.word ft_s2p1c0, ft_s2p2c1, ft_s2p1c2, ft_s0p0c0, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s0p0c0
+	.word ft_s2p1c0, ft_s2p2c1, ft_s2p1c2, ft_s0p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s0p0c0
 ft_s2f8:
-	.word ft_s2p0c0, ft_s2p1c1, ft_s2p0c2, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s0p0c0
+	.word ft_s2p0c0, ft_s2p1c1, ft_s2p0c2, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s0p0c0
 ft_s2f9:
-	.word ft_s2p1c0, ft_s2p2c1, ft_s2p1c2, ft_s0p0c0, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s0p0c0
+	.word ft_s2p1c0, ft_s2p2c1, ft_s2p1c2, ft_s0p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s0p0c0
 ft_s2f10:
-	.word ft_s2p0c0, ft_s2p3c1, ft_s2p0c2, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s2p0c1, ft_s0p0c0
+	.word ft_s2p0c0, ft_s2p3c1, ft_s2p0c2, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s0p0c0
 ; Bank 0
 ft_s2p0c0:
-	.byte $E5, $91, $88, $F4, $16, $03, $7F, $01, $16, $01, $7F, $03, $16, $01, $7F, $03, $16, $00, $7F, $00
+	.byte $E6, $91, $88, $F4, $16, $03, $7F, $01, $16, $01, $7F, $03, $16, $01, $7F, $03, $16, $00, $7F, $00
 	.byte $1B, $02, $7F, $00, $82, $01, $1C, $7F, $1D, $7F, $83, $16, $03, $7F, $01, $16, $01, $7F, $03, $16
 	.byte $01, $7F, $03, $22, $00, $7F, $00, $82, $01, $16, $7F, $1B, $7F, $1D, $83, $7F, $01
-
-; Bank 0
-ft_s2p0c1:
-	.byte $7F, $3F
 
 ; Bank 0
 ft_s2p0c2:
@@ -502,7 +567,7 @@ ft_s2p0c2:
 
 ; Bank 0
 ft_s2p1c0:
-	.byte $E5, $91, $88, $F4, $11, $03, $7F, $01, $11, $01, $7F, $03, $11, $01, $7F, $03, $11, $00, $7F, $00
+	.byte $E6, $91, $88, $F4, $11, $03, $7F, $01, $11, $01, $7F, $03, $11, $01, $7F, $03, $11, $00, $7F, $00
 	.byte $15, $02, $7F, $00, $82, $01, $16, $7F, $17, $7F, $18, $11, $7F, $83, $11, $03, $7F, $01, $11, $01
 	.byte $7F, $03, $82, $01, $11, $1D, $7F, $11, $7F, $15, $83, $7F, $01
 
@@ -529,5 +594,81 @@ ft_s2p3c1:
 	.byte $E0, $93, $02, $8A, $8F, $00, $FB, $16, $03, $F4, $16, $01, $FB, $16, $03, $F4, $16, $34, $86, $02
 	.byte $00, $00
 
+; Bank 0
+ft_s3_frames:
+	.word ft_s3f0
+	.word ft_s3f1
+	.word ft_s3f2
+	.word ft_s3f3
+	.word ft_s3f4
+	.word ft_s3f5
+	.word ft_s3f6
+	.word ft_s3f7
+	.word ft_s3f8
+	.word ft_s3f9
+	.word ft_s3f10
+ft_s3f0:
+	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+ft_s3f1:
+	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+ft_s3f2:
+	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+ft_s3f3:
+	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+ft_s3f4:
+	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+ft_s3f5:
+	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+ft_s3f6:
+	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+ft_s3f7:
+	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+ft_s3f8:
+	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+ft_s3f9:
+	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+ft_s3f10:
+	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+; Bank 0
+ft_s3p0c1:
+	.byte $82, $03, $E5, $85, $78, $FA, $49, $F3, $49, $85, $78, $F9, $3D, $F3, $3D, $85, $78, $F9, $3D, $F3
+	.byte $3D, $85, $78, $F9, $3D, $F3, $3D, $85, $78, $FA, $49, $F3, $49, $85, $78, $F9, $3D, $F3, $3D, $85
+	.byte $78, $F9, $3D, $F3, $3D, $85, $78, $F9, $3D, $83, $F3, $3D, $03
+
+; Bank 0
+ft_s4_frames:
+	.word ft_s4f0
+	.word ft_s4f1
+	.word ft_s4f2
+	.word ft_s4f3
+	.word ft_s4f4
+	.word ft_s4f5
+	.word ft_s4f6
+	.word ft_s4f7
+	.word ft_s4f8
+	.word ft_s4f9
+	.word ft_s4f10
+ft_s4f0:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f1:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f2:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f3:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f4:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f5:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f6:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f7:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f8:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f9:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f10:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 
 ; DPCM samples (located at DPCM segment)
