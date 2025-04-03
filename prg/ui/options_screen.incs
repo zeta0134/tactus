@@ -978,8 +978,28 @@ perform_sync:
 .endproc
 
 .proc FAR_options_page_refresh_music_controller
+        lda current_save + SaveFile::OptionMusicMode
+        cmp #OPTION_MUSIC_ENABLED
+        beq play_normal_track
+        cmp #OPTION_MUSIC_CLICK
+        beq play_click_track
+        cmp #OPTION_MUSIC_DISABLED
+        beq play_silent_track
+        ; huh?
+        rts
+play_normal_track:
         lda #TRACK_OPTIONS
         ldy #TRACK_VARIANT_NORMAL
+        jsr play_track
+        rts
+play_click_track:
+        lda #TRACK_OPTIONS_DUP_1
+        ldy #TRACK_VARIANT_CLICK
+        jsr play_track
+        rts
+play_silent_track:
+        lda #TRACK_OPTIONS_DUP_2
+        ldy #TRACK_VARIANT_SILENT
         jsr play_track
         rts
 .endproc

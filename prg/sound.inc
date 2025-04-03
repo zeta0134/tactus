@@ -96,6 +96,8 @@ TRACK_SHOWER_GROOVE    = 5
 TRACK_IN_ANOTHER_WORLD = 6
 TRACK_BOUNCY           = 7
 TRACK_ECHOES           = 8
+TRACK_OPTIONS_DUP_1    = 9  ; these exist as a cheap way to force a track re-init when changing BGM modes
+TRACK_OPTIONS_DUP_2    = 10 ; these exist as a cheap way to force a track re-init when changing BGM modes
 
 TRACK_VARIANT_NORMAL   = 0 ; every track has this
 TRACK_VARIANT_INTERIOR = 1 ; most level themes have these

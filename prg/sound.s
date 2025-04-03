@@ -117,6 +117,8 @@ track_table_module_low:
         .lobytes persune_in_another_world
         .lobytes zeta_bouncy
         .lobytes zeta_echoes
+        .lobytes zeta_options
+        .lobytes zeta_options
 
 track_table_module_high:
         .hibytes zeta_silence
@@ -128,6 +130,8 @@ track_table_module_high:
         .hibytes persune_in_another_world
         .hibytes zeta_bouncy
         .hibytes zeta_echoes
+        .hibytes zeta_options
+        .hibytes zeta_options
 
 track_table_bank:
         .lobytes .bank(zeta_silence)
@@ -139,6 +143,8 @@ track_table_bank:
         .lobytes .bank(persune_in_another_world)
         .lobytes .bank(zeta_bouncy)
         .lobytes .bank(zeta_echoes)
+        .lobytes .bank(zeta_options)
+        .lobytes .bank(zeta_options)
         
 track_table_song:
         .byte 0 ; silence (used for transitions)
@@ -150,6 +156,8 @@ track_table_song:
         .byte 0 ; in another world (warp zone)
         .byte 0 ; bouncy
         .byte 0 ; echoes
+        .byte 0 ; options
+        .byte 0 ; options
 
 track_table_num_variants:
         .byte 5 ; silence 
@@ -161,6 +169,8 @@ track_table_num_variants:
         .byte 5 ; in another world (warp zone)
         .byte 5 ; bouncy
         .byte 5 ; echoes
+        .byte 5 ; options music
+        .byte 5 ; options music
 
 track_table_heartbeat_offset:
         .byte 0 ; silence 
@@ -172,6 +182,8 @@ track_table_heartbeat_offset:
         .byte 4 ; in another world (warp zone)
         .byte 0 ; bouncy
         .byte 0 ; echoes
+        .byte 0 ; options music
+        .byte 0 ; options music
 
 track_table_heartbeat_period:
         .byte 0 ; silence 
@@ -183,6 +195,8 @@ track_table_heartbeat_period:
         .byte 8 ; in another world (initial, switches to 6 partway through)
         .byte 8 ; bouncy
         .byte 8 ; echoes
+        .byte 8 ; options music
+        .byte 8 ; options music
 
 ; bhop calls these functions for bank swapping and ZPCM tomfoolery
 .proc bhop_enable_zpcm
@@ -360,6 +374,13 @@ invalid_variant:
 .proc _play_sfx_pulse1
         perform_zpcm_inc
 
+        lda current_save + SaveFile::OptionSfxMode
+        cmp #OPTION_SFX_ENABLED
+        beq sfx_enabled
+        perform_zpcm_inc
+        rts
+sfx_enabled:
+
         ; Check our candidate priority against the channel's active priority.
         ; If the candidate is lower (<) than the current priority, bail without
         ; doing anything.
@@ -400,6 +421,13 @@ done_picking_sfx_bank:
 
 .proc _play_sfx_pulse2
         perform_zpcm_inc
+
+        lda current_save + SaveFile::OptionSfxMode
+        cmp #OPTION_SFX_ENABLED
+        beq sfx_enabled
+        perform_zpcm_inc
+        rts
+sfx_enabled:
 
         ; Check our candidate priority against the channel's active priority.
         ; If the candidate is lower (<) than the current priority, bail without
@@ -442,6 +470,13 @@ done_picking_sfx_bank:
 .proc _play_sfx_triangle
         perform_zpcm_inc
 
+        lda current_save + SaveFile::OptionSfxMode
+        cmp #OPTION_SFX_ENABLED
+        beq sfx_enabled
+        perform_zpcm_inc
+        rts
+sfx_enabled:
+
         ; Check our candidate priority against the channel's active priority.
         ; If the candidate is lower (<) than the current priority, bail without
         ; doing anything.
@@ -482,6 +517,13 @@ done_picking_sfx_bank:
 
 .proc _play_sfx_noise
         perform_zpcm_inc
+
+        lda current_save + SaveFile::OptionSfxMode
+        cmp #OPTION_SFX_ENABLED
+        beq sfx_enabled
+        perform_zpcm_inc
+        rts
+sfx_enabled:
 
         ; Check our candidate priority against the channel's active priority.
         ; If the candidate is lower (<) than the current priority, bail without
