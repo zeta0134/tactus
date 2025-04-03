@@ -1131,6 +1131,7 @@ PlayerSquare := R2
 TargetRow := R14
 TargetCol := R15
         jsr player_global_reset
+        jsr process_lingering_effect_expiry
 
         ; First up, default the player's animation cel to either standing or, if it's been a really long
         ; time since we got a player input AND the room is clear, the idle pose for flavor
@@ -1281,6 +1282,8 @@ PlayerSquare := R2
 
 TargetRow := R14
 TargetCol := R15
+        jsr process_lingering_effect_expiry
+
         lda #0
         sta PlayerTookDamageThisBeat
         sta PlayerDamageAnimCounter
@@ -1424,6 +1427,8 @@ PlayerSquare := R2
 
 TargetRow := R14
 TargetCol := R15
+        jsr process_lingering_effect_expiry
+
         lda #0
         sta PlayerTookDamageThisBeat
         sta PlayerDamageAnimCounter
@@ -1705,7 +1710,11 @@ previous_room_effect := room_spell_data1
 
 .proc cast_spell_life
         ; TODO: not this! Let's lighten the **player** instead.
-        jsr brighten_room
+        ; jsr brighten_room
+        lda #PlAYER_STAUTS_JUST_HEALED
+        sta PlayerLingeringStatusType
+        lda #1
+        sta PlayerLingeringStatusDuration
 
         ; Heal ALL the health
         lda #255
@@ -2658,5 +2667,39 @@ done_with_full_room_prep:
 
 sprite_failed:
         ; For now, that is all. Spell effects will fly elsewhere, yes!
+        rts
+.endproc
+
+; If the player is currently in the throes of a lingering effect, deal with its
+; means of expiry. Usually this is a beat timer counting down, but in some cases
+; custom logic is needed.
+.proc process_lingering_effect_expiry
+        lda PlayerLingeringStatusType
+        bne processing_required
+        rts ; bail fast if there is nothing to do
+processing_required:
+        cmp #PlAYER_STATUS_FROZEN
+        beq player_is_frozen
+        cmp #PlAYER_STATUS_SHOCKED
+        beq player_is_stunned
+        ; Normal expiry
+normal_expiry:
+        dec PlayerLingeringStatusDuration
+        lda PlayerLingeringStatusDuration
+        beq cancel_effect
+        bmi cancel_effect ; shouldn't ever happen, but just to be safe
+        rts
+cancel_effect:
+        lda #PLAYER_STATUS_NORMAL
+        sta PlayerLingeringStatusType
+        lda #0
+        sta PlayerLingeringStatusDuration
+        sta PlayerLingeringStatusFrame
+        rts
+player_is_frozen:
+player_is_stunned:
+        ; Breaking out of freezing has custom logic in the respective stun
+        ; state, which will handle terminating the effect. Take no automatic
+        ; action. (This shouldn't be reached, actually.)
         rts
 .endproc
