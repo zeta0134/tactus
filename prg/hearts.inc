@@ -15,3 +15,5 @@
 .global FAR_receive_healing
 ; Missing (healable) health in A
 .global FAR_missing_health
+; Current (effective) health in A
+.global FAR_current_health

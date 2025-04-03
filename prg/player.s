@@ -1134,6 +1134,7 @@ TargetRow := R14
 TargetCol := R15
         jsr player_global_reset
         jsr process_lingering_effect_expiry
+        jsr process_poison_tick
 
         ; First up, default the player's animation cel to either standing or, if it's been a really long
         ; time since we got a player input AND the room is clear, the idle pose for flavor
@@ -2947,5 +2948,26 @@ cancel_effect:
         lda #0
         sta PlayerLingeringStatusDuration
         sta PlayerLingeringStatusFrame
+        rts
+.endproc
+
+.proc process_poison_tick
+IncomingDamage := R0
+        lda PlayerLingeringStatusType
+        cmp #PLAYER_STATUS_POISONED
+        beq processing_required
+        rts
+processing_required:
+        ; Do we have more than 1 HP? If not, do nothing! (poison weakens, but
+        ; in this game it does not directly kill.)
+        near_call FAR_current_health
+        cmp #2
+        bcc skip_poison_tick
+
+        lda #1
+        sta IncomingDamage
+        near_call FAR_receive_damage
+
+skip_poison_tick:
         rts
 .endproc

@@ -520,3 +520,28 @@ done_with_this_heart:
         sbc HealableCurrent
         rts
 .endproc
+
+; Companion function to the above: how much health does the player have right now?
+; Return in A (and also R0 I guess)
+.proc FAR_current_health
+HealthCurrent := R0
+        ldx #0
+        stx HealthCurrent
+loop:
+        lda current_save + SaveFile::HeartSlotType, x
+        cmp #HEART_TYPE_NONE
+        beq done_with_this_heart
+consider_this_heart:
+        clc
+        lda HealthCurrent
+        adc current_save + SaveFile::HeartSlotHp, x
+        sta HealthCurrent
+done_with_this_heart:
+        inx
+        cpx #TOTAL_HEART_SLOTS
+        bne loop
+
+        lda HealthCurrent
+        rts
+.endproc
+
