@@ -151,14 +151,14 @@ track_table_song:
         .byte 0 ; echoes
 
 track_table_num_variants:
-        .byte 1 ; silence 
-        .byte 1 ; click_track
-        .byte 1 ; title music
+        .byte 5 ; silence 
+        .byte 5 ; click_track
+        .byte 5 ; title music
         .byte 3 ; options music
         .byte 1 ; gameover music
-        .byte 1 ; level music
+        .byte 1 ; shower groove
         .byte 3 ; in another world (warp zone)
-        .byte 3 ; bouncy
+        .byte 5 ; bouncy
         .byte 3 ; echoes
 
 track_table_heartbeat_offset:

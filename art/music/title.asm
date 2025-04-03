@@ -19,6 +19,7 @@ ft_instrument_list:
 	.word ft_inst_3
 	.word ft_inst_4
 	.word ft_inst_5
+	.word ft_inst_6
 
 ; Instruments
 ft_inst_0:
@@ -47,12 +48,18 @@ ft_inst_3:
 
 ft_inst_4:
 	.byte 0
+	.byte $11
+	.word ft_seq_2a03_20
+	.word ft_seq_2a03_24
+
+ft_inst_5:
+	.byte 0
 	.byte $15
 	.word ft_seq_2a03_115
 	.word ft_seq_2a03_12
 	.word ft_seq_2a03_54
 
-ft_inst_5:
+ft_inst_6:
 	.byte 0
 	.byte $11
 	.word ft_seq_2a03_115
@@ -61,6 +68,10 @@ ft_inst_5:
 ; Sequences
 ft_seq_2a03_12:
 	.byte $01, $FF, $00, $00, $FF
+ft_seq_2a03_20:
+	.byte $04, $FF, $00, $00, $0B, $01, $00, $00
+ft_seq_2a03_24:
+	.byte $01, $FF, $00, $00, $02
 ft_seq_2a03_29:
 	.byte $01, $FF, $00, $00, $00
 ft_seq_2a03_34:
@@ -96,14 +107,55 @@ ft_groove_list:
 	.byte $00
 ; Grooves (size, terms)
 	.byte $04, $03, $03, $02, $00, $01
+	.byte $04, $03, $03, $02, $00, $07
 
 ; Song pointer list
 ft_song_list:
 	.word ft_song_0
+	.word ft_song_1
+	.word ft_song_2
+	.word ft_song_3
+	.word ft_song_4
 
 ; Song info
 ft_song_0:
 	.word ft_s0_frames
+	.byte 4	; frame count
+	.byte 64	; pattern length
+	.byte 3	; speed
+	.byte 120	; tempo
+	.byte 0	; groove position
+	.byte 0	; initial bank
+
+ft_song_1:
+	.word ft_s1_frames
+	.byte 4	; frame count
+	.byte 64	; pattern length
+	.byte 3	; speed
+	.byte 120	; tempo
+	.byte 0	; groove position
+	.byte 0	; initial bank
+
+ft_song_2:
+	.word ft_s2_frames
+	.byte 4	; frame count
+	.byte 64	; pattern length
+	.byte 3	; speed
+	.byte 120	; tempo
+	.byte 0	; groove position
+	.byte 0	; initial bank
+
+ft_song_3:
+	.word ft_s3_frames
+	.byte 1	; frame count
+	.byte 64	; pattern length
+	.byte 3	; speed
+	.byte 120	; tempo
+	.byte 0	; groove position
+	.byte 0	; initial bank
+
+ft_song_4:
+	.word ft_s4_frames
 	.byte 4	; frame count
 	.byte 64	; pattern length
 	.byte 3	; speed
@@ -153,7 +205,7 @@ ft_s0p0c4:
 
 ; Bank 0
 ft_s0p1c0:
-	.byte $00, $03, $E4, $F6, $34, $03, $40, $01, $34, $05, $28, $03, $34, $01, $28, $0D, $1C, $03, $28, $01
+	.byte $00, $03, $E5, $F6, $34, $03, $40, $01, $34, $05, $28, $03, $34, $01, $28, $0D, $1C, $03, $28, $01
 	.byte $1C, $05, $10, $03, $1C, $01, $10, $09
 
 ; Bank 0
@@ -171,7 +223,68 @@ ft_s0p1c3:
 
 ; Bank 0
 ft_s0p2c0:
-	.byte $00, $03, $E5, $F6, $28, $03, $34, $01, $28, $19, $F7, $10, $03, $1C, $01, $10, $03, $10, $11
+	.byte $00, $03, $E6, $F6, $28, $03, $34, $01, $28, $19, $F7, $10, $03, $1C, $01, $10, $03, $10, $11
 
+; Bank 0
+ft_s1_frames:
+	.word ft_s1f0
+	.word ft_s1f1
+	.word ft_s1f2
+	.word ft_s1f3
+ft_s1f0:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f1:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f2:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f3:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+; Bank 0
+ft_s1p0c0:
+	.byte $7F, $3F
+
+; Bank 0
+ft_s1p0c4:
+	.byte $7E, $3F
+
+; Bank 0
+ft_s2_frames:
+	.word ft_s2f0
+	.word ft_s2f1
+	.word ft_s2f2
+	.word ft_s2f3
+ft_s2f0:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s2f1:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s2f2:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s2f3:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+; Bank 0
+ft_s3_frames:
+	.word ft_s3f0
+ft_s3f0:
+	.word ft_s1p0c0, ft_s3p0c1, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+; Bank 0
+ft_s3p0c1:
+	.byte $82, $03, $E4, $85, $78, $FA, $49, $F3, $49, $85, $78, $F9, $3D, $F3, $3D, $85, $78, $F9, $3D, $F3
+	.byte $3D, $85, $78, $F9, $3D, $F3, $3D, $85, $78, $FA, $49, $F3, $49, $85, $78, $F9, $3D, $F3, $3D, $85
+	.byte $78, $F9, $3D, $F3, $3D, $85, $78, $F9, $3D, $83, $F3, $3D, $03
+
+; Bank 0
+ft_s4_frames:
+	.word ft_s4f0
+	.word ft_s4f1
+	.word ft_s4f2
+	.word ft_s4f3
+ft_s4f0:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f1:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f2:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f3:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 
 ; DPCM samples (located at DPCM segment)

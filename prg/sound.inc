@@ -99,7 +99,9 @@ TRACK_ECHOES           = 8
 
 TRACK_VARIANT_NORMAL   = 0 ; every track has this
 TRACK_VARIANT_INTERIOR = 1 ; most level themes have these
-TRACK_VARIANT_PAUSE    = 2
+TRACK_VARIANT_PAUSE    = 2 ; and these
+TRACK_VARIANT_CLICK    = 3 ; replaces the debug click track song. these still respect the intended tempo
+TRACK_VARIANT_SILENT   = 4 ; same deal but it's absolute silence.
 
 ; 0 is the lowest priority, which seems like a reasonable default.
 ; For many games this is sufficient; the newest sound wins. Priority
