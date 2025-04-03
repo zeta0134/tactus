@@ -170,7 +170,12 @@ TargetSquare := R13
         ; Apply 4 ticks of "burned" to the player, replacing any previous lingering status
         lda #PLAYER_STATUS_BURNED
         sta PlayerLingeringStatusType
-        lda #4
+
+        ; a reasonable gameplay figure
+        ;lda #4
+        ; ridiculously long for testing
+        lda #127
+        
         sta PlayerLingeringStatusDuration
 
         ; Finally, "trip" this tile, so that it doesn't repeatedly re-apply its effect. We'll

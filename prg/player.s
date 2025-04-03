@@ -2366,6 +2366,9 @@ done_with_swing:
         ; if an attack landed at all ...
         lda AttackLanded
         beq attack_missed
+
+        ; process burn damage, if required
+        jsr process_burn_damage
         
         ; ... play a weapon slash effect
         lda EnemyDiedThisFrame
@@ -2969,5 +2972,23 @@ processing_required:
         near_call FAR_receive_damage
 
 skip_poison_tick:
+        rts
+.endproc
+
+.proc process_burn_damage
+IncomingDamage := R0
+        lda PlayerLingeringStatusType
+        cmp #PLAYER_STATUS_BURNED
+        beq processing_required
+        rts
+processing_required:
+
+        ; TODO: if we're really going to do burn resistance, factor that in here.
+        ; For now, burn damage deals a consistent 2 HP. Burns **can** kill the player.
+        lda #2
+        sta IncomingDamage
+        near_call FAR_receive_damage
+
+no_attack_this_turn:
         rts
 .endproc
