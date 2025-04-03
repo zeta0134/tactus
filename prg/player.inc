@@ -32,6 +32,7 @@
 .global PlayerCombo
 .global PlayerChain
 
+.global PlayerState
 .global PlayerNavState
 
 .globalzp PlayerZonePtr
@@ -78,6 +79,9 @@ PLAYER_STATE_CASTING = 2
 ; grave. This state will transition out of gameplay once
 ; entered!
 PLAYER_STATE_DEAD = 3
+; We are shocked! We can't take any actions until this wears off,
+; and our combo/chain is forced to reset.
+PLAYER_STATE_SHOCKED = 4
 
 PLAYER_STATUS_NORMAL      = 0
 PLAYER_STATUS_POISONED    = 1

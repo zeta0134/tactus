@@ -92,6 +92,11 @@ TargetSquare := R13
         sta PlayerLingeringStatusType
         lda #4
         sta PlayerLingeringStatusDuration
+        ; For now, do this all manually
+        lda #PLAYER_STATE_SHOCKED
+        sta PlayerState
+        ldx PlayerSpriteIndex
+        set_player_sprite_x SPRITE_PLAYER_02_PLAYER_STUN
 
         ; Finally, "trip" this tile, so that it doesn't repeatedly re-apply its effect. We'll
         ; reset it when the player steps elsewhere.

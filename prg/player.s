@@ -1033,6 +1033,7 @@ player_state_lut:
         .word player_state_bomb
         .word player_state_casting
         .word player_state_dead
+        .word player_state_shocked
 
 ; Called once at the beginning of every beat
 .proc FAR_update_player
@@ -1205,6 +1206,13 @@ resolve_enemy_collision:
         sta PlayerPreviousSuccessfulDirection
         jmp skip_jumping_pose
 apply_jumping_pose:
+        ; status checks: if we entered the shocked/frozen states, don't jump
+        lda PlayerLingeringStatusType
+        cmp #PlAYER_STATUS_SHOCKED
+        beq skip_jumping_pose
+        cmp #PlAYER_STATUS_FROZEN
+        beq skip_jumping_pose
+        ; okay to proceed!
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER_JUMP
         ; The player's movement succeeded, so store that in a flag
@@ -1357,6 +1365,115 @@ resolve_enemy_collision:
         lda PlayerCol
         sta TargetCol
         near_call FAR_player_resolve_collision
+
+        ; Update the player's combo counter
+        jsr update_chain_and_combo
+
+        ; Now we may finalize the player's position and draw
+        lda TargetRow
+        sta PlayerRow
+        lda TargetCol
+        sta PlayerCol
+
+        jsr set_player_target_coordinates
+
+        ; If the player is still holding this directional input, carry it over
+        ; to the next beat as a held input
+        ; (note: do this part unconditionally, as some mechanics rely on held inputs.
+        ; the optional ones will be checked at each site)
+        ldx PlayerNextDirection
+        lda player_direction_button_lut, x
+        and ButtonsThisFrame
+        beq done_with_held_inputs
+        lda PlayerNextDirection
+        sta PlayerHeldDirection
+done_with_held_inputs:
+        ; Clear player intent for the next beat
+        lda #0
+        sta PlayerNextDirection
+
+        jsr apply_player_torchlight
+
+        ; Detect exits and, if necessary, transition to the next room
+        jsr detect_exit
+
+        ; Detect being dead and, if necessary, transition to the end screen
+        jsr detect_critical_existence_failure
+
+        ; (Notably: do not detect pausing or spellcasting. Holding a bomb overrides both!)
+
+        lda #0
+        sta PlayerIntendsToBomb
+        sta PlayerIntendsToCast
+        sta PlayerIntendsToWait
+        sta PlayerIntendsToPause
+
+        perform_zpcm_inc
+
+        ; If necessary, cleanup dialog states through movement
+        jsr cleanup_dialog_state
+
+        ; Finally, our position is finalized, so compute the lookup table ptr for distance
+        ; (this massively improves enemy AI during pathfinding)
+        near_call FAR_compute_player_distance_lut_ptr
+        rts
+.endproc
+
+; A stun state during which we cannot move. Lasts until the effect duration expires naturally
+; or we take a hit from any other source, which also cancels the effect.
+.proc player_state_shocked
+TorchlightTotal := R0
+
+PlayerSquare := R2
+
+TargetRow := R14
+TargetCol := R15
+        jsr process_lingering_effect_expiry
+
+        ; If the effect has expired, go ahead and revert us back to normal state
+        lda PlayerLingeringStatusType
+        bne stun_not_expired
+        ; Reset to the normal state then
+        lda #PLAYER_STATE_NORMAL
+        sta PlayerState
+        lda #0
+        sta PlayerBeatsInThisState
+        ; Reset to our idle sprite, which may get replaced by taking damage
+        ldx PlayerSpriteIndex
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER
+        jmp done_setting_initial_sprite
+stun_not_expired:
+        ldx PlayerSpriteIndex
+        set_player_sprite_x SPRITE_PLAYER_02_PLAYER_STUN
+done_setting_initial_sprite:
+
+        lda #0
+        sta PlayerTookDamageThisBeat
+        sta PlayerDamageAnimCounter
+        ; If no damage direction is set, default to a kinda random-circle-y lookin' thing.
+        sta PlayerIncomingDamageDirection
+
+        ; Every beat we'll by default be in our generic palette. We need to recover from whatever
+        ; the previous beat's effect was doing, so flag that here.
+        lda #1
+        sta StagingObjPaletteDirty
+
+resolve_enemy_collision:
+        lda PlayerRow
+        sta TargetRow
+        lda PlayerCol
+        sta TargetCol
+        near_call FAR_player_resolve_collision
+
+        ; If we just took damage, then clear the stun state. (We might also be dead, we'll check for that in a minute.)
+        lda PlayerTookDamageThisBeat
+        beq no_damage_taken
+        ; Revert us to our normal state, but don't set a sprite (the damage routine did that)
+        lda #PLAYER_STATE_NORMAL
+        sta PlayerState
+        lda #0
+        sta PlayerBeatsInThisState
+no_damage_taken:
 
         ; Update the player's combo counter
         jsr update_chain_and_combo
@@ -2251,6 +2368,8 @@ damage_amount_okay:
         beq apply_damage_animation
         cmp #<SPRITE_PLAYER_01_PLAYER_IDLE
         beq apply_damage_animation
+        cmp #<SPRITE_PLAYER_02_PLAYER_STUN
+        beq apply_damage_animation
         jmp action_overrides_damage_animation
 apply_damage_animation:
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER_HIT
@@ -2680,8 +2799,6 @@ sprite_failed:
 processing_required:
         cmp #PlAYER_STATUS_FROZEN
         beq player_is_frozen
-        cmp #PlAYER_STATUS_SHOCKED
-        beq player_is_stunned
         ; Normal expiry
 normal_expiry:
         dec PlayerLingeringStatusDuration
@@ -2697,7 +2814,6 @@ cancel_effect:
         sta PlayerLingeringStatusFrame
         rts
 player_is_frozen:
-player_is_stunned:
         ; Breaking out of freezing has custom logic in the respective stun
         ; state, which will handle terminating the effect. Take no automatic
         ; action. (This shouldn't be reached, actually.)
