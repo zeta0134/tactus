@@ -82,6 +82,10 @@ PLAYER_STATE_DEAD = 3
 ; We are shocked! We can't take any actions until this wears off,
 ; and our combo/chain is forced to reset.
 PLAYER_STATE_SHOCKED = 4
+; We are frozen solid! The only action we can take is to tap
+; on the ice and try to break it. One tap decrements the freeze timer.
+; While frozen, our combo/chain is not reset!
+PLAYER_STATE_FROZEN = 5
 
 PLAYER_STATUS_NORMAL      = 0
 PLAYER_STATUS_POISONED    = 1
