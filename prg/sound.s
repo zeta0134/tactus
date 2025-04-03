@@ -10,6 +10,7 @@
         .include "far_call.inc"
         .include "pal.inc"
         .include "rainbow.inc"
+        .include "saves.inc"
         .include "slowam.inc"
         .include "sound.inc"
         .include "word_util.inc"
@@ -293,6 +294,9 @@ done:
         sta MusicCurrentBank
         access_data_bank MusicCurrentBank
 
+        lda target_music_variant
+        jsr play_variant
+
         ldx MusicCurrentTrack
         lda track_table_module_low, x
         ldy track_table_module_high, x
@@ -312,6 +316,7 @@ done:
         restore_previous_bank
 
         far_call FAR_beat_tracker_init
+        rts
 
 no_change:
         ; safely re-apply the current music variant (again)
@@ -324,6 +329,20 @@ no_change:
 
 ; inputs: variant number in A
 .proc play_variant
+        ; First, check to see if we need to replace this variant based on the music mode
+        ldx current_save + SaveFile::OptionMusicMode
+        cpx #OPTION_MUSIC_CLICK
+        beq force_click_track
+        cpx #OPTION_MUSIC_DISABLED
+        beq force_silent_track
+        jmp use_supplied_variant
+force_click_track:
+        lda #TRACK_VARIANT_CLICK
+        jmp use_supplied_variant
+force_silent_track:
+        lda #TRACK_VARIANT_SILENT
+        ; fall through to use supplied
+use_supplied_variant:
         ldx MusicCurrentTrack
         cmp track_table_num_variants, x
         beq invalid_variant ; variant index must be LESS than the total count

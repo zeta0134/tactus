@@ -608,32 +608,32 @@ ft_s3_frames:
 	.word ft_s3f9
 	.word ft_s3f10
 ft_s3f0:
-	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.word ft_s1p0c0, ft_s3p0c1, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 ft_s3f1:
-	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.word ft_s1p0c0, ft_s3p0c1, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 ft_s3f2:
-	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.word ft_s1p0c0, ft_s3p0c1, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 ft_s3f3:
-	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.word ft_s1p0c0, ft_s3p0c1, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 ft_s3f4:
-	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.word ft_s1p0c0, ft_s3p0c1, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 ft_s3f5:
-	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.word ft_s1p0c0, ft_s3p0c1, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 ft_s3f6:
-	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.word ft_s1p0c0, ft_s3p0c1, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 ft_s3f7:
-	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.word ft_s1p0c0, ft_s3p0c1, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 ft_s3f8:
-	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.word ft_s1p0c0, ft_s3p0c1, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 ft_s3f9:
-	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.word ft_s1p0c0, ft_s3p0c1, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 ft_s3f10:
-	.word ft_s0p0c0, ft_s3p0c1, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0, ft_s0p0c0
+	.word ft_s1p0c0, ft_s3p0c1, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 ; Bank 0
 ft_s3p0c1:
-	.byte $82, $03, $E5, $85, $78, $FA, $49, $F3, $49, $85, $78, $F9, $3D, $F3, $3D, $85, $78, $F9, $3D, $F3
-	.byte $3D, $85, $78, $F9, $3D, $F3, $3D, $85, $78, $FA, $49, $F3, $49, $85, $78, $F9, $3D, $F3, $3D, $85
-	.byte $78, $F9, $3D, $F3, $3D, $85, $78, $F9, $3D, $83, $F3, $3D, $03
+	.byte $82, $03, $E5, $85, $78, $8A, $8F, $00, $92, $FA, $49, $F3, $49, $85, $78, $F9, $3D, $F3, $3D, $85
+	.byte $78, $F9, $3D, $F3, $3D, $85, $78, $F9, $3D, $F3, $3D, $85, $78, $FA, $49, $F3, $49, $85, $78, $F9
+	.byte $3D, $F3, $3D, $85, $78, $F9, $3D, $F3, $3D, $85, $78, $F9, $3D, $83, $F3, $3D, $03
 
 ; Bank 0
 ft_s4_frames:

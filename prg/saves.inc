@@ -32,9 +32,11 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     OptionColorspace .byte
     OptionRhythmFlashBar .byte
     OptionRhythmFlashPlayer .byte
-    OptionPpuType .byte
+    OptionPpuType .byte       ; TODO: consider moving these to global, rather than per-file
     OptionColorEmphasis .byte
-    OptionsReserved .byte 8 ; pad out to 16 bytes total
+    OptionSfxMode .byte
+    OptionMusicMode .byte
+    OptionsReserved .byte 6 ; pad out to 16 bytes total
     ; FUTURE
     GeneralReserved .byte 24
     ; CURRENT RUN STATE (that which persists, anyway) (current: 31 bytes)
@@ -106,6 +108,13 @@ OPTION_PPU_TYPE_RGB       = 2
 
 OPTION_EMPHASIS_ENABLED = 0
 OPTION_EMPHASIS_DISABLED = 1
+
+OPTION_SFX_ENABLED = 0
+OPTION_SFX_DISABLED = 1
+
+OPTION_MUSIC_ENABLED  = 0
+OPTION_MUSIC_CLICK    = 1
+OPTION_MUSIC_DISABLED = 2
 
 ; 
 .struct SaveBlock

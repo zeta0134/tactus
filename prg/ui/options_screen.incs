@@ -55,6 +55,9 @@ options_sublayout_input_page_1:
 options_sublayout_audio_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_audio_str, 2, 13
+        widget_text_options sfx_mode_str, sfx_mode_options, {current_save + SaveFile::OptionSfxMode  },   4, 15
+        widget_text_options bgm_mode_str, bgm_mode_options, {current_save + SaveFile::OptionMusicMode  }, 4, 16
+        widget_controller FAR_options_page_refresh_music_controller
         .addr $0000 ; end of list
 options_sublayout_compatibility_tweaks_page_1:
         widget_controller FAR_options_page_clear_controller_init
@@ -203,6 +206,21 @@ flash_player_options:
         .byte 2
         .addr off_str
         .addr on_str
+
+sfx_mode_str:    .asciiz "SoundFX "
+sfx_mode_options:
+        .byte 2
+        .addr on_str
+        .addr off_str
+
+metronome_str: .asciiz "METRONOME"
+
+bgm_mode_str:    .asciiz "Music   "
+bgm_mode_options:
+        .byte 3
+        .addr on_str
+        .addr metronome_str
+        .addr off_str
 
 options_pal_default_base:    .incbin "../art/palettes/options/base.pal"
 options_pal_protan_base:     .incbin "../art/palettes/options/protan.pal"
@@ -956,5 +974,12 @@ perform_sync:
         sta StagingObjPaletteDirty
         sta StagingHudPaletteDirty
 
+        rts
+.endproc
+
+.proc FAR_options_page_refresh_music_controller
+        lda #TRACK_OPTIONS
+        ldy #TRACK_VARIANT_NORMAL
+        jsr play_track
         rts
 .endproc
