@@ -1,4 +1,4 @@
-; Dn-FamiTracker exported music data: tactus-gameover.dnm
+; Dn-FamiTracker exported music data: game_over.dnm
 ;
 
 ; Module header
@@ -109,10 +109,50 @@ ft_groove_list:
 ; Song pointer list
 ft_song_list:
 	.word ft_song_0
+	.word ft_song_1
+	.word ft_song_2
+	.word ft_song_3
+	.word ft_song_4
 
 ; Song info
 ft_song_0:
 	.word ft_s0_frames
+	.byte 3	; frame count
+	.byte 64	; pattern length
+	.byte 6	; speed
+	.byte 150	; tempo
+	.byte 0	; groove position
+	.byte 0	; initial bank
+
+ft_song_1:
+	.word ft_s1_frames
+	.byte 3	; frame count
+	.byte 64	; pattern length
+	.byte 6	; speed
+	.byte 150	; tempo
+	.byte 0	; groove position
+	.byte 0	; initial bank
+
+ft_song_2:
+	.word ft_s2_frames
+	.byte 3	; frame count
+	.byte 64	; pattern length
+	.byte 6	; speed
+	.byte 150	; tempo
+	.byte 0	; groove position
+	.byte 0	; initial bank
+
+ft_song_3:
+	.word ft_s3_frames
+	.byte 3	; frame count
+	.byte 64	; pattern length
+	.byte 6	; speed
+	.byte 150	; tempo
+	.byte 0	; groove position
+	.byte 0	; initial bank
+
+ft_song_4:
+	.word ft_s4_frames
 	.byte 3	; frame count
 	.byte 64	; pattern length
 	.byte 6	; speed
@@ -335,5 +375,57 @@ ft_s0p2c7:
 	.byte $FF, $25, $FC, $1E, $FB, $1B, $FC, $25, $FB, $1E, $F9, $1B, $FB, $21, $F9, $1E, $FB, $25, $F9, $21
 	.byte $F8, $1B, $F9, $25, $F8, $1E, $F6, $1B, $F8, $21, $83, $86, $02, $F6, $1E, $00
 
+; Bank 0
+ft_s1_frames:
+	.word ft_s1f0
+	.word ft_s1f1
+	.word ft_s1f2
+ft_s1f0:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f1:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s1f2:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+; Bank 0
+ft_s1p0c0:
+	.byte $7F, $3F
+
+; Bank 0
+ft_s1p0c4:
+	.byte $7E, $3F
+
+; Bank 0
+ft_s2_frames:
+	.word ft_s2f0
+	.word ft_s2f1
+	.word ft_s2f2
+ft_s2f0:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s2f1:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s2f2:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+; Bank 0
+ft_s3_frames:
+	.word ft_s3f0
+	.word ft_s3f1
+	.word ft_s3f2
+ft_s3f0:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s3f1:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s3f2:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+; Bank 0
+ft_s4_frames:
+	.word ft_s4f0
+	.word ft_s4f1
+	.word ft_s4f2
+ft_s4f0:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f1:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
+ft_s4f2:
+	.word ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c0, ft_s1p0c4
 
 ; DPCM samples (located at DPCM segment)
