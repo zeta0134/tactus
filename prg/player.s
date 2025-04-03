@@ -117,6 +117,7 @@ PlayerHeldBombIndex: .res 1
 PlayerLingeringStatusType: .res 1
 PlayerLingeringStatusDuration: .res 1 ; in beats
 PlayerLingeringStatusFrame: .res 1
+PlayerTappedIce: .res 1
 
 WeaponSingleTargetIndex: .res 1
 
@@ -188,6 +189,14 @@ damage_offsets_by_direction_lut:
         .addr damage_table_southeast_x, damage_table_southeast_y
         .addr damage_table_northwest_x, damage_table_northwest_y
         .addr damage_table_southwest_x, damage_table_southwest_y
+
+ice_pick_offsets_x:
+        .byte <-2, <-2, 2, 2, <-1, <-1, 1, 1, <-0, <-0, 0, 0, <-0, <-0, 0, 0
+        ; would repeat 16, just fall through to the other table
+ice_pick_offsets_y:
+        .repeat 32
+        .byte 0
+        .endrepeat
 
 .proc FAR_init_player
 NewHeartType := R0
@@ -586,6 +595,19 @@ done_with_height:
         adc (DamageOffsetPtrY), y
         sta sprite_table + MetaSpriteState::PositionY, x
 done_with_damage_offset:
+        ; If we're frozen, do the shake thing when the player inputs any direction
+        lda PlayerTappedIce
+        beq done_being_frozen
+        ldy PlayerLingeringStatusFrame
+        lda sprite_table + MetaSpriteState::PositionX, x
+        clc
+        adc ice_pick_offsets_x, y
+        sta sprite_table + MetaSpriteState::PositionX, x
+        lda sprite_table + MetaSpriteState::PositionY, x
+        clc
+        adc ice_pick_offsets_y, y
+        sta sprite_table + MetaSpriteState::PositionY, x
+done_being_frozen:
 
         ; Update the damage status every frame
         lda PlayerTookDamageThisBeat
@@ -1060,6 +1082,7 @@ PlayerStatePtr := R0
         sta PlayerTookDamageThisBeat
         sta PlayerDamageAnimCounter
         sta PlayerLingeringStatusFrame
+        sta PlayerTappedIce
         ; If no damage direction is set, default to a kinda random-circle-y lookin' thing.
         sta PlayerIncomingDamageDirection
 
@@ -1430,6 +1453,8 @@ PlayerSquare := R2
 
 TargetRow := R14
 TargetCol := R15
+        lda #0
+        sta PlayerLingeringStatusFrame
         jsr process_lingering_effect_expiry
 
         ; If the effect has expired, go ahead and revert us back to normal state
@@ -1541,11 +1566,16 @@ PlayerSquare := R2
 
 TargetRow := R14
 TargetCol := R15
+        lda #0
+        sta PlayerTappedIce
+        sta PlayerLingeringStatusFrame
 
         ; If the player intends to move, then process the effect expiry as usual
         lda PlayerNextDirection
         ora PlayerHeldDirection
         beq no_movement_attempted
+        lda #1
+        sta PlayerTappedIce
         jsr process_lingering_effect_expiry
         ; TODO: if we're going to juice up the tap with player shake or SFX, do that here!
 no_movement_attempted:
@@ -1578,6 +1608,9 @@ no_defrosting_today:
         ; Reset to our idle sprite, which may get replaced by taking damage
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER
+        ; Clear the ice tap thing, we're going to run normal player movement instead
+        lda #0
+        sta PlayerTappedIce
         ; Now just BECOME the normal state, and skip all this other nonsense. This way if the player
         ; queues up an action on the frame they would recover, we honor that action.
         jmp player_state_normal
