@@ -211,7 +211,7 @@ ft_song_2:
 	.byte 0	; speed
 	.byte 150	; tempo
 	.byte 1	; groove position
-	.byte 0	; initial bank
+	.byte 1 ; initial bank
 
 ft_song_3:
 	.word ft_s3_frames
@@ -220,7 +220,7 @@ ft_song_3:
 	.byte 0	; speed
 	.byte 150	; tempo
 	.byte 1	; groove position
-	.byte 0	; initial bank
+	.byte 1	; initial bank
 
 ft_song_4:
 	.word ft_s4_frames
@@ -229,7 +229,7 @@ ft_song_4:
 	.byte 0	; speed
 	.byte 150	; tempo
 	.byte 1	; groove position
-	.byte 0	; initial bank
+	.byte 1	; initial bank
 
 
 ;

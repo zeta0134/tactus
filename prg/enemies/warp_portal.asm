@@ -112,3 +112,35 @@ CurrentTile := R15
 
         rts
 .endproc
+
+.proc ENEMY_UPDATE_hidden_warp_tile
+CurrentRow := R14
+CurrentTile := R15
+        ; Visually behave like a regular disco tile
+        near_call ENEMY_UPDATE_draw_disco_tile
+
+        ; But make sure we still behave like a hidden warp floor tile, and not
+        ; a permanent disco tile
+        ldx CurrentTile
+        lda #TILE_HIDDEN_WARP_FLOOR
+        sta battlefield, x
+
+        rts
+.endproc
+
+        .segment "ENEMY_UTIL"
+
+.proc ENEMY_UTIL_suspend_hidden_warp_tile
+CurrentRow := R14
+CurrentTile := R15
+        ; Visually behave like a regular disco tile
+        near_call ENEMY_UTIL_draw_cleared_disco_tile
+
+        ; But make sure we still behave like a hidden warp floor tile, and not
+        ; a permanent disco tile
+        ldx CurrentTile
+        lda #TILE_HIDDEN_WARP_FLOOR
+        sta battlefield, x
+
+        rts
+.endproc

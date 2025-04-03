@@ -2,6 +2,29 @@
 ; ===                                           Utility Functions                                                          ===
 ; ============================================================================================================================
 
+; TODO: fix these offsets and kill the / 4
+.macro directional_tile_offset base_name, compass_direction, variant_offset
+        .word .ident(.sprintf("BG_TILE_%s_%04d", base_name, ((compass_direction / 4) + (variant_offset / 4))))
+.endmacro
+
+OFFSET_N  =  0 * 4
+OFFSET_NE =  5 * 4
+OFFSET_E  = 10 * 4
+OFFSET_SE = 15 * 4
+OFFSET_S  = 20 * 4
+OFFSET_SW = 25 * 4
+OFFSET_W  = 30 * 4
+OFFSET_NW = 35 * 4
+
+OFFSET_PLAIN           = 0 * 4
+OFFSET_SOLID_GROWING   = 1 * 4
+OFFSET_SOLID_STATIC    = 2 * 4
+OFFSET_OUTLINE_GROWING = 3 * 4
+OFFSET_OUTLINE_STATIC  = 4 * 4
+; note: use "PLAIN" for the shrinking variants; the
+; early bit of the animation will hide the lack of a tile underneath, and
+; that combination isn't supposed to show up anyway for game logic reasons
+
 .macro bail_if_already_moved
         ; All entities which can move use their high data flag to indicate that they have just done so.
         ; By bailing early, we prevent entities that care about this from accidentally being ticked

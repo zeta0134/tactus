@@ -495,10 +495,10 @@ tile_spell   TILE_CRACKED_WARP_WALL, FIXED_no_behavior
 
 ; TODO: real behaviors. These should convert to warp portals when hit by a bomb,
 ; but only if the player isn't standing on top of them at the time!
-tile_update  TILE_HIDDEN_WARP_FLOOR, ENEMY_UPDATE_draw_disco_tile
+tile_update  TILE_HIDDEN_WARP_FLOOR, ENEMY_UPDATE_hidden_warp_tile
 tile_attack  TILE_HIDDEN_WARP_FLOOR, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_HIDDEN_WARP_FLOOR, FIXED_no_behavior
-tile_suspend TILE_HIDDEN_WARP_FLOOR, ENEMY_UTIL_draw_cleared_disco_tile
+tile_suspend TILE_HIDDEN_WARP_FLOOR, ENEMY_UTIL_suspend_hidden_warp_tile
 tile_explode TILE_HIDDEN_WARP_FLOOR, ENEMY_BOMB_SPELL_become_warp_portal, FIXED_no_behavior
 tile_spell   TILE_HIDDEN_WARP_FLOOR, FIXED_no_behavior
 

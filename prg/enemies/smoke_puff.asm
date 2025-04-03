@@ -72,97 +72,79 @@ EffectiveAttackSquare := R10
 
         .segment "ENEMY_UPDATE"
 
-OFFSET_N  =  0 * 4
-OFFSET_NE =  5 * 4
-OFFSET_E  = 10 * 4
-OFFSET_SE = 15 * 4
-OFFSET_S  = 20 * 4
-OFFSET_SW = 25 * 4
-OFFSET_W  = 30 * 4
-OFFSET_NW = 35 * 4
-
-OFFSET_PLAIN           = 0 * 4
-OFFSET_SOLID_GROWING   = 1 * 4
-OFFSET_SOLID_STATIC    = 2 * 4
-OFFSET_OUTLINE_GROWING = 3 * 4
-OFFSET_OUTLINE_STATIC  = 4 * 4
-; note: use "PLAIN" for the shrinking variants; the
-; early bit of the animation will hide the lack of a tile underneath, and
-; that combination isn't supposed to show up anyway for game logic reasons
-
 smoke_puff_lut:
 smoke_puff_n:
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_N + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_N + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_N + OFFSET_SOLID_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_N + OFFSET_SOLID_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_N + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_N + OFFSET_OUTLINE_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_N + OFFSET_OUTLINE_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_N + OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_N, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_N, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_N, OFFSET_SOLID_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_N, OFFSET_SOLID_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_N, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_N, OFFSET_OUTLINE_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_N, OFFSET_OUTLINE_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_N, OFFSET_PLAIN
 smoke_puff_ne:
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NE + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NE + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NE + OFFSET_SOLID_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NE + OFFSET_SOLID_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NE + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NE + OFFSET_OUTLINE_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NE + OFFSET_OUTLINE_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NE + OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_NE, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_NE, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_NE, OFFSET_SOLID_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_NE, OFFSET_SOLID_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_NE, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_NE, OFFSET_OUTLINE_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_NE, OFFSET_OUTLINE_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_NE, OFFSET_PLAIN
 smoke_puff_e:
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_E + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_E + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_E + OFFSET_SOLID_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_E + OFFSET_SOLID_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_E + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_E + OFFSET_OUTLINE_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_E + OFFSET_OUTLINE_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_E + OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_E, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_E, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_E, OFFSET_SOLID_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_E, OFFSET_SOLID_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_E, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_E, OFFSET_OUTLINE_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_E, OFFSET_OUTLINE_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_E, OFFSET_PLAIN
 smoke_puff_se:
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SE + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SE + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SE + OFFSET_SOLID_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SE + OFFSET_SOLID_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SE + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SE + OFFSET_OUTLINE_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SE + OFFSET_OUTLINE_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SE + OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_SE, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_SE, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_SE, OFFSET_SOLID_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_SE, OFFSET_SOLID_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_SE, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_SE, OFFSET_OUTLINE_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_SE, OFFSET_OUTLINE_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_SE, OFFSET_PLAIN
 smoke_puff_s:
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_S + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_S + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_S + OFFSET_SOLID_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_S + OFFSET_SOLID_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_S + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_S + OFFSET_OUTLINE_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_S + OFFSET_OUTLINE_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_S + OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_S, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_S, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_S, OFFSET_SOLID_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_S, OFFSET_SOLID_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_S, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_S, OFFSET_OUTLINE_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_S, OFFSET_OUTLINE_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_S, OFFSET_PLAIN
 smoke_puff_sw:
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SW + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SW + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SW + OFFSET_SOLID_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SW + OFFSET_SOLID_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SW + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SW + OFFSET_OUTLINE_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SW + OFFSET_OUTLINE_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_SW + OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_SW, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_SW, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_SW, OFFSET_SOLID_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_SW, OFFSET_SOLID_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_SW, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_SW, OFFSET_OUTLINE_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_SW, OFFSET_OUTLINE_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_SW, OFFSET_PLAIN
 smoke_puff_w:
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_W + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_W + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_W + OFFSET_SOLID_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_W + OFFSET_SOLID_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_W + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_W + OFFSET_OUTLINE_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_W + OFFSET_OUTLINE_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_W + OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_W, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_W, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_W, OFFSET_SOLID_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_W, OFFSET_SOLID_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_W, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_W, OFFSET_OUTLINE_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_W, OFFSET_OUTLINE_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_W, OFFSET_PLAIN
 smoke_puff_nw:
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NW + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NW + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NW + OFFSET_SOLID_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NW + OFFSET_SOLID_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NW + OFFSET_PLAIN
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NW + OFFSET_OUTLINE_GROWING
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NW + OFFSET_OUTLINE_STATIC
-        .word BG_TILE_DUST_TILES_0000 + OFFSET_NW + OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_NW, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_NW, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_NW, OFFSET_SOLID_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_NW, OFFSET_SOLID_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_NW, OFFSET_PLAIN
+        directional_tile_offset "DUST_TILES", OFFSET_NW, OFFSET_OUTLINE_GROWING
+        directional_tile_offset "DUST_TILES", OFFSET_NW, OFFSET_OUTLINE_STATIC
+        directional_tile_offset "DUST_TILES", OFFSET_NW, OFFSET_PLAIN
 
 ; Note: This is only for DRAWING the smoke puff! Any other data you need to stuff into
 ; this thing, do that at the call site.
