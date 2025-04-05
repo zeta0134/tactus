@@ -38,6 +38,8 @@
 .global draw_battlefield_B
 .global draw_battlefield_C
 
+.global suspend_current_game
+
 ; The default AI update routine
 .global update_enemies_1
 ; The player may switch to this to process spellcasting logic

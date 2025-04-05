@@ -168,7 +168,13 @@ TargetSquare := R13
         ; First up, always block player movement. This is a solid object.
         near_call ENEMY_COLLIDE_solid_tile_forbids_movement
 
-        ; TODO: activate!
+        ; For now: just suspend out without confirmation. It's fine?
+        st16 GameMode, suspend_current_game
+
+        ; Do not run this logic again!
+        ldx TargetSquare
+        lda #TOTEM_EMPTY
+        sta tile_data, x
     
         rts
 .endproc

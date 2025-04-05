@@ -2025,3 +2025,16 @@ apply_room_specific_effect:
 keep_current_effect:   
         rts
 .endproc
+
+.proc suspend_current_game
+        lda current_save + SaveFile::RunFlags
+        ora #RUN_FLAGS_SUSPENDED
+        sta current_save + SaveFile::RunFlags
+
+        far_call FAR_save_current_file
+
+        st16 FadeToGameMode, title_prep
+        st16 GameMode, fade_to_game_mode_from_gameplay
+
+        rts
+.endproc
