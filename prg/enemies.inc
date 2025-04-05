@@ -35,6 +35,7 @@ TILE_HAZARD_POISON     = 30
 TILE_HAZARD_FREEZE     = 31
 TILE_HAZARD_SHOCK      = 32
 TILE_HAZARD_BURN       = 33
+TILE_TOTEM             = 34
 
 ; Actually in the fixed page
 .global draw_active_tile

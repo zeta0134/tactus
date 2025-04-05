@@ -6,7 +6,8 @@
 .global RoomTransitionType
 
 .global PlayfieldBgHighBank
-.global PlayfieldObjHighBank
+.global PlayerObjHighBank
+.global PlayfieldBgObjHighBank
 .global HudBgHighBank
 .global HudObjHighBank
 

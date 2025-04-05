@@ -230,6 +230,7 @@ tile_index_to_col_lut:
 .include "enemies/slimes.asm"
 .include "enemies/smoke_puff.asm"
 .include "enemies/treasure_chest.asm"
+.include "enemies/totems.asm"
 .include "enemies/warp_portal.asm"
 
 .macro define_array name
@@ -543,6 +544,16 @@ tile_collide TILE_HAZARD_BURN, ENEMY_COLLIDE_activate_hazard_burn
 tile_suspend TILE_HAZARD_BURN, FIXED_no_behavior
 tile_explode TILE_HAZARD_BURN, FIXED_no_behavior, FIXED_no_behavior
 tile_spell   TILE_HAZARD_BURN, FIXED_no_behavior
+
+; Note: all totems have shared initial dispatch, so they don't consume
+; extra enemy slots. There are a lot of these, but not a lot onscreen at
+; once, so we can eat the performance penalty here.
+tile_update  TILE_TOTEM, ENEMY_UPDATE_totem_update
+tile_attack  TILE_TOTEM, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_TOTEM, ENEMY_COLLIDE_with_totem
+tile_suspend TILE_TOTEM, ENEMY_UTIL_suspend_totem
+tile_explode TILE_TOTEM, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_TOTEM, FIXED_no_behavior
 
 .segment "ENEMY_UPDATE"
 

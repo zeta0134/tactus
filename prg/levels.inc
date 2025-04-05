@@ -327,6 +327,7 @@ ROOM_POOL_ZONE_5_WARP            = 34
         ObjPaletteTablePtr .word
         ObjPaletteTableBank .byte
         OverlayList .word
+        FinalizerPtr .word
         TileIDsLow .byte 176
         TileAttrsHigh .byte 176
         BehaviorIDs .byte 176

@@ -25,7 +25,9 @@ SPRITE_ONE_BEAT    = %00000100
 ; the last 2 bits are the sprite palette
 
 ; Special behavior flags, for special behaviors
-SPRITE_FLOAT       = %10000000
+SPRITE_FLOAT         = %10000000
+SPRITE_BIPHASIC      = %01000000 ; two tile variants selected by musical beat
+SPRITE_PALETTE_CYCLE = %00100000 ; flip between palettes 1, 2, 3 on every other musical beat
 
 .global sprite_table
 

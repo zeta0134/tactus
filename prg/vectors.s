@@ -132,10 +132,15 @@ all_frames:
         ; TODO: see if we can't break this up into high priority, low priority
         ; blocks, to move some of this logic out of actual vblank. we are in a
         ; race condition against the start of raster splits, after all
-        .repeat 16, i
+        .repeat 4, i
         lda PlayfieldObjBanks+i  ; 4
-        ora PlayfieldObjHighBank ; 3
+        ora PlayerObjHighBank    ; 3
         sta MAP_CHR_0_LO + i     ; 4
+        .endrepeat
+        .repeat 12, i
+        lda PlayfieldObjBanks+4+i  ; 4
+        ora PlayfieldBgObjHighBank ; 3
+        sta MAP_CHR_0_LO + 4 + i   ; 4
         .endrepeat
 
         ; re-enable rendering (the IRQ may have disabled it, if it ran)

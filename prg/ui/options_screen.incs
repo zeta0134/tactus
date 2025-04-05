@@ -51,6 +51,7 @@ options_sublayout_gameplay_page_1:
 options_sublayout_input_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_input_str, 2, 13
+        widget_text_label coming_soon_str, 4, 15
         .addr $0000 ; end of list
 options_sublayout_audio_page_1:
         widget_controller FAR_options_page_clear_controller_init
@@ -255,6 +256,8 @@ debug_silly_1_str: .asciiz "Yes yes, hello tcrf.net :)"
 debug_silly_2_str: .asciiz "I see you've found my debug"
 debug_silly_3_str: .asciiz "options! Come right on in,"
 debug_silly_4_str: .asciiz "have some coffee, etc."
+
+coming_soon_str: .asciiz "Coming Soon :)"
 
 ; ======================================================================
 ;                       Screen Specific Logic

@@ -61,7 +61,8 @@ LastBeat: .res 1
 AccumulatedGameBeats: .res 2
 
 PlayfieldBgHighBank: .res 1
-PlayfieldObjHighBank: .res 1 ; this is really more like "animation offset" but w/e
+PlayerObjHighBank: .res 1      ; for sprite banks that should be synced to the player when off-beat
+PlayfieldBgObjHighBank: .res 1 ; for sprite animations that should be synced to the background, always
 HudBgHighBank: .res 1
 HudObjHighBank: .res 1 ; ditto
 
@@ -423,7 +424,7 @@ LayoutPtr := R0
         sta SPRITE_BANK_STATIC_05
         lda #>SPRITE_STATIC_06_PLACEHOLDER
         sta SPRITE_BANK_STATIC_06
-        lda #>SPRITE_STATIC_07_PLACEHOLDER
+        lda #>SPRITE_STATIC_07_DISKETTE
         sta SPRITE_BANK_STATIC_07
 
         lda #>SPRITE_HUD_STATIC_00_COUNTER_01S_01
@@ -558,7 +559,8 @@ LayoutPtr := R0
         sta CurrentBeatCounter
         sta AccumulatedGameBeats
         sta AccumulatedGameBeats+1
-        sta PlayfieldObjHighBank
+        sta PlayerObjHighBank
+        sta PlayfieldBgObjHighBank
         sta HudBgHighBank
         sta HudObjHighBank
         lda #4
@@ -1849,7 +1851,8 @@ done_with_nametables:
         ldx TrackedMusicPos
         lda tracked_animation_frame, x
         sta PlayfieldBgHighBank
-        sta PlayfieldObjHighBank
+        sta PlayerObjHighBank
+        sta PlayfieldBgObjHighBank
         ; the title screen doesn't actually use these, but we
         ; still might as well update them. maybe it will gain a palette
         ; swap later?
@@ -1880,30 +1883,34 @@ cleared_gameplay:
         ; static elements (like flickering torchlight, dancing flowers, etc)
         ldx TrackedMusicPos
         lda tracked_animation_frame, x
+        sta PlayfieldBgObjHighBank
         ora #$04
         sta PlayfieldBgHighBank
         ; the sprite layer meanwhile continues to follow the player
         ldx TrackedGameplayPos
         lda tracked_animation_frame, x
-        sta PlayfieldObjHighBank
+        sta PlayerObjHighBank
         rts
 normal_gameplay:
         ; when the room is not clear, everything tracks the gameplay timing so the player and enemies
         ; remain in perfect sync, even if the player's inputs are a little late
         ldx TrackedGameplayPos
         lda tracked_animation_frame, x
-        sta PlayfieldObjHighBank
+        sta PlayerObjHighBank
+        sta PlayfieldBgObjHighBank
         ora #$04
         sta PlayfieldBgHighBank
         rts
 paused_gameplay:
         ; During a pause state, the sprite layer continues to update (so the player's idle animaton works)
         ; but the background layer is permanently frozen on frame 0, freezing enemies in place
+        lda #$00
+        sta PlayfieldBgObjHighBank
         lda #$04
         sta PlayfieldBgHighBank
         ldx TrackedMusicPos
         lda tracked_animation_frame, x
-        sta PlayfieldObjHighBank
+        sta PlayerObjHighBank
         rts
 .endproc
 

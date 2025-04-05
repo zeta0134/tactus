@@ -260,6 +260,42 @@ write_sprite_y:
 
         perform_zpcm_inc
 
+        ; special case: sprite tile may be indexed strangely for biphasic mode
+        lda sprite_table + MetaSpriteState::SpecialBehavior, x
+        and #SPRITE_BIPHASIC
+        beq normal_sprite_tile
+
+biphasic_sprite_tile:
+        ; For biphasic sprites, ignore horizontal flipping, but instead pay attention
+        ; to the current musical beat. We'll use the base tileid when "rising" and the
+        ; forward tile ID when "falling"
+        lda CurrentBeat
+        and #%00000001
+        bne second_biphasic_sprite
+first_biphasic_sprite:
+        lda sprite_table + MetaSpriteState::TileIndex, x
+        ldy #SelfModifiedSprite::TileId
+        sta (current_sprite_ptr), y
+        clc
+        adc #2
+        ldy #(SelfModifiedSprite::TileId + .sizeof(SelfModifiedSprite))
+        sta (current_sprite_ptr), y
+        perform_zpcm_inc
+        jmp attribute_byte
+second_biphasic_sprite:
+        lda sprite_table + MetaSpriteState::TileIndex, x
+        clc
+        adc #4
+        ldy #SelfModifiedSprite::TileId
+        sta (current_sprite_ptr), y
+        clc
+        adc #2
+        ldy #(SelfModifiedSprite::TileId + .sizeof(SelfModifiedSprite))
+        sta (current_sprite_ptr), y
+        perform_zpcm_inc
+        jmp attribute_byte
+
+normal_sprite_tile:
         ; Sprite tile may be inverted if we are horizontally flipped
         lda sprite_table + MetaSpriteState::BehaviorFlags, x
         and #SPRITE_HORIZ_FLIP
@@ -279,8 +315,8 @@ no_horizontal_flip:
         sta (current_sprite_ptr), y
 
         perform_zpcm_inc
-
         jmp attribute_byte
+
 horizontal_flip:
         lda sprite_table + MetaSpriteState::TileIndex, x
         
@@ -296,9 +332,10 @@ horizontal_flip:
         sta (current_sprite_ptr), y
 
         perform_zpcm_inc
+        jmp attribute_byte
 
 attribute_byte:
-        ; The attribute byte is always a straight copy
+        ; The attribute byte is usually a straight copy
         lda sprite_table + MetaSpriteState::BehaviorFlags, x
         
         ;sta SHADOW_OAM + OAM_ATTRIBUTES, y

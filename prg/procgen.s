@@ -1625,6 +1625,7 @@ loop:
 RoomPtr := R0
 RoomBank := R2
 EntityList := R4
+FinalizerPtr := R4
         ; NEW: the room pointer and associated bank are just part of the
         ; floor data now; load and use that
         ldx RoomIndexToGenerate
@@ -1648,8 +1649,23 @@ EntityList := R4
         ora #ROOM_FLAG_DARK
         sta room_flags, x
 not_dark:
-        restore_previous_bank
 
+        ; Run the finalizer function for this room, which will perform the rest
+        ; of its custom generation. (TODO: consider how much of the rest of this logic
+        ; should be part of that finalizer function. this might be very helpful for
+        ; bosses and whatnot)
+        ldy #Room::FinalizerPtr
+        lda (RoomPtr), y
+        sta FinalizerPtr+0
+        iny
+        lda (RoomPtr), y
+        sta FinalizerPtr+1
+        restore_previous_bank
+        jmp (FinalizerPtr)
+        ; bye!
+.endproc
+
+.proc room_finalizer_standard
         ; Does this room have exit stairs? If so, spawn those first
         ldx RoomIndexToGenerate
         lda room_flags, x
@@ -1657,7 +1673,7 @@ not_dark:
         beq no_exit_stairs
         jsr spawn_exit_block
         ldx RoomIndexToGenerate
-no_exit_stairs:        
+no_exit_stairs:
 
         ; Is this room already "cleared"? This might be set for certain
         ; special chambers, usually either peaceful areas, or boss rooms
@@ -1697,6 +1713,8 @@ spawn_basic_exterior_enemies:
         far_call FAR_spawn_entities_from_pool
         jmp room_cleared
 
+        ; TODO: move this to a challenge-specific finalizer. This'll also solve
+        ; the warp challenge chamber issue, as it can have its own finalizer.
 spawn_boss_enemies:
         ; Challenge rooms roll a fixed set of encounters from the
         ; player's current zone
@@ -1711,6 +1729,7 @@ room_cleared:
         perform_zpcm_inc
 
         ; If this is a shop room, roll shop loot
+        ; TODO: move this to a shop-specific finalizer function
         ldx RoomIndexToGenerate
         lda room_properties, x
         and #ROOM_CATEGORY_MASK
@@ -1718,8 +1737,32 @@ room_cleared:
         bne done_with_shop_rolls
         jsr roll_shop_loot
 done_with_shop_rolls:
+        perform_zpcm_inc
+
+        ; If this is the spawm chamber, go ahead and get the save totem in place
+        ldx RoomIndexToGenerate
+        cpx PlayerRoomIndex
+        bne not_spawn_chamber
+
+        ; exceeeedingly manual: put this at block 4, 4 no matter the room's actual layout
+        ; TODO: be fancier about this
+        ldy #(4 * BATTLEFIELD_WIDTH + 4)
+        lda #TILE_TOTEM
+        sta battlefield, y
+        lda #TOTEM_SAVE
+        sta tile_data, y
+        lda #<BG_TILE_MAP_TILES_0207
+        sta tile_patterns, y
+        lda #(>BG_TILE_MAP_TILES_0207 | PAL_EARTH)
+        sta tile_attributes, y
+not_spawn_chamber:
 
         perform_zpcm_inc
+        rts
+.endproc
+
+.proc room_finalizer_hub_spawn
+        ; TODO: be fancier!
         rts
 .endproc
 

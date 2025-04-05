@@ -58,6 +58,7 @@ class Room:
     base_logic: str
     is_warp: bool
     has_exit: bool
+    finalizer: str
     
 def read_boolean_properties(tile_element):
     boolean_properties = {}
@@ -246,6 +247,7 @@ def read_room(map_filename):
     raster_effect = string_properties.get("raster_effect","RASTER_EFFECT_NONE")
     color_emphasis = string_properties.get("color_emphasis","0")
     base_logic = string_properties.get("base_logic","ROOM_BASE_LOGIC_STANDARD")
+    finalizer = string_properties.get("finalizer","room_finalizer_standard")
 
     # finally let's make the name something useful
     (_, plain_filename) = os.path.split(map_filename)
@@ -255,7 +257,7 @@ def read_room(map_filename):
     return Room(name=safe_label, width=map_width, height=map_height, tiles=combined_tiles, overlays=overlays,
         exit_id=exit_id, bg_palette=room_bg_palette, obj_palette=room_obj_palette, dark=is_dark, category=category,
         forbid_player_spawning=forbid_player_spawning, raster_effect=raster_effect, color_emphasis=color_emphasis, 
-        base_logic=base_logic, is_warp=is_warp, has_exit=has_exit)
+        base_logic=base_logic, is_warp=is_warp, has_exit=has_exit, finalizer=finalizer)
 
 def tile_id_bytes(tiles):
   raw_bytes = []
@@ -477,6 +479,7 @@ def write_room(tilemap, output_file):
     output_file.write("  .addr " + tilemap.obj_palette + " ; OBJ palette table (ptr) for this room\n")
     output_file.write("  .byte <.bank(" + tilemap.obj_palette + ") ; OBJ palette table (bank) for this room\n")
     output_file.write("  .addr " + "overlays_"+tilemap.name + "; overlay list\n")
+    output_file.write("  .addr " + tilemap.finalizer + "; overlay list\n")
     output_file.write("  ; Drawn Tile IDs, LOW\n")
     pretty_print_table_str(tile_id_bytes(tilemap.tiles), output_file, tilemap.width)
     output_file.write("  ; Drawn Tile IDs, HIGH + Attributes\n")
