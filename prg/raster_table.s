@@ -60,6 +60,8 @@ HudSplitScrollY: .res 1
 HudSplitNametable: .res 1
 HudSplitFunny2006: .res 1
 
+HudSplitPpuCtrl: .res 1
+
         .segment "PRGRAM"
 
 .align 64
@@ -488,6 +490,7 @@ finalizer_table:
         .addr finalizer_none
         .addr finalizer_hud
         .addr finalizer_options
+        .addr finalizer_title
 
 ; just clears out the very last entry, no additional work needed
 ; Note: Y still holds the final entry in the table
@@ -639,6 +642,59 @@ done_picking_routine:
 
 ; Note: Y still holds the final entry in the table
 .proc finalizer_options
+        lda #0
+        sta HudSplitScrollX
+        sta HudNametable
+        lda #70
+        sta HudSplitScrollY
+        lda #((((70 & $F8) << 2) | (0 >> 3)) & $FF)
+        sta HudSplitFunny2006
+
+        lda #0
+        sta table_ppuscroll_x, y
+        lda #70
+        sta table_ppuscroll_y, y
+        lda #68
+        sta table_scanline_compare, y
+
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq use_pal_routine
+use_ntsc_routine:
+        lda #>irq_hud_palette_swap_ntsc
+        sta table_irq_high, y
+        jmp done_picking_routine
+use_pal_routine:
+        lda #>irq_hud_palette_swap_pal
+        sta table_irq_high, y
+done_picking_routine:
+
+        lda #(BG_ON | OBJ_ON)
+        sta table_ppumask, y
+
+        ; do this during NMI, so we don't get a race condition and flickery beat transitions
+        lda HudBgHighBank
+        sta HudBgActual
+        lda HudObjHighBank
+        sta HudObjActual
+
+        lda #0
+        sta HudNametable
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta HudAttr
+
+        ; We don't use any splits after this, but we're going to have the palette swap
+        ; set them up anyway, so make sure our last split is unreachable / no effect
+        iny
+        jsr finalizer_none
+
+        perform_zpcm_inc
+        rts
+.endproc
+
+; Note: Y still holds the final entry in the table
+.proc finalizer_title
+        ; TODO: customize!
         lda #0
         sta HudSplitScrollX
         sta HudNametable

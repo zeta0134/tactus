@@ -24,6 +24,7 @@
         .include "kernel.inc"
         .include "levels.inc"
         .include "loot.inc"
+        .include "main.inc"
         .include "nes.inc"
         .include "palette_cycler.inc"
         .include "particles.inc"
@@ -254,6 +255,12 @@ LayoutPtr := R0
         lda #1
         sta NmiSoftDisable
 
+        ; Clear this out in case some other UI subscreen fiddled with it (title mostly)
+        lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | OBJ_8X16 | NT_2000)
+        sta DesiredPpuCtrl
+        lda #0
+        jsr set_hi_chr_bank
+
         ; Setup a fade to black into the target mode
         ; NO! This was causing us to draw before the controller had a chance
         ; to fully initialize itself. Each controller widget will be in charge
@@ -309,12 +316,12 @@ LayoutPtr := R0
 ; (the widget logic contains all customizations, that's the point)
 .proc run_ui_subsystem
         jsr poll_input
-        perform_zpcm_inc
-        far_call FAR_draw_sprites
+        
         perform_zpcm_inc
         far_call FAR_refresh_palettes_gameloop
 
         jsr update_beat_counters_title
+
         far_call FAR_update_widgets
 
         jsr wait_for_next_vblank
@@ -502,6 +509,12 @@ LayoutPtr := R0
         lda #1
         sta NmiSoftDisable
 
+        ; Make sure this is sane
+        lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | OBJ_8X16 | NT_2000)
+        sta DesiredPpuCtrl
+        lda #0
+        jsr set_hi_chr_bank
+
         far_call FAR_init_torchlight
         far_call FAR_init_coins
 
@@ -569,32 +582,27 @@ LayoutPtr := R0
         lda #$FF
         sta ClearedRoomCooldown
 
-        ; For a new game, the player starts in zone 1-1
-        ; TODO: we'll actually almost certainly load into the HUB world here,
-        ; when we have that, and allow the hub exits to kick off the game proper.
-        ; (from the kernel's point of view, the hub is standard gameplay)
-        
-        ;st16 PlayerZonePtr, zone_grasslands_floor_1
-        ;st16 DestinationZonePtr, zone_grasslands_floor_1
-
-        ; TODO: Respect the "suspend" flag. If the suspend condition fails, force-load into
-        ; the HUB world instead, throwing away the current run state.
-        ; (for now, just trust what's in the file somewhat blindly; the function we call here
-        ; is smart enough not to load a garbage pointer if the data is out of range)
-
-        lda current_save + SaveFile::PlayerZoneId
-        far_call FAR_set_zone_ptr_from_id
-        mov16 DestinationZonePtr, PlayerZonePtr
-
         far_call FAR_initialize_sprites
         far_call FAR_init_player
-        ; TODO: pick which one of these to call based on which zone we're in?
-        ; Or I guess zone setup logic could do it...
-        far_call FAR_init_player_inventory_new_game
 
-        ; copy the run seed before we use it to generate the game state
-        ; (we'll display this in the debug HUD / game end screens, etc)
-        ; TODO: if we're going to do fixed seed things, do that here?
+        lda current_save + SaveFile::RunFlags
+        and #RUN_FLAGS_SUSPENDED
+        beq normal_load
+suspended_load:
+        ; We're loading a suspended game, so don't touch the player state. Just get
+        ; that new zone loaded. (We'll clear the suspend flag later when re-saving after
+        ; zone generation.) Note that we also leave the run seed alone, so that the
+        ; un-suspended game in theory generates the same floor. (This may not work very
+        ; well in practice while we are actively dev'ing on the procgen stuff, 
+        ; but it shouldn't break anything.)
+        lda current_save + SaveFile::PlayerZoneId
+        jmp zone_select_converge
+normal_load:
+        ; For a new game, the player starts in the HUB world with a freshly
+        ; cleared inventory.
+        far_call FAR_init_player_inventory_new_game
+        ; We also need to generate a new seed on the spot
+        ; TODO: don't do this if the player is in fixed seed mode.
 .if ::DEBUG_FORCE_SEED
         lda #.lobyte(.loword(DEBUG_SEED))
         sta current_save + SaveFile::RunSeed + 3
@@ -607,6 +615,13 @@ LayoutPtr := R0
 .else
         jsr generate_run_seed_for_save
 .endif
+
+        lda #ZONE_HUB_WORLD
+        ; fall through to converge
+zone_select_converge:
+        far_call FAR_set_zone_ptr_from_id
+        mov16 DestinationZonePtr, PlayerZonePtr
+
         ; (The HUD depends on the seed we just generated, though it may not necessarily
         ; actually display it.)
         far_call FAR_init_hud
@@ -635,6 +650,15 @@ LayoutPtr := R0
         far_call FAR_generate_rooms_for_floor
         lda #0
         sta UpdateBeatTrackerDuringNmi
+
+        ; Grab the zone we've just initialized and write it to the save file
+        far_call FAR_get_zone_id_from_zone_ptr
+        sta current_save + SaveFile::PlayerZoneId
+        ; Also since we're loading into a new area, go ahead and clear the suspended flag.
+        ; (we'll save again if we actually suspend.)
+        lda current_save + SaveFile::RunFlags
+        and #($FF - RUN_FLAGS_SUSPENDED)
+        sta current_save + SaveFile::RunFlags
 
         ; Now that we've generated this floor, go ahead and save right here, as it is convenient
         ; to do so. This will be the "commit point" for any gameplay state unlocked during a given

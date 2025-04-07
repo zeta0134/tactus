@@ -41,6 +41,7 @@ data_bank_high_shadow: .res 1
 	; We want our CHR ROM accessible in little tiny 512b chunks:
 	lda #(CHR_CHIP_ROM | CHR_MODE_4)
 	sta MAP_CHR_CONTROL
+
 	; initialize all the high bank portions to 0; only the sprite layer actually uses them,
 	; and they won't be displayed until some more sophisticated system initializes
 	; them properly. generally we arrange our CHR so that we don't need to change the
@@ -125,5 +126,26 @@ loop:
 	sta $5F00,x
 	inx
 	bne loop
+	rts
+.endproc
+
+; Value in A please
+.proc set_hi_chr_bank
+	sta MAP_CHR_0_HI
+	sta MAP_CHR_1_HI
+	sta MAP_CHR_2_HI
+	sta MAP_CHR_3_HI
+	sta MAP_CHR_4_HI
+	sta MAP_CHR_5_HI
+	sta MAP_CHR_6_HI
+	sta MAP_CHR_7_HI
+	sta MAP_CHR_8_HI
+	sta MAP_CHR_9_HI
+	sta MAP_CHR_A_HI
+	sta MAP_CHR_B_HI
+	sta MAP_CHR_C_HI
+	sta MAP_CHR_D_HI
+	sta MAP_CHR_E_HI
+	sta MAP_CHR_F_HI
 	rts
 .endproc

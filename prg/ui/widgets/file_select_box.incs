@@ -42,6 +42,7 @@ SHADOW_CORNER_DARK = $10
 .segment "DATA_UI_LAYOUTS"
 
 new_file_str: .asciiz "- NEW FILE -"
+in_progress_str: .asciiz "RUN IN PROGRESS"
 
 .segment "CODE_UI_WIDGETS_1"
 
@@ -393,7 +394,7 @@ widget_sprite_index := widgets_data4
         near_call FAR_prepare_file_pointer
         far_call FAR_is_new_file
         cmp #FILE_NEW
-        beq draw_new_file
+        jeq draw_new_file
 
 draw_existing_file:
         mov16 StringPtr, FilePtr
@@ -403,7 +404,26 @@ draw_existing_file:
         lda #UI_PAL_BG1
         sta PaletteIndex
         jsr FIXED_draw_string
-        ; TODO: any other fun status things we want to show in the second row
+
+        ; Draw the second row of details below the filename. TODO: make this much fancier
+        add16b NametableAddr, #32
+        add16b AttributeAddr, #32
+        ldy #SaveFile::RunFlags
+        lda (FilePtr), y
+        and #RUN_FLAGS_SUSPENDED
+        bne run_in_progress
+no_run_in_progress:
+        ; TODO: draw tropies and other achievements
+        ; Also do we need to clear out the area?
+        jmp done_with_second_row
+run_in_progress:
+        st16 StringPtr, in_progress_str
+        lda #CHR_BANK_FONT_MARSHMALLOW
+        sta TileBase
+        lda #UI_PAL_BG1
+        sta PaletteIndex
+        jsr FIXED_draw_string
+done_with_second_row:
 
         ; This file exists! Oh boy. Let's work out the colors then
         ldy CurrentWidgetIndex

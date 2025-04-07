@@ -178,6 +178,9 @@ widget_last_cursor_pos := widgets_data0
 
 widget_cursor_nav_index := widgets_data1
 
+        perform_zpcm_inc
+        far_call FAR_draw_sprites
+
         ldy #FILE_DETAILS_CURSOR_INDEX ; cursor index for this screen
         lda widget_cursor_nav_index, y
         sta CursorCurrentHighlight

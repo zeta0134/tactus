@@ -6,9 +6,16 @@
 
 title_ui_layout:
         widget_controller FAR_title_controller_init
-        widget_player_cursor
         widget_text_button empty_string, FAR_go_to_file_select, 12, 10
         .addr $0000 ; end of list
+
+.segment "DATA_UI_NAMETABLES_0"
+
+title_splash_nametables:
+
+.scope title_splash_flail_nametable
+        .include "../art/title_splash/splash_flail.asm"
+.endscope
 
 .segment "CODE_UI_LAYOUTS"
 
@@ -16,32 +23,202 @@ title_ui_layout:
 ;                       Screen Specific Logic
 ; ======================================================================
 
+.proc FAR_display_title_splash
+SourceNametable := R0
+SourceExAttr := R2
+BaseChrPage := R4
+NametableAddr := R8
+AttributeAddr := R10
+        
+        st16 NametableAddr, $5000
+        st16 AttributeAddr, $5800
+
+        access_data_bank #<.bank(title_splash_nametables)
+
+        ; For now, initialize the flail every time.
+        ; TODO: once we have the other splash screens converted, pick one
+        ; at random. (depending on how fancy we intend to be, gate some
+        ; of the choices based on whether the player has that weapon?)
+        st16 SourceNametable, title_splash_flail_nametable::nametable
+        st16 SourceExAttr, title_splash_flail_nametable::exattr
+        lda #CHR_BANK_SPLASH_FLAIL_BG
+        sta BaseChrPage
+
+        ; Copy in the nametable, accounting for the base bank where the tiles live
+        ldx #4 ; use this as a page counter
+        ldy #0
+loop:
+        lda (SourceNametable), y
+        sta (NametableAddr), y
+        lda (SourceExAttr), y
+        clc
+        adc BaseChrPage
+        sta (AttributeAddr), y
+        iny
+        bne loop
+        inc SourceNametable+1
+        inc SourceExAttr+1
+        inc NametableAddr+1
+        inc AttributeAddr+1
+        dex
+        bne loop
+
+        restore_previous_bank
+
+        rts
+.endproc
+
+.proc FAR_setup_title_palettes
+        ; Get the palette data hooked up. For now, assume the flail layout and no split.
+        ; Later this needs to become a HUD split, and we'll need to do something about the
+        ; title area up top.
+        lda #$00
+        sta TargetPlayfieldBackdrop
+
+        lda player_palettes_pajamas+PLAYER_PALETTE_TITLE_BASE
+        sec
+        sbc #$20
+        sta TargetPlayfieldBgPal0+0
+        sta PlayfieldObjPal0+0
+        lda player_palettes_pajamas+PLAYER_PALETTE_TITLE_BASE
+        sec
+        sbc #$10
+        sta TargetPlayfieldBgPal0+1
+        sta PlayfieldObjPal0+1
+        lda player_palettes_pajamas+PLAYER_PALETTE_TITLE_BASE
+        sta TargetPlayfieldBgPal0+2
+        sta PlayfieldObjPal0+2
+
+        lda player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
+        sec
+        sbc #$10
+        sta TargetPlayfieldBgPal1+0
+        sta PlayfieldObjPal1+0
+        lda player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
+        sta TargetPlayfieldBgPal1+1
+        sta PlayfieldObjPal1+1
+        lda player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
+        clc
+        adc #$10
+        sta TargetPlayfieldBgPal1+2
+        sta PlayfieldObjPal1+2
+
+        lda player_palettes_pigment+PLAYER_PALETTE_TITLE_BASE
+        sec
+        sbc #$10
+        sta TargetPlayfieldBgPal2+0
+        sta PlayfieldObjPal2+0
+        lda player_palettes_pigment+PLAYER_PALETTE_TITLE_BASE
+        sta TargetPlayfieldBgPal2+1
+        sta PlayfieldObjPal2+1
+        lda #$50
+        sta TargetPlayfieldBgPal2+2
+        sta PlayfieldObjPal2+2
+
+        lda #$20
+        sta TargetPlayfieldBgPal3+0
+        sta PlayfieldObjPal3+0
+        lda #$30
+        sta TargetPlayfieldBgPal3+1
+        sta PlayfieldObjPal3+1
+        lda #$50
+        sta TargetPlayfieldBgPal3+2
+        sta PlayfieldObjPal3+2
+
+        far_call FAR_set_bg_current_palette_from_target
+
+        rts
+.endproc
+
+.proc FAR_draw_title_sprites
+OamPtr    := R0
+SourceOam := R2
+OamIndex := R4
+
+
+        access_data_bank #<.bank(title_splash_nametables)
+
+        ; For now, initialize the flail every time.
+        ; TODO: once we have the other splash screens converted, pick one
+        ; at random. (depending on how fancy we intend to be, gate some
+        ; of the choices based on whether the player has that weapon?)
+        st16 SourceOam, title_splash_flail_nametable::oam
+
+        lda #0
+        sta OamIndex
+loop:
+        ldx OamIndex
+        lda sprite_ptr_lut_low, x
+        sta OamPtr+0
+        lda sprite_ptr_lut_high, x
+        sta OamPtr+1
+        ldy #0
+        lda (SourceOam), y
+        ldy #SelfModifiedSprite::PosY
+        sta (OamPtr), y
+        ldy #1
+        lda (SourceOam), y
+        ldy #SelfModifiedSprite::TileId
+        sta (OamPtr), y
+        ldy #2
+        lda (SourceOam), y
+        ldy #SelfModifiedSprite::Attributes
+        sta (OamPtr), y
+        ldy #3
+        lda (SourceOam), y
+        ldy #SelfModifiedSprite::PosX
+        sta (OamPtr), y
+        add16b SourceOam, #4
+        inc OamIndex
+        lda OamIndex
+        cmp #64
+        bne loop
+
+        restore_previous_bank
+
+        rts
+.endproc
+
+.proc FAR_fix_obj_chr_bank
+        ; TODO: pick the CHR bank based on which splash we are showing today
+        lda #<(CHR_BANK_SPLASH_FLAIL_OBJ >> 5)
+        jsr set_hi_chr_bank
+        .repeat 8, i
+        lda #<((CHR_BANK_SPLASH_FLAIL_OBJ << 3) + i)
+        sta PlayfieldObjBanks+i
+        sta HudObjBanks+i
+        .endrepeat
+
+        ; We are setting these banks very manually, so switch these ORA variables
+        ; to 0, which will effectively NOP them when run later.
+        lda #0
+        sta PlayerObjHighBank
+        sta PlayfieldBgObjHighBank
+        sta HudObjHighBank
+
+        rts
+.endproc
+
 .proc FAR_title_controller_init
         CurrentWidgetIndex := R20
-        ; the title screen for now doesn't use extended attributes, so
-        ; turn those off
-        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG)
-        sta MAP_NT_A_CONTROL
-        sta MAP_NT_C_CONTROL
-        lda #(NT_FPGA_RAM | NT_EXT_BANK_3 | NT_EXT_BG)
-        sta MAP_NT_B_CONTROL
-        sta MAP_NT_D_CONTROL
+        
+        ; The titlescreen does use extended nametables now, so get those going
+        lda #0
+        sta LeftNametableBank
+        sta RightNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta LeftNametableAttr
+        sta RightNametableAttr
 
-        ; Setup the title nametable
-        far_call FAR_copy_title_nametable
-        far_call FAR_set_title_exbg
+        ; The title screen alone uses 8x8 mode, set that up here
+        lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | NT_2000)
+        sta DesiredPpuCtrl
 
-        ; The title screen should apply the last player palette that was
-        ; used, for consistency (and so we don't have a "preferred" skin tone)        
-        lda player_palettes_phones+PLAYER_PALETTE_NORMAL
-        sta PlayfieldObjPal0+0, x
-        lda player_palettes_pajamas+PLAYER_PALETTE_NORMAL
-        sta PlayfieldObjPal0+1, x
-        lda player_palettes_pigment+PLAYER_PALETTE_NORMAL
-        sta PlayfieldObjPal0+2, x
-
-        lda #1
-        sta StagingObjPaletteDirty
+        far_call FAR_compute_player_colors
+        near_call FAR_display_title_splash
+        near_call FAR_setup_title_palettes
+        near_call FAR_draw_title_sprites
+        near_call FAR_fix_obj_chr_bank
 
         ; Play the title track on the title screen
         lda #TRACK_TITLE
@@ -61,13 +238,17 @@ title_ui_layout:
 
 .proc FAR_title_controller_update
 CurrentWidgetIndex := R20
+        ; This is after beat counters were done, so fix all the banks
+        ; and clear that out. Title screen sprites do not animate!
+        near_call FAR_fix_obj_chr_bank
+
         ; while on the title screen, continuously clock the rng seeds. this helps
         ; with entropy when starting a brand new game, even in emulators with an
         ; otherwise deterministic boot state
         jsr next_run_rand
         jsr next_gameplay_rand
 
-        lda #KEY_START
+        lda #(KEY_START | KEY_A)
         and ButtonsDown
         beq stay_here
         far_call FAR_go_to_file_select

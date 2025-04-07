@@ -119,9 +119,7 @@ all_frames:
         ; scroll nametable doesn't matter, so we're really just setting
         ; up consistent rendering primitives here in case they were clobbered
         ; during loading or something
-        ; TODO: this reduces safety, but we don't _really_ need to ever change this
-        ; after RESET. We could rework this and save 6 cycles...
-        lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | OBJ_8X16 | NT_2000)
+        lda DesiredPpuCtrl
         sta PPUCTRL
 
         ; Set the one (1) upper background register

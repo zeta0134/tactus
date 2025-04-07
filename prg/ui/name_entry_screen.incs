@@ -122,5 +122,8 @@ CurrentWidgetIndex := R20
 .endproc
 
 .proc FAR_name_entry_controller_update
+        perform_zpcm_inc
+        far_call FAR_draw_sprites
+
         rts
 .endproc

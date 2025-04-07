@@ -1,3 +1,5 @@
+        .macpack longbranch
+
         .include "../build/tile_defs.inc"
 
         .include "_globals.inc"
@@ -13,6 +15,7 @@
         .include "nes.inc"
         .include "input.inc"
         .include "levels.inc"
+        .include "main.inc"
         .include "math_util.inc"
         .include "player.inc"
         .include "prng.inc"

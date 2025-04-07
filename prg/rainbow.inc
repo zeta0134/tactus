@@ -249,3 +249,4 @@ NT_BANK_IDX           = %00111111
 .globalzp code_bank_shadow
 .globalzp data_bank_low_shadow
 .globalzp data_bank_high_shadow
+.global set_hi_chr_bank

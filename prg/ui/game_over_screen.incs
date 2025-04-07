@@ -28,6 +28,9 @@ CurrentWidgetIndex := R20
 .endproc
 
 .proc FAR_game_over_controller_update
+        perform_zpcm_inc
+        far_call FAR_draw_sprites
+
         lda #(KEY_A | KEY_B | KEY_START)
         and ButtonsDown
         beq stay_here

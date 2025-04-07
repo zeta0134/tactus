@@ -1,1 +1,2 @@
 .global start
+.globalzp DesiredPpuCtrl

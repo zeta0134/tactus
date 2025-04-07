@@ -20,6 +20,10 @@
         .include "word_util.inc"
         .include "zeropage.inc"
 
+.zeropage
+
+DesiredPpuCtrl: .res 1
+
 .segment "PRGFIXED_E000"
 
 .proc quickly_clear_palettes
@@ -85,7 +89,8 @@ start:
         ; now enable rendering and proceed to the main game loop
         lda #$1E
         sta PPUMASK
-        lda #(VBLANK_NMI | BG_1000 | OBJ_0000)
+        lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | OBJ_8X16 | NT_2000)
+        sta DesiredPpuCtrl
         sta PPUCTRL
 
         ; Setup our initial kernel state

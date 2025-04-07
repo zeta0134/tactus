@@ -59,3 +59,4 @@ RASTER_EFFECT_WARP_IN     = $3C
 RASTER_FINALIZER_NONE      = 0 ; For most standard UI screens
 RASTER_FINALIZER_PLAIN_HUD = 2 ; For standard gameplay (incl. dialog)
 RASTER_FINALIZER_OPTIONS   = 4 ; The options screen, just below the battlefield preview
+RASTER_FINALIZER_TITLE     = 6 ; The title screen, which we knew was going to be a special case and a half

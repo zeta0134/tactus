@@ -142,6 +142,9 @@ weapon_palette_table:
         sta HudMapDirty
         lda #0
         sta CurrentMapIndex
+        .repeat 6, i
+        sta HeartDisplayCurrent+i
+        .endrepeat
         lda #$FF
         sta ZonePtrCurrent+0
         sta ZonePtrCurrent+1

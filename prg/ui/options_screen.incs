@@ -388,6 +388,9 @@ torchlight_loop_a:
 
 .proc FAR_options_controller_update
 widget_cursor_nav_index := widgets_data1
+        perform_zpcm_inc
+        far_call FAR_draw_sprites
+
 
         ; We need the playfield to start in CHR 1M mode, to display
         ; the battlefield. We use a raster effect to switch back to

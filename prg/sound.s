@@ -293,10 +293,6 @@ done:
 ; inputs: track number in A, initial variant in Y
 .proc play_track
         perform_zpcm_inc
-        .if ::DEBUG_DISABLE_MUSIC
-        ; ignore the requested track, and queue up the click track instead
-        lda #1
-        .endif
         sty target_music_variant
 
         cmp MusicCurrentTrack

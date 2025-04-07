@@ -275,6 +275,7 @@ ZONE_TOTAL_COUNT = 70
 .global FAR_load_exit_pointer_from_current_zone
 .global FAR_setup_prng_seeds_from_current_save_and_current_zone
 .global FAR_set_zone_ptr_from_id
+.global FAR_get_zone_id_from_zone_ptr
 
 ROOM_POOL_OUT_OF_BOUNDS          =  0
 ROOM_POOL_GRASSY_EXTERIOR        =  1

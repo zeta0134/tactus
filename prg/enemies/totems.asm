@@ -169,7 +169,12 @@ TargetSquare := R13
         near_call ENEMY_COLLIDE_solid_tile_forbids_movement
 
         ; For now: just suspend out without confirmation. It's fine?
+        ; (This looks **slightly** janky. We might want to put the player
+        ; in some sort of a suspend state to animate out more cleanly.)
         st16 GameMode, suspend_current_game
+
+        ; Fun SFX!
+        queue_sfx_pulse1 sfx_teleport
 
         ; Do not run this logic again!
         ldx TargetSquare
