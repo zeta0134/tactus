@@ -21,6 +21,10 @@ title_splash_nametables:
         .include "../art/title_splash/splash_spear.asm"
 .endscope
 
+.scope title_splash_sword
+        .include "../art/title_splash/splash_sword.asm"
+.endscope
+
 .segment "CODE_UI_LAYOUTS"
 
 ; ======================================================================
@@ -53,11 +57,14 @@ widget_selected_splash := widgets_data0
         beq setup_flail
         cmp #SPLASH_VARIANT_SPEAR
         beq setup_spear
-        ; shouldn't be reachable?
+        ; default to sword
 
 setup_sword:
-        ; Not here yet, but will be our default case
-        ; jmp perform_oam_copy
+        st16 SourceNametable, title_splash_sword::nametable
+        st16 SourceExAttr, title_splash_sword::exattr
+        lda #CHR_BANK_SPLASH_SWORD_BG
+        sta BaseChrPage
+        jmp perform_copy
 setup_flail:
         st16 SourceNametable, title_splash_flail::nametable
         st16 SourceExAttr, title_splash_flail::exattr
@@ -99,7 +106,6 @@ loop:
 .proc FAR_setup_title_palettes
 CurrentWidgetIndex := R20
 widget_selected_splash := widgets_data0
-        ; Get the palette data hooked up. For now, assume the flail layout and no split.
         ; Later this needs to become a HUD split, and we'll need to do something about the
         ; title area up top.
         lda #$00
@@ -168,6 +174,22 @@ done_picking_phones_color:
         sta TargetPlayfieldBgPal3+2
         sta PlayfieldObjPal3+2
 
+        ; The sword only uses a funny palette for one of the bg layers,
+        ; apply that here if necessary
+        ldx CurrentWidgetIndex
+        lda widget_selected_splash, x
+        cmp #SPLASH_VARIANT_SWORD
+        bne done_with_sword_variant
+        lda player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
+        sta TargetPlayfieldBgPal2+0
+        lda player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
+        clc
+        adc #$10
+        sta TargetPlayfieldBgPal2+1
+        lda #$20
+        sta TargetPlayfieldBgPal2+2
+done_with_sword_variant:
+
         far_call FAR_set_bg_current_palette_from_target
 
         rts
@@ -195,11 +217,10 @@ widget_selected_splash := widgets_data0
         beq setup_flail
         cmp #SPLASH_VARIANT_SPEAR
         beq setup_spear
-        ; shouldn't be reachable?
-
+        ; default to sword
 setup_sword:
-        ; Not here yet, but will be our default case
-        ; jmp perform_oam_copy
+        st16 SourceOam, title_splash_sword::oam
+        jmp perform_oam_copy
 setup_flail:
         st16 SourceOam, title_splash_flail::oam
         jmp perform_oam_copy
@@ -261,11 +282,18 @@ widget_selected_splash := widgets_data0
         cmp #SPLASH_VARIANT_FLAIL
         beq setup_flail
         cmp #SPLASH_VARIANT_SPEAR
-        beq setup_spear
-        ; shouldn't be reachable?
+        jeq setup_spear
+        ; default to sword
 
 setup_sword:
-        ; Not here yet, but will be our default case
+        lda #<(CHR_BANK_SPLASH_SWORD_OBJ >> 5)
+        jsr set_hi_chr_bank
+        .repeat 8, i
+        lda #<((CHR_BANK_SPLASH_SWORD_OBJ << 3) + i)
+        sta PlayfieldObjBanks+i
+        sta HudObjBanks+i
+        .endrepeat
+        rts
 
 setup_flail:
         lda #<(CHR_BANK_SPLASH_FLAIL_OBJ >> 5)
@@ -292,10 +320,19 @@ setup_spear:
 .endproc
 
 title_splash_lut:
+        ; Force one for testing
+        ;.repeat 16
+        ;.byte SPLASH_VARIANT_SWORD
+        ;.endrepeat
+
+        ; The actual distribution
         .repeat 8
+        .byte SPLASH_VARIANT_SWORD
+        .endrepeat
+        .repeat 4
         .byte SPLASH_VARIANT_FLAIL
         .endrepeat
-        .repeat 8
+        .repeat 4
         .byte SPLASH_VARIANT_SPEAR
         .endrepeat
 
