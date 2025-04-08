@@ -3,12 +3,11 @@
 
 .global initialize_prng
 .global next_gameplay_rand
-.global next_run_rand
 .global next_floor_rand
 .global next_room_rand
+.global next_global_rand
 
 .global generate_run_seed_for_save ; from the global seed in the save block
-.global generate_floor_seed ; from the run seed
 .global generate_room_seed  ; from the floor seed
 
 .globalzp floor_seed, room_seed

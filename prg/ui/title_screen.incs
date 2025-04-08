@@ -13,8 +13,12 @@ title_ui_layout:
 
 title_splash_nametables:
 
-.scope title_splash_flail_nametable
+.scope title_splash_flail
         .include "../art/title_splash/splash_flail.asm"
+.endscope
+
+.scope title_splash_spear
+        .include "../art/title_splash/splash_spear.asm"
 .endscope
 
 .segment "CODE_UI_LAYOUTS"
@@ -23,27 +27,51 @@ title_splash_nametables:
 ;                       Screen Specific Logic
 ; ======================================================================
 
+SPLASH_VARIANT_FLAIL = 0
+SPLASH_VARIANT_SPEAR = 1
+SPLASH_VARIANT_SWORD = 2
+
 .proc FAR_display_title_splash
 SourceNametable := R0
 SourceExAttr := R2
 BaseChrPage := R4
 NametableAddr := R8
 AttributeAddr := R10
+
+CurrentWidgetIndex := R20
+widget_selected_splash := widgets_data0
         
         st16 NametableAddr, $5000
         st16 AttributeAddr, $5800
 
         access_data_bank #<.bank(title_splash_nametables)
 
-        ; For now, initialize the flail every time.
-        ; TODO: once we have the other splash screens converted, pick one
-        ; at random. (depending on how fancy we intend to be, gate some
-        ; of the choices based on whether the player has that weapon?)
-        st16 SourceNametable, title_splash_flail_nametable::nametable
-        st16 SourceExAttr, title_splash_flail_nametable::exattr
+        ; Choose the actual banks based on our selected splash
+        ldx CurrentWidgetIndex
+        lda widget_selected_splash, x
+        cmp #SPLASH_VARIANT_FLAIL
+        beq setup_flail
+        cmp #SPLASH_VARIANT_SPEAR
+        beq setup_spear
+        ; shouldn't be reachable?
+
+setup_sword:
+        ; Not here yet, but will be our default case
+        ; jmp perform_oam_copy
+setup_flail:
+        st16 SourceNametable, title_splash_flail::nametable
+        st16 SourceExAttr, title_splash_flail::exattr
         lda #CHR_BANK_SPLASH_FLAIL_BG
         sta BaseChrPage
+        jmp perform_copy
+setup_spear:
+        st16 SourceNametable, title_splash_spear::nametable
+        st16 SourceExAttr, title_splash_spear::exattr
+        lda #CHR_BANK_SPLASH_SPEAR_BG
+        sta BaseChrPage
+        jmp perform_copy
 
+perform_copy:
         ; Copy in the nametable, accounting for the base bank where the tiles live
         ldx #4 ; use this as a page counter
         ldy #0
@@ -69,6 +97,8 @@ loop:
 .endproc
 
 .proc FAR_setup_title_palettes
+CurrentWidgetIndex := R20
+widget_selected_splash := widgets_data0
         ; Get the palette data hooked up. For now, assume the flail layout and no split.
         ; Later this needs to become a HUD split, and we'll need to do something about the
         ; title area up top.
@@ -97,11 +127,24 @@ loop:
         lda player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
         sta TargetPlayfieldBgPal1+1
         sta PlayfieldObjPal1+1
+
+        ; Spear only needs white here, all others use phones+1
+        ldx CurrentWidgetIndex
+        lda widget_selected_splash, x
+        cmp #SPLASH_VARIANT_SPEAR
+        beq use_spear_phones_color
+use_sword_flail_phones_color:
         lda player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
         clc
         adc #$10
         sta TargetPlayfieldBgPal1+2
         sta PlayfieldObjPal1+2
+        jmp done_picking_phones_color
+use_spear_phones_color:
+        lda #$50
+        sta TargetPlayfieldBgPal1+2
+        sta PlayfieldObjPal1+2
+done_picking_phones_color:
 
         lda player_palettes_pigment+PLAYER_PALETTE_TITLE_BASE
         sec
@@ -135,6 +178,8 @@ OamPtr    := R0
 SourceOam := R2
 OamIndex := R4
 
+CurrentWidgetIndex := R20
+widget_selected_splash := widgets_data0
 
         access_data_bank #<.bank(title_splash_nametables)
 
@@ -142,8 +187,28 @@ OamIndex := R4
         ; TODO: once we have the other splash screens converted, pick one
         ; at random. (depending on how fancy we intend to be, gate some
         ; of the choices based on whether the player has that weapon?)
-        st16 SourceOam, title_splash_flail_nametable::oam
 
+        ; Choose the actual banks based on our selected splash
+        ldx CurrentWidgetIndex
+        lda widget_selected_splash, x
+        cmp #SPLASH_VARIANT_FLAIL
+        beq setup_flail
+        cmp #SPLASH_VARIANT_SPEAR
+        beq setup_spear
+        ; shouldn't be reachable?
+
+setup_sword:
+        ; Not here yet, but will be our default case
+        ; jmp perform_oam_copy
+setup_flail:
+        st16 SourceOam, title_splash_flail::oam
+        jmp perform_oam_copy
+setup_spear:
+        st16 SourceOam, title_splash_spear::oam
+        jmp perform_oam_copy
+
+
+perform_oam_copy:
         lda #0
         sta OamIndex
 loop:
@@ -180,14 +245,8 @@ loop:
 .endproc
 
 .proc FAR_fix_obj_chr_bank
-        ; TODO: pick the CHR bank based on which splash we are showing today
-        lda #<(CHR_BANK_SPLASH_FLAIL_OBJ >> 5)
-        jsr set_hi_chr_bank
-        .repeat 8, i
-        lda #<((CHR_BANK_SPLASH_FLAIL_OBJ << 3) + i)
-        sta PlayfieldObjBanks+i
-        sta HudObjBanks+i
-        .endrepeat
+CurrentWidgetIndex := R20
+widget_selected_splash := widgets_data0
 
         ; We are setting these banks very manually, so switch these ORA variables
         ; to 0, which will effectively NOP them when run later.
@@ -196,11 +255,60 @@ loop:
         sta PlayfieldBgObjHighBank
         sta HudObjHighBank
 
+        ; Choose the actual banks based on our selected splash
+        ldx CurrentWidgetIndex
+        lda widget_selected_splash, x
+        cmp #SPLASH_VARIANT_FLAIL
+        beq setup_flail
+        cmp #SPLASH_VARIANT_SPEAR
+        beq setup_spear
+        ; shouldn't be reachable?
+
+setup_sword:
+        ; Not here yet, but will be our default case
+
+setup_flail:
+        lda #<(CHR_BANK_SPLASH_FLAIL_OBJ >> 5)
+        jsr set_hi_chr_bank
+        .repeat 8, i
+        lda #<((CHR_BANK_SPLASH_FLAIL_OBJ << 3) + i)
+        sta PlayfieldObjBanks+i
+        sta HudObjBanks+i
+        .endrepeat
+        rts
+
+setup_spear:
+        lda #<(CHR_BANK_SPLASH_SPEAR_OBJ >> 5)
+        jsr set_hi_chr_bank
+        .repeat 8, i
+        lda #<((CHR_BANK_SPLASH_SPEAR_OBJ << 3) + i)
+        sta PlayfieldObjBanks+i
+        sta HudObjBanks+i
+        .endrepeat
+
+        
+
         rts
 .endproc
 
+title_splash_lut:
+        .repeat 8
+        .byte SPLASH_VARIANT_FLAIL
+        .endrepeat
+        .repeat 8
+        .byte SPLASH_VARIANT_SPEAR
+        .endrepeat
+
 .proc FAR_title_controller_init
-        CurrentWidgetIndex := R20
+CurrentWidgetIndex := R20
+widget_selected_splash := widgets_data0
+
+        jsr next_global_rand
+        and #$0F
+        tax
+        lda title_splash_lut, x
+        ldx CurrentWidgetIndex
+        sta widget_selected_splash, x
         
         ; The titlescreen does use extended nametables now, so get those going
         lda #0
@@ -245,7 +353,7 @@ CurrentWidgetIndex := R20
         ; while on the title screen, continuously clock the rng seeds. this helps
         ; with entropy when starting a brand new game, even in emulators with an
         ; otherwise deterministic boot state
-        jsr next_run_rand
+        jsr next_global_rand
         jsr next_gameplay_rand
 
         lda #(KEY_START | KEY_A)

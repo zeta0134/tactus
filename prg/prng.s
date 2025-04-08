@@ -142,7 +142,7 @@ game_seed_valid:
 
 ; Very HQ RNG source stored in the loaded save block. Mostly used to generate
 ; the run seed from game to game. Clock this continuously so it is difficult
-; to predict. Note that this sorta makes the nonse redundant...
+; to predict. Note that this sorta makes the nonce redundant...
 .proc next_global_rand
 	perform_zpcm_inc
 	; rotate the middle bytes left
@@ -191,58 +191,6 @@ game_seed_valid:
 	; ensure seed is not 0, which will lock up the LFSR
 	ora #$80
 	sta current_save + SaveFile::RunSeed + 3
-	rts
-.endproc
-
-;
-; 6502 LFSR PRNG - 32-bit
-; Brad Smith, 2019
-; http://rainwarrior.ca
-;
-
-; A 32-bit Galois LFSR
-
-; Possible feedback values that generate a full 4294967295 step sequence:
-; $AF = %10101111
-; $C5 = %11000101
-; $F5 = %11110101
-
-; $C5 is chosen
-
-.proc next_run_rand
-	perform_zpcm_inc
-	; rotate the middle bytes left
-	ldy current_save + SaveFile::RunSeed+2 ; will move to run_seed+3 at the end
-	lda current_save + SaveFile::RunSeed+1
-	sta current_save + SaveFile::RunSeed+2
-	; compute run_seed+1 ($C5>>1 = %1100010)
-	lda current_save + SaveFile::RunSeed+3 ; original high byte
-	lsr
-	sta current_save + SaveFile::RunSeed+1 ; reverse: 100011
-	lsr
-	lsr
-	lsr
-	lsr
-	eor current_save + SaveFile::RunSeed+1
-	lsr
-	eor current_save + SaveFile::RunSeed+1
-	eor current_save + SaveFile::RunSeed+0 ; combine with original low byte
-	sta current_save + SaveFile::RunSeed+1
-	; compute run_seed+0 ($C5 = %11000101)
-	lda current_save + SaveFile::RunSeed+3 ; original high byte
-	asl
-	eor current_save + SaveFile::RunSeed+3
-	asl
-	asl
-	asl
-	asl
-	eor current_save + SaveFile::RunSeed+3
-	asl
-	asl
-	eor current_save + SaveFile::RunSeed+3
-	sty current_save + SaveFile::RunSeed+3 ; finish rotating byte 2 into 3
-	sta current_save + SaveFile::RunSeed+0
-	perform_zpcm_inc
 	rts
 .endproc
 
