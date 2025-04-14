@@ -36,7 +36,8 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     OptionColorEmphasis .byte
     OptionSfxMode .byte
     OptionMusicMode .byte
-    OptionsReserved .byte 6 ; pad out to 16 bytes total
+    OptionLanguage .byte
+    OptionsReserved .byte 5 ; pad out to 16 bytes total
     ; FUTURE
     GeneralReserved .byte 24
     ; CURRENT RUN STATE (that which persists, anyway) (current: 31 bytes)

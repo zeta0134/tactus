@@ -27,6 +27,7 @@ DialogState: .res 2
 DialogHeight: .res 1
 DialogOpenClosePos: .res 1
 DialogCurrentAttr: .res 1
+DialogCurrentPage: .res 1
 
 DialogStringCurrentBank: .res 1
 DialogCurrentModeActive: .res 1
@@ -55,6 +56,9 @@ DialogChirpTimer: .res 1
 TimerActive: .res 1
 TimerIndex: .res 1
 TimerDelay: .res 1
+
+LocalizationPreserveStr: .res 2
+LocalizationPreserveBank: .res 1
 
         .segment "TEXT_STRINGS"
 
@@ -296,8 +300,21 @@ continue_closing:
 .endproc
 
 .proc state_init_text_display
+        ; Text rendering for dialog always begins at the extreme
+        ; top-left corner of the window. To start drawing somewhere
+        ; else, use newlines + space characters to position as needed.
         st16 DialogNametablePtr, (DIALOG_NAMETABLE_BASE+2)
         st16 DialogAttrPtr, (DIALOG_ATTRIBUTE_BASE+2)
+
+        ; All new strings start in plain white, english, low page,
+        ; just for a consistent reset. (Most dialogue strings will
+        ; immediately change this to the target font+color as
+        ; needed. This is a sensible default to cleanup any old
+        ; cruft.)
+        lda #0
+        sta DialogCurrentPage
+        lda #COLOR_MM_WHITE
+        sta DialogCurrentAttr
 
         st16 DialogState, state_run_text_display
         perform_zpcm_inc
@@ -351,6 +368,7 @@ CommandPtr := R0
         rts
 draw_single_character:
         perform_zpcm_inc
+        ora DialogCurrentPage
         sta (DialogNametablePtr), y
         cmp #' '
         beq no_chirp
@@ -368,11 +386,18 @@ no_chirp:
 .endproc
 
 dialog_command_lut:
-        .word dialog_cmd_newline; D_NEWLINE = $80
-        .word dialog_cmd_wait  ; D_WAIT    = $81
-        .word dialog_cmd_clear ; D_CLEAR   = $82
-        .word dialog_cmd_close ; D_CLOSE   = $83
-        .word dialog_cmd_attr  ; D_ATTR    = $84
+        .word dialog_cmd_newline   ; D_NEWLINE  = $80
+        .word dialog_cmd_wait      ; D_WAIT     = $81
+        .word dialog_cmd_clear     ; D_CLEAR    = $82
+        .word dialog_cmd_close     ; D_CLOSE    = $83
+        .word dialog_cmd_attr      ; D_ATTR     = $84
+        .word dialog_cmd_localize  ; D_LOCALIZE = $85
+        .word dialog_cmd_return    ; D_RETURN   = $86
+        .word dialog_cmd_ext_char  ; D_LOW_CHAR = $87
+        .word dialog_cmd_low_page  ; D_LOW_PAGE = $88
+        .word dialog_cmd_high_page ; D_HI_PAGE  = $89
+        .word dialog_cmd_pal       ; D_PAL      = $8A
+        .word dialog_cmd_font      ; D_FONT     = $8B
         ; TODO: safety? bah!
 
 .proc dialog_cmd_newline
@@ -589,6 +614,155 @@ start_timer:
         rts
 .endproc
 
+.proc dialog_cmd_localize
+NewStrTablePtr  := R0
+NewStrTableBank := R2
+        ; onward!
+        inc16 DialogStringCurrentPtr
+
+        ; Read the target string and bank, incrementing as we go
+        ldy #0
+        lda (DialogStringCurrentPtr), y
+        sta NewStrTablePtr+0
+        inc16 DialogStringCurrentPtr
+
+        ldy #0
+        lda (DialogStringCurrentPtr), y
+        sta NewStrTablePtr+1
+        inc16 DialogStringCurrentPtr
+
+        ldy #0
+        lda (DialogStringCurrentPtr), y
+        sta NewStrTableBank
+        inc16 DialogStringCurrentPtr
+
+        ; Preserve the current dialog state into our temporaries
+        lda DialogStringCurrentPtr+0
+        sta LocalizationPreserveStr+0
+        lda DialogStringCurrentPtr+1
+        sta LocalizationPreserveStr+1
+        lda DialogStringCurrentBank
+        sta LocalizationPreserveBank
+
+        ; Store and activate the new bank
+        lda NewStrTableBank
+        sta DialogStringCurrentBank
+        restore_previous_bank
+        access_data_bank DialogStringCurrentBank
+
+        ; Use the table to read the string pointer out of the
+        ; target bank (constraint: which shares the bank with the actual
+        ; data, this in theory shouldn't be an issue ever)
+        lda current_save + SaveFile::OptionLanguage
+        asl
+        tay
+        lda (NewStrTablePtr), y
+        sta DialogStringCurrentPtr+0
+        iny
+        lda (NewStrTablePtr), y
+        sta DialogStringCurrentPtr+1
+
+        ; And... we're done?
+        rts
+.endproc
+
+.proc dialog_cmd_return
+        ; Okay, return to our position in the original string.
+        ; Should be straightforward.
+
+        lda LocalizationPreserveStr+0
+        sta DialogStringCurrentPtr+0
+        lda LocalizationPreserveStr+1
+        sta DialogStringCurrentPtr+1
+        lda LocalizationPreserveBank
+        sta DialogStringCurrentBank
+
+        ; Switch to the new bank, and we're done
+        restore_previous_bank
+        access_data_bank DialogStringCurrentBank
+
+        rts
+.endproc
+
+.proc dialog_cmd_ext_char
+        ; onward!
+        inc16 DialogStringCurrentPtr
+        ldy #0
+        lda (DialogStringCurrentPtr), y
+draw_single_character:
+        perform_zpcm_inc
+        sta (DialogNametablePtr), y
+        cmp #' '
+        beq no_chirp
+        jsr dialog_play_chirp
+no_chirp:
+        ldy #0
+        lda DialogCurrentAttr
+        sta (DialogAttrPtr), y
+        inc16 DialogNametablePtr
+        inc16 DialogAttrPtr
+        ; onward!
+        inc16 DialogStringCurrentPtr
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc dialog_cmd_low_page
+        ; Switch to the low page and stay there. Simple!
+        lda #0
+        sta DialogCurrentPage
+        ; onward!
+        inc16 DialogStringCurrentPtr
+        rts
+.endproc
+
+.proc dialog_cmd_high_page
+        ; Switch to the high page and stay there. Simple!
+        lda #$80
+        sta DialogCurrentPage
+        ; onward!
+        inc16 DialogStringCurrentPtr
+        rts
+.endproc
+
+.proc dialog_cmd_pal
+Scratch := R0
+        ; onward!
+        inc16 DialogStringCurrentPtr
+        ; read and apply
+        ldy #0
+        lda (DialogStringCurrentPtr), y
+        and #%11000001
+        sta Scratch
+        lda DialogCurrentAttr
+        and #%00111110
+        ora Scratch
+        sta DialogCurrentAttr
+        ; onward properly!
+        inc16 DialogStringCurrentPtr
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc dialog_cmd_font
+Scratch := R0
+        ; onward!
+        inc16 DialogStringCurrentPtr
+        ; read and apply
+        ldy #0
+        lda (DialogStringCurrentPtr), y
+        and #%00111110
+        sta Scratch
+        lda DialogCurrentAttr
+        and #%11000001
+        ora Scratch
+        sta DialogCurrentAttr
+        ; onward properly!
+        inc16 DialogStringCurrentPtr
+        perform_zpcm_inc
+        rts
+.endproc
+
 chirps_lut:
         .word sfx_dialog_text_variant_1
         .word sfx_dialog_text_variant_2
@@ -634,3 +808,4 @@ play_chirp:
         perform_zpcm_inc
         rts
 .endproc
+

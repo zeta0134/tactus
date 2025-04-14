@@ -130,17 +130,17 @@ done_with_leading_spaces:
     ldy #0
     lda HundredsDisplay
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG1)
     sta (AttributeAddr), y
     ldy #1
     lda TensDisplay
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG1)
     sta (AttributeAddr), y
     ldy #2
     lda OnesDisplay
     sta (NametableAddr), y
-    lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+    lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG1)
     sta (AttributeAddr), y
 
     perform_zpcm_inc

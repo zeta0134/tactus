@@ -83,9 +83,9 @@ AttributeAddr := R6
 .proc FAR_draw_box_outline_light
 ShadowAttr := R9
 BoxOutlineAttr := R10
-        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG3)
+        lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG3)
         sta ShadowAttr
-        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG2)
+        lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG2)
         sta BoxOutlineAttr
         jmp _draw_box_outline_common
 .endproc
@@ -93,9 +93,9 @@ BoxOutlineAttr := R10
 .proc FAR_draw_box_outline_dark
 ShadowAttr := R9
 BoxOutlineAttr := R10
-        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG3)
+        lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG3)
         sta ShadowAttr
-        lda #(CHR_BANK_FONT_MARSHMALLOW_DARK | UI_PAL_BG2)
+        lda #(CHR_BANK_0_FONT_MARSHMALLOW_DARK | UI_PAL_BG2)
         sta BoxOutlineAttr
         jmp _draw_box_outline_common
 .endproc
@@ -315,7 +315,7 @@ col_loop:
         ; set that tile to blank
         lda #0
         sta (NametableAddr), y
-        lda #CHR_BANK_FONT_MARSHMALLOW ; palette doesn't matter here
+        lda #CHR_BANK_0_FONT_MARSHMALLOW ; palette doesn't matter here
         sta (AttributeAddr), y
         iny
         cpy Width
@@ -399,7 +399,7 @@ widget_sprite_index := widgets_data4
 draw_existing_file:
         mov16 StringPtr, FilePtr
         add16w StringPtr, #SaveFile::PlayerName
-        lda #CHR_BANK_FONT_MARSHMALLOW
+        lda #CHR_BANK_0_FONT_MARSHMALLOW
         sta TileBase
         lda #UI_PAL_BG1
         sta PaletteIndex
@@ -418,7 +418,7 @@ no_run_in_progress:
         jmp done_with_second_row
 run_in_progress:
         st16 StringPtr, in_progress_str
-        lda #CHR_BANK_FONT_MARSHMALLOW
+        lda #CHR_BANK_0_FONT_MARSHMALLOW
         sta TileBase
         lda #UI_PAL_BG1
         sta PaletteIndex
@@ -455,7 +455,7 @@ done_with_second_row:
 
 draw_new_file:
         st16 StringPtr, new_file_str
-        lda #CHR_BANK_FONT_MARSHMALLOW
+        lda #CHR_BANK_0_FONT_MARSHMALLOW
         sta TileBase
         lda #UI_PAL_BG1
         sta PaletteIndex

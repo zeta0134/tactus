@@ -484,7 +484,7 @@ PaletteIndex := T7
         sta StringPtr+0
         lda widget_text_string_high, y
         sta StringPtr+1
-        lda #CHR_BANK_FONT_MARSHMALLOW
+        lda #CHR_BANK_0_FONT_MARSHMALLOW
         sta TileBase
         lda #0
         sta PaletteIndex
@@ -526,7 +526,7 @@ PaletteIndex := T7
         sta StringPtr+0
         lda widget_text_string_high, y
         sta StringPtr+1
-        lda #CHR_BANK_FONT_MARSHMALLOW
+        lda #CHR_BANK_0_FONT_MARSHMALLOW
         sta TileBase
         lda widget_text_pal_index, y
         sta PaletteIndex
@@ -550,7 +550,7 @@ loop:
         perform_zpcm_inc
         lda #' '
         sta (NametableAddr), y
-        lda #CHR_BANK_FONT_MARSHMALLOW
+        lda #CHR_BANK_0_FONT_MARSHMALLOW
         sta (AttributeAddr), y
         inc16 NametableAddr
         inc16 AttributeAddr

@@ -89,7 +89,7 @@ dark_square:
         lda #DARK_SQUARE_TILE
 tile_converge:
         sta (NametableAddr), y
-        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG3)
+        lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG3)
         sta (AttributeAddr), y
         iny
         cpy #32

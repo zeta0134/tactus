@@ -91,7 +91,7 @@ draw_loop:
         lda (TilePtr), y
         sta (NametableAddr), y
         ; TODO: color?
-        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG2)
+        lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG2)
         sta (AttributeAddr), y
         iny
         cpy #128

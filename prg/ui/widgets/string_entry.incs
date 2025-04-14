@@ -73,10 +73,10 @@ col_loop:
         cmp widget_grid_pos_y, x
         bne no_highlight
 highlight:
-        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG1)
+        lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG1)
         jmp highlight_converge
 no_highlight:
-        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+        lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG0)
 highlight_converge:
         sta (AttributeAddr), y
         inc ColCounter
@@ -115,7 +115,7 @@ widget_grid_pos_x   := widgets_data5
 widget_grid_pos_y   := widgets_data6
 
         ; Common setup for all string drawing to follow
-        lda #CHR_BANK_FONT_MARSHMALLOW
+        lda #CHR_BANK_0_FONT_MARSHMALLOW
         sta TileBase
 
         ; Draw the current page name
@@ -292,7 +292,7 @@ loop:
         perform_zpcm_inc
         lda #NAME_ENTRY_UNDERLINE_TILE
         sta (NametableAddr), y
-        lda #CHR_BANK_FONT_MARSHMALLOW
+        lda #CHR_BANK_0_FONT_MARSHMALLOW
         sta (AttributeAddr), y
         iny
         cpy #15
@@ -324,7 +324,7 @@ widget_target_string_high := widgets_data3
         lda widget_target_string_high, y
         sta StringPtr+1
 
-        lda #CHR_BANK_FONT_MARSHMALLOW
+        lda #CHR_BANK_0_FONT_MARSHMALLOW
         sta TileBase
         lda #UI_PAL_BG1
         sta PaletteIndex
@@ -337,7 +337,7 @@ widget_target_string_high := widgets_data3
         ; draw the text editing cursor
         lda #NAME_ENTRY_TEXT_CURSOR
         sta (NametableAddr), y
-        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+        lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG0)
         sta (AttributeAddr), y
         iny
         cpy #16
@@ -354,7 +354,7 @@ padding_loop:
 draw_end_cursor:
         lda #NAME_ENTRY_END_CURSOR
         sta (NametableAddr), y
-        lda #(CHR_BANK_FONT_MARSHMALLOW | UI_PAL_BG0)
+        lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG0)
         sta (AttributeAddr), y
 done:
         rts

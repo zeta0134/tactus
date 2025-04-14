@@ -5,6 +5,7 @@
         .include "_globals.inc"
 
         .include "dialog.inc"
+        .include "localized_text.inc"
         .include "player.inc"
         .include "procgen.inc"
         .include "prng.inc"
@@ -240,11 +241,9 @@ sign_debug_zone_5w:
 
 sign_debug_misc_1:
         ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, COLOR_MM_YELLOW
-        .byte "Zone 1-2 but fast!", D_NEWLINE
-        .byte D_ATTR, COLOR_MM_WHITE
-        .byte "An early speed test!  this", D_NEWLINE
-        .byte "is largely obsolete.", D_WAIT, D_CLOSE
+        .byte D_PAL, DIALOG_PAL_YELLOW
+        localized_str hello_world_localized
+        .byte D_WAIT, D_CLOSE
 
 sign_debug_misc_2:
         ;     0123456789012345678901234567 ; 28-char width

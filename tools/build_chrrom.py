@@ -492,20 +492,20 @@ background_filenames = disco_filenames + map_filenames + loose_background_filena
 sprite_filenames = sorted(list(pathlib.Path('art/sprite_tiles').glob('*.png')))
 raw_chr_playfield_filenames = sorted(list(pathlib.Path('art/raw_chr_playfield').glob('*.chr')))
 png_chr_playfield_filenames = sorted(list(pathlib.Path('art/raw_chr_playfield').glob('*.png')))
-raw_chr_ui_filenames = sorted(list(pathlib.Path('art/raw_chr_ui').glob('*.chr')))
 png_chr_ui_filenames = sorted(list(pathlib.Path('art/raw_chr_ui').glob('*.png')))
+raw_chr_ui_filenames = sorted(list(pathlib.Path('art/raw_chr_ui').glob('*.chr')))
 sprite_bank_foldernames = sorted(list(pathlib.Path('art/sprite_banks').glob("*")))
 
 background_tiles = [read_background_tile(f) for f in background_filenames]
 sprite_tiles = [read_sprite_tile(f) for f in sprite_filenames]
 raw_chr_playfield_banks = [read_raw_chr(f) for f in raw_chr_playfield_filenames]
 png_chr_playfield_banks = [read_png_chr(f) for f in png_chr_playfield_filenames]
-raw_chr_ui_banks = [read_raw_chr(f) for f in raw_chr_ui_filenames]
 png_chr_ui_banks = [read_png_chr(f) for f in png_chr_ui_filenames]
+raw_chr_ui_banks = [read_raw_chr(f) for f in raw_chr_ui_filenames]
 raw_sprite_banks = [read_sprite_bank(f) for f in sprite_bank_foldernames]
 chr_bytes = generate_chr(background_tiles, sprite_tiles, 
   raw_chr_playfield_banks + png_chr_playfield_banks, 
-  raw_chr_ui_banks + png_chr_ui_banks, 
+  png_chr_ui_banks + raw_chr_ui_banks, 
   raw_sprite_banks)
 
 
@@ -555,7 +555,7 @@ with open('build/tile_defs.inc', 'w') as definitions:
   print("", file=definitions)
 
   print("; raw_chr ui banks", file=definitions)
-  combined_chr_ui_filenames = raw_chr_ui_filenames + png_chr_ui_filenames
+  combined_chr_ui_filenames = png_chr_ui_filenames + raw_chr_ui_filenames
   for i in range(0, len(combined_chr_ui_filenames)):
     bank_id = i + RAW_CHR_UI_REGION_BASE
     print("CHR_BANK_%s = %s" % (constant_name(combined_chr_ui_filenames[i]), ca65_byte_literal(bank_id)), file=definitions)

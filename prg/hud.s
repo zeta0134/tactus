@@ -1030,7 +1030,7 @@ draw_thousands_digit:
         adc #'0'
         sta ThousandsDigit
         ldx #15
-        draw_tile_at_x ROW_4, ThousandsDigit, #(HUD_TEXT_PAL | CHR_BANK_FONT_MARSHMALLOW)
+        draw_tile_at_x ROW_4, ThousandsDigit, #(HUD_TEXT_PAL | CHR_BANK_0_FONT_MARSHMALLOW)
         jmp converge
 draw_little_x:
         ldx #15
@@ -1042,19 +1042,19 @@ converge:
         adc #'0'
         sta HundredsDigit
         ldx #16
-        draw_tile_at_x ROW_4, HundredsDigit, #(HUD_TEXT_PAL | CHR_BANK_FONT_MARSHMALLOW)
+        draw_tile_at_x ROW_4, HundredsDigit, #(HUD_TEXT_PAL | CHR_BANK_0_FONT_MARSHMALLOW)
         lda TensDigit
         clc
         adc #'0'
         sta TensDigit
         ldx #17
-        draw_tile_at_x ROW_4, TensDigit, #(HUD_TEXT_PAL | CHR_BANK_FONT_MARSHMALLOW)
+        draw_tile_at_x ROW_4, TensDigit, #(HUD_TEXT_PAL | CHR_BANK_0_FONT_MARSHMALLOW)
         lda OnesDigit
         clc
         adc #'0'
         sta OnesDigit
         ldx #18
-        draw_tile_at_x ROW_4, OnesDigit, #(HUD_TEXT_PAL | CHR_BANK_FONT_MARSHMALLOW)
+        draw_tile_at_x ROW_4, OnesDigit, #(HUD_TEXT_PAL | CHR_BANK_0_FONT_MARSHMALLOW)
         perform_zpcm_inc
         rts
 .endproc
