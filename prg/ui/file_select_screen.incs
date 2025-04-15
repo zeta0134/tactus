@@ -198,6 +198,8 @@ widget_file_select_mode := widgets_data0
         jsr set_brightness
         lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
+        lda #FADE_SPEED_UI
+        sta GlobalFadeSpeed
 
         ldy CurrentWidgetIndex
         lda #FILE_SELECT_MODE_NORMAL

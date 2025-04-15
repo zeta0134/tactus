@@ -375,6 +375,8 @@ widget_selected_splash := widgets_data0
         jsr set_brightness
         lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
+        lda #FADE_SPEED_UI
+        sta GlobalFadeSpeed
 
         ldy CurrentWidgetIndex
         set_widget_state_y FAR_title_controller_update

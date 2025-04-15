@@ -400,6 +400,8 @@ torchlight_loop_a:
         jsr set_brightness
         lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
+        lda #FADE_SPEED_UI
+        sta GlobalFadeSpeed
 
         ldy CurrentWidgetIndex
         set_widget_state_y FAR_options_controller_update

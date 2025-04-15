@@ -1,3 +1,7 @@
+    
+    .include "../build/tile_defs.inc"
+    .include "_globals.inc"
+
     .include "dynamic_palette.inc"
 
     .include "far_call.inc"
@@ -261,7 +265,7 @@ intermediate_pal_loop:
         sta Brightness
         sta TargetBrightness
 
-        lda #3
+        lda #FADE_SPEED_GAMEPLAY
         sta GlobalFadeSpeed
 
         st16 PaletteStateFunc, palette_state_bgstep_01

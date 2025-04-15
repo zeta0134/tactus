@@ -165,6 +165,9 @@ continue_waiting:
         jsr set_brightness
         lda #BRIGHTNESS_FULLY_DARK
         sta TargetBrightness
+        ; We'll be in UI mode to start with, so use that as our initial fade speed
+        lda #FADE_SPEED_UI
+        sta GlobalFadeSpeed
 
         lda #0
         .repeat 16, i
@@ -181,7 +184,7 @@ continue_waiting:
         far_call FAR_compute_player_colors
 
         ; NORMAL: start on the title screen
-        ; TODO: add the boxgirl productions logo, and any other "first run" screens here
+        ; TODO: add the studio logo, and any other "first run" screens here
         st16 GameMode, title_prep
 
         jsr wait_for_next_vblank
@@ -578,6 +581,8 @@ LayoutPtr := R0
         sta HudObjHighBank
         lda #4
         sta PlayfieldBgHighBank
+        lda #FADE_SPEED_GAMEPLAY
+        sta GlobalFadeSpeed
 
         lda #$FF
         sta ClearedRoomCooldown
@@ -671,6 +676,8 @@ zone_select_converge:
         jsr set_brightness
         lda #BRIGHTNESS_NORMAL
         sta TargetBrightness
+        lda #FADE_SPEED_GAMEPLAY
+        sta GlobalFadeSpeed
 
         st16 GameMode, room_init
         rts
@@ -930,7 +937,7 @@ setup_warp_entrance:
         ; Over the warp transition we'll fade slowly to white!
         lda #BRIGHTNESS_FULLY_BRIGHT
         sta TargetBrightness
-        lda #12
+        lda #FADE_SPEED_WARP_ENTRANCE
         sta GlobalFadeSpeed
         lda #24
         sta BrightnessDelay
@@ -954,6 +961,7 @@ setup_warp_eject:
         sta TargetBrightness
         lda #6
         sta BrightnessDelay
+        lda #FADE_SPEED_WARP_EXIT
         sta GlobalFadeSpeed
         ; reset our delay counter, etc
         lda #0
@@ -994,6 +1002,7 @@ setup_default_transition:
         sta TargetBrightness
         lda #3
         sta BrightnessDelay
+        lda #FADE_SPEED_GAMEPLAY
         sta GlobalFadeSpeed
 
         jsr set_raster_effect_for_room
@@ -1034,6 +1043,7 @@ HealingAmount := R0
         sta TargetBrightness
         lda #3
         sta BrightnessDelay
+        lda #FADE_SPEED_GAMEPLAY
         sta GlobalFadeSpeed
 
         jsr set_raster_effect_for_room
