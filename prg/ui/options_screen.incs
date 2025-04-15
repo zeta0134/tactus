@@ -71,6 +71,8 @@ options_sublayout_debug_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_debug_str, 2, 13
         widget_text_options debug_language_str, debug_language_options, {current_save + SaveFile::OptionLanguage },      4, 15
+
+        widget_text_label_localized debug_localized_label, 4, 17
         widget_text_label debug_silly_1_str, 2, 24
         widget_text_label debug_silly_2_str, 2, 25
         widget_text_label debug_silly_3_str, 2, 26
@@ -273,6 +275,8 @@ debug_silly_2_str: .asciiz "I see you've found my debug"
 debug_silly_3_str: .asciiz "options! Come right on in,"
 debug_silly_4_str: .asciiz "have some coffee, etc."
 
+debug_localized_label: localized_str_close hello_world_localized
+
 coming_soon_str: .asciiz "Coming Soon :)"
 
 ; ======================================================================
@@ -420,6 +424,7 @@ widget_cursor_nav_index := widgets_data1
         lda #KEY_B
         and ButtonsDown
         beq stay_here
+        far_call FAR_compute_player_colors
         near_call FAR_save_and_return_to_file_details
         rts
 stay_here:
@@ -963,7 +968,7 @@ perform_sync:
 .proc FAR_update_player_color_values
         ; Read the color index values, work out the PPU values from the global LUT,
         ; and load those colors into the player sprite for preview
-        far_call FAR_compute_player_colors
+        far_call FAR_compute_player_colors_for_options
         ; Also copy these colors into the first hud palette, so that the preview sprite
         ; uses the same set
         lda PlayfieldObjPal0+0
@@ -981,7 +986,7 @@ perform_sync:
         ; have much else going on. Just continually invalidate all of the palettes, all the time,
         ; so that changes instantly take effect when applied.
         jsr _apply_options_palettes
-        far_call FAR_compute_player_colors
+        far_call FAR_compute_player_colors_for_options
         far_call FAR_apply_player_palette
 
         lda PlayfieldObjPal0+0

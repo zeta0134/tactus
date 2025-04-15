@@ -15,6 +15,7 @@
         .include "nes.inc"
         .include "input.inc"
         .include "levels.inc"
+        .include "localized_text.inc"
         .include "main.inc"
         .include "math_util.inc"
         .include "player.inc"
@@ -68,6 +69,9 @@ LastBeat: .res 1
 SubLayoutRequested: .res 1
 SubLayoutPtr: .res 2
 SubLayoutIndex: .res 1
+
+; String processing, it turns out, needs lots of scratch space
+UiStringScratch: .res 8
 
 
         .segment "DATA_UI_LAYOUTS"
@@ -561,3 +565,251 @@ loop:
         perform_zpcm_inc
         rts
 .endproc
+
+; Several of these are no-ops because they make no sense in a UI context,
+; mostly the commands for manipulating the dialog subsystem. We'll reuse
+; D_CLOSE as end-of-string, since we don't want to forbid 0 bytes for 
+; all glyph sets. (this means we'll eventually phase out the idea of
+; null-terminated strings altogether.)
+
+draw_string_cmd_table:
+        .word str_cmd_dummy     ; D_NEWLINE  = $80
+        .word str_cmd_dummy     ; D_WAIT     = $81
+        .word str_cmd_dummy     ; D_CLEAR    = $82
+        .word str_cmd_close     ; D_CLOSE    = $83
+        .word str_cmd_attr      ; D_ATTR     = $84
+        .word str_cmd_localize  ; D_LOCALIZE = $85
+        .word str_cmd_return    ; D_RETURN   = $86
+        .word str_cmd_ext_char  ; D_LOW_CHAR = $87
+        .word str_cmd_low_page  ; D_LOW_PAGE = $88
+        .word str_cmd_high_page ; D_HI_PAGE  = $89
+        .word str_cmd_pal       ; D_PAL      = $8A
+        .word str_cmd_font      ; D_FONT     = $8B
+        ; TODO: safety? bah!
+
+.proc FAR_draw_ui_string
+NametableAddr := T0
+AttributeAddr := T2
+StringPtr     := T4
+
+CommandPtr := UiStringScratch+0
+CurrentPage := UiStringScratch+2
+CurrentAttr := UiStringScratch+3
+LocalizePreservePtr := UiStringScratch+4
+LocalizePreserveBank := UiStringScratch+6
+        lda #COLOR_MM_WHITE
+        sta CurrentAttr
+        lda #0
+        sta CurrentPage
+loop:
+        perform_zpcm_inc
+        ldy #0
+        lda (StringPtr), y
+        bmi process_command
+process_single_character:
+        ora CurrentPage
+        sta (NametableAddr), y
+        lda CurrentAttr        
+        sta (AttributeAddr), y
+        inc16 NametableAddr
+        inc16 AttributeAddr
+        inc16 StringPtr
+        jmp loop
+process_command:
+        perform_zpcm_inc
+        cmp #D_CLOSE
+        beq end_of_string
+        asl
+        tax
+        lda draw_string_cmd_table+0, x
+        sta CommandPtr+0
+        lda draw_string_cmd_table+1, x
+        sta CommandPtr+1
+        jmp (CommandPtr) ; which will inc16 / return as needed
+end_of_string:
+        perform_zpcm_inc
+        rts        
+.endproc
+
+; NOTE: All string processing commands may assume that Y=0 on entry.
+; It is not required to preserve Y beyond this.
+
+.proc str_cmd_dummy
+StringPtr := T4
+        ; dummied out, this makes no sense for a UI string
+        inc16 StringPtr
+        jmp FAR_draw_ui_string::loop
+.endproc
+
+.proc str_cmd_close
+        ; the end of this string! hooray!
+        jmp FAR_draw_ui_string::end_of_string
+.endproc
+
+.proc str_cmd_attr
+StringPtr := T4
+CurrentAttr := UiStringScratch+3
+        ; onward!
+        inc16 StringPtr
+        ; read and apply
+        lda (StringPtr), y
+        sta CurrentAttr
+        ; onward properly!
+        inc16 StringPtr
+        perform_zpcm_inc
+        jmp FAR_draw_ui_string::loop
+.endproc
+
+.proc str_cmd_localize
+StringPtr := T4
+NewStrTablePtr  := T6
+LocalizePreservePtr := UiStringScratch+4
+LocalizePreserveBank := UiStringScratch+6
+NewStrTableBank := UiStringScratch+7
+
+        ; onward!
+        inc16 StringPtr
+
+        ; Read the target string and bank, incrementing as we go
+        lda (StringPtr), y
+        sta NewStrTablePtr+0
+        inc16 StringPtr
+
+        lda (StringPtr), y
+        sta NewStrTablePtr+1
+        inc16 StringPtr
+
+        lda (StringPtr), y
+        sta NewStrTableBank
+        inc16 StringPtr
+
+        ; Preserve the current dialog state into our temporaries
+        lda StringPtr+0
+        sta LocalizePreservePtr+0
+        lda StringPtr+1
+        sta LocalizePreservePtr+1
+        lda CurrentDataBankLow
+        sta LocalizePreserveBank
+
+        ; Store and activate the new bank
+        restore_previous_bank
+        access_data_bank NewStrTableBank
+
+        ; Use the table to read the string pointer out of the
+        ; target bank (constraint: which shares the bank with the actual
+        ; data, this in theory shouldn't be an issue ever)
+        lda current_save + SaveFile::OptionLanguage
+        asl
+        tay
+        lda (NewStrTablePtr), y
+        sta StringPtr+0
+        iny
+        lda (NewStrTablePtr), y
+        sta StringPtr+1
+
+        ; And... we're done?
+        jmp FAR_draw_ui_string::loop
+.endproc
+
+.proc str_cmd_return
+StringPtr := T4
+LocalizePreservePtr := UiStringScratch+4
+LocalizePreserveBank := UiStringScratch+6
+        ; Okay, return to our position in the original string.
+        ; Should be straightforward.
+
+        lda LocalizePreservePtr+0
+        sta StringPtr+0
+        lda LocalizePreservePtr+1
+        sta StringPtr+1
+
+        ; Switch to the new bank, and we're done
+        restore_previous_bank
+        access_data_bank LocalizePreserveBank
+
+        jmp FAR_draw_ui_string::loop
+.endproc
+
+.proc str_cmd_ext_char
+NametableAddr := T0
+AttributeAddr := T2
+StringPtr := T4
+CurrentAttr := UiStringScratch+3
+        ; onward!
+        inc16 StringPtr
+        lda (StringPtr), y
+        sta (NametableAddr), y
+        lda CurrentAttr
+        sta (AttributeAddr), y
+        inc16 NametableAddr
+        inc16 AttributeAddr
+        ; onward!
+        inc16 StringPtr
+        jmp FAR_draw_ui_string::loop
+.endproc
+
+.proc str_cmd_low_page
+StringPtr := T4
+CurrentPage := UiStringScratch+2
+        ; Switch to the low page and stay there. Simple!
+        lda #0
+        sta CurrentPage
+        ; onward!
+        inc16 StringPtr
+        jmp FAR_draw_ui_string::loop
+.endproc
+
+.proc str_cmd_high_page
+StringPtr := T4
+CurrentPage := UiStringScratch+2
+        ; Switch to the high page and stay there. Simple!
+        lda #$80
+        sta CurrentPage
+        ; onward!
+        inc16 StringPtr
+        jmp FAR_draw_ui_string::loop
+.endproc
+
+.proc str_cmd_pal
+StringPtr := T4
+CurrentAttr := UiStringScratch+3
+Scratch := UiStringScratch+7
+        ; onward!
+        inc16 StringPtr
+        ; read and apply
+        ldy #0
+        lda (StringPtr), y
+        and #%11000001
+        sta Scratch
+        lda CurrentAttr
+        and #%00111110
+        ora Scratch
+        sta CurrentAttr
+        ; onward properly!
+        inc16 StringPtr
+        perform_zpcm_inc
+        jmp FAR_draw_ui_string::loop
+.endproc
+
+.proc str_cmd_font
+StringPtr := T4
+CurrentAttr := UiStringScratch+3
+Scratch := UiStringScratch+7
+        ; onward!
+        inc16 StringPtr
+        ; read and apply
+        ldy #0
+        lda (StringPtr), y
+        and #%00111110
+        sta Scratch
+        lda CurrentAttr
+        and #%11000001
+        ora Scratch
+        sta CurrentAttr
+        ; onward properly!
+        inc16 StringPtr
+        perform_zpcm_inc
+        jmp FAR_draw_ui_string::loop
+.endproc
+
+

@@ -150,6 +150,63 @@ use_custom_palette:
     rts
 .endproc
 
+; Uses a smaller color set, skips initializing many of the extra colors
+; that we don't actually need. This helps performance primarily, so we aren't
+; lagging too terribly after the player moves the custom color sliders around.
+.proc FAR_compute_player_colors_for_options
+    perform_zpcm_inc
+    lda current_save + SaveFile::PlayerPalettePreset
+    cmp #PLAYER_PALETTE_PERSONALIZED
+    beq use_custom_palette
+
+use_preset_palette:
+    ldx current_save + SaveFile::PlayerPalettePreset
+    ldy palette_preset_lut_phones, x
+    lda player_colors_lut, y
+    sta player_palettes_phones+PLAYER_PALETTE_NORMAL
+    lda player_title_base_phones_lut, y
+    sta player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
+    ldx current_save + SaveFile::PlayerPalettePreset
+    ldy palette_preset_lut_pajamas, x
+    lda player_colors_lut, y
+    sta player_palettes_pajamas+PLAYER_PALETTE_NORMAL
+    lda player_title_base_pajamas_lut, y
+    sta player_palettes_pajamas+PLAYER_PALETTE_TITLE_BASE
+    ldx current_save + SaveFile::PlayerPalettePreset
+    ldy palette_preset_lut_pigment, x
+    lda player_colors_lut, y
+    sta player_palettes_pigment+PLAYER_PALETTE_NORMAL
+    lda player_title_base_pigment_lut, y
+    sta player_palettes_pigment+PLAYER_PALETTE_TITLE_BASE
+
+    jsr _compute_options_derived_colors
+    
+    perform_zpcm_inc
+    rts
+
+use_custom_palette:
+    ldy current_save + SaveFile::PlayerPalettePhonesIndex
+    lda player_colors_lut, y
+    sta player_palettes_phones+PLAYER_PALETTE_NORMAL
+    lda player_title_base_phones_lut, y
+    sta player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
+    ldy current_save + SaveFile::PlayerPalettePajamasIndex
+    lda player_colors_lut, y
+    sta player_palettes_pajamas+PLAYER_PALETTE_NORMAL
+    lda player_title_base_pajamas_lut, y
+    sta player_palettes_pajamas+PLAYER_PALETTE_TITLE_BASE
+    ldy current_save + SaveFile::PlayerPalettePigmentIndex
+    lda player_colors_lut, y
+    sta player_palettes_pigment+PLAYER_PALETTE_NORMAL
+    lda player_title_base_pigment_lut, y
+    sta player_palettes_pigment+PLAYER_PALETTE_TITLE_BASE
+
+    jsr _compute_options_derived_colors
+
+    perform_zpcm_inc
+    rts
+.endproc
+
 .proc _compute_file_1_colors
     perform_zpcm_inc
     lda current_block + SaveBlock::SaveSlot1 + SaveFile::PlayerPalettePreset
@@ -424,8 +481,38 @@ derived_color_mod_table:
 
     .byte $FF ; end of list
 
+abbreviated_derived_color_mod_table:
+          ; PHONES                  PAJAMAS                  PIGMENT
+          ; target, h.step, l.step  target, h.step, l.step   target, h.step, l.step
+    .byte      $55,      6,      2,    $55,      6,      2,     $55,      6,      2 ; Damage Light
+    .byte      $05,      6,      1,    $05,      6,      1,     $05,      6,      1 ; Damage Dark
+
+    ; A basic pulse to the beat. We allow this to fade all the way down to nothing.
+    .byte      $50,      0,      3,    $50,      0,      3,     $50,      0,      3 ; Rhythm Assist - 0
+    .byte      $50,      0,      2,    $50,      0,      2,     $50,      0,      2 ; Rhythm Assist - 1
+    .byte      $50,      0,      1,    $50,      0,      1,     $50,      0,      1 ; Rhythm Assist - 2
+    .byte      $50,      0,      1,    $50,      0,      1,     $50,      0,      1 ; Rhythm Assist - 3
+    .byte      $50,      0,      0,    $50,      0,      0,     $50,      0,      0 ; Rhythm Assist - 4
+    .byte      $50,      0,      0,    $50,      0,      0,     $50,      0,      0 ; Rhythm Assist - 5
+    .byte      $50,      0,      0,    $50,      0,      0,     $50,      0,      0 ; Rhythm Assist - 6
+    .byte      $50,      0,      0,    $50,      0,      0,     $50,      0,      0 ; Rhythm Assist - 7
+
+    .byte $FF ; end of list
 
 .proc _compute_derived_colors
+TablePtr   := R4
+    st16 TablePtr, derived_color_mod_table
+    jmp _compute_derived_colors_common
+.endproc
+
+; A shorter set, to not be quite so terrible for performance
+.proc _compute_options_derived_colors
+TablePtr   := R4
+    st16 TablePtr, abbreviated_derived_color_mod_table
+    jmp _compute_derived_colors_common
+.endproc
+
+.proc _compute_derived_colors_common
 ; used by hue/luminence stepping functions
 CurrentColor := R0
 TargetColor := R1
@@ -436,7 +523,7 @@ TablePtr   := R4
 PaletteIndex := R6
 ; R15 is used/clobbered by hue stepping routines
 
-    st16 TablePtr, derived_color_mod_table
+    
     lda #2 ; skip past entry 0, which is our "normal" palette, and 1 which is our "title base" palette
     sta PaletteIndex
 loop:

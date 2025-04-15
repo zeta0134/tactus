@@ -24,6 +24,10 @@ T7: .res 1
 ; supports a max length up to 256, don't exceed this
 ; (really, don't exceed a max length of 32, since that
 ; may wrap poorly; do that manually elsewhere)
+
+; These strings ARE null-terminated. Generally use .asciiz.
+; These strings DO NOT support embedded commands, and as such
+; should be used sparingly, as they cannot be localized directly.
 .proc FIXED_draw_string
 NametableAddr := T0
 AttributeAddr := T2
