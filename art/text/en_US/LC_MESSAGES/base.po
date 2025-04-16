@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-04-15 11:07-0400\n"
-"PO-Revision-Date: 2025-04-16 13:32+0000\n"
+"PO-Revision-Date: 2025-04-16 14:22+0000\n"
 "Last-Translator: Zeta <zeta0134@reploid.cafe>\n"
 "Language-Team: English <http://weblate.reploid.cafe/projects/tactus/items/en/"
 ">\n"
@@ -80,3 +80,153 @@ msgid "flail_description"
 msgstr ""
 "Strike adjacent foes\n"
 "while moving."
+
+msgid "go_go_boots_description"
+msgstr "Tap twice, move twice."
+
+msgid "go_go_boots_name"
+msgstr "GO GO BOOTS"
+
+msgid "heart_container_name"
+msgstr "HEART CONTAINER"
+
+msgid "temporary_heart_name"
+msgstr "BONUS HEART"
+
+msgid "heart_armor_name"
+msgstr "HEART ARMOR"
+
+msgid "defensive_shield_description"
+msgstr "-2 Incoming Damage."
+
+msgid "chain_link_name"
+msgstr "CHAIN LINK"
+
+msgid "chain_link_description"
+msgstr "+2 Chain Duration."
+
+msgid "gold_sack_name"
+msgstr "GOLD SACK"
+
+msgid "basic_torch_name"
+msgstr "TORCH"
+
+msgid "compass_name"
+msgstr "COMPASS"
+
+msgid "compass_description"
+msgstr "Locate special chambers."
+
+msgid "small_fries_name"
+msgstr "SMALL FRIES"
+
+msgid "small_fries_description"
+msgstr "+4 HP. Quite salty."
+
+msgid "medium_fries_name"
+msgstr "MEDIUM FRIES"
+
+msgid "large_fries_name"
+msgstr "LARGE FRIES"
+
+msgid "large_fries_description"
+msgstr "Heals all HP! Satiating."
+
+msgid "basic_torch_description"
+msgstr "+1 Lighting Radius."
+
+msgid "large_torch_name"
+msgstr "BIG OL' TORCH"
+
+msgid "large_torch_description"
+msgstr "+4 Lighting Radius."
+
+msgid "map_name"
+msgstr "DUNGEON MAP"
+
+msgid "map_description"
+msgstr ""
+"Fully reveal the current\n"
+"floor."
+
+msgid "medium_fries_description"
+msgstr "+8 HP. Best with ketchup."
+
+msgid "gold_sack_description"
+msgstr ""
+"One can never have too\n"
+"much treasure!"
+
+msgid "heart_container_description"
+msgstr "+4 Maximum HP."
+
+msgid "temporary_heart_description"
+msgstr "+4 Temporary HP."
+
+msgid "heart_armor_description"
+msgstr ""
+"Reduce incoming damage to\n"
+"this heart."
+
+msgid "defensive_shield_name"
+msgstr "DEFENSIVE SHIELD"
+
+msgid "aloha_tshirt_name"
+msgstr "ALOHA T-SHIRT"
+
+msgid "aloha_tshirt_description"
+msgstr ""
+"-1 Incoming Damage.\n"
+"Tourists charged double!"
+
+msgid "bombs_name"
+msgstr "BOMBS"
+
+msgid "bombs_description"
+msgstr ""
+"Explodes in a 3x3 area!\n"
+"B to hold, + to throw."
+
+msgid "spell_fire_name"
+msgstr "SCORCH"
+
+msgid "spell_fire_description"
+msgstr "Burns one entire chamber!"
+
+msgid "spell_air_name"
+msgstr "SHOCK"
+
+msgid "spell_air_description"
+msgstr ""
+"Electrify one entire\n"
+"chamber!"
+
+msgid "spell_ice_name"
+msgstr "CHILL"
+
+msgid "spell_ice_description"
+msgstr "Freeze one entire chamber!"
+
+msgid "spell_earth_name"
+msgstr "GROWTH"
+
+msgid "spell_earth_description"
+msgstr ""
+"Return one entire chamber\n"
+"to nature!"
+
+msgid "spell_bomb_fiesta_name"
+msgstr "BOMB FIESTA"
+
+msgid "spell_bomb_fiesta_description"
+msgstr ""
+"It's a party and the whole\n"
+"chamber's invited!"
+
+msgid "spell_life_name"
+msgstr "HEALING"
+
+msgid "spell_life_description"
+msgstr ""
+"Fully restore all hearts!\n"
+"Tastes like strawberries."

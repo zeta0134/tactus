@@ -45,236 +45,79 @@ item_bank_refs: .res 4
         .byte D_LOCALIZE, <description_str, >description_str, <.bank(description_str), D_WAIT, D_CLOSE
 .endmacro
 
+; TODO: not this. We want to remove the concept of L2/L3 weapons. But for now, we're translating
+; all mechanics as they stand. (This particular setup is quite awkward; if we later decide to keep these,
+; they should become separate items with bespoke translations. But the weapon upgrade system really ought
+; to replace this entirely.)
+.macro localized_l2_weapon_description name_str, description_str
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_PAL, HUD_PURPLE_PAL
+        .byte D_LOCALIZE, <name_str, >name_str, <.bank(name_str), D_FONT, FONT_ASCII, "- L2", D_NEWLINE
+        .byte D_PAL, HUD_TEXT_PAL
+        .byte D_LOCALIZE, <description_str, >description_str, <.bank(description_str), D_WAIT, D_CLOSE
+.endmacro
+
+.macro localized_l3_weapon_description name_str, description_str
+        ;     0123456789012345678901234567 ; 28-char width
+        .byte D_PAL, HUD_PURPLE_PAL
+        .byte D_LOCALIZE, <name_str, >name_str, <.bank(name_str), D_FONT, FONT_ASCII, "- L3", D_NEWLINE
+        .byte D_PAL, HUD_TEXT_PAL
+        .byte D_LOCALIZE, <description_str, >description_str, <.bank(description_str), D_WAIT, D_CLOSE
+.endmacro
+
+; Dummy / Debug Entries
 no_item_description:        localized_item_description no_item_name_localized, no_item_description_localized
-dagger_lv1_description:     localized_item_description dagger_name_localized,  dagger_description_localized
-broadsword_lv1_description: localized_item_description broadsword_name_localized,  broadsword_description_localized
-broadsword_lv2_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "BROADSWORD - L2", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Hits 3 squares in front.", D_WAIT, D_CLOSE
-broadsword_lv3_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "BROADSWORD - L3", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Hits 3 squares in front.", D_WAIT, D_CLOSE
 
-longsword_lv1_description: localized_item_description longsword_name_localized, longsword_description_localized
-longsword_lv2_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "LONGSWORD - L2", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Hits 2 squares ahead.", D_WAIT, D_CLOSE
+; Weapons
+dagger_lv1_description:        localized_item_description      dagger_name_localized,      dagger_description_localized
+broadsword_lv1_description:    localized_item_description      broadsword_name_localized,  broadsword_description_localized
+broadsword_lv2_description:    localized_l2_weapon_description broadsword_name_localized,  broadsword_description_localized
+broadsword_lv3_description:    localized_l3_weapon_description broadsword_name_localized,  broadsword_description_localized
+longsword_lv1_description:     localized_item_description      longsword_name_localized,   longsword_description_localized
+longsword_lv2_description:     localized_l2_weapon_description longsword_name_localized,   longsword_description_localized
+longsword_lv3_description:     localized_l3_weapon_description longsword_name_localized,   longsword_description_localized
+spear_lv1_description:         localized_item_description      spear_name_localized,       spear_description_localized
+spear_lv2_description:         localized_l2_weapon_description spear_name_localized,       spear_description_localized
+spear_lv3_description:         localized_l3_weapon_description spear_name_localized,       spear_description_localized
+flail_lv1_description:         localized_item_description      flail_name_localized,       flail_description_localized
+flail_lv2_description:         localized_l2_weapon_description flail_name_localized,       flail_description_localized
+flail_lv3_description:         localized_l3_weapon_description flail_name_localized,       flail_description_localized
 
-longsword_lv3_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "LONGSWORD - L3", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Hits 2 squares ahead.", D_WAIT, D_CLOSE
+; Light Sources
+basic_torch_description:       localized_item_description basic_torch_name_localized, basic_torch_description_localized
+large_torch_description:       localized_item_description large_torch_name_localized, large_torch_description_localized
 
-spear_lv1_description: localized_item_description spear_name_localized, spear_description_localized
-spear_lv2_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "SPEAR - L2", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Strike one foe up to", D_NEWLINE
-        .byte "2 squares ahead.", D_WAIT, D_CLOSE
-spear_lv3_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "SPEAR - L3", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Strike one foe up to", D_NEWLINE
-        .byte "2 squares ahead.", D_WAIT, D_CLOSE
+; Consumables
+compass_description:           localized_item_description compass_name_localized,           compass_description_localized
+map_description:               localized_item_description map_name_localized,               map_description_localized
+small_fries_description:       localized_item_description small_fries_name_localized,       small_fries_description_localized
+medium_fries_description:      localized_item_description medium_fries_name_localized,      medium_fries_description_localized
+large_fries_description:       localized_item_description large_fries_name_localized,       large_fries_description_localized
+gold_sack_description:         localized_item_description gold_sack_name_localized,         gold_sack_description_localized
+heart_container_description:   localized_item_description heart_container_name_localized,   heart_container_description_localized
+temporary_heart_description:   localized_item_description temporary_heart_name_localized,   temporary_heart_description_localized
+heart_armor_description:       localized_item_description heart_armor_name_localized,       heart_armor_description_localized
 
-flail_lv1_description: localized_item_description flail_name_localized, flail_description_localized
-flail_lv2_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "FLAIL - L2", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Strike adjacent foes", D_NEWLINE
-        .byte "while moving.", D_WAIT, D_CLOSE
+; Footwear
+go_go_boots_description:       localized_item_description go_go_boots_name_localized,       go_go_boots_description_localized
 
-flail_lv3_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "FLAIL - L3", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Strike adjacent foes", D_NEWLINE
-        .byte "while moving.", D_WAIT, D_CLOSE
+; Armor
+defensive_shield_description:  localized_item_description defensive_shield_name_localized,  defensive_shield_description_localized
+aloha_tshirt_description:      localized_item_description aloha_tshirt_name_localized,      aloha_tshirt_description_localized
 
-basic_torch_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "TORCH", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "+1 Lighting Radius", D_WAIT, D_CLOSE
+; Accessories
+chain_link_description:        localized_item_description chain_link_name_localized,        chain_link_description_localized
 
-large_torch_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "BIG OL' TORCH", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "+4 Lighting Radius", D_WAIT, D_CLOSE
+; Bombs
+bombs_description:             localized_item_description bombs_name_localized,             bombs_description_localized
 
-; Consumables don't display text in-game, but we might want
-; to make a sortof in-game glossary, and that's where these
-; could be used. Might as well populate them while we're on
-; a roll with the things.
-compass_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "COMPASS", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Locate special chambers.", D_WAIT, D_CLOSE
-
-map_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "DUNGEON MAP", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Fully reveal the current", D_NEWLINE
-        .byte "floor.", D_WAIT, D_CLOSE
-
-small_fries_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "SMALL FRIES", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "+4 HP. Quite Salty.", D_WAIT, D_CLOSE
-
-medium_fries_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "MEDIUM FRIES", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "+8 HP. Best with ketchup.", D_WAIT, D_CLOSE
-
-large_fries_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "LARGE FRIES", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Heals all HP! Satiating.", D_WAIT, D_CLOSE
-
-go_go_boots_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "GO GO BOOTS", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Tap twice, move twice.", D_WAIT, D_CLOSE
-
-gold_sack_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "GOLD SACK", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "One can never have too", D_NEWLINE
-        .byte "much treasure!", D_WAIT, D_CLOSE
-
-heart_container_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "HEART CONTAINER", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "+4 Maximum HP", D_WAIT, D_CLOSE
-
-temporary_heart_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "BONUS HEART", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "+4 Temporary HP", D_WAIT, D_CLOSE
-
-heart_armor_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "HEART ARMOR", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Reduce incoming damage to", D_NEWLINE
-        .byte "this heart.", D_WAIT, D_CLOSE
-
-defensive_shield_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "DEFENSIVE SHIELD", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "-2 Incoming Damage.", D_WAIT, D_CLOSE
-
-chain_link_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "CHAIN LINK", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "+2 Chain Duration.", D_WAIT, D_CLOSE
-
-aloha_tshirt_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "ALOHA T-SHIRT", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "-1 Incoming Damage.", D_NEWLINE
-        .byte "Tourists charged double!", D_WAIT, D_CLOSE
-
-bombs_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "BOMBS", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Explodes in a 3x3 area!", D_NEWLINE
-        .byte "B to hold, + to throw", D_WAIT, D_CLOSE
-
-spell_fire_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "SCORCH", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Burns one entire chamber!", D_WAIT, D_CLOSE
-
-spell_air_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "SHOCK", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Electrify one entire", D_NEWLINE
-        .byte "chamber!", D_WAIT, D_CLOSE
-
-spell_ice_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "CHILL", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Freeze one entire chamber!", D_WAIT, D_CLOSE
-
-spell_earth_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "GROWTH", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Return one entire chamber", D_NEWLINE
-        .byte "to nature!", D_WAIT, D_CLOSE
-
-spell_bomb_fiesta_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "BOMB FIESTA", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "It's a party and the whole", D_NEWLINE
-        .byte "chamber's invited!", D_WAIT, D_CLOSE
-
-spell_life_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "HEALING", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Fully restore all hearts!", D_NEWLINE
-        .byte "Tastes like strawberries.", D_WAIT, D_CLOSE
+; Spells
+spell_fire_description:        localized_item_description spell_fire_name_localized,        spell_fire_description_localized
+spell_air_description:         localized_item_description spell_air_name_localized,         spell_air_description_localized
+spell_ice_description:         localized_item_description spell_ice_name_localized,         spell_ice_description_localized
+spell_earth_description:       localized_item_description spell_earth_name_localized,       spell_earth_description_localized
+spell_bomb_fiesta_description: localized_item_description spell_bomb_fiesta_name_localized, spell_bomb_fiesta_description_localized
+spell_life_description:        localized_item_description spell_life_name_localized,        spell_life_description_localized
 
         .segment "DATA_0"
 

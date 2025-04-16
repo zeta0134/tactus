@@ -91,6 +91,73 @@ def gather_translated_strings(languages):
             "name":        _("spear_name"),
             "description": _("spear_description")}
 
+        items["basic_torch"] = {
+            "name":        _("basic_torch_name"),
+            "description": _("basic_torch_description")}
+        items["large_torch"] = {
+            "name":        _("large_torch_name"),
+            "description": _("large_torch_description")}
+        items["compass"] = {
+            "name":        _("compass_name"),
+            "description": _("compass_description")}
+        items["map"] = {
+            "name":        _("map_name"),
+            "description": _("map_description")}
+        items["small_fries"] = {
+            "name":        _("small_fries_name"),
+            "description": _("small_fries_description")}
+        items["medium_fries"] = {
+            "name":        _("medium_fries_name"),
+            "description": _("medium_fries_description")}
+        items["large_fries"] = {
+            "name":        _("large_fries_name"),
+            "description": _("large_fries_description")}
+        items["go_go_boots"] = {
+            "name":        _("go_go_boots_name"),
+            "description": _("go_go_boots_description")}
+        items["gold_sack"] = {
+            "name":        _("gold_sack_name"),
+            "description": _("gold_sack_description")}
+        items["heart_container"] = {
+            "name":        _("heart_container_name"),
+            "description": _("heart_container_description")}
+        items["temporary_heart"] = {
+            "name":        _("temporary_heart_name"),
+            "description": _("temporary_heart_description")}
+        items["heart_armor"] = {
+            "name":        _("heart_armor_name"),
+            "description": _("heart_armor_description")}
+        items["defensive_shield"] = {
+            "name":        _("defensive_shield_name"),
+            "description": _("defensive_shield_description")}
+        items["chain_link"] = {
+            "name":        _("chain_link_name"),
+            "description": _("chain_link_description")}
+        items["aloha_tshirt"] = {
+            "name":        _("aloha_tshirt_name"),
+            "description": _("aloha_tshirt_description")}
+        items["bombs"] = {
+            "name":        _("bombs_name"),
+            "description": _("bombs_description")}
+        items["spell_fire"] = {
+            "name":        _("spell_fire_name"),
+            "description": _("spell_fire_description")}
+        items["spell_air"] = {
+            "name":        _("spell_air_name"),
+            "description": _("spell_air_description")}
+        items["spell_ice"] = {
+            "name":        _("spell_ice_name"),
+            "description": _("spell_ice_description")}
+        items["spell_earth"] = {
+            "name":        _("spell_earth_name"),
+            "description": _("spell_earth_description")}
+        items["spell_bomb_fiesta"] = {
+            "name":        _("spell_bomb_fiesta_name"),
+            "description": _("spell_bomb_fiesta_description")}
+        items["spell_life"] = {
+            "name":        _("spell_life_name"),
+            "description": _("spell_life_description")}
+
         # massage the translated strings into a data structure keyed on the individual message,
         # as this is our output unit for the game. (We're looping over entire languages at once,
         # so this is slightly awkward to do.)
