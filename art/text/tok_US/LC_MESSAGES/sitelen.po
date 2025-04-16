@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-04-15 20:33+0000\n"
+"PO-Revision-Date: 2025-04-16 13:32+0000\n"
 "Last-Translator: Zeta <zeta0134@reploid.cafe>\n"
 "Language-Team: Toki Pona (Sitelen Pona) <http://weblate.reploid.cafe/"
 "projects/tactus/items/tok_sp/>\n"
@@ -50,3 +50,11 @@ msgstr "󱥊󱥻"
 #: all.py:24
 msgid "spear_description"
 msgstr "󱥈󱤉󱥼󱥶2"
+
+msgid "flail_name"
+msgstr "󱥜󱥻"
+
+msgid "flail_description"
+msgstr ""
+"󱥈󱤉󱥼󱥒\n"
+"󱤈󱤉󱥩󱤀"
