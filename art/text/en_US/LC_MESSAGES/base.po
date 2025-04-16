@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-04-15 11:07-0400\n"
-"PO-Revision-Date: 2025-04-16 14:22+0000\n"
+"PO-Revision-Date: 2025-04-16 23:50+0000\n"
 "Last-Translator: Zeta <zeta0134@reploid.cafe>\n"
 "Language-Team: English <http://weblate.reploid.cafe/projects/tactus/items/en/"
 ">\n"
@@ -230,3 +230,190 @@ msgid "spell_life_description"
 msgstr ""
 "Fully restore all hearts!\n"
 "Tastes like strawberries."
+
+msgid "ui_option_enabled"
+msgstr "ENABLED"
+
+msgid "ui_option_disabled"
+msgstr "DISABLED"
+
+msgid "hello_world"
+msgstr "Hello, World!"
+
+msgid "ui_option_on"
+msgstr "ON"
+
+msgid "options_player_palette_header"
+msgstr "PLAYER PALETTE"
+
+msgid "options_player_palette_preset_label"
+msgstr "Preset  "
+
+msgid "options_player_palette_preset_personalized"
+msgstr "PERSONALIZED"
+
+msgid "options_player_palette_preset_petunia"
+msgstr "PETUNIA"
+
+msgid "options_player_palette_preset_protea"
+msgstr "PROTEA"
+
+msgid "options_player_palette_preset_passion"
+msgstr "PASSION"
+
+msgid "options_player_palette_face"
+msgstr "Pigment    "
+
+msgid "options_game_mode_patient"
+msgstr "PATIENT"
+
+msgid "options_game_mode_doubletime"
+msgstr "DOUBLETIME"
+
+msgid "options_disco_floor_frozen_squares"
+msgstr "FROZEN SQUARES"
+
+msgid "ui_option_off"
+msgstr "OFF"
+
+msgid "options_player_palette_preset_peony"
+msgstr "PEONY"
+
+msgid "options_player_palette_preset_periwinkle"
+msgstr "PERIWINKLE"
+
+msgid "options_player_palette_outfit"
+msgstr "Pajamas    "
+
+msgid "options_player_palette_shoes"
+msgstr "Phones     "
+
+msgid "options_game_mode_label"
+msgstr "Rhythm  "
+
+msgid "options_game_mode_standard"
+msgstr "STANDARD"
+
+msgid "options_disco_floor_label"
+msgstr "Floor   "
+
+msgid "options_disco_floor_instant_squares"
+msgstr "INSTANT SQUARES"
+
+msgid "options_disco_floor_instant_outlines"
+msgstr "INSTANT OUTLINES"
+
+msgid "options_disco_floor_frozen_outlines"
+msgstr "FROZEN OUTLINES"
+
+msgid "options_disco_floor_just_groovement"
+msgstr "JUST GROOVEMENT"
+
+msgid "NO MOTION"
+msgstr "options_disco_floor_no_motion"
+
+msgid "options_minimap_theme_label"
+msgstr "Minimap    "
+
+msgid "options_minimap_theme_dark_grey"
+msgstr "DARK GREY"
+
+msgid "options_minimap_theme_dark_yellow"
+msgstr "DARK YELLOW"
+
+msgid "options_minimap_theme_dark_blue"
+msgstr "DARK BLUE"
+
+msgid "options_minimap_theme_light_grey"
+msgstr "LIGHT GREY"
+
+msgid "options_colorspace_default"
+msgstr "DEFAULT"
+
+msgid "options_colorspace_protan_deuteran"
+msgstr "PROTAN/DEUTERAN"
+
+msgid "options_ppu_type_automatic"
+msgstr "AUTO"
+
+msgid "options_minimap_theme_dark_red"
+msgstr "DARK RED"
+
+msgid "options_minimap_theme_light_yellow"
+msgstr "LIGHT YELLOW"
+
+msgid "options_minimap_theme_light_blue"
+msgstr "LIGHT BLUE"
+
+msgid "options_minimap_theme_light_red"
+msgstr "LIGHT RED"
+
+msgid "options_colorspace_label"
+msgstr "Colorspace "
+
+msgid "options_colorspace_tritan"
+msgstr "TRITAN"
+
+msgid "options_colorspace_monochrome_green"
+msgstr "DOT MATRIX GAME"
+
+msgid "options_colorspace_monochrome_grey"
+msgstr "CLASSIC FILM"
+
+msgid "options_ppu_type_label"
+msgstr "PPU "
+
+msgid "options_ppu_type_composite"
+msgstr "COMPOSITE (2C02,2C07)"
+
+msgid "options_ppu_type_rgb"
+msgstr "RGB (2C03,2C05)"
+
+msgid "options_color_emphasis_label"
+msgstr "Color Emphasis "
+
+msgid "options_rhythm_assistance_header"
+msgstr "Rhythm Assistance"
+
+msgid "options_flash_player_label"
+msgstr "Flash Player    "
+
+msgid "options_flash_separator_label"
+msgstr "Flash Separator "
+
+msgid "options_soundfx_mode_label"
+msgstr "SoundFX "
+
+msgid "options_music_mode_metronome"
+msgstr "METRONOME"
+
+msgid "options_tab_header_world_palette"
+msgstr "WORLD PALETTE"
+
+msgid "options_tab_header_gameplay"
+msgstr "GAMEPLAY"
+
+msgid "options_tab_header_input"
+msgstr "INPUT"
+
+msgid "options_tab_header_compatibility"
+msgstr "COMPATIBILITY TWEAKS"
+
+msgid "options_coming_soon_placeholder"
+msgstr "Coming Soon :)"
+
+msgid "options_music_mode_label"
+msgstr "Music   "
+
+msgid "options_tab_header_audio"
+msgstr "AUDIO"
+
+msgid "options_tab_header_debug"
+msgstr "DEBUG"
+
+msgid "options_silly_tcrf_shoutout"
+msgstr ""
+"Yes yes, hello tcrf.net :)\n"
+"I see you've found my debug\n"
+"options! Come right on in,\n"
+"have some coffee, etc."

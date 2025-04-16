@@ -60,6 +60,7 @@ def massage_string(unicode_str):
 
     # All strings end with D_RETURN, without exception.
     output_string.append("D_RETURN")
+    byte_count += 1
 
     return (".byte " + ", ".join(output_string), byte_count)
 
@@ -174,27 +175,143 @@ def gather_translated_strings(languages):
             language_strings[k + "_description"][l] = {
                 "message": item_description_message,
                 "length": item_description_length}
+
+        # now for UI strings, oh boy oh boy!
+
+        ui_strings = {}
+        # various debug strings that we initially used to test localization. these shouldn't go
+        # anywhere particularly visible in the final game, but we might as well keep them around
+        # and translate them properly while we test.
+        ui_strings["hello_world"] = _("hello_world")
+
+        # Somewhat common strings reused by several components
+        ui_strings["ui_option_enabled"]   = _("ui_option_enabled")
+        ui_strings["ui_option_disabled"]  = _("ui_option_disabled")
+        ui_strings["ui_option_on"]   = _("ui_option_on")
+        ui_strings["ui_option_off"]  = _("ui_option_off")
+
+        # options strings, sorted by tab
+        # tab: palette 1
+        ui_strings["options_player_palette_header"]              = _("options_player_palette_header")
+        ui_strings["options_player_palette_preset_label"]        = _("options_player_palette_preset_label")
+        ui_strings["options_player_palette_preset_personalized"] = _("options_player_palette_preset_personalized")
+        ui_strings["options_player_palette_preset_peony"]        = _("options_player_palette_preset_peony")
+        ui_strings["options_player_palette_preset_periwinkle"]   = _("options_player_palette_preset_periwinkle")
+        ui_strings["options_player_palette_preset_petunia"]      = _("options_player_palette_preset_petunia")
+        ui_strings["options_player_palette_preset_protea"]       = _("options_player_palette_preset_protea")
+        ui_strings["options_player_palette_preset_passion"]      = _("options_player_palette_preset_passion")
+
+        ui_strings["options_player_palette_outfit"] = _("options_player_palette_outfit")
+        ui_strings["options_player_palette_shoes"]  = _("options_player_palette_shoes")
+        ui_strings["options_player_palette_face"]   = _("options_player_palette_face")
+
+        # note: this option may be going away, in favor of challenge totems
+        ui_strings["options_game_mode_label"]       = _("options_game_mode_label")
+        ui_strings["options_game_mode_standard"]    = _("options_game_mode_standard")
+        ui_strings["options_game_mode_patient"]     = _("options_game_mode_patient")
+        ui_strings["options_game_mode_doubletime"]  = _("options_game_mode_doubletime")
+
+        ui_strings["options_disco_floor_label"]            = _("options_disco_floor_label")
+        ui_strings["options_disco_floor_instant_squares"]  = _("options_disco_floor_instant_squares")
+        ui_strings["options_disco_floor_frozen_squares"]   = _("options_disco_floor_frozen_squares")
+        ui_strings["options_disco_floor_instant_outlines"] = _("options_disco_floor_instant_outlines")
+        ui_strings["options_disco_floor_frozen_outlines"]  = _("options_disco_floor_frozen_outlines")
+        ui_strings["options_disco_floor_just_groovement"]  = _("options_disco_floor_just_groovement")
+        ui_strings["options_disco_floor_no_motion"]        = _("options_disco_floor_no_motion")
+
+        ui_strings["options_minimap_theme_label"]        = _("options_minimap_theme_label")
+        ui_strings["options_minimap_theme_dark_grey"]    = _("options_minimap_theme_dark_grey")
+        ui_strings["options_minimap_theme_dark_yellow"]  = _("options_minimap_theme_dark_yellow")
+        ui_strings["options_minimap_theme_dark_blue"]    = _("options_minimap_theme_dark_blue")
+        ui_strings["options_minimap_theme_dark_red"]     = _("options_minimap_theme_dark_red")
+        ui_strings["options_minimap_theme_light_grey"]   = _("options_minimap_theme_light_grey")
+        ui_strings["options_minimap_theme_light_yellow"] = _("options_minimap_theme_light_yellow")
+        ui_strings["options_minimap_theme_light_blue"]   = _("options_minimap_theme_light_blue")
+        ui_strings["options_minimap_theme_light_red"]    = _("options_minimap_theme_light_red")
+
+        ui_strings["options_colorspace_label"]            = _("options_colorspace_label")
+        ui_strings["options_colorspace_default"]          = _("options_colorspace_default")
+        ui_strings["options_colorspace_protan_deuteran"]  = _("options_colorspace_protan_deuteran")
+        ui_strings["options_colorspace_tritan"]           = _("options_colorspace_tritan")
+        ui_strings["options_colorspace_monochrome_green"] = _("options_colorspace_monochrome_green")
+        ui_strings["options_colorspace_monochrome_grey"]  = _("options_colorspace_monochrome_grey")
+
+        ui_strings["options_ppu_type_label"]           = _("options_ppu_type_label")
+        ui_strings["options_ppu_type_automatic"]       = _("options_ppu_type_automatic")
+        ui_strings["options_ppu_type_composite"]       = _("options_ppu_type_composite")
+        ui_strings["options_ppu_type_rgb"]             = _("options_ppu_type_rgb")
+
+        ui_strings["options_color_emphasis_label"]     = _("options_color_emphasis_label")
+
+        ui_strings["options_rhythm_assistance_header"] = _("options_rhythm_assistance_header")
+        ui_strings["options_flash_player_label"]       = _("options_flash_player_label")
+        ui_strings["options_flash_separator_label"]    = _("options_flash_separator_label")
+
+        ui_strings["options_soundfx_mode_label"]       = _("options_soundfx_mode_label")
+        ui_strings["options_music_mode_label"]         = _("options_music_mode_label")
+        ui_strings["options_music_mode_metronome"]     = _("options_music_mode_metronome")
+
+        ui_strings["options_tab_header_world_palette"] = _("options_tab_header_world_palette")
+        ui_strings["options_tab_header_gameplay"]      = _("options_tab_header_gameplay")
+        ui_strings["options_tab_header_input"]         = _("options_tab_header_input")
+        ui_strings["options_tab_header_audio"]         = _("options_tab_header_audio")
+        ui_strings["options_tab_header_compatibility"] = _("options_tab_header_compatibility")
+        ui_strings["options_tab_header_debug"]         = _("options_tab_header_debug")
+
+        ui_strings["options_coming_soon_placeholder"]  = _("options_coming_soon_placeholder")
+        ui_strings["options_silly_tcrf_shoutout"]      = _("options_silly_tcrf_shoutout")
+
+        for k in ui_strings:
+            (message, length) = massage_string(ui_strings[k])
+            if k not in language_strings:
+                language_strings[k] = {}
+            language_strings[k][l] = {
+                "message": message,
+                "length": length}
+
     return language_strings
 
 def print_localized_strings(language_strings, languages, output_file):
+    current_segment = 0
+    bytes_written_to_this_segment = 0
+    output_file.write(f'    .segment "LOCALIZED_STRINGS_{current_segment}"\n')
     # TODO: Compute the size of each string table and, if necessary, emit a segment switch.
     # (We have most of the necessary data already.)
     for k in language_strings:
-        output_file.write(f"{k}_localized:\n")
+        localization_table = ""
+        table_size_in_bytes = 0
+
+        localization_table += f"{k}_localized:\n"
         # first write the localization table, which will always include all languages
         # in a fixed order
         for l in languages:
-            output_file.write(f"  .addr {k}_{l}\n")
+            localization_table += f"  .addr {k}_{l}\n"
+            table_size_in_bytes += 2
         # Now for every translated string, output its correspond string encoding. If we
         # don't have a translation, use English or the key name as a fallback.
         for l in languages:
             byte_string = f"[{k}]"
+            message_length = len(byte_string)
             if l in language_strings[k]:
                 byte_string = language_strings[k][l]["message"]
+                message_length = language_strings[k][l]["length"]
             elif "english" in language_strings[k]:
                 byte_string = language_strings[k]["english"]["message"]
-            output_file.write(f"{k}_{l}: {byte_string}\n")
-        output_file.write("\n")
+                message_length = language_strings[k]["english"]["length"]
+            localization_table += f"{k}_{l}: {byte_string}\n"
+            table_size_in_bytes += message_length
+        localization_table += "\n"
+
+        # if necessary, emit a segment swap
+        if bytes_written_to_this_segment + table_size_in_bytes > 8192:
+            current_segment += 1
+            bytes_written_to_this_segment = 0
+            output_file.write(f'    .segment "LOCALIZED_STRINGS_{current_segment}"\n')
+
+        # write to output file, and track our bytes written
+        output_file.write(localization_table)
+        bytes_written_to_this_segment += table_size_in_bytes
+
 
 def print_header(language_strings, output_file):
     for k in language_strings:
