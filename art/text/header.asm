@@ -1,0 +1,12 @@
+.global no_item_name_localized
+.global no_item_description_localized
+.global dagger_name_localized
+.global dagger_description_localized
+.global broadsword_name_localized
+.global broadsword_description_localized
+.global longsword_name_localized
+.global longsword_description_localized
+.global flail_name_localized
+.global flail_description_localized
+.global spear_name_localized
+.global spear_description_localized

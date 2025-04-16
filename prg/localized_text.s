@@ -173,13 +173,39 @@ _MAJUNA         = $91
 
         .segment "TEXT_STRINGS"
 
+; ########  ######## ########  ##     ##  ######   
+; ##     ## ##       ##     ## ##     ## ##    ##  
+; ##     ## ##       ##     ## ##     ## ##        
+; ##     ## ######   ########  ##     ## ##   #### 
+; ##     ## ##       ##     ## ##     ## ##    ##  
+; ##     ## ##       ##     ## ##     ## ##    ##  
+; ########  ######## ########   #######   ######   
+
 hello_world_localized:
         .addr hello_world_english
         .addr hello_world_toki_pona_sitelen_lasina
         .addr hello_world_toki_pona_sitelen_pona
-hello_world_english:
-        .byte D_FONT, FONT_ASCII, "Hello World!", D_RETURN
-hello_world_toki_pona_sitelen_lasina: 
-        .byte D_FONT, FONT_ASCII, "toki a, jan ale o!", D_RETURN
-hello_world_toki_pona_sitelen_pona:
-        .byte D_FONT, COLOR_SP_WHITE, _TOKI, _A, _S, _JAN, _ALE, _O, D_RETURN
+hello_world_english:                  .byte D_FONT, FONT_ASCII, "Hello World!", D_RETURN
+hello_world_toki_pona_sitelen_lasina: .byte D_FONT, FONT_ASCII, "toki a, jan ale o!", D_RETURN
+hello_world_toki_pona_sitelen_pona:   .byte D_FONT, COLOR_SP_WHITE, _TOKI, _A, _S, _JAN, _ALE, _O, D_RETURN
+
+
+; #### ######## ######## ##     ##  ######  
+;  ##     ##    ##       ###   ### ##    ## 
+;  ##     ##    ##       #### #### ##       
+;  ##     ##    ######   ## ### ##  ######  
+;  ##     ##    ##       ##     ##       ## 
+;  ##     ##    ##       ##     ## ##    ## 
+; ####    ##    ######## ##     ##  ######  
+
+.include "../art/text/output.asm"
+
+; ##     ## ####                #######  ########  ######## ####  #######  ##    ##  ######  
+; ##     ##  ##                ##     ## ##     ##    ##     ##  ##     ## ###   ## ##    ## 
+; ##     ##  ##                ##     ## ##     ##    ##     ##  ##     ## ####  ## ##       
+; ##     ##  ##     #######    ##     ## ########     ##     ##  ##     ## ## ## ##  ######  
+; ##     ##  ##                ##     ## ##           ##     ##  ##     ## ##  ####       ## 
+; ##     ##  ##                ##     ## ##           ##     ##  ##     ## ##   ### ##    ## 
+;  #######  ####                #######  ##           ##    ####  #######  ##    ##  ######  
+
+

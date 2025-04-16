@@ -9,6 +9,7 @@
         .include "hearts.inc"
         .include "hud.inc"
         .include "kernel.inc"
+        .include "localized_text.inc"
         .include "prng.inc"
         .include "procgen.inc"
         .include "player.inc"
@@ -36,35 +37,23 @@ item_bank_refs: .res 4
 
         .segment "TEXT_STRINGS"
 
-no_item_description:
+.macro localized_item_description name_str, description_str
         ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "NO ITEM", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Huh? You shouldn't be", D_NEWLINE
-        .byte "reading this!", D_WAIT, D_CLOSE
+        .byte D_PAL, HUD_PURPLE_PAL
+        .byte D_LOCALIZE, <name_str, >name_str, <.bank(name_str), D_NEWLINE
+        .byte D_PAL, HUD_TEXT_PAL
+        .byte D_LOCALIZE, <description_str, >description_str, <.bank(description_str), D_WAIT, D_CLOSE
+.endmacro
 
-dagger_lv1_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "DAGGER", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "...kinda crummy!", D_WAIT, D_CLOSE
-
-broadsword_lv1_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "BROADSWORD", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Hits 3 squares in front.", D_WAIT, D_CLOSE
-
+no_item_description:        localized_item_description no_item_name_localized, no_item_description_localized
+dagger_lv1_description:     localized_item_description dagger_name_localized,  dagger_description_localized
+broadsword_lv1_description: localized_item_description broadsword_name_localized,  broadsword_description_localized
 broadsword_lv2_description:
         ;     0123456789012345678901234567 ; 28-char width
         .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
         .byte "BROADSWORD - L2", D_NEWLINE
         .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
         .byte "Hits 3 squares in front.", D_WAIT, D_CLOSE
-
 broadsword_lv3_description:
         ;     0123456789012345678901234567 ; 28-char width
         .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
@@ -72,13 +61,7 @@ broadsword_lv3_description:
         .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
         .byte "Hits 3 squares in front.", D_WAIT, D_CLOSE
 
-longsword_lv1_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "LONGSWORD", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Hits 2 squares ahead.", D_WAIT, D_CLOSE
-
+longsword_lv1_description: localized_item_description longsword_name_localized, longsword_description_localized
 longsword_lv2_description:
         ;     0123456789012345678901234567 ; 28-char width
         .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
@@ -93,14 +76,7 @@ longsword_lv3_description:
         .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
         .byte "Hits 2 squares ahead.", D_WAIT, D_CLOSE
 
-spear_lv1_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "SPEAR", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Strike one foe up to", D_NEWLINE
-        .byte "2 squares ahead.", D_WAIT, D_CLOSE
-
+spear_lv1_description: localized_item_description spear_name_localized, spear_description_localized
 spear_lv2_description:
         ;     0123456789012345678901234567 ; 28-char width
         .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
@@ -108,7 +84,6 @@ spear_lv2_description:
         .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
         .byte "Strike one foe up to", D_NEWLINE
         .byte "2 squares ahead.", D_WAIT, D_CLOSE
-
 spear_lv3_description:
         ;     0123456789012345678901234567 ; 28-char width
         .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
@@ -117,14 +92,7 @@ spear_lv3_description:
         .byte "Strike one foe up to", D_NEWLINE
         .byte "2 squares ahead.", D_WAIT, D_CLOSE
 
-flail_lv1_description:
-        ;     0123456789012345678901234567 ; 28-char width
-        .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)
-        .byte "FLAIL", D_NEWLINE
-        .byte D_ATTR, (FONT_BANK | HUD_TEXT_PAL)
-        .byte "Strike adjacent foes", D_NEWLINE
-        .byte "while moving.", D_WAIT, D_CLOSE
-
+flail_lv1_description: localized_item_description flail_name_localized, flail_description_localized
 flail_lv2_description:
         ;     0123456789012345678901234567 ; 28-char width
         .byte D_ATTR, (FONT_BANK | HUD_PURPLE_PAL)

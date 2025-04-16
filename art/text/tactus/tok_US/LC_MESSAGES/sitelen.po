@@ -1,0 +1,52 @@
+msgid ""
+msgstr ""
+"PO-Revision-Date: 2025-04-15 20:33+0000\n"
+"Last-Translator: Zeta <zeta0134@reploid.cafe>\n"
+"Language-Team: Toki Pona (Sitelen Pona) <http://weblate.reploid.cafe/"
+"projects/tactus/items/tok_sp/>\n"
+"Language: tok_sp\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.10.4\n"
+
+#: all.py:9
+msgid "no_item_description"
+msgstr "󱥙 󱥄󱤮󱤂󱤉󱤪󱥁󱤀"
+
+#: all.py:8
+msgid "no_item_name"
+msgstr "󱤎󱤂"
+
+#: all.py:11
+msgid "dagger_name"
+msgstr "󱤎󱥱󱤨"
+
+#: all.py:12
+msgid "dagger_description"
+msgstr "...󱥁󱤧󱤍󱤨"
+
+#: all.py:14
+msgid "broadsword_name"
+msgstr "󱤎󱥱󱥣󱥒"
+
+#: all.py:15
+msgid "broadsword_description"
+msgstr "󱥈󱤉󱥼󱥒3"
+
+#: all.py:17 all.py:20
+msgid "longsword_name"
+msgstr "󱤎󱥱󱥣󱤩"
+
+#: all.py:18 all.py:21
+msgid "longsword_description"
+msgstr "󱥈󱤉󱥼󱥟2"
+
+#: all.py:23
+msgid "spear_name"
+msgstr "󱥊󱥻"
+
+#: all.py:24
+msgid "spear_description"
+msgstr "󱥈󱤉󱥼󱥶2"

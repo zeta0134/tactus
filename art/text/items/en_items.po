@@ -1,0 +1,65 @@
+# Translations template for PROJECT.
+# Copyright (C) 2025 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2025-04-15 11:07-0400\n"
+"PO-Revision-Date: 2025-04-15 15:11+0000\n"
+"Last-Translator: Zeta <zeta0134@reploid.cafe>\n"
+"Language-Team: English <http://weblate.reploid.cafe/projects/tactus/items/en/"
+">\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 5.10.4\n"
+"Generated-By: Babel 2.15.0\n"
+
+#: all.py:8
+msgid "no_item_name"
+msgstr "NO ITEM"
+
+#: all.py:9
+msgid "no_item_description"
+msgstr ""
+"Huh? You shouldn't be\n"
+"reading this!"
+
+#: all.py:11
+msgid "dagger_name"
+msgstr "DAGGER"
+
+#: all.py:12
+msgid "dagger_description"
+msgstr "...kinda crummy!"
+
+#: all.py:14
+msgid "broadsword_name"
+msgstr "BROADSWORD"
+
+#: all.py:15
+msgid "broadsword_description"
+msgstr "Hits 3 squares in front."
+
+#: all.py:17 all.py:20
+msgid "longsword_name"
+msgstr "LONGSWORD"
+
+#: all.py:18 all.py:21
+msgid "longsword_description"
+msgstr "Hits 2 squares ahead."
+
+#: all.py:23
+msgid "spear_name"
+msgstr "SPEAR"
+
+#: all.py:24
+msgid "spear_description"
+msgstr ""
+"Strike one foe up to\n"
+"2 squares ahead."

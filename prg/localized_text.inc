@@ -15,3 +15,5 @@ LANGUAGE_ID_TOKI_PONA_SITELEN_PONA   = 2
 .endmacro
 
 .global hello_world_localized
+
+.include "../art/text/header.asm"
