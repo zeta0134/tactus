@@ -16,4 +16,4 @@ LANGUAGE_ID_TOKI_PONA_SITELEN_PONA   = 2
 
 .global hello_world_localized
 
-.include "../art/text/header.asm"
+.include "../build/localization/text_strings.inc"

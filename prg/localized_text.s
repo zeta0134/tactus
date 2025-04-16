@@ -181,6 +181,7 @@ _MAJUNA         = $91
 ; ##     ## ##       ##     ## ##     ## ##    ##  
 ; ########  ######## ########   #######   ######   
 
+; Old, testing, not needed, other cliches
 hello_world_localized:
         .addr hello_world_english
         .addr hello_world_toki_pona_sitelen_lasina
@@ -189,23 +190,5 @@ hello_world_english:                  .byte D_FONT, FONT_ASCII, "Hello World!", 
 hello_world_toki_pona_sitelen_lasina: .byte D_FONT, FONT_ASCII, "toki a, jan ale o!", D_RETURN
 hello_world_toki_pona_sitelen_pona:   .byte D_FONT, COLOR_SP_WHITE, _TOKI, _A, _S, _JAN, _ALE, _O, D_RETURN
 
-
-; #### ######## ######## ##     ##  ######  
-;  ##     ##    ##       ###   ### ##    ## 
-;  ##     ##    ##       #### #### ##       
-;  ##     ##    ######   ## ### ##  ######  
-;  ##     ##    ##       ##     ##       ## 
-;  ##     ##    ##       ##     ## ##    ## 
-; ####    ##    ######## ##     ##  ######  
-
-.include "../art/text/output.asm"
-
-; ##     ## ####                #######  ########  ######## ####  #######  ##    ##  ######  
-; ##     ##  ##                ##     ## ##     ##    ##     ##  ##     ## ###   ## ##    ## 
-; ##     ##  ##                ##     ## ##     ##    ##     ##  ##     ## ####  ## ##       
-; ##     ##  ##     #######    ##     ## ########     ##     ##  ##     ## ## ## ##  ######  
-; ##     ##  ##                ##     ## ##           ##     ##  ##     ## ##  ####       ## 
-; ##     ##  ##                ##     ## ##           ##     ##  ##     ## ##   ### ##    ## 
-;  #######  ####                #######  ##           ##    ####  #######  ##    ##  ######  
-
-
+; The actual game script
+.include "../build/localization/text_strings.asm"

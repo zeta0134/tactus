@@ -27,6 +27,10 @@ STRUCTURE_TMX_FILES := $(wildcard $(ARTDIR)/structures/*.tmx)
 STRUCTURE_INCS_FILES := \
 	$(patsubst $(ARTDIR)/structures/%.tmx,$(BUILDDIR)/structures/%.incs,$(STRUCTURE_TMX_FILES)) \
 
+TRANSLATION_SOURCES := \
+	$(wildcard $(ARTDIR)/text/en_US/*.po) \
+	$(wildcard $(ARTDIR)/text/tok_US/*.po)
+
 .PRECIOUS: $(BIN_FILES) $(LAYOUT_INCS_FILES) $(FLOOR_INCS_FILES) $(ROOM_INCS_FILES)
 
 all: dir $(ROM_NAME)
@@ -36,6 +40,7 @@ dir:
 	@mkdir -p build/floors
 	@mkdir -p build/rooms
 	@mkdir -p build/structures
+	@mkdir -p build/localization
 
 clean:
 	-@rm -rf build
@@ -82,7 +87,7 @@ $(ROM_NAME): $(BUILDDIR)/output_chr.bin $(BUILDDIR)/torchlight/torchlight_0.incs
 	# We need to talk about
 	tools/parallel_universes.py build/tactus-zpcm.bin build/tactus-base.bin 262144 $@
 
-$(BUILDDIR)/%.o: $(SOURCEDIR)/%.s $(BIN_FILES) $(FLOOR_INCS_FILES) $(ROOM_INCS_FILES) $(STRUCTURE_INCS_FILES)
+$(BUILDDIR)/%.o: $(SOURCEDIR)/%.s $(BIN_FILES) $(FLOOR_INCS_FILES) $(ROOM_INCS_FILES) $(STRUCTURE_INCS_FILES) $(BUILDDIR)/localization/text_strings.inc
 	ca65 -g -o $@ $<
 
 $(BUILDDIR)/rooms/%.incs: $(ARTDIR)/rooms/%.tmx
@@ -99,3 +104,8 @@ $(BUILDDIR)/output_chr.bin: $(BACKGROUND_PNG_FILES) $(SPRITE_PNG_FILES) $(RAW_CH
 
 $(BUILDDIR)/torchlight/torchlight_0.incs: dir
 	tools/lighting.py
+
+$(BUILDDIR)/localization/text_strings.inc: $(TRANSLATION_SOURCES)
+	pybabel compile -D base -d art/text
+	pybabel compile -D sitelen -d art/text
+	tools/localize.py art/text build/localization/text_strings.asm build/localization/text_strings.inc
