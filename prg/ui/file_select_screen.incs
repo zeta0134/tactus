@@ -39,15 +39,15 @@ FILE_SELECT_ERASE_BUTTON_INDEX = 6
 FILE_SELECT_COPY_BUTTON_INDEX = 7
 
 ; these all go in the top bar to indicate mode
-file_select_str:     localized_str file_select_header
+file_select_str:     localized_color_str {UI_PAL_BG0 | 0}, file_select_header
 erase_which_str:     localized_str file_select_msg_erase_which
 erase_confirm_str:   localized_str file_select_msg_erase_confirm
 copy_source_str:     localized_str file_select_msg_copy_source_select
 copy_dest_str:       localized_str file_select_msg_copy_destination_select
 copy_confirm_str:    localized_str file_select_msg_copy_confirm
 
-erase_file_str: .asciiz "ERASE FILE"
-copy_file_str: .asciiz "COPY FILE"
+erase_file_str: localized_color_str {UI_PAL_BG0 | 0}, file_select_erase_file_button
+copy_file_str:  localized_color_str {UI_PAL_BG0 | 0}, file_select_copy_file_button
 
 DARK_SQUARE_TILE = $06
 LIGHT_SQUARE_TILE = $07

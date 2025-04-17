@@ -6,11 +6,7 @@
 
 game_over_screen_ui_layout:
         widget_controller FAR_game_over_controller_init
-        widget_cursor
-        widget_text_button empty_string, game_over_str, 12, 10        
         .addr $0000 ; end of list
-
-game_over_str:   .asciiz "GAME OVER (WIP)"
 
 .segment "CODE_UI_LAYOUTS"
 

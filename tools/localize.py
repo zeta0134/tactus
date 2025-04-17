@@ -306,6 +306,9 @@ def gather_translated_strings(languages):
 
         ui_strings["file_details_welcome_string"]            = _("file_details_welcome_string")
 
+        ui_strings["file_details_start_game_button"] = _("file_details_start_game_button")
+        ui_strings["file_details_options_button"]    = _("file_details_options_button")
+
         for k in ui_strings:
             (message, length) = massage_string(ui_strings[k])
             if k not in language_strings:

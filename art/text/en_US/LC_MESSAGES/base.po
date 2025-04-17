@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-04-15 11:07-0400\n"
-"PO-Revision-Date: 2025-04-17 15:23+0000\n"
+"PO-Revision-Date: 2025-04-17 17:57+0000\n"
 "Last-Translator: Zeta <zeta0134@reploid.cafe>\n"
 "Language-Team: English <http://weblate.reploid.cafe/projects/tactus/items/en/"
 ">\n"
@@ -447,3 +447,9 @@ msgstr "COPY FILE"
 
 msgid "name_entry_header"
 msgstr "NAME ENTRY"
+
+msgid "file_details_options_button"
+msgstr " OPTIONS"
+
+msgid "file_details_start_game_button"
+msgstr " GET GROOVIN'"

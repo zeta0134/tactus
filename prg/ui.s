@@ -456,6 +456,7 @@ done:
         rts
 .endproc
 
+; TODO: This should go away?
 .proc FAR_draw_widget_label
 CurrentWidgetIndex := R20
 
@@ -497,6 +498,7 @@ PaletteIndex := T7
         rts
 .endproc
 
+; TODO: this should also go away.
 .proc FAR_draw_widget_label_pal
 CurrentWidgetIndex := R20
 
@@ -843,6 +845,8 @@ Scratch := UiStringScratch+7
 NametableAddr := T0
 AttributeAddr := T2
 StringPtr := T4
+
+CurrentAttr := UiStringScratch+3
         ; onward!
         inc16 StringPtr
         ; draw the entire player name, right here, on the spot, using our
@@ -858,7 +862,9 @@ loop:
         ; player names are (currently) null terminated, so handle that
         beq done
         sta (NametableAddr), y
-        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        lda CurrentAttr
+        and #%11000001
+        ora #FONT_ASCII
         sta (AttributeAddr), y
         inc16 NametableAddr
         inc16 AttributeAddr

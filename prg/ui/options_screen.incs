@@ -267,7 +267,7 @@ placeholder_compatibility_str: localized_color_str UI_STRING_PAL_MID_THEME, opti
 placeholder_debug_str:         localized_color_str UI_STRING_PAL_MID_THEME, options_tab_header_debug
 
 ;                           0123456789012345678901234567
-debug_silly_str: localized_str options_silly_tcrf_shoutout
+debug_silly_str: localized_color_str UI_STRING_PAL_DARK_THEME, options_silly_tcrf_shoutout
 
 debug_localized_label: localized_str hello_world
 

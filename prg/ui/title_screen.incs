@@ -6,7 +6,6 @@
 
 title_ui_layout:
         widget_controller FAR_title_controller_init
-        widget_text_button empty_string, FAR_go_to_file_select, 12, 10
         .addr $0000 ; end of list
 
 .segment "DATA_UI_NAMETABLES_0"
