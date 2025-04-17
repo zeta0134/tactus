@@ -71,7 +71,7 @@ SubLayoutPtr: .res 2
 SubLayoutIndex: .res 1
 
 ; String processing, it turns out, needs lots of scratch space
-UiStringScratch: .res 12
+UiStringScratch: .res 14
 
 
         .segment "DATA_UI_LAYOUTS"
@@ -498,49 +498,6 @@ PaletteIndex := T7
         rts
 .endproc
 
-; TODO: this should also go away.
-.proc FAR_draw_widget_label_pal
-CurrentWidgetIndex := R20
-
-; rename the data labels to something more readable
-widget_tile_x := widgets_data0
-widget_tile_y := widgets_data1
-widget_text_string_low := widgets_data2
-widget_text_string_high := widgets_data3
-widget_text_pal_index := widgets_data7
-
-; arguments to string drawing functions
-NametableAddr := T0
-AttributeAddr := T2
-TileX := T4
-TileY := T5
-StringPtr := T4
-TileBase := T6
-PaletteIndex := T7
-        perform_zpcm_inc
-        ldy CurrentWidgetIndex
-        lda widget_tile_x, y
-        sta TileX
-        lda widget_tile_y, y
-        sta TileY
-        st16 NametableAddr, $5000
-        st16 AttributeAddr, $5800
-        far_call FAR_nametable_from_coordinates
-        perform_zpcm_inc
-        ldy CurrentWidgetIndex
-        lda widget_text_string_low, y
-        sta StringPtr+0
-        lda widget_text_string_high, y
-        sta StringPtr+1
-        lda #CHR_BANK_0_FONT_MARSHMALLOW
-        sta TileBase
-        lda widget_text_pal_index, y
-        sta PaletteIndex
-        jsr FIXED_draw_string
-
-        rts
-.endproc
-
 ; Used by UI screens, often WIP, which don't have a default
 ; actual nametable to load. Just fill everything with space
 ; tiles. Clobbers R0-R5
@@ -578,7 +535,7 @@ draw_string_cmd_table:
         .word str_cmd_newline     ; D_NEWLINE     = $80
         .word str_cmd_dummy       ; D_WAIT        = $81
         .word str_cmd_dummy       ; D_CLEAR       = $82
-        .word str_cmd_close       ; D_CLOSE       = $83
+        .word str_cmd_dummy       ; D_CLOSE       = $83 (processed manually)
         .word str_cmd_attr        ; D_ATTR        = $84
         .word str_cmd_localize    ; D_LOCALIZE    = $85
         .word str_cmd_return      ; D_RETURN      = $86
@@ -589,6 +546,11 @@ draw_string_cmd_table:
         .word str_cmd_font        ; D_FONT        = $8B
         .word str_cmd_player_name ; D_PLAYER_NAME = $8C
         ; TODO: safety? bah!
+
+.proc _str_cmd_trampoline
+CommandPtr := UiStringScratch+0
+        jmp (CommandPtr)
+.endproc
 
 .proc FAR_draw_ui_string
 NametableAddr := T0
@@ -637,7 +599,8 @@ process_command:
         sta CommandPtr+0
         lda draw_string_cmd_table+1, x
         sta CommandPtr+1
-        jmp (CommandPtr) ; which will inc16 / return as needed
+        jsr _str_cmd_trampoline ; which will inc16 as needed
+        jmp loop
 end_of_string:
         perform_zpcm_inc
         rts        
@@ -650,7 +613,7 @@ end_of_string:
 StringPtr := T4
         ; dummied out, this makes no sense for a UI string
         inc16 StringPtr
-        jmp FAR_draw_ui_string::loop
+        rts
 .endproc
 
 .proc str_cmd_newline
@@ -667,12 +630,7 @@ LineStartAttrAddr := UiStringScratch+10
         mov16 AttributeAddr, LineStartAttrAddr
         ; onward!
         inc16 StringPtr
-        jmp FAR_draw_ui_string::loop
-.endproc
-
-.proc str_cmd_close
-        ; the end of this string! hooray!
-        jmp FAR_draw_ui_string::end_of_string
+        rts
 .endproc
 
 .proc str_cmd_attr
@@ -686,7 +644,7 @@ CurrentAttr := UiStringScratch+3
         ; onward properly!
         inc16 StringPtr
         perform_zpcm_inc
-        jmp FAR_draw_ui_string::loop
+        rts
 .endproc
 
 .proc str_cmd_localize
@@ -737,7 +695,7 @@ NewStrTableBank := UiStringScratch+7
         sta StringPtr+1
 
         ; And... we're done?
-        jmp FAR_draw_ui_string::loop
+        rts
 .endproc
 
 .proc str_cmd_return
@@ -756,7 +714,7 @@ LocalizePreserveBank := UiStringScratch+6
         restore_previous_bank
         access_data_bank LocalizePreserveBank
 
-        jmp FAR_draw_ui_string::loop
+        rts
 .endproc
 
 .proc str_cmd_ext_char
@@ -774,7 +732,7 @@ CurrentAttr := UiStringScratch+3
         inc16 AttributeAddr
         ; onward!
         inc16 StringPtr
-        jmp FAR_draw_ui_string::loop
+        rts
 .endproc
 
 .proc str_cmd_low_page
@@ -785,7 +743,7 @@ CurrentPage := UiStringScratch+2
         sta CurrentPage
         ; onward!
         inc16 StringPtr
-        jmp FAR_draw_ui_string::loop
+        rts
 .endproc
 
 .proc str_cmd_high_page
@@ -796,7 +754,7 @@ CurrentPage := UiStringScratch+2
         sta CurrentPage
         ; onward!
         inc16 StringPtr
-        jmp FAR_draw_ui_string::loop
+        rts
 .endproc
 
 .proc str_cmd_pal
@@ -817,7 +775,7 @@ Scratch := UiStringScratch+7
         ; onward properly!
         inc16 StringPtr
         perform_zpcm_inc
-        jmp FAR_draw_ui_string::loop
+        rts
 .endproc
 
 .proc str_cmd_font
@@ -838,7 +796,7 @@ Scratch := UiStringScratch+7
         ; onward properly!
         inc16 StringPtr
         perform_zpcm_inc
-        jmp FAR_draw_ui_string::loop
+        rts
 .endproc
 
 .proc str_cmd_player_name
@@ -875,5 +833,168 @@ loop:
 done:
 
         perform_zpcm_inc
-        jmp FAR_draw_ui_string::loop
+        rts
+.endproc
+
+; Like string drawing, usually, but for erasing instead.
+; Not everything needs to exist, stub out things that make no sense,
+; etc.
+erase_string_cmd_table:
+        .word str_cmd_newline        ; D_NEWLINE     = $80
+        .word str_cmd_dummy          ; D_WAIT        = $81
+        .word str_cmd_dummy          ; D_CLEAR       = $82
+        .word str_cmd_dummy          ; D_CLOSE       = $83 (handled manually)
+        .word str_cmd_dummy_param    ; D_ATTR        = $84
+        .word str_cmd_localize       ; D_LOCALIZE    = $85
+        .word str_cmd_return         ; D_RETURN      = $86
+        .word str_cmd_erase_ext_char ; D_LOW_CHAR    = $87
+        .word str_cmd_dummy          ; D_LOW_PAGE    = $88
+        .word str_cmd_dummy          ; D_HI_PAGE     = $89
+        .word str_cmd_dummy_param    ; D_PAL         = $8A
+        .word str_cmd_dummy_param    ; D_FONT        = $8B
+        .word str_cmd_dummy          ; D_PLAYER_NAME = $8C (not implemented)
+        ; TODO: safety? bah!
+
+.proc FAR_erase_ui_string
+NametableAddr := T0
+AttributeAddr := T2
+StringPtr     := T4
+
+CommandPtr := UiStringScratch+0
+LocalizePreservePtr := UiStringScratch+4
+LocalizePreserveBank := UiStringScratch+6
+
+LineStartTileAddr := UiStringScratch+8
+LineStartAttrAddr := UiStringScratch+10
+
+        ; Preserve our starting position; this is useful
+        ; primarily for newline processing
+        mov16 LineStartTileAddr, NametableAddr
+        mov16 LineStartAttrAddr, AttributeAddr
+
+loop:
+        perform_zpcm_inc
+        ldy #0
+        lda (StringPtr), y
+        bmi process_command
+process_single_character:
+        lda #' '
+        sta (NametableAddr), y
+        lda #FONT_ASCII
+        sta (AttributeAddr), y
+        inc16 NametableAddr
+        inc16 AttributeAddr
+        inc16 StringPtr
+        jmp loop
+process_command:
+        perform_zpcm_inc
+        cmp #D_CLOSE
+        beq end_of_string
+        asl
+        tax
+        lda erase_string_cmd_table+0, x
+        sta CommandPtr+0
+        lda erase_string_cmd_table+1, x
+        sta CommandPtr+1
+        jsr _str_cmd_trampoline ; which will inc16 as needed
+        jmp loop
+end_of_string:
+        perform_zpcm_inc
+        rts        
+.endproc
+
+.proc str_cmd_dummy_param
+StringPtr     := T4
+        ; dummied out, but we need to eat a param byte also
+        inc16 StringPtr
+        inc16 StringPtr
+        rts
+.endproc
+
+.proc str_cmd_erase_ext_char
+NametableAddr := T0
+AttributeAddr := T2
+StringPtr := T4
+CurrentAttr := UiStringScratch+3
+        ; onward!
+        inc16 StringPtr
+        lda #' '
+        sta (NametableAddr), y
+        lda #FONT_ASCII
+        sta (AttributeAddr), y
+        inc16 NametableAddr
+        inc16 AttributeAddr
+        ; onward!
+        inc16 StringPtr
+        rts
+.endproc
+
+; Mostly for the options: occasionally we need to know the length of one
+; of these stupid things in characters. Here newlines do NOT make sense,
+; so dummy those out. Otherwise this is remarkably similar to string drawing,
+; except our goal is to count the bytes we would have displayed.
+count_string_cmd_table:
+        .word str_cmd_dummy          ; D_NEWLINE     = $80
+        .word str_cmd_dummy          ; D_WAIT        = $81
+        .word str_cmd_dummy          ; D_CLEAR       = $82
+        .word str_cmd_dummy          ; D_CLOSE       = $83 (handled manually)
+        .word str_cmd_dummy_param    ; D_ATTR        = $84
+        .word str_cmd_localize       ; D_LOCALIZE    = $85
+        .word str_cmd_return         ; D_RETURN      = $86
+        .word str_cmd_count_ext_char ; D_LOW_CHAR    = $87
+        .word str_cmd_dummy          ; D_LOW_PAGE    = $88
+        .word str_cmd_dummy          ; D_HI_PAGE     = $89
+        .word str_cmd_dummy_param    ; D_PAL         = $8A
+        .word str_cmd_dummy_param    ; D_FONT        = $8B
+        .word str_cmd_dummy          ; D_PLAYER_NAME = $8C (not implemented)
+        ; TODO: safety? bah!
+
+.proc FAR_strlen_ui_string
+StringLength  := R0
+
+StringPtr     := T4
+
+CommandPtr := UiStringScratch+0
+LocalizePreservePtr := UiStringScratch+4
+LocalizePreserveBank := UiStringScratch+6
+
+        ; Initialize our result
+        st16 StringLength, 0
+
+loop:
+        perform_zpcm_inc
+        ldy #0
+        lda (StringPtr), y
+        bmi process_command
+process_single_character:
+        inc16 StringLength
+        inc16 StringPtr
+        jmp loop
+process_command:
+        perform_zpcm_inc
+        cmp #D_CLOSE
+        beq end_of_string
+        asl
+        tax
+        lda count_string_cmd_table+0, x
+        sta CommandPtr+0
+        lda count_string_cmd_table+1, x
+        sta CommandPtr+1
+        jsr _str_cmd_trampoline ; which will inc16 as needed
+        jmp loop
+end_of_string:
+        perform_zpcm_inc
+        rts   
+.endproc
+
+.proc str_cmd_count_ext_char
+StringLength  := R0
+
+StringPtr     := T4
+        ; skip over the command byte
+        inc16 StringPtr
+        ; count the text byte
+        inc16 StringLength
+        inc16 StringPtr
+        rts
 .endproc

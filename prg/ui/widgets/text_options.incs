@@ -12,6 +12,13 @@
 .proc FAR_widget_text_options_init
 CurrentWidgetIndex := R20
 
+; arguments to string drawing functions
+NametableAddr := T0
+AttributeAddr := T2
+TileX := T4
+TileY := T5
+StringPtr := T4
+
 ; rename the data labels to something more readable
 widget_tile_x := widgets_data0
 widget_tile_y := widgets_data1
@@ -45,7 +52,21 @@ widget_data_target_high := widgets_data7
         sta widgets_state_flags, y
 
         ; draw the initial label and options for this widget
-        near_call FAR_draw_widget_label
+        lda widget_tile_x, y
+        sta TileX
+        lda widget_tile_y, y
+        sta TileY
+        st16 NametableAddr, $5000
+        st16 AttributeAddr, $5800
+        far_call FAR_nametable_from_coordinates
+        perform_zpcm_inc
+        ldy CurrentWidgetIndex
+        lda widget_label_string_low, y
+        sta StringPtr+0
+        lda widget_label_string_high, y
+        sta StringPtr+1    
+        near_call FAR_draw_ui_string
+
         jsr _draw_option
 
         ; now switch to the update function
@@ -94,7 +115,6 @@ nothing_to_do:
         ; otherwise we're done
         rts
 redraw_self:
-        near_call FAR_draw_widget_label
         jsr _draw_option
         rts
 .endproc
@@ -179,13 +199,13 @@ wraparound:
 
 .proc _draw_option
         jsr _draw_option_common
-        jsr FIXED_draw_string
+        near_call FAR_draw_ui_string
         rts
 .endproc
 
 .proc _erase_option
         jsr _draw_option_common
-        jsr FIXED_erase_string
+        near_call FAR_erase_ui_string
         rts
 .endproc
 
@@ -202,11 +222,9 @@ AttributeAddr := T2
 TileX := T4
 TileY := T5
 StringPtr := T4
-TileBase := T6
-PaletteIndex := T7
 
-StringLenPtr := T0
-StringLength := T2
+; result from strlen function
+StringLength  := R0
 
 ; rename the data labels to something more readable
 widget_tile_x := widgets_data0
@@ -223,10 +241,10 @@ widget_displayed_value := widgets_data8
         ; first, we need to skip over the label portion, so work that out
         ldy CurrentWidgetIndex
         lda widget_label_string_low, y
-        sta StringLenPtr+0
+        sta StringPtr+0
         lda widget_label_string_high, y
-        sta StringLenPtr+1
-        jsr FIXED_strlen
+        sta StringPtr+1
+        near_call FAR_strlen_ui_string
         ; however long the label is, add that much to the starting X position
         ; in tiles for string drawing
         ldy CurrentWidgetIndex
@@ -277,10 +295,6 @@ option_out_of_range:
 converge:
         perform_zpcm_inc
         ; finally, draw the stupid thing
-        lda #CHR_BANK_0_FONT_MARSHMALLOW
-        sta TileBase
-        lda #%01000000 ; sure, why not
-        sta PaletteIndex        
         ; setup complete, the calling function will decide what to do
         ; with this string information. common, out!
         rts

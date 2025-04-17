@@ -74,6 +74,7 @@ options_sublayout_debug_page_1:
 
         widget_text_label debug_localized_label, 4, 17
         widget_text_label debug_silly_str, 2, 24
+        widget_controller FAR_apply_language_selection_controller_init
         .addr $0000 ; end of list
 
 PRESET_PERSONALIZED_VALUE = 0
@@ -87,11 +88,11 @@ PALETTE_SLIDER_INDEX_3    = 4 + 8
 
 OPTIONS_SCREEN_SUBLAYOUT_INDEX = 4
 
-game_mode_str:      .asciiz "Rhythm  "
-disco_floor_str:    .asciiz "Floor   "
-minimap_flavor_str: .asciiz "Minimap    "
+game_mode_str:      localized_color_str UI_STRING_PAL_LIGHT_THEME, options_game_mode_label
+disco_floor_str:    localized_color_str UI_STRING_PAL_LIGHT_THEME, options_disco_floor_label
+minimap_flavor_str: localized_color_str UI_STRING_PAL_LIGHT_THEME, options_minimap_theme_label
 
-player_palette_preset_str: .asciiz "Preset  "
+player_palette_preset_str: localized_color_str UI_STRING_PAL_LIGHT_THEME, options_player_palette_preset_label
 player_palette_outfit_str: .asciiz "Pajamas    "
 player_palette_shoes_str:  .asciiz "Phones     "
 player_palette_face_str:   .asciiz "Pigment    "
@@ -105,12 +106,12 @@ disco_types:
         .addr disco_option_4_str
         .addr disco_option_5_str
 
-disco_option_0_str: .asciiz "INSTANT SQUARES"
-disco_option_1_str: .asciiz "FROZEN SQUARES"
-disco_option_2_str: .asciiz "INSTANT OUTLINES"
-disco_option_3_str: .asciiz "FROZEN OUTLINES"
-disco_option_4_str: .asciiz "JUST GROOVEMENT"
-disco_option_5_str: .asciiz "NO MOTION"
+disco_option_0_str: localized_str options_disco_floor_instant_squares
+disco_option_1_str: localized_str options_disco_floor_frozen_squares
+disco_option_2_str: localized_str options_disco_floor_instant_outlines
+disco_option_3_str: localized_str options_disco_floor_frozen_outlines
+disco_option_4_str: localized_str options_disco_floor_just_groovement
+disco_option_5_str: localized_str options_disco_floor_no_motion
 
 player_palette_preset_types:
         .byte 6 ; selectable length of option set
@@ -121,12 +122,12 @@ player_palette_preset_types:
         .addr player_palette_preset_option_4_str
         .addr player_palette_preset_option_5_str
 
-player_palette_preset_option_custom_str: .asciiz "PERSONALIZED"
-player_palette_preset_option_1_str:      .asciiz "PEONY"
-player_palette_preset_option_2_str:      .asciiz "PERIWINKLE"
-player_palette_preset_option_3_str:      .asciiz "PETUNIA"
-player_palette_preset_option_4_str:      .asciiz "PROTEA"
-player_palette_preset_option_5_str:      .asciiz "PASSION"
+player_palette_preset_option_custom_str: localized_str options_player_palette_preset_personalized
+player_palette_preset_option_1_str:      localized_str options_player_palette_preset_peony
+player_palette_preset_option_2_str:      localized_str options_player_palette_preset_periwinkle
+player_palette_preset_option_3_str:      localized_str options_player_palette_preset_petunia
+player_palette_preset_option_4_str:      localized_str options_player_palette_preset_protea
+player_palette_preset_option_5_str:      localized_str options_player_palette_preset_passion
 
 game_mode_types:
         .byte 3 ; length of option set
@@ -134,9 +135,9 @@ game_mode_types:
         .addr game_mode_patient_str
         .addr game_mode_doubletime_str
 
-game_mode_standard_str:   .asciiz "STANDARD"
-game_mode_patient_str:    .asciiz "PATIENT"
-game_mode_doubletime_str: .asciiz "DOUBLETIME"
+game_mode_standard_str:   localized_str options_game_mode_standard
+game_mode_patient_str:    localized_str options_game_mode_patient
+game_mode_doubletime_str: localized_str options_game_mode_doubletime
 
 minimap_themes:
         .byte 8
@@ -149,16 +150,16 @@ minimap_themes:
         .addr minimap_light_purple_str
         .addr minimap_light_red_str
 
-minimap_dark_grey_str:    .asciiz "DARK GREY"
-minimap_dark_yellow_str:  .asciiz "DARK YELLOW"
-minimap_dark_purple_str:  .asciiz "DARK BLUE"
-minimap_dark_red_str:     .asciiz "DARK RED"
-minimap_light_grey_str:   .asciiz "LIGHT GREY"
-minimap_light_yellow_str: .asciiz "LIGHT YELLOW"
-minimap_light_purple_str: .asciiz "LIGHT BLUE"
-minimap_light_red_str:    .asciiz "LIGHT RED"
+minimap_dark_grey_str:    localized_str options_minimap_theme_dark_grey
+minimap_dark_yellow_str:  localized_str options_minimap_theme_dark_yellow
+minimap_dark_purple_str:  localized_str options_minimap_theme_dark_blue
+minimap_dark_red_str:     localized_str options_minimap_theme_dark_red
+minimap_light_grey_str:   localized_str options_minimap_theme_light_grey
+minimap_light_yellow_str: localized_str options_minimap_theme_light_yellow
+minimap_light_purple_str: localized_str options_minimap_theme_light_blue
+minimap_light_red_str:    localized_str options_minimap_theme_light_red
 
-colorspace_options_str: .asciiz "Colorspace "
+colorspace_options_str: localized_color_str UI_STRING_PAL_LIGHT_THEME, options_colorspace_label
 
 colorspace_options:
         .byte 5
@@ -168,54 +169,54 @@ colorspace_options:
         .addr greenscale_colorspace_str
         .addr greyscale_colorspace_str
 
-default_colorspace_str:     .asciiz "DEFAULT"
-red_green_colorspace_str:   .asciiz "PROTAN/DEUTERAN"
-blue_yellow_colorspace_str: .asciiz "TRITAN"
-greenscale_colorspace_str:  .asciiz "DOT MATRIX GAME"
-greyscale_colorspace_str:   .asciiz "CLASSIC FILM"
+default_colorspace_str:     localized_str options_colorspace_default
+red_green_colorspace_str:   localized_str options_colorspace_protan_deuteran
+blue_yellow_colorspace_str: localized_str options_colorspace_tritan
+greenscale_colorspace_str:  localized_str options_colorspace_monochrome_green
+greyscale_colorspace_str:   localized_str options_colorspace_monochrome_grey
 
-pputype_str:     .asciiz "PPU "
+pputype_str:     localized_color_str UI_STRING_PAL_LIGHT_THEME, options_ppu_type_label
 pputype_options:
         .byte 3
         .addr pputype_auto_str
         .addr pputype_composite_str
         .addr pputype_rgb_str
-pputype_auto_str: .asciiz "AUTO"
-pputype_composite_str: .asciiz "COMPOSITE (2C02,2C07)"
-pputype_rgb_str:       .asciiz "RGB (2C03,2C05)"
+pputype_auto_str:      localized_str options_ppu_type_automatic
+pputype_composite_str: localized_str options_ppu_type_composite
+pputype_rgb_str:       localized_str options_ppu_type_rgb
 
-ppuemphasis_str: .asciiz "Color Emphasis "
+ppuemphasis_str: localized_color_str UI_STRING_PAL_LIGHT_THEME, options_color_emphasis_label
 emphasis_options:
         .byte 2
         .addr enabled_str
         .addr disabled_str
-enabled_str:  .asciiz "ENABLED"
-disabled_str: .asciiz "DISABLED"
+enabled_str:  localized_str ui_option_enabled
+disabled_str: localized_str ui_option_disabled
 
 rhythm_assist_str: localized_color_str UI_STRING_PAL_MID_THEME, options_rhythm_assistance_header
-flash_separator_str: .asciiz "Flash Separator "
+flash_separator_str: localized_color_str UI_STRING_PAL_LIGHT_THEME, options_flash_separator_label
 flash_separator_options:
         .byte 2
         .addr off_str
         .addr on_str
-off_str: .asciiz "OFF"
-on_str: .asciiz "ON"
+off_str: localized_str ui_option_off
+on_str:  localized_str ui_option_on
 
-flash_player_str:    .asciiz "Flash Player    "
+flash_player_str: localized_color_str UI_STRING_PAL_LIGHT_THEME, options_flash_player_label
 flash_player_options:
         .byte 2
         .addr off_str
         .addr on_str
 
-sfx_mode_str:    .asciiz "SoundFX "
+sfx_mode_str: localized_color_str UI_STRING_PAL_LIGHT_THEME, options_soundfx_mode_label
 sfx_mode_options:
         .byte 2
         .addr on_str
         .addr off_str
 
-metronome_str: .asciiz "METRONOME"
+metronome_str: localized_str options_music_mode_metronome
 
-bgm_mode_str:    .asciiz "Music   "
+bgm_mode_str: localized_color_str UI_STRING_PAL_LIGHT_THEME, options_music_mode_label
 bgm_mode_options:
         .byte 3
         .addr on_str
@@ -225,7 +226,7 @@ bgm_mode_options:
 ; Why debug? Because we eventually want this to be
 ; a dedicated screen. Coordinating the language redraw
 ; while options is already running is kindof a pain.
-debug_language_str:    .asciiz "Language "
+debug_language_str:    .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Language ", D_CLOSE
 debug_language_options:
         .byte 3
         .addr debug_language_english_str
@@ -233,9 +234,9 @@ debug_language_options:
         .addr debug_language_toki_pona_sitelen_pona_str
 ; TODO: localize the language string into the target language
 ; (waiting on UI string drawing to become command aware)
-debug_language_english_str:                  .asciiz "English"
-debug_language_toki_pona_sitelen_lasina_str: .asciiz "Toki Pona (lasina)"
-debug_language_toki_pona_sitelen_pona_str:   .asciiz "Toki Pona (pona)"
+debug_language_english_str:                  .byte "English", D_CLOSE
+debug_language_toki_pona_sitelen_lasina_str: .byte "Toki Pona (lasina)", D_CLOSE
+debug_language_toki_pona_sitelen_pona_str:   .byte "Toki Pona (pona)", D_CLOSE
 
 options_pal_default_base:    .incbin "../art/palettes/options/base.pal"
 options_pal_protan_base:     .incbin "../art/palettes/options/protan.pal"
@@ -1024,5 +1025,38 @@ play_silent_track:
         lda #TRACK_OPTIONS_DUP_2
         ldy #TRACK_VARIANT_SILENT
         jsr play_track
+        rts
+.endproc
+
+.proc FAR_apply_language_selection_controller_init
+CurrentWidgetIndex := R20
+widget_previous_language_id := widgets_data0
+        ldy CurrentWidgetIndex
+        lda current_save + SaveFile::OptionLanguage
+        sta widget_previous_language_id, y
+        set_widget_state_y FAR_apply_language_selection_controller_update
+        rts
+.endproc
+
+.proc FAR_apply_language_selection_controller_update
+CurrentWidgetIndex := R20
+widget_previous_language_id := widgets_data0
+        ; If the language setting hasn't been tickled, then there is nothing to do
+        ldy CurrentWidgetIndex
+        lda widget_previous_language_id, y
+        cmp current_save + SaveFile::OptionLanguage
+        bne reload_this_layout
+        rts
+reload_this_layout:
+
+        ; Re-request the current sublayout. This will force a full re-draw
+        ; of all relevant widgets.
+        lda #OPTIONS_SCREEN_SUBLAYOUT_INDEX
+        sta SubLayoutIndex
+        lda #<options_sublayout_debug_page_1
+        sta SubLayoutPtr+0
+        lda #>options_sublayout_debug_page_1
+        sta SubLayoutPtr+1
+        far_call FAR_request_sublayout
         rts
 .endproc
