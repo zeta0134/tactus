@@ -93,9 +93,9 @@ disco_floor_str:    localized_color_str UI_STRING_PAL_LIGHT_THEME, options_disco
 minimap_flavor_str: localized_color_str UI_STRING_PAL_LIGHT_THEME, options_minimap_theme_label
 
 player_palette_preset_str: localized_color_str UI_STRING_PAL_LIGHT_THEME, options_player_palette_preset_label
-player_palette_outfit_str: .asciiz "Pajamas    "
-player_palette_shoes_str:  .asciiz "Phones     "
-player_palette_face_str:   .asciiz "Pigment    "
+player_palette_outfit_str: localized_color_str UI_STRING_PAL_LIGHT_THEME, options_player_palette_outfit ; .asciiz "Pajamas    "
+player_palette_shoes_str:  localized_color_str UI_STRING_PAL_LIGHT_THEME, options_player_palette_shoes  ; .asciiz "Phones     "
+player_palette_face_str:   localized_color_str UI_STRING_PAL_LIGHT_THEME, options_player_palette_face   ; .asciiz "Pigment    "
 
 disco_types:
         .byte 6 ; length of option set
