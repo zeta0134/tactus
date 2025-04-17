@@ -10,7 +10,7 @@ name_entry_ui_layout:
         widget_string_entry english_page_table, (current_save + SaveFile::PlayerName)
         .addr $0000 ; end of list
 
-name_entry_str:   .asciiz "NAME ENTRY"
+name_entry_str: localized_str name_entry_header
 
 english_upper_str: .asciiz "UPPER"
 letter_grid_english_upper:

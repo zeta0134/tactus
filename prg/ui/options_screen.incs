@@ -22,7 +22,7 @@ options_ui_layout:
 options_sublayout_palette_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_controller FAR_options_color_preview_controller_init
-        widget_text_label_localized player_options_str, 2, 13
+        widget_text_label player_options_str, 2, 13
         widget_text_options player_palette_preset_str, player_palette_preset_types, {current_save + SaveFile::PlayerPalettePreset}, 4, 15
         widget_numeric_slider player_palette_outfit_str, 15, 52, {current_save + SaveFile::PlayerPalettePajamasIndex}, 4, 17
         widget_numeric_viewer {current_save + SaveFile::PlayerPalettePajamasIndex}, 11, 17
@@ -34,46 +34,46 @@ options_sublayout_palette_page_1:
         .addr $0000 ; end of list
 options_sublayout_palette_page_2:
         widget_controller FAR_options_page_clear_controller_init
-        widget_text_label_localized palette_page_2_str, 2, 13
+        widget_text_label palette_page_2_str, 2, 13
         widget_text_options colorspace_options_str, colorspace_options, {current_save + SaveFile::OptionColorspace  },      4, 15
         widget_text_options minimap_flavor_str,     minimap_themes,     {current_save + SaveFile::OptionMinimapTheme},      4, 16
         widget_controller FAR_apply_colormap_shenanigans
         .addr $0000 ; end of list
 options_sublayout_gameplay_page_1:
         widget_controller FAR_options_page_clear_controller_init
-        widget_text_label_localized placeholder_gameplay_str, 2, 13
+        widget_text_label placeholder_gameplay_str, 2, 13
         widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode  },      4, 15
         widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor  },      4, 16
-        widget_text_label_localized rhythm_assist_str, 2, 18
+        widget_text_label rhythm_assist_str, 2, 18
         widget_text_options flash_separator_str,  flash_separator_options, {current_save + SaveFile::OptionRhythmFlashBar   },  4, 20
         widget_text_options flash_player_str,     flash_player_options,    {current_save + SaveFile::OptionRhythmFlashPlayer},  4, 21
         .addr $0000 ; end of list
 options_sublayout_input_page_1:
         widget_controller FAR_options_page_clear_controller_init
-        widget_text_label_localized placeholder_input_str, 2, 13
-        widget_text_label_localized coming_soon_str, 4, 15
+        widget_text_label placeholder_input_str, 2, 13
+        widget_text_label coming_soon_str, 4, 15
         .addr $0000 ; end of list
 options_sublayout_audio_page_1:
         widget_controller FAR_options_page_clear_controller_init
-        widget_text_label_localized placeholder_audio_str, 2, 13
+        widget_text_label placeholder_audio_str, 2, 13
         widget_text_options sfx_mode_str, sfx_mode_options, {current_save + SaveFile::OptionSfxMode  },   4, 15
         widget_text_options bgm_mode_str, bgm_mode_options, {current_save + SaveFile::OptionMusicMode  }, 4, 16
         widget_controller FAR_options_page_refresh_music_controller
         .addr $0000 ; end of list
 options_sublayout_compatibility_tweaks_page_1:
         widget_controller FAR_options_page_clear_controller_init
-        widget_text_label_localized placeholder_compatibility_str, 2, 13
+        widget_text_label placeholder_compatibility_str, 2, 13
         widget_text_options pputype_str,      pputype_options,      {current_save + SaveFile::OptionPpuType      },      4, 15
         widget_text_options ppuemphasis_str,  emphasis_options,     {current_save + SaveFile::OptionColorEmphasis},      4, 16
         widget_controller FAR_apply_colormap_shenanigans
         .addr $0000 ; end of list
 options_sublayout_debug_page_1:
         widget_controller FAR_options_page_clear_controller_init
-        widget_text_label_localized placeholder_debug_str, 2, 13
+        widget_text_label placeholder_debug_str, 2, 13
         widget_text_options debug_language_str, debug_language_options, {current_save + SaveFile::OptionLanguage },      4, 15
 
-        widget_text_label_localized debug_localized_label, 4, 17
-        widget_text_label_localized debug_silly_str, 2, 24
+        widget_text_label debug_localized_label, 4, 17
+        widget_text_label debug_silly_str, 2, 24
         .addr $0000 ; end of list
 
 PRESET_PERSONALIZED_VALUE = 0

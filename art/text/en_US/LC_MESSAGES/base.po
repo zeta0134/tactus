@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-04-15 11:07-0400\n"
-"PO-Revision-Date: 2025-04-16 23:50+0000\n"
+"PO-Revision-Date: 2025-04-17 15:23+0000\n"
 "Last-Translator: Zeta <zeta0134@reploid.cafe>\n"
 "Language-Team: English <http://weblate.reploid.cafe/projects/tactus/items/en/"
 ">\n"
@@ -417,3 +417,33 @@ msgstr ""
 "I see you've found my debug\n"
 "options! Come right on in,\n"
 "have some coffee, etc."
+
+msgid "file_select_header"
+msgstr "FILE SELECT "
+
+msgid "file_select_msg_erase_which"
+msgstr "ERASE WHICH?"
+
+msgid "file_select_msg_copy_source_select"
+msgstr "COPY WHICH? "
+
+msgid "file_select_msg_copy_destination_select"
+msgstr "WHERE TO?   "
+
+msgid "file_select_msg_erase_confirm"
+msgstr "REALLY !?   "
+
+msgid "file_details_welcome_string"
+msgstr "Welcome [PLAYER_NAME]!"
+
+msgid "file_select_msg_copy_confirm"
+msgstr "OVERWRITE?  "
+
+msgid "file_select_erase_file_button"
+msgstr "ERASE FILE"
+
+msgid "file_select_copy_file_button"
+msgstr "COPY FILE"
+
+msgid "name_entry_header"
+msgstr "NAME ENTRY"

@@ -573,18 +573,19 @@ loop:
 ; null-terminated strings altogether.)
 
 draw_string_cmd_table:
-        .word str_cmd_newline   ; D_NEWLINE  = $80
-        .word str_cmd_dummy     ; D_WAIT     = $81
-        .word str_cmd_dummy     ; D_CLEAR    = $82
-        .word str_cmd_close     ; D_CLOSE    = $83
-        .word str_cmd_attr      ; D_ATTR     = $84
-        .word str_cmd_localize  ; D_LOCALIZE = $85
-        .word str_cmd_return    ; D_RETURN   = $86
-        .word str_cmd_ext_char  ; D_LOW_CHAR = $87
-        .word str_cmd_low_page  ; D_LOW_PAGE = $88
-        .word str_cmd_high_page ; D_HI_PAGE  = $89
-        .word str_cmd_pal       ; D_PAL      = $8A
-        .word str_cmd_font      ; D_FONT     = $8B
+        .word str_cmd_newline     ; D_NEWLINE     = $80
+        .word str_cmd_dummy       ; D_WAIT        = $81
+        .word str_cmd_dummy       ; D_CLEAR       = $82
+        .word str_cmd_close       ; D_CLOSE       = $83
+        .word str_cmd_attr        ; D_ATTR        = $84
+        .word str_cmd_localize    ; D_LOCALIZE    = $85
+        .word str_cmd_return      ; D_RETURN      = $86
+        .word str_cmd_ext_char    ; D_LOW_CHAR    = $87
+        .word str_cmd_low_page    ; D_LOW_PAGE    = $88
+        .word str_cmd_high_page   ; D_HI_PAGE     = $89
+        .word str_cmd_pal         ; D_PAL         = $8A
+        .word str_cmd_font        ; D_FONT        = $8B
+        .word str_cmd_player_name ; D_PLAYER_NAME = $8C
         ; TODO: safety? bah!
 
 .proc FAR_draw_ui_string
@@ -838,4 +839,35 @@ Scratch := UiStringScratch+7
         jmp FAR_draw_ui_string::loop
 .endproc
 
+.proc str_cmd_player_name
+NametableAddr := T0
+AttributeAddr := T2
+StringPtr := T4
+        ; onward!
+        inc16 StringPtr
+        ; draw the entire player name, right here, on the spot, using our
+        ; current nametable/attr position.
+        ; TODO: rework this when the player name format changes, likely to support
+        ; different character sets and whatnot. For now, the player name uses ascii
+        ; and marshmallows, because marshmallows are nice.
+        ldx #0
+        ldy #0
+loop:
+        perform_zpcm_inc
+        lda current_save + SaveFile::PlayerName, x
+        ; player names are (currently) null terminated, so handle that
+        beq done
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        inc16 NametableAddr
+        inc16 AttributeAddr
+        inx
+        ; Safety: player names should not exceed 15 characters. How did that happen?
+        cpx #15
+        bne loop
+done:
 
+        perform_zpcm_inc
+        jmp FAR_draw_ui_string::loop
+.endproc

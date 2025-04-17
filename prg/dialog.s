@@ -386,18 +386,19 @@ no_chirp:
 .endproc
 
 dialog_command_lut:
-        .word dialog_cmd_newline   ; D_NEWLINE  = $80
-        .word dialog_cmd_wait      ; D_WAIT     = $81
-        .word dialog_cmd_clear     ; D_CLEAR    = $82
-        .word dialog_cmd_close     ; D_CLOSE    = $83
-        .word dialog_cmd_attr      ; D_ATTR     = $84
-        .word dialog_cmd_localize  ; D_LOCALIZE = $85
-        .word dialog_cmd_return    ; D_RETURN   = $86
-        .word dialog_cmd_ext_char  ; D_LOW_CHAR = $87
-        .word dialog_cmd_low_page  ; D_LOW_PAGE = $88
-        .word dialog_cmd_high_page ; D_HI_PAGE  = $89
-        .word dialog_cmd_pal       ; D_PAL      = $8A
-        .word dialog_cmd_font      ; D_FONT     = $8B
+        .word dialog_cmd_newline   ; D_NEWLINE     = $80
+        .word dialog_cmd_wait      ; D_WAIT        = $81
+        .word dialog_cmd_clear     ; D_CLEAR       = $82
+        .word dialog_cmd_close     ; D_CLOSE       = $83
+        .word dialog_cmd_attr      ; D_ATTR        = $84
+        .word dialog_cmd_localize  ; D_LOCALIZE    = $85
+        .word dialog_cmd_return    ; D_RETURN      = $86
+        .word dialog_cmd_ext_char  ; D_LOW_CHAR    = $87
+        .word dialog_cmd_low_page  ; D_LOW_PAGE    = $88
+        .word dialog_cmd_high_page ; D_HI_PAGE     = $89
+        .word dialog_cmd_pal       ; D_PAL         = $8A
+        .word dialog_cmd_font      ; D_FONT        = $8B
+        .word dialog_player_name   ; D_PLAYER_NAME = $8C
         ; TODO: safety? bah!
 
 .proc dialog_cmd_newline
@@ -758,6 +759,24 @@ Scratch := R0
         ora Scratch
         sta DialogCurrentAttr
         ; onward properly!
+        inc16 DialogStringCurrentPtr
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc dialog_player_name
+        ; TODO: this!
+        ; For now: skip over the command byte and do nothing. :(
+        ; (actually implementing char-by-char drawing is very complicated, as
+        ; player strings are stored in a completely different format)
+
+        ; Zeta strategy: have a PlayerName string and position. Initialize that
+        ; (based on the current save file) and then switch to a different outer dialog
+        ; state entirely, whose only job is to continue drawing the player string until
+        ; we reach the end, then return to the regular string drawing state to pick
+        ; up where we left off.
+
+        ; stub it out!
         inc16 DialogStringCurrentPtr
         perform_zpcm_inc
         rts

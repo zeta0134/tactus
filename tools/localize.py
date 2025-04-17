@@ -17,14 +17,28 @@ def special_glyphs(raw_char):
         return (["D_NEWLINE"], "FONT_ASCII")
     return None
 
+# Don't go nuts with these, many commands aren't that useful
+# and the more we have, the more expensive this routine gets.
+embedded_command_strings = {}
+embedded_command_strings["[PLAYER_NAME]"] = ["D_PLAYER_NAME"]
+embedded_command_strings["[WAIT]"] = ["D_WAIT"]
+embedded_command_strings["[CLEAR]"] = ["D_CLEAR"]
+
+def contains_command_string(test_str):
+    for candidate_command in embedded_command_strings:
+        if test_str.startswith(candidate_command):
+            remaining_str = test_str[len(candidate_command):]
+            return (embedded_command_strings[candidate_command], remaining_str)
+    return None
+
 def massage_string(unicode_str):
     output_string = []
     byte_count = 0
     current_font = ""
     current_ascii_string = ""
-    for raw_char in unicode_str:
-        glyph_properties = special_glyphs(raw_char)
-        if glyph_properties != None:
+    while len(unicode_str) > 0:
+        maybe_cmd = contains_command_string(unicode_str)
+        if maybe_cmd != None:
             if len(current_ascii_string) > 0:
                 if current_font != "FONT_ASCII":
                     output_string.append("D_FONT")
@@ -34,18 +48,35 @@ def massage_string(unicode_str):
                 output_string.append(f'"{current_ascii_string}"')
                 byte_count += len(current_ascii_string)
                 current_ascii_string = ""
-            (byte_sequence, font) = glyph_properties
-            if current_font != font:
-                output_string.append("D_FONT")
-                output_string.append(font)
-                current_font = font
-                byte_count += 2
-            output_string.extend(byte_sequence)
-            byte_count += len(byte_sequence)
-        elif raw_char.isascii():
-            current_ascii_string += raw_char
+            (cmd_bytes, unicode_str) = maybe_cmd
+            output_string.extend(cmd_bytes)
+            byte_count += len(cmd_bytes)
         else:
-            print(f"Warning: unprintable char: {raw_char}, ignoring")
+            raw_char = unicode_str[0:1]
+            unicode_str = unicode_str[1:]
+            glyph_properties = special_glyphs(raw_char)
+            if glyph_properties != None:
+                if len(current_ascii_string) > 0:
+                    if current_font != "FONT_ASCII":
+                        output_string.append("D_FONT")
+                        output_string.append("FONT_ASCII")
+                        current_font = "FONT_ASCII"
+                        byte_count += 2
+                    output_string.append(f'"{current_ascii_string}"')
+                    byte_count += len(current_ascii_string)
+                    current_ascii_string = ""
+                (byte_sequence, font) = glyph_properties
+                if current_font != font:
+                    output_string.append("D_FONT")
+                    output_string.append(font)
+                    current_font = font
+                    byte_count += 2
+                output_string.extend(byte_sequence)
+                byte_count += len(byte_sequence)
+            elif raw_char.isascii():
+                current_ascii_string += raw_char
+            else:
+                print(f"Warning: unprintable char: {raw_char}, ignoring")
     if len(current_ascii_string) > 0:
         if current_font != "FONT_ASCII":
             output_string.append("D_FONT")
@@ -260,6 +291,20 @@ def gather_translated_strings(languages):
 
         ui_strings["options_coming_soon_placeholder"]  = _("options_coming_soon_placeholder")
         ui_strings["options_silly_tcrf_shoutout"]      = _("options_silly_tcrf_shoutout")
+
+        # YOU WERE HERE
+        ui_strings["file_select_header"]                      = _("file_select_header")
+        ui_strings["file_select_msg_erase_which"]             = _("file_select_msg_erase_which")
+        ui_strings["file_select_msg_erase_confirm"]           = _("file_select_msg_erase_confirm")
+        ui_strings["file_select_msg_copy_source_select"]      = _("file_select_msg_copy_source_select")
+        ui_strings["file_select_msg_copy_destination_select"] = _("file_select_msg_copy_destination_select")
+        ui_strings["file_select_msg_copy_confirm"]            = _("file_select_msg_copy_confirm")
+        ui_strings["file_select_erase_file_button"]           = _("file_select_erase_file_button")
+        ui_strings["file_select_copy_file_button"]            = _("file_select_copy_file_button")
+
+        ui_strings["name_entry_header"]            = _("name_entry_header")
+
+        ui_strings["file_details_welcome_string"]            = _("file_details_welcome_string")
 
         for k in ui_strings:
             (message, length) = massage_string(ui_strings[k])

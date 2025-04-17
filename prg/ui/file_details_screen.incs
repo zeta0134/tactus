@@ -8,16 +8,15 @@ file_details_ui_layout:
         widget_controller FAR_file_details_controller_init
         widget_cursor
         widget_text_label file_details_str, 5, 3
-        widget_text_label {current_save + SaveFile::PlayerName}, 13, 3
         widget_text_button_attr start_game_str, FAR_go_to_gameplay, 7, 7, UI_PAL_BG1
         widget_text_button_attr options_str, FAR_go_to_options, 7, 11, UI_PAL_BG1
         .addr $0000 ; end of list
 
 FILE_DETAILS_CURSOR_INDEX = 1
-FILE_DETAILS_START_INDEX = 4
-FILE_DETAILS_OPTIONS_INDEX = 5
+FILE_DETAILS_START_INDEX = 3
+FILE_DETAILS_OPTIONS_INDEX = 4
 
-file_details_str:   .asciiz "Welcome " ; shouldn't this be the player name?
+file_details_str: localized_str file_details_welcome_string
 start_game_str: .asciiz " GET GROOVIN'"
 options_str: .asciiz " OPTIONS"
 
