@@ -91,7 +91,6 @@ game_mode_str:      .asciiz "Rhythm  "
 disco_floor_str:    .asciiz "Floor   "
 minimap_flavor_str: .asciiz "Minimap    "
 
-player_options_str: localized_str_close options_player_palette_header_localized
 player_palette_preset_str: .asciiz "Preset  "
 player_palette_outfit_str: .asciiz "Pajamas    "
 player_palette_shoes_str:  .asciiz "Phones     "
@@ -193,7 +192,7 @@ emphasis_options:
 enabled_str:  .asciiz "ENABLED"
 disabled_str: .asciiz "DISABLED"
 
-rhythm_assist_str: localized_str_close options_rhythm_assistance_header_localized
+rhythm_assist_str: localized_color_str UI_STRING_PAL_MID_THEME, options_rhythm_assistance_header
 flash_separator_str: .asciiz "Flash Separator "
 flash_separator_options:
         .byte 2
@@ -259,19 +258,20 @@ options_pal_tab_compatibility: .incbin "../art/palettes/options/tab_compatibilit
 options_pal_tab_debug:         .incbin "../art/palettes/options/tab_debug.pal"
 options_pal_tab_greyscale:     .incbin "../art/palettes/options/tab_greyscale.pal"
 
-palette_page_2_str:             localized_str_close options_tab_header_world_palette_localized
-placeholder_gameplay_str:       localized_str_close options_tab_header_gameplay_localized
-placeholder_input_str:          localized_str_close options_tab_header_input_localized
-placeholder_audio_str:          localized_str_close options_tab_header_audio_localized
-placeholder_compatibility_str:  localized_str_close options_tab_header_compatibility_localized
-placeholder_debug_str:          localized_str_close options_tab_header_debug_localized
+player_options_str:            localized_color_str UI_STRING_PAL_MID_THEME, options_player_palette_header
+palette_page_2_str:            localized_color_str UI_STRING_PAL_MID_THEME, options_tab_header_world_palette
+placeholder_gameplay_str:      localized_color_str UI_STRING_PAL_MID_THEME, options_tab_header_gameplay
+placeholder_input_str:         localized_color_str UI_STRING_PAL_MID_THEME, options_tab_header_input
+placeholder_audio_str:         localized_color_str UI_STRING_PAL_MID_THEME, options_tab_header_audio
+placeholder_compatibility_str: localized_color_str UI_STRING_PAL_MID_THEME, options_tab_header_compatibility
+placeholder_debug_str:         localized_color_str UI_STRING_PAL_MID_THEME, options_tab_header_debug
 
 ;                           0123456789012345678901234567
-debug_silly_str: localized_str_close options_silly_tcrf_shoutout_localized
+debug_silly_str: localized_str options_silly_tcrf_shoutout
 
-debug_localized_label: localized_str_close hello_world_localized
+debug_localized_label: localized_str hello_world
 
-coming_soon_str: localized_str_close options_coming_soon_placeholder_localized
+coming_soon_str: localized_color_str UI_STRING_PAL_MID_THEME, options_coming_soon_placeholder
 
 ; ======================================================================
 ;                       Screen Specific Logic

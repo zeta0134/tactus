@@ -4,14 +4,31 @@ LANGUAGE_ID_TOKI_PONA_SITELEN_LASINA = 1
 LANGUAGE_ID_TOKI_PONA_SITELEN_PONA   = 2
 
 
-.macro localized_str string_addr
-    .byte D_LOCALIZE, <string_addr, >string_addr, <.bank(string_addr)
+.macro localized_embed string_name
+    .byte D_LOCALIZE
+    .byte <(.ident(.sprintf("%s_localized", .string(string_name))))
+    .byte >(.ident(.sprintf("%s_localized", .string(string_name))))
+    .byte <.bank((.ident(.sprintf("%s_localized", .string(string_name)))))
 .endmacro
 
 ; Handy in the UI, where we are often localizing short strings that should terminate
 ; after the localized component. Keeps things compact and tidy.
-.macro localized_str_close string_addr
-    .byte D_LOCALIZE, <string_addr, >string_addr, <.bank(string_addr), D_CLOSE
+.macro localized_str string_name
+    .byte D_LOCALIZE
+    .byte <(.ident(.sprintf("%s_localized", .string(string_name))))
+    .byte >(.ident(.sprintf("%s_localized", .string(string_name))))
+    .byte <.bank((.ident(.sprintf("%s_localized", .string(string_name)))))
+    .byte D_CLOSE
+.endmacro
+
+; Same deal but with a non-default color, useful for all sorts of stuff
+.macro localized_color_str color, string_name
+    .byte D_PAL, color
+    .byte D_LOCALIZE
+    .byte <(.ident(.sprintf("%s_localized", .string(string_name))))
+    .byte >(.ident(.sprintf("%s_localized", .string(string_name))))
+    .byte <.bank((.ident(.sprintf("%s_localized", .string(string_name)))))
+    .byte D_CLOSE
 .endmacro
 
 .global hello_world_localized

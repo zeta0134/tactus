@@ -6,6 +6,7 @@ build
 audiodump.raw
 *.pyc
 *.DS_Store
+*.mo
 
 vendor/*.so
 vendor/*.txt

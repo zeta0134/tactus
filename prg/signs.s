@@ -242,7 +242,7 @@ sign_debug_zone_5w:
 sign_debug_misc_1:
         ;     0123456789012345678901234567 ; 28-char width
         .byte D_PAL, DIALOG_PAL_YELLOW
-        localized_str hello_world_localized
+        localized_embed hello_world
         .byte D_WAIT, D_CLOSE
 
 sign_debug_misc_2:

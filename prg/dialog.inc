@@ -26,6 +26,16 @@ DIALOG_PAL_DARK_BLUE = (HUD_PURPLE_PAL | 1)
 DIALOG_PAL_PEACH     = (HUD_RED_PAL    | 0)
 DIALOG_PAL_RED       = (HUD_RED_PAL    | 1)
 
+; for UI, only "white" is the same, everything else is
+; totally different. those differences are loosely encoded here:
+UI_STRING_PAL_WHITE         = (UI_PAL_BG1     | 0)
+UI_STRING_PAL_LIGHT_BLUE    = (UI_PAL_BG1     | 1)
+UI_STRING_PAL_LIGHT_THEME   = (UI_PAL_BG2     | 0)
+UI_STRING_PAL_MID_THEME     = (UI_PAL_BG2     | 1)
+; bg0:bank0 is reliably a duplicate of bg2:bank1, so we don't include that twice
+UI_STRING_PAL_DARK_THEME    = (UI_PAL_BG0     | 1)
+; for now, bg3 isn't used or set in the UI. it is solid black. this may change!
+
 FONT_ASCII         = CHR_BANK_0_FONT_MARSHMALLOW
 FONT_SITELEN_PONA  = CHR_BANK_0_FONT_SITELEN_PONA_LEKO_MAJUNA
 

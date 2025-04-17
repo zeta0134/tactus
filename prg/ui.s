@@ -71,7 +71,7 @@ SubLayoutPtr: .res 2
 SubLayoutIndex: .res 1
 
 ; String processing, it turns out, needs lots of scratch space
-UiStringScratch: .res 8
+UiStringScratch: .res 12
 
 
         .segment "DATA_UI_LAYOUTS"
@@ -573,7 +573,7 @@ loop:
 ; null-terminated strings altogether.)
 
 draw_string_cmd_table:
-        .word str_cmd_dummy     ; D_NEWLINE  = $80
+        .word str_cmd_newline   ; D_NEWLINE  = $80
         .word str_cmd_dummy     ; D_WAIT     = $81
         .word str_cmd_dummy     ; D_CLEAR    = $82
         .word str_cmd_close     ; D_CLOSE    = $83
@@ -597,7 +597,16 @@ CurrentPage := UiStringScratch+2
 CurrentAttr := UiStringScratch+3
 LocalizePreservePtr := UiStringScratch+4
 LocalizePreserveBank := UiStringScratch+6
-        lda #COLOR_MM_WHITE
+
+LineStartTileAddr := UiStringScratch+8
+LineStartAttrAddr := UiStringScratch+10
+
+        ; Preserve our starting position; this is useful
+        ; primarily for newline processing
+        mov16 LineStartTileAddr, NametableAddr
+        mov16 LineStartAttrAddr, AttributeAddr
+
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
         sta CurrentAttr
         lda #0
         sta CurrentPage
@@ -637,6 +646,23 @@ end_of_string:
 .proc str_cmd_dummy
 StringPtr := T4
         ; dummied out, this makes no sense for a UI string
+        inc16 StringPtr
+        jmp FAR_draw_ui_string::loop
+.endproc
+
+.proc str_cmd_newline
+NametableAddr := T0
+AttributeAddr := T2
+StringPtr     := T4
+
+LineStartTileAddr := UiStringScratch+8
+LineStartAttrAddr := UiStringScratch+10
+        ; Return to the start of the current line, then add 32 (one row) to that
+        add16b LineStartTileAddr, #32
+        add16b LineStartAttrAddr, #32
+        mov16 NametableAddr, LineStartTileAddr
+        mov16 AttributeAddr, LineStartAttrAddr
+        ; onward!
         inc16 StringPtr
         jmp FAR_draw_ui_string::loop
 .endproc
