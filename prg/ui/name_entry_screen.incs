@@ -7,7 +7,7 @@
 name_entry_ui_layout:
         widget_controller FAR_name_entry_controller_init
         widget_text_label name_entry_str, 11, 3
-        widget_string_entry english_page_table, (current_save + SaveFile::PlayerName)
+        widget_string_entry english_page_table, (current_save + SaveFile::PlayerNameTiles)
         .addr $0000 ; end of list
 
 name_entry_str: localized_str name_entry_header

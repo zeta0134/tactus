@@ -209,7 +209,7 @@ wraparound:
         rts
 .endproc
 
-range_error_str: .asciiz "RANGE ERROR!"
+range_error_str: .byte "RANGE ERROR!", D_CLOSE
 
 .proc _draw_option_common
 OptionsTablePtr := R0

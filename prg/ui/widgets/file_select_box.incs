@@ -366,6 +366,8 @@ TileBase := T6
 PaletteIndex := T7
 
 FilePtr := R0
+FileNameTilePtr := R2
+FileNameAttrPtr := R4
 CurrentWidgetIndex := R20
     
 widget_tile_x := widgets_data0
@@ -397,13 +399,22 @@ widget_sprite_index := widgets_data4
         jeq draw_new_file
 
 draw_existing_file:
-        mov16 StringPtr, FilePtr
-        add16w StringPtr, #SaveFile::PlayerName
-        lda #CHR_BANK_0_FONT_MARSHMALLOW
-        sta TileBase
-        lda #UI_PAL_BG1
-        sta PaletteIndex
-        jsr FIXED_draw_string
+        mov16 FileNameTilePtr, FilePtr
+        add16w FileNameTilePtr, #SaveFile::PlayerNameTiles
+        mov16 FileNameAttrPtr, FilePtr
+        add16w FileNameAttrPtr, #SaveFile::PlayerNameFont
+        ldy #0
+tile_loop:
+        lda (FileNameAttrPtr), y
+        beq done_drawing_filename
+        sta (AttributeAddr), y
+        lda (FileNameTilePtr), y
+        sta (NametableAddr), y
+        iny
+        ; safety
+        cpy #15
+        bne tile_loop
+done_drawing_filename:
 
         ; Draw the second row of details below the filename. TODO: make this much fancier
         add16b NametableAddr, #32

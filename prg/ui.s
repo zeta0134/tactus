@@ -456,48 +456,6 @@ done:
         rts
 .endproc
 
-; TODO: This should go away?
-.proc FAR_draw_widget_label
-CurrentWidgetIndex := R20
-
-; rename the data labels to something more readable
-widget_tile_x := widgets_data0
-widget_tile_y := widgets_data1
-widget_text_string_low := widgets_data2
-widget_text_string_high := widgets_data3
-
-; arguments to string drawing functions
-NametableAddr := T0
-AttributeAddr := T2
-TileX := T4
-TileY := T5
-StringPtr := T4
-TileBase := T6
-PaletteIndex := T7
-        perform_zpcm_inc
-        ldy CurrentWidgetIndex
-        lda widget_tile_x, y
-        sta TileX
-        lda widget_tile_y, y
-        sta TileY
-        st16 NametableAddr, $5000
-        st16 AttributeAddr, $5800
-        far_call FAR_nametable_from_coordinates
-        perform_zpcm_inc
-        ldy CurrentWidgetIndex
-        lda widget_text_string_low, y
-        sta StringPtr+0
-        lda widget_text_string_high, y
-        sta StringPtr+1
-        lda #CHR_BANK_0_FONT_MARSHMALLOW
-        sta TileBase
-        lda #0
-        sta PaletteIndex
-        jsr FIXED_draw_string
-
-        rts
-.endproc
-
 ; Used by UI screens, often WIP, which don't have a default
 ; actual nametable to load. Just fill everything with space
 ; tiles. Clobbers R0-R5
@@ -816,14 +774,19 @@ CurrentAttr := UiStringScratch+3
         ldy #0
 loop:
         perform_zpcm_inc
-        lda current_save + SaveFile::PlayerName, x
-        ; player names are (currently) null terminated, so handle that
+        ; player names are null terminated in the FONT layer, so handle that
+        lda current_save + SaveFile::PlayerNameFont, x
         beq done
-        sta (NametableAddr), y
+        ; massage that into the current font color
+        sta (AttributeAddr), y
         lda CurrentAttr
         and #%11000001
-        ora #FONT_ASCII
+        ora (AttributeAddr), y
         sta (AttributeAddr), y
+        ; the character is a fully qualified tile ID, no nonsense
+        lda current_save + SaveFile::PlayerNameTiles, x
+        sta (NametableAddr), y
+        ; onwards and done
         inc16 NametableAddr
         inc16 AttributeAddr
         inx

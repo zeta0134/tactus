@@ -15,10 +15,15 @@ TACTUS_SAVE_VERSION_NUMBER = 2
 ; makes old testers lose their save files.
 .struct SaveFile
     ; PLAYER PERSONALIZATION PRIMITIVES
-    PlayerName .byte 16      ; this might be too long in practice? depends on where we use it I guess.
+    ; this might be too long in practice? depends on where we use it I guess.
+    ; Player names are in an awkward format, largely to preserve extended
+    ; language information. Use a 0 in the "font" to end the string, as this is not
+    ; a valid CHR bank for bg tile display anyway. (That's in the sprite area.)
+    PlayerNameTiles .byte 16 ; 8bit tile ID to display during drawing
+    PlayerNameFont  .byte 16 ; bank ID (no palette info) for the font to use for EACH tile.
     ; GAME STATE
     EnemiesEncounteredFlags .byte 32
-    ItemsDiscoveredFlags .byte 32
+    ItemsDiscoveredFlags .byte 32  
     ; PLAYER PERSONALIZATION PREFERENCES
     PlayerPalettePreset .byte
     PlayerPalettePhonesIndex .byte
@@ -79,7 +84,7 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     SpellsCast               .byte
     StepsTaken               .byte 2
     LastDamageDealtWith      .byte ; item / weapon used to deliver the final blow, basically
-    RunTrackerReserved       .byte 47 ; bring the total up to 80 bytes
+    RunTrackerReserved       .byte 31 ; bring the total up to 80 bytes
 .endstruct ; total size should be 256 bytes
 
 ; When set: do not roll a new run seed upon entering the big door

@@ -151,11 +151,11 @@ loop:
 ; Result in A
 .proc is_valid_file
 SaveFilePtr := R0
-    ; somewhere in PlayerName must be a $0 byte!
+    ; somewhere in PlayerNameFont must be a $0 byte!
     ; if we don't have this, we can lock up trying to draw the
     ; resulting string. (Empty string is acceptable, it signals this is a "new" file)
     ldx #0
-    ldy #SaveFile::PlayerName
+    ldy #SaveFile::PlayerNameFont
 player_name_loop:
     perform_zpcm_inc
     lda (SaveFilePtr), y
@@ -179,7 +179,7 @@ SaveFilePtr := R0
     ; all zeroes? if so, this is a new file!
     ; (to encode an actually empty string, if desired, write $0, $FF)
     ldx #0
-    ldy #SaveFile::PlayerName
+    ldy #SaveFile::PlayerNameFont
 player_name_loop:
     perform_zpcm_inc
     lda (SaveFilePtr), y

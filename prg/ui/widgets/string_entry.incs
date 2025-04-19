@@ -5,7 +5,7 @@
         .byte <.bank(widget_string_entry::FAR_widget_string_entry_init)
         .addr page_table
         .addr destination_str
-        .byte 0, 0, 0, 0
+        .byte 0, 0, 0, PLAYER_NAME_FIELD_LENGTH ; which we may want to configure?
         ; the string entry thing comes with its own cursor
         .addr widget_string_entry::FAR_widget_string_entry_cursor_init
         .byte <.bank(widget_string_entry::FAR_widget_string_entry_cursor_init)
@@ -304,16 +304,16 @@ loop:
 
 .proc FAR_draw_target_string
 ; FIXED_draw_string
-NametableAddr := T0
-AttributeAddr := T2
-StringPtr := T4
-TileBase := T6
-PaletteIndex := T7
+NametableAddr := R0
+AttributeAddr := R2
+StringPtr := R4
+AttrPtr := R6
 
 CurrentWidgetIndex := R20
 
 widget_target_string_low := widgets_data2
 widget_target_string_high := widgets_data3
+widget_target_string_length := widgets_data7
         
         st16 NametableAddr, ($5000 + (TARGET_STRING_TOP_TILE * 32) + TARGET_STRING_LEFT_TILE)
         st16 AttributeAddr, ($5800 + (TARGET_STRING_TOP_TILE * 32) + TARGET_STRING_LEFT_TILE)
@@ -323,12 +323,23 @@ widget_target_string_high := widgets_data3
         sta StringPtr+0
         lda widget_target_string_high, y
         sta StringPtr+1
+        mov16 AttrPtr, StringPtr
+        add16b AttrPtr, {widget_target_string_length, y}
 
-        lda #CHR_BANK_0_FONT_MARSHMALLOW
-        sta TileBase
-        lda #UI_PAL_BG1
-        sta PaletteIndex
-        jsr FIXED_draw_string
+        ldy #0
+draw_loop:
+        lda (AttrPtr), y
+        beq done_with_draw
+        ora #UI_PAL_BG1
+        sta (AttributeAddr), y
+        lda (StringPtr), y
+        sta (NametableAddr), y
+        iny
+        ; safety!
+        cpy #PLAYER_NAME_FIELD_LENGTH
+        bne draw_loop
+done_with_draw:
+        
         ; at this point, the nametable/attribute pointers are still set
         ; and Y is pointing to the character after the string.
         ; are we at the end of the string?
@@ -360,12 +371,31 @@ done:
         rts
 .endproc
 
-.proc FAR_add_to_string
-StringPtr := T0
-Length := T2
+; Result in Y, also in R4
+.proc _player_strlen
+StringPtr := R0
+AttrPtr := R2
+Length := R4
+        ldy #0
+loop:
+        lda (AttrPtr), y
+        beq done
+        iny
+        cpy #16
+        bne loop
+done:
+        sty Length
+        rts
+.endproc
 
-PagePtr := R0
-PageTablePtr := R2
+.proc FAR_add_to_string
+StringPtr := R0
+AttrPtr := R2
+Length := R4
+
+
+PagePtr := R6
+PageTablePtr := R8
 
 CurrentWidgetIndex := R20
 
@@ -376,6 +406,7 @@ widget_target_string_high := widgets_data3
 widget_current_page := widgets_data4
 widget_grid_pos_x   := widgets_data5
 widget_grid_pos_y   := widgets_data6   
+widget_target_string_length := widgets_data7
 
         ; First, check the string length. If it's already 15 or higher, buzz and fail.
         ldy CurrentWidgetIndex
@@ -383,9 +414,10 @@ widget_grid_pos_y   := widgets_data6
         sta StringPtr+0
         lda widget_target_string_high, y
         sta StringPtr+1
-        jsr FIXED_strlen
-        lda Length
-        cmp #15
+        mov16 AttrPtr, StringPtr
+        add16b AttrPtr, {widget_target_string_length, y}
+        jsr _player_strlen
+        cpy #PLAYER_NAME_MAX_LENGTH
         bcs fail_to_add
         ; Add the pointed-to glyph to the end of the pointed-at string, followed by a $0 byte
         ;; First, load in the active page table
@@ -419,10 +451,14 @@ widget_grid_pos_y   := widgets_data6
         lda (PagePtr), y
         ldy Length
         sta (StringPtr), y
+        ;; TODO: figure out how we're going to store the attribute byte and store that here
+        ;; for now, assume FONT_ASCII
+        lda #FONT_ASCII
+        sta (AttrPtr), y
         ; follow this up with a $0 byte in the original string, to ensure it remains null-terminated
         iny
         lda #0
-        sta (StringPtr), y
+        sta (AttrPtr), y
         ; finally, draw the string again
         near_call FAR_draw_target_string
         queue_sfx_pulse1 sfx_select_cursor
@@ -433,13 +469,15 @@ fail_to_add:
 .endproc
 
 .proc FAR_delete_from_string
-StringPtr := T0
-Length := T2
+StringPtr := R0
+AttrPtr := R2
+Length := R4
 
 CurrentWidgetIndex := R20
 
 widget_target_string_low := widgets_data2
 widget_target_string_high := widgets_data3
+widget_target_string_length := widgets_data7
 
         ; First, check the string length. If it is already 0, buzz and fail.
         ldy CurrentWidgetIndex
@@ -447,14 +485,16 @@ widget_target_string_high := widgets_data3
         sta StringPtr+0
         lda widget_target_string_high, y
         sta StringPtr+1
-        jsr FIXED_strlen
+        mov16 AttrPtr, StringPtr
+        add16b AttrPtr, {widget_target_string_length, y}
+        jsr _player_strlen
         lda Length
         beq fail_to_add
         ; Remove the glyph at the end of the pointed-at string, replacing it with a $0 byte
         lda #0
         ldy Length
         dey
-        sta (StringPtr), y
+        sta (AttrPtr), y
         ; finally, draw the string again
         near_call FAR_draw_target_string
         queue_sfx_pulse1 sfx_select_cursor
@@ -604,13 +644,15 @@ perform_deletion:
 .endproc
 
 .proc FAR_accept_string
-StringPtr := T0
-Length := T2
+StringPtr := R0
+AttrPtr := R2
+Length := R4
 
 CurrentWidgetIndex := R20
 
 widget_target_string_low := widgets_data2
 widget_target_string_high := widgets_data3
+widget_target_string_length := widgets_data7
         ; Sanity check: is this string nonempty?
         ; If so, buzz and fail!
         ldy CurrentWidgetIndex
@@ -618,7 +660,9 @@ widget_target_string_high := widgets_data3
         sta StringPtr+0
         lda widget_target_string_high, y
         sta StringPtr+1
-        jsr FIXED_strlen
+        mov16 AttrPtr, StringPtr
+        add16b AttrPtr, {widget_target_string_length, y}
+        jsr _player_strlen
         lda Length
         beq buzz_and_fail
         ; Otherwise, go ahead and save this file, then
