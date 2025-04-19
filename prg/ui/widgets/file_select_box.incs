@@ -41,8 +41,8 @@ SHADOW_CORNER_DARK = $10
 
 .segment "DATA_UI_LAYOUTS"
 
-new_file_str: .asciiz "- NEW FILE -"
-in_progress_str: .asciiz "RUN IN PROGRESS"
+new_file_str:    localized_color_str UI_PAL_BG1, file_select_new_file
+in_progress_str: localized_color_str UI_PAL_BG1, file_select_run_in_progress
 
 .segment "CODE_UI_WIDGETS_1"
 
@@ -407,6 +407,7 @@ draw_existing_file:
 tile_loop:
         lda (FileNameAttrPtr), y
         beq done_drawing_filename
+        ora #UI_PAL_BG1
         sta (AttributeAddr), y
         lda (FileNameTilePtr), y
         sta (NametableAddr), y
@@ -429,11 +430,7 @@ no_run_in_progress:
         jmp done_with_second_row
 run_in_progress:
         st16 StringPtr, in_progress_str
-        lda #CHR_BANK_0_FONT_MARSHMALLOW
-        sta TileBase
-        lda #UI_PAL_BG1
-        sta PaletteIndex
-        jsr FIXED_draw_string
+        far_call FAR_draw_ui_string
 done_with_second_row:
 
         ; This file exists! Oh boy. Let's work out the colors then
@@ -466,11 +463,7 @@ done_with_second_row:
 
 draw_new_file:
         st16 StringPtr, new_file_str
-        lda #CHR_BANK_0_FONT_MARSHMALLOW
-        sta TileBase
-        lda #UI_PAL_BG1
-        sta PaletteIndex
-        jsr FIXED_draw_string
+        far_call FAR_draw_ui_string
 
         ; new files won't display a player sprite, so just move it offscreen
         ldy CurrentWidgetIndex

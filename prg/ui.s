@@ -524,15 +524,19 @@ LocalizePreserveBank := UiStringScratch+6
 LineStartTileAddr := UiStringScratch+8
 LineStartAttrAddr := UiStringScratch+10
 
+        ; Default our font and color to something sensible
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta CurrentAttr
+attribute_set_converge:
+
+        lda #0
+        sta CurrentPage
+
         ; Preserve our starting position; this is useful
         ; primarily for newline processing
         mov16 LineStartTileAddr, NametableAddr
         mov16 LineStartAttrAddr, AttributeAddr
 
-        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
-        sta CurrentAttr
-        lda #0
-        sta CurrentPage
 loop:
         perform_zpcm_inc
         ldy #0
@@ -562,6 +566,21 @@ process_command:
 end_of_string:
         perform_zpcm_inc
         rts        
+.endproc
+
+; For the few times when we need to default the color
+; to something other than MM+White, programmatically, use this!
+.proc FAR_draw_colored_ui_string
+PaletteIndex := T7
+CurrentAttr := UiStringScratch+3
+        lda PaletteIndex
+        ; We still default to ascii as the font, since localized
+        ; strings expect this and will break otherwise.
+        and #%11000001
+        ora #FONT_ASCII
+        sta CurrentAttr
+
+        jmp FAR_draw_ui_string::attribute_set_converge
 .endproc
 
 ; NOTE: All string processing commands may assume that Y=0 on entry.

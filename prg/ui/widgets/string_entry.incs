@@ -16,9 +16,8 @@
 .scope widget_string_entry
 
 .segment "DATA_UI_LAYOUTS"
-
-string_entry_del_str: .asciiz "Delete"
-string_entry_accept_str: .asciiz "Accept"
+string_entry_del_str:    localized_str string_entry_delete_button
+string_entry_accept_str: localized_str string_entry_accept_button
 
 .segment "CODE_UI_WIDGETS_1"
 
@@ -99,7 +98,6 @@ highlight_converge:
 NametableAddr := T0
 AttributeAddr := T2
 StringPtr := T4
-TileBase := T6
 PaletteIndex := T7
 
 PageTablePtr := R2
@@ -114,11 +112,8 @@ widget_current_page := widgets_data4
 widget_grid_pos_x   := widgets_data5
 widget_grid_pos_y   := widgets_data6
 
-        ; Common setup for all string drawing to follow
-        lda #CHR_BANK_0_FONT_MARSHMALLOW
-        sta TileBase
-
-        ; Draw the current page name
+        ; Draw the current page name. This is non-translated (one of a few remaining holdouts)
+        ; because the page table *itself* is picked based on the target language, and so should
 
         ; If we are at the cursor position, then highlight this string
         ldy CurrentWidgetIndex
@@ -153,7 +148,7 @@ page_name_highlight_converge:
         sta StringPtr+1
         st16 NametableAddr, ($5000 + (PAGE_NAME_ROW * 32) + BUTTONS_LEFT_TILE)
         st16 AttributeAddr, ($5800 + (PAGE_NAME_ROW * 32) + BUTTONS_LEFT_TILE)
-        jsr FIXED_draw_string
+        far_call FAR_draw_colored_ui_string
         ; Draw the delete string
 
         ; If we are at the cursor position, then highlight this string
@@ -175,7 +170,7 @@ delete_highlight_converge:
         st16 StringPtr, string_entry_del_str
         st16 NametableAddr, ($5000 + (DEL_ROW * 32) + BUTTONS_LEFT_TILE)
         st16 AttributeAddr, ($5800 + (DEL_ROW * 32) + BUTTONS_LEFT_TILE)
-        jsr FIXED_draw_string
+        far_call FAR_draw_colored_ui_string
 
         ; If we are at the cursor position, then highlight this string
         ldy CurrentWidgetIndex
@@ -196,7 +191,7 @@ accept_highlight_converge:
         st16 StringPtr, string_entry_accept_str
         st16 NametableAddr, ($5000 + (CONFIRM_ROW * 32) + BUTTONS_LEFT_TILE)
         st16 AttributeAddr, ($5800 + (CONFIRM_ROW * 32) + BUTTONS_LEFT_TILE)
-        jsr FIXED_draw_string
+        far_call FAR_draw_colored_ui_string
         rts
 .endproc
 

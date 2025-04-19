@@ -12,7 +12,13 @@ name_entry_ui_layout:
 
 name_entry_str: localized_str name_entry_header
 
-english_upper_str: .asciiz "UPPER"
+; The table names are not externally localized since they are already language
+; specific, but they ARE command-string aware, so they can access different fonts.
+
+; The tables themselves include the target font page after the set of glyphs. This 
+; somewhat unusual order is to facilitate older grid-navigation code that was written
+; before the decision to localize.
+english_upper_str: .byte "UPPER", D_CLOSE
 letter_grid_english_upper:
         .byte 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'
         .byte 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'
@@ -20,8 +26,11 @@ letter_grid_english_upper:
         .byte 'Y', 'Z', ' ', '0', '1', '2', '3', '4'
         .byte '.', ',', '-', '5', '6', '7', '8', '9'
         .byte '+', '_', '/', '^', '&', '*', '(', ')'
+        .repeat 48
+        .byte FONT_ASCII
+        .endrepeat
 
-english_lower_str: .asciiz "lower"
+english_lower_str: .byte "lower", D_CLOSE
 letter_grid_english_lower:
         .byte 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'
         .byte 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'
@@ -29,6 +38,9 @@ letter_grid_english_lower:
         .byte 'y', 'z', '?', '!', '@', '#', '$', '%'
         .byte '`', '~', '*', '=', '\', '|', '[', ']'
         .byte '<', '>', '{', '}', $3B, ':', $22, $27
+        .repeat 48
+        .byte FONT_ASCII
+        .endrepeat
 
 english_page_table:
         .addr english_upper_str, letter_grid_english_upper

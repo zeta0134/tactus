@@ -292,7 +292,6 @@ def gather_translated_strings(languages):
         ui_strings["options_coming_soon_placeholder"]  = _("options_coming_soon_placeholder")
         ui_strings["options_silly_tcrf_shoutout"]      = _("options_silly_tcrf_shoutout")
 
-        # YOU WERE HERE
         ui_strings["file_select_header"]                      = _("file_select_header")
         ui_strings["file_select_msg_erase_which"]             = _("file_select_msg_erase_which")
         ui_strings["file_select_msg_erase_confirm"]           = _("file_select_msg_erase_confirm")
@@ -308,6 +307,12 @@ def gather_translated_strings(languages):
 
         ui_strings["file_details_start_game_button"] = _("file_details_start_game_button")
         ui_strings["file_details_options_button"]    = _("file_details_options_button")
+
+        ui_strings["file_select_new_file"]        = _("file_select_new_file")
+        ui_strings["file_select_run_in_progress"] = _("file_select_run_in_progress")
+
+        ui_strings["string_entry_delete_button"] = _("string_entry_delete_button")
+        ui_strings["string_entry_accept_button"] = _("string_entry_accept_button")
 
         for k in ui_strings:
             (message, length) = massage_string(ui_strings[k])
