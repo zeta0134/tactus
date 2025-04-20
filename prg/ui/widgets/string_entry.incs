@@ -1,9 +1,9 @@
 ; These are fixed on the screen, and I'm not going to waste effort
 ; trying to make them relocatable. Deal.
-.macro widget_string_entry page_table, destination_str
+.macro widget_string_entry destination_str
         .addr widget_string_entry::FAR_widget_string_entry_init
         .byte <.bank(widget_string_entry::FAR_widget_string_entry_init)
-        .addr page_table
+        .addr $0000 ; will self-populate with the page table
         .addr destination_str
         .byte 0, 0, 0, PLAYER_NAME_FIELD_LENGTH ; which we may want to configure?
         ; the string entry thing comes with its own cursor
@@ -38,6 +38,7 @@ NametableAddr := R2
 AttributeAddr := R4
 RowCounter := R6
 ColCounter := R7
+AttrPtr := R8
 TOP_LEFT_NAMETABLE  = $5000 + (NAME_ENTRY_TOP_TILE * 32) + NAME_ENTRY_LEFT_TILE
 TOP_LEFT_ATTRIBUTE = TOP_LEFT_NAMETABLE + $800
 
@@ -45,6 +46,9 @@ CurrentWidgetIndex := R20
 
 widget_grid_pos_x   := widgets_data5
 widget_grid_pos_y   := widgets_data6
+
+        mov16 AttrPtr, PagePtr
+        add16b AttrPtr, #48
 
         ldx CurrentWidgetIndex
 
@@ -72,11 +76,18 @@ col_loop:
         cmp widget_grid_pos_y, x
         bne no_highlight
 highlight:
-        lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG1)
+        lda #UI_PAL_BG1
         jmp highlight_converge
 no_highlight:
-        lda #(CHR_BANK_0_FONT_MARSHMALLOW | UI_PAL_BG0)
+        lda #UI_PAL_BG0
 highlight_converge:
+        ldy ColCounter
+        ora (AttrPtr), y
+        pha ; preserve
+        lda ColCounter
+        asl
+        tay
+        pla ; restore
         sta (AttributeAddr), y
         inc ColCounter
         lda ColCounter
@@ -85,6 +96,7 @@ highlight_converge:
         add16b NametableAddr, #64
         add16b AttributeAddr, #64
         add16b PagePtr, #8
+        add16b AttrPtr, #8
         inc RowCounter
         lda RowCounter
         cmp #6
@@ -94,7 +106,6 @@ highlight_converge:
 .endproc
 
 .proc FAR_draw_controls
-; FIXED_draw_string
 NametableAddr := T0
 AttributeAddr := T2
 StringPtr := T4
@@ -298,7 +309,6 @@ loop:
 .endproc
 
 .proc FAR_draw_target_string
-; FIXED_draw_string
 NametableAddr := R0
 AttributeAddr := R2
 StringPtr := R4
@@ -392,6 +402,9 @@ Length := R4
 PagePtr := R6
 PageTablePtr := R8
 
+GlyphOffset := R10
+FontOffset  := R11
+
 CurrentWidgetIndex := R20
 
 widget_page_table_low := widgets_data0
@@ -441,14 +454,20 @@ widget_target_string_length := widgets_data7
         asl ; x8
         clc
         adc widget_grid_pos_x, y
-        tay
+        sta GlyphOffset
+        clc
+        adc #48
+        sta FontOffset
         ;; grab the new glyph byte, and store it at "Length" which we computed before
+        ldy GlyphOffset
         lda (PagePtr), y
         ldy Length
         sta (StringPtr), y
         ;; TODO: figure out how we're going to store the attribute byte and store that here
         ;; for now, assume FONT_ASCII
-        lda #FONT_ASCII
+        ldy FontOffset
+        lda (PagePtr), y
+        ldy Length
         sta (AttrPtr), y
         ; follow this up with a $0 byte in the original string, to ensure it remains null-terminated
         iny
@@ -691,6 +710,16 @@ widget_grid_pos_y   := widgets_data6
         lda #0
         sta widget_grid_pos_x, y
         sta widget_grid_pos_y, y
+
+        ; Pick the page table address based on the current global language
+        ; (this is often in the context of a brand new file)
+        lda current_block + SaveBlock::GlobalOptionLanguage
+        asl
+        tax
+        lda page_tables_by_language+0, x
+        sta widget_page_table_low, y
+        lda page_tables_by_language+1, x
+        sta widget_page_table_high, y
 
         near_call FAR_draw_current_page
         near_call FAR_draw_controls

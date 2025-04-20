@@ -314,6 +314,12 @@ def gather_translated_strings(languages):
         ui_strings["string_entry_delete_button"] = _("string_entry_delete_button")
         ui_strings["string_entry_accept_button"] = _("string_entry_accept_button")
 
+        ui_strings["string_entry_english_uppercase"]         = _("string_entry_english_uppercase")
+        ui_strings["string_entry_english_lowercase"]         = _("string_entry_english_lowercase")
+        ui_strings["string_entry_sitelen_pona_pu_1"]         = _("string_entry_sitelen_pona_pu_1")
+        ui_strings["string_entry_sitelen_pona_pu_2"]         = _("string_entry_sitelen_pona_pu_2")
+        ui_strings["string_entry_sitelen_pona_pu_3_ku_misc"] = _("string_entry_sitelen_pona_pu_3_ku_misc")
+
         for k in ui_strings:
             (message, length) = massage_string(ui_strings[k])
             if k not in language_strings:

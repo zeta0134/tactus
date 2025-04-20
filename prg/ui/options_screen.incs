@@ -70,7 +70,7 @@ options_sublayout_compatibility_tweaks_page_1:
 options_sublayout_debug_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_debug_str, 2, 13
-        widget_text_options debug_language_str, debug_language_options, {current_save + SaveFile::OptionLanguage },      4, 15
+        widget_text_options debug_language_str, debug_language_options, {current_block + SaveBlock::GlobalOptionLanguage },      4, 15
 
         widget_text_label debug_localized_label, 4, 17
         widget_text_label debug_silly_str, 2, 24
@@ -1032,7 +1032,7 @@ play_silent_track:
 CurrentWidgetIndex := R20
 widget_previous_language_id := widgets_data0
         ldy CurrentWidgetIndex
-        lda current_save + SaveFile::OptionLanguage
+        lda current_block + SaveBlock::GlobalOptionLanguage
         sta widget_previous_language_id, y
         set_widget_state_y FAR_apply_language_selection_controller_update
         rts
@@ -1044,7 +1044,7 @@ widget_previous_language_id := widgets_data0
         ; If the language setting hasn't been tickled, then there is nothing to do
         ldy CurrentWidgetIndex
         lda widget_previous_language_id, y
-        cmp current_save + SaveFile::OptionLanguage
+        cmp current_block + SaveBlock::GlobalOptionLanguage
         bne reload_this_layout
         rts
 reload_this_layout:

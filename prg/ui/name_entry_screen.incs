@@ -7,7 +7,7 @@
 name_entry_ui_layout:
         widget_controller FAR_name_entry_controller_init
         widget_text_label name_entry_str, 11, 3
-        widget_string_entry english_page_table, (current_save + SaveFile::PlayerNameTiles)
+        widget_string_entry (current_save + SaveFile::PlayerNameTiles)
         .addr $0000 ; end of list
 
 name_entry_str: localized_str name_entry_header
@@ -18,7 +18,7 @@ name_entry_str: localized_str name_entry_header
 ; The tables themselves include the target font page after the set of glyphs. This 
 ; somewhat unusual order is to facilitate older grid-navigation code that was written
 ; before the decision to localize.
-english_upper_str: .byte "UPPER", D_CLOSE
+english_upper_str: localized_str string_entry_english_uppercase
 letter_grid_english_upper:
         .byte 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'
         .byte 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'
@@ -30,7 +30,7 @@ letter_grid_english_upper:
         .byte FONT_ASCII
         .endrepeat
 
-english_lower_str: .byte "lower", D_CLOSE
+english_lower_str: localized_str string_entry_english_lowercase
 letter_grid_english_lower:
         .byte 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'
         .byte 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p'
@@ -42,10 +42,64 @@ letter_grid_english_lower:
         .byte FONT_ASCII
         .endrepeat
 
+sitelen_pona_pu_1_str: localized_str string_entry_sitelen_pona_pu_1
+letter_grid_sitelen_pona_pu_1:
+        .byte    _A,   _AKESI,  _ALA, _ALASA,  _ALE,   _ANPA,  _ANTE,    _ANU
+        .byte _AWEN,       _E,   _EN,  _ESUN,  _IJO,    _IKE,   _ILO,   _INSA
+        .byte _JAKI,     _JAN, _JELO,    _JO, _KALA, _KALAMA,  _KAMA,   _KASI
+        .byte  _KEN, _KEPEKEN, _KILI, _KIWEN,   _KO,    _KON,  _KULE, _KULUPU
+        .byte _KUTE,      _LA, _LAPE,  _LASO, _LAWA,    _LEN,  _LETE,     _LI
+        .byte _LILI,   _LINJA, _LIPU,  _LOJE,  _LON,   _LUKA, _LUKIN,   _LUPA
+        .repeat 48
+        .byte FONT_SITELEN_PONA
+        .endrepeat
+
+sitelen_pona_pu_2_str: localized_str string_entry_sitelen_pona_pu_2
+letter_grid_sitelen_pona_pu_2:
+        .byte     _MA, _MAMA,   _MANI,   _MELI,   _MI,  _MIJE,  _MOKU,   _MOLI
+        .byte  _MONSI,   _MU,    _MUN,   _MUSI, _MUTE, _NANPA,  _NASA,  _NASIN
+        .byte   _NENA,   _NI,   _NIMI,   _NOKA,    _O,  _OLIN,   _ONA,   _OPEN
+        .byte _PAKALA, _PALI, _PALISA,    _PAN, _PANA,    _PI, _PILIN, _PIMEJA
+        .byte   _PINI, _PIPI,   _POKA,   _POKI, _PONA,    _PU,  _SAMA,   _SELI
+        .byte   _SELO, _SEME,   _SEWI, _SIJELO, _SIKE,   _SIN,  _SINA, _SINPIN
+        .repeat 48
+        .byte FONT_SITELEN_PONA
+        .endrepeat
+
+sitelen_pona_pu_3_ku_misc_str: localized_str string_entry_sitelen_pona_pu_3_ku_misc
+letter_grid_sitelen_pona_pu_3_ku_misc:
+        .byte _SITELEN,      _SONA,         _SOWELI,           _SULI,       _SUNO,    _SUPA,       _SUWI,        _TAN
+        .byte    _TASO,      _TAWA,           _TELO,          _TENPO,       _TOKI,    _TOMO,         _TU,       _UNPA
+        .byte     _UTA,     _UTALA,           _WALO,            _WAN,       _WASO,    _WAWA,       _WEKA,       _WILE
+        .byte  _NAMAKO,       _KIN,            _OKO,         _KIPISI,       _LEKO, _MONSUTA,      _TONSI,     _JASIMA
+        .byte    _SOKO,      _MESO,          _EPIKU,       _KOKOSILA,     _LANPAN,       _N,   _MISIKEKE,     _MAJUNA
+        .byte  _KIJETE, _SANTAKALU, _POKI_NIMI_OPEN, _POKI_NIMI_PINI, _MIDDLE_DOT,   _COLON, _QUOTE_OPEN, _QUOTE_PINI
+        .repeat 48
+        .byte FONT_SITELEN_PONA
+        .endrepeat
+
 english_page_table:
         .addr english_upper_str, letter_grid_english_upper
         .addr english_lower_str, letter_grid_english_lower
         .addr $0000
+
+toki_pona_sitelen_lasina_page_table:
+        .addr english_upper_str, letter_grid_english_upper
+        .addr english_lower_str, letter_grid_english_lower
+        .addr $0000
+
+toki_pona_sitelen_pona_page_table:
+        .addr sitelen_pona_pu_1_str, letter_grid_sitelen_pona_pu_1
+        .addr sitelen_pona_pu_2_str, letter_grid_sitelen_pona_pu_2
+        .addr sitelen_pona_pu_3_ku_misc_str, letter_grid_sitelen_pona_pu_3_ku_misc
+        .addr english_upper_str, letter_grid_english_upper
+        .addr english_lower_str, letter_grid_english_lower
+        .addr $0000
+
+page_tables_by_language:
+        .addr english_page_table                    ; LANGUAGE_ID_ENGLISH                  = 0
+        .addr toki_pona_sitelen_lasina_page_table   ; LANGUAGE_ID_TOKI_PONA_SITELEN_LASINA = 1
+        .addr toki_pona_sitelen_pona_page_table     ; LANGUAGE_ID_TOKI_PONA_SITELEN_PONA   = 2
 
 ; TODO: give this its own separate palette data
 name_entry_pal_default_base:    .incbin "../art/palettes/options/base.pal"

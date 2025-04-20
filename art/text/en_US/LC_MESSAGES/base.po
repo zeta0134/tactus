@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-04-15 11:07-0400\n"
-"PO-Revision-Date: 2025-04-19 14:28+0000\n"
+"PO-Revision-Date: 2025-04-19 20:04+0000\n"
 "Last-Translator: Zeta <zeta0134@reploid.cafe>\n"
 "Language-Team: English <http://weblate.reploid.cafe/projects/tactus/items/en/"
 ">\n"
@@ -465,3 +465,18 @@ msgstr "- NEW FILE -"
 
 msgid "string_entry_accept_button"
 msgstr "Accept"
+
+msgid "string_entry_english_uppercase"
+msgstr "UPPER "
+
+msgid "string_entry_english_lowercase"
+msgstr "lower "
+
+msgid "string_entry_sitelen_pona_pu_3_ku_misc"
+msgstr "TP.SP3"
+
+msgid "string_entry_sitelen_pona_pu_2"
+msgstr "TP.SP2"
+
+msgid "string_entry_sitelen_pona_pu_1"
+msgstr "TP.SP1"

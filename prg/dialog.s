@@ -654,7 +654,7 @@ NewStrTableBank := R2
         ; Use the table to read the string pointer out of the
         ; target bank (constraint: which shares the bank with the actual
         ; data, this in theory shouldn't be an issue ever)
-        lda current_save + SaveFile::OptionLanguage
+        lda current_block + SaveBlock::GlobalOptionLanguage
         asl
         tay
         lda (NewStrTablePtr), y

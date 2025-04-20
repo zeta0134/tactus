@@ -356,7 +356,6 @@ player_palette_by_file_id:
         .byte SPRITE_PAL_0, SPRITE_PAL_2, SPRITE_PAL_3
 
 .proc FAR_draw_file_contents
-; FIXED_draw_string
 NametableAddr := T0
 AttributeAddr := T2
 TileX := T4

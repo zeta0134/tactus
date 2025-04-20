@@ -41,8 +41,7 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     OptionColorEmphasis .byte
     OptionSfxMode .byte
     OptionMusicMode .byte
-    OptionLanguage .byte
-    OptionsReserved .byte 5 ; pad out to 16 bytes total
+    OptionsReserved .byte 6 ; pad out to 16 bytes total
     ; FUTURE
     GeneralReserved .byte 24
     ; CURRENT RUN STATE (that which persists, anyway) (current: 31 bytes)
@@ -122,18 +121,19 @@ OPTION_MUSIC_ENABLED  = 0
 OPTION_MUSIC_CLICK    = 1
 OPTION_MUSIC_DISABLED = 2
 
-; 
+; TOOD: move console-level compatibility flags into this structure
 .struct SaveBlock
     SaveSlot1 .byte .sizeof(SaveFile)
     SaveSlot2 .byte .sizeof(SaveFile)
     SaveSlot3 .byte .sizeof(SaveFile)
     ; BASICS
-    GameSeed .byte 4         ; Must be nonzero!
-    GenerationalIndex .dword ; ignored for active, used during save/load
-    Nonce .dword             ; might as well; helps to detect save file corruption
-    SaveVersion .byte        ; if we change saves in a byte incompatible way, increment this version
-    LastUsedSlot .byte       ; which save slot was used most recently. range: 0-2
-    Checksum .word           ; the sum of all save bytes must match this
+    GameSeed .byte 4           ; Must be nonzero!
+    GenerationalIndex .dword   ; ignored for active, used during save/load
+    Nonce .dword               ; might as well; helps to detect save file corruption
+    SaveVersion .byte          ; if we change saves in a byte incompatible way, increment this version
+    LastUsedSlot .byte         ; which save slot was used most recently. range: 0-2
+    GlobalOptionLanguage .byte ; the currently selected language
+    Checksum .word             ; the sum of all save bytes must match this
 .endstruct
 
 BLOCK_VALID = 0

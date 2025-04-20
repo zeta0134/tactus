@@ -122,6 +122,10 @@ sitelen_pona_pu["󱥵"] = "_WAWA"
 sitelen_pona_pu["󱥶"] = "_WEKA"
 sitelen_pona_pu["󱥷"] = "_WILE"
 
+sitelen_pona_pu["󱦐"] = "_POKI_NIMI_OPEN"
+sitelen_pona_pu["󱦑"] = "_POKI_NIMI_PINI"
+sitelen_pona_pu["󱦝"] = "_COLON"
+
 sitelen_pona_ku = {}
 sitelen_pona_ku["󱥸"] = ["D_EXT_CHAR", "_NAMAKO"]
 sitelen_pona_ku["󱥹"] = ["D_EXT_CHAR", "_KIN"]
@@ -139,6 +143,7 @@ sitelen_pona_ku["󱦅"] = ["D_EXT_CHAR", "_LANPAN"]
 sitelen_pona_ku["󱦆"] = ["D_EXT_CHAR", "_N"]
 sitelen_pona_ku["󱦇"] = ["D_EXT_CHAR", "_MISIKEKE"]
 sitelen_pona_ku["󱦢"] = ["D_EXT_CHAR", "_MAJUNA"]
+
 
 sitelen_pona_kijete_santakalu = {}
 sitelen_pona_kijete_santakalu["󱦀"] = ["D_EXT_CHAR", "_KIJETE", "D_EXT_CHAR", "_SANTAKALU"]

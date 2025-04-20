@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-04-16 13:32+0000\n"
-"Last-Translator: Zeta <zeta0134@reploid.cafe>\n"
+"PO-Revision-Date: 2025-04-20 02:39+0000\n"
+"Last-Translator: Weblate Admin <zeta0134@reploid.cafe>\n"
 "Language-Team: Toki Pona <http://weblate.reploid.cafe/projects/tactus/items/"
 "tok/>\n"
 "Language: tok\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Weblate 5.10.4\n"
+"X-Generator: Weblate 5.11\n"
 
 #: all.py:9
 msgid "no_item_description"
@@ -60,3 +60,253 @@ msgid "flail_description"
 msgstr ""
 "pakala e leko poka.\n"
 "awen e tawa, a!"
+
+msgid "string_entry_english_uppercase"
+msgstr "LASINA "
+
+msgid "string_entry_english_lowercase"
+msgstr "lasina "
+
+msgid "string_entry_sitelen_pona_pu_3_ku_misc"
+msgstr "s.pona3"
+
+msgid "string_entry_sitelen_pona_pu_2"
+msgstr "s.pona2"
+
+msgid "string_entry_sitelen_pona_pu_1"
+msgstr "s.pona1"
+
+msgid "ui_option_disabled"
+msgstr "pini"
+
+msgid "ui_option_enabled"
+msgstr "ken"
+
+msgid "hello_world"
+msgstr "toki a, jan ale o!"
+
+msgid "file_select_msg_erase_which"
+msgstr "o ala e seme?"
+
+msgid "file_select_msg_copy_source_select"
+msgstr "o tu e seme? "
+
+msgid "file_details_welcome_string"
+msgstr "toki a, jan [PLAYER_NAME] o!"
+
+msgid "file_select_msg_erase_confirm"
+msgstr "ala e ni?    "
+
+msgid "file_select_msg_copy_destination_select"
+msgstr "lon seme?    "
+
+msgid "file_select_msg_copy_confirm"
+msgstr "pakala e ni? "
+
+msgid "file_details_options_button"
+msgstr " ante nasin"
+
+msgid "string_entry_delete_button"
+msgstr "o ala"
+
+msgid "file_select_run_in_progress"
+msgstr "tenpo ni la: musi li tawa"
+
+msgid "name_entry_header"
+msgstr "toki a, jan seme?"
+
+msgid "file_select_copy_file_button"
+msgstr "o tu e lipu musi"
+
+msgid "file_select_erase_file_button"
+msgstr "o ala e lipu musi"
+
+msgid "file_details_start_game_button"
+msgstr " o open e musi a!"
+
+msgid "options_disco_floor_frozen_squares"
+msgstr "leko ale lete"
+
+msgid "options_game_mode_doubletime"
+msgstr "tenpo wawa"
+
+msgid "options_game_mode_patient"
+msgstr "awen e jan"
+
+msgid "options_player_palette_face"
+msgstr "selo: "
+
+msgid "options_player_palette_preset_passion"
+msgstr "kasi sitelen lape"
+
+msgid "string_entry_accept_button"
+msgstr "pona!"
+
+msgid "file_select_new_file"
+msgstr "- lipu musi sin -"
+
+msgid "options_player_palette_preset_protea"
+msgstr "kasi suwi ante"
+
+msgid "options_player_palette_preset_petunia"
+msgstr "kasi pilin utala"
+
+msgid "options_player_palette_preset_personalized"
+msgstr "nasa pi wile mi"
+
+msgid "options_player_palette_preset_label"
+msgstr "kule jan: "
+
+msgid "options_player_palette_header"
+msgstr "lipu jan"
+
+msgid "ui_option_on"
+msgstr "ken"
+
+msgid "options_minimap_theme_dark_grey"
+msgstr "pimeja"
+
+msgid "options_minimap_theme_label"
+msgstr "lipu nasin lili: "
+
+msgid "options_disco_floor_just_groovement"
+msgstr "tawa lili"
+
+msgid "options_disco_floor_frozen_outlines"
+msgstr "leko selo lete"
+
+msgid "options_disco_floor_instant_outlines"
+msgstr "leko selo ante"
+
+msgid "options_disco_floor_instant_squares"
+msgstr "leko ale ante"
+
+msgid "options_disco_floor_label"
+msgstr "lukin supa: "
+
+msgid "options_game_mode_standard"
+msgstr "tenpo meso"
+
+msgid "options_game_mode_label"
+msgstr "tawa musi: "
+
+msgid "options_player_palette_shoes"
+msgstr "ilo kute: "
+
+msgid "options_player_palette_outfit"
+msgstr "len lape: "
+
+msgid "options_player_palette_preset_periwinkle"
+msgstr "kasi jan pona"
+
+msgid "options_player_palette_preset_peony"
+msgstr "kasi olin suli"
+
+msgid "ui_option_off"
+msgstr "pini"
+
+msgid "file_select_header"
+msgstr "sina jan seme"
+
+msgid "options_ppu_type_automatic"
+msgstr "kepeken wawa nasa"
+
+msgid "options_colorspace_protan_deuteran"
+msgstr "loje sama laso kasi"
+
+msgid "options_colorspace_default"
+msgstr "lon"
+
+msgid "options_minimap_theme_light_grey"
+msgstr "walo"
+
+msgid "options_minimap_theme_dark_blue"
+msgstr "laso pimeja"
+
+msgid "options_minimap_theme_dark_yellow"
+msgstr "jelo pimeja"
+
+msgid "options_rhythm_assistance_header"
+msgstr "o suno tenpo e..."
+
+msgid "options_flash_separator_label"
+msgstr "linja tu: "
+
+msgid "options_flash_player_label"
+msgstr "sina    : "
+
+msgid "options_color_emphasis_label"
+msgstr "kule suno: "
+
+msgid "options_ppu_type_rgb"
+msgstr "RGB (2C03,2C05)"
+
+msgid "options_ppu_type_composite"
+msgstr "COMPOSITE (2C02,2C07)"
+
+msgid "options_ppu_type_label"
+msgstr "ilo PPU: "
+
+msgid "options_colorspace_monochrome_grey"
+msgstr "pimeja walo"
+
+msgid "options_colorspace_monochrome_green"
+msgstr "laso mute"
+
+msgid "options_colorspace_tritan"
+msgstr "laso sama jelo"
+
+msgid "options_colorspace_label"
+msgstr "ma kule: "
+
+msgid "options_minimap_theme_light_red"
+msgstr "loje walo"
+
+msgid "options_minimap_theme_light_blue"
+msgstr "laso walo"
+
+msgid "options_minimap_theme_light_yellow"
+msgstr "jelo walo"
+
+msgid "options_minimap_theme_dark_red"
+msgstr "loje pimeja"
+
+msgid "options_coming_soon_placeholder"
+msgstr "... tenpo kama lili, a!"
+
+msgid "options_tab_header_compatibility"
+msgstr "lipu pi ilo mute"
+
+msgid "options_tab_header_input"
+msgstr "lipu lawa"
+
+msgid "options_tab_header_gameplay"
+msgstr "lipu musi"
+
+msgid "options_tab_header_world_palette"
+msgstr "lipu pi kule ma"
+
+msgid "options_music_mode_metronome"
+msgstr "ilo pi tenpo musi"
+
+msgid "options_soundfx_mode_label"
+msgstr "o kute e kalama: "
+
+msgid "options_music_mode_label"
+msgstr "o kute e musi  : "
+
+msgid "options_silly_tcrf_shoutout"
+msgstr ""
+"toki a, kulupu Tcrf.net o!\n"
+"sina li alasa e ante nasin\n"
+"len mi. tawa pona a! sina\n"
+"wile e telo wawa anu seme?"
+
+msgid "options_tab_header_debug"
+msgstr "lipu pi pipi ala"
+
+msgid "options_tab_header_audio"
+msgstr "lipu kute"
+
+msgid "options_disco_floor_no_motion"
+msgstr "tawa ala"

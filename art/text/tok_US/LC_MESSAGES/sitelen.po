@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-04-16 13:32+0000\n"
-"Last-Translator: Zeta <zeta0134@reploid.cafe>\n"
+"PO-Revision-Date: 2025-04-20 02:42+0000\n"
+"Last-Translator: Weblate Admin <zeta0134@reploid.cafe>\n"
 "Language-Team: Toki Pona (Sitelen Pona) <http://weblate.reploid.cafe/"
 "projects/tactus/items/tok_sp/>\n"
 "Language: tok_sp\n"
@@ -9,7 +9,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.10.4\n"
+"X-Generator: Weblate 5.11\n"
 
 #: all.py:9
 msgid "no_item_description"
@@ -58,3 +58,253 @@ msgid "flail_description"
 msgstr ""
 "󱥈󱤉󱥼󱥒\n"
 "󱤈󱤉󱥩󱤀"
+
+msgid "string_entry_english_uppercase"
+msgstr "LASINA"
+
+msgid "string_entry_english_lowercase"
+msgstr "lasina"
+
+msgid "string_entry_sitelen_pona_pu_3_ku_misc"
+msgstr "󱥠󱥔󱤽3󱦀"
+
+msgid "string_entry_sitelen_pona_pu_2"
+msgstr "󱥠󱥔󱤽2  "
+
+msgid "string_entry_sitelen_pona_pu_1"
+msgstr "󱥠󱥔󱤽1  "
+
+msgid "ui_option_disabled"
+msgstr "󱥐"
+
+msgid "ui_option_enabled"
+msgstr "󱤘"
+
+msgid "hello_world"
+msgstr "󱥬󱤀󱤑󱤄󱥄"
+
+msgid "file_select_header"
+msgstr "󱥞󱤑󱥙         "
+
+msgid "file_select_msg_copy_source_select"
+msgstr "󱥄󱥮󱤉󱤪󱥙       "
+
+msgid "file_select_msg_erase_which"
+msgstr "󱥄󱤂󱤉󱤪󱥙       "
+
+msgid "file_select_msg_erase_confirm"
+msgstr "󱥄󱤂󱤉󱤪󱥁󱤇󱥙    "
+
+msgid "file_select_msg_copy_confirm"
+msgstr "󱥄󱥈󱤉󱤪󱥁󱤇󱥙     "
+
+msgid "file_select_msg_copy_destination_select"
+msgstr "󱤬󱥙          "
+
+msgid "file_details_options_button"
+msgstr " 󱤆󱤿"
+
+msgid "file_select_run_in_progress"
+msgstr "󱥫󱥁󱤡󱤻󱤧󱥩"
+
+msgid "name_entry_header"
+msgstr "󱥬󱤀 󱤑󱦐󱥙󱦑"
+
+msgid "file_select_copy_file_button"
+msgstr "󱥄󱥮󱤉󱤪󱤻"
+
+msgid "file_select_erase_file_button"
+msgstr "󱥄󱤂󱤉󱤪󱤻"
+
+msgid "file_details_welcome_string"
+msgstr "󱥬󱤀󱤑 󱦐[PLAYER_NAME]󱦑󱥄"
+
+msgid "file_details_start_game_button"
+msgstr " 󱥄󱥇󱤉󱤻󱤀"
+
+msgid "options_disco_floor_frozen_squares"
+msgstr "󱥼󱤄󱤦"
+
+msgid "options_game_mode_doubletime"
+msgstr "󱥫󱥵"
+
+msgid "options_game_mode_patient"
+msgstr "󱤈󱤉󱤑"
+
+msgid "options_player_palette_face"
+msgstr "󱥘󱦝         "
+
+msgid "options_player_palette_preset_protea"
+msgstr "󱤗󱥦󱤆"
+
+msgid "options_player_palette_preset_petunia"
+msgstr "󱤗󱥎󱥱"
+
+msgid "options_player_palette_preset_personalized"
+msgstr "󱤾󱥍󱥷󱤴"
+
+msgid "options_player_palette_preset_passion"
+msgstr "󱤗󱥠󱤢"
+
+msgid "string_entry_accept_button"
+msgstr "󱥂󱤧󱥔"
+
+msgid "file_select_new_file"
+msgstr "- 󱤪󱤻󱥝 -"
+
+msgid "options_player_palette_preset_label"
+msgstr "󱤞󱤑󱦝 "
+
+msgid "options_player_palette_header"
+msgstr "󱤪󱤑"
+
+msgid "ui_option_on"
+msgstr "󱤘"
+
+msgid "options_minimap_theme_dark_grey"
+msgstr "󱥏"
+
+msgid "options_minimap_theme_label"
+msgstr "󱤞󱥍󱤪󱤿󱤨󱦝 "
+
+msgid "options_disco_floor_just_groovement"
+msgstr "󱥩󱤨"
+
+msgid "string_entry_delete_button"
+msgstr "󱥄󱤂󱤉󱥠󱥐"
+
+msgid "options_disco_floor_frozen_outlines"
+msgstr "󱥼󱥘󱤦"
+
+msgid "options_disco_floor_instant_outlines"
+msgstr "󱥼󱥘󱤆"
+
+msgid "options_disco_floor_instant_squares"
+msgstr "󱥼󱤄󱤆"
+
+msgid "options_disco_floor_label"
+msgstr "󱤮󱥥󱦝 "
+
+msgid "options_game_mode_standard"
+msgstr "󱥫󱦂"
+
+msgid "options_game_mode_label"
+msgstr "󱥩󱤻󱦝 "
+
+msgid "options_player_palette_shoes"
+msgstr "󱤌󱤠󱦝        "
+
+msgid "options_player_palette_outfit"
+msgstr "󱤥󱤢󱦝        "
+
+msgid "options_player_palette_preset_periwinkle"
+msgstr "󱤗󱤑󱥔"
+
+msgid "options_player_palette_preset_peony"
+msgstr "󱤗󱥅󱥣"
+
+msgid "ui_option_off"
+msgstr "󱥐"
+
+msgid "options_ppu_type_automatic"
+msgstr "󱤙󱥵󱤾"
+
+msgid "options_colorspace_protan_deuteran"
+msgstr "󱥺󱤧󱥈󱤉󱥁󱦝 󱤫󱥖󱤣󱤗"
+
+msgid "options_colorspace_default"
+msgstr "󱤬"
+
+msgid "options_minimap_theme_light_grey"
+msgstr "󱥲"
+
+msgid "options_minimap_theme_dark_blue"
+msgstr "󱤣󱥏"
+
+msgid "options_minimap_theme_dark_yellow"
+msgstr "󱤒󱥏"
+
+msgid "options_flash_player_label"
+msgstr "󱥄󱥤󱥫󱤉󱥞 󱦝"
+
+msgid "options_rhythm_assistance_header"
+msgstr "󱤎󱥔󱤉󱥫󱤻"
+
+msgid "options_flash_separator_label"
+msgstr "󱥄󱥤󱥫󱤉󱤩󱥮󱦝"
+
+msgid "options_color_emphasis_label"
+msgstr "󱤞󱥤󱦝 "
+
+msgid "options_ppu_type_rgb"
+msgstr "RGB (2C03,2C05)"
+
+msgid "options_ppu_type_composite"
+msgstr "COMPOSITE (2C02,2C07)"
+
+msgid "options_ppu_type_label"
+msgstr "󱤎󱦐PPU󱦑󱦝 "
+
+msgid "options_colorspace_monochrome_grey"
+msgstr "󱥏󱥲"
+
+msgid "options_colorspace_monochrome_green"
+msgstr "󱤣󱤼"
+
+msgid "options_colorspace_tritan"
+msgstr "󱥺󱤧󱥈󱤉󱥁󱦝 󱤣󱥚󱥖󱤒"
+
+msgid "options_colorspace_label"
+msgstr "󱤰󱤞 󱦝 "
+
+msgid "options_minimap_theme_light_red"
+msgstr "󱤫󱥲"
+
+msgid "options_minimap_theme_light_blue"
+msgstr "󱤣󱥲"
+
+msgid "options_minimap_theme_light_yellow"
+msgstr "󱤒󱥲"
+
+msgid "options_minimap_theme_dark_red"
+msgstr "󱤫󱥏"
+
+msgid "options_coming_soon_placeholder"
+msgstr "...󱥫󱤖󱤨󱤀 󱦀"
+
+msgid "options_tab_header_compatibility"
+msgstr "󱤪󱥍󱤎󱤼"
+
+msgid "options_tab_header_input"
+msgstr "󱤪󱤤"
+
+msgid "options_tab_header_gameplay"
+msgstr "󱤪󱤻"
+
+msgid "options_tab_header_world_palette"
+msgstr "󱤪󱥍󱤞󱤰"
+
+msgid "options_music_mode_metronome"
+msgstr "󱤎󱥍󱥫󱤻"
+
+msgid "options_soundfx_mode_label"
+msgstr "󱥄󱤠󱤉󱤕󱦝 "
+
+msgid "options_silly_tcrf_shoutout"
+msgstr ""
+"󱥬󱤀󱤟󱦐tcrf.net󱦑󱥄\n"
+"󱥞󱤧󱤃󱤉󱤆󱤿󱤥󱤴\n"
+"󱤖󱥔󱤀\n"
+"󱥞󱥷󱤉󱥪󱥵󱤇󱥙"
+
+msgid "options_tab_header_debug"
+msgstr "󱤪󱥍󱥑󱤂"
+
+msgid "options_tab_header_audio"
+msgstr "󱤪󱤠"
+
+msgid "options_music_mode_label"
+msgstr "󱥄󱤠󱤉󱤻󱦝 "
+
+msgid "options_disco_floor_no_motion"
+msgstr "󱥩󱤂"
