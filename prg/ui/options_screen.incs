@@ -23,56 +23,56 @@ options_sublayout_palette_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_controller FAR_options_color_preview_controller_init
         widget_text_label player_options_str, 2, 13
-        widget_text_options player_palette_preset_str, player_palette_preset_types, {current_save + SaveFile::PlayerPalettePreset}, 4, 15
-        widget_numeric_slider player_palette_outfit_str, 15, 52, {current_save + SaveFile::PlayerPalettePajamasIndex}, 4, 17
-        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePajamasIndex}, 11, 17
-        widget_numeric_slider player_palette_shoes_str,  15, 52, {current_save + SaveFile::PlayerPalettePhonesIndex},  4, 18
-        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePhonesIndex},  11, 18
-        widget_numeric_slider player_palette_face_str,   15, 52, {current_save + SaveFile::PlayerPalettePigmentIndex}, 4, 19
-        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePigmentIndex}, 11, 19
+        widget_text_options player_palette_preset_str, player_palette_preset_types, {current_save + SaveFile::PlayerPalettePreset}, 3, 15
+        widget_numeric_slider player_palette_outfit_str, 15, 52, {current_save + SaveFile::PlayerPalettePajamasIndex}, 3, 17
+        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePajamasIndex}, 27, 17
+        widget_numeric_slider player_palette_shoes_str,  15, 52, {current_save + SaveFile::PlayerPalettePhonesIndex},  3, 18
+        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePhonesIndex},  27, 18
+        widget_numeric_slider player_palette_face_str,   15, 52, {current_save + SaveFile::PlayerPalettePigmentIndex}, 3, 19
+        widget_numeric_viewer {current_save + SaveFile::PlayerPalettePigmentIndex}, 27, 19
         widget_controller FAR_apply_fancy_color_shenanigans
         .addr $0000 ; end of list
 options_sublayout_palette_page_2:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label palette_page_2_str, 2, 13
-        widget_text_options colorspace_options_str, colorspace_options, {current_save + SaveFile::OptionColorspace  },      4, 15
-        widget_text_options minimap_flavor_str,     minimap_themes,     {current_save + SaveFile::OptionMinimapTheme},      4, 16
+        widget_text_options colorspace_options_str, colorspace_options, {current_save + SaveFile::OptionColorspace  },      3, 15
+        widget_text_options minimap_flavor_str,     minimap_themes,     {current_save + SaveFile::OptionMinimapTheme},      3, 16
         widget_controller FAR_apply_colormap_shenanigans
         .addr $0000 ; end of list
 options_sublayout_gameplay_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_gameplay_str, 2, 13
-        widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode  },      4, 15
-        widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor  },      4, 16
+        widget_text_options game_mode_str,      game_mode_types,      {current_save + SaveFile::OptionRhythmMode  },      3, 15
+        widget_text_options disco_floor_str,    disco_types,          {current_save + SaveFile::OptionDiscoFloor  },      3, 16
         widget_text_label rhythm_assist_str, 2, 18
-        widget_text_options flash_separator_str,  flash_separator_options, {current_save + SaveFile::OptionRhythmFlashBar   },  4, 20
-        widget_text_options flash_player_str,     flash_player_options,    {current_save + SaveFile::OptionRhythmFlashPlayer},  4, 21
+        widget_text_options flash_separator_str,  flash_separator_options, {current_save + SaveFile::OptionRhythmFlashBar   },  3, 20
+        widget_text_options flash_player_str,     flash_player_options,    {current_save + SaveFile::OptionRhythmFlashPlayer},  3, 21
         .addr $0000 ; end of list
 options_sublayout_input_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_input_str, 2, 13
-        widget_text_label coming_soon_str, 4, 15
+        widget_text_label coming_soon_str, 3, 15
         .addr $0000 ; end of list
 options_sublayout_audio_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_audio_str, 2, 13
-        widget_text_options sfx_mode_str, sfx_mode_options, {current_save + SaveFile::OptionSfxMode  },   4, 15
-        widget_text_options bgm_mode_str, bgm_mode_options, {current_save + SaveFile::OptionMusicMode  }, 4, 16
+        widget_text_options sfx_mode_str, sfx_mode_options, {current_save + SaveFile::OptionSfxMode  },   3, 15
+        widget_text_options bgm_mode_str, bgm_mode_options, {current_save + SaveFile::OptionMusicMode  }, 3, 16
         widget_controller FAR_options_page_refresh_music_controller
         .addr $0000 ; end of list
 options_sublayout_compatibility_tweaks_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_compatibility_str, 2, 13
-        widget_text_options pputype_str,      pputype_options,      {current_save + SaveFile::OptionPpuType      },      4, 15
-        widget_text_options ppuemphasis_str,  emphasis_options,     {current_save + SaveFile::OptionColorEmphasis},      4, 16
+        widget_text_options pputype_str,      pputype_options,      {current_save + SaveFile::OptionPpuType      },      3, 15
+        widget_text_options ppuemphasis_str,  emphasis_options,     {current_save + SaveFile::OptionColorEmphasis},      3, 16
         widget_controller FAR_apply_colormap_shenanigans
         .addr $0000 ; end of list
 options_sublayout_debug_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_debug_str, 2, 13
-        widget_text_options debug_language_str, debug_language_options, {current_block + SaveBlock::GlobalOptionLanguage },      4, 15
+        widget_text_options debug_language_str, debug_language_options, {current_block + SaveBlock::GlobalOptionLanguage },      3, 15
 
-        widget_text_label debug_localized_label, 4, 17
+        widget_text_label debug_localized_label, 3, 17
         widget_text_label debug_silly_str, 2, 24
         widget_controller FAR_apply_language_selection_controller_init
         .addr $0000 ; end of list
@@ -497,7 +497,7 @@ widget_color_bottom_metasprite_index := widgets_data1
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
         lda #$FF
         sta sprite_table + MetaSpriteState::LifetimeBeats, x
-        lda #113
+        lda #215
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #128
         sta sprite_table + MetaSpriteState::PositionY, x
@@ -514,7 +514,7 @@ widget_color_bottom_metasprite_index := widgets_data1
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
         lda #$FF
         sta sprite_table + MetaSpriteState::LifetimeBeats, x
-        lda #113
+        lda #215
         sta sprite_table + MetaSpriteState::PositionX, x
         lda #144
         sta sprite_table + MetaSpriteState::PositionY, x

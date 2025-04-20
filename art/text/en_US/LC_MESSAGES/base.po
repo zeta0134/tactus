@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-04-15 11:07-0400\n"
-"PO-Revision-Date: 2025-04-19 20:04+0000\n"
-"Last-Translator: Zeta <zeta0134@reploid.cafe>\n"
+"PO-Revision-Date: 2025-04-20 13:51+0000\n"
+"Last-Translator: Weblate Admin <zeta0134@reploid.cafe>\n"
 "Language-Team: English <http://weblate.reploid.cafe/projects/tactus/items/en/"
 ">\n"
 "Language: en\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Generator: Weblate 5.10.4\n"
+"X-Generator: Weblate 5.11\n"
 "Generated-By: Babel 2.15.0\n"
 
 #: all.py:8
@@ -262,7 +262,7 @@ msgid "options_player_palette_preset_passion"
 msgstr "PASSION"
 
 msgid "options_player_palette_face"
-msgstr "Pigment    "
+msgstr "Pigment  "
 
 msgid "options_game_mode_patient"
 msgstr "PATIENT"
@@ -283,10 +283,10 @@ msgid "options_player_palette_preset_periwinkle"
 msgstr "PERIWINKLE"
 
 msgid "options_player_palette_outfit"
-msgstr "Pajamas    "
+msgstr "Pajamas  "
 
 msgid "options_player_palette_shoes"
-msgstr "Phones     "
+msgstr "Phones   "
 
 msgid "options_game_mode_label"
 msgstr "Rhythm  "
@@ -308,9 +308,6 @@ msgstr "FROZEN OUTLINES"
 
 msgid "options_disco_floor_just_groovement"
 msgstr "JUST GROOVEMENT"
-
-msgid "NO MOTION"
-msgstr "options_disco_floor_no_motion"
 
 msgid "options_minimap_theme_label"
 msgstr "Minimap    "
@@ -480,3 +477,6 @@ msgstr "TP.SP2"
 
 msgid "string_entry_sitelen_pona_pu_1"
 msgstr "TP.SP1"
+
+msgid "options_disco_floor_no_motion"
+msgstr "NO MOTION"

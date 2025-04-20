@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-04-20 02:42+0000\n"
+"PO-Revision-Date: 2025-04-20 13:52+0000\n"
 "Last-Translator: Weblate Admin <zeta0134@reploid.cafe>\n"
 "Language-Team: Toki Pona (Sitelen Pona) <http://weblate.reploid.cafe/"
 "projects/tactus/items/tok_sp/>\n"
@@ -132,7 +132,7 @@ msgid "options_game_mode_patient"
 msgstr "󱤈󱤉󱤑"
 
 msgid "options_player_palette_face"
-msgstr "󱥘󱦝         "
+msgstr "󱥘󱦝     "
 
 msgid "options_player_palette_preset_protea"
 msgstr "󱤗󱥦󱤆"
@@ -192,10 +192,10 @@ msgid "options_game_mode_label"
 msgstr "󱥩󱤻󱦝 "
 
 msgid "options_player_palette_shoes"
-msgstr "󱤌󱤠󱦝        "
+msgstr "󱤌󱤠󱦝    "
 
 msgid "options_player_palette_outfit"
-msgstr "󱤥󱤢󱦝        "
+msgstr "󱤥󱤢󱦝    "
 
 msgid "options_player_palette_preset_periwinkle"
 msgstr "󱤗󱤑󱥔"

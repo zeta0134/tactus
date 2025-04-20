@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-04-20 02:39+0000\n"
+"PO-Revision-Date: 2025-04-20 13:52+0000\n"
 "Last-Translator: Weblate Admin <zeta0134@reploid.cafe>\n"
 "Language-Team: Toki Pona <http://weblate.reploid.cafe/projects/tactus/items/"
 "tok/>\n"
@@ -62,10 +62,10 @@ msgstr ""
 "awen e tawa, a!"
 
 msgid "string_entry_english_uppercase"
-msgstr "LASINA "
+msgstr "LASINA"
 
 msgid "string_entry_english_lowercase"
-msgstr "lasina "
+msgstr "lasina"
 
 msgid "string_entry_sitelen_pona_pu_3_ku_misc"
 msgstr "s.pona3"
@@ -95,7 +95,7 @@ msgid "file_details_welcome_string"
 msgstr "toki a, jan [PLAYER_NAME] o!"
 
 msgid "file_select_msg_erase_confirm"
-msgstr "ala e ni?    "
+msgstr "o ala e ni?  "
 
 msgid "file_select_msg_copy_destination_select"
 msgstr "lon seme?    "
@@ -113,16 +113,16 @@ msgid "file_select_run_in_progress"
 msgstr "tenpo ni la: musi li tawa"
 
 msgid "name_entry_header"
-msgstr "toki a, jan seme?"
+msgstr "jan seme?"
 
 msgid "file_select_copy_file_button"
-msgstr "o tu e lipu musi"
+msgstr "o tu e lipu"
 
 msgid "file_select_erase_file_button"
-msgstr "o ala e lipu musi"
+msgstr "o ala e lipu"
 
 msgid "file_details_start_game_button"
-msgstr " o open e musi a!"
+msgstr " o open e musi!"
 
 msgid "options_disco_floor_frozen_squares"
 msgstr "leko ale lete"
@@ -134,7 +134,7 @@ msgid "options_game_mode_patient"
 msgstr "awen e jan"
 
 msgid "options_player_palette_face"
-msgstr "selo: "
+msgstr "selo:    "
 
 msgid "options_player_palette_preset_passion"
 msgstr "kasi sitelen lape"
@@ -143,7 +143,7 @@ msgid "string_entry_accept_button"
 msgstr "pona!"
 
 msgid "file_select_new_file"
-msgstr "- lipu musi sin -"
+msgstr "lipu musi sin"
 
 msgid "options_player_palette_preset_protea"
 msgstr "kasi suwi ante"
@@ -191,10 +191,10 @@ msgid "options_game_mode_label"
 msgstr "tawa musi: "
 
 msgid "options_player_palette_shoes"
-msgstr "ilo kute: "
+msgstr "ilo kute:"
 
 msgid "options_player_palette_outfit"
-msgstr "len lape: "
+msgstr "len lape:"
 
 msgid "options_player_palette_preset_periwinkle"
 msgstr "kasi jan pona"
@@ -242,7 +242,7 @@ msgid "options_ppu_type_rgb"
 msgstr "RGB (2C03,2C05)"
 
 msgid "options_ppu_type_composite"
-msgstr "COMPOSITE (2C02,2C07)"
+msgstr "RCA (2C02,2C07)"
 
 msgid "options_ppu_type_label"
 msgstr "ilo PPU: "
@@ -290,10 +290,10 @@ msgid "options_music_mode_metronome"
 msgstr "ilo pi tenpo musi"
 
 msgid "options_soundfx_mode_label"
-msgstr "o kute e kalama: "
+msgstr "kalama: "
 
 msgid "options_music_mode_label"
-msgstr "o kute e musi  : "
+msgstr "musi  : "
 
 msgid "options_silly_tcrf_shoutout"
 msgstr ""
