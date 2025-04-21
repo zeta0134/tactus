@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-04-20 13:52+0000\n"
+"PO-Revision-Date: 2025-04-21 12:01+0000\n"
 "Last-Translator: Weblate Admin <zeta0134@reploid.cafe>\n"
 "Language-Team: Toki Pona <http://weblate.reploid.cafe/projects/tactus/items/"
 "tok/>\n"
@@ -310,3 +310,157 @@ msgstr "lipu kute"
 
 msgid "options_disco_floor_no_motion"
 msgstr "tawa ala"
+
+msgid "heart_container_name"
+msgstr "POKI PILIN"
+
+msgid "go_go_boots_description"
+msgstr ""
+"o luka sin e nena tawa ni:\n"
+"sina tawa lon leko tu."
+
+msgid "go_go_boots_name"
+msgstr "LEN NOKA PI TAWA TAWA"
+
+msgid "large_fries_name"
+msgstr "KILI MA SULI"
+
+msgid "heart_armor_description"
+msgstr "pilin ni la: kipisi e pakala."
+
+msgid "chain_link_description"
+msgstr "awen e tenpo moli linja +2."
+
+msgid "basic_torch_name"
+msgstr "PALISA SUNO"
+
+msgid "compass_name"
+msgstr "ILO ALASA"
+
+msgid "compass_description"
+msgstr ""
+"alasa e tomo mani, e tomo\n"
+"utala, e tomo lupa weka."
+
+msgid "small_fries_name"
+msgstr "KILI MA LILI"
+
+msgid "basic_torch_description"
+msgstr "pana e weka suno +1."
+
+msgid "large_torch_name"
+msgstr "PALISA SUNO SULI"
+
+msgid "large_torch_description"
+msgstr "pana e weka suno +4."
+
+msgid "map_name"
+msgstr "LIPU NASIN"
+
+msgid "gold_sack_description"
+msgstr "mani mute li pona ale, a!"
+
+msgid "heart_container_description"
+msgstr "pana e pilin lili sewi +4."
+
+msgid "spell_life_name"
+msgstr "LIPU NASA MISIKEKE"
+
+msgid "aloha_tshirt_description"
+msgstr ""
+"kipisi e pakala -1. jan esun\n"
+"li wile e mani suli!"
+
+msgid "aloha_tshirt_name"
+msgstr "LEN SIJELO MUSI"
+
+msgid "bombs_description"
+msgstr ""
+"o luka li nena B, li nena +.\n"
+"pakala lon leko 3."
+
+msgid "bombs_name"
+msgstr "SIKE WAWA"
+
+msgid "spell_air_description"
+msgstr "wawa sewi e tomo ale, a!"
+
+msgid "spell_air_name"
+msgstr "LIPU NASA KON"
+
+msgid "spell_bomb_fiesta_description"
+msgstr ""
+"ona li musi suli tawa\n"
+"tomo ale, a!"
+
+msgid "spell_bomb_fiesta_name"
+msgstr "MUSI PI SIKE WAWA"
+
+msgid "spell_earth_description"
+msgstr ""
+"kama sin e tomo tawa\n"
+"ma kasi."
+
+msgid "spell_earth_name"
+msgstr "LIPU NASA MA"
+
+msgid "spell_fire_description"
+msgstr "seli e tomo ale, a!"
+
+msgid "spell_fire_name"
+msgstr "LIPU NASA SELI"
+
+msgid "spell_ice_description"
+msgstr "lete e tomo ale, a!"
+
+msgid "spell_ice_name"
+msgstr "LIPU NASA LETE"
+
+msgid "spell_life_description"
+msgstr ""
+"pana e pilin ale. ona li\n"
+"pilin uta e kili suwi, a!"
+
+msgid "temporary_heart_name"
+msgstr "PILIN NAMAKO"
+
+msgid "temporary_heart_description"
+msgstr ""
+"pana e pilin pi \n"
+"tenpo lili +4."
+
+msgid "heart_armor_name"
+msgstr "AWEN PILIN"
+
+msgid "defensive_shield_description"
+msgstr "kipisi e pakala -2."
+
+msgid "chain_link_name"
+msgstr "LINJA KIWEN"
+
+msgid "gold_sack_name"
+msgstr "POKI MANI"
+
+msgid "small_fries_description"
+msgstr ""
+"pana e pilin lili +4.\n"
+"... ona wile e namako."
+
+msgid "medium_fries_name"
+msgstr "KILI MA MESO"
+
+msgid "large_fries_description"
+msgstr ""
+"pana e pilin ale.\n"
+"moku pona!"
+
+msgid "map_description"
+msgstr "sona e nasin lon supa ni."
+
+msgid "medium_fries_description"
+msgstr ""
+"pana e pilin lili +8.\n"
+"ona en ko moku li wan pona."
+
+msgid "defensive_shield_name"
+msgstr "ILO AWEN LIPU"

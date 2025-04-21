@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-04-20 13:52+0000\n"
+"PO-Revision-Date: 2025-04-21 12:07+0000\n"
 "Last-Translator: Weblate Admin <zeta0134@reploid.cafe>\n"
 "Language-Team: Toki Pona (Sitelen Pona) <http://weblate.reploid.cafe/"
 "projects/tactus/items/tok_sp/>\n"
@@ -308,3 +308,149 @@ msgstr "󱥄󱤠󱤉󱤻󱦝 "
 
 msgid "options_disco_floor_no_motion"
 msgstr "󱥩󱤂"
+
+msgid "defensive_shield_description"
+msgstr "󱥻󱤉󱥈 -2"
+
+msgid "go_go_boots_description"
+msgstr ""
+"󱥄󱤭󱥝󱤉󱥀󱥩󱥁\n"
+"󱥞󱥩󱤬󱥼󱥮"
+
+msgid "go_go_boots_name"
+msgstr "󱤥󱥃󱥍󱥩󱥩"
+
+msgid "heart_armor_name"
+msgstr "󱤈󱥎"
+
+msgid "heart_container_name"
+msgstr "󱥓󱥎"
+
+msgid "spell_life_name"
+msgstr "󱤪󱤾󱦇"
+
+msgid "temporary_heart_name"
+msgstr "󱥎󱥸"
+
+msgid "gold_sack_name"
+msgstr "󱥓󱤲"
+
+msgid "compass_description"
+msgstr "󱤃󱤉󱥭󱤲󱤉󱥭󱥱󱤉󱥭󱤯󱥶"
+
+msgid "large_fries_name"
+msgstr "󱤚󱤰󱥣"
+
+msgid "basic_torch_name"
+msgstr "󱥊󱥤"
+
+msgid "compass_name"
+msgstr "󱤎󱤃"
+
+msgid "medium_fries_name"
+msgstr "󱤚󱤰󱦂"
+
+msgid "small_fries_description"
+msgstr ""
+"󱥌󱤉󱥎󱤨+4\n"
+"... 󱥆󱥷󱤉󱥸"
+
+msgid "small_fries_name"
+msgstr "󱤚󱤰󱤨"
+
+msgid "large_torch_description"
+msgstr "󱥌󱤉󱥶󱥤 +4"
+
+msgid "chain_link_description"
+msgstr "󱤈󱤉󱥫󱤷󱤩 +2"
+
+msgid "map_description"
+msgstr "󱥡󱤉󱤿󱤬󱥥󱥁"
+
+msgid "large_torch_name"
+msgstr "󱥊󱥤󱥣"
+
+msgid "medium_fries_description"
+msgstr ""
+"󱥌󱤉󱥎󱤨 +8\n"
+"󱥆󱤊󱤜󱤶󱤧󱥳󱥔"
+
+msgid "map_name"
+msgstr "󱤪󱤿"
+
+msgid "basic_torch_description"
+msgstr "󱥌󱤉󱥶󱥤 +1"
+
+msgid "temporary_heart_description"
+msgstr "󱥌󱤉󱥎󱥍󱥫󱤨 +4"
+
+msgid "heart_armor_description"
+msgstr "󱥎󱥁󱤡󱥻󱤉󱥈"
+
+msgid "large_fries_description"
+msgstr ""
+"󱥌󱤉󱥎󱤄\n"
+"󱤶󱥔󱤀"
+
+msgid "heart_container_description"
+msgstr "󱥌󱤉󱥎󱤨󱥚 +4"
+
+msgid "gold_sack_description"
+msgstr "󱤲󱤼󱤧󱥔󱤄󱤀"
+
+msgid "defensive_shield_name"
+msgstr "󱤎󱤈󱤪"
+
+msgid "spell_earth_name"
+msgstr "󱤪󱤾󱤰"
+
+msgid "aloha_tshirt_description"
+msgstr ""
+"󱥻󱤉󱥈 -1\n"
+"󱤑󱤋󱤧󱥷󱤲󱥣󱤀"
+
+msgid "aloha_tshirt_name"
+msgstr "󱤥󱥛󱤻"
+
+msgid "bombs_description"
+msgstr ""
+"󱥄󱤭󱤧󱥀󱦐B󱦑󱤧󱥀󱦐+󱦑\n"
+"󱥈󱤬󱥼3"
+
+msgid "bombs_name"
+msgstr "󱥜󱥵"
+
+msgid "chain_link_name"
+msgstr "󱤩󱤛"
+
+msgid "spell_air_description"
+msgstr "󱥵󱥚󱤉󱥭󱤄󱤀"
+
+msgid "spell_air_name"
+msgstr "󱤪󱤾󱤝"
+
+msgid "spell_bomb_fiesta_description"
+msgstr "󱥆󱤧󱤻󱥣󱥩󱥭󱤄󱤀"
+
+msgid "spell_bomb_fiesta_name"
+msgstr "󱤻󱥍󱥜󱥵"
+
+msgid "spell_earth_description"
+msgstr "󱤖󱥝󱤉󱥭󱥩󱤰󱤗"
+
+msgid "spell_fire_description"
+msgstr "󱥗󱤉󱥭󱤄󱤀"
+
+msgid "spell_fire_name"
+msgstr "󱤪󱤾󱥗"
+
+msgid "spell_ice_description"
+msgstr "󱤦󱤉󱥭󱤄󱤀"
+
+msgid "spell_ice_name"
+msgstr "󱤪󱤾󱤦"
+
+msgid "spell_life_description"
+msgstr ""
+"󱥌󱤉󱥎󱤄\n"
+"󱥆󱤧󱥎󱥰󱤉󱤚󱥦󱤀"
