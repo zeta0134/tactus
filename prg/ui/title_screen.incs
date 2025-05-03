@@ -151,24 +151,27 @@ widget_selected_splash := widgets_data0
         lda player_palettes_pajamas+PLAYER_PALETTE_TITLE_BASE
         sec
         sbc #$20
-        sta TargetPlayfieldBgPal0+0
+        sta HudBgPal0+0
+        sta HudObjPal0+0
         sta PlayfieldObjPal0+0
         lda player_palettes_pajamas+PLAYER_PALETTE_TITLE_BASE
         sec
         sbc #$10
-        sta TargetPlayfieldBgPal0+1
+        sta HudBgPal0+1
+        sta HudObjPal0+1
         sta PlayfieldObjPal0+1
         lda player_palettes_pajamas+PLAYER_PALETTE_TITLE_BASE
-        sta TargetPlayfieldBgPal0+2
+        sta HudBgPal0+2
+        sta HudObjPal0+2
         sta PlayfieldObjPal0+2
 
         lda player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
         sec
         sbc #$10
-        sta TargetPlayfieldBgPal1+0
+        sta HudBgPal1+0
         sta PlayfieldObjPal1+0
         lda player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
-        sta TargetPlayfieldBgPal1+1
+        sta HudBgPal1+1
         sta PlayfieldObjPal1+1
 
         ; Spear only needs white here, all others use phones+1
@@ -180,35 +183,35 @@ use_sword_flail_phones_color:
         lda player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
         clc
         adc #$10
-        sta TargetPlayfieldBgPal1+2
+        sta HudBgPal1+2
         sta PlayfieldObjPal1+2
         jmp done_picking_phones_color
 use_spear_phones_color:
         lda #$50
-        sta TargetPlayfieldBgPal1+2
+        sta HudBgPal1+2
         sta PlayfieldObjPal1+2
 done_picking_phones_color:
 
         lda player_palettes_pigment+PLAYER_PALETTE_TITLE_BASE
         sec
         sbc #$10
-        sta TargetPlayfieldBgPal2+0
+        sta HudBgPal2+0
         sta PlayfieldObjPal2+0
         lda player_palettes_pigment+PLAYER_PALETTE_TITLE_BASE
-        sta TargetPlayfieldBgPal2+1
+        sta HudBgPal2+1
         sta PlayfieldObjPal2+1
         lda #$50
-        sta TargetPlayfieldBgPal2+2
+        sta HudBgPal2+2
         sta PlayfieldObjPal2+2
 
         lda #$20
-        sta TargetPlayfieldBgPal3+0
+        sta HudBgPal3+0
         sta PlayfieldObjPal3+0
         lda #$30
-        sta TargetPlayfieldBgPal3+1
+        sta HudBgPal3+1
         sta PlayfieldObjPal3+1
         lda #$50
-        sta TargetPlayfieldBgPal3+2
+        sta HudBgPal3+2
         sta PlayfieldObjPal3+2
 
         ; The sword only uses a funny palette for one of the bg layers,
@@ -218,13 +221,13 @@ done_picking_phones_color:
         cmp #SPLASH_VARIANT_SWORD
         bne done_with_sword_variant
         lda player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
-        sta TargetPlayfieldBgPal2+0
+        sta HudBgPal2+0
         lda player_palettes_phones+PLAYER_PALETTE_TITLE_BASE
         clc
         adc #$10
-        sta TargetPlayfieldBgPal2+1
+        sta HudBgPal2+1
         lda #$20
-        sta TargetPlayfieldBgPal2+2
+        sta HudBgPal2+2
 done_with_sword_variant:
 
         far_call FAR_set_bg_current_palette_from_target
@@ -384,13 +387,24 @@ widget_selected_splash := widgets_data0
         ldx CurrentWidgetIndex
         sta widget_selected_splash, x
         
-        ; The titlescreen does use extended nametables now, so get those going
+        ; The titlescreen alone uses 4k CHR banking, which has lots of irritating implications.
+        ; Get those set up now
+        lda #(CHR_CHIP_ROM | CHR_MODE_4)
+        sta MAP_CHR_CONTROL
+
+        ; The titlescreen text uses extended attributes, but not extended banks
         lda #0
         sta LeftNametableBank
         sta RightNametableBank
-        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_AT)
         sta LeftNametableAttr
         sta RightNametableAttr
+
+        ; Note that the palette swap will turn extended attributes back on once we're done with the titlescreen
+        ; bit, after which only sprites will be using the CHR banks.
+
+        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_TITLE, #0
+        set_raster_playback_speed #1, #0
 
         ; The title screen alone uses 8x8 mode, set that up here
         lda #(VBLANK_NMI | BG_1000 | OBJ_0000 | NT_2000)

@@ -272,6 +272,11 @@ LayoutPtr := R0
         ; clear FPGA RAM
         jsr clear_fpga_ram
 
+        ; Most UI screens use standard 512-byte banking windows, exceptions will switch
+        ; modes in widget logic
+        lda #(CHR_CHIP_ROM | CHR_MODE_4)
+        sta MAP_CHR_CONTROL
+
         ; set up our usual extended attributes, which is necessary to properly
         ; display fonts
         lda #0
@@ -520,6 +525,10 @@ LayoutPtr := R0
 
         far_call FAR_init_torchlight
         far_call FAR_init_coins
+
+        ; During gameplay, we want our CHR ROM accessible in little tiny 512b chunks:
+        lda #(CHR_CHIP_ROM | CHR_MODE_4)
+        sta MAP_CHR_CONTROL
 
         ; the game screen uses ExAttr for palette access, so set that up here
         ; we'll start on the left nametable

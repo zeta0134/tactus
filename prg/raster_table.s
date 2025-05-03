@@ -698,16 +698,16 @@ done_picking_routine:
         lda #0
         sta HudSplitScrollX
         sta HudNametable
-        lda #70
+        lda #96
         sta HudSplitScrollY
-        lda #((((70 & $F8) << 2) | (0 >> 3)) & $FF)
+        lda #((((96 & $F8) << 2) | (0 >> 3)) & $FF)
         sta HudSplitFunny2006
 
         lda #0
         sta table_ppuscroll_x, y
-        lda #70
+        lda #96
         sta table_ppuscroll_y, y
-        lda #68
+        lda #94
         sta table_scanline_compare, y
 
         lda system_type
