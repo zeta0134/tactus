@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Given a source full-screen PNG, attempt to deconstruct it to 8x8 attributes,
 # then spit out the accompanying nametable in ExRAM format. Given the matching
 # sprite overlay, attempt to deconstruct that into (for now) grid-aligned 8x8

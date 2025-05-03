@@ -174,6 +174,9 @@ nmi_soft_disable:
 
         far_call_nmi FAR_update_audio
         perform_zpcm_inc
+        
+        ; why are we running this a second time?
+        ; ... this is LOAD BEARING? Zeta why!?
         jsr update_beat_tracker
         perform_zpcm_inc
 
