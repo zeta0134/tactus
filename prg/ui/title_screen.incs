@@ -143,10 +143,10 @@ loop:
 .proc FAR_setup_title_palettes
 CurrentWidgetIndex := R20
 widget_selected_splash := widgets_data0
-        ; Later this needs to become a HUD split, and we'll need to do something about the
-        ; title area up top.
+        ; Both palette sections use the same backdrop color of solid black
         lda #$00
         sta TargetPlayfieldBackdrop
+        sta HudBackdrop
 
         lda player_palettes_pajamas+PLAYER_PALETTE_TITLE_BASE
         sec
@@ -229,6 +229,26 @@ done_picking_phones_color:
         lda #$20
         sta HudBgPal2+2
 done_with_sword_variant:
+
+        ; The "playfield" background controls the text palette, and for now
+        ; we'll use a fixed sortof aqua green for the text:
+        lda #$1C
+        sta TargetPlayfieldBgPal0+0
+        lda #$2B
+        sta TargetPlayfieldBgPal0+1
+        lda #$3A
+        sta TargetPlayfieldBgPal0+2
+        ; We aren't using the rest, so clear those all out to nothing
+        lda #$00
+        sta TargetPlayfieldBgPal1+0
+        sta TargetPlayfieldBgPal1+1
+        sta TargetPlayfieldBgPal1+2
+        sta TargetPlayfieldBgPal2+0
+        sta TargetPlayfieldBgPal2+1
+        sta TargetPlayfieldBgPal2+2
+        sta TargetPlayfieldBgPal3+0
+        sta TargetPlayfieldBgPal3+1
+        sta TargetPlayfieldBgPal3+2
 
         far_call FAR_set_bg_current_palette_from_target
 
