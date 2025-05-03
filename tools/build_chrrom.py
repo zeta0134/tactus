@@ -26,7 +26,6 @@ from ca65 import ca65_byte_literal, ca65_word_literal
 
 SPRITE_BANKS_BASE             = 0x000
 RAW_CHR_UI_REGION_BASE        = 0x020
-STATIC_CHR_BASE               = 0x040
 
 BACKGROUND_REGION_BASE        = 0x100
 RAW_CHR_PLAYFIELD_REGION_BASE = 0x138
@@ -574,6 +573,14 @@ with open('build/tile_defs.inc', 'w') as definitions:
   for i in range(0, len(combined_chr_ui_filenames)):
     bank_id = i + RAW_CHR_UI_REGION_BASE
     print("CHR_BANK_%s = %s" % (constant_name(combined_chr_ui_filenames[i]), ca65_byte_literal(bank_id)), file=definitions)
+  print("", file=definitions)
+
+  print("; static_chr banks", file=definitions)
+  for i in range(0, len(raw_static_chr_filenames)):
+    high_static_bank_index = math.floor(i / 32) + 1
+    low_static_bank_index = i % 32
+    bank_id = (high_static_bank_index * 0x40) + (low_static_bank_index)
+    print("STATIC_CHR_BANK_%s = %s" % (constant_name(raw_static_chr_filenames[i]), ca65_byte_literal(bank_id)), file=definitions)
   print("", file=definitions)
 
 
