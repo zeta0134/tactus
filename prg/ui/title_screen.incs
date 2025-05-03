@@ -328,8 +328,8 @@ loop:
 .proc FAR_fix_obj_chr_bank
 CurrentWidgetIndex := R20
 widget_selected_splash := widgets_data0
-widget_temp_timer      := widgets_data1
-widget_temp_frame      := widgets_data2
+widget_animation_frame := widgets_data1
+widget_animation_delay := widgets_data2
 
         ; We are setting these banks very manually, so switch these ORA variables
         ; to 0, which will effectively NOP them when run later.
@@ -368,25 +368,26 @@ done_with_obj:
 
         ; Now for the title screen, set an initial frame. We'll be switching
         ; this out with a raster effect later so don't overthink this
-        ldx CurrentWidgetIndex
+        ;ldx CurrentWidgetIndex
         lda #STATIC_CHR_BANK_TITLE_0000
-        clc
-        adc widget_temp_frame, x
+        ;clc
+        ;adc widget_animation_frame, x
         sta PlayfieldObjBanks+1
 
-        ; And update the temporary timer
-        lda widget_temp_timer, x
+        rts
+
+        dec widget_animation_delay, x
         beq advance_frame
-        dec widget_temp_timer, x
         rts
 advance_frame:
         lda #4
-        sta widget_temp_timer, x
-        lda widget_temp_frame, x
+        sta widget_animation_delay, x
+        lda widget_animation_frame, x
         clc
         adc #1
         and #$0F
-        sta widget_temp_frame, x
+        sta widget_animation_frame, x
+
         rts
 .endproc
 
@@ -410,8 +411,9 @@ title_splash_lut:
 .proc FAR_title_controller_init
 CurrentWidgetIndex := R20
 widget_selected_splash := widgets_data0
-widget_temp_timer      := widgets_data1
-widget_temp_frame      := widgets_data2
+
+widget_animation_frame := widgets_data1
+widget_animation_delay := widgets_data2
 
         jsr next_global_rand
         and #$0F
@@ -421,8 +423,9 @@ widget_temp_frame      := widgets_data2
         sta widget_selected_splash, x
 
         lda #0
-        sta widget_temp_timer, x
-        sta widget_temp_frame, x
+        sta widget_animation_frame, x
+        lda #4
+        sta widget_animation_delay, x
         
         ; The titlescreen alone uses 4k CHR banking, which has lots of irritating implications.
         ; Get those set up now
@@ -440,7 +443,10 @@ widget_temp_frame      := widgets_data2
         ; Note that the palette swap will turn extended attributes back on once we're done with the titlescreen
         ; bit, after which only sprites will be using the CHR banks.
 
-        set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_TITLE, #0
+        ;set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_TITLE, #0
+        set_raster_effect_safely #RASTER_EFFECT_TITLE_TEXT, #RASTER_FINALIZER_TITLE, #0
+        ;set_raster_effect_safely #RASTER_EFFECT_TITLE_TEXT, #RASTER_FINALIZER_NONE, #0
+        ;set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_NONE, #0
         set_raster_playback_speed #1, #0
 
         ; The title screen alone uses 8x8 mode, set that up here
@@ -472,6 +478,17 @@ widget_temp_frame      := widgets_data2
         rts
 .endproc
 
+raster_speeds_lut:
+        .word $0120
+        .word $00F0
+        .word $00E0
+        .word $00D0
+        .word $00A0
+        .word $0080
+        .word $0070
+        .word $0060
+
+
 .proc FAR_title_controller_update
 CurrentWidgetIndex := R20
         ; This is after beat counters were done, so fix all the banks
@@ -483,6 +500,16 @@ CurrentWidgetIndex := R20
         ; otherwise deterministic boot state
         jsr next_global_rand
         jsr next_gameplay_rand
+
+
+        ldx TrackedMusicPos
+        lda tracked_row_buffer, x
+        asl
+        tax
+        lda raster_speeds_lut+1, x
+        sta RasterPlaybackSpeedHigh
+        lda raster_speeds_lut+0, x
+        sta RasterPlaybackSpeedLow
 
         lda #(KEY_START | KEY_A)
         and ButtonsDown

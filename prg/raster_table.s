@@ -95,8 +95,10 @@ PpuMaskScratch: .res 1
         .include "raster/heat.incs"
 
         .segment "DATA_RASTER_0"
-
         .include "raster/warp_in.incs"
+
+        .segment "DATA_3"
+        .include "raster/flaming_text.incs"
 
         .segment "CODE_1"
 
@@ -152,6 +154,9 @@ raster_effects_list:
         .addr warp_in_frames
         .byte <.bank(warp_in_frames) ; frame table bank
         .byte 90 ; duration in frames
+        .addr flaming_text_frames
+        .byte <.bank(flaming_text_frames) ; frame table bank
+        .byte 60 ; duration in frames
 
 nametable_lut_x:
         .repeat 256, i
@@ -1554,6 +1559,48 @@ return_from_delay:
         lda IrqPreserveA ; 3
         ldx IrqPreserveX ; 3
         perform_zpcm_inc ; (6)
+        rti
+.endproc
+
+.align 256 
+; used exclusively to drive the raster effect on the title screen. here we
+; need to only swap the 4k table in $1000 with good timing
+.proc title_chr0_lo_bank_only
+        perform_zpcm_inc ; (6)
+        ; register preservation to zeropage (6)
+        sta IrqPreserveA ; 3
+        stx IrqPreserveX ; 3
+
+        ; BEFORE the end of the scanline (mostly) (3)
+        ldx RasterTableIndex     ; 3
+
+        ; first, acknowledge the IRQ and set up for the next one (12)
+        lda table_scanline_compare+1, x ; 4
+        sta MAP_PPU_IRQ_LATCH         ; 4 (set new cmp value)
+        lda MAP_PPU_IRQ_STATUS        ; 4 (acknowledge)
+
+        ; set the IRQ function to run on the NEXT scanline here (high byte only)
+        ; this also gives us a bit of margin to avoid dot 256-257 more reliably
+        lda table_irq_high+1, x     ; 4
+        sta self_modifying_irq+2    ; 3
+
+        ; TODO: if we need delay cycles, put them right here
+        ; TODO: should we have a configurable base for this effect?
+
+        ; use the x position as the CHR bank offset
+
+        lda table_ppuscroll_x, x        ; 4
+        clc                             ; 2
+        adc #STATIC_CHR_BANK_TITLE_0000 ; 2
+        sta MAP_CHR_0_LO+1              ; 4
+
+        inc RasterTableIndex ; 5
+
+        ; register restoration from zeropage (6)
+        lda IrqPreserveA ; 3
+        ldx IrqPreserveX ; 3
+        
+        perform_zpcm_inc ; 6
         rti
 .endproc
 

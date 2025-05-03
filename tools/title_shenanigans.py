@@ -35,22 +35,24 @@ def sample_background_layer(image, x, y, animation_frame):
   return (px, is_transprent)
 
 def sample_low_flame_layer(image, x, y, animation_frame):
-  target_x = in_range_x(x + animation_frame)
-  target_y = y
+  target_x = in_range_x(x + math.sin((animation_frame + x) / 16 * math.pi * 2.0) * 8)
+  target_y = in_range_y(y + math.sin((animation_frame + x) / 16 * math.pi * 2.0) * 8 - 1)
+
   px = image.getpixel((target_x, target_y + LOW_FLAME_OFFSET))
   is_transprent = (px == 0) or (px > 3)
   return (px, is_transprent)
 
 def sample_mid_flame_layer(image, x, y, animation_frame):
-  target_x = in_range_x(x - animation_frame)
-  target_y = y
+  target_x = in_range_x(x + math.sin((animation_frame + x) / 16 * math.pi * 2.0 + (math.pi * 2.0 / 3.0)) * 8)
+  target_y = in_range_y(y + math.sin((animation_frame + x) / 16 * math.pi * 2.0 + (math.pi * 2.0 / 3.0)) * 8) - 8
   px = image.getpixel((target_x, target_y + MID_FLAME_OFFSET))
   is_transprent = (px == 0) or (px > 3)
   return (px, is_transprent)
 
 def sample_high_flame_layer(image, x, y, animation_frame):
-  target_x = in_range_x(x + animation_frame)
-  target_y = y
+  target_x = in_range_x(x + math.sin((animation_frame + x) / 16 * math.pi * 2.0 + (math.pi * 4.0 / 3.0)) * 8)
+  target_y = in_range_y(y - math.sin((animation_frame + x) / 16 * math.pi * 2.0 + (math.pi * 4.0 / 3.0)) * 8)
+
   px = image.getpixel((target_x, target_y + HI_FLAME_OFFSET))
   is_transprent = (px == 0) or (px > 3)
   return (px, is_transprent)
