@@ -24,6 +24,9 @@ title_splash_nametables:
         .include "../art/title_splash/splash_sword.asm"
 .endscope
 
+title_text_nametable:
+        .incbin "../art/raw_nametables/title_text.nam"
+
 .segment "CODE_UI_LAYOUTS"
 
 ; ======================================================================
@@ -95,6 +98,41 @@ loop:
         inc NametableAddr+1
         inc AttributeAddr+1
         dex
+        bne loop
+
+        restore_previous_bank
+
+        rts
+.endproc
+
+; TODO: will this be localized? If so, we may need to load a different
+; nametable here.
+.proc FAR_display_title_text
+SourceNametable := R0
+NametableAddr := R2
+AttributeAddr := R4
+Length := R6
+        st16 SourceNametable, title_text_nametable
+        st16 NametableAddr, $5000
+        st16 AttributeAddr, $5800
+        st16 Length, (32*12)
+
+        access_data_bank #<.bank(title_splash_nametables)
+
+perform_copy:
+        ldy #0
+loop:
+        lda (SourceNametable), y
+        sta (NametableAddr), y
+        lda #0
+        sta (AttributeAddr), y
+        
+        inc16 SourceNametable
+        inc16 NametableAddr
+        inc16 AttributeAddr
+        dec16 Length
+        lda Length+0
+        ora Length+1
         bne loop
 
         restore_previous_bank
@@ -360,6 +398,7 @@ widget_selected_splash := widgets_data0
 
         far_call FAR_compute_player_colors
         near_call FAR_display_title_splash
+        near_call FAR_display_title_text
         near_call FAR_setup_title_palettes
         near_call FAR_draw_title_sprites
         near_call FAR_fix_obj_chr_bank

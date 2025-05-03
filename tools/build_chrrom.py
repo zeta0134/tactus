@@ -26,6 +26,7 @@ from ca65 import ca65_byte_literal, ca65_word_literal
 
 SPRITE_BANKS_BASE             = 0x000
 RAW_CHR_UI_REGION_BASE        = 0x020
+STATIC_CHR_BASE               = 0x040
 
 BACKGROUND_REGION_BASE        = 0x100
 RAW_CHR_PLAYFIELD_REGION_BASE = 0x138
@@ -432,7 +433,12 @@ def ui_chr_bank_base_address(bank_id):
 def sprite_bank_base_address(bank_id):
   return (SPRITE_BANKS_BASE * 2048) + (bank_id * 2048)
 
-def generate_chr(background_tiles, sprite_tiles, raw_chr_playfield_banks, raw_chr_ui_banks, raw_sprite_banks):
+def static_chr_base_address(i):
+  high_static_bank_index = math.floor(i / 32) + 1
+  low_static_bank_index = i % 32
+  return (high_static_bank_index * 256 * 1024) + (low_static_bank_index * 4096)
+
+def generate_chr(background_tiles, sprite_tiles, raw_chr_playfield_banks, raw_chr_ui_banks, raw_sprite_banks, static_chr_banks):
   # start with 2 MB of blank CHR tiles
   chr_bytes = [0] * 1024 * 1024 * 2
   # for every background tile, which is now 64x64 and a 4x4 grid of CHR tiles,
@@ -479,9 +485,16 @@ def generate_chr(background_tiles, sprite_tiles, raw_chr_playfield_banks, raw_ch
   # sprite banks are a similar deal, but each one is just 2048 bytes in size, 
   # comprising 4 animation frames for each 512-byte window
   for i in range(0, len(raw_sprite_banks)):
-    for animation_frame in range(0, 4):
-      sprite_bank_addr = sprite_bank_base_address(i)
-      chr_bytes[sprite_bank_addr:sprite_bank_addr+2048] = raw_sprite_banks[i]["data"]
+    sprite_bank_addr = sprite_bank_base_address(i)
+    chr_bytes[sprite_bank_addr:sprite_bank_addr+2048] = raw_sprite_banks[i]["data"]
+  # static CHR banks are a little bit strange: we squeeze these into the otherwuse unused
+  # animation frames that would occupy the sprite region. Sprites don't actually animate
+  # this way, so we have 3x 128kB regions that aren't being used for anything. These are
+  # accessed in non-extended 4k banking mode generally, mostly by the title screen and other
+  # static, non-gameplay screens.
+  for i in range(0, len(static_chr_banks)):
+    static_bank_addr = static_chr_base_address(i)
+    chr_bytes[static_bank_addr:static_bank_addr+4096] = static_chr_banks[i][0:4096]
   return chr_bytes
 
 disco_filenames = sorted(list(pathlib.Path('art/disco_tiles').glob('*.png')))
@@ -495,6 +508,7 @@ png_chr_playfield_filenames = sorted(list(pathlib.Path('art/raw_chr_playfield').
 png_chr_ui_filenames = sorted(list(pathlib.Path('art/raw_chr_ui').glob('*.png')))
 raw_chr_ui_filenames = sorted(list(pathlib.Path('art/raw_chr_ui').glob('*.chr')))
 sprite_bank_foldernames = sorted(list(pathlib.Path('art/sprite_banks').glob("*")))
+raw_static_chr_filenames = sorted(list(pathlib.Path('art/raw_chr_static').glob('*.chr')))
 
 background_tiles = [read_background_tile(f) for f in background_filenames]
 sprite_tiles = [read_sprite_tile(f) for f in sprite_filenames]
@@ -502,11 +516,12 @@ raw_chr_playfield_banks = [read_raw_chr(f) for f in raw_chr_playfield_filenames]
 png_chr_playfield_banks = [read_png_chr(f) for f in png_chr_playfield_filenames]
 png_chr_ui_banks = [read_png_chr(f) for f in png_chr_ui_filenames]
 raw_chr_ui_banks = [read_raw_chr(f) for f in raw_chr_ui_filenames]
+raw_static_chr_banks = [read_raw_chr(f) for f in raw_static_chr_filenames]
 raw_sprite_banks = [read_sprite_bank(f) for f in sprite_bank_foldernames]
 chr_bytes = generate_chr(background_tiles, sprite_tiles, 
   raw_chr_playfield_banks + png_chr_playfield_banks, 
   png_chr_ui_banks + raw_chr_ui_banks, 
-  raw_sprite_banks)
+  raw_sprite_banks, raw_static_chr_banks)
 
 
 with open('build/output_chr.bin', 'wb') as chr_file:
