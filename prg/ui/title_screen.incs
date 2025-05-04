@@ -368,25 +368,8 @@ done_with_obj:
 
         ; Now for the title screen, set an initial frame. We'll be switching
         ; this out with a raster effect later so don't overthink this
-        ;ldx CurrentWidgetIndex
         lda #STATIC_CHR_BANK_TITLE_0000
-        ;clc
-        ;adc widget_animation_frame, x
         sta PlayfieldObjBanks+1
-
-        rts
-
-        dec widget_animation_delay, x
-        beq advance_frame
-        rts
-advance_frame:
-        lda #4
-        sta widget_animation_delay, x
-        lda widget_animation_frame, x
-        clc
-        adc #1
-        and #$0F
-        sta widget_animation_frame, x
 
         rts
 .endproc
@@ -412,20 +395,12 @@ title_splash_lut:
 CurrentWidgetIndex := R20
 widget_selected_splash := widgets_data0
 
-widget_animation_frame := widgets_data1
-widget_animation_delay := widgets_data2
-
         jsr next_global_rand
         and #$0F
         tax
         lda title_splash_lut, x
         ldx CurrentWidgetIndex
         sta widget_selected_splash, x
-
-        lda #0
-        sta widget_animation_frame, x
-        lda #4
-        sta widget_animation_delay, x
         
         ; The titlescreen alone uses 4k CHR banking, which has lots of irritating implications.
         ; Get those set up now
@@ -442,11 +417,7 @@ widget_animation_delay := widgets_data2
 
         ; Note that the palette swap will turn extended attributes back on once we're done with the titlescreen
         ; bit, after which only sprites will be using the CHR banks.
-
-        ;set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_TITLE, #0
         set_raster_effect_safely #RASTER_EFFECT_TITLE_TEXT, #RASTER_FINALIZER_TITLE, #0
-        ;set_raster_effect_safely #RASTER_EFFECT_TITLE_TEXT, #RASTER_FINALIZER_NONE, #0
-        ;set_raster_effect_safely #RASTER_EFFECT_NONE, #RASTER_FINALIZER_NONE, #0
         set_raster_playback_speed #1, #0
 
         ; The title screen alone uses 8x8 mode, set that up here
