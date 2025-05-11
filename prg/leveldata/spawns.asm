@@ -167,3 +167,26 @@ enemy_mole_advanced:
         default_spawn_pool_details
         pack_size 1, 3
 
+enemy_one_armed_bandit_earth:
+        full_spawn_entry TILE_ONE_ARMED_BANDIT, BG_TILE_ONE_ARMED_BANDIT_IDLE_7, PAL_EARTH, 0, 0, one_armed_bandit_conditions
+        default_spawn_pool_details
+        pack_size 3, 4
+
+enemy_one_armed_bandit_ice:
+        full_spawn_entry TILE_ONE_ARMED_BANDIT, BG_TILE_ONE_ARMED_BANDIT_IDLE_7, PAL_ICE, 0, 0, one_armed_bandit_conditions
+        default_spawn_pool_details
+        pack_size 3, 4
+
+enemy_one_armed_bandit_air:
+        full_spawn_entry TILE_ONE_ARMED_BANDIT, BG_TILE_ONE_ARMED_BANDIT_IDLE_7, PAL_AIR, 0, 0, one_armed_bandit_conditions
+        default_spawn_pool_details
+        pack_size 3, 4
+
+enemy_one_armed_bandit_fire:
+        full_spawn_entry TILE_ONE_ARMED_BANDIT, BG_TILE_ONE_ARMED_BANDIT_IDLE_7, PAL_FIRE, 0, 0, one_armed_bandit_conditions
+        default_spawn_pool_details
+        pack_size 3, 4
+
+
+
+

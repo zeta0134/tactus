@@ -12,7 +12,7 @@
 ; Always spawn THIS enemy (for testing)
 spawn_pool_generic:
     .repeat 128
-    .addr enemy_spider_basic
+    .addr enemy_one_armed_bandit_air
     .endrepeat
 
 .else

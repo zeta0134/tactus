@@ -54,6 +54,10 @@ LootRewardMax: .res 1
 TankinessMax: .res 1
 PopulationLimit: .res 1
 
+; arbitrary logic needed by certain packs of enemies
+BanditsSpawned: .res 1
+BanditSingleType: .res 1
+
     .segment "DATA_3"
 
 spawn_pool_data:
@@ -299,6 +303,43 @@ invalid_space:
         rts
 .endproc
 
+.proc one_armed_bandit_conditions
+        ; insta-bail if there are too many bandits
+        lda BanditsSpawned
+        beq try_to_spawn
+        cmp #4
+        bcc bandits_underpopulated
+fail_to_spawn:
+        lda #$FF
+        rts
+bandits_underpopulated:
+        ; Since another bandit exists, we must
+        ; insta-bail if the "type" of this bandit doesn't match. This
+        ; forces all bandits that initially spawn in a room to be the
+        ; same element, which is a necessary condition for their "magic"
+        ; reward to make mechanical sense.
+        ldy #SpawnListEntry::TileHighAttr
+        lda (EntityPtr), y
+        cmp BanditSingleType
+        bne fail_to_spawn
+        ; Okay from here the conditions are just like any other single-tile enemy
+try_to_spawn:
+        jsr single_disco_tile
+        beq spawn_succeeds
+        rts
+spawn_succeeds:
+        ; remember what type we just spawned, so that future
+        ; bandits are locked-in and must match the type
+        ldy #SpawnListEntry::TileHighAttr
+        lda (EntityPtr), y
+        sta BanditSingleType
+        ; and increment our population cap
+        inc BanditsSpawned
+        ; now actually return success
+        lda #0
+        rts
+.endproc
+
 .proc __cond_trampoline
         jmp (ConditionalPtr)
 .endproc
@@ -415,6 +456,11 @@ PackSize := R19
         sta AccumulatedLootReward
         sta AccumulatedTrickiness
         sta AccumulatedPopulation
+
+        ; initialize other state
+        lda #0
+        sta BanditsSpawned
+        sta BanditSingleType
 
         ; basically, keep spawning until we hit our population cap
 loop:

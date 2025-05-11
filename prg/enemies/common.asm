@@ -749,7 +749,7 @@ die:
         sta battlefield, x
 
         ; Do NOT update the player's combo!
-        ; Do NOT roll for loot (TODO: if we want loot, wee if we can roll without considering chain/combo)
+        ; Do NOT roll for loot (TODO: if we want loot, see if we can roll without considering chain/combo)
         ; Do NOT play a SFX, the explosion SFX is already queued up
 
         ; DO decrement the active counter, as we have just properly died
@@ -1007,6 +1007,7 @@ TargetSquare := R13
         lda #4
         sta DamageAmount
         far_call FAR_damage_player
+post_damage:
 
         ; Now the tricky part: we need to scan the map and find this enemy's poof
         ; (It might not exist if we have a bugged board, so handle that safely)

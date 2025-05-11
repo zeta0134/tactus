@@ -225,6 +225,7 @@ tile_index_to_col_lut:
 .include "enemies/item_shadow.asm"
 .include "enemies/mole.asm"
 .include "enemies/mushroom.asm"
+.include "enemies/one_armed_bandit.asm"
 .include "enemies/semisafe_tile.asm"
 .include "enemies/sign.asm"
 .include "enemies/slimes.asm"
@@ -554,6 +555,14 @@ tile_collide TILE_TOTEM, ENEMY_COLLIDE_with_totem
 tile_suspend TILE_TOTEM, ENEMY_UTIL_suspend_totem
 tile_explode TILE_TOTEM, FIXED_no_behavior, FIXED_no_behavior
 tile_spell   TILE_TOTEM, FIXED_no_behavior
+
+tile_update  TILE_ONE_ARMED_BANDIT, ENEMY_UPDATE_update_one_armed_bandit
+tile_attack  TILE_ONE_ARMED_BANDIT, ENEMY_ATTACK_direct_attack_one_armed_bandit, ENEMY_ATTACK_indirect_attack_one_armed_bandit
+tile_collide TILE_ONE_ARMED_BANDIT, ENEMY_COLLIDE_one_armed_bandit_attacks_player
+tile_suspend TILE_ONE_ARMED_BANDIT, ENEMY_UTIL_move_away_from_map_edge
+tile_explode TILE_ONE_ARMED_BANDIT, ENEMY_BOMB_SPELL_one_armed_bandit_direct_explode, ENEMY_BOMB_SPELL_one_armed_bandit_indirect_explode
+tile_spell   TILE_ONE_ARMED_BANDIT, ENEMY_BOMB_SPELL_one_armed_bandit_spell_dispatch
+
 
 .segment "ENEMY_UPDATE"
 

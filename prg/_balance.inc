@@ -171,6 +171,15 @@ MUSHROOM_SPORE_DMG     = 4
 ; and share a loot table.
 SLIME_LOOT_TABLE = tiny_loot_table
 
+; These have a shared and quite large health pool.
+; Players are meant to freeze them all at once to defeat
+; the group, so the real intent of high health is to
+; discourage "standard" combat and invite the player to
+; explore the mechanic properly.
+ONE_ARMED_BANDIT_HP            = 8
+ONE_ARMED_BANDIT_LOOT_TABLE    = basic_loot_table
+ONE_ARMED_BANDIT_TARGET_RADIUS = $c6 ; about 16 squares
+
 ; ░▒▓█▓▒░▒▓████████▓▒░▒▓████████▓▒░▒▓██████████████▓▒░ ░▒▓███████▓▒░ 
 ; ░▒▓█▓▒░  ░▒▓█▓▒░   ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
 ; ░▒▓█▓▒░  ░▒▓█▓▒░   ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
