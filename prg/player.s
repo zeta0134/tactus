@@ -1841,6 +1841,34 @@ no_defeat_sfx:
         rts
 .endproc
 
+; Note: Only really stable/tested/intended for room-altering elemental
+; effects. Monsters as a general rule don't cast other spells, those are
+; for the player.
+.proc FAR_monster_spellcasting_dispatch
+SpellCastPtr := R0
+        ; When a monster wishes to cast a spell, we need to have it
+        ; call the same room-state-setting special effects (and other
+        ; tomfoolery) that the player logic calls. Note that the player
+        ; may then immediately call this again with their OWN spell, so
+        ; we'll need to test that case somehow and work out the kinks.
+        lda CurrentlyActiveSpell
+        sec
+        sbc #FIRST_SPELL_IN_ITEM_LIST
+        ; Safety: don't call a spell effect that doesn't exist
+        ; (This shouldn't happen, but crashing is no fun)
+        cmp #LAST_SPELL_IN_ITEM_LIST
+        bcs not_safe_to_dispatch
+        asl
+        tax
+        lda spell_casting_dispatch_lut+0, x
+        sta SpellCastPtr+0
+        lda spell_casting_dispatch_lut+1, x
+        sta SpellCastPtr+1
+        jsr _spellcasting_trampoline
+not_safe_to_dispatch:
+        rts
+.endproc
+
 .proc _spellcasting_trampoline
 SpellCastPtr := R0
         jmp (SpellCastPtr)

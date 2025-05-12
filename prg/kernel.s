@@ -1187,10 +1187,14 @@ continue_waiting:
         ; Set the next kernel mode early; the player might override this
         st16 GameMode, update_enemies_1
 
-        ; If a monster is requesting a spellcast, set THAT game mode instead
+        ; If a monster is requesting a spellcast, do that setup and set the
+        ; appropriate game mode. (If the player casts their own spell, it will
+        ; run after these take effect. Conflicts in mechanics resolve in the
+        ; player's favor. Effects and SFX may overlap somewhat.)
         lda MonsterRequestsSpellCast
         beq no_monster_spells
         st16 GameMode, update_spells_1
+        far_call FAR_monster_spellcasting_dispatch
 no_monster_spells:
         lda #0
         sta MonsterRequestsSpellCast

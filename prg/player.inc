@@ -8,6 +8,7 @@
 .global FAR_correct_player_pos_during_slide
 .global FAR_finalize_player_pos_after_slide
 .global FAR_apply_player_palette
+.global FAR_monster_spellcasting_dispatch
 
 .global row_number_to_tile_index_lut
 
