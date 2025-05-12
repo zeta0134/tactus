@@ -494,18 +494,21 @@ shared_juice_and_cleanup:
         queue_sfx_noise sfx_defeat_enemy_noise
 cleanup_without_sfx:
         ; Spawn a death sprite here (the whole group at once-ish)
+        ; For sprite-logic reasons this is actually delayed until the following beat, just like we'd expect
         far_call ENEMY_BOMB_SPELL_spawn_death_sprite_here
         ; because we updated ourselves this frame, but we are no longer, decrement ourselves again
         dec enemies_active
+        
+        ; Trying WITHOUT this?
         ; ... should we draw the new tile to the active buffer right now? It's sortof a delayed
         ; player-caused transformation, it might look weird if we don't...
         ; ... I'm gonna try it.
-        lda CurrentTile
-        sta TargetIndex
-        jsr draw_active_tile
+        ;lda CurrentTile
+        ;sta TargetIndex
+        ;jsr draw_active_tile
         ; If we were palette cycling before, we shouldn't be now. (this looks odd after a forced tile draw)
-        lda CurrentTile
-        jsr unqueue_palette_cycle
+        ;lda CurrentTile
+        ;jsr unqueue_palette_cycle
 
 
         ; TODO: are all of my buddies also frozen? If so, become defeated!
