@@ -55,6 +55,8 @@ TILE_ONE_ARMED_BANDIT  = 35
 .global FAR_suspend_entire_room
 .global FAR_explode_tile
 .global FAR_cast_spell_on_static_enemy_row
+.global FAR_init_room_coordination_state
+.global FAR_init_beat_coordination_state
 
 FLAG_MOVED_THIS_FRAME = %10000000
 

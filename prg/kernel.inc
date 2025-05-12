@@ -14,6 +14,9 @@
 .global PlayfieldObjBanks
 .global HudObjBanks
 
+.global CurrentlyActiveSpell
+.global MonsterRequestsSpellCast
+
 ; subroutines
 .global FAR_kernel_game_loop
 

@@ -9,10 +9,18 @@
 
 .if ::DEBUG_SPAWN_OVERRIDE
 
-; Always spawn THIS enemy (for testing)
 spawn_pool_generic:
-    .repeat 128
+    ; Always spawn THIS specific enemy
+    ;.repeat 128
+    ;.addr enemy_one_armed_bandit_air
+    ;.endrepeat
+
+    ; For when I'd like to test all four variants
+    .repeat 32
+    .addr enemy_one_armed_bandit_earth
+    .addr enemy_one_armed_bandit_ice
     .addr enemy_one_armed_bandit_air
+    .addr enemy_one_armed_bandit_fire
     .endrepeat
 
 .else

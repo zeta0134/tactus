@@ -15,6 +15,11 @@ ONE_ARMED_BANDIT_STATE_ANTICIPATE = %010 ; state just before an attack
 ONE_ARMED_BANDIT_STATE_ATTACK     = %100 ; state just after an attack (looks like idle)
 ONE_ARMED_BANDIT_STATE_FROZEN     = %110 ; after being hit once, we freeze on the current reel
 
+REEL_POS_SEVEN  = %00000000
+REEL_POS_CHERRY = %00010000
+REEL_POS_GEM    = %00100000
+REEL_POS_MAGIC  = %00110000
+
 ; note: X should already contain our tile index, as the mechanism
 ; for loading this differs depending on which AI function is running
 .macro oab_compute_reel_index scratch_byte
@@ -51,6 +56,14 @@ ONE_ARMED_BANDIT_STATE_FROZEN     = %110 ; after being hit once, we freeze on th
         sta tile_flags, x
 .endmacro
 
+.macro oab_compute_coordination_index_y
+        lda tile_attributes, x ; . pp......
+        rol                    ; p p.......
+        rol                    ; p .......p
+        rol                    ; . ......pp
+        and #%00000011         ; . 000000pp
+        tay
+.endmacro
 
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
@@ -153,6 +166,12 @@ CurrentTile := R15
         sta tile_patterns, x
         lda slot_reel_anticipate_earth+1, y
         sta tile_attributes, x
+        ; Increase the count of active bandits
+        oab_compute_coordination_index_y
+        lda RoomStateBanditsActiveCurrent, y
+        clc
+        adc #1
+        sta RoomStateBanditsActiveCurrent, y
         ; For the idle state that's it!
         rts
 .endproc
@@ -176,6 +195,13 @@ CurrentTile := R15
         sta tile_patterns, x
         lda slot_reel_idle_earth+1, y
         sta tile_attributes, x
+
+        ; Increase the count of active bandits
+        oab_compute_coordination_index_y
+        lda RoomStateBanditsActiveCurrent, y
+        clc
+        adc #1
+        sta RoomStateBanditsActiveCurrent, y
 
         ldy CurrentTile
         lda (PlayerDistanceLut), y
@@ -306,11 +332,182 @@ CurrentTile := R15
         sta tile_patterns, x
         lda slot_reel_idle_earth+1, y
         sta tile_attributes, x
+        ; Increase the count of active bandits
+        oab_compute_coordination_index_y
+        lda RoomStateBanditsActiveCurrent, y
+        clc
+        adc #1
+        sta RoomStateBanditsActiveCurrent, y
         ; For the idle state that's it!
         rts
 .endproc
 
+spellcast_item_id_by_coordination_index_lut:
+        .byte ITEM_SPELL_EARTH
+        .byte ITEM_SPELL_ICE
+        .byte ITEM_SPELL_AIR
+        .byte ITEM_SPELL_FIRE
+
 .proc ENEMY_UPDATE_update_one_armed_bandit_frozen
+; for draw_active_tile
+TargetIndex := R0
+
+ScratchByte := R0
+CurrentRow := R14
+CurrentTile := R15
+        ldx CurrentTile
+        ; Increase the count of frozen bandits
+        oab_compute_coordination_index_y
+        lda RoomStateBanditsFrozenCurrent, y
+        clc
+        adc #1
+        sta RoomStateBanditsFrozenCurrent, y
+
+        ; Using the previous frame's state...
+        ; If there are any active bandits remaining, do nothing
+        lda RoomStateBanditsActivePrevious, y
+        beq become_defeated
+        rts
+
+become_defeated:
+        ; TODO - we can't really spawn sprites here... can we? they'd show up too soon...
+        ; how should we punch up the success state? much pondering! this isn't the only enemy
+        ; that may self-defeat...
+
+        ; Firstly, figure out what we should spawn. Cherries are a special case:
+        ; if WE are currently a cherry, we'll always roll a healing item
+check_healing_item:
+        lda tile_data, x
+        and #ONE_ARMED_BANDIT_DATA_REEL_POS
+        cmp #REEL_POS_CHERRY
+        jeq reward_healing_item
+
+        ; Everything else requires a group match. For now, just check for 3+ of the target
+        ; AND zero of anything else
+check_big_treasure:
+        ; must have 3 or more of...
+        lda RoomStateBanditReelCountSeven, y
+        cmp #3
+        bcc no_big_treasure
+        ; ... and none of:
+        lda RoomStateBanditReelCountCherry, y
+        bne no_big_treasure
+        lda RoomStateBanditReelCountGem, y
+        bne no_big_treasure
+        lda RoomStateBanditReelCountMagic, y
+        bne no_big_treasure
+        jmp reward_big_treasure
+no_big_treasure:
+
+check_small_treasure:
+        ; must have 3 or more of...
+        lda RoomStateBanditReelCountGem, y
+        cmp #3
+        bcc no_small_treasure
+        ; ... and none of:
+        lda RoomStateBanditReelCountCherry, y
+        bne no_small_treasure
+        lda RoomStateBanditReelCountSeven, y
+        bne no_small_treasure
+        lda RoomStateBanditReelCountMagic, y
+        bne no_small_treasure
+        jmp reward_small_treasure
+no_small_treasure:
+
+check_magic_spell:
+        ; must have 3 or more of...
+        lda RoomStateBanditReelCountMagic, y
+        cmp #3
+        bcc no_magic_spell
+        ; ... and none of:
+        lda RoomStateBanditReelCountCherry, y
+        bne no_magic_spell
+        lda RoomStateBanditReelCountSeven, y
+        bne no_magic_spell
+        lda RoomStateBanditReelCountGem, y
+        bne no_magic_spell
+        jmp reward_magic_spell
+no_magic_spell:
+        ; Failure! ... ermh... just vanish in a puff of logic?
+        ; ... sure? oh, but reward standard loot while we're at it
+        ldx CurrentTile
+        stx DiscoTile
+        lda CurrentRow
+        sta DiscoRow
+        near_call ENEMY_UPDATE_draw_disco_tile_here
+        set_loot_table ONE_ARMED_BANDIT_LOOT_TABLE
+        roll_loot_at CurrentTile
+        jmp shared_juice_and_cleanup
+
+reward_small_treasure:
+        ; "Small" treasure is one "diamond" per bandit. We should have a loot table that forces this
+        ldx CurrentTile
+        stx DiscoTile
+        lda CurrentRow
+        sta DiscoRow
+        near_call ENEMY_UPDATE_draw_disco_tile_here
+        set_loot_table one_diamond_loot_table
+        roll_base_loot_at CurrentTile
+        jmp shared_juice_and_cleanup
+reward_big_treasure:
+        ; "Big" treasure is one gold sack, as an item. This means we need to replace ourselves with an
+        ; item shadow, sorta like a chest
+        ldx CurrentTile        
+        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_EARTH
+        lda #0
+        sta tile_flags, x
+        lda #ITEM_GOLD_SACK
+        sta tile_data, x
+        jmp shared_juice_and_cleanup
+reward_healing_item:
+        ; "Healing" items are just food. For now, spawn a buffet of medium fries
+        ; TODO: later we should roll from a zone-appropriate loot table?
+        ldx CurrentTile
+        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_EARTH
+        lda #0
+        sta tile_flags, x
+        lda #ITEM_SMALL_FRIES
+        sta tile_data, x
+        jmp shared_juice_and_cleanup
+reward_magic_spell:
+        ; Magic spells basically queue up the appropriate spell effect, just like if the player
+        ; had cast that spell. There is one spell effect for each color, so work that out
+        ; At this point Y still contains our coordination index, so this is straightforward
+        lda spellcast_item_id_by_coordination_index_lut, y
+        sta CurrentlyActiveSpell
+        lda #1
+        sta MonsterRequestsSpellCast
+        ; Play the spellcasting SFX, just like if the player was holding up a scroll
+        queue_sfx_pulse1_with_priority sfx_cast_pulse, #10
+        ; Cleanup our own tile
+        ldx CurrentTile
+        stx DiscoTile
+        lda CurrentRow
+        sta DiscoRow
+        near_call ENEMY_UPDATE_draw_disco_tile_here
+        ; And perform the remainder of shared cleanup, minus defeat SFX (since we want the spell SFX to play instead)
+        jmp cleanup_without_sfx
+
+shared_juice_and_cleanup:
+        ; Play an appropriately crunchy death sound
+        queue_sfx_pulse1 sfx_defeat_enemy_pulse
+        queue_sfx_noise sfx_defeat_enemy_noise
+cleanup_without_sfx:
+        ; Spawn a death sprite here (the whole group at once-ish)
+        far_call ENEMY_BOMB_SPELL_spawn_death_sprite_here
+        ; because we updated ourselves this frame, but we are no longer, decrement ourselves again
+        dec enemies_active
+        ; ... should we draw the new tile to the active buffer right now? It's sortof a delayed
+        ; player-caused transformation, it might look weird if we don't...
+        ; ... I'm gonna try it.
+        lda CurrentTile
+        sta TargetIndex
+        jsr draw_active_tile
+        ; If we were palette cycling before, we shouldn't be now. (this looks odd after a forced tile draw)
+        lda CurrentTile
+        jsr unqueue_palette_cycle
+
+
         ; TODO: are all of my buddies also frozen? If so, become defeated!
         ; If all of my buddies are on a matching symbol, drop that particular
         ; loot (rolling from tables as needed, etc etc), otherwise drop a large
@@ -394,13 +591,54 @@ EffectiveAttackSquare := R10
         and #ONE_ARMED_BANDIT_DATA_HP
         ; if we should die, do that
         cmp #ONE_ARMED_BANDIT_HP
-        bcs die_now
+        jcs die_now
         ; otherwise, write the health back
         sta ScratchHp
         lda tile_data, x
         and #($FF - ONE_ARMED_BANDIT_DATA_HP)
         ora ScratchHp
         sta tile_data, x
+
+        ; If we are not currently in the frozen state, we're ABOUT to be, so
+        ; increment the count of our reel type for detecting loot
+        lda tile_flags, x
+        and #ONE_ARMED_BANDIT_FLAGS_STATE
+        cmp #ONE_ARMED_BANDIT_STATE_FROZEN
+        beq done_incrementing_reel_counts
+        oab_compute_coordination_index_y
+        lda tile_data, x
+        and #ONE_ARMED_BANDIT_DATA_REEL_POS
+        cmp #REEL_POS_CHERRY
+        beq increment_cherry_count
+        cmp #REEL_POS_GEM
+        beq increment_gem_count
+        cmp #REEL_POS_MAGIC
+        beq increment_magic_count
+increment_seven_count:
+        lda RoomStateBanditReelCountSeven, y
+        clc
+        adc #1
+        sta RoomStateBanditReelCountSeven, y
+        jmp done_incrementing_reel_counts
+increment_cherry_count:
+        lda RoomStateBanditReelCountCherry, y
+        clc
+        adc #1
+        sta RoomStateBanditReelCountCherry, y
+        jmp done_incrementing_reel_counts
+increment_gem_count:
+        lda RoomStateBanditReelCountGem, y
+        clc
+        adc #1
+        sta RoomStateBanditReelCountGem, y
+        jmp done_incrementing_reel_counts
+increment_magic_count:
+        lda RoomStateBanditReelCountMagic, y
+        clc
+        adc #1
+        sta RoomStateBanditReelCountMagic, y
+        jmp done_incrementing_reel_counts
+done_incrementing_reel_counts:
 
         ; now switch to our frozen state if we weren't there already
         lda tile_flags, x
@@ -428,6 +666,50 @@ EffectiveAttackSquare := R10
         rts
 
 die_now:
+        ; Firstly, DECREASE the number of active frozen bandits on this frame; this
+        ; affects loot generation for the remaining bandits on the next frame, if any
+        oab_compute_coordination_index_y
+        lda RoomStateBanditsFrozenCurrent, y
+        sec
+        sbc #1
+        sta RoomStateBanditsFrozenCurrent, y
+
+        ; Similarly, decrease the frozen count of our current reel, as we are leaving this mortal coil
+        ; and are no longer feeling generous towards the player
+        lda tile_data, x
+        and #ONE_ARMED_BANDIT_DATA_REEL_POS
+        cmp #REEL_POS_CHERRY
+        beq decrement_cherry_count
+        cmp #REEL_POS_GEM
+        beq decrement_gem_count
+        cmp #REEL_POS_MAGIC
+        beq decrement_magic_count
+decrement_seven_count:
+        lda RoomStateBanditReelCountSeven, y
+        sec
+        sbc #1
+        sta RoomStateBanditReelCountSeven, y
+        jmp done_incrementing_reel_counts
+decrement_cherry_count:
+        lda RoomStateBanditReelCountCherry, y
+        sec
+        sbc #1
+        sta RoomStateBanditReelCountCherry, y
+        jmp done_incrementing_reel_counts
+decrement_gem_count:
+        lda RoomStateBanditReelCountGem, y
+        sec
+        sbc #1
+        sta RoomStateBanditReelCountGem, y
+        jmp done_incrementing_reel_counts
+decrement_magic_count:
+        lda RoomStateBanditReelCountMagic, y
+        sec
+        sbc #1
+        sta RoomStateBanditReelCountMagic, y
+        jmp done_decrementing_reel_counts
+done_decrementing_reel_counts:
+
         ; TODO: see if we can tail-call into the common shared routine here?
 
         ldx EffectiveAttackSquare
@@ -476,10 +758,21 @@ die_now:
 ; ============================================================================================================================
         .segment "ENEMY_COLLIDE"
 .proc ENEMY_COLLIDE_one_armed_bandit_attacks_player
-        ; TODO: fancy custom logic to ignore damage based on our last attack direction
-        ; (if applicable) or the player's movement direction into us (if applicable)
+TargetSquare := R13
+        ; If we are currently frozen, we are entirely nonthreatening! (Especially if we *just* became frozen
+        ; in response to the player's attack!)
+        ldx TargetSquare
+        lda tile_flags, x
+        and #ONE_ARMED_BANDIT_FLAGS_STATE
+        cmp #ONE_ARMED_BANDIT_STATE_FROZEN
+        beq deal_no_damage
 
-        ; For now, fall through to regular damage stuff
+        ; If we recently moved to the east, we are also nonthreatening
+        lda tile_data, x
+        and #ONE_ARMED_BANDIT_DATA_MOVED_EAST
+        bne deal_no_damage
+
+        ; TODO: handle the player bumping into us from the west?
 
 deal_standard_4hp_damage:
         ; tail call into the damaging function

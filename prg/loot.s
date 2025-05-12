@@ -196,6 +196,12 @@ base60: .word loot_25_000, loot_25_000, loot_10_000
 ; b61-b74 can't be guaranteed
 base75: .word loot_25_000, loot_25_000, loot_25_000 ; Note: maximum possible loot
 
+special_one_diamond:    .word loot_25_000, loot_00_000, loot_00_000
+special_two_diamonds:   .word loot_25_000, loot_25_000, loot_00_000
+special_three_diamonds: .word loot_25_000, loot_25_000, loot_25_000
+
+; 
+
 ; ========================================================
 ;                       LOOT TABLES
 ; ========================================================
@@ -293,6 +299,11 @@ advanced_loot_table:
     .word    base30,  base35,  base40,  base45,  base50 ; CHAIN 7
     .word    base35,  base40,  base45,  base50,  base55 ; CHAIN 8
     .word    base40,  base45,  base50,  base60,  base75 ; CHAIN WOW
+
+; For game mechanics that need to force a single gem
+one_diamond_loot_table:    .word special_one_diamond
+two_diamonds_loot_table:   .word special_two_diamonds
+three_diamonds_loot_table: .word special_three_diamonds
 
 chain_offset_lut:
     .byte 0, 10, 20, 30, 40, 50, 60, 70, 80
@@ -462,6 +473,7 @@ combo_in_range:
     adc combo_offset_lut, y
     tay
 
+initialize_drop_table:
     ; Load up the relevant drop table
     lda (LootTable), y
     sta DropTablePtr+0
@@ -503,6 +515,15 @@ combo_in_range:
     perform_zpcm_inc
 
     rts
+.endproc
+
+; For when we need to roll a really specific small loot table
+; and ignore player chain/combo, typically for enemies that have
+; special defeat conditions (one-armed bandits, bosses, etc)
+.proc FAR_roll_base_loot
+    perform_zpcm_inc
+    ldy #0
+    jmp FAR_roll_loot::initialize_drop_table
 .endproc
 
 .proc roll_coin

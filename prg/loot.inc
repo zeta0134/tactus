@@ -17,7 +17,8 @@
 
 .globalzp LootTable
 .global LootPosition
-.global FAR_roll_loot
+.global FAR_roll_loot      ; general case: use the player's chain+combo to pick an entry in the loot table
+.global FAR_roll_base_loot ; force a specific drop (always the first entry in the provided loot table)
 .global FAR_queue_price_tile_here
 .global FAR_draw_prices
 .global FAR_reset_price_tracker
@@ -38,4 +39,10 @@
     lda pos
     sta LootPosition
     far_call FAR_roll_loot
+.endmacro
+
+.macro roll_base_loot_at pos
+    lda pos
+    sta LootPosition
+    far_call FAR_roll_base_loot
 .endmacro

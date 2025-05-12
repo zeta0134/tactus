@@ -2904,10 +2904,17 @@ full_room_spell:
         ; takes effect
         lda #1
         sta DeferLootProcessing
-        ; Finally, we need to know if the spell defeats an enemy, so we can play the
+        ; We need to know if the spell defeats an enemy, so we can play the
         ; defeat SFX when the spell effect ends
         lda #0
         sta SpellDefeatsEnemy
+        ; Finally, tell the kernel to run spell logic on the next round of updates. Here
+        ; we explicitly set the spell ID for enemy logic to use (monsters also call this system
+        ; in their own way)
+        ; Note that at this point, if a monster HAD queued up a spell, the player's spell overwrites it.
+        ; Player spells have higher priority. (This really shouldn't happen very often.)
+        lda current_save + SaveFile::PlayerEquipmentSpell
+        sta CurrentlyActiveSpell
         st16 GameMode, update_spells_1
 done_with_full_room_prep:
 

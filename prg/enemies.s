@@ -563,8 +563,63 @@ tile_suspend TILE_ONE_ARMED_BANDIT, ENEMY_UTIL_move_away_from_map_edge
 tile_explode TILE_ONE_ARMED_BANDIT, ENEMY_BOMB_SPELL_one_armed_bandit_direct_explode, ENEMY_BOMB_SPELL_one_armed_bandit_indirect_explode
 tile_spell   TILE_ONE_ARMED_BANDIT, ENEMY_BOMB_SPELL_one_armed_bandit_spell_dispatch
 
+.segment "PRGRAM"
+
+RoomStateBanditsActiveCurrent:  .res 4
+RoomStateBanditsActivePrevious: .res 4
+RoomStateBanditsFrozenCurrent:  .res 4
+RoomStateBanditsFrozenPrevious: .res 4
+RoomStateBanditReelCountSeven:  .res 4
+RoomStateBanditReelCountCherry: .res 4
+RoomStateBanditReelCountGem:    .res 4
+RoomStateBanditReelCountMagic:  .res 4
 
 .segment "ENEMY_UPDATE"
+
+; A few enemies need to coordinate their behavior as a group. This is the reset
+; function for their memory. Anything those enemies want to persist needs to be
+; handled during suspension. (Try to avoid this if we can, it gets very messy.)
+.proc FAR_init_room_coordination_state
+        ; Bandits have one set of state variables per color group,
+        ; allowing up to 4 groups (one of each element) to cooperate
+        ; within the same chamber. Not sure how practical this is really,
+        ; but I sorta want to design a boss fight that involves groups of
+        ; the things, so there's that. Might as well.
+        lda #0
+        ldx #0
+loop:
+        sta RoomStateBanditsActiveCurrent, x
+        sta RoomStateBanditsActivePrevious, x
+        sta RoomStateBanditsFrozenCurrent, x
+        sta RoomStateBanditsFrozenPrevious, x
+        sta RoomStateBanditReelCountSeven, x
+        sta RoomStateBanditReelCountCherry, x
+        sta RoomStateBanditReelCountGem, x
+        sta RoomStateBanditReelCountMagic, x
+        inx
+        cpx #4
+        bne loop
+
+        rts
+.endproc
+
+.proc FAR_init_beat_coordination_state
+        ; Bandits need to key off the state of the previous beat, while simultaneously
+        ; building the state of the current beat. Do that here
+        ldx #0
+loop:
+        lda RoomStateBanditsActiveCurrent, x
+        sta RoomStateBanditsActivePrevious, x
+        lda RoomStateBanditsFrozenCurrent, x
+        sta RoomStateBanditsFrozenPrevious, x
+        lda #0
+        sta RoomStateBanditsActiveCurrent, x
+        sta RoomStateBanditsFrozenCurrent, x
+        inx
+        cpx #4
+        bne loop
+        rts
+.endproc
 
 static_behaviors_low:
         .lobytes enemy_update_table

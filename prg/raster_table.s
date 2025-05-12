@@ -100,7 +100,7 @@ PpuMaskScratch: .res 1
         .segment "DATA_3"
         .include "raster/flaming_text.incs"
 
-        .segment "CODE_1"
+        .segment "CODE_RASTER_TABLE"
 
 ; this is the one we should probably split into tables, if we
 ; find ourselves needing more than 64 effects. but for now

@@ -76,7 +76,10 @@ HudObjBanks: .res 8
 HeldInputCooldown: .res 1
 WarpTransitionTimer: .res 1
 
-.segment "CODE_1"
+CurrentlyActiveSpell: .res 1
+MonsterRequestsSpellCast: .res 1
+
+.segment "CODE_KERNEL"
 
 ; === Utility Functions ===
 .proc wait_for_next_vblank
@@ -303,7 +306,7 @@ LayoutPtr := R0
         ; Set the initial color emphasis to none (which the UI controllers
         ; may of course override at their leisure)
         lda #0
-        near_call FAR_apply_room_global_color_emphasis
+        far_call FAR_apply_room_global_color_emphasis
 
         ; Set the initial sprite banks for the UI, which will animate as usual
         jsr set_ui_banks
@@ -588,6 +591,8 @@ LayoutPtr := R0
         sta PlayfieldBgObjHighBank
         sta HudBgHighBank
         sta HudObjHighBank
+        sta MonsterRequestsSpellCast
+        sta CurrentlyActiveSpell
         lda #4
         sta PlayfieldBgHighBank
         lda #FADE_SPEED_GAMEPLAY
@@ -700,6 +705,7 @@ zone_select_converge:
         
         ; Load the current room (which is now pregenerated)
         far_call FAR_load_current_room
+        far_call FAR_init_room_coordination_state
 
         ; If the music for this room has changed, get that queued up
         ; TODO: should we try to detect a track change and fade out early?
@@ -839,6 +845,7 @@ not_too_high:
 .proc room_transition
         ; Load the current room (which is now pregenerated)
         far_call FAR_load_current_room
+        far_call FAR_init_room_coordination_state
 
         ; Set this room's color emphasis
         jsr set_color_emphasis_for_room
@@ -1180,6 +1187,14 @@ continue_waiting:
         ; Set the next kernel mode early; the player might override this
         st16 GameMode, update_enemies_1
 
+        ; If a monster is requesting a spellcast, set THAT game mode instead
+        lda MonsterRequestsSpellCast
+        beq no_monster_spells
+        st16 GameMode, update_spells_1
+no_monster_spells:
+        lda #0
+        sta MonsterRequestsSpellCast
+
         ; - First, tick any non-player entities that need to update before
         ;   the player's inputs are processed
         far_call FAR_tick_bomb_fuses
@@ -1347,6 +1362,9 @@ StartingTile := R15
 
         restore_previous_bank
 
+        lda #0
+        sta MonsterRequestsSpellCast
+
         jsr every_gameloop
         st16 GameMode, draw_battlefield_A
         rts
@@ -1359,6 +1377,8 @@ StartingTile := R15
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
 
         far_call FAR_reset_price_tracker
+        perform_zpcm_inc
+        far_call FAR_init_beat_coordination_state
         perform_zpcm_inc
 
         ; - clear "moved this frame" flags from all tiles, permitting
@@ -2039,7 +2059,7 @@ screen_shake_raster_lut:
         ; This is kinda expensive, don't call it too often
         ldx PlayerRoomIndex
         lda room_color_emphasis, x
-        near_call FAR_apply_room_global_color_emphasis
+        far_call FAR_apply_room_global_color_emphasis
         rts
 .endproc
 
