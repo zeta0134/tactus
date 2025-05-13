@@ -5,6 +5,9 @@
 ; - e    - most recent movement was east
 ; - ss   - current state
 
+; TODO: this file has a lot of tedious copy/paste, and ROM space is kindof
+; at a premium for enemy logic. Consider subroutines!
+
 ONE_ARMED_BANDIT_FLAGS_STATE     = %00000110
 ONE_ARMED_BANDIT_DATA_MOVED_EAST = %10000000
 ONE_ARMED_BANDIT_DATA_REEL_POS   = %00110000
@@ -448,6 +451,9 @@ reward_small_treasure:
         near_call ENEMY_UPDATE_draw_disco_tile_here
         set_loot_table one_diamond_loot_table
         roll_base_loot_at CurrentTile
+        ; Since we're rewarding the player, play a chime
+        queue_sfx_pulse1 sfx_puzzle_success_pulse
+        queue_sfx_triangle sfx_puzzle_success_tri
         jmp shared_juice_and_cleanup
 reward_big_treasure:
         ; "Big" treasure is one gold sack, as an item. This means we need to replace ourselves with an
@@ -458,7 +464,10 @@ reward_big_treasure:
         sta tile_flags, x
         lda #ITEM_GOLD_SACK
         sta tile_data, x
-        jmp shared_juice_and_cleanup
+        ; Since we're rewarding the player, play a chime
+        queue_sfx_pulse1 sfx_puzzle_success_pulse
+        queue_sfx_triangle sfx_puzzle_success_tri
+        jmp shared_juice_and_cleanup        
 reward_healing_item:
         ; "Healing" items are just food. For now, spawn a buffet of medium fries
         ; TODO: later we should roll from a zone-appropriate loot table?
@@ -468,6 +477,9 @@ reward_healing_item:
         sta tile_flags, x
         lda #ITEM_SMALL_FRIES
         sta tile_data, x
+        ; Since we're rewarding the player, play a chime
+        queue_sfx_pulse1 sfx_puzzle_success_pulse
+        queue_sfx_triangle sfx_puzzle_success_tri
         jmp shared_juice_and_cleanup
 reward_magic_spell:
         ; Magic spells basically queue up the appropriate spell effect, just like if the player
@@ -490,8 +502,8 @@ reward_magic_spell:
 
 shared_juice_and_cleanup:
         ; Play an appropriately crunchy death sound
-        queue_sfx_pulse1 sfx_defeat_enemy_pulse
-        queue_sfx_noise sfx_defeat_enemy_noise
+        defer_sfx_pulse1 sfx_defeat_enemy_pulse
+        defer_sfx_noise sfx_defeat_enemy_noise
 cleanup_without_sfx:
         ; Spawn a death sprite here (the whole group at once-ish)
         ; For sprite-logic reasons this is actually delayed until the following beat, just like we'd expect
@@ -692,19 +704,19 @@ decrement_seven_count:
         sec
         sbc #1
         sta RoomStateBanditReelCountSeven, y
-        jmp done_incrementing_reel_counts
+        jmp done_decrementing_reel_counts
 decrement_cherry_count:
         lda RoomStateBanditReelCountCherry, y
         sec
         sbc #1
         sta RoomStateBanditReelCountCherry, y
-        jmp done_incrementing_reel_counts
+        jmp done_decrementing_reel_counts
 decrement_gem_count:
         lda RoomStateBanditReelCountGem, y
         sec
         sbc #1
         sta RoomStateBanditReelCountGem, y
-        jmp done_incrementing_reel_counts
+        jmp done_decrementing_reel_counts
 decrement_magic_count:
         lda RoomStateBanditReelCountMagic, y
         sec
@@ -795,8 +807,53 @@ deal_no_damage:
 .proc ENEMY_BOMB_SPELL_one_armed_bandit_direct_explode
 AttackSquare := R3
 EffectiveAttackSquare := R10
-        ; TODO: we are about to die to an explosion! Clean up any global state
-        ; that other bandits may rely on.
+        ldx EffectiveAttackSquare
+        ; If we are currently frozen...
+        lda tile_flags, x
+        and #ONE_ARMED_BANDIT_FLAGS_STATE
+        cmp #ONE_ARMED_BANDIT_STATE_FROZEN
+        bne done_fixing_frozen_counter
+        ; ... then DECREASE the number of active frozen bandits on this frame;
+        oab_compute_coordination_index_y
+        lda RoomStateBanditsFrozenCurrent, y
+        sec
+        sbc #1
+        sta RoomStateBanditsFrozenCurrent, y
+        ; ... and DECREASE the count for this reel type
+        lda tile_data, x
+        and #ONE_ARMED_BANDIT_DATA_REEL_POS
+        cmp #REEL_POS_CHERRY
+        beq decrement_cherry_count
+        cmp #REEL_POS_GEM
+        beq decrement_gem_count
+        cmp #REEL_POS_MAGIC
+        beq decrement_magic_count
+decrement_seven_count:
+        lda RoomStateBanditReelCountSeven, y
+        sec
+        sbc #1
+        sta RoomStateBanditReelCountSeven, y
+        jmp done_decrementing_reel_counts
+decrement_cherry_count:
+        lda RoomStateBanditReelCountCherry, y
+        sec
+        sbc #1
+        sta RoomStateBanditReelCountCherry, y
+        jmp done_decrementing_reel_counts
+decrement_gem_count:
+        lda RoomStateBanditReelCountGem, y
+        sec
+        sbc #1
+        sta RoomStateBanditReelCountGem, y
+        jmp done_decrementing_reel_counts
+decrement_magic_count:
+        lda RoomStateBanditReelCountMagic, y
+        sec
+        sbc #1
+        sta RoomStateBanditReelCountMagic, y
+        jmp done_decrementing_reel_counts
+done_decrementing_reel_counts:
+done_fixing_frozen_counter:
 
         ; Copy in the attack square, so we can use shared logic to process the effect
         lda AttackSquare
@@ -806,14 +863,61 @@ EffectiveAttackSquare := R10
 .endproc
 
 .proc ENEMY_BOMB_SPELL_one_armed_bandit_indirect_explode
-        ; TODO: we are about to die to an explosion! Clean up any global state
-        ; that other bandits may rely on.
+AttackSquare := R3
+EffectiveAttackSquare := R10
+        ldx EffectiveAttackSquare
+        ; If we are currently frozen...
+        lda tile_flags, x
+        and #ONE_ARMED_BANDIT_FLAGS_STATE
+        cmp #ONE_ARMED_BANDIT_STATE_FROZEN
+        bne done_fixing_frozen_counter
+        ; ... then DECREASE the number of active frozen bandits on this frame;
+        oab_compute_coordination_index_y
+        lda RoomStateBanditsFrozenCurrent, y
+        sec
+        sbc #1
+        sta RoomStateBanditsFrozenCurrent, y
+        ; ... and DECREASE the count for this reel type
+        lda tile_data, x
+        and #ONE_ARMED_BANDIT_DATA_REEL_POS
+        cmp #REEL_POS_CHERRY
+        beq decrement_cherry_count
+        cmp #REEL_POS_GEM
+        beq decrement_gem_count
+        cmp #REEL_POS_MAGIC
+        beq decrement_magic_count
+decrement_seven_count:
+        lda RoomStateBanditReelCountSeven, y
+        sec
+        sbc #1
+        sta RoomStateBanditReelCountSeven, y
+        jmp done_decrementing_reel_counts
+decrement_cherry_count:
+        lda RoomStateBanditReelCountCherry, y
+        sec
+        sbc #1
+        sta RoomStateBanditReelCountCherry, y
+        jmp done_decrementing_reel_counts
+decrement_gem_count:
+        lda RoomStateBanditReelCountGem, y
+        sec
+        sbc #1
+        sta RoomStateBanditReelCountGem, y
+        jmp done_decrementing_reel_counts
+decrement_magic_count:
+        lda RoomStateBanditReelCountMagic, y
+        sec
+        sbc #1
+        sta RoomStateBanditReelCountMagic, y
+        jmp done_decrementing_reel_counts
+done_decrementing_reel_counts:
+done_fixing_frozen_counter:
 
         near_call ENEMY_BOMB_SPELL_explode_common
         rts
 .endproc
 
 .proc ENEMY_BOMB_SPELL_one_armed_bandit_spell_dispatch
-        ; TODO: change our color **and** redraw our reel symbol
+        ; TODO: change our color **and** advance/redraw our reel symbol
         rts
 .endproc

@@ -999,3 +999,28 @@ sfx_go_go_pulse:
         pulse_cont_duty               $2,     $B,                                        0
         pulse_cont_duty               $2,     $9,                                        0
         pulse_cont_duty               $2,     $7,                                        0
+
+sfx_puzzle_success_pulse:
+        .byte 14
+        pulse_init        PITCH_B4,   $2,     $F,         0
+        pulse_cont_duty               $2,     $E,         0
+        pulse_cont_duty               $2,     $D,         0
+        pulse_cont_duty               $2,     $C,         0
+        pulse_cont_duty               $2,     $B,         0
+        pulse_init        PITCH_G4,   $2,     $E,         0
+        pulse_cont_duty               $2,     $D,         0
+        pulse_cont_duty               $2,     $C,         0
+        pulse_cont_duty               $2,     $B,         0
+        pulse_cont_duty               $2,     $A,         0
+        pulse_cont_duty               $2,     $9,         0
+        pulse_cont_duty               $2,     $8,         0
+        pulse_cont_duty               $2,     $7,         0
+        pulse_cont_duty               $2,     $6,         0
+
+sfx_puzzle_success_tri:
+        .byte 4
+        tri_init  PITCH_B5,       4
+        tri_halt                  0
+        tri_init  PITCH_G5,       4
+        tri_halt                  0
+

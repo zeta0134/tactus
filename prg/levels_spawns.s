@@ -55,8 +55,7 @@ TankinessMax: .res 1
 PopulationLimit: .res 1
 
 ; arbitrary logic needed by certain packs of enemies
-BanditsSpawned: .res 1
-BanditSingleType: .res 1
+BanditsSpawned: .res 4
 
     .segment "DATA_3"
 
@@ -304,25 +303,22 @@ invalid_space:
 .endproc
 
 .proc one_armed_bandit_conditions
-        ; insta-bail if there are too many bandits
-        lda BanditsSpawned
-        beq try_to_spawn
+        ; work out the type of this bandit
+        ldy #SpawnListEntry::TileHighAttr
+        lda (EntityPtr), y ; . pp......
+        rol                ; p p.......
+        rol                ; p .......p
+        rol                ; . ......pp
+        and #%00000011     ; . 000000pp
+        tay
+
+        ; insta-bail if there are too many bandits of this type
+        lda BanditsSpawned, y
         cmp #4
-        bcc bandits_underpopulated
+        bcc try_to_spawn
 fail_to_spawn:
         lda #$FF
         rts
-bandits_underpopulated:
-        ; Since another bandit exists, we must
-        ; insta-bail if the "type" of this bandit doesn't match. This
-        ; forces all bandits that initially spawn in a room to be the
-        ; same element, which is a necessary condition for their "magic"
-        ; reward to make mechanical sense.
-        ldy #SpawnListEntry::TileHighAttr
-        lda (EntityPtr), y
-        cmp BanditSingleType
-        bne fail_to_spawn
-        ; Okay from here the conditions are just like any other single-tile enemy
 try_to_spawn:
         jsr single_disco_tile
         beq spawn_succeeds
@@ -330,11 +326,22 @@ try_to_spawn:
 spawn_succeeds:
         ; remember what type we just spawned, so that future
         ; bandits are locked-in and must match the type
+
+        ; work out the type of this bandit (again)
         ldy #SpawnListEntry::TileHighAttr
-        lda (EntityPtr), y
-        sta BanditSingleType
+        lda (EntityPtr), y ; . pp......
+        rol                ; p p.......
+        rol                ; p .......p
+        rol                ; . ......pp
+        and #%00000011     ; . 000000pp
+        tay
+
         ; and increment our population cap
-        inc BanditsSpawned
+        lda BanditsSpawned, y
+        clc
+        adc #1
+        sta BanditsSpawned, y
+
         ; now actually return success
         lda #0
         rts
@@ -458,9 +465,13 @@ PackSize := R19
         sta AccumulatedPopulation
 
         ; initialize other state
+        ; DEBUG: only allow two groups to spawn
+        lda #4
+        sta BanditsSpawned+0
+        sta BanditsSpawned+1
         lda #0
-        sta BanditsSpawned
-        sta BanditSingleType
+        sta BanditsSpawned+2
+        sta BanditsSpawned+3
 
         ; basically, keep spawning until we hit our population cap
 loop:

@@ -43,6 +43,15 @@ FadeCounter: .res 1
 CandidateSfxPtr: .res 2
 CandidateSfxPriority: .res 1
 
+DeferredSfxPtrPulse1: .res 2
+DeferredSfxPriorityPulse1: .res 1
+DeferredSfxPtrPulse2: .res 2
+DeferredSfxPriorityPulse2: .res 1
+DeferredSfxPtrTriangle: .res 2
+DeferredSfxPriorityTriangle: .res 1
+DeferredSfxPtrNoise: .res 2
+DeferredSfxPriorityNoise: .res 1
+
 UpdateBeatTrackerDuringNmi: .res 1
 
         .zeropage
@@ -600,6 +609,12 @@ done_picking_sfx_bank:
         lda #0
         sta UpdateBeatTrackerDuringNmi
 
+        lda #$FF
+        sta DeferredSfxPriorityPulse1
+        sta DeferredSfxPriorityPulse2
+        sta DeferredSfxPriorityTriangle
+        sta DeferredSfxPriorityNoise
+
         restore_previous_bank
 
         rts
@@ -636,6 +651,61 @@ done_picking_sfx_bank:
         perform_zpcm_inc
 skip_beat_tracker:
 
+        rts
+.endproc
+
+.proc FAR_queue_deferred_sounds
+        lda DeferredSfxPriorityPulse1
+        cmp #$FF
+        beq skip_pulse_1
+        sta CandidateSfxPriority
+        lda DeferredSfxPtrPulse1+0
+        sta CandidateSfxPtr+0
+        lda DeferredSfxPtrPulse1+1
+        sta CandidateSfxPtr+1
+        jsr _play_sfx_pulse1
+        lda #$FF
+        sta DeferredSfxPriorityPulse1
+skip_pulse_1:
+
+        lda DeferredSfxPriorityPulse2
+        cmp #$FF
+        beq skip_pulse_2
+        sta CandidateSfxPriority
+        lda DeferredSfxPtrPulse2+0
+        sta CandidateSfxPtr+0
+        lda DeferredSfxPtrPulse2+1
+        sta CandidateSfxPtr+1
+        jsr _play_sfx_pulse2
+        lda #$FF
+        sta DeferredSfxPriorityPulse2
+skip_pulse_2:
+
+        lda DeferredSfxPriorityTriangle
+        cmp #$FF
+        beq skip_triangle
+        sta CandidateSfxPriority
+        lda DeferredSfxPtrTriangle+0
+        sta CandidateSfxPtr+0
+        lda DeferredSfxPtrTriangle+1
+        sta CandidateSfxPtr+1
+        jsr _play_sfx_triangle
+        lda #$FF
+        sta DeferredSfxPriorityTriangle
+skip_triangle:
+
+        lda DeferredSfxPriorityNoise
+        cmp #$FF
+        beq skip_noise
+        sta CandidateSfxPriority
+        lda DeferredSfxPtrNoise+0
+        sta CandidateSfxPtr+0
+        lda DeferredSfxPtrNoise+1
+        sta CandidateSfxPtr+1
+        jsr _play_sfx_noise
+        lda #$FF
+        sta DeferredSfxPriorityNoise
+skip_noise:
         rts
 .endproc
 

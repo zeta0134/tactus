@@ -1199,6 +1199,10 @@ no_monster_spells:
         lda #0
         sta MonsterRequestsSpellCast
 
+        ; If any monsters deferred SFX to the start of the next beat, process those now
+        ; TODO: should we clean these out between rooms or game modes?
+        far_call FAR_queue_deferred_sounds
+
         ; - First, tick any non-player entities that need to update before
         ;   the player's inputs are processed
         far_call FAR_tick_bomb_fuses

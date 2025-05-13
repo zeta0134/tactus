@@ -9,6 +9,7 @@
 
 .global FAR_init_audio
 .global FAR_update_audio
+.global FAR_queue_deferred_sounds
 
 ; rhythm game
 .global sfx_defeat_enemy_noise
@@ -76,6 +77,9 @@
 
 .global sfx_go_go_pulse
 
+.global sfx_puzzle_success_pulse
+.global sfx_puzzle_success_tri
+
 .global CandidateSfxPtr
 .global CandidateSfxPriority
 
@@ -83,6 +87,15 @@
 .global Pulse2RowCounter
 .global Pulse1DelayCounter
 .global Pulse2DelayCounter
+
+.global DeferredSfxPtrPulse1
+.global DeferredSfxPriorityPulse1
+.global DeferredSfxPtrPulse2
+.global DeferredSfxPriorityPulse2
+.global DeferredSfxPtrTriangle
+.global DeferredSfxPriorityTriangle
+.global DeferredSfxPtrNoise
+.global DeferredSfxPriorityNoise
 
 .global UpdateBeatTrackerDuringNmi
 
@@ -130,6 +143,20 @@ TRACK_VARIANT_SILENT   = 4 ; same deal but it's absolute silence.
         jsr _play_sfx_pulse1
 .endmacro
 
+.macro defer_sfx_pulse1_with_priority sound_ptr, priority
+        lda #<sound_ptr
+        sta DeferredSfxPtrPulse1+0
+        lda #>sound_ptr
+        sta DeferredSfxPtrPulse1+1
+        lda priority
+        sta DeferredSfxPriorityPulse1
+.endmacro
+
+; This macro is even more cautious: if any other sound is playing,
+; regardless of when it started, back off and do nothing. Good for
+; short flavor sounds that should never interrupt longer gameplay
+; relevant things.
+
 .macro queue_sfx_pulse1_with_lowest_priority sound_ptr
 .scope
         lda Pulse1RowCounter
@@ -154,6 +181,10 @@ skip:
         queue_sfx_pulse1_with_priority_ptr sound_ptr, #0
 .endmacro
 
+.macro defer_sfx_pulse1 sound_ptr
+        defer_sfx_pulse1_with_priority sound_ptr, #0
+.endmacro
+
 .macro queue_sfx_pulse2_with_priority sound_ptr, priority
 lda #<sound_ptr
         sta CandidateSfxPtr+0
@@ -162,6 +193,15 @@ lda #<sound_ptr
         lda priority
         sta CandidateSfxPriority
         jsr _play_sfx_pulse2
+.endmacro
+
+.macro defer_sfx_pulse2_with_priority sound_ptr, priority
+        lda #<sound_ptr
+        sta DeferredSfxPtrPulse2+0
+        lda #>sound_ptr
+        sta DeferredSfxPtrPulse2+1
+        lda priority
+        sta DeferredSfxPriorityPulse2
 .endmacro
 
 .macro queue_sfx_pulse2_with_lowest_priority sound_ptr
@@ -184,6 +224,10 @@ skip:
         queue_sfx_pulse2_with_priority sound_ptr, #0
 .endmacro
 
+.macro defer_sfx_pulse2 sound_ptr
+        defer_sfx_pulse2_with_priority sound_ptr, #0
+.endmacro
+
 .macro queue_sfx_triangle_with_priority sound_ptr, priority
         lda #<sound_ptr
         sta CandidateSfxPtr+0
@@ -194,8 +238,21 @@ skip:
         jsr _play_sfx_triangle
 .endmacro
 
+.macro defer_sfx_triangle_with_priority sound_ptr, priority
+        lda #<sound_ptr
+        sta DeferredSfxPtrTriangle+0
+        lda #>sound_ptr
+        sta DeferredSfxPtrTriangle+1
+        lda priority
+        sta DeferredSfxPriorityTriangle
+.endmacro
+
 .macro queue_sfx_triangle sound_ptr
         queue_sfx_triangle_with_priority sound_ptr, #0
+.endmacro
+
+.macro defer_sfx_triangle sound_ptr
+        defer_sfx_triangle_with_priority sound_ptr, #0
 .endmacro
 
 .macro queue_sfx_noise_with_priority sound_ptr, priority
@@ -208,6 +265,19 @@ skip:
         jsr _play_sfx_noise
 .endmacro
 
+.macro defer_sfx_noise_with_priority sound_ptr, priority
+        lda #<sound_ptr
+        sta DeferredSfxPtrNoise+0
+        lda #>sound_ptr
+        sta DeferredSfxPtrNoise+1
+        lda priority
+        sta DeferredSfxPriorityNoise
+.endmacro
+
 .macro queue_sfx_noise sound_ptr
         queue_sfx_noise_with_priority sound_ptr, #0
+.endmacro
+
+.macro defer_sfx_noise sound_ptr
+        defer_sfx_noise_with_priority sound_ptr, #0
 .endmacro
