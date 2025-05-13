@@ -304,6 +304,7 @@ advanced_loot_table:
 one_diamond_loot_table:    .word special_one_diamond
 two_diamonds_loot_table:   .word special_two_diamonds
 three_diamonds_loot_table: .word special_three_diamonds
+three_coins_loot_table:    .word base03
 
 chain_offset_lut:
     .byte 0, 10, 20, 30, 40, 50, 60, 70, 80

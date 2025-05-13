@@ -8,15 +8,19 @@
 ; TODO: this file has a lot of tedious copy/paste, and ROM space is kindof
 ; at a premium for enemy logic. Consider subroutines!
 
-ONE_ARMED_BANDIT_FLAGS_STATE     = %00000110
+ONE_ARMED_BANDIT_FLAGS_STATE     = %00001110
 ONE_ARMED_BANDIT_DATA_MOVED_EAST = %10000000
 ONE_ARMED_BANDIT_DATA_REEL_POS   = %00110000
 ONE_ARMED_BANDIT_DATA_HP         = %00001111
 
-ONE_ARMED_BANDIT_STATE_IDLE       = %000 ; normal state: reel spins every beat
-ONE_ARMED_BANDIT_STATE_ANTICIPATE = %010 ; state just before an attack
-ONE_ARMED_BANDIT_STATE_ATTACK     = %100 ; state just after an attack (looks like idle)
-ONE_ARMED_BANDIT_STATE_FROZEN     = %110 ; after being hit once, we freeze on the current reel
+ONE_ARMED_BANDIT_STATE_IDLE        = %0000 ; normal state: reel spins every beat
+ONE_ARMED_BANDIT_STATE_ANTICIPATE  = %0010 ; state just before an attack
+ONE_ARMED_BANDIT_STATE_ATTACK      = %0100 ; state just after an attack (looks like idle)
+ONE_ARMED_BANDIT_STATE_FROZEN      = %0110 ; after being hit once, we freeze on the current reel
+ONE_ARMED_BANDIT_STATE_LOOT_COINS  = %1000 ; already dead, to defer loot generation and die properly
+ONE_ARMED_BANDIT_STATE_LOOT_GEMS   = %1010 ; 
+ONE_ARMED_BANDIT_STATE_LOOT_DUMMY1 = %1100 ; placeholder, shouldn't be used
+ONE_ARMED_BANDIT_STATE_LOOT_DUMMY2 = %1110 ; ditto
 
 REEL_POS_SEVEN  = %00000000
 REEL_POS_CHERRY = %00010000
@@ -124,6 +128,10 @@ one_armed_bandit_update_dispatch_lut:
         .addr ENEMY_UPDATE_update_one_armed_bandit_anticipate
         .addr ENEMY_UPDATE_update_one_armed_bandit_attack
         .addr ENEMY_UPDATE_update_one_armed_bandit_frozen
+        .addr ENEMY_UPDATE_update_one_armed_bandit_terminal_award_coins
+        .addr ENEMY_UPDATE_update_one_armed_bandit_terminal_award_diamonds
+        .addr ENEMY_UPDATE_update_one_armed_bandit_terminal_award_coins ; shouldn't be used?
+        .addr ENEMY_UPDATE_update_one_armed_bandit_terminal_award_coins ; ditto?
 
 .proc ENEMY_UPDATE_update_one_armed_bandit
 DestFunc := R0
@@ -373,10 +381,6 @@ CurrentTile := R15
         rts
 
 become_defeated:
-        ; TODO - we can't really spawn sprites here... can we? they'd show up too soon...
-        ; how should we punch up the success state? much pondering! this isn't the only enemy
-        ; that may self-defeat...
-
         ; Firstly, figure out what we should spawn. Cherries are a special case:
         ; if WE are currently a cherry, we'll always roll a healing item
 check_healing_item:
@@ -431,26 +435,29 @@ check_magic_spell:
         bne no_magic_spell
         jmp reward_magic_spell
 no_magic_spell:
-        ; Failure! ... ermh... just vanish in a puff of logic?
-        ; ... sure? oh, but reward standard loot while we're at it
+        ; This is a "loot" reward, so set us into the appropriate state for that
         ldx CurrentTile
-        stx DiscoTile
-        lda CurrentRow
-        sta DiscoRow
-        near_call ENEMY_UPDATE_draw_disco_tile_here
-        set_loot_table ONE_ARMED_BANDIT_LOOT_TABLE
-        roll_loot_at CurrentTile
+        oab_set_state #ONE_ARMED_BANDIT_STATE_LOOT_COINS
+        ; Draw an earth-tinged "explode" tile in our current location, this will
+        ; appear underneath the death sprite
+        lda #<BG_TILE_EXPLOSION
+        sta tile_patterns, x
+        lda #>BG_TILE_EXPLOSION
+        ora #PAL_EARTH
+        sta tile_attributes, x
         jmp shared_juice_and_cleanup
 
 reward_small_treasure:
-        ; "Small" treasure is one "diamond" per bandit. We should have a loot table that forces this
+        ; This is a "loot" reward, so set us into the appropriate state for that
         ldx CurrentTile
-        stx DiscoTile
-        lda CurrentRow
-        sta DiscoRow
-        near_call ENEMY_UPDATE_draw_disco_tile_here
-        set_loot_table one_diamond_loot_table
-        roll_base_loot_at CurrentTile
+        oab_set_state #ONE_ARMED_BANDIT_STATE_LOOT_GEMS
+        ; Draw an earth-tinged "explode" tile in our current location, this will
+        ; appear underneath the death sprite
+        lda #<BG_TILE_EXPLOSION
+        sta tile_patterns, x
+        lda #>BG_TILE_EXPLOSION
+        ora #PAL_EARTH
+        sta tile_attributes, x
         ; Since we're rewarding the player, play a chime
         queue_sfx_pulse1 sfx_puzzle_success_pulse
         queue_sfx_triangle sfx_puzzle_success_tri
@@ -510,23 +517,55 @@ cleanup_without_sfx:
         far_call ENEMY_BOMB_SPELL_spawn_death_sprite_here
         ; because we updated ourselves this frame, but we are no longer, decrement ourselves again
         dec enemies_active
-        
-        ; Trying WITHOUT this?
-        ; ... should we draw the new tile to the active buffer right now? It's sortof a delayed
-        ; player-caused transformation, it might look weird if we don't...
-        ; ... I'm gonna try it.
-        ;lda CurrentTile
-        ;sta TargetIndex
-        ;jsr draw_active_tile
-        ; If we were palette cycling before, we shouldn't be now. (this looks odd after a forced tile draw)
-        ;lda CurrentTile
-        ;jsr unqueue_palette_cycle
 
+        rts
+.endproc
 
-        ; TODO: are all of my buddies also frozen? If so, become defeated!
-        ; If all of my buddies are on a matching symbol, drop that particular
-        ; loot (rolling from tables as needed, etc etc), otherwise drop a large
-        ; quantity of standard loot.
+.proc ENEMY_UPDATE_update_one_armed_bandit_terminal_award_coins
+; for draw_active_tile
+TargetIndex := R0
+
+ScratchByte := R0
+CurrentRow := R14
+CurrentTile := R15
+        ; This is the state a failed match ends up in, so it should use the 3-coin loot table
+        set_loot_table three_coins_loot_table
+        roll_base_loot_at CurrentTile
+
+        ; now turn ourselves into a regular disco tile, and that should be it
+        ldx CurrentTile
+        stx DiscoTile
+        lda CurrentRow
+        sta DiscoRow
+        near_call ENEMY_UPDATE_draw_disco_tile_here
+
+        ; because we updated ourselves this frame, but we are no longer, decrement ourselves again
+        dec enemies_active
+
+        rts
+.endproc
+
+.proc ENEMY_UPDATE_update_one_armed_bandit_terminal_award_diamonds
+; for draw_active_tile
+TargetIndex := R0
+
+ScratchByte := R0
+CurrentRow := R14
+CurrentTile := R15
+        ; This is a successful "gems" match, so reward "gems" (2 diamonds)
+        set_loot_table two_diamonds_loot_table
+        roll_base_loot_at CurrentTile
+
+        ; now turn ourselves into a regular disco tile, and that should be it
+        ldx CurrentTile
+        stx DiscoTile
+        lda CurrentRow
+        sta DiscoRow
+        near_call ENEMY_UPDATE_draw_disco_tile_here
+
+        ; because we updated ourselves this frame, but we are no longer, decrement ourselves again
+        dec enemies_active
+
         rts
 .endproc
 

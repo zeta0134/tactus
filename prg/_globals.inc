@@ -9,3 +9,4 @@
 .global one_diamond_loot_table
 .global two_diamonds_loot_table
 .global three_diamonds_loot_table
+.global three_coins_loot_table
