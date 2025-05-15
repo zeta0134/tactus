@@ -5,3 +5,4 @@
 .global FAR_reset_palette_cycler
 .global FAR_update_palette_cycler
 .global FAR_reset_palette_warp_tile
+.global FAR_queue_late_cycle_phase

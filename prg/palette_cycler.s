@@ -214,3 +214,90 @@ set_high_byte:
         sta (AttributeAddr), y
         rts
 .endproc
+
+; Call this when you've enabled palette cycling for an enemy, but it's
+; after the "reset" beat. This will correct their active palette (right now) to match
+; what it "should" be, so that the rest of the effect plays out in sync. Meant for when
+; we need to start palette cycling in enemy logic rather than in response to player
+; logic. Tile index in A as usual
+.proc FAR_queue_late_cycle_phase
+TempPal := R0
+TargetIndex := R1
+AttributeAddr := R2
+
+HighRowScratch := R4
+LowRowScratch := R5
+        sta TargetIndex
+        ; First up, queue this palette cycle normally
+        jsr queue_palette_cycle
+        ; Now we need to find that tile and fix its current attributes.
+        ; This bit is just like _cycle_target_tile
+        lda #0
+        sta HighRowScratch
+
+        lda TargetIndex
+        asl
+        rol HighRowScratch
+        asl
+        rol HighRowScratch
+        and #%11000000
+        sta LowRowScratch
+        ; now deal with the column, which here is x2 (we'll do a +32 later to skip over the row)
+        lda TargetIndex
+        asl
+        and #%00011110
+        ora LowRowScratch
+        sta AttributeAddr+0
+
+        lda active_battlefield
+        bne second_nametable
+        lda #$58
+        jmp set_high_byte
+second_nametable:
+        lda #$5C
+set_high_byte:
+        ora HighRowScratch
+        sta AttributeAddr+1
+
+        ; Now that we have this, work out the new attribute. The "frames remaining" counter
+        ; works backwards, so first compute the number of ticks that have already run,
+        ; mod 4
+        lda #FRAMES_TO_CYCLE
+        sec
+        sbc frames_remaining
+        and #%00000011
+        ; now we need to add this to the palette bits, so get that shifted into place
+        clc
+        ror ; 0000000x x
+        ror ; x0000000 x
+        ror ; xx000000 0
+        ; and stash it, we'll use it four times
+        sta TempPal
+
+        ; Now we just tickle the palette accordingly by adding our computed
+        ; TempPal to the existing palette
+        ldy #0
+        lda TempPal
+        clc
+        adc (AttributeAddr), y
+        sta (AttributeAddr), y
+
+        ldy #1
+        lda TempPal
+        clc
+        adc (AttributeAddr), y
+        sta (AttributeAddr), y
+
+        ldy #32
+        lda TempPal
+        clc
+        adc (AttributeAddr), y
+        sta (AttributeAddr), y
+
+        ldy #33
+        lda TempPal
+        clc
+        adc (AttributeAddr), y
+        sta (AttributeAddr), y
+        rts
+.endproc

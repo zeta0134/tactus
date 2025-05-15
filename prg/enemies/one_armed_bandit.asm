@@ -461,6 +461,8 @@ reward_small_treasure:
         ; Since we're rewarding the player, play a chime
         queue_sfx_pulse1 sfx_puzzle_success_pulse
         queue_sfx_triangle sfx_puzzle_success_tri
+        lda CurrentTile
+        far_call FAR_queue_late_cycle_phase
         jmp shared_juice_and_cleanup
 reward_big_treasure:
         ; "Big" treasure is one gold sack, as an item. This means we need to replace ourselves with an
@@ -474,6 +476,8 @@ reward_big_treasure:
         ; Since we're rewarding the player, play a chime
         queue_sfx_pulse1 sfx_puzzle_success_pulse
         queue_sfx_triangle sfx_puzzle_success_tri
+        lda CurrentTile
+        far_call FAR_queue_late_cycle_phase
         jmp shared_juice_and_cleanup        
 reward_healing_item:
         ; "Healing" items are just food. For now, spawn a buffet of medium fries
@@ -487,6 +491,8 @@ reward_healing_item:
         ; Since we're rewarding the player, play a chime
         queue_sfx_pulse1 sfx_puzzle_success_pulse
         queue_sfx_triangle sfx_puzzle_success_tri
+        lda CurrentTile
+        far_call FAR_queue_late_cycle_phase
         jmp shared_juice_and_cleanup
 reward_magic_spell:
         ; Magic spells basically queue up the appropriate spell effect, just like if the player
@@ -504,6 +510,8 @@ reward_magic_spell:
         lda CurrentRow
         sta DiscoRow
         near_call ENEMY_UPDATE_draw_disco_tile_here
+        lda CurrentTile
+        far_call FAR_queue_late_cycle_phase
         ; And perform the remainder of shared cleanup, minus defeat SFX (since we want the spell SFX to play instead)
         jmp cleanup_without_sfx
 
