@@ -62,3 +62,17 @@ divide_loop:
 .endscope
 .endmacro
 
+; similar, but clamped to 0-31 to keep the performance in check. ideal
+; for rather small rolls
+.macro in_range_smol_from_table_y range
+.scope
+    prng_from_table_y
+    and #$1F
+    sec
+divide_loop:
+    sbc range
+    bcs divide_loop
+    adc range
+    perform_zpcm_inc
+.endscope
+.endmacro

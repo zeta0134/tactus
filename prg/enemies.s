@@ -571,6 +571,13 @@ tile_suspend TILE_CULTIST, ENEMY_UTIL_cultist_suspend_logic
 tile_explode TILE_CULTIST, ENEMY_BOMB_SPELL_one_armed_bandit_direct_explode, ENEMY_BOMB_SPELL_one_armed_bandit_indirect_explode
 tile_spell   TILE_CULTIST, ENEMY_BOMB_SPELL_cultist_spell_dispatch
 
+tile_update  TILE_MAGIC_CIRCLE, ENEMY_UPDATE_cultist_magic_circle
+tile_attack  TILE_MAGIC_CIRCLE, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_MAGIC_CIRCLE, FIXED_no_behavior
+tile_suspend TILE_MAGIC_CIRCLE, ENEMY_UTIL_draw_cleared_disco_tile
+tile_explode TILE_MAGIC_CIRCLE, FIXED_no_behavior, FIXED_no_behavior    ; ... shouldn't this cancel the teleport?
+tile_spell   TILE_MAGIC_CIRCLE, FIXED_no_behavior 
+
 .segment "PRGRAM"
 
 RoomStateBanditsActiveCurrent:  .res 4

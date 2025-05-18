@@ -473,6 +473,14 @@ PackSize := R19
         sta BanditsSpawned+2
         sta BanditsSpawned+3
 
+        .if ::DEBUG_SINGLE_ENEMY
+        lda PopulationLimit
+        beq no_population_override
+        lda #1
+        sta PopulationLimit
+no_population_override:
+        .endif
+
         ; basically, keep spawning until we hit our population cap
 loop:
         perform_zpcm_inc
@@ -523,6 +531,11 @@ fixed_pack_size:
         clc
         adc (EntityPtr), y
         sta PackSize
+
+        .if ::DEBUG_SINGLE_ENEMY
+        lda #1
+        sta PackSize
+        .endif
         
         ; increase the population count by the rolled pack size (it may
         ; slightly exceed the intended limit; this is fine)

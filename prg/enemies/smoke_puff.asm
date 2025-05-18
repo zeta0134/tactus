@@ -3,6 +3,12 @@
 ; ============================================================================================================================
         .segment "ENEMY_UPDATE"
 .proc ENEMY_UPDATE_update_smoke_puff
+CurrentTile := R15
+
+        ; Do not revert to a disco tile if we are already updating today
+        ldx CurrentTile
+        bail_if_already_moved
+
         ; All a smoke puff needs to do is return to normal floor after one beat
         near_call ENEMY_UPDATE_draw_disco_tile
         rts
