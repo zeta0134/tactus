@@ -218,6 +218,7 @@ tile_index_to_col_lut:
 .include "enemies/birb.asm"
 .include "enemies/cardinal_chaser.asm"
 .include "enemies/challenge_spikes.asm"
+.include "enemies/cultist.asm"
 .include "enemies/diagonal_chaser.asm"
 .include "enemies/disco_tile.asm"
 .include "enemies/exit_block.asm"
@@ -559,9 +560,16 @@ tile_spell   TILE_TOTEM, FIXED_no_behavior
 tile_update  TILE_ONE_ARMED_BANDIT, ENEMY_UPDATE_update_one_armed_bandit
 tile_attack  TILE_ONE_ARMED_BANDIT, ENEMY_ATTACK_direct_attack_one_armed_bandit, ENEMY_ATTACK_indirect_attack_one_armed_bandit
 tile_collide TILE_ONE_ARMED_BANDIT, ENEMY_COLLIDE_one_armed_bandit_attacks_player
-tile_suspend TILE_ONE_ARMED_BANDIT, ENEMY_UTIL_move_away_from_map_edge
+tile_suspend TILE_ONE_ARMED_BANDIT, ENEMY_UTIL_one_armed_bandit_suspend
 tile_explode TILE_ONE_ARMED_BANDIT, ENEMY_BOMB_SPELL_one_armed_bandit_direct_explode, ENEMY_BOMB_SPELL_one_armed_bandit_indirect_explode
-tile_spell   TILE_ONE_ARMED_BANDIT, ENEMY_BOMB_SPELL_one_armed_bandit_spell_dispatch
+tile_spell   TILE_ONE_ARMED_BANDIT, FIXED_no_behavior
+
+tile_update  TILE_CULTIST, ENEMY_UPDATE_cultist
+tile_attack  TILE_CULTIST, ENEMY_ATTACK_direct_attack_cultist, ENEMY_ATTACK_indirect_attack_cultist
+tile_collide TILE_CULTIST, ENEMY_COLLIDE_cultist_attacks_player
+tile_suspend TILE_CULTIST, ENEMY_UTIL_cultist_suspend_logic
+tile_explode TILE_CULTIST, ENEMY_BOMB_SPELL_one_armed_bandit_direct_explode, ENEMY_BOMB_SPELL_one_armed_bandit_indirect_explode
+tile_spell   TILE_CULTIST, ENEMY_BOMB_SPELL_cultist_spell_dispatch
 
 .segment "PRGRAM"
 

@@ -5,7 +5,7 @@ DEBUG_GOD_MODE = 1
 
 DEBUG_SPAWN_OVERRIDE = 1
 
-DEBUG_FORCE_SEED = 1
+DEBUG_FORCE_SEED = 0
 DEBUG_SEED = $BCD855CE
 
 ; Force a single specific item to always spawn in shops, for testing

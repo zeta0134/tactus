@@ -187,6 +187,26 @@ enemy_one_armed_bandit_fire:
         default_spawn_pool_details
         pack_size 3, 4
 
+enemy_cultist_earth:
+        full_spawn_entry TILE_CULTIST, BG_TILE_CULTIST_IDLE, PAL_EARTH, 0, 0, single_disco_tile
+        default_spawn_pool_details
+        pack_size 3, 4
+
+enemy_cultist_air:
+        full_spawn_entry TILE_CULTIST, BG_TILE_CULTIST_IDLE, PAL_AIR, 0, 0, single_disco_tile
+        default_spawn_pool_details
+        pack_size 3, 4
+
+enemy_cultist_ice:
+        full_spawn_entry TILE_CULTIST, BG_TILE_CULTIST_IDLE, PAL_ICE, 0, 0, single_disco_tile
+        default_spawn_pool_details
+        pack_size 3, 4
+
+enemy_cultist_fire:
+        full_spawn_entry TILE_CULTIST, BG_TILE_CULTIST_IDLE, PAL_FIRE, 0, 0, single_disco_tile
+        default_spawn_pool_details
+        pack_size 3, 4
+
 
 
 

@@ -468,8 +468,8 @@ PackSize := R19
         ; DEBUG: only allow two groups to spawn
         lda #4
         sta BanditsSpawned+0
-        sta BanditsSpawned+1
         lda #0
+        sta BanditsSpawned+1
         sta BanditsSpawned+2
         sta BanditsSpawned+3
 

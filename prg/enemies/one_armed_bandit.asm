@@ -964,7 +964,62 @@ done_fixing_frozen_counter:
         rts
 .endproc
 
-.proc ENEMY_BOMB_SPELL_one_armed_bandit_spell_dispatch
-        ; TODO: change our color **and** advance/redraw our reel symbol
-        rts
+; ============================================================================================================================
+; ===                                             Suspend Behaviors                                                        ===
+; ============================================================================================================================
+        .segment "ENEMY_UTIL"
+
+; Suspend logic needs its own copy of this table for drawing
+suspend_slot_reel_idle_earth:
+        .word (PAL_EARTH << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_7
+        .word (PAL_EARTH << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_CHERRY
+        .word (PAL_EARTH << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_GEM
+        .word (PAL_EARTH << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_LEAF
+suspend_slot_reel_idle_ice:
+        .word (PAL_ICE << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_7
+        .word (PAL_ICE << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_CHERRY
+        .word (PAL_ICE << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_GEM
+        .word (PAL_ICE << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_SNOWFLAKE
+suspend_slot_reel_idle_air:
+        .word (PAL_AIR << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_7
+        .word (PAL_AIR << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_CHERRY
+        .word (PAL_AIR << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_GEM
+        .word (PAL_AIR << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_LIGHTNING
+suspend_slot_reel_idle_fire:
+        .word (PAL_FIRE << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_7
+        .word (PAL_FIRE << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_CHERRY
+        .word (PAL_FIRE << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_GEM
+        .word (PAL_FIRE << 8) | BG_TILE_ONE_ARMED_BANDIT_IDLE_FLAME
+
+.proc ENEMY_UTIL_one_armed_bandit_suspend
+ScratchByte := R0
+CurrentSquare := R15
+        ; In addition to the usual suspend logic, we need to un-freeze ourselves
+        ; AND reset our reel to position 0. The first thing avoids a global state
+        ; bug (bandits pop early when frozen and then revisited) and the second is
+        ; for game feel, as it allows players that mess up the reel position to
+        ; "retry" if they really want to.
+
+        ldx CurrentSquare
+        ; Set our state back to idle (regardless of what it was originally)
+        lda tile_flags, x
+        and #($FF - ONE_ARMED_BANDIT_FLAGS_STATE)
+        ora #ONE_ARMED_BANDIT_STATE_IDLE
+        sta tile_flags, x
+        ; Reset our reel to the 7 slot, which is a reasonable enough default
+        lda tile_data, x
+        and #($FF - ONE_ARMED_BANDIT_DATA_REEL_POS)
+        ora #REEL_POS_SEVEN
+        sta tile_data, x
+        ; Redraw ourselves based on the above
+        oab_compute_reel_index ScratchByte
+        tay
+        lda suspend_slot_reel_idle_earth+0, y
+        sta tile_patterns, x
+        lda suspend_slot_reel_idle_earth+1, y
+        sta tile_attributes, x
+
+        ; And finally, run typical suspend logic
+        near_call ENEMY_UTIL_move_away_from_map_edge
+        rts 
 .endproc
