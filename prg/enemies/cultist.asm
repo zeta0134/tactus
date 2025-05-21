@@ -60,6 +60,221 @@ CULTIST_STATE_CASTING      = %00000111
 ; ============================================================================================================================
         .segment "ENEMY_UPDATE"
 
+cultist_cast_table_io:
+        ; [ ] [ ] [ ]
+        ; [s] [C] [ ]
+        ; [s] [s] [ ]
+        .byte <((0 * BATTLEFIELD_WIDTH) - 1)
+        .byte <((1 * BATTLEFIELD_WIDTH) - 1)
+        .byte <((1 * BATTLEFIELD_WIDTH) + 0)
+        .byte 0 ; padding
+        ; [s] [s] [ ]
+        ; [s] [C] [ ]
+        ; [ ] [ ] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) - 1)
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) - 1)
+        .byte 0 ; padding
+        ; [ ] [s] [s]
+        ; [ ] [C] [s]
+        ; [ ] [ ] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 1)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) + 0)
+        .byte 0 ; padding
+        ; [ ] [ ] [ ]
+        ; [ ] [C] [s]
+        ; [ ] [s] [s]
+        .byte <((0 * BATTLEFIELD_WIDTH) + 1)
+        .byte <((1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <((1 * BATTLEFIELD_WIDTH) + 1)
+        .byte 0 ; padding
+        ; [ ] [ ] [ ] [ ]
+        ; [ ] [ ] [ ] [ ]
+        ; [s] [C] [s] [s]
+        ; [ ] [ ] [ ] [ ]
+        .byte <((0 * BATTLEFIELD_WIDTH) - 1)
+        .byte <((0 * BATTLEFIELD_WIDTH) + 1)
+        .byte <((0 * BATTLEFIELD_WIDTH) + 2)
+        .byte 0 ; padding
+        ; [ ] [ ] [ ] [ ]
+        ; [ ] [ ] [ ] [ ]
+        ; [s] [s] [C] [s]
+        ; [ ] [ ] [ ] [ ]
+        .byte <((0 * BATTLEFIELD_WIDTH) - 2)
+        .byte <((0 * BATTLEFIELD_WIDTH) - 1)
+        .byte <((0 * BATTLEFIELD_WIDTH) + 1)
+        .byte 0 ; padding
+        ; [ ] [s] [ ] [ ]
+        ; [ ] [s] [ ] [ ]
+        ; [ ] [C] [ ] [ ]
+        ; [ ] [s] [ ] [ ]
+        .byte <((-2 * BATTLEFIELD_WIDTH) + 0)
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 1 * BATTLEFIELD_WIDTH) + 0)
+        .byte 0 ; padding
+        ; [ ] [s] [ ] [ ]
+        ; [ ] [C] [ ] [ ]
+        ; [ ] [s] [ ] [ ]
+        ; [ ] [s] [ ] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 2 * BATTLEFIELD_WIDTH) + 0)
+        .byte 0 ; padding
+
+; In this arrangement, with the cultist centered,
+; the T shape only has 4 meaningful variants. We
+; only have 7 shapes and someone had to get the short
+; end of the stick. Sorry, T cultist! Next time try
+; being *less* evil.
+cultist_cast_table_t:
+        .repeat 2        
+        ; [ ] [ ] [ ]
+        ; [s] [C] [s]
+        ; [ ] [s] [ ]
+        .byte <((0 * BATTLEFIELD_WIDTH) - 1)
+        .byte <((0 * BATTLEFIELD_WIDTH) + 1)
+        .byte <((1 * BATTLEFIELD_WIDTH) + 0)
+        .byte 0 ; padding
+        ; [ ] [s] [ ]
+        ; [ ] [C] [s]
+        ; [ ] [s] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) + 1)
+        .byte <(( 1 * BATTLEFIELD_WIDTH) + 0)
+        .byte 0 ; padding        
+        ; [ ] [s] [ ]
+        ; [s] [C] [s]
+        ; [ ] [ ] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) - 1)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) + 1)
+        .byte 0 ; padding
+        ; [ ] [s] [ ]
+        ; [s] [C] [ ]
+        ; [ ] [s] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) - 1)
+        .byte <(( 1 * BATTLEFIELD_WIDTH) + 0)
+        .byte 0 ; padding
+        .endrepeat
+
+cultist_cast_table_lj:
+        ; [ ] [s] [ ]
+        ; [ ] [C] [ ]
+        ; [ ] [s] [s]
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 1 * BATTLEFIELD_WIDTH) + 1)
+        .byte 0 ; padding
+        ; [ ] [ ] [s]
+        ; [s] [C] [s]
+        ; [ ] [ ] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 1)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) - 1)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) + 1)
+        .byte 0 ; padding
+        ; [s] [s] [ ]
+        ; [ ] [C] [ ]
+        ; [ ] [s] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) - 1)
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 1 * BATTLEFIELD_WIDTH) + 0)
+        .byte 0 ; padding
+        ; [ ] [ ] [ ]
+        ; [s] [C] [s]
+        ; [s] [ ] [ ]
+        .byte <((0 * BATTLEFIELD_WIDTH) - 1)
+        .byte <((0 * BATTLEFIELD_WIDTH) + 1)
+        .byte <((1 * BATTLEFIELD_WIDTH) - 1)
+        .byte 0 ; padding        
+        ; [ ] [s] [ ]
+        ; [ ] [C] [ ]
+        ; [s] [s] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 1 * BATTLEFIELD_WIDTH) - 1)
+        .byte <(( 1 * BATTLEFIELD_WIDTH) + 0)
+        .byte 0 ; padding
+        ; [ ] [ ] [ ]
+        ; [s] [C] [s]
+        ; [ ] [ ] [s]
+        .byte <((0 * BATTLEFIELD_WIDTH) - 1)
+        .byte <((0 * BATTLEFIELD_WIDTH) + 1)
+        .byte <((1 * BATTLEFIELD_WIDTH) + 1)
+        .byte 0 ; padding
+        ; [ ] [s] [s]
+        ; [ ] [C] [ ]
+        ; [ ] [s] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 1)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) + 0)
+        .byte 0 ; padding
+        ; [s] [ ] [ ]
+        ; [s] [C] [s]
+        ; [ ] [ ] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) - 1)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) - 1)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) + 1)
+        .byte 0 ; padding
+
+cultist_cast_table_sz:
+        ; [ ] [ ] [ ]
+        ; [ ] [C] [s]
+        ; [s] [s] [ ]
+        .byte <((0 * BATTLEFIELD_WIDTH) + 1)
+        .byte <((1 * BATTLEFIELD_WIDTH) - 1)
+        .byte <((1 * BATTLEFIELD_WIDTH) + 0)
+        .byte 0 ; padding
+        ; [ ] [s] [s]
+        ; [s] [C] [ ]
+        ; [ ] [ ] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 1)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) - 1)
+        .byte 0 ; padding
+        ; [ ] [s] [ ]
+        ; [ ] [C] [s]
+        ; [ ] [ ] [s]
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) + 1)
+        .byte <(( 1 * BATTLEFIELD_WIDTH) + 1)
+        .byte 0 ; padding
+        ; [s] [ ] [ ]
+        ; [s] [C] [ ]
+        ; [ ] [s] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) - 1)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) - 1)
+        .byte <(( 1 * BATTLEFIELD_WIDTH) + 0)
+        .byte 0 ; padding
+        ; [ ] [ ] [ ]
+        ; [s] [C] [ ]
+        ; [ ] [s] [s]
+        .byte <((0 * BATTLEFIELD_WIDTH) - 1)
+        .byte <((1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <((1 * BATTLEFIELD_WIDTH) + 1)
+        .byte 0 ; padding
+        ; [s] [s] [ ]
+        ; [ ] [C] [s]
+        ; [ ] [ ] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) - 1)
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) + 1)
+        .byte 0 ; padding
+        ; [ ] [s] [ ]
+        ; [s] [C] [ ]
+        ; [s] [ ] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 0)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) - 1)
+        .byte <(( 1 * BATTLEFIELD_WIDTH) - 1)
+        .byte 0 ; padding
+        ; [ ] [ ] [s]
+        ; [ ] [C] [s]
+        ; [ ] [s] [ ]
+        .byte <((-1 * BATTLEFIELD_WIDTH) + 1)
+        .byte <(( 0 * BATTLEFIELD_WIDTH) + 1)
+        .byte <(( 1 * BATTLEFIELD_WIDTH) + 0)
+        .byte 0 ; padding
+
 cultist_update_dispatch_lut:
         .addr ENEMY_UPDATE_cultist_mercy_wait
         .addr ENEMY_UPDATE_cultist_idle
