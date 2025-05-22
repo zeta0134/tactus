@@ -187,198 +187,24 @@ loop:
 .endproc
 .export bhop_apply_dpcm_bank
 
-; TODO: do these REALLY need to be in fixed? surely we could far_call without too much
-; of a performance penalty, non?
-
+; stubbed
 .proc _play_sfx_pulse1
-        perform_zpcm_inc
-
-        lda current_save + SaveFile::OptionSfxMode
-        cmp #OPTION_SFX_ENABLED
-        beq sfx_enabled
-        perform_zpcm_inc
-        rts
-sfx_enabled:
-
-        ; Check our candidate priority against the channel's active priority.
-        ; If the candidate is lower (<) than the current priority, bail without
-        ; doing anything.
-        lda CandidateSfxPriority
-        cmp Pulse1Priority
-        bcs candidate_check_succeeded
-        rts
-candidate_check_succeeded:
-        sta Pulse1Priority
-
-        lda system_type
-        cmp #SYSTEM_TYPE_PAL
-        beq use_pal_sfx
-use_ntsc_sfx:
-        access_data_bank #<.bank(sfx_data_ntsc)
-        jmp done_picking_sfx_bank
-use_pal_sfx:
-        access_data_bank #<.bank(sfx_data_pal)
-        jmp done_picking_sfx_bank
-done_picking_sfx_bank:
-
-        lda CandidateSfxPtr
-        sta Pulse1SfxPtr
-        lda CandidateSfxPtr+1
-        sta Pulse1SfxPtr+1
-        ldy #0
-        lda (Pulse1SfxPtr), y
-        sta Pulse1RowCounter
-        inc16 Pulse1SfxPtr
-        lda #0
-        sta Pulse1DelayCounter
-        lda #0
-        far_call bhop_mute_channel
-        restore_previous_bank
-        perform_zpcm_inc
+        far_call FAR_play_sfx_pulse1
         rts
 .endproc
 
 .proc _play_sfx_pulse2
-        perform_zpcm_inc
-
-        lda current_save + SaveFile::OptionSfxMode
-        cmp #OPTION_SFX_ENABLED
-        beq sfx_enabled
-        perform_zpcm_inc
-        rts
-sfx_enabled:
-
-        ; Check our candidate priority against the channel's active priority.
-        ; If the candidate is lower (<) than the current priority, bail without
-        ; doing anything.
-        lda CandidateSfxPriority
-        cmp Pulse2Priority
-        bcs candidate_check_succeeded
-        rts
-candidate_check_succeeded:
-        sta Pulse2Priority
-
-        lda system_type
-        cmp #SYSTEM_TYPE_PAL
-        beq use_pal_sfx
-use_ntsc_sfx:
-        access_data_bank #<.bank(sfx_data_ntsc)
-        jmp done_picking_sfx_bank
-use_pal_sfx:
-        access_data_bank #<.bank(sfx_data_pal)
-        jmp done_picking_sfx_bank
-done_picking_sfx_bank:
-
-        lda CandidateSfxPtr
-        sta Pulse2SfxPtr
-        lda CandidateSfxPtr+1
-        sta Pulse2SfxPtr+1
-        ldy #0
-        lda (Pulse2SfxPtr), y
-        sta Pulse2RowCounter
-        inc16 Pulse2SfxPtr
-        lda #0
-        sta Pulse2DelayCounter
-        lda #1
-        far_call bhop_mute_channel
-        restore_previous_bank
-        perform_zpcm_inc
+        far_call FAR_play_sfx_pulse2
         rts
 .endproc
 
 .proc _play_sfx_triangle
-        perform_zpcm_inc
-
-        lda current_save + SaveFile::OptionSfxMode
-        cmp #OPTION_SFX_ENABLED
-        beq sfx_enabled
-        perform_zpcm_inc
-        rts
-sfx_enabled:
-
-        ; Check our candidate priority against the channel's active priority.
-        ; If the candidate is lower (<) than the current priority, bail without
-        ; doing anything.
-        lda CandidateSfxPriority
-        cmp TrianglePriority
-        bcs candidate_check_succeeded
-        rts
-candidate_check_succeeded:
-        sta TrianglePriority
-
-        lda system_type
-        cmp #SYSTEM_TYPE_PAL
-        beq use_pal_sfx
-use_ntsc_sfx:
-        access_data_bank #<.bank(sfx_data_ntsc)
-        jmp done_picking_sfx_bank
-use_pal_sfx:
-        access_data_bank #<.bank(sfx_data_pal)
-        jmp done_picking_sfx_bank
-done_picking_sfx_bank:
-
-        lda CandidateSfxPtr
-        sta TriangleSfxPtr
-        lda CandidateSfxPtr+1
-        sta TriangleSfxPtr+1
-        ldy #0
-        lda (TriangleSfxPtr), y
-        sta TriangleRowCounter
-        inc16 TriangleSfxPtr
-        lda #0
-        sta TriangleDelayCounter
-        lda #2
-        far_call bhop_mute_channel
-        restore_previous_bank
-        perform_zpcm_inc
+        far_call FAR_play_sfx_triangle
         rts
 .endproc
 
 .proc _play_sfx_noise
-        perform_zpcm_inc
-
-        lda current_save + SaveFile::OptionSfxMode
-        cmp #OPTION_SFX_ENABLED
-        beq sfx_enabled
-        perform_zpcm_inc
-        rts
-sfx_enabled:
-
-        ; Check our candidate priority against the channel's active priority.
-        ; If the candidate is lower (<) than the current priority, bail without
-        ; doing anything.
-        lda CandidateSfxPriority
-        cmp NoisePriority
-        bcs candidate_check_succeeded
-        rts
-candidate_check_succeeded:
-        sta NoisePriority
-
-        lda system_type
-        cmp #SYSTEM_TYPE_PAL
-        beq use_pal_sfx
-use_ntsc_sfx:
-        access_data_bank #<.bank(sfx_data_ntsc)
-        jmp done_picking_sfx_bank
-use_pal_sfx:
-        access_data_bank #<.bank(sfx_data_pal)
-        jmp done_picking_sfx_bank
-done_picking_sfx_bank:
-
-        lda CandidateSfxPtr
-        sta NoiseSfxPtr
-        lda CandidateSfxPtr+1
-        sta NoiseSfxPtr+1
-        ldy #0
-        lda (NoiseSfxPtr), y
-        sta NoiseRowCounter
-        inc16 NoiseSfxPtr
-        lda #0
-        sta NoiseDelayCounter
-        lda #3
-        far_call bhop_mute_channel
-        restore_previous_bank
-        perform_zpcm_inc
+        far_call FAR_play_sfx_noise
         rts
 .endproc
 
@@ -568,6 +394,201 @@ invalid_variant:
         ; switch to variant 0 instead, which is always present and safe
         lda #0
         sta target_music_variant
+        rts
+.endproc
+
+; TODO: do these REALLY need to be in fixed? surely we could far_call without too much
+; of a performance penalty, non?
+
+.proc FAR_play_sfx_pulse1
+        perform_zpcm_inc
+
+        lda current_save + SaveFile::OptionSfxMode
+        cmp #OPTION_SFX_ENABLED
+        beq sfx_enabled
+        perform_zpcm_inc
+        rts
+sfx_enabled:
+
+        ; Check our candidate priority against the channel's active priority.
+        ; If the candidate is lower (<) than the current priority, bail without
+        ; doing anything.
+        lda CandidateSfxPriority
+        cmp Pulse1Priority
+        bcs candidate_check_succeeded
+        rts
+candidate_check_succeeded:
+        sta Pulse1Priority
+
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq use_pal_sfx
+use_ntsc_sfx:
+        access_data_bank #<.bank(sfx_data_ntsc)
+        jmp done_picking_sfx_bank
+use_pal_sfx:
+        access_data_bank #<.bank(sfx_data_pal)
+        jmp done_picking_sfx_bank
+done_picking_sfx_bank:
+
+        lda CandidateSfxPtr
+        sta Pulse1SfxPtr
+        lda CandidateSfxPtr+1
+        sta Pulse1SfxPtr+1
+        ldy #0
+        lda (Pulse1SfxPtr), y
+        sta Pulse1RowCounter
+        inc16 Pulse1SfxPtr
+        lda #0
+        sta Pulse1DelayCounter
+        lda #0
+        near_call bhop_mute_channel
+        restore_previous_bank
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc FAR_play_sfx_pulse2
+        perform_zpcm_inc
+
+        lda current_save + SaveFile::OptionSfxMode
+        cmp #OPTION_SFX_ENABLED
+        beq sfx_enabled
+        perform_zpcm_inc
+        rts
+sfx_enabled:
+
+        ; Check our candidate priority against the channel's active priority.
+        ; If the candidate is lower (<) than the current priority, bail without
+        ; doing anything.
+        lda CandidateSfxPriority
+        cmp Pulse2Priority
+        bcs candidate_check_succeeded
+        rts
+candidate_check_succeeded:
+        sta Pulse2Priority
+
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq use_pal_sfx
+use_ntsc_sfx:
+        access_data_bank #<.bank(sfx_data_ntsc)
+        jmp done_picking_sfx_bank
+use_pal_sfx:
+        access_data_bank #<.bank(sfx_data_pal)
+        jmp done_picking_sfx_bank
+done_picking_sfx_bank:
+
+        lda CandidateSfxPtr
+        sta Pulse2SfxPtr
+        lda CandidateSfxPtr+1
+        sta Pulse2SfxPtr+1
+        ldy #0
+        lda (Pulse2SfxPtr), y
+        sta Pulse2RowCounter
+        inc16 Pulse2SfxPtr
+        lda #0
+        sta Pulse2DelayCounter
+        lda #1
+        near_call bhop_mute_channel
+        restore_previous_bank
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc FAR_play_sfx_triangle
+        perform_zpcm_inc
+
+        lda current_save + SaveFile::OptionSfxMode
+        cmp #OPTION_SFX_ENABLED
+        beq sfx_enabled
+        perform_zpcm_inc
+        rts
+sfx_enabled:
+
+        ; Check our candidate priority against the channel's active priority.
+        ; If the candidate is lower (<) than the current priority, bail without
+        ; doing anything.
+        lda CandidateSfxPriority
+        cmp TrianglePriority
+        bcs candidate_check_succeeded
+        rts
+candidate_check_succeeded:
+        sta TrianglePriority
+
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq use_pal_sfx
+use_ntsc_sfx:
+        access_data_bank #<.bank(sfx_data_ntsc)
+        jmp done_picking_sfx_bank
+use_pal_sfx:
+        access_data_bank #<.bank(sfx_data_pal)
+        jmp done_picking_sfx_bank
+done_picking_sfx_bank:
+
+        lda CandidateSfxPtr
+        sta TriangleSfxPtr
+        lda CandidateSfxPtr+1
+        sta TriangleSfxPtr+1
+        ldy #0
+        lda (TriangleSfxPtr), y
+        sta TriangleRowCounter
+        inc16 TriangleSfxPtr
+        lda #0
+        sta TriangleDelayCounter
+        lda #2
+        near_call bhop_mute_channel
+        restore_previous_bank
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc FAR_play_sfx_noise
+        perform_zpcm_inc
+
+        lda current_save + SaveFile::OptionSfxMode
+        cmp #OPTION_SFX_ENABLED
+        beq sfx_enabled
+        perform_zpcm_inc
+        rts
+sfx_enabled:
+
+        ; Check our candidate priority against the channel's active priority.
+        ; If the candidate is lower (<) than the current priority, bail without
+        ; doing anything.
+        lda CandidateSfxPriority
+        cmp NoisePriority
+        bcs candidate_check_succeeded
+        rts
+candidate_check_succeeded:
+        sta NoisePriority
+
+        lda system_type
+        cmp #SYSTEM_TYPE_PAL
+        beq use_pal_sfx
+use_ntsc_sfx:
+        access_data_bank #<.bank(sfx_data_ntsc)
+        jmp done_picking_sfx_bank
+use_pal_sfx:
+        access_data_bank #<.bank(sfx_data_pal)
+        jmp done_picking_sfx_bank
+done_picking_sfx_bank:
+
+        lda CandidateSfxPtr
+        sta NoiseSfxPtr
+        lda CandidateSfxPtr+1
+        sta NoiseSfxPtr+1
+        ldy #0
+        lda (NoiseSfxPtr), y
+        sta NoiseRowCounter
+        inc16 NoiseSfxPtr
+        lda #0
+        sta NoiseDelayCounter
+        lda #3
+        near_call bhop_mute_channel
+        restore_previous_bank
+        perform_zpcm_inc
         rts
 .endproc
 

@@ -2,6 +2,7 @@
 .global FAR_play_variant
 .global FAR_fade_to_track
 
+; fixed stubs
 .global _play_sfx_pulse1
 .global _play_sfx_pulse2
 .global _play_sfx_triangle
