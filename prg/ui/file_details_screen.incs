@@ -36,7 +36,7 @@ widget_last_cursor_pos := widgets_data0
         ; TODO: a file select theme? or we just use options for this whole set
         lda #TRACK_OPTIONS
         ldy #TRACK_VARIANT_NORMAL
-        jsr play_track
+        far_call FAR_play_track
 
         ; this screen DOES use extended attributes, so set that up
         lda #0

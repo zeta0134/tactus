@@ -347,7 +347,7 @@ LayoutPtr := R0
         ; Play lovely silence while we're loading
         lda #TRACK_SILENCE
         ldy #TRACK_VARIANT_NORMAL
-        jsr play_track
+        far_call FAR_play_track
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
         sta PPUMASK
@@ -512,7 +512,7 @@ LayoutPtr := R0
         ; (this also ensures the music / beat counter are in a deterministic spot when we fade back in)
         lda #TRACK_SILENCE
         ldy #TRACK_VARIANT_NORMAL
-        jsr play_track
+        far_call FAR_play_track
         ; disable rendering, and soft-disable NMI (so music keeps playing)
         lda #$00
         sta PPUMASK

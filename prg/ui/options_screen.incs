@@ -360,7 +360,7 @@ CurrentWidgetIndex := R20
         ; Play the options track on the options screen
         lda #TRACK_OPTIONS
         ldy #TRACK_VARIANT_NORMAL
-        jsr play_track
+        far_call FAR_play_track
 
         ; the options screen DOES use extended attributes, so set that up
         lda #0
@@ -1014,17 +1014,17 @@ perform_sync:
 play_normal_track:
         lda #TRACK_OPTIONS
         ldy #TRACK_VARIANT_NORMAL
-        jsr play_track
+        far_call FAR_play_track
         rts
 play_click_track:
         lda #TRACK_OPTIONS_DUP_1
         ldy #TRACK_VARIANT_CLICK
-        jsr play_track
+        far_call FAR_play_track
         rts
 play_silent_track:
         lda #TRACK_OPTIONS_DUP_2
         ldy #TRACK_VARIANT_SILENT
-        jsr play_track
+        far_call FAR_play_track
         rts
 .endproc
 

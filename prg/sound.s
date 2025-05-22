@@ -114,99 +114,6 @@ FADE_SPEED = 8
 
         .segment "PRGFIXED_E000"
 
-; todo: figure out if we can move this elsewhere? it might grow
-
-track_table_module_low:
-        .lobytes zeta_silence
-        .lobytes zeta_click_track
-        .lobytes zeta_title
-        .lobytes zeta_options
-        .lobytes zeta_game_over
-        .lobytes zeta_shower_groove
-        .lobytes persune_in_another_world
-        .lobytes zeta_bouncy
-        .lobytes zeta_echoes
-        .lobytes zeta_options
-        .lobytes zeta_options
-
-track_table_module_high:
-        .hibytes zeta_silence
-        .hibytes zeta_click_track
-        .hibytes zeta_title
-        .hibytes zeta_options
-        .hibytes zeta_game_over
-        .hibytes zeta_shower_groove
-        .hibytes persune_in_another_world
-        .hibytes zeta_bouncy
-        .hibytes zeta_echoes
-        .hibytes zeta_options
-        .hibytes zeta_options
-
-track_table_bank:
-        .lobytes .bank(zeta_silence)
-        .lobytes .bank(zeta_click_track)
-        .lobytes .bank(zeta_title)
-        .lobytes .bank(zeta_options)
-        .lobytes .bank(zeta_game_over)
-        .lobytes .bank(zeta_shower_groove)
-        .lobytes .bank(persune_in_another_world)
-        .lobytes .bank(zeta_bouncy)
-        .lobytes .bank(zeta_echoes)
-        .lobytes .bank(zeta_options)
-        .lobytes .bank(zeta_options)
-        
-track_table_song:
-        .byte 0 ; silence (used for transitions)
-        .byte 0 ; click track (meant for debugging)
-        .byte 0 ; title
-        .byte 0 ; options
-        .byte 0 ; gameover
-        .byte 0 ; shower groove
-        .byte 0 ; in another world (warp zone)
-        .byte 0 ; bouncy
-        .byte 0 ; echoes
-        .byte 0 ; options
-        .byte 0 ; options
-
-track_table_num_variants:
-        .byte 5 ; silence 
-        .byte 5 ; click_track
-        .byte 5 ; title music
-        .byte 5 ; options music
-        .byte 5 ; gameover music
-        .byte 5 ; shower groove
-        .byte 5 ; in another world (warp zone)
-        .byte 5 ; bouncy
-        .byte 5 ; echoes
-        .byte 5 ; options music
-        .byte 5 ; options music
-
-track_table_heartbeat_offset:
-        .byte 0 ; silence 
-        .byte 0 ; click_track
-        .byte 0 ; title music
-        .byte 0 ; options music
-        .byte 0 ; gameover music
-        .byte 0 ; level music
-        .byte 4 ; in another world (warp zone)
-        .byte 0 ; bouncy
-        .byte 0 ; echoes
-        .byte 0 ; options music
-        .byte 0 ; options music
-
-track_table_heartbeat_period:
-        .byte 0 ; silence 
-        .byte 8 ; click_track
-        .byte 8 ; title music
-        .byte 8 ; options music
-        .byte 8 ; gameover music
-        .byte 8 ; level music
-        .byte 8 ; in another world (initial, switches to 6 partway through)
-        .byte 8 ; bouncy
-        .byte 8 ; echoes
-        .byte 8 ; options music
-        .byte 8 ; options music
-
 ; bhop calls these functions for bank swapping and ZPCM tomfoolery
 .proc bhop_enable_zpcm
 ScratchPtr := NmiSafePtr
@@ -280,101 +187,8 @@ loop:
 .endproc
 .export bhop_apply_dpcm_bank
 
-
-; interface functions should mostly live in fixed; we'll call these often, and several
-; need A to remain unclobbered
-
-.proc fade_to_track
-        perform_zpcm_inc
-        sta MusicTargetTrack
-        lda #FADE_SPEED
-        sta FadeCounter
-        ; special case: is our current track 0, silence? If so, start playback immediately
-        lda MusicCurrentTrack
-        bne done
-        lda MusicTargetTrack
-        ldy #TRACK_VARIANT_NORMAL
-        jsr play_track
-done:
-        rts
-.endproc
-
-; inputs: track number in A, initial variant in Y
-.proc play_track
-        perform_zpcm_inc
-        sty target_music_variant
-
-        cmp MusicCurrentTrack
-        jeq no_change
-        sta MusicCurrentTrack
-        sta MusicTargetTrack
-        tax
-        lda track_table_bank, x
-        sta MusicCurrentBank
-        access_data_bank MusicCurrentBank
-
-        lda target_music_variant
-        jsr play_variant
-
-        ldx MusicCurrentTrack
-        lda track_table_module_low, x
-        ldy track_table_module_high, x
-        far_call bhop_set_module_addr
-
-        ldx MusicCurrentTrack
-        lda track_table_bank, x
-        far_call bhop_set_module_bank
-
-        perform_zpcm_inc
-
-        ldx MusicCurrentTrack
-        lda track_table_song, x
-        far_call bhop_init
-        lda #0
-        sta global_attenuation
-        restore_previous_bank
-
-        far_call FAR_beat_tracker_init
-        rts
-
-no_change:
-        ; safely re-apply the current music variant (again)
-        ; to be sure it is applied even if we did not actually change songs
-        lda target_music_variant
-        jsr play_variant
-
-        rts
-.endproc
-
-; inputs: variant number in A
-.proc play_variant
-        ; First, check to see if we need to replace this variant based on the music mode
-        ldx current_save + SaveFile::OptionMusicMode
-        cpx #OPTION_MUSIC_CLICK
-        beq force_click_track
-        cpx #OPTION_MUSIC_DISABLED
-        beq force_silent_track
-        jmp use_supplied_variant
-force_click_track:
-        lda #TRACK_VARIANT_CLICK
-        jmp use_supplied_variant
-force_silent_track:
-        lda #TRACK_VARIANT_SILENT
-        ; fall through to use supplied
-use_supplied_variant:
-        ldx MusicCurrentTrack
-        cmp track_table_num_variants, x
-        beq invalid_variant ; variant index must be LESS than the total count
-        bcs invalid_variant
-        ; this variant is valid, so apply it
-        sta target_music_variant
-        rts
-invalid_variant:
-        ; switch to variant 0 instead, which is always present and safe
-        lda #0
-        sta target_music_variant
-        rts
-.endproc
+; TODO: do these REALLY need to be in fixed? surely we could far_call without too much
+; of a performance penalty, non?
 
 .proc _play_sfx_pulse1
         perform_zpcm_inc
@@ -571,6 +385,192 @@ done_picking_sfx_bank:
 ; Everything else goes in the switched bank
         .segment "CODE_SOUND"
 
+track_table_module_low:
+        .lobytes zeta_silence
+        .lobytes zeta_click_track
+        .lobytes zeta_title
+        .lobytes zeta_options
+        .lobytes zeta_game_over
+        .lobytes zeta_shower_groove
+        .lobytes persune_in_another_world
+        .lobytes zeta_bouncy
+        .lobytes zeta_echoes
+        .lobytes zeta_options
+        .lobytes zeta_options
+
+track_table_module_high:
+        .hibytes zeta_silence
+        .hibytes zeta_click_track
+        .hibytes zeta_title
+        .hibytes zeta_options
+        .hibytes zeta_game_over
+        .hibytes zeta_shower_groove
+        .hibytes persune_in_another_world
+        .hibytes zeta_bouncy
+        .hibytes zeta_echoes
+        .hibytes zeta_options
+        .hibytes zeta_options
+
+track_table_bank:
+        .lobytes .bank(zeta_silence)
+        .lobytes .bank(zeta_click_track)
+        .lobytes .bank(zeta_title)
+        .lobytes .bank(zeta_options)
+        .lobytes .bank(zeta_game_over)
+        .lobytes .bank(zeta_shower_groove)
+        .lobytes .bank(persune_in_another_world)
+        .lobytes .bank(zeta_bouncy)
+        .lobytes .bank(zeta_echoes)
+        .lobytes .bank(zeta_options)
+        .lobytes .bank(zeta_options)
+        
+track_table_song:
+        .byte 0 ; silence (used for transitions)
+        .byte 0 ; click track (meant for debugging)
+        .byte 0 ; title
+        .byte 0 ; options
+        .byte 0 ; gameover
+        .byte 0 ; shower groove
+        .byte 0 ; in another world (warp zone)
+        .byte 0 ; bouncy
+        .byte 0 ; echoes
+        .byte 0 ; options
+        .byte 0 ; options
+
+track_table_num_variants:
+        .byte 5 ; silence 
+        .byte 5 ; click_track
+        .byte 5 ; title music
+        .byte 5 ; options music
+        .byte 5 ; gameover music
+        .byte 5 ; shower groove
+        .byte 5 ; in another world (warp zone)
+        .byte 5 ; bouncy
+        .byte 5 ; echoes
+        .byte 5 ; options music
+        .byte 5 ; options music
+
+track_table_heartbeat_offset:
+        .byte 0 ; silence 
+        .byte 0 ; click_track
+        .byte 0 ; title music
+        .byte 0 ; options music
+        .byte 0 ; gameover music
+        .byte 0 ; level music
+        .byte 4 ; in another world (warp zone)
+        .byte 0 ; bouncy
+        .byte 0 ; echoes
+        .byte 0 ; options music
+        .byte 0 ; options music
+
+track_table_heartbeat_period:
+        .byte 0 ; silence 
+        .byte 8 ; click_track
+        .byte 8 ; title music
+        .byte 8 ; options music
+        .byte 8 ; gameover music
+        .byte 8 ; level music
+        .byte 8 ; in another world (initial, switches to 6 partway through)
+        .byte 8 ; bouncy
+        .byte 8 ; echoes
+        .byte 8 ; options music
+        .byte 8 ; options music
+
+; interface functions should mostly live in fixed; we'll call these often, and several
+; need A to remain unclobbered
+
+.proc FAR_fade_to_track
+        perform_zpcm_inc
+        sta MusicTargetTrack
+        lda #FADE_SPEED
+        sta FadeCounter
+        ; special case: is our current track 0, silence? If so, start playback immediately
+        lda MusicCurrentTrack
+        bne done
+        lda MusicTargetTrack
+        ldy #TRACK_VARIANT_NORMAL
+        near_call FAR_play_track
+done:
+        rts
+.endproc
+
+; inputs: track number in A, initial variant in Y
+.proc FAR_play_track
+        perform_zpcm_inc
+        sty target_music_variant
+
+        cmp MusicCurrentTrack
+        jeq no_change
+        sta MusicCurrentTrack
+        sta MusicTargetTrack
+        tax
+        lda track_table_bank, x
+        sta MusicCurrentBank
+        access_data_bank MusicCurrentBank
+
+        lda target_music_variant
+        near_call FAR_play_variant
+
+        ldx MusicCurrentTrack
+        lda track_table_module_low, x
+        ldy track_table_module_high, x
+        far_call bhop_set_module_addr
+
+        ldx MusicCurrentTrack
+        lda track_table_bank, x
+        far_call bhop_set_module_bank
+
+        perform_zpcm_inc
+
+        ldx MusicCurrentTrack
+        lda track_table_song, x
+        near_call bhop_init
+        lda #0
+        sta global_attenuation
+        restore_previous_bank
+
+        far_call FAR_beat_tracker_init
+        rts
+
+no_change:
+        ; safely re-apply the current music variant (again)
+        ; to be sure it is applied even if we did not actually change songs
+        lda target_music_variant
+        near_call FAR_play_variant
+
+        rts
+.endproc
+
+; inputs: variant number in A
+.proc FAR_play_variant
+        ; First, check to see if we need to replace this variant based on the music mode
+        ldx current_save + SaveFile::OptionMusicMode
+        cpx #OPTION_MUSIC_CLICK
+        beq force_click_track
+        cpx #OPTION_MUSIC_DISABLED
+        beq force_silent_track
+        jmp use_supplied_variant
+force_click_track:
+        lda #TRACK_VARIANT_CLICK
+        jmp use_supplied_variant
+force_silent_track:
+        lda #TRACK_VARIANT_SILENT
+        ; fall through to use supplied
+use_supplied_variant:
+        ldx MusicCurrentTrack
+        cmp track_table_num_variants, x
+        beq invalid_variant ; variant index must be LESS than the total count
+        bcs invalid_variant
+        ; this variant is valid, so apply it
+        sta target_music_variant
+        rts
+invalid_variant:
+        ; switch to variant 0 instead, which is always present and safe
+        lda #0
+        sta target_music_variant
+        rts
+.endproc
+
 .proc FAR_init_audio
         perform_zpcm_inc
         ; Always initialize the music engine with track 0 of the first module. This will
@@ -729,7 +729,7 @@ skip_noise:
         ; Otherwise, switch to the target track
         lda MusicTargetTrack
         ldy #TRACK_VARIANT_NORMAL
-        jsr play_track
+        near_call FAR_play_track
 done_with_fade:
         rts
 .endproc

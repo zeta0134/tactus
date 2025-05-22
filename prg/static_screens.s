@@ -228,7 +228,7 @@ victory:
         ; TODO; replace this with the victory track, when and if we have one
         lda #TRACK_SILENCE
         ldy #TRACK_VARIANT_NORMAL
-        jsr play_track
+        far_call FAR_play_track
 
         jmp converge
 game_over:
@@ -244,7 +244,7 @@ game_over:
         ; TODO; replace this with the game over jingle, when and if we have one
         lda #TRACK_GAMEOVER
         ldy #TRACK_VARIANT_NORMAL
-        jsr play_track
+        far_call FAR_play_track
 
 converge:
         ; Text labels for progress through the dungeon

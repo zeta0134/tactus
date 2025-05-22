@@ -434,7 +434,7 @@ widget_selected_splash := widgets_data0
         ; Play the title track on the title screen
         lda #TRACK_TITLE
         ldy #TRACK_VARIANT_NORMAL
-        jsr play_track
+        far_call FAR_play_track
 
         ; NOW we may safely begin to fade in
         lda #BRIGHTNESS_FULLY_DARK

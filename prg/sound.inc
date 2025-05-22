@@ -1,6 +1,6 @@
-.global play_track
-.global play_variant
-.global fade_to_track
+.global FAR_play_track
+.global FAR_play_variant
+.global FAR_fade_to_track
 
 .global _play_sfx_pulse1
 .global _play_sfx_pulse2

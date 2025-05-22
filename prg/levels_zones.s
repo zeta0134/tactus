@@ -852,7 +852,7 @@ play_warp_chamber_music:
         ; tricky enough on its own.)
         lda #TRACK_IN_ANOTHER_WORLD
         ldy #TRACK_VARIANT_NORMAL
-        jsr play_track
+        far_call FAR_play_track
         lda #0
         sta tempo_adjustment
         rts
@@ -879,7 +879,7 @@ normal_variant:
         ldy #TRACK_VARIANT_NORMAL
 done_picking_variant:
         pla
-        jsr play_track
+        far_call FAR_play_track
 
         ldy #ZoneDefinition::AddedTempo
         lda (PlayerZonePtr), y

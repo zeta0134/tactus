@@ -2733,7 +2733,7 @@ perform_health_check:
         ; STOP the music
         lda #TRACK_SILENCE
         ldy #TRACK_VARIANT_NORMAL
-        sta play_track
+        far_call FAR_play_track
 
         ; Oops
         queue_sfx_pulse1 sfx_death_spin_pulse
@@ -2802,7 +2802,7 @@ perform_pause:
         sta TargetBrightness
 
         lda #TRACK_VARIANT_PAUSE
-        jsr play_variant
+        far_call FAR_play_variant
 
         queue_sfx_pulse1 sfx_pause
 
