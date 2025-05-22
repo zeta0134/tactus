@@ -253,6 +253,7 @@ tile_index_to_col_lut:
 .define end_mac .endmacro
 
 define_array enemy_update_table
+define_array enemy_update_bank_table
 define_array enemy_direct_attack_table
 define_array enemy_indirect_attack_table
 define_array enemy_collide_table
@@ -271,6 +272,7 @@ _expected_spell_tileid .set $00
 .macro tile_update TILE_ID, update_func
         .assert _expected_update_tileid = TILE_ID, error, .sprintf("during tile_update for %s, expected $%02x, got instead $%02x", .string(TILE_ID), _expected_update_tileid, TILE_ID)
         enemy_update_table_push_back update_func
+        enemy_update_bank_table_push_back <.bank(update_func)
         _expected_update_tileid .set _expected_update_tileid + $01
 .endmacro
 
@@ -636,6 +638,9 @@ loop:
         rts
 .endproc
 
+; For speed and banking reasons, this whole bit is now moved into the fixed region
+        .segment "PRGFIXED_E000"
+
 static_behaviors_low:
         .lobytes enemy_update_table
         .repeat ($100 - _expected_update_tileid)
@@ -648,18 +653,40 @@ static_behaviors_high:
         .byte >FIXED_crash_handler
         .endrepeat
 
+static_behaviors_bank:
+        .lobytes enemy_update_bank_table
+        .repeat ($100 - _expected_update_tileid)
+        .byte <.bank(FIXED_crash_handler)
+        .endrepeat
+
 ; Note: parameters are intentionally backloaded, to allow the behavior functions to use R0+
 ; without conflict
-.proc FAR_update_static_enemy_row
+.proc FIXED_update_static_enemy_row
 Length := R13
 CurrentRow := R14
 StartingTile := R15
+        ; First preserve the origin bank; we're going to do a goofy stubbed
+        ; pseudo-far-call and will otherwise clobber this
+        lda CurrentBank
+        pha
+
         lda #::BATTLEFIELD_WIDTH
         sta Length
 loop:
         perform_zpcm_inc
         ldx StartingTile
         ldy battlefield, x
+
+        ; Manually bank switch the target bank here
+        lda static_behaviors_bank, y
+        sta CurrentBank ; if targets wish to far call, so they can return properly
+        ;rainbow_set_code_bank CurrentBank (to skip a redundant lda)
+        and #<__BANK_MASK__
+        ora #<__BANK_OFFSET__
+        sta code_bank_shadow
+        sta MAP_PRG_8_LO
+
+        ; Now it should be safe to call the target routine
         lda static_behaviors_low, y
         sta DestPtr+0
         lda static_behaviors_high, y
@@ -668,6 +695,12 @@ loop:
         inc StartingTile
         dec Length
         bne loop
+
+        ; Now restore that bank we manually preserved before we return
+        pla
+        sta CurrentBank
+        rainbow_set_code_bank CurrentBank
+
         rts
 .endproc
 

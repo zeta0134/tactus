@@ -1402,7 +1402,7 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 0)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
@@ -1410,7 +1410,7 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 1)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
@@ -1418,7 +1418,7 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 2)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
         debug_color LIGHTGRAY
 
         restore_previous_bank
@@ -1439,7 +1439,7 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 3)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
@@ -1447,7 +1447,7 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 4)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
@@ -1455,7 +1455,7 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 5)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
@@ -1463,7 +1463,7 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 6)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
         debug_color LIGHTGRAY
 
         restore_previous_bank
@@ -1484,7 +1484,7 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 7)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
@@ -1492,7 +1492,7 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 8)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
@@ -1500,7 +1500,7 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 9)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
         debug_color LIGHTGRAY
 
         debug_color (TINT_B | TINT_R | LIGHTGRAY)
@@ -1508,7 +1508,7 @@ StartingTile := R15
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 10)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
         debug_color LIGHTGRAY
 
         restore_previous_bank

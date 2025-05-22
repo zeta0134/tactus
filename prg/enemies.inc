@@ -50,7 +50,7 @@ TILE_MAGIC_CIRCLE      = 37
 .global WarpOverlayAttr
 
 ; NOT in the fixed page
-.global FAR_update_static_enemy_row
+.global FIXED_update_static_enemy_row
 .global FAR_clear_active_move_flags
 .global FAR_attack_enemy_tile
 .global FAR_player_collides_with_tile

@@ -830,19 +830,19 @@ converge:
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 1)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
 
         lda #2
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 2)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
 
         lda #3
         sta StartingRow
         lda #(::BATTLEFIELD_WIDTH * 3)
         sta StartingTile
-        far_call FAR_update_static_enemy_row
+        jsr FIXED_update_static_enemy_row
 
         ; un-clobber the disco setting that we preserved
         pla
