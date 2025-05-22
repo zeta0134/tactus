@@ -1,7 +1,7 @@
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
-        .segment "ENEMY_UPDATE"
+        .segment "ENEMY_UPDATE0"
 .proc ENEMY_UPDATE_update_smoke_puff
 CurrentTile := R15
 
@@ -76,7 +76,7 @@ EffectiveAttackSquare := R10
         rts
 .endproc
 
-        .segment "ENEMY_UPDATE"
+        .segment "ENEMY_UPDATE0"
 
 smoke_puff_lut:
 smoke_puff_n:

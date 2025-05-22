@@ -1,4 +1,4 @@
-        .segment "ENEMY_UPDATE"
+        .segment "ENEMY_UPDATE0"
 .proc ENEMY_UPDATE_update_mushroom
 IdleDelay := R0
 ; these are provided for us
@@ -277,7 +277,7 @@ not_a_spore:
         rts
 .endproc
 
-        .segment "ENEMY_UPDATE"
+        .segment "ENEMY_UPDATE0"
 .proc ENEMY_UPDATE_update_one_beat_hazard
 CurrentTile := R15
         ldx CurrentTile
@@ -311,7 +311,7 @@ DamageAmount := R0
         rts
 .endproc
 
-        .segment "ENEMY_UPDATE"
+        .segment "ENEMY_UPDATE0"
 
 spores_lut:
 spores_n:

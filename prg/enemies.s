@@ -589,7 +589,7 @@ RoomStateBanditReelCountCherry: .res 4
 RoomStateBanditReelCountGem:    .res 4
 RoomStateBanditReelCountMagic:  .res 4
 
-.segment "ENEMY_UPDATE"
+.segment "ENEMY_UPDATE0"
 
 ; A few enemies need to coordinate their behavior as a group. This is the reset
 ; function for their memory. Anything those enemies want to persist needs to be

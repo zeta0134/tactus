@@ -1,7 +1,7 @@
 ; These are mostly for testing the hazard system. I'm not sure we'll
 ; keep these behaviors in this form? Unclear. Play it by ear I guess.
 
-        .segment "ENEMY_UPDATE"
+        .segment "ENEMY_UPDATE0"
 .proc ENEMY_UPDATE_update_hazard_tile
 ; these are provided for us
 CurrentRow := R14

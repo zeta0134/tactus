@@ -97,7 +97,7 @@ proceed_to_warp:
         rts
 .endproc
 
-        .segment "ENEMY_UPDATE"
+        .segment "ENEMY_UPDATE0"
 
 .proc ENEMY_UPDATE_draw_warp_portal
 CurrentRow := R14

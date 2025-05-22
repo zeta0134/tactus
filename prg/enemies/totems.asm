@@ -7,7 +7,7 @@
 ; additional state. These are almost always special case game-state affecting objects,
 ; so feel free to allocate additional memory for them as required.
 
-        .segment "ENEMY_UPDATE"
+        .segment "ENEMY_UPDATE0"
 
 TOTEM_SPRITE_SPAWNED = %00000001
 

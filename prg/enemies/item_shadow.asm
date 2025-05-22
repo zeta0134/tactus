@@ -1,4 +1,4 @@
-        .segment "ENEMY_UPDATE"
+        .segment "ENEMY_UPDATE0"
 .proc ENEMY_UPDATE_draw_item_sprite
 ; as used by FAR_apply_item_world_metasprite 
 MetaSpriteIndex := R0
@@ -56,7 +56,7 @@ CurrentTile := R15
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
-        .segment "ENEMY_UPDATE"
+        .segment "ENEMY_UPDATE0"
 .proc ENEMY_UPDATE_update_item_shadow
 ItemPtr         := R0
 ItemCost        := R2

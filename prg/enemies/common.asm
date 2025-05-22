@@ -120,7 +120,7 @@ semisafe_failure:
         sta tile_attributes, y
 .endmacro
 
-        .segment "ENEMY_UPDATE"
+        .segment "ENEMY_UPDATE0"
 ; Result in A, clobbers R0
 ; This variant always uses the player's current position
 ; against the active tile's current position
@@ -538,7 +538,7 @@ TargetTile: .res 1
 ; Given up to 8 candidate directions, chooses the "best" one with caller-provided
 ; rates that is actually a valid destination tile. Tries to be reasonably efficient
 ; under these constraints. Most enemies use this in some form or fashion.
-        .segment "ENEMY_UPDATE"
+        .segment "ENEMY_UPDATE0"
 .proc ENEMY_UPDATE_choose_destination
         lda #$FF
         sta ValidDestination

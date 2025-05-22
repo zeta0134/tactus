@@ -58,7 +58,7 @@ CULTIST_STATE_CASTING      = %00000111
 ; ============================================================================================================================
 ; ===                                           Enemy Update Behaviors                                                     ===
 ; ============================================================================================================================
-        .segment "ENEMY_UPDATE"
+        .segment "ENEMY_UPDATE1"
 
 cultist_cast_table_io:
         ; [ ] [ ] [ ]
@@ -579,7 +579,7 @@ CurrentTile := R15
         ; It's our turn to move! Get ready to do that. First, we need to
         ; choose our new target, which may fail, but generally should not.
         ; If it does, we'll passively skip our turn and visibly do nothing.
-        jsr ENEMY_UPDATE_cultist_choose_target
+        near_call ENEMY_UPDATE_cultist_choose_target
         cmp #$FF
         bne targeting_succeeded
         rts
@@ -621,7 +621,7 @@ NumAttempts := R7
         jmp entire_map
 
 dog_player:
-        jsr ENEMY_UPDATE_cultist_targeting_predict_player_position
+        near_call ENEMY_UPDATE_cultist_targeting_predict_player_position
         cmp #$FF
         beq near_player
         rts
@@ -630,7 +630,7 @@ near_player:
         lda #4
         sta NumAttempts
 near_player_loop:
-        jsr ENEMY_UPDATE_cultist_targeting_area_around_player
+        near_call ENEMY_UPDATE_cultist_targeting_area_around_player
         cmp #$FF
         beq near_player_targeting_failed
         rts
@@ -643,7 +643,7 @@ entire_map:
         lda #8
         sta NumAttempts
 entire_map_loop:
-        jsr ENEMY_UPDATE_cultist_random_targeting
+        near_call ENEMY_UPDATE_cultist_random_targeting
         cmp #$FF
         beq entire_map_targeting_failed
         rts
@@ -879,7 +879,7 @@ not_a_cultist:
         stx DiscoTile
         lda CurrentRow
         sta DiscoRow
-        near_call ENEMY_UPDATE_draw_disco_tile_here
+        far_call ENEMY_UPDATE_draw_disco_tile_here
         rts
 actually_a_cultist:
         ; Move the cultist here
