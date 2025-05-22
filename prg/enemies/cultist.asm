@@ -17,7 +17,7 @@ CULTIST_FLAGS_HP           = %01111000
 
 ; Why store this again? because we may be HIT by a player spell, and change our color, between beats!
 CULTIST_DATA_SPELL_COLOR   = %11000000
-CULTIST_DATA_SPELL_PATTERN = %00111000
+CULTIST_DATA_SPELL_SHAPE   = %00111000
 CULTIST_DATA_BEAT_COUNTER  = %00000111
 
 CULTIST_STATE_MERCY_WAIT   = %00000000
@@ -284,6 +284,246 @@ cultist_update_dispatch_lut:
         .addr ENEMY_UPDATE_cultist_casting
         .addr ENEMY_UPDATE_cultist_idle
         .addr ENEMY_UPDATE_cultist_idle
+
+; Note: attack/collide routines will need their own copies of these tables
+; and routines
+; Have X set to the tile index of the enemy before calling this function
+; (make sure it's the enemy with the authorative palette at this stage, not
+; the poof tile or something silly)
+.proc ENEMY_UPDATE_set_spell_shape_table
+SpellShapeTable := R0       
+CurrentTile := R15
+        ; These mappings are somewhat arbitrary; feel free to tweak to taste.
+        ; We want each color to draw from its own unique pool of shape types
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_EARTH
+        beq load_earth_table
+        cmp #PAL_ICE
+        beq load_ice_table
+        cmp #PAL_AIR
+        beq load_air_table
+        cmp #PAL_FIRE
+        beq load_fire_table
+        ; unreachable? fall through to earth I guess
+load_earth_table:
+        lda #<cultist_cast_table_t
+        sta SpellShapeTable+0
+        lda #>cultist_cast_table_t
+        sta SpellShapeTable+1
+        rts
+load_ice_table:
+        lda #<cultist_cast_table_lj
+        sta SpellShapeTable+0
+        lda #>cultist_cast_table_lj
+        sta SpellShapeTable+1
+        rts
+load_air_table:
+        lda #<cultist_cast_table_sz
+        sta SpellShapeTable+0
+        lda #>cultist_cast_table_sz
+        sta SpellShapeTable+1
+        rts
+load_fire_table:
+        lda #<cultist_cast_table_io
+        sta SpellShapeTable+0
+        lda #>cultist_cast_table_io
+        sta SpellShapeTable+1
+        rts
+.endproc
+
+.proc ENEMY_UPDATE_choose_spell_shape
+SpellShapeTable := R0
+SpellIndex := R2
+SpellCounter := R3
+
+ChosenIndex := R4
+ChosenTileCount := R5
+CandidateTileCount := R6
+
+SpellShapeCounter := R7
+
+CurrentRow := R14
+CurrentTile := R15
+        ; First, set up the spell table based on our palette color
+        ; these mappings are arbitrary and may be tweaked to taste
+        ldx CurrentTile
+        near_call ENEMY_UPDATE_choose_spell_shape
+        ; Now choose a random index into that table, preshifted
+        prng_from_table_y
+        and #%00011100 ; 8 possibilities, 4 bytes each
+        sta SpellIndex
+        sta ChosenIndex
+        ; Set up to loop over the entries
+        lda #0
+        sta ChosenTileCount
+        sta CandidateTileCount
+        lda #8
+        sta SpellCounter
+spell_shape_loop:
+        lda #3
+        sta SpellShapeCounter
+        ldy SpellIndex
+spell_tile_loop:
+        lda (SpellShapeTable), y
+        if_valid_destination spell_tile_is_valid
+spell_tile_is_invalid:
+        jmp increment_spell_tile_counters
+spell_tile_is_valid:
+        inc CandidateTileCount
+increment_spell_tile_counters:
+        iny
+        dec SpellShapeCounter
+        bne spell_tile_loop
+done_with_this_shape:
+        ; If this shape beats our current candidate, copy those details over
+        lda CandidateTileCount
+        cmp ChosenTileCount
+        bcc candidate_not_beaten
+        sta ChosenTileCount
+        lda SpellIndex
+        sta ChosenIndex
+        ; Now, if the candidate count happens to be 3+ here, we're instantly done. Skip all the
+        ; rest of the looping, we'll never find a better one
+        lda CandidateTileCount
+        cmp #3
+        bcs done_with_all_shapes
+        ; Otherwise, keep looping through the rest of the shapes
+candidate_not_beaten:
+        lda SpellIndex
+        clc
+        adc #%00000100
+        and #%00011100
+        sta SpellIndex
+        dec SpellCounter
+        bne spell_shape_loop
+done_with_all_shapes:
+        ; Okay, by this point we've committed to whatever spell index we chose, regardless of its
+        ; quality, so get that massagged and written back to our entity slot
+        ; fortunately this bit is straightforward
+        asl ChosenIndex                       ; format is now: ..XXX...
+        lda tile_data, x
+        and #($FF - CULTIST_DATA_SPELL_SHAPE)
+        ora SpellIndex
+        sta tile_data, x
+
+        rts
+.endproc
+
+.proc ENEMY_UPDATE_draw_spell_warning
+SpellShapeTable := R0
+TargetTile := R2
+CurrentRow := R14
+CurrentTile := R15
+        ; For every valid tile in the spell shape table, 
+        ; draw a disco tile but use the "warning" artwork.
+        ; we should be handling our own cleanup, but on the off
+        ; chance that something goes wrong, these will self-revert
+        ; on their own.
+        ldx CurrentTile
+        near_call ENEMY_UPDATE_set_spell_shape_table
+        ldy #3
+spell_tile_loop:
+        lda (SpellShapeTable), y
+        sta TargetTile
+        if_valid_destination draw_warning_here
+        jmp done_with_this_tile
+draw_warning_here:
+        ldx TargetTile
+        ; TODO: respect filled / outline!
+        lda #<BG_TILE_WARNING_PLAIN
+        sta tile_patterns, x
+        lda #>BG_TILE_WARNING_PLAIN
+        sta tile_attributes, x
+        lda #TILE_DISCO_FLOOR
+        sta battlefield, x
+done_with_this_tile:
+        dey
+        bne spell_tile_loop
+        rts
+.endproc
+
+.proc ENEMY_UPDATE_cast_spell
+SpellShapeTable := R0
+TargetTile := R2
+SpellPattern := R3
+SpellAttr := R4
+SpellBehavior := R5
+
+CurrentRow := R14
+CurrentTile := R15
+        ; Very similar to drawing the warning, with a couple of changes. Most
+        ; notably, we need to differentiate the spell tiles based on the enemy color.
+        ; TODO: further differentiate based on checkerboard style!
+        ldx CurrentTile
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_EARTH
+        beq use_poison_tile
+        cmp #PAL_ICE
+        beq use_crystal_tile
+        cmp #PAL_AIR
+        beq use_lightning_ball_tile
+        cmp #PAL_FIRE
+        beq use_flame_tile
+use_poison_tile:
+        lda #<BG_TILE_HAZARD_POISON_OUTLINE
+        sta SpellPattern
+        lda #(>BG_TILE_HAZARD_POISON_OUTLINE | PAL_EARTH)
+        sta SpellAttr
+        lda #TILE_DISCO_FLOOR ; TODO: not this!
+        sta SpellBehavior
+        jmp done_picking_spell_tile
+use_crystal_tile:
+        lda #<BG_TILE_HAZARD_ICE_OUTLINE
+        sta SpellPattern
+        lda #(>BG_TILE_HAZARD_ICE_OUTLINE | PAL_ICE)
+        sta SpellAttr
+        lda #TILE_DISCO_FLOOR ; TODO: not this!
+        sta SpellBehavior
+        jmp done_picking_spell_tile
+use_lightning_ball_tile:
+        lda #<BG_TILE_HAZARD_LIGHTNING_OUTLINE
+        sta SpellPattern
+        lda #(>BG_TILE_HAZARD_LIGHTNING_OUTLINE | PAL_AIR)
+        sta SpellAttr
+        lda #TILE_DISCO_FLOOR ; TODO: not this!
+        sta SpellBehavior
+        jmp done_picking_spell_tile
+use_flame_tile:
+        lda #<BG_TILE_HAZARD_FIRE_OUTLINE
+        sta SpellPattern
+        lda #(>BG_TILE_HAZARD_FIRE_OUTLINE | PAL_FIRE)
+        sta SpellAttr
+        lda #TILE_DISCO_FLOOR ; TODO: not this!
+        sta SpellBehavior
+        jmp done_picking_spell_tile
+done_picking_spell_tile:
+        near_call ENEMY_UPDATE_set_spell_shape_table
+
+        ; Okay, now loop through and apply this to all valid tiles. Notably
+        ; our "warning" tiles use DISCO FLOOR as their behavioral base, so they
+        ; will still be considered "valid" when this code runs.
+        ldy #3
+spell_tile_loop:
+        lda (SpellShapeTable), y
+        sta TargetTile
+        if_valid_destination draw_warning_here
+        jmp done_with_this_tile
+draw_warning_here:
+        ldx TargetTile
+        ; TODO: respect filled / outline!
+        lda SpellPattern
+        sta tile_patterns, x
+        lda SpellAttr
+        sta tile_attributes, x
+        lda SpellBehavior
+        sta battlefield, x
+done_with_this_tile:
+        dey
+        bne spell_tile_loop
+        rts
+.endproc
 
 .proc ENEMY_UPDATE_cultist
 DestFunc := R0
