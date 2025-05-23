@@ -471,6 +471,8 @@ SpellAttr := R4
 SpellBehavior := R5
 SpellTileCounter := R6
 
+CurrentSpellTileIndex := R7
+
 CurrentRow := R14
 CurrentTile := R15
         ; Very similar to drawing the warning, with a couple of changes. Most
@@ -532,8 +534,9 @@ done_picking_spell_tile:
         lda tile_data, x
         and #CULTIST_DATA_SPELL_SHAPE
         lsr ; format is now ...XXX..
-        tay
+        sta CurrentSpellTileIndex
 spell_tile_loop:
+        ldy CurrentSpellTileIndex
         lda (SpellShapeTable), y
         clc
         adc CurrentTile
@@ -560,12 +563,9 @@ draw_spell_tile_here:
         
         ; TODO: set data to indicate damage output and hazard strength?
         ; (receiving end needs to respect this, new system, etc)
-        
-        ; We are a scary spell! Flash accordingly for impact
-        ; TODO: this!
 
 done_with_this_tile:
-        iny
+        inc CurrentSpellTileIndex
         dec SpellTileCounter
         bne spell_tile_loop
 
@@ -1005,6 +1005,11 @@ CurrentTile := R15
         draw_at_x_keeppal TILE_CULTIST, BG_TILE_CULTIST_IDLE
         cultist_set_state #CULTIST_STATE_IDLE
         cultist_increment_beat_counter ScratchByte
+
+        ; On THIS beat we will be in the "casting" state, so draw ourselves
+        ; with a palette flash to suggest that effort
+        lda CurrentTile
+        far_call FAR_queue_late_cycle_phase
 
         rts
 .endproc
