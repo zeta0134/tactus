@@ -420,7 +420,7 @@ tile_suspend TILE_MUSHROOM, FIXED_no_behavior
 tile_explode TILE_MUSHROOM, ENEMY_BOMB_SPELL_direct_explode, FIXED_no_behavior
 tile_spell   TILE_MUSHROOM, ENEMY_BOMB_SPELL_mushroom_spell_dispatch
 
-tile_update  TILE_ONE_BEAT_HAZARD, ENEMY_UPDATE_update_one_beat_hazard
+tile_update  TILE_ONE_BEAT_HAZARD, ENEMY_UPDATE_revert_to_disco_tile
 tile_attack  TILE_ONE_BEAT_HAZARD, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_ONE_BEAT_HAZARD, ENEMY_COLLIDE_hazard_damages_player
 tile_suspend TILE_ONE_BEAT_HAZARD, FIXED_no_behavior
@@ -579,6 +579,41 @@ tile_collide TILE_MAGIC_CIRCLE, FIXED_no_behavior
 tile_suspend TILE_MAGIC_CIRCLE, ENEMY_UTIL_draw_cleared_disco_tile
 tile_explode TILE_MAGIC_CIRCLE, FIXED_no_behavior, FIXED_no_behavior    ; ... shouldn't this cancel the teleport?
 tile_spell   TILE_MAGIC_CIRCLE, FIXED_no_behavior 
+
+tile_update  TILE_INDICATOR, ENEMY_UPDATE_revert_to_disco_tile
+tile_attack  TILE_INDICATOR, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_INDICATOR, FIXED_no_behavior
+tile_suspend TILE_INDICATOR, ENEMY_UTIL_draw_cleared_disco_tile
+tile_explode TILE_INDICATOR, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_INDICATOR, FIXED_no_behavior
+
+tile_update  TILE_ONE_BEAT_POISON, ENEMY_UPDATE_revert_to_disco_tile
+tile_attack  TILE_ONE_BEAT_POISON, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_ONE_BEAT_POISON, ENEMY_COLLIDE_activate_hazard_poison
+tile_suspend TILE_ONE_BEAT_POISON, ENEMY_UTIL_draw_cleared_disco_tile
+tile_explode TILE_ONE_BEAT_POISON, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_ONE_BEAT_POISON, FIXED_no_behavior
+
+tile_update  TILE_ONE_BEAT_FREEZE, ENEMY_UPDATE_revert_to_disco_tile
+tile_attack  TILE_ONE_BEAT_FREEZE, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_ONE_BEAT_FREEZE, ENEMY_COLLIDE_activate_hazard_freeze
+tile_suspend TILE_ONE_BEAT_FREEZE, ENEMY_UTIL_draw_cleared_disco_tile
+tile_explode TILE_ONE_BEAT_FREEZE, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_ONE_BEAT_FREEZE, FIXED_no_behavior
+
+tile_update  TILE_ONE_BEAT_SHOCK, ENEMY_UPDATE_revert_to_disco_tile
+tile_attack  TILE_ONE_BEAT_SHOCK, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_ONE_BEAT_SHOCK, ENEMY_COLLIDE_activate_hazard_shock
+tile_suspend TILE_ONE_BEAT_SHOCK, ENEMY_UTIL_draw_cleared_disco_tile
+tile_explode TILE_ONE_BEAT_SHOCK, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_ONE_BEAT_SHOCK, FIXED_no_behavior
+
+tile_update  TILE_ONE_BEAT_BURN, ENEMY_UPDATE_revert_to_disco_tile
+tile_attack  TILE_ONE_BEAT_BURN, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_ONE_BEAT_BURN, ENEMY_COLLIDE_activate_hazard_burn
+tile_suspend TILE_ONE_BEAT_BURN, ENEMY_UTIL_draw_cleared_disco_tile
+tile_explode TILE_ONE_BEAT_BURN, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_ONE_BEAT_BURN, FIXED_no_behavior
 
 .segment "PRGRAM"
 

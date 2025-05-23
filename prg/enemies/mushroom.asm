@@ -278,7 +278,7 @@ not_a_spore:
 .endproc
 
         .segment "ENEMY_UPDATE0"
-.proc ENEMY_UPDATE_update_one_beat_hazard
+.proc ENEMY_UPDATE_revert_to_disco_tile
 CurrentTile := R15
         ldx CurrentTile
         bail_if_already_moved

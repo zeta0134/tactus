@@ -31,14 +31,19 @@ TILE_CRACKED_WARP_WALL = 26
 TILE_HIDDEN_WARP_FLOOR = 27
 TILE_WARP_PORTAL       = 28
 TILE_HAZARD_HEAL       = 29
-TILE_HAZARD_POISON     = 30
-TILE_HAZARD_FREEZE     = 31
-TILE_HAZARD_SHOCK      = 32
-TILE_HAZARD_BURN       = 33
+TILE_HAZARD_POISON     = 30 ; \ 
+TILE_HAZARD_FREEZE     = 31 ; | debug single-tile things that always apply this effect
+TILE_HAZARD_SHOCK      = 32 ; | we shouldn't need these long term, consider removing them
+TILE_HAZARD_BURN       = 33 ; /
 TILE_TOTEM             = 34
 TILE_ONE_ARMED_BANDIT  = 35
 TILE_CULTIST           = 36
 TILE_MAGIC_CIRCLE      = 37
+TILE_INDICATOR         = 38 ; \ (this one is inert / safe)
+TILE_ONE_BEAT_POISON   = 39 ; | all of these revert to a plain
+TILE_ONE_BEAT_FREEZE   = 40 ; | disco tile on the following beat. good for
+TILE_ONE_BEAT_SHOCK    = 41 ; | enemy abilities, spells, etc
+TILE_ONE_BEAT_BURN     = 42 ; /
 
 ; Actually in the fixed page
 .global draw_active_tile

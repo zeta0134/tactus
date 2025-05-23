@@ -25,7 +25,7 @@ CULTIST_STATE_IDLE         = %00000001
 CULTIST_STATE_TEPELORTING  = %00000010
 CULTIST_STATE_KNOCKED_BACK = %00000011
 CULTIST_STATE_ANTICIPATE   = %00000100
-CULTIST_STATE_CASTING      = %00000111
+CULTIST_STATE_CASTING      = %00000101
 
 ; Note: all macros assume X is prepopulated with our
 ; state index, as various entrypoints need to do that
@@ -343,12 +343,14 @@ CandidateTileCount := R6
 
 SpellShapeCounter := R7
 
+TargetTile := R8
+
 CurrentRow := R14
 CurrentTile := R15
         ; First, set up the spell table based on our palette color
         ; these mappings are arbitrary and may be tweaked to taste
         ldx CurrentTile
-        near_call ENEMY_UPDATE_choose_spell_shape
+        near_call ENEMY_UPDATE_set_spell_shape_table
         ; Now choose a random index into that table, preshifted
         prng_from_table_y
         and #%00011100 ; 8 possibilities, 4 bytes each
@@ -357,15 +359,19 @@ CurrentTile := R15
         ; Set up to loop over the entries
         lda #0
         sta ChosenTileCount
-        sta CandidateTileCount
         lda #8
         sta SpellCounter
 spell_shape_loop:
         lda #3
         sta SpellShapeCounter
+        lda #0
+        sta CandidateTileCount
         ldy SpellIndex
 spell_tile_loop:
         lda (SpellShapeTable), y
+        clc
+        adc CurrentTile
+        sta TargetTile
         if_valid_destination spell_tile_is_valid
 spell_tile_is_invalid:
         jmp increment_spell_tile_counters
@@ -402,9 +408,10 @@ done_with_all_shapes:
         ; quality, so get that massagged and written back to our entity slot
         ; fortunately this bit is straightforward
         asl ChosenIndex                       ; format is now: ..XXX...
+        ldx CurrentTile
         lda tile_data, x
         and #($FF - CULTIST_DATA_SPELL_SHAPE)
-        ora SpellIndex
+        ora ChosenIndex
         sta tile_data, x
 
         rts
@@ -413,6 +420,7 @@ done_with_all_shapes:
 .proc ENEMY_UPDATE_draw_spell_warning
 SpellShapeTable := R0
 TargetTile := R2
+SpellTileCounter := R3
 CurrentRow := R14
 CurrentTile := R15
         ; For every valid tile in the spell shape table, 
@@ -422,9 +430,17 @@ CurrentTile := R15
         ; on their own.
         ldx CurrentTile
         near_call ENEMY_UPDATE_set_spell_shape_table
-        ldy #3
+        lda #3
+        sta SpellTileCounter
+        ldx CurrentTile
+        lda tile_data, x
+        and #CULTIST_DATA_SPELL_SHAPE
+        lsr ; format is now ...XXX..
+        tay
 spell_tile_loop:
         lda (SpellShapeTable), y
+        clc
+        adc CurrentTile
         sta TargetTile
         if_valid_destination draw_warning_here
         jmp done_with_this_tile
@@ -435,10 +451,14 @@ draw_warning_here:
         sta tile_patterns, x
         lda #>BG_TILE_WARNING_PLAIN
         sta tile_attributes, x
-        lda #TILE_DISCO_FLOOR
+        lda #TILE_INDICATOR
         sta battlefield, x
+        lda tile_flags, x
+        ora #FLAG_MOVED_THIS_FRAME
+        sta tile_flags, x
 done_with_this_tile:
-        dey
+        iny
+        dec SpellTileCounter
         bne spell_tile_loop
         rts
 .endproc
@@ -449,12 +469,14 @@ TargetTile := R2
 SpellPattern := R3
 SpellAttr := R4
 SpellBehavior := R5
+SpellTileCounter := R6
 
 CurrentRow := R14
 CurrentTile := R15
         ; Very similar to drawing the warning, with a couple of changes. Most
         ; notably, we need to differentiate the spell tiles based on the enemy color.
         ; TODO: further differentiate based on checkerboard style!
+        ; TODO: spellcast SFX? we might want to only do this if the player gets hit?
         ldx CurrentTile
         lda tile_attributes, x
         and #PAL_MASK
@@ -471,7 +493,7 @@ use_poison_tile:
         sta SpellPattern
         lda #(>BG_TILE_HAZARD_POISON_OUTLINE | PAL_EARTH)
         sta SpellAttr
-        lda #TILE_DISCO_FLOOR ; TODO: not this!
+        lda #TILE_ONE_BEAT_POISON
         sta SpellBehavior
         jmp done_picking_spell_tile
 use_crystal_tile:
@@ -479,7 +501,7 @@ use_crystal_tile:
         sta SpellPattern
         lda #(>BG_TILE_HAZARD_ICE_OUTLINE | PAL_ICE)
         sta SpellAttr
-        lda #TILE_DISCO_FLOOR ; TODO: not this!
+        lda #TILE_ONE_BEAT_FREEZE
         sta SpellBehavior
         jmp done_picking_spell_tile
 use_lightning_ball_tile:
@@ -487,7 +509,7 @@ use_lightning_ball_tile:
         sta SpellPattern
         lda #(>BG_TILE_HAZARD_LIGHTNING_OUTLINE | PAL_AIR)
         sta SpellAttr
-        lda #TILE_DISCO_FLOOR ; TODO: not this!
+        lda #TILE_ONE_BEAT_SHOCK
         sta SpellBehavior
         jmp done_picking_spell_tile
 use_flame_tile:
@@ -495,22 +517,35 @@ use_flame_tile:
         sta SpellPattern
         lda #(>BG_TILE_HAZARD_FIRE_OUTLINE | PAL_FIRE)
         sta SpellAttr
-        lda #TILE_DISCO_FLOOR ; TODO: not this!
+        lda #TILE_ONE_BEAT_BURN
         sta SpellBehavior
         jmp done_picking_spell_tile
 done_picking_spell_tile:
-        near_call ENEMY_UPDATE_set_spell_shape_table
 
         ; Okay, now loop through and apply this to all valid tiles. Notably
         ; our "warning" tiles use DISCO FLOOR as their behavioral base, so they
         ; will still be considered "valid" when this code runs.
-        ldy #3
+        near_call ENEMY_UPDATE_set_spell_shape_table
+        lda #3
+        sta SpellTileCounter
+        ldx CurrentTile
+        lda tile_data, x
+        and #CULTIST_DATA_SPELL_SHAPE
+        lsr ; format is now ...XXX..
+        tay
 spell_tile_loop:
         lda (SpellShapeTable), y
+        clc
+        adc CurrentTile
         sta TargetTile
-        if_valid_destination draw_warning_here
+        
+        ldx TargetTile
+        lda battlefield, x
+        cmp #TILE_INDICATOR      ; indicators are valid for spellcasts, but not anything else
+        beq draw_spell_tile_here ; (we don't want enemies moving into spell range if we can help it)
+        if_valid_destination draw_spell_tile_here
         jmp done_with_this_tile
-draw_warning_here:
+draw_spell_tile_here:
         ldx TargetTile
         ; TODO: respect filled / outline!
         lda SpellPattern
@@ -519,9 +554,21 @@ draw_warning_here:
         sta tile_attributes, x
         lda SpellBehavior
         sta battlefield, x
+        lda tile_flags, x
+        ora #FLAG_MOVED_THIS_FRAME
+        sta tile_flags, x
+        
+        ; TODO: set data to indicate damage output and hazard strength?
+        ; (receiving end needs to respect this, new system, etc)
+        
+        ; We are a scary spell! Flash accordingly for impact
+        ; TODO: this!
+
 done_with_this_tile:
-        dey
+        iny
+        dec SpellTileCounter
         bne spell_tile_loop
+
         rts
 .endproc
 
@@ -897,24 +944,31 @@ actually_a_cultist:
         ; TODO: make this fancier and use the filled / outline variant as appropriete
         lda #TILE_SMOKE_PUFF
         sta battlefield, y
-        lda #(PAL_EARTH | >BG_TILE_TEPELORT_AFTERIMAGE_PLAIN)
-        sta tile_attributes, y
-        lda #<BG_TILE_TEPELORT_AFTERIMAGE_PLAIN
-        sta tile_patterns, y
         txa
         sta tile_data, y
         lda #$80
         sta tile_flags, y
 
-        ; Put the cultist in the IDLE state
-        ; TODO: anticipate for spellcasting instead, and all of that logic
-        draw_at_x_keeppal TILE_CULTIST, BG_TILE_CULTIST_IDLE
-        cultist_set_state #CULTIST_STATE_IDLE
+        sty DiscoTile
+        lda tile_index_to_row_lut, y
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_teleport_tile_here_y ; clobbers X
+
+        ; Put the cultist in the ANTICIPATE state
+        ldx CurrentTile
+        draw_at_x_keeppal TILE_CULTIST, BG_TILE_CULTIST_HANDS_RAISED
+        cultist_set_state #CULTIST_STATE_ANTICIPATE
         cultist_increment_beat_counter ScratchByte
 
-        ; For now, we're done!
+        ; Decide what magic spell the cultist will cast, and cache that in its data struct
+        near_call ENEMY_UPDATE_choose_spell_shape
+        ; Draw "warning" tiles for the entire spell area, as we will be casting the spell on the next beat
+        near_call ENEMY_UPDATE_draw_spell_warning
+
+        ; And now, we're done!
         rts
 .endproc
+
 
 .proc ENEMY_UPDATE_cultist_knocked_back
 CurrentRow := R14
@@ -923,16 +977,81 @@ CurrentTile := R15
 .endproc
 
 .proc ENEMY_UPDATE_cultist_anticipate
+ScratchByte := R0
 CurrentRow := R14
 CurrentTile := R15
+        ; Put the cultist in the CASTING state
+        ldx CurrentTile
+        draw_at_x_keeppal TILE_CULTIST, BG_TILE_CULTIST_HANDS_ON_GROUND
+        cultist_set_state #CULTIST_STATE_CASTING
+        cultist_increment_beat_counter ScratchByte
+
+        ; Actually cast that spell
+        near_call ENEMY_UPDATE_cast_spell
+
+        ; ... we're done?
+
         rts
 .endproc
 
 .proc ENEMY_UPDATE_cultist_casting
+ScratchByte := R0
 CurrentRow := R14
 CurrentTile := R15
+        
+        ; Gleefully return to idle, yes! Time for another round.
+        ; (of waiting)
+        ldx CurrentTile
+        draw_at_x_keeppal TILE_CULTIST, BG_TILE_CULTIST_IDLE
+        cultist_set_state #CULTIST_STATE_IDLE
+        cultist_increment_beat_counter ScratchByte
+
         rts
 .endproc
+
+        ; these functions rely on disco logic to determine which variant to display, and they're
+        ; short, so put them in the main bank. we'll need to far call on use.
+        .segment "ENEMY_UPDATE0"
+
+teleport_tiles_by_disco_floor_lut:
+        .word (PAL_EARTH << 8) | BG_TILE_TEPELORT_AFTERIMAGE_PLAIN
+        .word (PAL_EARTH << 8) | BG_TILE_TEPELORT_AFTERIMAGE_PLAIN
+        .word (PAL_EARTH << 8) | BG_TILE_TEPELORT_AFTERIMAGE_FILLED
+        .word (PAL_EARTH << 8) | BG_TILE_TEPELORT_AFTERIMAGE_FILLED
+        .word (PAL_EARTH << 8) | BG_TILE_TEPELORT_AFTERIMAGE_PLAIN
+        .word (PAL_EARTH << 8) | BG_TILE_TEPELORT_AFTERIMAGE_OUTLINE
+        .word (PAL_EARTH << 8) | BG_TILE_TEPELORT_AFTERIMAGE_OUTLINE
+        .word (PAL_EARTH << 8) | BG_TILE_TEPELORT_AFTERIMAGE_PLAIN
+
+; Note: This is only for DRAWING the teleport tile! Anything else you need to do
+; to the thing has to happen at the call site.
+; Arguments: Y contains destination tile
+; Clobbers: X
+.proc ENEMY_UPDATE_draw_teleport_tile_here_y
+TargetFuncPtr := R0
+        perform_zpcm_inc
+        ; run the disco selection logic based on the player's preference
+        ; (DiscoTile==SmokePuffTile, and DiscoRow==SmokePuffRow, so that setup is done by this point)
+        ldx current_save + SaveFile::OptionDiscoFloor
+        lda disco_behavior_lut_low, x
+        sta TargetFuncPtr+0
+        lda disco_behavior_lut_high, x
+        sta TargetFuncPtr+1
+        jsr _disco_trampoline
+
+        asl ; expand from byte to word alignment
+        tax
+        
+        lda teleport_tiles_by_disco_floor_lut+0, x
+        sta tile_patterns, y
+        lda teleport_tiles_by_disco_floor_lut+1, x
+        sta tile_attributes, y
+
+        ; And done!
+        perform_zpcm_inc
+        rts
+.endproc
+
 
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
