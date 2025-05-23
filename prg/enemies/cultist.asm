@@ -1006,6 +1006,25 @@ CurrentTile := R15
         rts
 .endproc
 
+        
+; Does what it says on the tin! Great for powerful spell effects
+.proc ENEMY_UPDATE_flash_and_revert_to_disco_tile
+CurrentTile := R15
+        ldx CurrentTile
+        bail_if_already_moved
+
+        ; it's been one beat! stop being a one beat hazard, thx.
+        ldx CurrentTile
+        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_EARTH
+        far_call ENEMY_UPDATE_draw_disco_tile
+
+        ; flash wildly, yes yes!
+        lda CurrentTile
+        far_call FAR_queue_late_cycle_phase
+
+        rts
+.endproc
+
         ; these functions rely on disco logic to determine which variant to display, and they're
         ; short, so put them in the main bank. we'll need to far call on use.
         .segment "ENEMY_UPDATE0"
@@ -1095,41 +1114,41 @@ TargetFuncPtr := R10 ; to not clobber call site state
 
 spell_tiles_by_disco_floor_lut:
         ; inescapable death, handily organized
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_OUTLINE
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_OUTLINE
         .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
         .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_OUTLINE
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_OUTLINE
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_OUTLINE
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_OUTLINE
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
 
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_OUTLINE
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_OUTLINE
         .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
         .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_OUTLINE
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_OUTLINE
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_OUTLINE
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_OUTLINE
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
 
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_OUTLINE
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_OUTLINE
         .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
         .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_OUTLINE
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_OUTLINE
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_OUTLINE
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_OUTLINE
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
 
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_OUTLINE
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_OUTLINE
         .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
         .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_OUTLINE
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_OUTLINE
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_OUTLINE
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_OUTLINE
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
 
 ; Note: This is only for DRAWING the teleport tile! Anything else you need to do
 ; to the thing has to happen at the call site.
