@@ -421,6 +421,7 @@ done_with_all_shapes:
 SpellShapeTable := R0
 TargetTile := R2
 SpellTileCounter := R3
+CurrentSpellTileIndex := R4
 CurrentRow := R14
 CurrentTile := R15
         ; For every valid tile in the spell shape table, 
@@ -436,8 +437,9 @@ CurrentTile := R15
         lda tile_data, x
         and #CULTIST_DATA_SPELL_SHAPE
         lsr ; format is now ...XXX..
-        tay
+        sta CurrentSpellTileIndex
 spell_tile_loop:
+        ldy CurrentSpellTileIndex
         lda (SpellShapeTable), y
         clc
         adc CurrentTile
@@ -446,18 +448,17 @@ spell_tile_loop:
         jmp done_with_this_tile
 draw_warning_here:
         ldx TargetTile
-        ; TODO: respect filled / outline!
-        lda #<BG_TILE_WARNING_PLAIN
-        sta tile_patterns, x
-        lda #>BG_TILE_WARNING_PLAIN
-        sta tile_attributes, x
+        stx DiscoTile
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_warning_tile_here_x
         lda #TILE_INDICATOR
         sta battlefield, x
         lda tile_flags, x
         ora #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
 done_with_this_tile:
-        iny
+        inc CurrentSpellTileIndex
         dec SpellTileCounter
         bne spell_tile_loop
         rts
@@ -466,12 +467,12 @@ done_with_this_tile:
 .proc ENEMY_UPDATE_cast_spell
 SpellShapeTable := R0
 TargetTile := R2
-SpellPattern := R3
-SpellAttr := R4
 SpellBehavior := R5
 SpellTileCounter := R6
 
 CurrentSpellTileIndex := R7
+
+SpellOffsetIndex := R9 ; used by draw function to pick fill style
 
 CurrentRow := R14
 CurrentTile := R15
@@ -491,34 +492,26 @@ CurrentTile := R15
         cmp #PAL_FIRE
         beq use_flame_tile
 use_poison_tile:
-        lda #<BG_TILE_HAZARD_POISON_OUTLINE
-        sta SpellPattern
-        lda #(>BG_TILE_HAZARD_POISON_OUTLINE | PAL_EARTH)
-        sta SpellAttr
+        lda #0
+        sta SpellOffsetIndex
         lda #TILE_ONE_BEAT_POISON
         sta SpellBehavior
         jmp done_picking_spell_tile
 use_crystal_tile:
-        lda #<BG_TILE_HAZARD_ICE_OUTLINE
-        sta SpellPattern
-        lda #(>BG_TILE_HAZARD_ICE_OUTLINE | PAL_ICE)
-        sta SpellAttr
+        lda #16
+        sta SpellOffsetIndex
         lda #TILE_ONE_BEAT_FREEZE
         sta SpellBehavior
         jmp done_picking_spell_tile
 use_lightning_ball_tile:
-        lda #<BG_TILE_HAZARD_LIGHTNING_OUTLINE
-        sta SpellPattern
-        lda #(>BG_TILE_HAZARD_LIGHTNING_OUTLINE | PAL_AIR)
-        sta SpellAttr
+        lda #32
+        sta SpellOffsetIndex
         lda #TILE_ONE_BEAT_SHOCK
         sta SpellBehavior
         jmp done_picking_spell_tile
 use_flame_tile:
-        lda #<BG_TILE_HAZARD_FIRE_OUTLINE
-        sta SpellPattern
-        lda #(>BG_TILE_HAZARD_FIRE_OUTLINE | PAL_FIRE)
-        sta SpellAttr
+        lda #48
+        sta SpellOffsetIndex
         lda #TILE_ONE_BEAT_BURN
         sta SpellBehavior
         jmp done_picking_spell_tile
@@ -550,16 +543,15 @@ spell_tile_loop:
         jmp done_with_this_tile
 draw_spell_tile_here:
         ldx TargetTile
-        ; TODO: respect filled / outline!
-        lda SpellPattern
-        sta tile_patterns, x
-        lda SpellAttr
-        sta tile_attributes, x
         lda SpellBehavior
         sta battlefield, x
         lda tile_flags, x
         ora #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
+        stx DiscoTile
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_spellcast_tile_here_x
         
         ; TODO: set data to indicate damage output and hazard strength?
         ; (receiving end needs to respect this, new system, etc)
@@ -1018,6 +1010,11 @@ CurrentTile := R15
         ; short, so put them in the main bank. we'll need to far call on use.
         .segment "ENEMY_UPDATE0"
 
+.proc _cultist_disco_trampoline
+TargetFuncPtr := R10
+        jmp (TargetFuncPtr)
+.endproc
+
 teleport_tiles_by_disco_floor_lut:
         .word (PAL_EARTH << 8) | BG_TILE_TEPELORT_AFTERIMAGE_PLAIN
         .word (PAL_EARTH << 8) | BG_TILE_TEPELORT_AFTERIMAGE_PLAIN
@@ -1033,7 +1030,7 @@ teleport_tiles_by_disco_floor_lut:
 ; Arguments: Y contains destination tile
 ; Clobbers: X
 .proc ENEMY_UPDATE_draw_teleport_tile_here_y
-TargetFuncPtr := R0
+TargetFuncPtr := R10
         perform_zpcm_inc
         ; run the disco selection logic based on the player's preference
         ; (DiscoTile==SmokePuffTile, and DiscoRow==SmokePuffRow, so that setup is done by this point)
@@ -1042,7 +1039,7 @@ TargetFuncPtr := R0
         sta TargetFuncPtr+0
         lda disco_behavior_lut_high, x
         sta TargetFuncPtr+1
-        jsr _disco_trampoline
+        jsr _cultist_disco_trampoline
 
         asl ; expand from byte to word alignment
         tax
@@ -1057,6 +1054,114 @@ TargetFuncPtr := R0
         rts
 .endproc
 
+warning_tiles_by_disco_floor_lut:
+        .word (PAL_EARTH << 8) | BG_TILE_WARNING_PLAIN
+        .word (PAL_EARTH << 8) | BG_TILE_WARNING_PLAIN
+        .word (PAL_EARTH << 8) | BG_TILE_WARNING_FILLED
+        .word (PAL_EARTH << 8) | BG_TILE_WARNING_FILLED
+        .word (PAL_EARTH << 8) | BG_TILE_WARNING_PLAIN
+        .word (PAL_EARTH << 8) | BG_TILE_WARNING_OUTLINE
+        .word (PAL_EARTH << 8) | BG_TILE_WARNING_OUTLINE
+        .word (PAL_EARTH << 8) | BG_TILE_WARNING_PLAIN
+
+; Note: This is only for DRAWING the teleport tile! Anything else you need to do
+; to the thing has to happen at the call site.
+; Arguments: X contains destination tile
+; Clobbers:  Y
+.proc ENEMY_UPDATE_draw_warning_tile_here_x
+TargetFuncPtr := R10 ; to not clobber call site state
+        perform_zpcm_inc
+        ; run the disco selection logic based on the player's preference
+        ; (DiscoTile==SmokePuffTile, and DiscoRow==SmokePuffRow, so that setup is done by this point)
+        ldy current_save + SaveFile::OptionDiscoFloor
+        lda disco_behavior_lut_low, y
+        sta TargetFuncPtr+0
+        lda disco_behavior_lut_high, y
+        sta TargetFuncPtr+1
+        jsr _cultist_disco_trampoline
+
+        asl ; expand from byte to word alignment
+        tay
+        
+        lda warning_tiles_by_disco_floor_lut+0, y
+        sta tile_patterns, x
+        lda warning_tiles_by_disco_floor_lut+1, y
+        sta tile_attributes, x
+
+        ; And done!
+        perform_zpcm_inc
+        rts
+.endproc
+
+spell_tiles_by_disco_floor_lut:
+        ; inescapable death, handily organized
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_OUTLINE
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_OUTLINE
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_OUTLINE
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_OUTLINE
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_OUTLINE
+        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_OUTLINE
+
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_OUTLINE
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_OUTLINE
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_OUTLINE
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_OUTLINE
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_OUTLINE
+        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_OUTLINE
+
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_OUTLINE
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_OUTLINE
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_OUTLINE
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_OUTLINE
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_OUTLINE
+        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_OUTLINE
+
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_OUTLINE
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_OUTLINE
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_OUTLINE
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_OUTLINE
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_OUTLINE
+        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_OUTLINE
+
+; Note: This is only for DRAWING the teleport tile! Anything else you need to do
+; to the thing has to happen at the call site.
+; Arguments: X contains destination tile, R9 contains spell index to use as offset (0, 16, 32, 48)
+; Clobbers:  Y
+.proc ENEMY_UPDATE_draw_spellcast_tile_here_x
+SpellOffsetIndex := R9
+TargetFuncPtr := R10 ; to not clobber call site state
+        perform_zpcm_inc
+        ; run the disco selection logic based on the player's preference
+        ; (DiscoTile==SmokePuffTile, and DiscoRow==SmokePuffRow, so that setup is done by this point)
+        ldy current_save + SaveFile::OptionDiscoFloor
+        lda disco_behavior_lut_low, y
+        sta TargetFuncPtr+0
+        lda disco_behavior_lut_high, y
+        sta TargetFuncPtr+1
+        jsr _cultist_disco_trampoline
+
+        asl ; expand from byte to word alignment
+        clc
+        adc SpellOffsetIndex
+        tay
+        
+        lda spell_tiles_by_disco_floor_lut+0, y
+        sta tile_patterns, x
+        lda spell_tiles_by_disco_floor_lut+1, y
+        sta tile_attributes, x
+
+        ; And done!
+        perform_zpcm_inc
+        rts
+.endproc
 
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
