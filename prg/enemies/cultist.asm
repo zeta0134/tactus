@@ -464,15 +464,68 @@ done_with_this_tile:
         rts
 .endproc
 
+; Called as a COLLISION response. Make sure we are not clobbering
+; collision state while we're at it, though that should be relatively
+; minimal.
+.proc ENEMY_UPDATE_during_collision_cleanup_spell_warning
+TempSpellShapeTable := R0
+TargetIndex := R0
+
+SpellShapeTable := R2
+TargetTile := R4
+SpellTileCounter := R5
+CurrentSpellTileIndex := R6
+
+PuffSquare := R12
+TargetSquare := R13
+
+        ldx TargetSquare
+        near_call ENEMY_UPDATE_set_spell_shape_table
+        ; aaand move this out of range because draw_active_tile is going to clobber R0
+        mov16 SpellShapeTable, TempSpellShapeTable
+
+        lda #3
+        sta SpellTileCounter
+        ldx TargetSquare
+        lda tile_data, x
+        and #CULTIST_DATA_SPELL_SHAPE
+        lsr ; format is now ...XXX..
+        sta CurrentSpellTileIndex
+spell_tile_loop:
+        ldy CurrentSpellTileIndex
+        lda (SpellShapeTable), y
+        clc
+        adc TargetSquare
+        sta TargetTile
+        ; ONLY clean up indicator tiles. Affect nothing else!
+        ldx TargetTile
+        lda battlefield, x
+        cmp #TILE_INDICATOR
+        bne done_with_this_tile
+draw_disco_tile_here:
+        stx DiscoTile
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_disco_tile_here
+        lda DiscoTile
+        sta TargetIndex
+        jsr draw_active_tile
+done_with_this_tile:
+        inc CurrentSpellTileIndex
+        dec SpellTileCounter
+        bne spell_tile_loop
+        rts
+.endproc
+
 .proc ENEMY_UPDATE_cast_spell
 SpellShapeTable := R0
 TargetTile := R2
+SpellPattern := R3
+SpellAttr := R4
 SpellBehavior := R5
 SpellTileCounter := R6
 
 CurrentSpellTileIndex := R7
-
-SpellOffsetIndex := R9 ; used by draw function to pick fill style
 
 CurrentRow := R14
 CurrentTile := R15
@@ -492,26 +545,34 @@ CurrentTile := R15
         cmp #PAL_FIRE
         beq use_flame_tile
 use_poison_tile:
-        lda #0
-        sta SpellOffsetIndex
+        lda #<BG_TILE_HAZARD_POISON_FILLED
+        sta SpellPattern
+        lda #(>BG_TILE_HAZARD_POISON_FILLED | PAL_EARTH)
+        sta SpellAttr
         lda #TILE_ONE_BEAT_POISON
         sta SpellBehavior
         jmp done_picking_spell_tile
 use_crystal_tile:
-        lda #16
-        sta SpellOffsetIndex
+        lda #<BG_TILE_HAZARD_ICE_FILLED
+        sta SpellPattern
+        lda #(>BG_TILE_HAZARD_ICE_FILLED | PAL_ICE)
+        sta SpellAttr
         lda #TILE_ONE_BEAT_FREEZE
         sta SpellBehavior
         jmp done_picking_spell_tile
 use_lightning_ball_tile:
-        lda #32
-        sta SpellOffsetIndex
+        lda #<BG_TILE_HAZARD_LIGHTNING_FILLED
+        sta SpellPattern
+        lda #(>BG_TILE_HAZARD_LIGHTNING_FILLED | PAL_AIR)
+        sta SpellAttr
         lda #TILE_ONE_BEAT_SHOCK
         sta SpellBehavior
         jmp done_picking_spell_tile
 use_flame_tile:
-        lda #48
-        sta SpellOffsetIndex
+        lda #<BG_TILE_HAZARD_FIRE_FILLED
+        sta SpellPattern
+        lda #(>BG_TILE_HAZARD_FIRE_FILLED | PAL_FIRE)
+        sta SpellAttr
         lda #TILE_ONE_BEAT_BURN
         sta SpellBehavior
         jmp done_picking_spell_tile
@@ -548,10 +609,10 @@ draw_spell_tile_here:
         lda tile_flags, x
         ora #FLAG_MOVED_THIS_FRAME
         sta tile_flags, x
-        stx DiscoTile
-        lda tile_index_to_row_lut, x
-        sta DiscoRow
-        far_call ENEMY_UPDATE_draw_spellcast_tile_here_x
+        lda SpellPattern
+        sta tile_patterns, x
+        lda SpellAttr
+        sta tile_attributes, x
         
         ; TODO: set data to indicate damage output and hazard strength?
         ; (receiving end needs to respect this, new system, etc)
@@ -561,6 +622,68 @@ done_with_this_tile:
         dec SpellTileCounter
         bne spell_tile_loop
 
+        rts
+.endproc
+
+; Called as an ATTACK response. Make sure we are not clobbering
+; attack state while we're at it!
+.proc ENEMY_UPDATE_during_attack_cleanup_spell_effects
+TempSpellShapeTable := R0 ;  and R1
+TargetIndex := R0
+; DO NOT USE: R2 - R10
+
+EffectiveAttackSquare := R10 
+; DO NOT USE: R14, R15
+
+; OR R16 - R17, used by disco tile routines >_<
+
+SpellShapeTable := R18
+TargetTile := R20
+SpellTileCounter := R21
+CurrentSpellTileIndex := R22
+
+        ldx EffectiveAttackSquare
+        near_call ENEMY_UPDATE_set_spell_shape_table
+        ; aaand move this out of range because draw_active_tile is going to clobber R0
+        mov16 SpellShapeTable, TempSpellShapeTable
+
+        lda #3
+        sta SpellTileCounter
+        ldx EffectiveAttackSquare
+        lda tile_data, x
+        and #CULTIST_DATA_SPELL_SHAPE
+        lsr ; format is now ...XXX..
+        sta CurrentSpellTileIndex
+spell_tile_loop:
+        ldy CurrentSpellTileIndex
+        lda (SpellShapeTable), y
+        clc
+        adc EffectiveAttackSquare
+        sta TargetTile
+        ; ONLY clean up spell tiles. Affect nothing else!
+        ldx TargetTile
+        lda battlefield, x
+        cmp #TILE_ONE_BEAT_POISON
+        beq draw_disco_tile_here
+        cmp #TILE_ONE_BEAT_FREEZE
+        beq draw_disco_tile_here
+        cmp #TILE_ONE_BEAT_SHOCK
+        beq draw_disco_tile_here
+        cmp #TILE_ONE_BEAT_BURN
+        beq draw_disco_tile_here
+        jmp done_with_this_tile
+draw_disco_tile_here:
+        stx DiscoTile
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_disco_tile_here
+        lda DiscoTile
+        sta TargetIndex
+        jsr draw_active_tile
+done_with_this_tile:
+        inc CurrentSpellTileIndex
+        dec SpellTileCounter
+        bne spell_tile_loop
         rts
 .endproc
 
@@ -963,8 +1086,15 @@ actually_a_cultist:
 
 
 .proc ENEMY_UPDATE_cultist_knocked_back
+ScratchByte := R0
 CurrentRow := R14
 CurrentTile := R15
+        ; By the time we get here, we can just return to our regular idle. Nothing else needs doing.
+        ldx CurrentTile
+        draw_at_x_keeppal TILE_CULTIST, BG_TILE_CULTIST_IDLE
+        cultist_set_state #CULTIST_STATE_IDLE
+        cultist_increment_beat_counter ScratchByte
+
         rts
 .endproc
 
@@ -1112,76 +1242,6 @@ TargetFuncPtr := R10 ; to not clobber call site state
         rts
 .endproc
 
-spell_tiles_by_disco_floor_lut:
-        ; inescapable death, handily organized
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
-        .word (PAL_EARTH << 8) | BG_TILE_HAZARD_POISON_FILLED
-
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
-        .word (PAL_ICE << 8) | BG_TILE_HAZARD_ICE_FILLED
-
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
-        .word (PAL_AIR << 8) | BG_TILE_HAZARD_LIGHTNING_FILLED
-
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
-        .word (PAL_FIRE << 8) | BG_TILE_HAZARD_FIRE_FILLED
-
-; Note: This is only for DRAWING the teleport tile! Anything else you need to do
-; to the thing has to happen at the call site.
-; Arguments: X contains destination tile, R9 contains spell index to use as offset (0, 16, 32, 48)
-; Clobbers:  Y
-.proc ENEMY_UPDATE_draw_spellcast_tile_here_x
-SpellOffsetIndex := R9
-TargetFuncPtr := R10 ; to not clobber call site state
-        perform_zpcm_inc
-        ; run the disco selection logic based on the player's preference
-        ; (DiscoTile==SmokePuffTile, and DiscoRow==SmokePuffRow, so that setup is done by this point)
-        ldy current_save + SaveFile::OptionDiscoFloor
-        lda disco_behavior_lut_low, y
-        sta TargetFuncPtr+0
-        lda disco_behavior_lut_high, y
-        sta TargetFuncPtr+1
-        jsr _cultist_disco_trampoline
-
-        asl ; expand from byte to word alignment
-        clc
-        adc SpellOffsetIndex
-        tay
-        
-        lda spell_tiles_by_disco_floor_lut+0, y
-        sta tile_patterns, x
-        lda spell_tiles_by_disco_floor_lut+1, y
-        sta tile_attributes, x
-
-        ; And done!
-        perform_zpcm_inc
-        rts
-.endproc
-
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===
 ; ============================================================================================================================
@@ -1202,6 +1262,26 @@ TargetFuncPtr := R10 ; to not clobber call site state
         .segment "ENEMY_COLLIDE"
 
 .proc ENEMY_COLLIDE_cultist_attacks_player
+TargetSquare := R13
+        ; If we are currently in our anticipation state, then we need to clean up our warning tiles and switch
+        ; to our knockback state. The collision logic is about to yoink us back to our old puff tile.
+        ldx TargetSquare
+        lda tile_flags, x
+        and #CULTIST_FLAGS_STATE
+        cmp #CULTIST_STATE_ANTICIPATE
+        bne converge_with_standard_collision
+        ; Switch to the knockback state
+        cultist_set_state #CULTIST_STATE_KNOCKED_BACK
+        ; Set our tile pattern/attribute accordingly
+        draw_at_x_keeppal TILE_CULTIST, BG_TILE_CULTIST_KNOCKED_BACK
+        ; Cleanup any warning tiles that we previously generated
+        far_call ENEMY_UPDATE_during_collision_cleanup_spell_warning
+        ; And now we may fall through to the shared handler for player bumps
+
+converge_with_standard_collision:
+        ; tail call into the damaging function
+        jmp ENEMY_COLLIDE_basic_enemy_attacks_player
+
         rts
 .endproc
 

@@ -5,7 +5,7 @@
 ; mostly used for scratch space in tile update routines, which are
 ; otherwise short on ZP due to all the engine state higher up in the
 ; stack frame
-.globalzp R16,R17,R18,R19,R20
+.globalzp R16,R17,R18,R19,R20,R21,R22,R23,R24
 
 .globalzp GameloopCounter, LastNmi, NmiSoftDisable
 .globalzp ActiveDrawingScratch

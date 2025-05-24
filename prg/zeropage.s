@@ -25,6 +25,10 @@ R17: .byte $00
 R18: .byte $00
 R19: .byte $00
 R20: .byte $00
+R21: .byte $00
+R22: .byte $00
+R23: .byte $00
+R24: .byte $00
 
 ; Gameplay and graphics globals
 GameloopCounter: .byte $00

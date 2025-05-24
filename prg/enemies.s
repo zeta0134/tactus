@@ -76,7 +76,7 @@ DUST_DIRECTION_NW := 56
 ; Note: this is kinda slow! expect it to cause lag if we try to change a BUNCH of
 ; tiles in one go, but it should be reasonably okay for half a dozen or so
 .proc draw_active_tile
-TargetIndex := R0
+TargetIndex := R0 ; TODO: move this out of R0? It's mildly inconvenient
 
 NametableAddr := ActiveDrawingScratch+0
 AttributeAddr := ActiveDrawingScratch+2
@@ -768,16 +768,18 @@ indirect_attack_behaviors_high:
 .proc FAR_attack_enemy_tile
 ; R0 and R1 are reserved for the enemy behaviors to use
 ; Current target square to consider for attacking
-PlayerSquare := R2
+PlayerSquare := R2             ; TODO: see if we can relocate these, it's REALLY inconvenient
 AttackSquare := R3
 WeaponSquaresIndex := R4
 WeaponSquaresPtr := R5 ; R6
 AttackLanded := R7
 WeaponProperties := R8
 TilesRemaining := R9
+; R11 - R13 are free for called routines to use
 ; We don't use these, but we should know not to clobber them
 TargetRow := R14
 TargetCol := R15
+; R16 - R20 are free for called routines to use
         
         perform_zpcm_inc
 
