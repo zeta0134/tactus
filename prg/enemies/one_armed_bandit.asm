@@ -843,6 +843,7 @@ deal_standard_4hp_damage:
 deal_no_damage:
         ; tail call into a non-threatening function (we still need all the other
         ; "move back to the puff tile" logic from a standard foe)
+        ; TODO: this is still spawning damage sprites; can we skip those?
         jmp ENEMY_COLLIDE_basic_enemy_attacks_player::post_damage
 .endproc
 

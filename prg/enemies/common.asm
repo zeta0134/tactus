@@ -641,9 +641,6 @@ EnemyHealth := R11
         and #%01111111
         cmp EnemyHealth
         bcs die
-        ; TODO: if we implement health bars, we should draw one right now
-        ; TODO: can we build a system that palette cycles enemies once they take damage? just a quick
-        ; rotation through the four palettes, at frame speed rather than beat speed
 
         ; this enemy took a hit and did not die! let's cycle their palette for flashy effect
         lda EffectiveAttackSquare

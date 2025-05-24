@@ -12,8 +12,8 @@
 ; BG_TILE_WARNING_OUTLINE = $28c8
 ; BG_TILE_WARNING_PLAIN = $28cc
 
-CULTIST_FLAGS_STATE        = %00000111
-CULTIST_FLAGS_HP           = %01111000
+CULTIST_FLAGS_STATE        = %01110000
+CULTIST_FLAGS_HP           = %00001111
 
 ; Why store this again? because we may be HIT by a player spell, and change our color, between beats!
 CULTIST_DATA_SPELL_COLOR   = %11000000
@@ -21,11 +21,11 @@ CULTIST_DATA_SPELL_SHAPE   = %00111000
 CULTIST_DATA_BEAT_COUNTER  = %00000111
 
 CULTIST_STATE_MERCY_WAIT   = %00000000
-CULTIST_STATE_IDLE         = %00000001
-CULTIST_STATE_TEPELORTING  = %00000010
-CULTIST_STATE_KNOCKED_BACK = %00000011
-CULTIST_STATE_ANTICIPATE   = %00000100
-CULTIST_STATE_CASTING      = %00000101
+CULTIST_STATE_IDLE         = %00010000
+CULTIST_STATE_TEPELORTING  = %00100000
+CULTIST_STATE_KNOCKED_BACK = %00110000
+CULTIST_STATE_ANTICIPATE   = %01000000
+CULTIST_STATE_CASTING      = %01010000
 
 ; Note: all macros assume X is prepopulated with our
 ; state index, as various entrypoints need to do that
@@ -663,6 +663,8 @@ spell_tile_loop:
         ; ONLY clean up spell tiles. Affect nothing else!
         ldx TargetTile
         lda battlefield, x
+        cmp #TILE_INDICATOR       ; included so we can reuse the logic during indirect attacks
+        beq draw_disco_tile_here
         cmp #TILE_ONE_BEAT_POISON
         beq draw_disco_tile_here
         cmp #TILE_ONE_BEAT_FREEZE
@@ -701,7 +703,9 @@ CurrentTile := R15
         ldx CurrentTile
         lda tile_flags, x
         and #CULTIST_FLAGS_STATE
-        asl
+        lsr
+        lsr
+        lsr
         tay
         lda cultist_update_dispatch_lut+0, y
         sta DestFunc+0
@@ -1248,11 +1252,83 @@ TargetFuncPtr := R10 ; to not clobber call site state
         .segment "ENEMY_ATTACK"
 
 .proc ENEMY_ATTACK_direct_attack_cultist
+AttackSquare := R3
+EffectiveAttackSquare := R10 
+        ; If we have *just moved*, then ignore this attack
+        ; (A valid attack can only land at our previous destination)
+        ldx AttackSquare
+        lda tile_flags, x
+        bmi ignore_attack
+        ; Copy in the attack square, so we can use shared logic to process the effect
+        lda AttackSquare
+        sta EffectiveAttackSquare
+        near_call ENEMY_ATTACK_attack_cultist_common
+ignore_attack:
         rts
 .endproc
 
 .proc ENEMY_ATTACK_indirect_attack_cultist
+        near_call ENEMY_ATTACK_attack_cultist_common
         rts
+.endproc
+
+.proc ENEMY_ATTACK_attack_cultist_common
+; Damage done by the weapon swing
+WeaponDmg := R0
+
+AttackLanded := R7
+EffectiveAttackSquare := R10 
+        
+        ; Register the attack as a hit
+        lda #1
+        sta AttackLanded
+
+        ; Add the player's currently equipped damage to our flags byte
+        far_call FAR_weapon_dmg ; clobbers X,Y, result in R0
+        lda WeaponDmg
+        ; now add that to our running HP total
+        ldx EffectiveAttackSquare
+        clc
+        adc tile_flags, x
+        sta tile_flags, x
+        ; Now check: if the damage, NOT including the movement bit, is greater than our health...
+        and #CULTIST_FLAGS_HP
+        cmp #CULTIST_SHARED_HP ; TODO: should this be shared?
+        bcs die
+        
+        ; If this cultist is not in the casting state, then queue up a palette flash.
+        ; (otherwise we would queue them up twice, which will look strange)
+        lda tile_flags, x
+        and #CULTIST_FLAGS_STATE
+        cmp #CULTIST_STATE_CASTING
+        beq doing_science_and_still_alive
+
+        lda EffectiveAttackSquare
+        jsr queue_palette_cycle
+
+doing_science_and_still_alive:
+        rts
+
+die:
+        ; Oh dear.
+        ; Whelp. If we're in a spellcasting state, we need to clean up our warning/spell tiles
+        ldx EffectiveAttackSquare
+        lda tile_flags, x
+        and #CULTIST_FLAGS_STATE
+        cmp #CULTIST_STATE_ANTICIPATE
+        beq cleanup_tiles
+        cmp #CULTIST_STATE_CASTING
+        beq cleanup_tiles
+        jmp no_cleanup_needed
+cleanup_tiles:
+        far_call ENEMY_UPDATE_during_attack_cleanup_spell_effects
+no_cleanup_needed:
+        ; And now all the rest works like any other enemy
+        ; ... in fact... the only thing we really need to do differently is set our
+        ; loot table, so do that now
+        set_loot_table CULTIST_SHARED_LOOT
+        jmp ENEMY_ATTACK_attack_with_hp_common::die
+        ; tail call
 .endproc
 
 
@@ -1280,6 +1356,8 @@ TargetSquare := R13
 
 converge_with_standard_collision:
         ; tail call into the damaging function
+
+        ; TODO: make a variant of this that doesn't assume adjacency. (no slash sprite, just the flashing square)
         jmp ENEMY_COLLIDE_basic_enemy_attacks_player
 
         rts
@@ -1307,6 +1385,14 @@ converge_with_standard_collision:
 ; ============================================================================================================================
         .segment "ENEMY_UTIL"
 .proc ENEMY_UTIL_cultist_suspend_logic
+ScratchByte := R0
+CurrentSquare := R15
+        ; Simple enough: whatever state we are in, move to mercy idle instead, just like if we were freshly spawned.
+        ; (Our targeting logic means we are never too close to the map edge for our position to be a problem otherwise)
+        ldx CurrentSquare
+        cultist_set_state #CULTIST_STATE_MERCY_WAIT
+        draw_at_x_keeppal TILE_CULTIST, BG_TILE_CULTIST_IDLE
+
         rts
 .endproc
 
