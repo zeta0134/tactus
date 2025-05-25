@@ -1377,7 +1377,49 @@ converge_with_standard_collision:
 .endproc
 
 .proc ENEMY_BOMB_SPELL_cultist_spell_dispatch
-        rts
+
+; for calling ENEMY_UPDATE_during_attack_cleanup_spell_effects
+EffectiveAttackSquare := R10 
+
+; for convering with standard spell damage stuff
+EnemyHealth := R12
+
+CurrentRow := R14
+CurrentTile := R15
+        ; If we are hit by a spell while in any clearly-moving pose, switch to knocked-back. Otherwise switch to
+        ; mercy-idle. The point here is to cancel the cast and give the player a beat to read the room before they
+        ; need to react to us again, and the decision about which state to enter is just visual flair.
+
+        ldx CurrentTile
+        lda tile_flags, x
+        and #CULTIST_FLAGS_STATE
+        cmp #CULTIST_STATE_ANTICIPATE
+        beq switch_to_knockback
+        cmp #CULTIST_STATE_CASTING
+        beq switch_to_knockback
+switch_to_mercy_wait:
+        cultist_set_state #CULTIST_STATE_MERCY_WAIT
+        draw_at_x_keeppal TILE_CULTIST, BG_TILE_CULTIST_IDLE
+        jmp done_switching_states
+switch_to_knockback:
+        cultist_set_state #CULTIST_STATE_KNOCKED_BACK
+        draw_at_x_keeppal TILE_CULTIST, BG_TILE_CULTIST_KNOCKED_BACK
+        ; In either of these states, we need to clean up the warning/spell tiles
+        ; so they don't actually finish their cast, as we've "interrupted" that action
+        ; Here we're reusing logic meant for being attacked, so move out index into
+        ; R10 to match what it expects
+        ; TODO: can we clean up "which tile are we" interfacing with enemy routines in general?
+        lda CurrentTile
+        sta EffectiveAttackSquare
+        far_call ENEMY_UPDATE_during_attack_cleanup_spell_effects
+done_switching_states:
+
+        ; And now that we've done all of that, we can run the normal spellcast logic just like
+        ; for any other enemy.
+        lda #CULTIST_SHARED_HP
+        sta EnemyHealth
+        jmp ENEMY_BOMB_SPELL_regular_enemy_elemental_spell_common
+        ; tail call
 .endproc
 
 ; ============================================================================================================================

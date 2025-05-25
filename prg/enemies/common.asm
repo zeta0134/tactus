@@ -896,6 +896,8 @@ CurrentTile := R15
         jeq heal_completely
 
         ; Otherwise, elemental spells attempt to deal one (1) dmg
+        ; TODO: Should we have a "more powerful spells" accessory? If we do, up this to
+        ; 2 DMG in the general case and 4 DMG in the cross-aligned case
 take_one_damage:
         lda #1
         ldx CurrentTile
@@ -903,7 +905,7 @@ take_one_damage:
         adc tile_flags, x
         sta tile_flags, x
         ; Now check: if the damage, NOT including the movement bit, is greater than our health...
-        and #%01111111
+        and #%00001111
         cmp EnemyHealth
         bcs die
         jmp survived_spell
@@ -940,7 +942,7 @@ die:
 heal_completely:
         ldx CurrentTile
         lda tile_flags, x
-        and #%10000000 ; reset DMG to 0
+        and #%11110000 ; reset DMG to 0
         sta tile_flags, x
         ; Fall through to survive-spell stuff for now
         ; (later we should probably take a different path)
