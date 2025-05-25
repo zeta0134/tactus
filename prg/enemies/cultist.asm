@@ -524,8 +524,8 @@ SpellPattern := R3
 SpellAttr := R4
 SpellBehavior := R5
 SpellTileCounter := R6
-
 CurrentSpellTileIndex := R7
+SpellHazardData := R8
 
 CurrentRow := R14
 CurrentTile := R15
@@ -551,6 +551,8 @@ use_poison_tile:
         sta SpellAttr
         lda #TILE_ONE_BEAT_POISON
         sta SpellBehavior
+        lda #$71 ; 7 beats, 1 initial dmg, 2 hearts total
+        sta SpellHazardData
         jmp done_picking_spell_tile
 use_crystal_tile:
         lda #<BG_TILE_HAZARD_ICE_FILLED
@@ -559,6 +561,8 @@ use_crystal_tile:
         sta SpellAttr
         lda #TILE_ONE_BEAT_FREEZE
         sta SpellBehavior
+        lda #$44 ; 4 taps to unfreeze, 4 initial dmg, 1 heart total
+        sta SpellHazardData
         jmp done_picking_spell_tile
 use_lightning_ball_tile:
         lda #<BG_TILE_HAZARD_LIGHTNING_FILLED
@@ -567,6 +571,8 @@ use_lightning_ball_tile:
         sta SpellAttr
         lda #TILE_ONE_BEAT_SHOCK
         sta SpellBehavior
+        lda #$44 ; 4 shock beats, 4 initial dmg, 1 heart total
+        sta SpellHazardData
         jmp done_picking_spell_tile
 use_flame_tile:
         lda #<BG_TILE_HAZARD_FIRE_FILLED
@@ -575,6 +581,8 @@ use_flame_tile:
         sta SpellAttr
         lda #TILE_ONE_BEAT_BURN
         sta SpellBehavior
+        lda #$84 ; 8 burn beats, 4 initial dmg, 1 heart total (and many more if the player isn't careful)
+        sta SpellHazardData
         jmp done_picking_spell_tile
 done_picking_spell_tile:
 
@@ -613,6 +621,8 @@ draw_spell_tile_here:
         sta tile_patterns, x
         lda SpellAttr
         sta tile_attributes, x
+        lda SpellHazardData
+        sta tile_data, x
         
         ; TODO: set data to indicate damage output and hazard strength?
         ; (receiving end needs to respect this, new system, etc)
