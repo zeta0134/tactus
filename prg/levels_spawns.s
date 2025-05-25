@@ -56,6 +56,7 @@ PopulationLimit: .res 1
 
 ; arbitrary logic needed by certain packs of enemies
 BanditsSpawned: .res 4
+CultistsSpawned: .res 1
 
     .segment "DATA_3"
 
@@ -347,6 +348,41 @@ spawn_succeeds:
         rts
 .endproc
 
+.proc no_finalizer
+        rts
+.endproc
+
+.proc cultist_conditions
+        ; If there are more than 7 cultists on this map, stop! put your pencils down. Do NOT
+        ; spawn more of the accursed things! (frankly 7 may be too many) (7 is, in fact, too many!)
+        lda CultistsSpawned
+        cmp #4
+        bcs too_many_cultists
+not_enough_cultists:
+        jsr single_disco_tile
+        rts
+too_many_cultists:
+        lda #$FF
+        rts
+.endproc
+
+; The starting "turn" order for cultists as the count grows, so that they coordinate
+; and become increasingly closer togehter, rhythm wise. This gives the group as a whole
+; a steadily increasing difficulty curve primarily based on pack size
+cultist_coordinated_beat_table:
+        .byte 1, 5, 3, 7, 2, 6, 4, 8
+
+.proc cultist_finalizer_coordinate_beat
+        lda CultistsSpawned
+        and #%111 ; safety
+        tay
+        lda cultist_coordinated_beat_table, y
+        ldx SpawnedEntityIndex
+        sta tile_data, x
+        inc CultistsSpawned
+        rts
+.endproc
+
 .proc __cond_trampoline
         jmp (ConditionalPtr)
 .endproc
@@ -372,7 +408,7 @@ valid_space_loop:
         jsr pick_safe_coordinate
         jsr __cond_trampoline
         bne valid_space_loop
-
+spawn_attempt_succeeds:
         ldx SpawnedEntityIndex
         ldy #SpawnListEntry::Behavior
         lda (EntityPtr), y
@@ -389,6 +425,17 @@ valid_space_loop:
         ldy #SpawnListEntry::Flags
         lda (EntityPtr), y
         sta tile_flags, x
+
+        ; we're done with the spawn condition check, so reuse its
+        ; trampoline for the finalizer logic
+        ldy #SpawnListEntry::FinalizerBehavior
+        lda (EntityPtr), y
+        sta ConditionalPtr+0
+        iny
+        lda (EntityPtr), y
+        sta ConditionalPtr+1
+        jsr __cond_trampoline
+
 done:
         rts
 spawn_attempt_failed:
@@ -465,13 +512,12 @@ PackSize := R19
         sta AccumulatedPopulation
 
         ; initialize other state
-        ; DEBUG: only allow two groups to spawn
-        lda #4
-        sta BanditsSpawned+0
         lda #0
+        sta BanditsSpawned+0
         sta BanditsSpawned+1
         sta BanditsSpawned+2
         sta BanditsSpawned+3
+        sta CultistsSpawned
 
         .if ::DEBUG_SINGLE_ENEMY
         lda PopulationLimit

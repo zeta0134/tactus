@@ -6,12 +6,12 @@ enemy_slime_basic:
         pack_size 2, 3
 
 enemy_slime_intermediate:
-        full_spawn_entry TILE_SLIME, BG_TILE_SLIME_IDLE, PAL_AIR, 0, 0, disco_tile_to_my_right
+        full_spawn_entry TILE_SLIME, BG_TILE_SLIME_IDLE, PAL_AIR, 0, 0, disco_tile_to_my_right, no_finalizer
         default_spawn_pool_details
         pack_size 2, 6
 
 enemy_slime_advanced:
-        full_spawn_entry TILE_SLIME, BG_TILE_SLIME_IDLE, PAL_FIRE, 0, 0, disco_square_to_my_down_and_right
+        full_spawn_entry TILE_SLIME, BG_TILE_SLIME_IDLE, PAL_FIRE, 0, 0, disco_square_to_my_down_and_right, no_finalizer
         default_spawn_pool_details
         pack_size 1, 3
 
@@ -48,82 +48,82 @@ enemy_spider_advanced:
 ; mushrooms are synchronized to the beat. we can spawn them offset so they aren't all
 ; attacking at the same time
 enemy_mushroom_basic_beat_0:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_FIRE, 0, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_FIRE, 0, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_basic_beat_1:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_FIRE, 1, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_FIRE, 1, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_basic_beat_2:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_FIRE, 2, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_FIRE, 2, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_basic_beat_3:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_FIRE, 3, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_FIRE, 3, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_intermediate_beat_0:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_ICE, 0, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_ICE, 0, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_intermediate_beat_1:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_ICE, 1, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_ICE, 1, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_intermediate_beat_2:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_ICE, 2, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_ICE, 2, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_intermediate_beat_3:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_ICE, 3, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_ICE, 3, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_advanced_beat_0:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_AIR, 0, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_AIR, 0, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_advanced_beat_1:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_AIR, 1, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_AIR, 1, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_advanced_beat_2:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_AIR, 2, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_AIR, 2, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_weird_beat_0:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_EARTH, 0, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_EARTH, 0, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_weird_beat_1:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_EARTH, 1, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_EARTH, 1, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_weird_beat_2:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_EARTH, 2, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_EARTH, 2, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_weird_beat_3:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_EARTH, 3, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_EARTH, 3, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
 enemy_mushroom_weird_beat_4:
-        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_EARTH, 4, 0, ring_of_disco_tiles
+        full_spawn_entry TILE_MUSHROOM, BG_TILE_MUSHROOM_IDLE, PAL_EARTH, 4, 0, ring_of_disco_tiles, no_finalizer
         default_spawn_pool_details
         pack_size 1, 1
 
@@ -168,44 +168,44 @@ enemy_mole_advanced:
         pack_size 1, 3
 
 enemy_one_armed_bandit_earth:
-        full_spawn_entry TILE_ONE_ARMED_BANDIT, BG_TILE_ONE_ARMED_BANDIT_IDLE_7, PAL_EARTH, 0, 0, one_armed_bandit_conditions
+        full_spawn_entry TILE_ONE_ARMED_BANDIT, BG_TILE_ONE_ARMED_BANDIT_IDLE_7, PAL_EARTH, 0, 0, one_armed_bandit_conditions, no_finalizer
         default_spawn_pool_details
         pack_size 3, 4
 
 enemy_one_armed_bandit_ice:
-        full_spawn_entry TILE_ONE_ARMED_BANDIT, BG_TILE_ONE_ARMED_BANDIT_IDLE_7, PAL_ICE, 0, 0, one_armed_bandit_conditions
+        full_spawn_entry TILE_ONE_ARMED_BANDIT, BG_TILE_ONE_ARMED_BANDIT_IDLE_7, PAL_ICE, 0, 0, one_armed_bandit_conditions, no_finalizer
         default_spawn_pool_details
         pack_size 3, 4
 
 enemy_one_armed_bandit_air:
-        full_spawn_entry TILE_ONE_ARMED_BANDIT, BG_TILE_ONE_ARMED_BANDIT_IDLE_7, PAL_AIR, 0, 0, one_armed_bandit_conditions
+        full_spawn_entry TILE_ONE_ARMED_BANDIT, BG_TILE_ONE_ARMED_BANDIT_IDLE_7, PAL_AIR, 0, 0, one_armed_bandit_conditions, no_finalizer
         default_spawn_pool_details
         pack_size 3, 4
 
 enemy_one_armed_bandit_fire:
-        full_spawn_entry TILE_ONE_ARMED_BANDIT, BG_TILE_ONE_ARMED_BANDIT_IDLE_7, PAL_FIRE, 0, 0, one_armed_bandit_conditions
+        full_spawn_entry TILE_ONE_ARMED_BANDIT, BG_TILE_ONE_ARMED_BANDIT_IDLE_7, PAL_FIRE, 0, 0, one_armed_bandit_conditions, no_finalizer
         default_spawn_pool_details
         pack_size 3, 4
 
 enemy_cultist_earth:
-        full_spawn_entry TILE_CULTIST, BG_TILE_CULTIST_IDLE, PAL_EARTH, 0, 0, single_disco_tile
+        full_spawn_entry TILE_CULTIST, BG_TILE_CULTIST_IDLE, PAL_EARTH, 0, 0, cultist_conditions, cultist_finalizer_coordinate_beat
         default_spawn_pool_details
-        pack_size 3, 4
+        pack_size 1, 2
 
 enemy_cultist_air:
-        full_spawn_entry TILE_CULTIST, BG_TILE_CULTIST_IDLE, PAL_AIR, 0, 0, single_disco_tile
+        full_spawn_entry TILE_CULTIST, BG_TILE_CULTIST_IDLE, PAL_AIR, 0, 0, cultist_conditions, cultist_finalizer_coordinate_beat
         default_spawn_pool_details
-        pack_size 3, 4
+        pack_size 1, 2
 
 enemy_cultist_ice:
-        full_spawn_entry TILE_CULTIST, BG_TILE_CULTIST_IDLE, PAL_ICE, 0, 0, single_disco_tile
+        full_spawn_entry TILE_CULTIST, BG_TILE_CULTIST_IDLE, PAL_ICE, 0, 0, cultist_conditions, cultist_finalizer_coordinate_beat
         default_spawn_pool_details
-        pack_size 3, 4
+        pack_size 1, 2
 
 enemy_cultist_fire:
-        full_spawn_entry TILE_CULTIST, BG_TILE_CULTIST_IDLE, PAL_FIRE, 0, 0, single_disco_tile
+        full_spawn_entry TILE_CULTIST, BG_TILE_CULTIST_IDLE, PAL_FIRE, 0, 0, cultist_conditions, cultist_finalizer_coordinate_beat
         default_spawn_pool_details
-        pack_size 3, 4
+        pack_size 1, 2
 
 
 

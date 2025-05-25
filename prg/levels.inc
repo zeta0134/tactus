@@ -20,6 +20,7 @@
         Data .byte
         Flags .byte
         SpawnCheck .addr
+        FinalizerBehavior .addr
 .endstruct
 
 .macro basic_spawn_entry behavior, tile_id, pal
@@ -29,15 +30,17 @@
         .byte $0                 ; Data
         .byte $0                 ; Flags
         .addr single_disco_tile  ; SpawnCheck
+        .addr no_finalizer       ; Finalizer
 .endmacro
 
-.macro full_spawn_entry behavior, tile_id, pal, data, flags, spawn_condition
+.macro full_spawn_entry behavior, tile_id, pal, data, flags, spawn_condition, finalizer_behavior
         .byte behavior           ; Behavior
         .byte (<tile_id)         ; TileLow
         .byte ((>tile_id) | pal) ; TileHighAttr
         .byte data               ; Data
         .byte flags              ; Flags
         .addr spawn_condition    ; SpawnCheck
+        .addr finalizer_behavior ; SpawnCheck
 .endmacro
 
 .struct SpawnSetEntry
@@ -65,6 +68,7 @@
         Data .byte
         Flags .byte
         SpawnCheck .addr
+        FinalizerBehavior .addr
         RoomCompatibility .byte
         Aggression .byte ; excessive danger
         Trickiness .byte ; unusual setup / resistance to standard techniques
