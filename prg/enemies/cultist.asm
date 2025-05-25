@@ -1369,15 +1369,85 @@ converge_with_standard_collision:
         .segment "ENEMY_BOMB_SPELL"
 
 .proc ENEMY_BOMB_SPELL_cultist_direct_explode
+AttackSquare := R3
+EffectiveAttackSquare := R10
+        ; Copy in the attack square, so we can use shared logic to process the effect
+        lda AttackSquare
+        sta EffectiveAttackSquare
+        near_call ENEMY_BOMB_SPELL_cultist_explode_common
         rts
 .endproc
 
 .proc ENEMY_BOMB_SPELL_cultist_indirect_explode
+        near_call ENEMY_BOMB_SPELL_cultist_explode_common
         rts
 .endproc
 
-.proc ENEMY_BOMB_SPELL_cultist_spell_dispatch
+.proc ENEMY_BOMB_SPELL_cultist_cleanup_own_magic_circle
+TargetIndex := R0
+EffectiveAttackSquare := R10
+        ; In this specific case, we have been hit pre-teleport, and the
+        ; magic circle hasn't rendered yet. Find it if we can (this may
+        ; potentially fail, be safe) and revert it to a disco tile.
+        ; We don't care if this is slow, but **boy** is it!
 
+        ldx #0
+magic_circle_loop:
+        lda battlefield, x
+        cmp #TILE_MAGIC_CIRCLE
+        bne not_a_magic_circle
+        lda tile_data, x
+        cmp EffectiveAttackSquare
+        bne not_our_magic_circle
+        ; This magic circle is ours! KILL IT!
+        stx DiscoTile
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_disco_tile_here
+        lda DiscoTile
+        sta TargetIndex
+        jsr draw_active_tile
+        ; and we're totally done
+        rts
+not_a_magic_circle:
+not_our_magic_circle:
+        inx
+        cpx #BATTLEFIELD_SIZE
+        bne magic_circle_loop
+        ; failure!? don't care
+        rts
+.endproc
+
+.proc ENEMY_BOMB_SPELL_cultist_explode_common
+OriginalAttackSquare := R3
+EffectiveAttackSquare := R10
+        ; If we were blown up while in the middle of casting a spell, we
+        ; must clean up our spell effects before we do anything else
+        ldx EffectiveAttackSquare
+        lda tile_flags, x
+        and #CULTIST_FLAGS_STATE
+        cmp #CULTIST_STATE_ANTICIPATE
+        beq cleanup_spell_tiles
+        cmp #CULTIST_STATE_CASTING
+        beq cleanup_spell_tiles
+        cmp #CULTIST_STATE_TEPELORTING
+        beq cleanup_magic_circle
+        jmp done_with_shenanigans
+cleanup_spell_tiles:
+        far_call ENEMY_UPDATE_during_attack_cleanup_spell_effects
+        jmp done_with_shenanigans
+cleanup_magic_circle:
+        near_call ENEMY_BOMB_SPELL_cultist_cleanup_own_magic_circle
+done_with_shenanigans:
+
+        ; Now we can use the shared "regular enemy" logic, die properly, handle
+        ; the death sprite spawning in the right spot, all that good stuff.
+        jmp ENEMY_BOMB_SPELL_explode_common
+        ;tail call
+.endproc
+
+
+.proc ENEMY_BOMB_SPELL_cultist_spell_dispatch
 ; for calling ENEMY_UPDATE_during_attack_cleanup_spell_effects
 EffectiveAttackSquare := R10 
 
