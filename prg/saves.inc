@@ -44,7 +44,7 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     OptionsReserved .byte 6 ; pad out to 16 bytes total
     ; FUTURE
     GeneralReserved .byte 24
-    ; CURRENT RUN STATE (that which persists, anyway) (current: 31 bytes)
+    ; CURRENT RUN STATE (that which persists, anyway) (current: 32 bytes)
     RunFlags                 .byte
     RunSeed                  .byte 4
     HeartSlotType            .byte 6
@@ -61,7 +61,9 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     PlayerSecondUpgradeSlot  .byte
     PlayerGold               .byte 2
     PlayerZoneId             .byte 1  ; index into a LUT, since pointers may move around
-    RunStateReserved         .byte 18 ; bring total up to 48 bytes
+    PlayerWeaponUpgradeSlot1 .byte
+    PlayerWeaponUpgradeSlot2 .byte
+    RunStateReserved         .byte 16 ; bring total up to 48 bytes
     ; STUFF WE TRACK DURING A RUN, FOR THE END SCREEN MOSTLY (current: 33 bytes)
     RunTimeFrames            .byte
     RunTimeSeconds           .byte

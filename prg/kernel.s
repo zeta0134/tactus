@@ -655,9 +655,20 @@ zone_select_converge:
         ; Clear out any gameplay state that will look odd over the zone transition
         .global FAR_init_particles
 
+        ; Clear out some zone-specific player state
         lda #0
         sta HeldInputCooldown
         sta PlayerHeldDirection
+
+        ; We're deleting all existing items, so clear out some backup state we keep
+        ; for weapon upgrades. (New weapons should, currently, have no upgrades)
+        lda #ITEM_NONE
+        sta BackupWeaponUpgradeSlot1
+        sta BackupWeaponUpgradeSlot2
+        lda #$FF
+        sta BackupWeaponUpgradeRoomIndex
+        sta BackupWeaponUpgradeRow
+        sta BackupWeaponUpgradeCol
 
         ; Generate proper mazes and randomize player, exit, and boss
         ; This **will** lag badly, so switch our beat tracker to update during NMI

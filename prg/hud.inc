@@ -4,6 +4,15 @@
 
 .global HudMapDirty
 
+.global WeaponDisplayCurrent
+.global TorchDisplayCurrent
+.global ArmorDisplayCurrent
+.global BootsDisplayCurrent
+.global AccessoryDisplayCurrent
+.global SpellDisplayCurrent
+.global ItemDisplayCurrent
+.global ItemCountCurrent
+
 .macro chr_tile_offset ident, tile_x, tile_y
 ident = ((tile_y * 16) + tile_x)
 .endmacro

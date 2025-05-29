@@ -1,3 +1,5 @@
+        .macpack longbranch
+
         .include "items.inc"
 
         .include "../build/tile_defs.inc"
@@ -162,6 +164,10 @@ item_table:
         .word spell_earth
         .word spell_bomb_fiesta
         .word spell_healing
+        .word upgrade_crystal_earth
+        .word upgrade_crystal_ice
+        .word upgrade_crystal_air
+        .word upgrade_crystal_fire
 
         ; safety
         .repeat 128
@@ -856,6 +862,74 @@ spell_healing:
         .addr spell_life_description            ; DescriptionStringPtr
         .byte <.bank(spell_life_description)    ; DescriptionStringBank
 
+upgrade_crystal_earth:
+        .byte SLOT_CONSUMABLE                 ; SlotId
+        .word SPRITE_ITEMS_05_UPGRADE_EARTH   ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE               ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                               ; HudSpriteTile (unused)
+        .byte 0                               ; HudSpriteAttr (unused)
+        .word 250                             ; ShopCost (base)
+        .byte WEAPON_DAGGER                   ; WeaponShape (unused)
+        .addr no_effect                       ; DamageFunc
+        .addr no_effect                       ; TorchlightFunc
+        .addr give_upgrade_earth              ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
+        .addr no_item_description             ; DescriptionStringPtr
+        .byte <.bank(no_item_description)     ; DescriptionStringBank
+
+upgrade_crystal_ice:
+        .byte SLOT_CONSUMABLE                 ; SlotId
+        .word SPRITE_ITEMS_05_UPGRADE_ICE     ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                               ; HudSpriteTile (unused)
+        .byte 0                               ; HudSpriteAttr (unused)
+        .word 250                             ; ShopCost (base)
+        .byte WEAPON_DAGGER                   ; WeaponShape (unused)
+        .addr no_effect                       ; DamageFunc
+        .addr no_effect                       ; TorchlightFunc
+        .addr give_upgrade_ice                ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
+        .addr no_item_description             ; DescriptionStringPtr
+        .byte <.bank(no_item_description)     ; DescriptionStringBank
+
+upgrade_crystal_air:
+        .byte SLOT_CONSUMABLE                 ; SlotId
+        .word SPRITE_ITEMS_05_UPGRADE_AIR     ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                               ; HudSpriteTile (unused)
+        .byte 0                               ; HudSpriteAttr (unused)
+        .word 250                             ; ShopCost (base)
+        .byte WEAPON_DAGGER                   ; WeaponShape (unused)
+        .addr no_effect                       ; DamageFunc
+        .addr no_effect                       ; TorchlightFunc
+        .addr give_upgrade_air                ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
+        .addr no_item_description             ; DescriptionStringPtr
+        .byte <.bank(no_item_description)     ; DescriptionStringBank
+
+upgrade_crystal_fire:
+        .byte SLOT_CONSUMABLE                 ; SlotId
+        .word SPRITE_ITEMS_05_UPGRADE_FIRE    ; WorldSpriteTile
+        .byte SPRITE_PAL_RED                  ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
+        .byte 0                               ; HudSpriteTile (unused)
+        .byte 0                               ; HudSpriteAttr (unused)
+        .word 250                             ; ShopCost (base)
+        .byte WEAPON_DAGGER                   ; WeaponShape (unused)
+        .addr no_effect                       ; DamageFunc
+        .addr no_effect                       ; TorchlightFunc
+        .addr give_upgrade_fire               ; UseFunc
+        .addr no_effect                       ; DmgReductionFunc
+        .addr no_item_description             ; DescriptionStringPtr
+        .byte <.bank(no_item_description)     ; DescriptionStringBank
+
         .segment "CODE_ITEMS"
 
 ; Flat value functions. If these seem remarkably inefficient, that's because they are
@@ -1179,6 +1253,62 @@ upgrade_to_temporary_armored:
         rts
 .endproc
 
+.proc give_upgrade_earth
+        ldx #ITEM_UPGRADE_EARTH
+        jmp _give_upgrade_common
+.endproc
+
+.proc give_upgrade_ice
+        ldx #ITEM_UPGRADE_ICE
+        jmp _give_upgrade_common
+.endproc
+
+.proc give_upgrade_air
+        ldx #ITEM_UPGRADE_AIR
+        jmp _give_upgrade_common
+.endproc
+
+.proc give_upgrade_fire
+        ldx #ITEM_UPGRADE_FIRE
+        jmp _give_upgrade_common
+.endproc
+
+; Call with X set to the upgrade item
+.proc _give_upgrade_common
+        ; The starting dagger does not support upgrades!
+        lda current_save + SaveFile::PlayerEquipmentWeapon
+        cmp #ITEM_DAGGER_L1
+        beq failure
+        ; Otherwise, whichever slot is free, put it there
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot1
+        cmp #ITEM_NONE
+        beq use_slot_1
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot2
+        cmp #ITEM_NONE
+        beq use_slot_2
+failure:
+        ; failure: this weapon is fully upgraded
+        lda #$FF
+        rts
+use_slot_1:
+        stx current_save + SaveFile::PlayerWeaponUpgradeSlot1
+        jmp converge
+use_slot_2:
+        stx current_save + SaveFile::PlayerWeaponUpgradeSlot2
+converge:
+        ; play a fancy equip sfx
+        ; TODO: make this even fancier?
+        queue_sfx_pulse1 sfx_equip_ability_pulse1
+        queue_sfx_pulse2 sfx_equip_ability_pulse2
+
+        ; "Dirty" the weapon in the hud, forcing a redraw of the equip slots
+        lda #$FF
+        sta WeaponDisplayCurrent
+
+        lda #0 ; return success
+        rts
+.endproc
+
 .proc FAR_init_item_bank_allocations
         lda #$FF
         .repeat 4, i
@@ -1410,7 +1540,7 @@ player_equipment_by_index := current_save + SaveFile::PlayerEquipmentWeapon
         ldy #ItemDef::SlotId
         lda (ItemPtr), y
         cmp #SLOT_CONSUMABLE
-        beq pickup_consumable_item
+        jeq pickup_consumable_item
         ; TODO: bombs are a special case
         ; (spells are not really)
 pickup_equipped_item:
@@ -1421,6 +1551,51 @@ pickup_equipped_item:
         lda NewItem
         sta player_equipment_by_index, y
         stx OutputOldItem
+
+        ; special case: if this was a weapon, then we need to also deal with upgrades
+        cpy #SLOT_WEAPON
+        bne not_a_weapon
+        ; we're gonna change the upgrade slots, so force the HUD to redraw when it has a chance
+        lda #ITEM_NONE
+        sta WeaponDisplayCurrent
+        ; are we standing on the backup spot? if so, switcheroo!
+        lda BackupWeaponUpgradeRoomIndex
+        cmp PlayerRoomIndex
+        bne no_valid_backup
+        lda BackupWeaponUpgradeRow
+        cmp PlayerRow
+        bne no_valid_backup
+        lda BackupWeaponUpgradeCol
+        cmp PlayerCol
+        bne no_valid_backup
+standing_on_a_valid_backup:
+        ; switcheroo!
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot1
+        ldx BackupWeaponUpgradeSlot1
+        stx current_save + SaveFile::PlayerWeaponUpgradeSlot1
+        sta BackupWeaponUpgradeSlot1
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot2
+        ldx BackupWeaponUpgradeSlot2
+        stx current_save + SaveFile::PlayerWeaponUpgradeSlot2
+        sta BackupWeaponUpgradeSlot2
+        jmp done_with_weapons
+no_valid_backup:
+        ; backup current, initialize new
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot1
+        sta BackupWeaponUpgradeSlot1
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot2
+        sta BackupWeaponUpgradeSlot2
+        lda PlayerRoomIndex
+        sta BackupWeaponUpgradeRoomIndex
+        lda PlayerRow
+        sta BackupWeaponUpgradeRow
+        lda PlayerCol
+        sta BackupWeaponUpgradeCol
+        lda #ITEM_NONE
+        sta current_save + SaveFile::PlayerWeaponUpgradeSlot1
+        sta current_save + SaveFile::PlayerWeaponUpgradeSlot2
+done_with_weapons:
+not_a_weapon:
         restore_previous_bank
         perform_zpcm_inc
         rts

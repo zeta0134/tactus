@@ -64,6 +64,12 @@
 .global WarpStability
 .global MusicalWarpStabilityCooldown
 
+.global BackupWeaponUpgradeSlot1
+.global BackupWeaponUpgradeSlot2
+.global BackupWeaponUpgradeRoomIndex
+.global BackupWeaponUpgradeRow
+.global BackupWeaponUpgradeCol
+
 MAX_HEARTS = 5
 MAX_GOLD = 9999
 

@@ -94,6 +94,12 @@ chr_tile_offset SPELL_A_ENABLED,    2, 14
 chr_tile_offset SPELL_B_ENABLED,    2, 15
 chr_tile_offset SPELL_DISABLED_BL_CORNER, 1, 14
 
+chr_tile_offset UPGRADE_ICE,   0, 8
+chr_tile_offset UPGRADE_EARTH, 1, 8
+chr_tile_offset UPGRADE_AIR,   2, 8
+chr_tile_offset UPGRADE_FIRE,  3, 8
+chr_tile_offset UPGRADE_SLOT,  0, 9
+
 chr_tile_offset WARP_STATIC, 0, 12
 
 TILE_COL_OFFSET = 1
@@ -1238,6 +1244,80 @@ no_a_item_equipped:
         rts
 .endproc
 
+.proc draw_weapon_upgrade_icon
+ItemId := R0
+TileAddr  := R2
+AttributeAddr := R4
+DrawTile := R6
+DrawAttr := R7
+        sta ItemId
+
+        clc
+        lda TileAddr+0
+        adc #<HUD_ATTR_OFFSET
+        sta AttributeAddr+0
+        lda TileAddr+1
+        adc #>HUD_ATTR_OFFSET
+        sta AttributeAddr+1
+
+        lda ItemId
+        cmp #ITEM_UPGRADE_EARTH
+        beq draw_earth_icon
+        cmp #ITEM_UPGRADE_ICE
+        beq draw_ice_icon
+        cmp #ITEM_UPGRADE_AIR
+        beq draw_air_icon
+        cmp #ITEM_UPGRADE_FIRE
+        beq draw_fire_icon
+handle_empty_slot:
+        lda current_save + SaveFile::PlayerEquipmentWeapon
+        cmp #ITEM_DAGGER_L1
+        beq draw_blank_tile
+draw_empty_slot:
+        lda #UPGRADE_SLOT
+        sta DrawTile
+        lda #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        sta DrawAttr
+        jmp converge
+draw_blank_tile:
+        lda #BLANK_TILE
+        sta DrawTile
+        lda #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        sta DrawAttr
+        jmp converge
+draw_earth_icon:
+        lda #UPGRADE_EARTH
+        sta DrawTile
+        lda #(HUD_PURPLE_PAL | CHR_BANK_HUD)
+        sta DrawAttr
+        jmp converge
+draw_ice_icon:
+        lda #UPGRADE_ICE
+        sta DrawTile
+        lda #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        sta DrawAttr
+        jmp converge
+draw_air_icon:
+        lda #UPGRADE_AIR
+        sta DrawTile
+        lda #(HUD_YELLOW_PAL | CHR_BANK_HUD)
+        sta DrawAttr
+        jmp converge
+draw_fire_icon:
+        lda #UPGRADE_FIRE
+        sta DrawTile
+        lda #(HUD_RED_PAL | CHR_BANK_HUD)
+        sta DrawAttr
+        jmp converge
+converge:
+        ldy #0
+        lda DrawTile
+        sta (TileAddr), y
+        lda DrawAttr
+        sta (AttributeAddr), y
+        rts
+.endproc
+
 .proc draw_equipment
 ItemId := R0
 TileAddr  := R2
@@ -1254,6 +1334,15 @@ check_weapon:
         st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 2)
         jsr draw_equipment_icon
         perform_zpcm_inc
+        ; for weapons we also need to draw the upgrade slots. here
+        ; we also handle ITEM_NONE differently: for the DAGGER it is a blank
+        ; tile, and for everything else it is an empty slot tile
+        st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 1)
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot1
+        jsr draw_weapon_upgrade_icon
+        st16 TileAddr, (HUD_TILE_BASE + ROW_2 + 1)
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot2
+        jsr draw_weapon_upgrade_icon
 
 check_torch:
         lda current_save + SaveFile::PlayerEquipmentTorch

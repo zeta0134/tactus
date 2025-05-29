@@ -124,6 +124,15 @@ WeaponSingleTargetIndex: .res 1
 WarpStability: .res 1
 MusicalWarpStabilityCooldown: .res 1
 
+PlayerWeaponUpgradeSlot1: .res 1
+PlayerWeaponUpgradeSlot2: .res 1
+
+BackupWeaponUpgradeSlot1: .res 1
+BackupWeaponUpgradeSlot2: .res 1
+BackupWeaponUpgradeRoomIndex: .res 1
+BackupWeaponUpgradeRow: .res 1
+BackupWeaponUpgradeCol: .res 1
+
 .segment "PRGFIXED_E000"
 
 ; For rapidly computing the tile row
@@ -295,7 +304,7 @@ HeartCount := R2
         ; not really sure how weapon obelisks are going to work.
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
-        lda #ITEM_BROADSWORD_L2
+        lda #ITEM_BROADSWORD_L1
         sta current_save + SaveFile::PlayerEquipmentWeapon
         lda #ITEM_BASIC_TORCH
         sta current_save + SaveFile::PlayerEquipmentTorch
@@ -309,6 +318,11 @@ HeartCount := R2
         sta current_save + SaveFile::PlayerEquipmentBombs
         lda #ITEM_SPELL_AIR
         sta current_save + SaveFile::PlayerEquipmentSpell
+
+        lda #ITEM_NONE
+        sta current_save + SaveFile::PlayerWeaponUpgradeSlot1
+        lda #ITEM_NONE
+        sta current_save + SaveFile::PlayerWeaponUpgradeSlot2
 
         lda #99
         sta current_save + SaveFile::PlayerBombCount
@@ -332,10 +346,6 @@ HeartCount := R2
         sta NewHeartType
         near_call FAR_add_heart
 
-        ;lda #HEART_TYPE_REGULAR
-        ;sta NewHeartType
-        ;near_call FAR_add_heart
-
         ; Heal the player to full! (regular hearts start empty)
         lda #128
         sta HealingAmount
@@ -357,6 +367,10 @@ HeartCount := R2
         lda #ITEM_NONE
         sta current_save + SaveFile::PlayerEquipmentBombs
         sta current_save + SaveFile::PlayerEquipmentSpell
+
+        lda #ITEM_NONE
+        sta current_save + SaveFile::PlayerWeaponUpgradeSlot1
+        sta current_save + SaveFile::PlayerWeaponUpgradeSlot2
 
         ; 2 regular hearts makes the starting player *quite* squishy.
         ; that's the point!

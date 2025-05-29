@@ -318,10 +318,10 @@ combo_offset_lut:
 ; heavily weighted towards L1 weapons, but occasionally has some L2 and other interesting stuff
 common_treasure_table:
     ; Sometimes we need the shop to carry three specific items. Here's how to do that:
-    ;.byte 3
-    ;.byte ITEM_ALOHA_TSHIRT_1
-    ;.byte ITEM_ALOHA_TSHIRT_2
-    ;.byte ITEM_ALOHA_TSHIRT_3
+    .byte 3
+    .byte ITEM_UPGRADE_ICE
+    .byte ITEM_UPGRADE_AIR
+    .byte ITEM_UPGRADE_FIRE
 
     .byte 34
     .byte ITEM_BROADSWORD_L1
@@ -339,10 +339,10 @@ common_treasure_table:
     .byte ITEM_BASIC_TORCH
     .byte ITEM_BASIC_TORCH
     .byte ITEM_BASIC_TORCH
-    .byte ITEM_BROADSWORD_L2
-    .byte ITEM_BROADSWORD_L2
-    .byte ITEM_SPEAR_L2
-    .byte ITEM_SPEAR_L2
+    .byte ITEM_UPGRADE_EARTH
+    .byte ITEM_UPGRADE_ICE
+    .byte ITEM_UPGRADE_AIR
+    .byte ITEM_UPGRADE_FIRE
     .byte ITEM_GO_GO_BOOTS
     .byte ITEM_GO_GO_BOOTS
     .byte ITEM_TEMPORARY_HEART
@@ -359,28 +359,28 @@ common_treasure_table:
     .byte ITEM_SPELL_ICE
     .byte ITEM_SPELL_EARTH
 
-; heavily weighted towards L2 items, some L3 items too
+; heavily weighted towards upgrade crystals, contains lots of other powerful items
 rare_treasure_table:
     .byte 35
-    .byte ITEM_BROADSWORD_L2
-    .byte ITEM_BROADSWORD_L2
-    .byte ITEM_BROADSWORD_L2
-    .byte ITEM_LONGSWORD_L2
-    .byte ITEM_LONGSWORD_L2
-    .byte ITEM_LONGSWORD_L2
-    .byte ITEM_SPEAR_L2
-    .byte ITEM_SPEAR_L2
-    .byte ITEM_SPEAR_L2
-    .byte ITEM_FLAIL_L2
-    .byte ITEM_FLAIL_L2
-    .byte ITEM_FLAIL_L2
+    .byte ITEM_UPGRADE_EARTH
+    .byte ITEM_UPGRADE_ICE
+    .byte ITEM_UPGRADE_AIR
+    .byte ITEM_UPGRADE_FIRE
+    .byte ITEM_UPGRADE_EARTH
+    .byte ITEM_UPGRADE_ICE
+    .byte ITEM_UPGRADE_AIR
+    .byte ITEM_UPGRADE_FIRE
+    .byte ITEM_UPGRADE_EARTH
+    .byte ITEM_UPGRADE_ICE
+    .byte ITEM_UPGRADE_AIR
+    .byte ITEM_UPGRADE_FIRE
+    .byte ITEM_UPGRADE_EARTH
+    .byte ITEM_UPGRADE_ICE
+    .byte ITEM_UPGRADE_AIR
+    .byte ITEM_UPGRADE_FIRE
     .byte ITEM_LARGE_TORCH
     .byte ITEM_LARGE_TORCH
     .byte ITEM_LARGE_TORCH
-    .byte ITEM_BROADSWORD_L3
-    .byte ITEM_LONGSWORD_L3
-    .byte ITEM_SPEAR_L3
-    .byte ITEM_FLAIL_L3
     .byte ITEM_GO_GO_BOOTS
     .byte ITEM_GO_GO_BOOTS
     .byte ITEM_HEART_CONTAINER
