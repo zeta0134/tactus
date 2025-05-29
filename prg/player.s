@@ -133,6 +133,9 @@ BackupWeaponUpgradeRoomIndex: .res 1
 BackupWeaponUpgradeRow: .res 1
 BackupWeaponUpgradeCol: .res 1
 
+PlayerWeaponDmgWeak: .res 5
+PlayerWeaponDmgStrong: .res 5
+
 .segment "PRGFIXED_E000"
 
 ; For rapidly computing the tile row
@@ -396,6 +399,7 @@ heart_loop:
         lda #0
         sta current_save + SaveFile::PlayerBombCount
 .endif
+
         rts
 .endproc
 

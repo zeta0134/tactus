@@ -1301,6 +1301,9 @@ converge:
         queue_sfx_pulse1 sfx_equip_ability_pulse1
         queue_sfx_pulse2 sfx_equip_ability_pulse2
 
+        ; Our crystal arrangement has changed, so recalc damage (yay!)
+        far_call FAR_calculate_weapon_damage
+
         ; "Dirty" the weapon in the hud, forcing a redraw of the equip slots
         lda #$FF
         sta WeaponDisplayCurrent
@@ -1555,6 +1558,12 @@ pickup_equipped_item:
         ; special case: if this was a weapon, then we need to also deal with upgrades
         cpy #SLOT_WEAPON
         bne not_a_weapon
+        ; ... (sigh) and because external logic will "reject" the pickup if the item doesn't
+        ; actually change, and we don't guard against this spawn condition... check for THAT
+        ; as well
+        lda NewItem
+        cmp OutputOldItem
+        beq not_a_weapon
         ; we're gonna change the upgrade slots, so force the HUD to redraw when it has a chance
         lda #ITEM_NONE
         sta WeaponDisplayCurrent
@@ -1578,7 +1587,7 @@ standing_on_a_valid_backup:
         ldx BackupWeaponUpgradeSlot2
         stx current_save + SaveFile::PlayerWeaponUpgradeSlot2
         sta BackupWeaponUpgradeSlot2
-        jmp done_with_weapons
+        jmp done_with_crystal_management
 no_valid_backup:
         ; backup current, initialize new
         lda current_save + SaveFile::PlayerWeaponUpgradeSlot1
@@ -1594,7 +1603,8 @@ no_valid_backup:
         lda #ITEM_NONE
         sta current_save + SaveFile::PlayerWeaponUpgradeSlot1
         sta current_save + SaveFile::PlayerWeaponUpgradeSlot2
-done_with_weapons:
+done_with_crystal_management:
+        far_call FAR_calculate_weapon_damage
 not_a_weapon:
         restore_previous_bank
         perform_zpcm_inc

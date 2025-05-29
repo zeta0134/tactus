@@ -42,6 +42,7 @@
         .include "static_screens.inc"
         .include "torchlight.inc"
         .include "ui.inc"
+        .include "weapons.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
@@ -634,6 +635,9 @@ normal_load:
 .else
         jsr generate_run_seed_for_save
 .endif
+
+        ; no matter how we load, we need to initialize the player's weapon dmg table
+        far_call FAR_calculate_weapon_damage
 
         lda #ZONE_HUB_WORLD
         ; fall through to converge

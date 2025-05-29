@@ -319,7 +319,7 @@ combo_offset_lut:
 common_treasure_table:
     ; Sometimes we need the shop to carry three specific items. Here's how to do that:
     .byte 3
-    .byte ITEM_UPGRADE_ICE
+    .byte ITEM_UPGRADE_EARTH
     .byte ITEM_UPGRADE_AIR
     .byte ITEM_UPGRADE_FIRE
 

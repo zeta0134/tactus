@@ -8,6 +8,7 @@
         .include "kernel.inc"
         .include "player.inc"
         .include "rainbow.inc"
+        .include "saves.inc"
         .include "sprites.inc"
         .include "weapons.inc"
         .include "word_util.inc"
@@ -870,4 +871,173 @@ SpriteBank := R0
         lda west_anim_lut+2, x
         sta SPRITE_BANK_WEAPON
         jmp weapon_init_common
+.endproc
+
+; indexed by aaabbb, composed of crystal indices, where 0 is "no crystal"
+weapon_dmg_offset_lut:
+        .byte 0  ; none     + none
+        .byte 10 ; earth    + none
+        .byte 20 ; ice      + none
+        .byte 30 ; air      + none
+        .byte 40 ; fire     + none
+        .byte 0  ; oob      + none (nonsense)
+        .byte 0  ; oob      + none (nonsense)
+        .byte 0  ; oob      + none (nonsense)
+        
+        .byte 0   ; none     + earth (nonsense)
+        .byte 50  ; earth    + earth
+        .byte 100 ; ice      + earth
+        .byte 90  ; air      + earth
+        .byte 110 ; fire     + earth
+        .byte 0   ; oob      + earth (nonsense)
+        .byte 0   ; oob      + earth (nonsense)
+        .byte 0   ; oob      + earth (nonsense)
+
+        .byte 0   ; none     + ice (nonsense)
+        .byte 100 ; earth    + ice
+        .byte 60  ; ice      + ice
+        .byte 120 ; air      + ice
+        .byte 90  ; fire     + ice
+        .byte 0   ; oob      + ice (nonsense)
+        .byte 0   ; oob      + ice (nonsense)
+        .byte 0   ; oob      + ice (nonsense)
+
+        .byte 0   ; none     + air (nonsense)
+        .byte 90  ; earth    + air
+        .byte 120 ; ice      + air
+        .byte 70  ; air      + air
+        .byte 130 ; fire     + air
+        .byte 0   ; oob      + air (nonsense)
+        .byte 0   ; oob      + air (nonsense)
+        .byte 0   ; oob      + air (nonsense)
+
+        .byte 0   ; none     + fire (nonsense)
+        .byte 110 ; earth    + fire
+        .byte 90  ; ice      + fire
+        .byte 130 ; air      + fire
+        .byte 80  ; fire     + fire
+        .byte 0   ; oob      + fire (nonsense)
+        .byte 0   ; oob      + fire (nonsense)
+        .byte 0   ; oob      + fire (nonsense)
+
+weapon_dmg_table:
+        ; ===== Base / Non-upgraded =====
+        ;     non-elemental, earth, ice, air, fire
+        .byte             1,     1,   1,   1,    1 ; regular hit
+        .byte             2,     2,   2,   2,    2 ; strong hit ; shouldn't generally be used?
+        ; ===== Single Upgrade (second slot empty) =====
+        ; EARTH
+        ;     non-elemental, earth, ice, air, fire
+        .byte             1,     1,   1,   2,    1 ; regular hit
+        .byte             2,     1,   2,   3,    2 ; strong hit
+        ; ICE
+        ;     non-elemental, earth, ice, air, fire
+        .byte             1,     1,   1,   1,    2 ; regular hit
+        .byte             2,     2,   1,   2,    3 ; strong hit
+        ; AIR
+        ;     non-elemental, earth, ice, air, fire
+        .byte             1,     2,   1,   1,    1 ; regular hit
+        .byte             2,     3,   2,   1,    2 ; strong hit
+        ; FIRE
+        ;     non-elemental, earth, ice, air, fire
+        .byte             1,     1,   2,   1,    1 ; regular hit
+        .byte             2,     2,   3,   2,    1 ; strong hit
+        ; ===== Two Matched Crystals - Strong Affinity =====
+        ; EARTH+EARTH
+        ;     non-elemental, earth, ice, air, fire
+        .byte             2,     1,   2,   4,    2 ; regular hit
+        .byte             3,     2,   3,   4,    3 ; strong hit
+        ; ICE+ICE
+        ;     non-elemental, earth, ice, air, fire
+        .byte             2,     2,   1,   2,    4 ; regular hit
+        .byte             3,     3,   2,   3,    4 ; strong hit
+        ; AIR+AIR
+        ;     non-elemental, earth, ice, air, fire
+        .byte             2,     4,   2,   1,    2 ; regular hit
+        .byte             3,     4,   3,   2,    3 ; strong hit
+        ; FIRE+FIRE
+        ;     non-elemental, earth, ice, air, fire
+        .byte             2,     2,   4,   2,    1 ; regular hit
+        .byte             3,     3,   4,   3,    2 ; strong hit
+        ; ===== Two Opposed Crystals - Neutral Affinity =====
+        ;     non-elemental, earth, ice, air, fire
+        .byte             2,     2,   2,   2,    2 ; regular hit
+        .byte             3,     3,   3,   3,    3 ; strong hit
+
+        ; EARTH+ICE
+        ;     non-elemental, earth, ice, air, fire
+        .byte             2,     2,   3,   2,    3 ; regular hit
+        .byte             3,     2,   4,   2,    4 ; strong hit
+        ; EARTH+FIRE
+        ;     non-elemental, earth, ice, air, fire
+        .byte             2,     2,   3,   3,    2 ; regular hit
+        .byte             3,     2,   4,   4,    2 ; strong hit
+        ; ICE+AIR
+        ;     non-elemental, earth, ice, air, fire
+        .byte             2,     3,   2,   2,    3 ; regular hit
+        .byte             3,     4,   2,   2,    4 ; strong hit
+        ; AIR+FIRE
+        ;     non-elemental, earth, ice, air, fire
+        .byte             1,     3,   3,   2,    2 ; regular hit
+        .byte             1,     4,   4,   2,    2 ; strong hit
+
+; This function works out the weak/strong dmg amounts based on the current
+; slotted upgrade crystals, and caches those for quick access by enemy
+; damage routines. Call this any time the current crystals change for any reason.
+.proc FAR_calculate_weapon_damage
+AffinityIndex := R20
+        lda #0
+        sta AffinityIndex
+
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot1
+        cmp #ITEM_NONE
+        beq no_first_slot
+        sec
+        sbc #ITEM_UPGRADE_EARTH - 1
+        and #%111 ; safety
+        sta AffinityIndex
+no_first_slot:
+
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot2
+        cmp #ITEM_NONE
+        beq no_second_slot
+        sec
+        sbc #ITEM_UPGRADE_EARTH - 1
+        and #%111 ; safety
+        .repeat 3
+        asl
+        .endrepeat
+        ora AffinityIndex
+        sta AffinityIndex
+no_second_slot:
+
+        ; Now copy and cache, etc. Straightforward from here
+        ldx AffinityIndex
+        lda weapon_dmg_offset_lut, x
+        tax
+        
+        lda weapon_dmg_table + WEAPON_STRENGTH_OFFSET_WEAK + WEAPON_AFFINITY_OFFSET_NONE, x
+        sta PlayerWeaponDmgWeak + WEAPON_AFFINITY_OFFSET_NONE
+        lda weapon_dmg_table + WEAPON_STRENGTH_OFFSET_WEAK + WEAPON_AFFINITY_OFFSET_EARTH, x
+        sta PlayerWeaponDmgWeak + WEAPON_AFFINITY_OFFSET_EARTH
+        lda weapon_dmg_table + WEAPON_STRENGTH_OFFSET_WEAK + WEAPON_AFFINITY_OFFSET_ICE, x
+        sta PlayerWeaponDmgWeak + WEAPON_AFFINITY_OFFSET_ICE
+        lda weapon_dmg_table + WEAPON_STRENGTH_OFFSET_WEAK + WEAPON_AFFINITY_OFFSET_AIR, x
+        sta PlayerWeaponDmgWeak + WEAPON_AFFINITY_OFFSET_AIR
+        lda weapon_dmg_table + WEAPON_STRENGTH_OFFSET_WEAK + WEAPON_AFFINITY_OFFSET_FIRE, x
+        sta PlayerWeaponDmgWeak + WEAPON_AFFINITY_OFFSET_FIRE
+
+        lda weapon_dmg_table + WEAPON_STRENGTH_OFFSET_STRONG + WEAPON_AFFINITY_OFFSET_NONE, x
+        sta PlayerWeaponDmgStrong + WEAPON_AFFINITY_OFFSET_NONE
+        lda weapon_dmg_table + WEAPON_STRENGTH_OFFSET_STRONG + WEAPON_AFFINITY_OFFSET_EARTH, x
+        sta PlayerWeaponDmgStrong + WEAPON_AFFINITY_OFFSET_EARTH
+        lda weapon_dmg_table + WEAPON_STRENGTH_OFFSET_STRONG + WEAPON_AFFINITY_OFFSET_ICE, x
+        sta PlayerWeaponDmgStrong + WEAPON_AFFINITY_OFFSET_ICE
+        lda weapon_dmg_table + WEAPON_STRENGTH_OFFSET_STRONG + WEAPON_AFFINITY_OFFSET_AIR, x
+        sta PlayerWeaponDmgStrong + WEAPON_AFFINITY_OFFSET_AIR
+        lda weapon_dmg_table + WEAPON_STRENGTH_OFFSET_STRONG + WEAPON_AFFINITY_OFFSET_FIRE, x
+        sta PlayerWeaponDmgStrong + WEAPON_AFFINITY_OFFSET_FIRE
+
+        ; et voila!
+        rts
 .endproc

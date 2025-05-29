@@ -58,7 +58,7 @@ run: dir $(ROM_NAME)
 
 mesen: dir $(ROM_NAME)
 	bash -c "ruby vendor/linker_map_reader.rb build/map.txt | grep -E 'RAM|ZEROPAGE'"
-	vendor/Mesen $(ROM_NAME)
+	vendor/Mesen $(ROM_NAME) > /dev/null
 
 beta: dir $(ROM_NAME)
 	/home/zeta0134/Downloads/MesenBeta/Mesen $(ROM_NAME)
