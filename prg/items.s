@@ -620,6 +620,10 @@ heart_armor:
         .byte <.bank(heart_armor_description)  ; DescriptionStringBank
 
 ; TODO: this really needs to be directional, and much stronger
+; For now, it matches the t-shirt, which is fine-ish as it is overpowered
+; otherwise. The high cost is offset by NOT having the t-shirt's detrimental
+; side effect, making it firmly a mid to late game purchase (and ideally a
+; weak / boring one at that)
 defensive_shield:
         .byte SLOT_ARMOR                           ; SlotId
         .word SPRITE_ITEMS_03_SHIELD               ; WorldSpriteTile
@@ -633,7 +637,7 @@ defensive_shield:
         .addr no_effect                            ; DamageFunc
         .addr no_effect                            ; TorchlightFunc
         .addr do_nothing                           ; UseFunc
-        .addr flat_2                               ; DmgReductionFunc
+        .addr flat_1                               ; DmgReductionFunc
         .addr defensive_shield_description         ; DescriptionStringPtr
         .byte <.bank(defensive_shield_description) ; DescriptionStringBank
 

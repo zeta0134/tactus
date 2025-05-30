@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-05-30 04:18+0000\n"
+"PO-Revision-Date: 2025-05-30 04:25+0000\n"
 "Last-Translator: Weblate Admin <zeta0134@reploid.cafe>\n"
 "Language-Team: Toki Pona (Sitelen Pona) <http://weblate.reploid.cafe/"
 "projects/tactus/items/tok_sp/>\n"
@@ -310,7 +310,7 @@ msgid "options_disco_floor_no_motion"
 msgstr "󱥩󱤂"
 
 msgid "defensive_shield_description"
-msgstr "󱥻󱤉󱥈 -2"
+msgstr "󱥻󱤉󱥈 -1"
 
 msgid "go_go_boots_description"
 msgstr ""
