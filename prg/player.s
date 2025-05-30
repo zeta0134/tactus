@@ -145,6 +145,9 @@ PlayerAbsorbtions: .res 1
 PlayerIncomingDmgAmount: .res 1
 PlayerIncomingDmgElement: .res 1
 
+PlayerIncomingStatusDuration: .res 1
+PlayerIncomingStatusType: .res 1
+
 .segment "PRGFIXED_E000"
 
 ; For rapidly computing the tile row
@@ -320,7 +323,7 @@ HeartCount := R2
         sta current_save + SaveFile::PlayerEquipmentWeapon
         lda #ITEM_BASIC_TORCH
         sta current_save + SaveFile::PlayerEquipmentTorch
-        lda #ITEM_NONE
+        lda #ITEM_ALOHA_TSHIRT_1
         sta current_save + SaveFile::PlayerEquipmentArmor
         lda #ITEM_GO_GO_BOOTS
         sta current_save + SaveFile::PlayerEquipmentBoots
@@ -2052,6 +2055,7 @@ previous_room_effect := room_spell_data1
 .endproc
 
 .proc cast_spell_life
+HealingAmount := R0
         ; TODO: not this! Let's lighten the **player** instead.
         ; jsr brighten_room
         lda #PLAYER_STAUTS_JUST_HEALED
@@ -2060,7 +2064,8 @@ previous_room_effect := room_spell_data1
         sta PlayerLingeringStatusDuration
 
         ; Heal ALL the health
-        lda #255
+        lda #128
+        sta HealingAmount
         near_call FAR_receive_healing
 
         ; Max ALL the temporary hearts, if missing
@@ -2539,14 +2544,16 @@ TargetCol := R15
 .endproc
 
 .proc FAR_damage_player
-IncomingDamage := R0 ; used by heart function
+ ; used by heart functions
+IncomingDamage := R0
+HealingAmount := R0
 
 DamageReduction := R0
         ; Handle absorbtion, immunity, weakness and resistance in that order
         lda PlayerIncomingDmgElement ; bit mask for this element (possibly 0, for non-elemental)
         bit PlayerAbsorbtions
         jne handle_absorbtion
-        bit PlayerAbsorbtions
+        bit PlayerImmunities
         jne handle_immunity
         bit PlayerWeaknesses
         beq not_weak_to_this_type
@@ -2632,6 +2639,7 @@ handle_absorbtion:
         ; The player should become HEALED by this amount! How fortunate for them.
         ; TODO: evaluate if this is OP, we might want absorbtion to be more like +1 flat?
         lda PlayerIncomingDmgAmount
+        sta HealingAmount
         near_call FAR_receive_healing
         ; We just healed the player (in response to damage) so play a healing SFX to indicate this
         queue_sfx_triangle sfx_small_heart
@@ -2641,6 +2649,120 @@ handle_absorbtion:
 handle_immunity:
         ; TODO: play a little "tink" SFX here?
         ; For now, do nothing!
+        rts
+.endproc
+
+.proc FAR_apply_hazard_to_player
+        ; Get complicated based on the hazard type
+        lda PlayerIncomingStatusType
+        cmp #PLAYER_STATUS_POISONED
+        beq try_apply_poison
+        cmp #PLAYER_STATUS_FROZEN
+        beq try_apply_frozen
+        cmp #PLAYER_STATUS_SHOCKED
+        beq try_apply_shocked
+        cmp #PLAYER_STATUS_BURNED
+        jeq try_apply_burn
+        ; huh? invalid status, bail, yes!
+        rts
+try_apply_poison:
+        ; Are we immune / absorbing of this type? If so, do nothing!
+        lda #PLAYER_RESISTANCE_MASK_EARTH
+        bit PlayerImmunities
+        bne immune_to_poison
+        bit PlayerAbsorbtions
+        bne immune_to_poison
+        bit PlayerProtections
+        bne immune_to_poison
+        ; If we're resistant, we should at least halve the incoming duration
+        bit PlayerResistances
+        beq not_resistant_to_poison
+        lsr PlayerIncomingStatusDuration
+not_resistant_to_poison:
+        ; Alright, apply that status!
+        lda #PLAYER_STATUS_POISONED
+        sta PlayerLingeringStatusType
+        lda PlayerIncomingStatusDuration
+        sta PlayerLingeringStatusDuration
+        ; And done!
+immune_to_poison:
+        rts
+
+try_apply_frozen:
+        ; Are we immune / absorbing of this type? If so, do nothing!
+        lda #PLAYER_RESISTANCE_MASK_ICE
+        bit PlayerImmunities
+        bne immune_to_freeze
+        bit PlayerAbsorbtions
+        bne immune_to_freeze
+        bit PlayerProtections
+        bne immune_to_freeze
+        ; If we're resistant, we should at least halve the incoming duration
+        bit PlayerResistances
+        beq not_resistant_to_freeze
+        lsr PlayerIncomingStatusDuration
+not_resistant_to_freeze:
+        ; Alright, apply that status!
+        lda #PLAYER_STATUS_FROZEN
+        sta PlayerLingeringStatusType
+        lda PlayerIncomingStatusDuration
+        sta PlayerLingeringStatusDuration
+        lda #PLAYER_STATE_FROZEN
+        sta PlayerState
+        ldx PlayerSpriteIndex
+        set_player_sprite_x SPRITE_PLAYER_02_PLAYER_STUN
+        ; And done!
+immune_to_freeze:
+        rts
+
+try_apply_shocked:
+        ; Are we immune / absorbing of this type? If so, do nothing!
+        lda #PLAYER_RESISTANCE_MASK_AIR
+        bit PlayerImmunities
+        bne immune_to_shock
+        bit PlayerAbsorbtions
+        bne immune_to_shock
+        bit PlayerProtections
+        bne immune_to_shock
+        ; If we're resistant, we should at least halve the incoming duration
+        bit PlayerResistances
+        beq not_resistant_to_shock
+        lsr PlayerIncomingStatusDuration
+not_resistant_to_shock:
+        ; Alright, apply that status!
+        lda #PLAYER_STATUS_SHOCKED
+        sta PlayerLingeringStatusType
+        lda PlayerIncomingStatusDuration
+        sta PlayerLingeringStatusDuration
+        lda #PLAYER_STATE_SHOCKED
+        sta PlayerState
+        ldx PlayerSpriteIndex
+        set_player_sprite_x SPRITE_PLAYER_02_PLAYER_STUN
+        ; And done!
+immune_to_shock:
+        rts
+
+try_apply_burn:
+        ; Are we immune / absorbing of this type? If so, do nothing!
+        lda #PLAYER_RESISTANCE_MASK_FIRE
+        bit PlayerImmunities
+        bne immune_to_burn
+        bit PlayerAbsorbtions
+        bne immune_to_burn
+        bit PlayerProtections
+        bne immune_to_burn
+        ; If we're resistant, we should at least halve the incoming duration
+        bit PlayerResistances
+        beq not_resistant_to_burn
+        lsr PlayerIncomingStatusDuration
+not_resistant_to_burn:
+        ; Alright, apply that status!
+        lda #PLAYER_STATUS_BURNED
+        sta PlayerLingeringStatusType
+        lda PlayerIncomingStatusDuration
+        sta PlayerLingeringStatusDuration
+        ; And done!
+immune_to_burn:
         rts
 .endproc
 

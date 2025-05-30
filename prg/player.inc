@@ -4,6 +4,7 @@
 .global FAR_determine_player_intent
 .global FAR_update_player
 .global FAR_damage_player
+.global FAR_apply_hazard_to_player
 .global FAR_player_resolve_collision
 .global FAR_correct_player_pos_during_slide
 .global FAR_finalize_player_pos_after_slide
@@ -81,6 +82,9 @@
 
 .global PlayerIncomingDmgAmount
 .global PlayerIncomingDmgElement
+
+.global PlayerIncomingStatusDuration
+.global PlayerIncomingStatusType
 
 MAX_HEARTS = 5
 MAX_GOLD = 9999

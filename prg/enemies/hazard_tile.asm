@@ -100,6 +100,7 @@ TargetSquare := R13
 
         ; Heal the player to full
         lda #128
+        sta HealingAmount
         far_call FAR_receive_healing
         ; Play a cute SFX
         queue_sfx_triangle sfx_small_heart
@@ -109,6 +110,7 @@ TargetSquare := R13
         sta PlayerLingeringStatusType
         lda #1
         sta PlayerLingeringStatusDuration
+        ; Side note: this is the only "hazard" that can't be negated by any mechanic.
 
         ; Finally, "trip" this tile, so that it doesn't repeatedly re-apply its effect. We'll
         ; reset it when the player steps elsewhere.
@@ -159,20 +161,12 @@ done_applying_damage:
         .endrepeat
         sta HazardDuration
 
-        ; TODO: do we need to manually throw the player into "shocked" state here, or will
-        ; player logic pick up on this?
-        ; TODO: how should we handle immunity from shock effects? We might need a player far_call
-        ; here to apply effects, rather than putting the logic in the source?
-        ; Apply 4 ticks of "shocked" to the player, replacing any previous lingering status
+        ; Apply HazardDuration ticks of "shocked" to the player
         lda #PLAYER_STATUS_SHOCKED
-        sta PlayerLingeringStatusType
+        sta PlayerIncomingStatusType
         lda HazardDuration
-        sta PlayerLingeringStatusDuration
-        ; For now, do this all manually
-        lda #PLAYER_STATE_SHOCKED
-        sta PlayerState
-        ldx PlayerSpriteIndex
-        set_player_sprite_x SPRITE_PLAYER_02_PLAYER_STUN
+        sta PlayerIncomingStatusDuration
+        far_call FAR_apply_hazard_to_player
 done_applying_lingering_status:
 
         ; Finally, "trip" this tile, so that it doesn't repeatedly re-apply its effect. We'll
@@ -208,7 +202,7 @@ TargetSquare := R13
         and #HAZARD_TILE_DATA_DMG_AMOUNT
         beq done_applying_damage
         sta PlayerIncomingDmgAmount
-        lda #PLAYER_RESISTANCE_MASK_AIR
+        lda #PLAYER_RESISTANCE_MASK_ICE
         sta PlayerIncomingDmgElement
         far_call FAR_damage_player
 done_applying_damage:
@@ -224,20 +218,12 @@ done_applying_damage:
         .endrepeat
         sta HazardDuration
 
-        ; TODO: do we need to manually throw the player into "frozen" state here, or will
-        ; player logic pick up on this?
-        ; TODO: how should we handle immunity from freeze effects? We might need a player far_call
-        ; here to apply effects, rather than putting the logic in the source?
-        ; Apply 4 ticks of "frozen" to the player, replacing any previous lingering status
+        ; Apply HazardDuration ticks of "frozen" to the player
         lda #PLAYER_STATUS_FROZEN
-        sta PlayerLingeringStatusType
+        sta PlayerIncomingStatusType
         lda HazardDuration
-        sta PlayerLingeringStatusDuration
-        ; For now, do this all manually
-        lda #PLAYER_STATE_FROZEN
-        sta PlayerState
-        ldx PlayerSpriteIndex
-        set_player_sprite_x SPRITE_PLAYER_02_PLAYER_STUN
+        sta PlayerIncomingStatusDuration
+        far_call FAR_apply_hazard_to_player
 done_applying_lingering_status:
 
         ; Finally, "trip" this tile, so that it doesn't repeatedly re-apply its effect. We'll
@@ -273,7 +259,7 @@ TargetSquare := R13
         and #HAZARD_TILE_DATA_DMG_AMOUNT
         beq done_applying_damage
         sta PlayerIncomingDmgAmount
-        lda #PLAYER_RESISTANCE_MASK_AIR
+        lda #PLAYER_RESISTANCE_MASK_FIRE
         sta PlayerIncomingDmgElement
         far_call FAR_damage_player
 done_applying_damage:
@@ -289,15 +275,12 @@ done_applying_damage:
         .endrepeat
         sta HazardDuration
 
-        ; TODO: do we need to manually throw the player into "burned" state here? is burned
-        ; even a special state?
-        ; TODO: how should we handle immunity from burn effects? We might need a player far_call
-        ; here to apply effects, rather than putting the logic in the source?
-        ; Apply 4 ticks of "burned" to the player, replacing any previous lingering status
+        ; Apply HazardDuration ticks of "burned" to the player
         lda #PLAYER_STATUS_BURNED
-        sta PlayerLingeringStatusType
+        sta PlayerIncomingStatusType
         lda HazardDuration
-        sta PlayerLingeringStatusDuration
+        sta PlayerIncomingStatusDuration
+        far_call FAR_apply_hazard_to_player
 done_applying_lingering_status:
 
         ; Finally, "trip" this tile, so that it doesn't repeatedly re-apply its effect. We'll
@@ -333,7 +316,7 @@ TargetSquare := R13
         and #HAZARD_TILE_DATA_DMG_AMOUNT
         beq done_applying_damage
         sta PlayerIncomingDmgAmount
-        lda #PLAYER_RESISTANCE_MASK_AIR
+        lda #PLAYER_RESISTANCE_MASK_EARTH
         sta PlayerIncomingDmgElement
         far_call FAR_damage_player
 done_applying_damage:
@@ -349,15 +332,12 @@ done_applying_damage:
         .endrepeat
         sta HazardDuration
 
-        ; TODO: do we need to manually throw the player into "poisoned" state here? is poison
-        ; even a special state?
-        ; TODO: how should we handle immunity from poison effects? We might need a player far_call
-        ; here to apply effects, rather than putting the logic in the source?
-        ; Apply 4 ticks of "poisoned" to the player, replacing any previous lingering status
+        ; Apply HazardDuration ticks of "poisoned" to the player
         lda #PLAYER_STATUS_POISONED
-        sta PlayerLingeringStatusType
+        sta PlayerIncomingStatusType
         lda HazardDuration
-        sta PlayerLingeringStatusDuration
+        sta PlayerIncomingStatusDuration
+        far_call FAR_apply_hazard_to_player
 done_applying_lingering_status:
 
         ; Finally, "trip" this tile, so that it doesn't repeatedly re-apply its effect. We'll
