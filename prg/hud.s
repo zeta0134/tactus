@@ -85,7 +85,7 @@ chr_tile_offset ARMORED_HEART_BEATING,    6, 5
 chr_tile_offset ARMORED_HEART_DEPLETED,   8, 5
 chr_tile_offset FRAGILE_HEART_BASE,      10, 5
 chr_tile_offset FRAGILE_HEART_BEATING,   12, 5
-chr_tile_offset HEART_NOTHING_BASE,      10, 7
+chr_tile_offset HEART_NOTHING_BASE,       0, 0
 chr_tile_offset HEART_CONTAINER_BASE,    12, 7
 chr_tile_offset HEART_CONTAINER_BEATING, 14, 7
 chr_tile_offset SPELL_A_DISABLED,   0, 14

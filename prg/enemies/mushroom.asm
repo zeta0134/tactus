@@ -293,9 +293,12 @@ CurrentTile := R15
         .segment "ENEMY_COLLIDE"
 .proc ENEMY_COLLIDE_hazard_damages_player
 DamageAmount := R0
-        ; hazards to 2 dmg to the player (for now)
         lda #MUSHROOM_SPORE_DMG
-        sta DamageAmount
+        sta PlayerIncomingDmgAmount
+        ; TODO: these hazards were placed by an elemental foe. We should track that element
+        ; and apply the proper resistances!
+        lda #0
+        sta PlayerIncomingDmgElement
         far_call FAR_damage_player
         
         ; YOU WERE HERE
@@ -303,6 +306,7 @@ DamageAmount := R0
         ; knockback goes away from the mushroom. (Read the tile we chose; there's
         ; a whole equivalence class due to the disco floor thing, and I'm too tired
         ; to think it out right now.)
+        ; Future Zeta: ... wha? knockback? ... huh? what was I thinking of here?
 
         ; hazards don't disappear when they "collide." They
         ; will clean themselves up automatically, usually

@@ -194,6 +194,7 @@ add_col_distance:
 .endproc
 
         .segment "ENEMY_ATTACK"
+
 .proc ENEMY_ATTACK_spawn_death_sprite_here
 MetaSpriteIndex := R0
 AttackSquare := R3
@@ -232,6 +233,41 @@ sprite_failed:
 .endproc
 
         .segment "ENEMY_COLLIDE"
+
+.proc ENEMY_COLLIDE_compute_own_elemental_affinity_mask
+TargetSquare := R13
+        ldx TargetSquare
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_EARTH
+        beq use_earth
+        cmp #PAL_ICE
+        beq use_ice
+        cmp #PAL_AIR
+        beq use_air
+        cmp #PAL_FIRE
+        beq use_fire
+        ; shouldn't be reachable? default to non-elemental
+        lda #0
+        sta PlayerIncomingDmgElement
+        rts
+use_earth:
+        lda #PLAYER_RESISTANCE_MASK_EARTH
+        sta PlayerIncomingDmgElement
+        rts
+use_ice:
+        lda #PLAYER_RESISTANCE_MASK_ICE
+        sta PlayerIncomingDmgElement
+        rts
+use_air:
+        lda #PLAYER_RESISTANCE_MASK_AIR
+        sta PlayerIncomingDmgElement
+        rts
+use_fire:
+        lda #PLAYER_RESISTANCE_MASK_FIRE
+        sta PlayerIncomingDmgElement
+        rts
+.endproc
 
 ; TODO: the underneath-the-enemy thing should really have lower priority
 damage_properties_by_direction:
@@ -996,15 +1032,14 @@ sprite_failed:
 ; ============================================================================================================================
         .segment "ENEMY_COLLIDE"
 .proc ENEMY_COLLIDE_basic_enemy_attacks_player
-DamageAmount := R0
-
 TargetIndex := R0
 TileId := R1
 PuffSquare := R12
 TargetSquare := R13
         ; basic attacks do 4 damage (1 full heart)
         lda #4
-        sta DamageAmount
+        sta PlayerIncomingDmgAmount
+        near_call ENEMY_COLLIDE_compute_own_elemental_affinity_mask
         far_call FAR_damage_player
 post_damage:
 

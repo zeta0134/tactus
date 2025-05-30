@@ -129,8 +129,6 @@ do_nothing:
 .endproc
 
 .proc ENEMY_COLLIDE_activate_hazard_shock
-DamageAmount := R0
-
 TargetIndex := R0
 HazardDuration := R1
 TargetSquare := R13
@@ -144,7 +142,9 @@ TargetSquare := R13
         lda tile_data, x
         and #HAZARD_TILE_DATA_DMG_AMOUNT
         beq done_applying_damage
-        sta DamageAmount
+        sta PlayerIncomingDmgAmount
+        lda #PLAYER_RESISTANCE_MASK_AIR
+        sta PlayerIncomingDmgElement
         far_call FAR_damage_player
 done_applying_damage:
 
@@ -194,8 +194,6 @@ do_nothing:
 .endproc
 
 .proc ENEMY_COLLIDE_activate_hazard_freeze
-DamageAmount := R0
-
 TargetIndex := R0
 HazardDuration := R1
 TargetSquare := R13
@@ -209,7 +207,9 @@ TargetSquare := R13
         lda tile_data, x
         and #HAZARD_TILE_DATA_DMG_AMOUNT
         beq done_applying_damage
-        sta DamageAmount
+        sta PlayerIncomingDmgAmount
+        lda #PLAYER_RESISTANCE_MASK_AIR
+        sta PlayerIncomingDmgElement
         far_call FAR_damage_player
 done_applying_damage:
 
@@ -259,8 +259,6 @@ do_nothing:
 .endproc
 
 .proc ENEMY_COLLIDE_activate_hazard_burn
-DamageAmount := R0
-
 TargetIndex := R0
 HazardDuration := R1
 TargetSquare := R13
@@ -274,7 +272,9 @@ TargetSquare := R13
         lda tile_data, x
         and #HAZARD_TILE_DATA_DMG_AMOUNT
         beq done_applying_damage
-        sta DamageAmount
+        sta PlayerIncomingDmgAmount
+        lda #PLAYER_RESISTANCE_MASK_AIR
+        sta PlayerIncomingDmgElement
         far_call FAR_damage_player
 done_applying_damage:
 
@@ -319,8 +319,6 @@ do_nothing:
 .endproc
 
 .proc ENEMY_COLLIDE_activate_hazard_poison
-DamageAmount := R0
-
 TargetIndex := R0
 HazardDuration := R1
 TargetSquare := R13
@@ -334,7 +332,9 @@ TargetSquare := R13
         lda tile_data, x
         and #HAZARD_TILE_DATA_DMG_AMOUNT
         beq done_applying_damage
-        sta DamageAmount
+        sta PlayerIncomingDmgAmount
+        lda #PLAYER_RESISTANCE_MASK_AIR
+        sta PlayerIncomingDmgElement
         far_call FAR_damage_player
 done_applying_damage:
 

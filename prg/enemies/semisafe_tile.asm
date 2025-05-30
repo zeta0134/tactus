@@ -38,7 +38,11 @@ apply_damage:
         ; For now, the semisafe tile always does 2 damage to the player. Stronger
         ; attacks, if they exist, might need special consideration here?
         lda #4
-        sta DamageAmount
+        sta PlayerIncomingDmgAmount
+        ; TODO: these hazards were placed by an elemental foe. We should track that element
+        ; and apply the proper resistances!
+        lda #0
+        sta PlayerIncomingDmgElement
         far_call FAR_damage_player
         
         ; Now we need to spawn a damage sprite. Using the original logic, the PuffSquare

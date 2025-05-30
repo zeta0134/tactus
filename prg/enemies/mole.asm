@@ -701,15 +701,14 @@ not_our_wrench_w:
 ; ============================================================================================================================
         .segment "ENEMY_COLLIDE"
 .proc ENEMY_COLLIDE_projectile_attacks_player
-DamageAmount := R0
-
 TargetIndex := R0
 TileId := R1
 TargetSquare := R13
         ; projectiles do 2 dmg
         ; ... TODO: move these into a global constants file, for easier balancing
         lda #MOLE_WRENCH_DMG
-        sta DamageAmount
+        sta PlayerIncomingDmgAmount
+        near_call ENEMY_COLLIDE_compute_own_elemental_affinity_mask
         far_call FAR_damage_player
 
         lda #0

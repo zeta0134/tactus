@@ -142,6 +142,9 @@ PlayerImmunities: .res 1
 PlayerWeaknesses: .res 1
 PlayerAbsorbtions: .res 1
 
+PlayerIncomingDmgAmount: .res 1
+PlayerIncomingDmgElement: .res 1
+
 .segment "PRGFIXED_E000"
 
 ; For rapidly computing the tile row
@@ -317,7 +320,7 @@ HeartCount := R2
         sta current_save + SaveFile::PlayerEquipmentWeapon
         lda #ITEM_BASIC_TORCH
         sta current_save + SaveFile::PlayerEquipmentTorch
-        lda #ITEM_SHIELD
+        lda #ITEM_NONE
         sta current_save + SaveFile::PlayerEquipmentArmor
         lda #ITEM_GO_GO_BOOTS
         sta current_save + SaveFile::PlayerEquipmentBoots
@@ -339,19 +342,19 @@ HeartCount := R2
         near_call FAR_initialize_hearts_for_game
         
         ; All the heart types, yes!
-        lda #HEART_TYPE_REGULAR_ARMORED
+        lda #HEART_TYPE_REGULAR
         sta NewHeartType
         near_call FAR_add_heart
-        lda #HEART_TYPE_REGULAR_ARMORED
+        lda #HEART_TYPE_REGULAR
         sta NewHeartType
         near_call FAR_add_heart
-        lda #HEART_TYPE_REGULAR_ARMORED
+        lda #HEART_TYPE_REGULAR
         sta NewHeartType
         near_call FAR_add_heart
-        lda #HEART_TYPE_REGULAR_ARMORED
+        lda #HEART_TYPE_REGULAR
         sta NewHeartType
         near_call FAR_add_heart
-        lda #HEART_TYPE_TEMPORARY_ARMORED
+        lda #HEART_TYPE_TEMPORARY
         sta NewHeartType
         near_call FAR_add_heart
 
@@ -2536,9 +2539,29 @@ TargetCol := R15
 .endproc
 
 .proc FAR_damage_player
-IncomingDamage := R0
+IncomingDamage := R0 ; used by heart function
+
 DamageReduction := R0
-        lda IncomingDamage
+        ; Handle absorbtion, immunity, weakness and resistance in that order
+        lda PlayerIncomingDmgElement ; bit mask for this element (possibly 0, for non-elemental)
+        bit PlayerAbsorbtions
+        jne handle_absorbtion
+        bit PlayerAbsorbtions
+        jne handle_immunity
+        bit PlayerWeaknesses
+        beq not_weak_to_this_type
+        ; Weakness DOUBLES incoming damage
+        asl PlayerIncomingDmgAmount
+not_weak_to_this_type:
+        bit PlayerResistances
+        beq not_resistant_to_this_type
+        ; Resistance HALVES incoming damage, rounding down
+        lsr PlayerIncomingDmgAmount
+not_resistant_to_this_type:
+        ; We're done with special modifiers, so now use the remaining damage as our base and process
+        ; damage reductions. The resulting damage is always capped to a minimum of 1, so the player
+        ; is never fully immune to any damage source unless they have that specific property.
+        lda PlayerIncomingDmgAmount
         pha
         far_call FAR_dmg_reduction
         pla
@@ -2603,6 +2626,21 @@ action_overrides_damage_animation:
         rts
 
 already_dead:
+        rts
+
+handle_absorbtion:
+        ; The player should become HEALED by this amount! How fortunate for them.
+        ; TODO: evaluate if this is OP, we might want absorbtion to be more like +1 flat?
+        lda PlayerIncomingDmgAmount
+        near_call FAR_receive_healing
+        ; We just healed the player (in response to damage) so play a healing SFX to indicate this
+        queue_sfx_triangle sfx_small_heart
+        ; But do NOT replace their hazard state. Absorbtion isn't *that* powerful.
+        ; Anyway, we're done!
+        rts
+handle_immunity:
+        ; TODO: play a little "tink" SFX here?
+        ; For now, do nothing!
         rts
 .endproc
 
