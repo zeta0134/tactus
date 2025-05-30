@@ -12,6 +12,7 @@
     TorchlightFunc .addr
     UseFunc .addr
     DmgReductionFunc .addr
+    ApplyPassivesFunc .addr
     DescriptionStringPtr .addr
     DescriptionStringBank .byte
 .endstruct
@@ -41,6 +42,7 @@ SLOT_CONSUMABLE = 7
 .global FAR_weapon_dmg
 .global FAR_equipment_torchlight
 .global FAR_dmg_reduction
+.global FAR_compute_player_passives
 
 ; various utilities for generating loot. be mindful of the RNG seed!
 .global FAR_reset_shop_tracker

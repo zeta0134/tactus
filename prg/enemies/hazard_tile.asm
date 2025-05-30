@@ -105,7 +105,7 @@ TargetSquare := R13
         queue_sfx_triangle sfx_small_heart
         ; Apply 1 tick of "just healed" to the player, replacing any previous lingering status
         ; (this will also make them glow pink)
-        lda #PlAYER_STAUTS_JUST_HEALED
+        lda #PLAYER_STAUTS_JUST_HEALED
         sta PlayerLingeringStatusType
         lda #1
         sta PlayerLingeringStatusDuration
@@ -164,7 +164,7 @@ done_applying_damage:
         ; TODO: how should we handle immunity from shock effects? We might need a player far_call
         ; here to apply effects, rather than putting the logic in the source?
         ; Apply 4 ticks of "shocked" to the player, replacing any previous lingering status
-        lda #PlAYER_STATUS_SHOCKED
+        lda #PLAYER_STATUS_SHOCKED
         sta PlayerLingeringStatusType
         lda HazardDuration
         sta PlayerLingeringStatusDuration
@@ -229,7 +229,7 @@ done_applying_damage:
         ; TODO: how should we handle immunity from freeze effects? We might need a player far_call
         ; here to apply effects, rather than putting the logic in the source?
         ; Apply 4 ticks of "frozen" to the player, replacing any previous lingering status
-        lda #PlAYER_STATUS_FROZEN
+        lda #PLAYER_STATUS_FROZEN
         sta PlayerLingeringStatusType
         lda HazardDuration
         sta PlayerLingeringStatusDuration

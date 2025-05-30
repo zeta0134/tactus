@@ -189,8 +189,9 @@ no_item:
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr no_item_description             ; DescriptionStringPtr
-        .byte <.bank(no_item_description)      ; DescriptionStringBank
+        .byte <.bank(no_item_description)     ; DescriptionStringBank
 
 dagger_lvl_1:
         .byte SLOT_WEAPON                     ; SlotId
@@ -206,58 +207,62 @@ dagger_lvl_1:
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr dagger_lv1_description          ; DescriptionStringPtr
-        .byte <.bank(dagger_lv1_description)   ; DescriptionStringBank
+        .byte <.bank(dagger_lv1_description)  ; DescriptionStringBank
 
 broadsword_lvl_1:
-        .byte SLOT_WEAPON                       ; SlotId
-        .word SPRITE_ITEMS_01_BROADSWORD        ; WorldSpriteTile
-        .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_BROADSWORD       ; HudBgTile
-        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS) ; HudBgAttr
-        .byte 0                                 ; HudSpriteTile
-        .byte 0                                 ; HudSpriteAttr
-        .word 75                                ; ShopCost
-        .byte WEAPON_BROADSWORD                 ; WeaponShape
-        .addr flat_1                            ; DamageFunc
-        .addr no_effect                         ; TorchlightFunc
-        .addr do_nothing                        ; UseFunc
-        .addr no_effect                         ; DmgReductionFunc
-        .addr broadsword_lv1_description        ; DescriptionStringPtr
+        .byte SLOT_WEAPON                        ; SlotId
+        .word SPRITE_ITEMS_01_BROADSWORD         ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                  ; WorldSpriteAttr
+        .byte EQUIPMENT_WEAPON_BROADSWORD        ; HudBgTile
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS)  ; HudBgAttr
+        .byte 0                                  ; HudSpriteTile
+        .byte 0                                  ; HudSpriteAttr
+        .word 75                                 ; ShopCost
+        .byte WEAPON_BROADSWORD                  ; WeaponShape
+        .addr flat_1                             ; DamageFunc
+        .addr no_effect                          ; TorchlightFunc
+        .addr do_nothing                         ; UseFunc
+        .addr no_effect                          ; DmgReductionFunc
+        .addr do_nothing                         ; ApplyPassivesFunc
+        .addr broadsword_lv1_description         ; DescriptionStringPtr
         .byte <.bank(broadsword_lv1_description) ; DescriptionStringBank
 
 broadsword_lvl_2:
-        .byte SLOT_WEAPON                       ; SlotId
-        .word SPRITE_ITEMS_01_BROADSWORD        ; WorldSpriteTile
-        .byte SPRITE_PAL_RED                    ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_BROADSWORD       ; HudBgTile
-        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)    ; HudBgAttr
-        .byte 0                                 ; HudSpriteTile
-        .byte 0                                 ; HudSpriteAttr
-        .word 250                               ; ShopCost
-        .byte WEAPON_BROADSWORD                 ; WeaponShape
-        .addr flat_2                            ; DamageFunc
-        .addr no_effect                         ; TorchlightFunc
-        .addr do_nothing                        ; UseFunc
-        .addr no_effect                         ; DmgReductionFunc
-        .addr broadsword_lv2_description        ; DescriptionStringPtr
+        .byte SLOT_WEAPON                        ; SlotId
+        .word SPRITE_ITEMS_01_BROADSWORD         ; WorldSpriteTile
+        .byte SPRITE_PAL_RED                     ; WorldSpriteAttr
+        .byte EQUIPMENT_WEAPON_BROADSWORD        ; HudBgTile
+        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)     ; HudBgAttr
+        .byte 0                                  ; HudSpriteTile
+        .byte 0                                  ; HudSpriteAttr
+        .word 250                                ; ShopCost
+        .byte WEAPON_BROADSWORD                  ; WeaponShape
+        .addr flat_2                             ; DamageFunc
+        .addr no_effect                          ; TorchlightFunc
+        .addr do_nothing                         ; UseFunc
+        .addr no_effect                          ; DmgReductionFunc
+        .addr do_nothing                         ; ApplyPassivesFunc
+        .addr broadsword_lv2_description         ; DescriptionStringPtr
         .byte <.bank(broadsword_lv2_description) ; DescriptionStringBank
 
 broadsword_lvl_3:
-        .byte SLOT_WEAPON                       ; SlotId
-        .word SPRITE_ITEMS_01_BROADSWORD        ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_BROADSWORD       ; HudBgTile
-        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
-        .byte 0                                 ; HudSpriteTile
-        .byte 0                                 ; HudSpriteAttr
-        .word 1000                              ; ShopCost
-        .byte WEAPON_BROADSWORD                 ; WeaponShape
-        .addr flat_3                            ; DamageFunc
-        .addr no_effect                         ; TorchlightFunc
-        .addr do_nothing                        ; UseFunc
-        .addr no_effect                         ; DmgReductionFunc
-        .addr broadsword_lv3_description        ; DescriptionStringPtr
+        .byte SLOT_WEAPON                        ; SlotId
+        .word SPRITE_ITEMS_01_BROADSWORD         ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                  ; WorldSpriteAttr
+        .byte EQUIPMENT_WEAPON_BROADSWORD        ; HudBgTile
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS)  ; HudBgAttr
+        .byte 0                                  ; HudSpriteTile
+        .byte 0                                  ; HudSpriteAttr
+        .word 1000                               ; ShopCost
+        .byte WEAPON_BROADSWORD                  ; WeaponShape
+        .addr flat_3                             ; DamageFunc
+        .addr no_effect                          ; TorchlightFunc
+        .addr do_nothing                         ; UseFunc
+        .addr no_effect                          ; DmgReductionFunc
+        .addr do_nothing                         ; ApplyPassivesFunc
+        .addr broadsword_lv3_description         ; DescriptionStringPtr
         .byte <.bank(broadsword_lv3_description) ; DescriptionStringBank
 
 longsword_lvl_1:
@@ -274,41 +279,44 @@ longsword_lvl_1:
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr longsword_lv1_description         ; DescriptionStringPtr
-        .byte <.bank(longsword_lv1_description)  ; DescriptionStringBank
+        .byte <.bank(longsword_lv1_description) ; DescriptionStringBank
 
 longsword_lvl_2:
-        .byte SLOT_WEAPON                      ; SlotId
-        .word SPRITE_ITEMS_03_LONGSWORD        ; WorldSpriteTile
-        .byte SPRITE_PAL_RED                   ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_LONGSWORD       ; HudBgTile
-        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)   ; HudBgAttr
-        .byte 0                                ; HudSpriteTile
-        .byte 0                                ; HudSpriteAttr
-        .word 250                              ; ShopCost
-        .byte WEAPON_LONGSWORD                 ; WeaponShape
-        .addr flat_2                           ; DamageFunc
-        .addr no_effect                        ; TorchlightFunc
-        .addr do_nothing                       ; UseFunc
-        .addr no_effect                        ; DmgReductionFunc
-        .addr longsword_lv2_description        ; DescriptionStringPtr
-        .byte <.bank(longsword_lv2_description) ; DescriptionStringBank
-
-longsword_lvl_3:
         .byte SLOT_WEAPON                       ; SlotId
         .word SPRITE_ITEMS_03_LONGSWORD         ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
+        .byte SPRITE_PAL_RED                    ; WorldSpriteAttr
         .byte EQUIPMENT_WEAPON_LONGSWORD        ; HudBgTile
-        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)    ; HudBgAttr
         .byte 0                                 ; HudSpriteTile
         .byte 0                                 ; HudSpriteAttr
-        .word 1000                              ; ShopCost
+        .word 250                               ; ShopCost
         .byte WEAPON_LONGSWORD                  ; WeaponShape
-        .addr flat_3                            ; DamageFunc
+        .addr flat_2                            ; DamageFunc
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
-        .addr longsword_lv3_description         ; DescriptionStringPtr
+        .addr do_nothing                        ; ApplyPassivesFunc
+        .addr longsword_lv2_description         ; DescriptionStringPtr
+        .byte <.bank(longsword_lv2_description) ; DescriptionStringBank
+
+longsword_lvl_3:
+        .byte SLOT_WEAPON                        ; SlotId
+        .word SPRITE_ITEMS_03_LONGSWORD          ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                  ; WorldSpriteAttr
+        .byte EQUIPMENT_WEAPON_LONGSWORD         ; HudBgTile
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS)  ; HudBgAttr
+        .byte 0                                  ; HudSpriteTile
+        .byte 0                                  ; HudSpriteAttr
+        .word 1000                               ; ShopCost
+        .byte WEAPON_LONGSWORD                   ; WeaponShape
+        .addr flat_3                             ; DamageFunc
+        .addr no_effect                          ; TorchlightFunc
+        .addr do_nothing                         ; UseFunc
+        .addr no_effect                          ; DmgReductionFunc
+        .addr do_nothing                         ; ApplyPassivesFunc
+        .addr longsword_lv3_description          ; DescriptionStringPtr
         .byte <.bank(longsword_lv3_description)  ; DescriptionStringBank
 
 spear_lvl_1:
@@ -325,8 +333,9 @@ spear_lvl_1:
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr spear_lv1_description             ; DescriptionStringPtr
-        .byte <.bank(spear_lv1_description)      ; DescriptionStringBank
+        .byte <.bank(spear_lv1_description)     ; DescriptionStringBank
 
 spear_lvl_2:
         .byte SLOT_WEAPON                     ; SlotId
@@ -342,8 +351,9 @@ spear_lvl_2:
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr spear_lv2_description           ; DescriptionStringPtr
-        .byte <.bank(spear_lv2_description)    ; DescriptionStringBank
+        .byte <.bank(spear_lv2_description)   ; DescriptionStringBank
 
 spear_lvl_3:
         .byte SLOT_WEAPON                       ; SlotId
@@ -359,8 +369,9 @@ spear_lvl_3:
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr spear_lv3_description             ; DescriptionStringPtr
-        .byte <.bank(spear_lv3_description)      ; DescriptionStringBank
+        .byte <.bank(spear_lv3_description)     ; DescriptionStringBank
 
 flail_lvl_1:
         .byte SLOT_WEAPON                       ; SlotId
@@ -376,8 +387,9 @@ flail_lvl_1:
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr flail_lv1_description             ; DescriptionStringPtr
-        .byte <.bank(flail_lv1_description)      ; DescriptionStringBank
+        .byte <.bank(flail_lv1_description)     ; DescriptionStringBank
 
 flail_lvl_2:
         .byte SLOT_WEAPON                     ; SlotId
@@ -393,8 +405,9 @@ flail_lvl_2:
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr flail_lv2_description           ; DescriptionStringPtr
-        .byte <.bank(flail_lv2_description)    ; DescriptionStringBank
+        .byte <.bank(flail_lv2_description)   ; DescriptionStringBank
 
 flail_lvl_3:
         .byte SLOT_WEAPON                       ; SlotId
@@ -410,8 +423,9 @@ flail_lvl_3:
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr flail_lv3_description             ; DescriptionStringPtr
-        .byte <.bank(flail_lv3_description)      ; DescriptionStringBank
+        .byte <.bank(flail_lv3_description)     ; DescriptionStringBank
 
 basic_torch:
         .byte SLOT_TORCH                        ; SlotId
@@ -427,8 +441,9 @@ basic_torch:
         .addr flat_8                            ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr basic_torch_description           ; DescriptionStringPtr
-        .byte <.bank(basic_torch_description)    ; DescriptionStringBank
+        .byte <.bank(basic_torch_description)   ; DescriptionStringBank
 
 large_torch:
         .byte SLOT_TORCH                        ; SlotId
@@ -444,8 +459,9 @@ large_torch:
         .addr flat_15                           ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr large_torch_description           ; DescriptionStringPtr
-        .byte <.bank(large_torch_description)    ; DescriptionStringBank
+        .byte <.bank(large_torch_description)   ; DescriptionStringBank
 
 compass:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -461,8 +477,9 @@ compass:
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr identify_special_rooms          ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr compass_description             ; DescriptionStringPtr
-        .byte <.bank(compass_description)      ; DescriptionStringBank
+        .byte <.bank(compass_description)     ; DescriptionStringBank
 
 map:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -478,8 +495,9 @@ map:
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr map_all_rooms                   ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr map_description                 ; DescriptionStringPtr
-        .byte <.bank(map_description)          ; DescriptionStringBank
+        .byte <.bank(map_description)         ; DescriptionStringBank
 
 small_fries:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -495,24 +513,26 @@ small_fries:
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr heal_4_hp                       ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr small_fries_description         ; DescriptionStringPtr
-        .byte <.bank(small_fries_description)  ; DescriptionStringBank
+        .byte <.bank(small_fries_description) ; DescriptionStringBank
 
 medium_fries:
-        .byte SLOT_CONSUMABLE                 ; SlotId
-        .word SPRITE_ITEMS_03_MEDIUM_FRIES    ; WorldSpriteTile
-        .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
-        .byte EQUIPMENT_NONE                  ; HudBgTile (unused)
-        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS) ; HudBgAttr (unused)
-        .byte 0                               ; HudSpriteTile (unused)
-        .byte 0                               ; HudSpriteAttr (unused)
-        .word 75                              ; ShopCost
-        .byte WEAPON_DAGGER                   ; WeaponShape    (unused)
-        .addr no_effect                       ; DamageFunc     (unused)
-        .addr no_effect                       ; TorchlightFunc (unused)
-        .addr heal_8_hp                       ; UseFunc
-        .addr no_effect                       ; DmgReductionFunc
-        .addr medium_fries_description        ; DescriptionStringPtr
+        .byte SLOT_CONSUMABLE                  ; SlotId
+        .word SPRITE_ITEMS_03_MEDIUM_FRIES     ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                   ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS)  ; HudBgAttr (unused)
+        .byte 0                                ; HudSpriteTile (unused)
+        .byte 0                                ; HudSpriteAttr (unused)
+        .word 75                               ; ShopCost
+        .byte WEAPON_DAGGER                    ; WeaponShape    (unused)
+        .addr no_effect                        ; DamageFunc     (unused)
+        .addr no_effect                        ; TorchlightFunc (unused)
+        .addr heal_8_hp                        ; UseFunc
+        .addr no_effect                        ; DmgReductionFunc
+        .addr do_nothing                       ; ApplyPassivesFunc
+        .addr medium_fries_description         ; DescriptionStringPtr
         .byte <.bank(medium_fries_description) ; DescriptionStringBank
 
 large_fries:
@@ -529,8 +549,9 @@ large_fries:
         .addr no_effect                       ; TorchlightFunc (unused)
         .addr heal_all_hp                     ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr large_fries_description         ; DescriptionStringPtr
-        .byte <.bank(large_fries_description)  ; DescriptionStringBank
+        .byte <.bank(large_fries_description) ; DescriptionStringBank
 
 ; Note: as an item with a custom effect, these are just special-case checked
 ; in the player movement code
@@ -548,8 +569,9 @@ go_go_boots:
         .addr no_effect                       ; TorchlightFunc
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr go_go_boots_description         ; DescriptionStringPtr
-        .byte <.bank(go_go_boots_description)  ; DescriptionStringBank
+        .byte <.bank(go_go_boots_description) ; DescriptionStringBank
 
 gold_sack:
         .byte SLOT_CONSUMABLE                 ; SlotId
@@ -565,41 +587,44 @@ gold_sack:
         .addr no_effect                       ; TorchlightFunc
         .addr give_100_gold                   ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr gold_sack_description           ; DescriptionStringPtr
-        .byte <.bank(gold_sack_description)    ; DescriptionStringBank
+        .byte <.bank(gold_sack_description)   ; DescriptionStringBank
 
 heart_container:
-        .byte SLOT_CONSUMABLE                    ; SlotId
-        .word SPRITE_ITEMS_02_HEART_CONTAINER    ; WorldSpriteTile
-        .byte SPRITE_PAL_RED                     ; WorldSpriteAttr
-        .byte EQUIPMENT_NONE                     ; HudBgTile (unused)
-        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS)    ; HudBgAttr (unused)
-        .byte 0                                  ; HudSpriteTile (unused)
-        .byte 0                                  ; HudSpriteAttr (unused)
-        .word 250                                ; ShopCost
-        .byte WEAPON_DAGGER                      ; WeaponShape (unused)
-        .addr no_effect                          ; DamageFunc
-        .addr no_effect                          ; TorchlightFunc
-        .addr give_heart_container               ; UseFunc
-        .addr no_effect                          ; DmgReductionFunc
-        .addr heart_container_description        ; DescriptionStringPtr
+        .byte SLOT_CONSUMABLE                     ; SlotId
+        .word SPRITE_ITEMS_02_HEART_CONTAINER     ; WorldSpriteTile
+        .byte SPRITE_PAL_RED                      ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                      ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS)     ; HudBgAttr (unused)
+        .byte 0                                   ; HudSpriteTile (unused)
+        .byte 0                                   ; HudSpriteAttr (unused)
+        .word 250                                 ; ShopCost
+        .byte WEAPON_DAGGER                       ; WeaponShape (unused)
+        .addr no_effect                           ; DamageFunc
+        .addr no_effect                           ; TorchlightFunc
+        .addr give_heart_container                ; UseFunc
+        .addr no_effect                           ; DmgReductionFunc
+        .addr do_nothing                          ; ApplyPassivesFunc
+        .addr heart_container_description         ; DescriptionStringPtr
         .byte <.bank(heart_container_description) ; DescriptionStringBank
 
 temporary_heart:
-        .byte SLOT_CONSUMABLE                    ; SlotId
-        .word SPRITE_ITEMS_02_HEART_CONTAINER    ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE                  ; WorldSpriteAttr
-        .byte EQUIPMENT_NONE                     ; HudBgTile (unused)
-        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS)    ; HudBgAttr (unused)
-        .byte 0                                  ; HudSpriteTile (unused)
-        .byte 0                                  ; HudSpriteAttr (unused)
-        .word 50                                 ; ShopCost
-        .byte WEAPON_DAGGER                      ; WeaponShape (unused)
-        .addr no_effect                          ; DamageFunc
-        .addr no_effect                          ; TorchlightFunc
-        .addr FAR_give_temporary_heart           ; UseFunc
-        .addr no_effect                          ; DmgReductionFunc
-        .addr temporary_heart_description        ; DescriptionStringPtr
+        .byte SLOT_CONSUMABLE                     ; SlotId
+        .word SPRITE_ITEMS_02_HEART_CONTAINER     ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                   ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                      ; HudBgTile (unused)
+        .byte (HUD_TEXT_PAL | CHR_BANK_ITEMS)     ; HudBgAttr (unused)
+        .byte 0                                   ; HudSpriteTile (unused)
+        .byte 0                                   ; HudSpriteAttr (unused)
+        .word 50                                  ; ShopCost
+        .byte WEAPON_DAGGER                       ; WeaponShape (unused)
+        .addr no_effect                           ; DamageFunc
+        .addr no_effect                           ; TorchlightFunc
+        .addr FAR_give_temporary_heart            ; UseFunc
+        .addr no_effect                           ; DmgReductionFunc
+        .addr do_nothing                          ; ApplyPassivesFunc
+        .addr temporary_heart_description         ; DescriptionStringPtr
         .byte <.bank(temporary_heart_description) ; DescriptionStringBank
 
 heart_armor:
@@ -616,8 +641,9 @@ heart_armor:
         .addr no_effect                       ; TorchlightFunc
         .addr give_heart_armor                ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr heart_armor_description         ; DescriptionStringPtr
-        .byte <.bank(heart_armor_description)  ; DescriptionStringBank
+        .byte <.bank(heart_armor_description) ; DescriptionStringBank
 
 ; TODO: this really needs to be directional, and much stronger
 ; For now, it matches the t-shirt, which is fine-ish as it is overpowered
@@ -638,6 +664,7 @@ defensive_shield:
         .addr no_effect                            ; TorchlightFunc
         .addr do_nothing                           ; UseFunc
         .addr flat_1                               ; DmgReductionFunc
+        .addr do_nothing                           ; ApplyPassivesFunc
         .addr defensive_shield_description         ; DescriptionStringPtr
         .byte <.bank(defensive_shield_description) ; DescriptionStringBank
 
@@ -657,6 +684,7 @@ chain_link:
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr chain_link_description            ; DescriptionStringPtr
         .byte <.bank(chain_link_description)    ; DescriptionStringBank
 
@@ -674,6 +702,7 @@ aloha_tshirt_1:
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr flat_1                            ; DmgReductionFunc
+        .addr award_air_resistance              ; ApplyPassivesFunc
         .addr aloha_tshirt_description          ; DescriptionStringPtr
         .byte <.bank(aloha_tshirt_description)  ; DescriptionStringBank
 
@@ -691,6 +720,7 @@ aloha_tshirt_2:
         .addr no_effect                           ; TorchlightFunc
         .addr do_nothing                          ; UseFunc
         .addr flat_1                              ; DmgReductionFunc
+        .addr award_fire_resistance               ; ApplyPassivesFunc
         .addr aloha_tshirt_description            ; DescriptionStringPtr
         .byte <.bank(aloha_tshirt_description)    ; DescriptionStringBank
 
@@ -708,6 +738,7 @@ aloha_tshirt_3:
         .addr no_effect                          ; TorchlightFunc
         .addr do_nothing                         ; UseFunc
         .addr flat_1                             ; DmgReductionFunc
+        .addr award_earth_resistance             ; ApplyPassivesFunc
         .addr aloha_tshirt_description           ; DescriptionStringPtr
         .byte <.bank(aloha_tshirt_description)   ; DescriptionStringBank
 
@@ -725,6 +756,7 @@ bomb_standard:
         .addr no_effect                         ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr bombs_description                 ; DescriptionStringPtr
         .byte <.bank(bombs_description)         ; DescriptionStringBank
 
@@ -742,6 +774,7 @@ bomb_standard_one_pack:
         .addr no_effect                         ; TorchlightFunc
         .addr award_1_standard_bomb             ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr bombs_description                 ; DescriptionStringPtr
         .byte <.bank(bombs_description)         ; DescriptionStringBank
 
@@ -759,6 +792,7 @@ bomb_standard_three_pack:
         .addr no_effect                         ; TorchlightFunc
         .addr award_3_standard_bombs            ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr bombs_description                 ; DescriptionStringPtr
         .byte <.bank(bombs_description)         ; DescriptionStringBank
 
@@ -779,6 +813,7 @@ spell_fire:
         .addr no_effect                         ; TorchlightFunc
         .addr no_effect                         ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr spell_fire_description            ; DescriptionStringPtr
         .byte <.bank(spell_fire_description)    ; DescriptionStringBank
 
@@ -796,6 +831,7 @@ spell_air:
         .addr no_effect                         ; TorchlightFunc
         .addr no_effect                         ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr spell_air_description             ; DescriptionStringPtr
         .byte <.bank(spell_air_description)     ; DescriptionStringBank
 
@@ -813,6 +849,7 @@ spell_ice:
         .addr no_effect                         ; TorchlightFunc
         .addr no_effect                         ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr spell_ice_description             ; DescriptionStringPtr
         .byte <.bank(spell_ice_description)     ; DescriptionStringBank
 
@@ -830,6 +867,7 @@ spell_earth:
         .addr no_effect                         ; TorchlightFunc
         .addr no_effect                         ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr spell_earth_description           ; DescriptionStringPtr
         .byte <.bank(spell_earth_description)   ; DescriptionStringBank
 
@@ -847,6 +885,7 @@ spell_bomb_fiesta:
         .addr no_effect                             ; TorchlightFunc
         .addr no_effect                             ; UseFunc
         .addr no_effect                             ; DmgReductionFunc
+        .addr do_nothing                            ; ApplyPassivesFunc
         .addr spell_bomb_fiesta_description         ; DescriptionStringPtr
         .byte <.bank(spell_bomb_fiesta_description) ; DescriptionStringBank
 
@@ -864,6 +903,7 @@ spell_healing:
         .addr no_effect                         ; TorchlightFunc
         .addr no_effect                         ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
         .addr spell_life_description            ; DescriptionStringPtr
         .byte <.bank(spell_life_description)    ; DescriptionStringBank
 
@@ -881,6 +921,7 @@ upgrade_crystal_earth:
         .addr no_effect                       ; TorchlightFunc
         .addr give_upgrade_earth              ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
 
@@ -898,6 +939,7 @@ upgrade_crystal_ice:
         .addr no_effect                       ; TorchlightFunc
         .addr give_upgrade_ice                ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
 
@@ -915,6 +957,7 @@ upgrade_crystal_air:
         .addr no_effect                       ; TorchlightFunc
         .addr give_upgrade_air                ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
 
@@ -932,6 +975,7 @@ upgrade_crystal_fire:
         .addr no_effect                       ; TorchlightFunc
         .addr give_upgrade_fire               ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
+        .addr do_nothing                      ; ApplyPassivesFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
 
@@ -1611,6 +1655,7 @@ no_valid_backup:
 done_with_crystal_management:
         far_call FAR_calculate_weapon_damage
 not_a_weapon:
+        near_call FAR_compute_player_passives
         restore_previous_bank
         perform_zpcm_inc
         rts
@@ -1940,5 +1985,90 @@ max_exceeded:
 max_not_exceeded:
         sta current_save + SaveFile::PlayerBombCount
         lda #0 ; return success
+        rts
+.endproc
+
+; The four basic resistances just ORA right in, neat as you please
+.proc award_earth_resistance
+        lda PlayerResistances
+        ora #PLAYER_RESISTANCE_MASK_EARTH
+        sta PlayerResistances
+        rts
+.endproc
+
+.proc award_ice_resistance
+        lda PlayerResistances
+        ora #PLAYER_RESISTANCE_MASK_ICE
+        sta PlayerResistances
+        rts
+.endproc
+
+.proc award_air_resistance
+        lda PlayerResistances
+        ora #PLAYER_RESISTANCE_MASK_AIR
+        sta PlayerResistances
+        rts
+.endproc
+
+.proc award_fire_resistance
+        lda PlayerResistances
+        ora #PLAYER_RESISTANCE_MASK_FIRE
+        sta PlayerResistances
+        rts
+.endproc
+
+.proc _item_passive_common
+        asl
+        tax
+        lda item_table+0, x
+        sta ItemPtr+0
+        lda item_table+1, x
+        sta ItemPtr+1
+        ldy #ItemDef::ApplyPassivesFunc
+        lda (ItemPtr), y
+        sta ItemFuncPtr+0
+        iny
+        lda (ItemPtr), y
+        sta ItemFuncPtr+1
+        jsr __item_logic_trampoline
+        rts
+.endproc
+
+; Call this after loading, and then again each time the player's equipment changes
+.proc FAR_compute_player_passives
+        perform_zpcm_inc
+        access_data_bank #<.bank(item_table)
+
+        ; First, clear all passive information from the player's cached state
+        lda #0
+        sta PlayerResistances
+        sta PlayerProtections
+        sta PlayerImmunities
+        sta PlayerWeaknesses
+        sta PlayerAbsorbtions
+
+        ; Now run through each equipped item and compute any passive effects it may award.
+        ; Exclusive effects depend on item evaluation order, so let's settle on left-to-right.
+        ; Weapons, then Torches, then Armor, then Boots, then Accessories.
+        lda current_save + SaveFile::PlayerEquipmentWeapon
+        jsr _item_passive_common
+        perform_zpcm_inc
+        lda current_save + SaveFile::PlayerEquipmentTorch
+        jsr _item_passive_common
+        perform_zpcm_inc
+        lda current_save + SaveFile::PlayerEquipmentArmor
+        jsr _item_passive_common
+        perform_zpcm_inc
+        lda current_save + SaveFile::PlayerEquipmentBoots
+        jsr _item_passive_common
+        perform_zpcm_inc
+        lda current_save + SaveFile::PlayerEquipmentAccessory
+        jsr _item_passive_common
+        perform_zpcm_inc
+
+        ; Neither bombs nor spells apply passives currently. I don't think I want them to, as
+        ; they would be tricky to re-evaluate constantly for an odd mechanical interaction.
+
+        restore_previous_bank
         rts
 .endproc

@@ -638,6 +638,7 @@ normal_load:
 
         ; no matter how we load, we need to initialize the player's weapon dmg table
         far_call FAR_calculate_weapon_damage
+        far_call FAR_compute_player_passives
 
         lda #ZONE_HUB_WORLD
         ; fall through to converge

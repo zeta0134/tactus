@@ -136,6 +136,12 @@ BackupWeaponUpgradeCol: .res 1
 PlayerWeaponDmgWeak: .res 5
 PlayerWeaponDmgStrong: .res 5
 
+PlayerResistances: .res 1
+PlayerProtections: .res 1
+PlayerImmunities: .res 1
+PlayerWeaknesses: .res 1
+PlayerAbsorbtions: .res 1
+
 .segment "PRGFIXED_E000"
 
 ; For rapidly computing the tile row
@@ -507,7 +513,7 @@ PaletteBase := R0
         ; and apply those as necessary
 
         ldx PlayerLingeringStatusType
-        cpx #PlAYER_STATUS_SHOCKED
+        cpx #PLAYER_STATUS_SHOCKED
         bne no_zap_zaps
 check_for_zap_zaps:
         lda PlayerLingeringStatusFrame
@@ -1251,9 +1257,9 @@ resolve_enemy_collision:
 apply_jumping_pose:
         ; status checks: if we entered the shocked/frozen states, don't jump
         lda PlayerLingeringStatusType
-        cmp #PlAYER_STATUS_SHOCKED
+        cmp #PLAYER_STATUS_SHOCKED
         beq skip_jumping_pose
-        cmp #PlAYER_STATUS_FROZEN
+        cmp #PLAYER_STATUS_FROZEN
         beq skip_jumping_pose
         ; okay to proceed!
         ldx PlayerSpriteIndex
@@ -2045,7 +2051,7 @@ previous_room_effect := room_spell_data1
 .proc cast_spell_life
         ; TODO: not this! Let's lighten the **player** instead.
         ; jsr brighten_room
-        lda #PlAYER_STAUTS_JUST_HEALED
+        lda #PLAYER_STAUTS_JUST_HEALED
         sta PlayerLingeringStatusType
         lda #1
         sta PlayerLingeringStatusDuration
