@@ -458,6 +458,7 @@ reward_small_treasure:
         lda #>BG_TILE_EXPLOSION
         ora #PAL_EARTH
         sta tile_attributes, x
+
         ; Since we're rewarding the player, play a chime
         queue_sfx_pulse1 sfx_puzzle_success_pulse
         queue_sfx_triangle sfx_puzzle_success_tri
@@ -626,6 +627,7 @@ ignore_attack:
 
 .proc ENEMY_ATTACK_attack_one_armed_bandit_common
 ; Scratch for calculations
+WeaponDmg := R0
 ScratchHp := R0
 ScratchReelIndex := R0
 
@@ -641,15 +643,32 @@ EffectiveAttackSquare := R10
         lda #1
         sta AttackLanded
 
-        ; Bandits always take 1 "hit" per attack, regardless of the player's
-        ; equipment, elemental alignments, etc. They're "sturdy", have no
-        ; weaknesses, and this isn't the intended way to defeat them.
+        ; If we are terminal, do nothing else!
+        ldx EffectiveAttackSquare
+        lda tile_flags, x
+        and #ONE_ARMED_BANDIT_FLAGS_STATE
+        cmp #ONE_ARMED_BANDIT_STATE_LOOT_COINS
+        beq terminal
+        cmp #ONE_ARMED_BANDIT_STATE_LOOT_GEMS
+        beq terminal
+        cmp #ONE_ARMED_BANDIT_STATE_LOOT_DUMMY1
+        beq terminal
+        cmp #ONE_ARMED_BANDIT_STATE_LOOT_DUMMY2
+        beq terminal
+        jmp not_terminal
+terminal:
+        rts
+not_terminal:
+
+        ; Bandits have a stupid amount of HP, but are affected by elemental affinity
+        ; just like any other enemy.
+        far_call FAR_weapon_dmg ; clobbers X,Y, result in R0
 
         ldx EffectiveAttackSquare
         lda tile_data, x
         and #ONE_ARMED_BANDIT_DATA_HP
         clc
-        adc #1
+        adc WeaponDmg
         and #ONE_ARMED_BANDIT_DATA_HP
         ; if we should die, do that
         cmp #ONE_ARMED_BANDIT_HP

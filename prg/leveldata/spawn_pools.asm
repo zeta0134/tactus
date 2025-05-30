@@ -17,10 +17,10 @@ spawn_pool_generic:
 
     ; For when I'd like to test all four variants
     .repeat 32
-    .addr enemy_cultist_earth
-    .addr enemy_cultist_ice
-    .addr enemy_cultist_air
-    .addr enemy_cultist_fire
+    .addr enemy_one_armed_bandit_earth
+    .addr enemy_one_armed_bandit_ice
+    .addr enemy_one_armed_bandit_air
+    .addr enemy_one_armed_bandit_fire
     .endrepeat
 
 .else
