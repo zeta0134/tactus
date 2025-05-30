@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-04-21 12:01+0000\n"
+"PO-Revision-Date: 2025-05-30 04:18+0000\n"
 "Last-Translator: Weblate Admin <zeta0134@reploid.cafe>\n"
 "Language-Team: Toki Pona <http://weblate.reploid.cafe/projects/tactus/items/"
 "tok/>\n"
@@ -329,7 +329,7 @@ msgid "heart_armor_description"
 msgstr "pilin ni la: kipisi e pakala."
 
 msgid "chain_link_description"
-msgstr "awen e tenpo moli linja +2."
+msgstr "awen e tenpo moli linja +1."
 
 msgid "basic_torch_name"
 msgstr "PALISA SUNO"

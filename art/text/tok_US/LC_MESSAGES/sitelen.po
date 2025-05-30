@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-04-21 12:07+0000\n"
+"PO-Revision-Date: 2025-05-30 04:18+0000\n"
 "Last-Translator: Weblate Admin <zeta0134@reploid.cafe>\n"
 "Language-Team: Toki Pona (Sitelen Pona) <http://weblate.reploid.cafe/"
 "projects/tactus/items/tok_sp/>\n"
@@ -362,7 +362,7 @@ msgid "large_torch_description"
 msgstr "󱥌󱤉󱥶󱥤 +4"
 
 msgid "chain_link_description"
-msgstr "󱤈󱤉󱥫󱤷󱤩 +2"
+msgstr "󱤈󱤉󱥫󱤷󱤩 +1"
 
 msgid "map_description"
 msgstr "󱥡󱤉󱤿󱤬󱥥󱥁"

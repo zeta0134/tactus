@@ -2481,7 +2481,7 @@ ChainGraceThreshold := R0
         lda current_save + SaveFile::PlayerEquipmentAccessory
         cmp #ITEM_CHAIN_LINK
         bne chain_threshold_finalized
-        lda #3
+        lda #2
         sta ChainGraceThreshold
 chain_threshold_finalized:
         ; Based on the player's accumulated combo, manipulate their chain here
