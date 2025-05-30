@@ -6,6 +6,7 @@
         
         .include "_globals.inc"
 
+        .include "battlefield.inc"
         .include "dialog.inc"
         .include "far_call.inc"
         .include "hearts.inc"
@@ -1662,20 +1663,50 @@ DmgTotal := R0
         rts
 .endproc
 
-; Returns weapon dmg amount in A, based on the currently loaded item
+; Returns weapon dmg amount in A, based on the currently loaded item.
+; This is called by enemy attack processing code, and expects:
+; - WeaponProperties in R8
+; - EffectiveAttackSquare in R10
 ; Clobbers: TODO, probably at least X,Y
 .proc FAR_weapon_dmg
+TempIndex := R0
 DmgTotal := R0
+WeaponProperties := R8
+EffectiveAttackSquare := R10
         perform_zpcm_inc
         access_data_bank #<.bank(item_table)
 
-        ; Loop through all 5 equipment slots and keep a running sum of their damage
-        ; contributions
+        
         lda #0
         sta DmgTotal
 
-        lda current_save + SaveFile::PlayerEquipmentWeapon
-        jsr item_damage_common
+        ; First, process the base weapon. This is mostly already cached for us, but we
+        ; need to factor in whether this is a "strong hit" and also the elemental affinity
+        ; of the enemy we're attacking. Do that now.
+        ; TODO: how will we handle non-elemental affinity? Figure that out when the time comes,
+        ; for now ignore it.
+        ldx EffectiveAttackSquare
+        lda tile_attributes, x
+        and #PAL_MASK
+        .repeat 6
+        lsr
+        .endrepeat
+        clc
+        adc #1
+        tax
+        ; if this is a strong hit, add that offset
+        lda WeaponProperties
+        and #WEAPON_STRONG_HIT
+        bne strong_hit
+weak_hit:
+        lda PlayerWeaponDmgWeak, x
+        jmp base_dmg_converge
+strong_hit:
+        lda PlayerWeaponDmgStrong, x
+base_dmg_converge:
+        sta DmgTotal
+
+        ; Run through all 4 equipment slots and add their damage calculations to our sum
         perform_zpcm_inc
         lda current_save + SaveFile::PlayerEquipmentTorch
         jsr item_damage_common
