@@ -24,7 +24,7 @@ hes_dead_jim:
         rts
 .endproc
 
-        .segment "CODE_PLAYER"
+        .segment "CODE_PLAYER_0"
 
 initial_heart_hp:
         .byte 0 ; none

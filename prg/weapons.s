@@ -20,7 +20,7 @@
 ; oh, this is probably overkill. it's fine.
 weapon_metasprite_ids: .res 8
 
-.segment "CODE_PLAYER"
+.segment "CODE_PLAYER_0"
 
 ; TODO: move this to a data bank?
 weapon_class_table:

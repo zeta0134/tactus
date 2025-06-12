@@ -74,7 +74,8 @@ PlayerCurrentY: .res 2
 PlayerTargetX: .res 2
 PlayerTargetY: .res 2
 
-PlayerJumpHeightPos: .res 2
+PlayerJumpHeightPos: .res 1
+PlayerAnimationTable: .res 1
 PlayerMovementBlocked: .res 1
 PlayerTorchlightRadius: .res 1
 
@@ -148,6 +149,8 @@ PlayerIncomingDmgElement: .res 1
 PlayerIncomingStatusDuration: .res 1
 PlayerIncomingStatusType: .res 1
 
+
+
 .segment "PRGFIXED_E000"
 
 ; For rapidly computing the tile row
@@ -157,11 +160,41 @@ player_tile_index_table:
         .byte (::BATTLEFIELD_WIDTH * i)
         .endrepeat
 
-.segment "CODE_PLAYER"
+.segment "CODE_PLAYER_0"
 
-JUMP_HEIGHT_END = 5
+JUMP_HEIGHT_END = 11
 jump_height_table:
-        .byte 10, 14, 11, 7, 2, 0
+        .byte 10, 14, 11, 7, 2, 0, 0, 0, 0, 0, 0, 0
+
+JUMP_ANIMATION_INDEX = 0
+player_anim_tile_table:
+        .byte <(SPRITE_PLAYER_01_PLAYER_JUMP + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER_JUMP + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER_JUMP + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER_JUMP + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER_JUMP + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_02_PLAYER_SQUISH_3 + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_02_PLAYER_SQUISH_3 + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_02_PLAYER_SQUISH_2 + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_02_PLAYER_SQUISH_1 + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER + SPRITE_OFFSET_PLAYER)
+
+player_anim_bank_table:
+        .byte >SPRITE_PLAYER_01_PLAYER_JUMP
+        .byte >SPRITE_PLAYER_01_PLAYER_JUMP
+        .byte >SPRITE_PLAYER_01_PLAYER_JUMP
+        .byte >SPRITE_PLAYER_01_PLAYER_JUMP
+        .byte >SPRITE_PLAYER_01_PLAYER_JUMP
+        .byte >SPRITE_PLAYER_02_PLAYER_SQUISH_3
+        .byte >SPRITE_PLAYER_02_PLAYER_SQUISH_3
+        .byte >SPRITE_PLAYER_02_PLAYER_SQUISH_2
+        .byte >SPRITE_PLAYER_02_PLAYER_SQUISH_1
+        .byte >SPRITE_PLAYER_01_PLAYER
+        .byte >SPRITE_PLAYER_01_PLAYER
+        .byte >SPRITE_PLAYER_01_PLAYER
+
 
 damage_table_north_x:
 damage_table_south_x:
@@ -222,6 +255,8 @@ ice_pick_offsets_y:
         .byte 0
         .endrepeat
 
+.segment "CODE_PLAYER_1"
+
 .proc FAR_init_player
 NewHeartType := R0
 HealingAmount := R0
@@ -244,13 +279,15 @@ HeartCount := R2
         lda #$FF ; intentionally offscreen
         sta sprite_table + MetaSpriteState::PositionY, x
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER
+        lda #$FF
+        sta PlayerAnimationTable
 
         ; For now, init the player to position 6, 6 (for no particular reason)
         lda #6
         sta PlayerRow
         sta PlayerCol
-        jsr set_player_target_coordinates
-        jsr apply_target_coordinates_immediately
+        far_call FAR_set_player_target_coordinates
+        far_call FAR_apply_target_coordinates_immediately
 
         ; Initialize us to the *end* of the jump height table; this is its resting state
         lda #JUMP_HEIGHT_END
@@ -342,29 +379,29 @@ HeartCount := R2
         lda #99
         sta current_save + SaveFile::PlayerBombCount
 
-        near_call FAR_initialize_hearts_for_game
+        far_call FAR_initialize_hearts_for_game
         
         ; All the heart types, yes!
         lda #HEART_TYPE_REGULAR
         sta NewHeartType
-        near_call FAR_add_heart
+        far_call FAR_add_heart
         lda #HEART_TYPE_REGULAR
         sta NewHeartType
-        near_call FAR_add_heart
+        far_call FAR_add_heart
         lda #HEART_TYPE_REGULAR
         sta NewHeartType
-        near_call FAR_add_heart
+        far_call FAR_add_heart
         lda #HEART_TYPE_REGULAR
         sta NewHeartType
-        near_call FAR_add_heart
+        far_call FAR_add_heart
         lda #HEART_TYPE_TEMPORARY
         sta NewHeartType
-        near_call FAR_add_heart
+        far_call FAR_add_heart
 
         ; Heal the player to full! (regular hearts start empty)
         lda #128
         sta HealingAmount
-        near_call FAR_receive_healing
+        far_call FAR_receive_healing
 
         st16 current_save + SaveFile::PlayerGold, 500
 .else
@@ -389,7 +426,7 @@ HeartCount := R2
 
         ; 2 regular hearts makes the starting player *quite* squishy.
         ; that's the point!
-        near_call FAR_initialize_hearts_for_game
+        far_call FAR_initialize_hearts_for_game
 
         lda #3
         sta HeartCount
@@ -397,14 +434,14 @@ HeartCount := R2
 heart_loop:
         lda #HEART_TYPE_REGULAR
         sta NewHeartType
-        near_call FAR_add_heart
+        far_call FAR_add_heart
         dec HeartCount
         bne heart_loop
 
         ; Heal the player to full! (regular hearts start empty)
         lda #128
         sta HealingAmount
-        near_call FAR_receive_healing
+        far_call FAR_receive_healing
 
         st16 current_save + SaveFile::PlayerGold, 0
 
@@ -414,6 +451,8 @@ heart_loop:
 
         rts
 .endproc
+
+.segment "CODE_PLAYER_0"
 
 DAMAGE_ANIM_MAX = 30
 
@@ -594,12 +633,28 @@ DamageOffsetPtrY := R2
         sec
         sbc jump_height_table, y
         sta sprite_table + MetaSpriteState::PositionY, x
+        ; If we are currently playing a fancy animation, process that now
+        lda PlayerAnimationTable
+        cmp #$FF
+        beq done_with_fancy_animations
+        ; work out the index into the animation table; we reuse the jump height
+        ; position counter here, and we'll keep those lengths in sync as we go
+        clc 
+        adc PlayerJumpHeightPos
+        tay
+        ; now use that to set the metasprite tile and player bank
+        lda player_anim_tile_table, y
+        sta sprite_table + MetaSpriteState::TileIndex, x
+        lda player_anim_bank_table, y
+        sta SPRITE_BANK_PLAYER
+done_with_fancy_animations:
         ; Update the jump height position every frame
         lda PlayerJumpHeightPos
         cmp #JUMP_HEIGHT_END
         beq done_with_height
         inc PlayerJumpHeightPos
 done_with_height:
+
         ; If we took damage this beat, apply that offset here
         lda PlayerTookDamageThisBeat
         beq done_with_damage_offset
@@ -753,8 +808,8 @@ correct_slide_up:
 .endproc
 
 .proc FAR_finalize_player_pos_after_slide
-        jsr set_player_target_coordinates
-        jsr apply_target_coordinates_immediately
+        near_call FAR_set_player_target_coordinates
+        near_call FAR_apply_target_coordinates_immediately
         rts
 .endproc
 
@@ -917,7 +972,7 @@ no_valid_press: ; not really sure how this label gets hit, but whatever
         rts
 .endproc
 
-.proc set_player_target_coordinates
+.proc FAR_set_player_target_coordinates
         perform_zpcm_inc
         lda PlayerCol
         .repeat 4
@@ -943,7 +998,7 @@ no_valid_press: ; not really sure how this label gets hit, but whatever
 .endproc
 
 ; Useful during init, or to prevent a large travel lerp during teleports
-.proc apply_target_coordinates_immediately
+.proc FAR_apply_target_coordinates_immediately
         ; Do not lerp. Do not collect 200 zorkmids
         lda PlayerTargetX
         sta PlayerCurrentX
@@ -1129,6 +1184,11 @@ PlayerStatePtr := R0
         ora #SPRITE_PAL_0
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
 
+        ; Similarly, disable the fancy animation table system; most animations don't
+        ; use it, so this is a sensible default
+        lda #$FF
+        sta PlayerAnimationTable
+
         lda #0
         sta PlayerCombo
 
@@ -1203,10 +1263,14 @@ check_for_idle_pose:
         sta PlayerIdleBeats
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER_IDLE
+        lda #$FF
+        sta PlayerAnimationTable
         jmp done_with_initial_pose
 pick_standard_pose:
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER
+        lda #$FF
+        sta PlayerAnimationTable
 done_with_initial_pose:
 
         lda PlayerRow
@@ -1270,6 +1334,8 @@ apply_jumping_pose:
         ; okay to proceed!
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER_JUMP
+        lda #JUMP_ANIMATION_INDEX
+        sta PlayerAnimationTable
         ; The player's movement succeeded, so store that in a flag
         lda PlayerNextDirection
         ora PlayerHeldDirection
@@ -1285,7 +1351,7 @@ skip_jumping_pose:
         lda TargetCol
         sta PlayerCol
 
-        jsr set_player_target_coordinates
+        near_call FAR_set_player_target_coordinates
 
         ; If the player is still holding this directional input, carry it over
         ; to the next beat as a held input
@@ -1389,6 +1455,8 @@ check_bomb_in_hand:
         ; Normally while holding a bomb we should use our held state:
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_02_PLAYER_HOLD
+        lda #$FF
+        sta PlayerAnimationTable
         ; If we are now holding a standard bomb and we are on beat 3, PANIC
         lda current_save + SaveFile::PlayerEquipmentBombs
         cmp #ITEM_BOMB_STANDARD
@@ -1399,6 +1467,8 @@ check_bomb_in_hand:
         ; Set the panic sprite
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_02_PLAYER_PANIC
+        lda #$FF
+        sta PlayerAnimationTable
 done_panicking:
 
         jmp resolve_enemy_collision
@@ -1413,6 +1483,8 @@ not_holding_bomb:
         ; Reset to idle, so the damage logic switches to that sprite
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER
+        lda #$FF
+        sta PlayerAnimationTable
 
 resolve_enemy_collision:
         lda PlayerRow
@@ -1430,7 +1502,7 @@ resolve_enemy_collision:
         lda TargetCol
         sta PlayerCol
 
-        jsr set_player_target_coordinates
+        near_call FAR_set_player_target_coordinates
 
         ; If the player is still holding this directional input, carry it over
         ; to the next beat as a held input
@@ -1498,12 +1570,16 @@ TargetCol := R15
         ; Reset to our idle sprite, which may get replaced by taking damage
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER
+        lda #$FF
+        sta PlayerAnimationTable
         ; Now just BECOME the normal state, and skip all this other nonsense. This way if the player
         ; queues up an action on the frame they would recover, we honor that action.
         jmp player_state_normal
 stun_not_expired:
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_02_PLAYER_STUN
+        lda #$FF
+        sta PlayerAnimationTable
 
         lda #0
         sta PlayerTookDamageThisBeat
@@ -1542,7 +1618,7 @@ no_damage_taken:
         lda TargetCol
         sta PlayerCol
 
-        jsr set_player_target_coordinates
+        near_call FAR_set_player_target_coordinates
 
         ; If the player is still holding this directional input, carry it over
         ; to the next beat as a held input
@@ -1638,6 +1714,8 @@ no_defrosting_today:
         ; Reset to our idle sprite, which may get replaced by taking damage
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER
+        lda #$FF
+        sta PlayerAnimationTable
         ; Clear the ice tap thing, we're going to run normal player movement instead
         lda #0
         sta PlayerTappedIce
@@ -1647,6 +1725,8 @@ no_defrosting_today:
 stun_not_expired:
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_02_PLAYER_STUN
+        lda #$FF
+        sta PlayerAnimationTable
 
         lda #0
         sta PlayerTookDamageThisBeat
@@ -1685,7 +1765,7 @@ no_damage_taken:
         lda TargetCol
         sta PlayerCol
 
-        jsr set_player_target_coordinates
+        near_call FAR_set_player_target_coordinates
 
         ; If the player is still holding this directional input, carry it over
         ; to the next beat as a held input
@@ -1766,6 +1846,8 @@ TargetCol := R15
         ; Set our animation frame back to idle
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER
+        lda #$FF
+        sta PlayerAnimationTable
 
 resolve_enemy_collision:
         lda PlayerRow
@@ -1783,7 +1865,7 @@ resolve_enemy_collision:
         lda TargetCol
         sta PlayerCol
 
-        jsr set_player_target_coordinates
+        near_call FAR_set_player_target_coordinates
 
         ; If the player is still holding some directional input,
         ; even though we ignored it, carry it over anyway. (this way we don't eat that input.)
@@ -2128,7 +2210,7 @@ TargetCol := R15
         ; don't trigger if we aren't actually attempting a move. also, specifically,
         ; go go boots now trigger on HELD movements only. Ignore a fresh press!
         lda PlayerHeldDirection
-        beq done_with_go_go_boots
+        jeq done_with_go_go_boots
 
         ; don't trigger if we are changing directions OR if this is our
         ; first movement in this chain
@@ -2185,6 +2267,8 @@ done_with_map_edge_checks:
         ; (even if the next one fails!)
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER_JUMP
+        lda #JUMP_ANIMATION_INDEX
+        sta PlayerAnimationTable
 
 move_player:
         jsr player_move        
@@ -2472,6 +2556,8 @@ skip_weapon_sfx:
         ; TODO: if we have multiple or weapon-specific attack animations, here is where to apply them
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER_ATTACK
+        lda #$FF
+        sta PlayerAnimationTable
 
 done:
         ; If there is any cleanup to do, do that here. Otherwise we're finished I think?
@@ -2583,7 +2669,7 @@ damage_amount_okay:
         sta IncomingDamage
         near_call FAR_receive_damage
         jsr FIXED_is_player_considered_dead
-        bne already_dead
+        jne already_dead
 
         lda #1
         sta ScreenShakeDepth
@@ -2629,6 +2715,8 @@ damage_amount_okay:
         jmp action_overrides_damage_animation
 apply_damage_animation:
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER_HIT
+        lda #$FF
+        sta PlayerAnimationTable
 action_overrides_damage_animation:
         rts
 
@@ -2711,6 +2799,8 @@ not_resistant_to_freeze:
         sta PlayerState
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_02_PLAYER_STUN
+        lda #$FF
+        sta PlayerAnimationTable
         ; And done!
 immune_to_freeze:
         rts
@@ -2738,6 +2828,8 @@ not_resistant_to_shock:
         sta PlayerState
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_02_PLAYER_STUN
+        lda #$FF
+        sta PlayerAnimationTable
         ; And done!
 immune_to_shock:
         rts
@@ -2997,6 +3089,8 @@ continue_being_paused:
         ; Put player in the "idle" pose during a pause
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER_IDLE
+        lda #$FF
+        sta PlayerAnimationTable
 
         ; Important: do NOT process any actual game logic while we are paused!
         ; Jump ahead to battlefield drawing, which will re-use the state we just computed.
@@ -3049,6 +3143,8 @@ proceed_to_hoist:
         sta PlayerIdleBeats
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_02_PLAYER_HOIST
+        lda #$FF
+        sta PlayerAnimationTable
 all_done:
         rts
 .endproc
@@ -3139,6 +3235,8 @@ done_with_full_room_prep:
         ; Animate them into the... hrm. Item holding pose, yes!
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER_HAND_RAISED
+        lda #$FF
+        sta PlayerAnimationTable
 
         ; Spawn in a sprite at the player's current tile coordinates, with
         ; that spell item rising up into the air, just like a death sprite
