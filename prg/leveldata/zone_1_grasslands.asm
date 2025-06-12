@@ -89,8 +89,8 @@ zone_grasslands_banner_boss:
         .byte (HUD_PURPLE_PAL | CHR_BANK_ZONES), (HUD_PURPLE_PAL | CHR_BANK_ZONES)
 
 zone_grasslands_floor_1:
-        .addr spawn_pool_generic   ; Interior Spawn Pool
-        .addr spawn_pool_generic   ; Exterior Spawn Pool
+        .addr spawn_pool_grasslands_cave     ; Interior Spawn Pool
+        .addr spawn_pool_grasslands_outdoors ; Exterior Spawn Pool
         .addr spawn_pool_generic   ; Warp Spawn Pool
         .addr spawnset_a53_z1_f1 ; General Challenge Set
         .addr spawnset_a53_z1_f1 ; Warp Challenge Set
@@ -130,8 +130,8 @@ zone_grasslands_floor_1:
 
 
 zone_grasslands_floor_2:
-        .addr spawn_pool_generic   ; Interior Spawn Pool
-        .addr spawn_pool_generic   ; Exterior Spawn Pool
+        .addr spawn_pool_grasslands_cave     ; Interior Spawn Pool
+        .addr spawn_pool_grasslands_outdoors ; Exterior Spawn Pool
         .addr spawn_pool_generic   ; Warp Spawn Pool
         .addr spawnset_a53_z1_f2 ; General Challenge Set
         .addr spawnset_a53_z1_f2 ; Warp Challenge Set
@@ -170,8 +170,8 @@ zone_grasslands_floor_2:
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
 
 zone_grasslands_floor_3:
-        .addr spawn_pool_generic   ; Interior Spawn Pool
-        .addr spawn_pool_generic   ; Exterior Spawn Pool
+        .addr spawn_pool_grasslands_cave     ; Interior Spawn Pool
+        .addr spawn_pool_grasslands_outdoors ; Exterior Spawn Pool
         .addr spawn_pool_generic   ; Warp Spawn Pool
         .addr spawnset_a53_z1_f3 ; General Challenge Set
         .addr spawnset_a53_z1_f3 ; Warp Challenge Set
@@ -210,8 +210,8 @@ zone_grasslands_floor_3:
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
 
 zone_grasslands_floor_4:
-        .addr spawn_pool_generic   ; Interior Spawn Pool
-        .addr spawn_pool_generic   ; Exterior Spawn Pool
+        .addr spawn_pool_grasslands_cave     ; Interior Spawn Pool
+        .addr spawn_pool_grasslands_outdoors ; Exterior Spawn Pool
         .addr spawn_pool_generic   ; Warp Spawn Pool
         .addr spawnset_a53_z1_f4 ; General Challenge Set
         .addr spawnset_a53_z1_f4 ; Warp Challenge Set

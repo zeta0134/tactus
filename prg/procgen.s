@@ -1417,6 +1417,11 @@ skip_considering_warp_exit:
         lda (RoomPtr), y
         and #ROOM_PROPERTIES_WARP
         bne skip_picking_warp_portal
+        ;   - Any chamber which specifically forbids the warp portal from spawning
+        ;     (oob chambers, uncommon rooms that don't have a valid structure spot, etc)
+        lda (RoomPtr), y
+        and #ROOM_PROPERTIES_FORBID_WARP_PORTAL
+        bne skip_picking_warp_portal
 
 .if ::DEBUG_OVERRIDE_PORTAL_CHAMBER
         lda PlayerRoomIndex

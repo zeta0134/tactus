@@ -58,6 +58,7 @@ class Room:
     base_logic: str
     is_warp: bool
     has_exit: bool
+    forbid_warp_portal: bool
     finalizer: str
     
 def read_boolean_properties(tile_element):
@@ -238,6 +239,7 @@ def read_room(map_filename):
     is_dark = flags.get("dark", False)
     is_warp = flags.get("is_warp", False)
     has_exit = flags.get("has_exit", False)
+    forbid_warp_portal = flags.get("forbid_warp_portal", False)
     string_properties = read_string_properties(map_element)
     category = string_properties.get("category", "exterior")
 
@@ -257,7 +259,7 @@ def read_room(map_filename):
     return Room(name=safe_label, width=map_width, height=map_height, tiles=combined_tiles, overlays=overlays,
         exit_id=exit_id, bg_palette=room_bg_palette, obj_palette=room_obj_palette, dark=is_dark, category=category,
         forbid_player_spawning=forbid_player_spawning, raster_effect=raster_effect, color_emphasis=color_emphasis, 
-        base_logic=base_logic, is_warp=is_warp, has_exit=has_exit, finalizer=finalizer)
+        base_logic=base_logic, is_warp=is_warp, has_exit=has_exit, forbid_warp_portal=forbid_warp_portal, finalizer=finalizer)
 
 def tile_id_bytes(tiles):
   raw_bytes = []
@@ -467,6 +469,8 @@ def write_room(tilemap, output_file):
         properties_byte |= 0x08
     if tilemap.has_exit:
         properties_byte |= 0x04
+    if tilemap.forbid_warp_portal:
+        properties_byte |= 0x02
     properties_byte |= (category_ids[tilemap.category] << 4)
     output_file.write(ca65_label("room_"+tilemap.name) + "\n")
     output_file.write("  .byte " + ca65_byte_literal(properties_byte) + " ; property flags\n")

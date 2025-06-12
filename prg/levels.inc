@@ -98,6 +98,8 @@
 .global FAR_spawn_entities_from_pool
 
 .global spawn_pool_generic
+.global spawn_pool_grasslands_outdoors
+.global spawn_pool_grasslands_cave
 
 .globalzp SpawnSetPtr
 .global spawnset_a53_z1_f1

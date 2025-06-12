@@ -72,15 +72,16 @@ FLOORPLAN_MINIMAP_SHAPE_INTERIOR      = %00010000
 FLOORPLAN_MINIMAP_SHAPE_STRUCTURE     = %00100000
 FLOORPLAN_MINIMAP_SHAPE_RESERVED      = %00110000
 
-ROOM_PROPERTIES_NOSPAWN      = %10000000
-ROOM_PROPERTIES_DARK         = %01000000
-ROOM_PROPERTIES_WARP         = %00001000 ; this room is part of the warp zone (don't put the player here)
-ROOM_PROPERTIES_EXIT_CHAMBER = %00000100 ; this chamber contains an exit (currently only used for warps)
-ROOM_CATEGORY_EXTERIOR       = %00000000
-ROOM_CATEGORY_INTERIOR       = %00010000
-ROOM_CATEGORY_CHALLENGE      = %00100000
-ROOM_CATEGORY_SHOP           = %00110000
-ROOM_CATEGORY_MASK           = %00110000
+ROOM_PROPERTIES_NOSPAWN            = %10000000
+ROOM_PROPERTIES_DARK               = %01000000
+ROOM_PROPERTIES_WARP               = %00001000 ; this room is part of the warp zone (don't put the player here)
+ROOM_PROPERTIES_EXIT_CHAMBER       = %00000100 ; this chamber contains an exit (currently only used for warps)
+ROOM_PROPERTIES_FORBID_WARP_PORTAL = %00000010 ; this chamber cannot house the warp portal (no valid structure spot, OOB, etc)
+ROOM_CATEGORY_EXTERIOR             = %00000000
+ROOM_CATEGORY_INTERIOR             = %00010000
+ROOM_CATEGORY_CHALLENGE            = %00100000
+ROOM_CATEGORY_SHOP                 = %00110000
+ROOM_CATEGORY_MASK                 = %00110000
 
 ; All warp zones share these settings, unlike the regular floors which may
 ; differ depending on maze layout
