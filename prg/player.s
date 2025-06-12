@@ -166,8 +166,10 @@ JUMP_HEIGHT_END = 11
 jump_height_table:
         .byte 10, 14, 11, 7, 2, 0, 0, 0, 0, 0, 0, 0
 
-JUMP_ANIMATION_INDEX = 0
+JUMP_ANIMATION_INDEX      = 0
+JUMP_ANIMATION_MILD_INDEX = 11
 player_anim_tile_table:
+        ; Jump Animation: Regular Strength
         .byte <(SPRITE_PLAYER_01_PLAYER_JUMP + SPRITE_OFFSET_PLAYER)
         .byte <(SPRITE_PLAYER_01_PLAYER_JUMP + SPRITE_OFFSET_PLAYER)
         .byte <(SPRITE_PLAYER_01_PLAYER_JUMP + SPRITE_OFFSET_PLAYER)
@@ -180,8 +182,22 @@ player_anim_tile_table:
         .byte <(SPRITE_PLAYER_01_PLAYER + SPRITE_OFFSET_PLAYER)
         .byte <(SPRITE_PLAYER_01_PLAYER + SPRITE_OFFSET_PLAYER)
         .byte <(SPRITE_PLAYER_01_PLAYER + SPRITE_OFFSET_PLAYER)
+        ; Jump Animation: Mild Strength
+        .byte <(SPRITE_PLAYER_01_PLAYER_JUMP + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER_JUMP + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER_JUMP + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER_JUMP + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER_JUMP + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_02_PLAYER_SQUISH_2 + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_02_PLAYER_SQUISH_1 + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER + SPRITE_OFFSET_PLAYER)
+        .byte <(SPRITE_PLAYER_01_PLAYER + SPRITE_OFFSET_PLAYER)
 
 player_anim_bank_table:
+        ; Jump Animation: Regular Strength
         .byte >SPRITE_PLAYER_01_PLAYER_JUMP
         .byte >SPRITE_PLAYER_01_PLAYER_JUMP
         .byte >SPRITE_PLAYER_01_PLAYER_JUMP
@@ -191,6 +207,19 @@ player_anim_bank_table:
         .byte >SPRITE_PLAYER_02_PLAYER_SQUISH_3
         .byte >SPRITE_PLAYER_02_PLAYER_SQUISH_2
         .byte >SPRITE_PLAYER_02_PLAYER_SQUISH_1
+        .byte >SPRITE_PLAYER_01_PLAYER
+        .byte >SPRITE_PLAYER_01_PLAYER
+        .byte >SPRITE_PLAYER_01_PLAYER
+        ; Jump Animation: Mild Strength
+        .byte >SPRITE_PLAYER_01_PLAYER_JUMP
+        .byte >SPRITE_PLAYER_01_PLAYER_JUMP
+        .byte >SPRITE_PLAYER_01_PLAYER_JUMP
+        .byte >SPRITE_PLAYER_01_PLAYER_JUMP
+        .byte >SPRITE_PLAYER_01_PLAYER_JUMP
+        .byte >SPRITE_PLAYER_02_PLAYER_SQUISH_2
+        .byte >SPRITE_PLAYER_02_PLAYER_SQUISH_1
+        .byte >SPRITE_PLAYER_01_PLAYER
+        .byte >SPRITE_PLAYER_01_PLAYER
         .byte >SPRITE_PLAYER_01_PLAYER
         .byte >SPRITE_PLAYER_01_PLAYER
         .byte >SPRITE_PLAYER_01_PLAYER
@@ -1334,7 +1363,8 @@ apply_jumping_pose:
         ; okay to proceed!
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER_JUMP
-        lda #JUMP_ANIMATION_INDEX
+        ;lda #JUMP_ANIMATION_INDEX
+        lda #JUMP_ANIMATION_MILD_INDEX
         sta PlayerAnimationTable
         ; The player's movement succeeded, so store that in a flag
         lda PlayerNextDirection
@@ -2267,7 +2297,8 @@ done_with_map_edge_checks:
         ; (even if the next one fails!)
         ldx PlayerSpriteIndex
         set_player_sprite_x SPRITE_PLAYER_01_PLAYER_JUMP
-        lda #JUMP_ANIMATION_INDEX
+        ;lda #JUMP_ANIMATION_INDEX
+        lda #JUMP_ANIMATION_MILD_INDEX
         sta PlayerAnimationTable
 
 move_player:
