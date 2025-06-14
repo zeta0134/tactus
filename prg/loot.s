@@ -321,7 +321,7 @@ common_treasure_table:
     .byte 3
     .byte ITEM_OBSIDIAN_RING
     .byte ITEM_RUBY_NECKLACE
-    .byte ITEM_SAPPHIRE_BRACELET
+    .byte ITEM_TOPAZ_EARRINGS
 
     .byte 38
     .byte ITEM_BROADSWORD_L1
