@@ -110,11 +110,10 @@ aloha_tshirt_description:      localized_item_description aloha_tshirt_name_loca
 
 ; Accessories
 chain_link_description:        localized_item_description chain_link_name_localized,        chain_link_description_localized
-; TODO: point these properly!
-obsidian_ring_description:     localized_item_description no_item_name_localized,           no_item_description_localized
-ruby_necklace_description:     localized_item_description no_item_name_localized,           no_item_description_localized
-topaz_earrings_description:    localized_item_description no_item_name_localized,           no_item_description_localized
-sapphire_bracelet_description: localized_item_description no_item_name_localized,           no_item_description_localized
+obsidian_ring_description:     localized_item_description obsidian_ring_name_localized,     obsidian_ring_description_localized
+ruby_necklace_description:     localized_item_description ruby_necklace_name_localized,     ruby_necklace_description_localized
+topaz_earrings_description:    localized_item_description topaz_earrings_name_localized,    topaz_earrings_description_localized
+sapphire_bracelet_description: localized_item_description sapphire_bracelet_name_localized, sapphire_bracelet_description_localized
 
 ; Bombs
 bombs_description:             localized_item_description bombs_name_localized,             bombs_description_localized

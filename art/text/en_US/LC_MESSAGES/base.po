@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2025-04-15 11:07-0400\n"
-"PO-Revision-Date: 2025-06-14 13:12+0000\n"
+"PO-Revision-Date: 2025-06-14 19:51+0000\n"
 "Last-Translator: Weblate Admin <zeta0134@reploid.cafe>\n"
 "Language-Team: English <http://weblate.reploid.cafe/projects/tactus/items/en/"
 ">\n"
@@ -482,3 +482,35 @@ msgstr "TP.SP1"
 
 msgid "options_disco_floor_no_motion"
 msgstr "NO MOTION"
+
+msgid "obsidian_ring_name"
+msgstr "OBSIDIAN RING"
+
+msgid "ruby_necklace_name"
+msgstr "RUBY NECKLACE"
+
+msgid "obsidian_ring_description"
+msgstr ""
+"Resist Earth damage,\n"
+"Protection from Poison."
+
+msgid "ruby_necklace_description"
+msgstr ""
+"Resist Fire damage,\n"
+"Protection from Burning."
+
+msgid "topaz_earrings_name"
+msgstr "TOPAZ EARRINGS"
+
+msgid "sapphire_bracelet_name"
+msgstr "SAPPHIRE BRACELET"
+
+msgid "topaz_earrings_description"
+msgstr ""
+"Resist Air damage,\n"
+"Protection from Shocks."
+
+msgid "sapphire_bracelet_description"
+msgstr ""
+"Resist Ice damage,\n"
+"Protection from Freezing."

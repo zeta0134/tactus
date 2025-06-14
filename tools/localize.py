@@ -189,6 +189,18 @@ def gather_translated_strings(languages):
         items["spell_life"] = {
             "name":        _("spell_life_name"),
             "description": _("spell_life_description")}
+        items["obsidian_ring"] = {
+            "name":        _("obsidian_ring_name"),
+            "description": _("obsidian_ring_description")}
+        items["ruby_necklace"] = {
+            "name":        _("ruby_necklace_name"),
+            "description": _("ruby_necklace_description")}
+        items["topaz_earrings"] = {
+            "name":        _("topaz_earrings_name"),
+            "description": _("topaz_earrings_description")}
+        items["sapphire_bracelet"] = {
+            "name":        _("sapphire_bracelet_name"),
+            "description": _("sapphire_bracelet_description")}
 
         # massage the translated strings into a data structure keyed on the individual message,
         # as this is our output unit for the game. (We're looping over entire languages at once,
