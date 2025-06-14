@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2025-05-30 04:25+0000\n"
+"PO-Revision-Date: 2025-06-14 13:12+0000\n"
 "Last-Translator: Weblate Admin <zeta0134@reploid.cafe>\n"
 "Language-Team: Toki Pona <http://weblate.reploid.cafe/projects/tactus/items/"
 "tok/>\n"
@@ -349,10 +349,12 @@ msgid "basic_torch_description"
 msgstr "pana e weka suno +1."
 
 msgid "large_torch_name"
-msgstr "PALISA SUNO SULI"
+msgstr "PALISA SUNO SELI"
 
 msgid "large_torch_description"
-msgstr "pana e weka suno +4."
+msgstr ""
+"pana e weka suno +4.\n"
+"pakala e monsuta lete +1."
 
 msgid "map_name"
 msgstr "LIPU NASIN"

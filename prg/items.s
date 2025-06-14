@@ -455,7 +455,7 @@ large_torch:
         .byte 0                                 ; HudSpriteAttr
         .word 150                               ; ShopCost
         .byte WEAPON_DAGGER                     ; WeaponShape (unused)
-        .addr no_effect                         ; DamageFunc
+        .addr dmg_plus_1_to_ice                 ; DamageFunc
         .addr flat_15                           ; TorchlightFunc
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
@@ -1064,6 +1064,27 @@ upgrade_crystal_fire:
 .endproc
 
 .proc do_nothing
+        rts
+.endproc
+
+.proc dmg_plus_1_to_ice
+; don't clobber
+;DmgTotal := R0
+
+; available because we are in the middle of a weapon strike when this
+; routine is called
+EffectiveAttackSquare := R10
+
+        ldx EffectiveAttackSquare
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_ICE
+        bne no_bonus
+yes_bonus:
+        lda #1
+        rts
+no_bonus:
+        lda #0
         rts
 .endproc
 
