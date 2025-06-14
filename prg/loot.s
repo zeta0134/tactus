@@ -318,12 +318,12 @@ combo_offset_lut:
 ; heavily weighted towards L1 weapons, but occasionally has some L2 and other interesting stuff
 common_treasure_table:
     ; Sometimes we need the shop to carry three specific items. Here's how to do that:
-    ;.byte 3
-    ;.byte ITEM_ALOHA_TSHIRT_1
-    ;.byte ITEM_ALOHA_TSHIRT_2
-    ;.byte ITEM_ALOHA_TSHIRT_3
+    .byte 3
+    .byte ITEM_OBSIDIAN_RING
+    .byte ITEM_RUBY_NECKLACE
+    .byte ITEM_SAPPHIRE_BRACELET
 
-    .byte 34
+    .byte 38
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L1
@@ -358,6 +358,10 @@ common_treasure_table:
     .byte ITEM_SPELL_AIR
     .byte ITEM_SPELL_ICE
     .byte ITEM_SPELL_EARTH
+    .byte ITEM_OBSIDIAN_RING
+    .byte ITEM_RUBY_NECKLACE
+    .byte ITEM_TOPAZ_EARRINGS
+    .byte ITEM_SAPPHIRE_BRACELET
 
 ; heavily weighted towards upgrade crystals, contains lots of other powerful items
 rare_treasure_table:

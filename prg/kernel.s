@@ -636,15 +636,15 @@ normal_load:
         jsr generate_run_seed_for_save
 .endif
 
-        ; no matter how we load, we need to initialize the player's weapon dmg table
-        far_call FAR_calculate_weapon_damage
-        far_call FAR_compute_player_passives
-
         lda #ZONE_HUB_WORLD
         ; fall through to converge
 zone_select_converge:
         far_call FAR_set_zone_ptr_from_id
         mov16 DestinationZonePtr, PlayerZonePtr
+
+        ; no matter how we load, we need to initialize the player's weapon dmg table
+        far_call FAR_calculate_weapon_damage
+        far_call FAR_compute_player_passives
 
         ; (The HUD depends on the seed we just generated, though it may not necessarily
         ; actually display it.)

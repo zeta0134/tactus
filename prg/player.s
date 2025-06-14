@@ -385,15 +385,15 @@ HeartCount := R2
         ; not really sure how weapon obelisks are going to work.
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
-        lda #ITEM_BROADSWORD_L1
+        lda #ITEM_DAGGER_L1
         sta current_save + SaveFile::PlayerEquipmentWeapon
-        lda #ITEM_BASIC_TORCH
+        lda #ITEM_NONE
         sta current_save + SaveFile::PlayerEquipmentTorch
-        lda #ITEM_ALOHA_TSHIRT_1
+        lda #ITEM_NONE
         sta current_save + SaveFile::PlayerEquipmentArmor
-        lda #ITEM_GO_GO_BOOTS
+        lda #ITEM_NONE
         sta current_save + SaveFile::PlayerEquipmentBoots
-        lda #ITEM_CHAIN_LINK
+        lda #ITEM_SAPPHIRE_BRACELET
         sta current_save + SaveFile::PlayerEquipmentAccessory
         lda #ITEM_BOMB_STANDARD
         sta current_save + SaveFile::PlayerEquipmentBombs

@@ -110,6 +110,11 @@ aloha_tshirt_description:      localized_item_description aloha_tshirt_name_loca
 
 ; Accessories
 chain_link_description:        localized_item_description chain_link_name_localized,        chain_link_description_localized
+; TODO: point these properly!
+obsidian_ring_description:     localized_item_description no_item_name_localized,           no_item_description_localized
+ruby_necklace_description:     localized_item_description no_item_name_localized,           no_item_description_localized
+topaz_earrings_description:    localized_item_description no_item_name_localized,           no_item_description_localized
+sapphire_bracelet_description: localized_item_description no_item_name_localized,           no_item_description_localized
 
 ; Bombs
 bombs_description:             localized_item_description bombs_name_localized,             bombs_description_localized
@@ -169,6 +174,10 @@ item_table:
         .word upgrade_crystal_ice
         .word upgrade_crystal_air
         .word upgrade_crystal_fire
+        .word obsidian_ring
+        .word ruby_necklace
+        .word topaz_earrings
+        .word sapphire_bracelet
 
         ; safety
         .repeat 128
@@ -978,6 +987,78 @@ upgrade_crystal_fire:
         .addr do_nothing                      ; ApplyPassivesFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
+
+obsidian_ring:
+        .byte SLOT_ACCESSORY                             ; SlotId
+        .word SPRITE_ITEMS_05_OBSIDIAN_RING              ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                          ; WorldSpriteAttr
+        .byte EQUIPMENT_OBSIDIAN_RING                    ; HudBgTile
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS)          ; HudBgAttr
+        .byte 0                                          ; HudSpriteTile (unused)
+        .byte 0                                          ; HudSpriteAttr (unused)
+        .word 150                                        ; ShopCost (base)
+        .byte WEAPON_DAGGER                              ; WeaponShape (unused)
+        .addr no_effect                                  ; DamageFunc
+        .addr no_effect                                  ; TorchlightFunc
+        .addr no_effect                                  ; UseFunc
+        .addr no_effect                                  ; DmgReductionFunc
+        .addr award_earth_resistance_and_protection      ; ApplyPassivesFunc
+        .addr obsidian_ring_description                  ; DescriptionStringPtr
+        .byte <.bank(obsidian_ring_description)          ; DescriptionStringBank
+
+ruby_necklace:
+        .byte SLOT_ACCESSORY                             ; SlotId
+        .word SPRITE_ITEMS_05_RUBY_NECKLACE              ; WorldSpriteTile
+        .byte SPRITE_PAL_RED                             ; WorldSpriteAttr
+        .byte EQUIPMENT_RUBY_NECKLACE                    ; HudBgTile
+        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)             ; HudBgAttr
+        .byte 0                                          ; HudSpriteTile (unused)
+        .byte 0                                          ; HudSpriteAttr (unused)
+        .word 150                                        ; ShopCost (base)
+        .byte WEAPON_DAGGER                              ; WeaponShape (unused)
+        .addr no_effect                                  ; DamageFunc
+        .addr no_effect                                  ; TorchlightFunc
+        .addr no_effect                                  ; UseFunc
+        .addr no_effect                                  ; DmgReductionFunc
+        .addr award_fire_resistance_and_protection       ; ApplyPassivesFunc
+        .addr ruby_necklace_description                  ; DescriptionStringPtr
+        .byte <.bank(ruby_necklace_description)          ; DescriptionStringBank
+
+topaz_earrings:
+        .byte SLOT_ACCESSORY                             ; SlotId
+        .word SPRITE_ITEMS_05_TOPAZ_EARRINGS             ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                          ; WorldSpriteAttr
+        .byte EQUIPMENT_TOPAZ_EARRINGS                   ; HudBgTile
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS)          ; HudBgAttr
+        .byte 0                                          ; HudSpriteTile (unused)
+        .byte 0                                          ; HudSpriteAttr (unused)
+        .word 150                                        ; ShopCost (base)
+        .byte WEAPON_DAGGER                              ; WeaponShape (unused)
+        .addr no_effect                                  ; DamageFunc
+        .addr no_effect                                  ; TorchlightFunc
+        .addr no_effect                                  ; UseFunc
+        .addr no_effect                                  ; DmgReductionFunc
+        .addr award_air_resistance_and_protection        ; ApplyPassivesFunc
+        .addr topaz_earrings_description                 ; DescriptionStringPtr
+        .byte <.bank(topaz_earrings_description)         ; DescriptionStringBank
+
+sapphire_bracelet:
+        .byte SLOT_ACCESSORY                             ; SlotId
+        .word SPRITE_ITEMS_05_SAPPHIRE_BRACELET          ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                          ; WorldSpriteAttr
+        .byte EQUIPMENT_SAPPHIRE_BRACELET                ; HudBgTile
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS)          ; HudBgAttr
+        .byte 0                                          ; HudSpriteTile (unused)
+        .byte 0                                          ; HudSpriteAttr (unused)
+        .word 150                                        ; ShopCost (base)
+        .byte WEAPON_DAGGER                              ; WeaponShape (unused)
+        .addr no_effect                                  ; DamageFunc
+        .addr no_effect                                  ; TorchlightFunc
+        .addr no_effect                                  ; UseFunc
+        .addr no_effect                                  ; DmgReductionFunc
+        .addr award_ice_resistance_and_protection        ; ApplyPassivesFunc
+        .addr sapphire_bracelet_description              ; DescriptionStringPtr
+        .byte <.bank(sapphire_bracelet_description)      ; DescriptionStringBank
 
         .segment "CODE_ITEMS"
 
@@ -2035,6 +2116,46 @@ max_not_exceeded:
         lda PlayerResistances
         ora #PLAYER_RESISTANCE_MASK_FIRE
         sta PlayerResistances
+        rts
+.endproc
+
+.proc award_earth_resistance_and_protection
+        lda PlayerResistances
+        ora #PLAYER_RESISTANCE_MASK_EARTH
+        sta PlayerResistances
+        lda PlayerProtections
+        ora #PLAYER_RESISTANCE_MASK_EARTH
+        sta PlayerProtections
+        rts
+.endproc
+
+.proc award_ice_resistance_and_protection
+        lda PlayerResistances
+        ora #PLAYER_RESISTANCE_MASK_ICE
+        sta PlayerResistances
+        lda PlayerProtections
+        ora #PLAYER_RESISTANCE_MASK_ICE
+        sta PlayerProtections
+        rts
+.endproc
+
+.proc award_air_resistance_and_protection
+        lda PlayerResistances
+        ora #PLAYER_RESISTANCE_MASK_AIR
+        sta PlayerResistances
+        lda PlayerProtections
+        ora #PLAYER_RESISTANCE_MASK_AIR
+        sta PlayerProtections
+        rts
+.endproc
+
+.proc award_fire_resistance_and_protection
+        lda PlayerResistances
+        ora #PLAYER_RESISTANCE_MASK_FIRE
+        sta PlayerResistances
+        lda PlayerProtections
+        ora #PLAYER_RESISTANCE_MASK_FIRE
+        sta PlayerProtections
         rts
 .endproc
 
