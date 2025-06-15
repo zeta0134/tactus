@@ -54,6 +54,8 @@ SpellDisplayCurrent: .res 1
 ItemDisplayCurrent: .res 1
 ItemCountCurrent: .res 1
 
+NinjaFootwrapsChargeCurrent: .res 1
+
 .segment "CODE_0"
 
 HUD_TILE_BASE        = $52C0
@@ -162,6 +164,7 @@ weapon_palette_table:
         sta SpellDisplayCurrent
         sta ItemDisplayCurrent
         sta ItemCountCurrent
+        sta NinjaFootwrapsChargeCurrent
 
         jsr clear_hud_canvas
         jsr draw_static_hud_elements
@@ -1102,7 +1105,7 @@ ItemPtr := R8
         sta DrawAttr
 
         ; Perform the draw
-
+perform_the_draw:
         ldy #0
 
         lda DrawTile
@@ -1142,6 +1145,70 @@ ItemPtr := R8
         sta (AttributeAddr), y
         
         rts
+.endproc
+
+ninja_footwraps_tileid_lut:
+        .byte EQUIPMENT_NINJA_FOOTWRAPS
+        .byte EQUIPMENT_NINJA_FOOTWRAPS_RECHARGE_1
+        .byte EQUIPMENT_NINJA_FOOTWRAPS_RECHARGE_2
+        .byte EQUIPMENT_NINJA_FOOTWRAPS_RECHARGE_3
+        .byte EQUIPMENT_NINJA_FOOTWRAPS_RECHARGE_4
+        .byte EQUIPMENT_NINJA_FOOTWRAPS_RECHARGE_5
+        .byte EQUIPMENT_NINJA_FOOTWRAPS_RECHARGE_6
+        .byte EQUIPMENT_NINJA_FOOTWRAPS_RECHARGE_7
+
+ninja_footwraps_attribute_lut:
+        .byte (CHR_BANK_ITEMS | HUD_PURPLE_PAL)
+        .byte (CHR_BANK_ITEMS | HUD_TEXT_PAL)
+        .byte (CHR_BANK_ITEMS | HUD_TEXT_PAL)
+        .byte (CHR_BANK_ITEMS | HUD_TEXT_PAL)
+        .byte (CHR_BANK_ITEMS | HUD_TEXT_PAL)
+        .byte (CHR_BANK_ITEMS | HUD_TEXT_PAL)
+        .byte (CHR_BANK_ITEMS | HUD_TEXT_PAL)
+        .byte (CHR_BANK_ITEMS | HUD_TEXT_PAL)
+
+.proc draw_ninja_footwraps_icon
+TileAddr  := R2
+AttributeAddr := R4
+DrawTile := R6
+DrawAttr := R7
+
+        clc
+        lda TileAddr+0
+        adc #<HUD_ATTR_OFFSET
+        sta AttributeAddr+0
+        lda TileAddr+1
+        adc #>HUD_ATTR_OFFSET
+        sta AttributeAddr+1
+
+        ; if our display item isn't yet the boots, draw unconditionally
+        ; (to ensure the icon changes after item pickup regardless of charge coherence)
+        lda current_save + SaveFile::PlayerEquipmentBoots
+        cmp BootsDisplayCurrent
+        bne definitely_draw
+
+        ; otherwise, use the difference between our old and current charge to determine whether
+        ; we need to draw
+        lda PlayerNinjaFootwrapsCooldown
+        cmp NinjaFootwrapsChargeCurrent
+        bne definitely_draw
+nothing_to_do:
+        rts
+
+definitely_draw:
+        lda current_save + SaveFile::PlayerEquipmentBoots
+        sta BootsDisplayCurrent
+        lda PlayerNinjaFootwrapsCooldown
+        sta NinjaFootwrapsChargeCurrent
+
+        ldx PlayerNinjaFootwrapsCooldown
+        lda ninja_footwraps_tileid_lut, x
+        sta DrawTile
+        lda ninja_footwraps_attribute_lut, x
+        sta DrawAttr
+
+        jmp draw_icon_common::perform_the_draw
+        ; tail call
 .endproc
 
 .proc draw_equipment_icon
@@ -1366,9 +1433,18 @@ check_armor:
 
 check_boots:
         lda current_save + SaveFile::PlayerEquipmentBoots
+        ; special case: items with weird bonus HUD state do their
+        ; own thing here
+        cmp #ITEM_NINJA_FOOTWRAPS
+        bne not_ninja_footwraps
+        st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 8)
+        jsr draw_ninja_footwraps_icon
+        perform_zpcm_inc
+        jmp check_accessory
+not_ninja_footwraps:
         cmp BootsDisplayCurrent
         beq check_accessory
-        sta BootsDisplayCurrent        
+        sta BootsDisplayCurrent
         sta ItemId
         st16 TileAddr, (HUD_TILE_BASE + ROW_1 + 8)
         jsr draw_equipment_icon
