@@ -1,37 +1,44 @@
-        .setcpu "6502"
+        .macpack longbranch
 
         .include "../build/tile_defs.inc"
 
         .include "_globals.inc"
 
+        .include "battlefield.inc"
+        .include "enemies.inc"
         .include "far_call.inc"
+        .include "hearts.inc"
+        .include "items.inc"
         .include "kernel.inc"
         .include "player.inc"
         .include "rainbow.inc"
         .include "saves.inc"
+        .include "sound.inc"
         .include "sprites.inc"
         .include "weapons.inc"
         .include "word_util.inc"
         .include "zeropage.inc"
         .include "zpcm.inc"
 
+.zeropage
+
+PlayerWeaponPtr: .res 2
+
 .segment "RAM"
 
 ; oh, this is probably overkill. it's fine.
 weapon_metasprite_ids: .res 8
 
-.segment "CODE_PLAYER_0"
+; "Scratch" registers, because 16 was just not enough for some situations
+EnemyDiedThisFrame: .res 1
+SafetyCol: .res 1
+SafetyRow: .res 1
 
-; TODO: move this to a data bank?
-weapon_class_table:
-        .word dagger
-        .word broadsword
-        .word longsword
-        .word spear
-        .word flail
+.segment "CODE_PLAYER_1"
 
-; Programmer notes: try to prefer clockwise update order, for consistency.
-; That means single-hit weapons should prioritize the *player's* left
+.proc FAR_draw_weapon_effects
+        jmp (WeaponDrawFunc)
+.endproc
 
 ; No update! Sprites stay where they are spawned, even if the player moves later.
 ; Ideal for simple slashes and strikes.
@@ -101,6 +108,277 @@ skip_this_sprite:
         perform_zpcm_inc
         rts
 .endproc
+
+.proc load_weapon_ptr
+ItemPtr := R0
+        access_data_bank #<.bank(item_table)
+        lda current_save + SaveFile::PlayerEquipmentWeapon
+        asl
+        tay
+        lda item_table+0, y
+        sta ItemPtr+0
+        lda item_table+1, y
+        sta ItemPtr+1
+        ldy #ItemDef::WeaponShape
+        lda (ItemPtr), y
+        asl
+        tay
+        lda weapon_class_table+0, y
+        sta PlayerWeaponPtr+0
+        lda weapon_class_table+1, y
+        sta PlayerWeaponPtr+1
+        restore_previous_bank
+        rts
+.endproc
+
+.proc FAR_player_swing_weapon
+; R0 and R1 are reserved for the enemy behaviors to use
+; Current target square to consider for attacking
+PlayerSquare := R2
+AttackSquare := R3
+WeaponSquaresIndex := R4
+WeaponSquaresPtr := R5 ; R6
+AttackLanded := R7
+WeaponProperties := R8
+TilesRemaining := R9
+; We don't use these, but we should know not to clobber them
+EffectiveAttackSquare := R10
+TargetRow := R14
+TargetCol := R15
+        perform_zpcm_inc
+
+        jsr load_weapon_ptr ; clobbers R0,R1,y
+
+        perform_zpcm_inc
+
+        lda #0
+        sta EnemyDiedThisFrame
+
+        lda #0
+        sta PlayerCombo
+
+        ldx PlayerRow
+        lda row_number_to_tile_index_lut, x ; Row * Width
+        clc
+        adc PlayerCol                  ; ... + Col
+        sta PlayerSquare
+
+        ; depending on the player's directional input, we'll need to load one of
+        ; the four directional pointers, so do that:
+
+        lda PlayerNextDirection
+        ora PlayerHeldDirection
+check_north:
+        cmp #PLAYER_DIRECTION_NORTH
+        bne check_east
+        ldy #WeaponClass::NorthSquaresPtr
+        jmp done_choosing_direction
+check_east:
+        cmp #PLAYER_DIRECTION_EAST
+        bne check_south
+        far_call FAR_player_face_right
+        ldy #WeaponClass::EastSquaresPtr
+        jmp done_choosing_direction
+check_south:
+        cmp #PLAYER_DIRECTION_SOUTH
+        bne check_west
+        ldy #WeaponClass::SouthSquaresPtr
+        jmp done_choosing_direction
+check_west:
+        cmp #PLAYER_DIRECTION_WEST
+        bne done_choosing_direction ; should never be taken
+        far_call FAR_player_face_left
+        ldy #WeaponClass::WestSquaresPtr
+
+done_choosing_direction:
+        perform_zpcm_inc
+        lda (PlayerWeaponPtr), y
+        sta WeaponSquaresPtr
+        iny
+        lda (PlayerWeaponPtr), y
+        sta WeaponSquaresPtr+1
+        ; skip ahead 4 words, minus 1 for the iny we already did, to nab
+        ; the corresponding animation init routine for this direction
+        .repeat 7 
+        iny       
+        .endrepeat
+        ; preload the weapon init animation (which we may cancel later)
+        lda (PlayerWeaponPtr), y
+        sta WeaponDrawFunc+0
+        iny
+        lda (PlayerWeaponPtr), y
+        sta WeaponDrawFunc+1
+        
+        ; Now we iterate through each of these squares, roll an attack against the square
+        lda #0
+        sta AttackLanded
+        sta WeaponSquaresIndex
+        sta WeaponSingleTargetIndex
+
+        ldy #WeaponClass::NumSquares
+        lda (PlayerWeaponPtr), y
+        sta TilesRemaining
+loop:
+        perform_zpcm_inc
+        ; Reset to the player's position
+        lda PlayerSquare
+        sta AttackSquare
+        ; For safety, track the raw row/col as well
+        lda PlayerRow
+        sta SafetyRow
+        lda PlayerCol
+        sta SafetyCol
+
+        ; Add the relative offset from the considered square
+        ldy WeaponSquaresIndex
+        lda (WeaponSquaresPtr), y ; X offset
+        clc
+        adc AttackSquare
+        sta AttackSquare
+        
+        ; Also add it to our tracked SafetyCol
+        lda PlayerCol
+        clc
+        adc (WeaponSquaresPtr), y ; X offset
+        sta SafetyCol
+
+        iny
+        ; For the SafetyRow, we can do simple arithmetic here
+        lda (WeaponSquaresPtr), y ; Y offset
+        clc
+        adc SafetyRow
+        sta SafetyRow
+        
+        lda (WeaponSquaresPtr), y ; Y offset
+        bmi negative_y
+positive_y:
+        tax        
+        lda row_number_to_tile_index_lut, x
+        clc
+        adc AttackSquare
+        sta AttackSquare
+        jmp converge
+negative_y:
+        eor #$FF
+        tax
+        inx
+        sec
+        lda AttackSquare
+        sbc row_number_to_tile_index_lut, x
+        sta AttackSquare
+converge:
+        iny
+        perform_zpcm_inc
+
+        lda (WeaponSquaresPtr), y ; Behavioral Flags for this tile
+        sta WeaponProperties      ; Stash these here so the enemies can see them (if applicable)
+        iny
+        sty WeaponSquaresIndex
+
+        ; Safety Dance: do NOT attack tiles that are out of bounds
+        lda SafetyCol
+        bmi skip_out_of_bounds
+        cmp #BATTLEFIELD_WIDTH
+        bcs skip_out_of_bounds
+        lda SafetyRow
+        bmi skip_out_of_bounds
+        cmp #BATTLEFIELD_HEIGHT
+        bcs skip_out_of_bounds
+
+        perform_zpcm_inc
+        far_call FAR_attack_enemy_tile
+skip_out_of_bounds:
+        perform_zpcm_inc
+
+check_player_movement:
+        ; If this weapon square could cancel movement
+        lda #WEAPON_CANCEL_MOVEMENT
+        and WeaponProperties
+        beq check_early_exit
+        ; ... and an attack actually landed
+        lda AttackLanded
+        beq check_early_exit
+        ; ... then block player movement
+        lda #1
+        sta PlayerMovementBlocked
+check_early_exit:
+        ; If this weapon square is single target...
+        lda #WEAPON_SINGLE_TARGET
+        and WeaponProperties
+        beq no_early_exit
+        ; ... and the attack actually landed
+        lda AttackLanded
+        beq no_early_exit
+        ; Then we are done with the swing, and should clean up
+        jmp done_with_swing
+no_early_exit:
+        ; Otherwise, iterate to the next weapon square and continue
+        inc WeaponSingleTargetIndex
+        dec TilesRemaining
+        jne loop
+
+done_with_swing:
+        perform_zpcm_inc
+        ; if an attack landed at all ...
+        lda AttackLanded
+        beq attack_missed
+
+        ; process burn damage, if required
+        jsr process_burn_damage
+        
+        ; ... play a weapon slash effect
+        lda EnemyDiedThisFrame
+        bne skip_weapon_sfx
+        queue_sfx_noise sfx_weapon_slash
+skip_weapon_sfx:
+        ; ... and set our sprite state to attacking
+        ; TODO: if we have multiple or weapon-specific attack animations, here is where to apply them
+        ldx PlayerSpriteIndex
+        set_player_sprite_x SPRITE_PLAYER_01_PLAYER_ATTACK
+        lda #$FF
+        sta PlayerAnimationTable
+
+done:
+        ; If there is any cleanup to do, do that here. Otherwise we're finished I think?
+        perform_zpcm_inc
+        rts
+
+attack_missed:
+        ; Clear out our animation routine which we preloaded earlier, we want to
+        ; draw nothing instead
+        st16 WeaponDrawFunc, weapon_update_none
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc process_burn_damage
+IncomingDamage := R0
+        lda PlayerLingeringStatusType
+        cmp #PLAYER_STATUS_BURNED
+        beq processing_required
+        rts
+processing_required:
+
+        ; TODO: if we're really going to do burn resistance, factor that in here.
+        ; For now, burn damage deals a consistent 2 HP. Burns **can** kill the player.
+        lda #2
+        sta IncomingDamage
+        far_call FAR_receive_damage
+
+no_attack_this_turn:
+        rts
+.endproc
+
+; TODO: move this to a data bank?
+weapon_class_table:
+        .word dagger
+        .word broadsword
+        .word longsword
+        .word spear
+        .word flail
+
+; Programmer notes: try to prefer clockwise update order, for consistency.
+; That means single-hit weapons should prioritize the *player's* left
 
 ; Make sure WeaponAnimPtr is set before calling!
 .proc weapon_init_common

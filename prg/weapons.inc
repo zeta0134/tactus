@@ -36,4 +36,7 @@ WEAPON_FLAIL = 4
 .global weapon_class_table
 .global weapon_update_none
 
+.global FAR_player_swing_weapon
+.global FAR_draw_weapon_effects
+
 .global FAR_calculate_weapon_damage

@@ -38,7 +38,6 @@
 
 FxTileId: .res 1
 SfxTileId: .res 1
-PlayerWeaponPtr: .res 2
 
 PlayerZonePtr: .res 2
 
@@ -84,11 +83,6 @@ PlayerKeys: .res 1
 PlayerRoomIndex: .res 1
 
 PlayerIdleBeats: .res 1
-
-; "Scratch" registers, because 16 was just not enough for some situations
-EnemyDiedThisFrame: .res 1
-SafetyCol: .res 1
-SafetyRow: .res 1
 
 ; Score Multipliers
 PlayerCombo: .res 1
@@ -155,7 +149,6 @@ PlayerIncomingStatusType: .res 1
 
 ; For rapidly computing the tile row
 row_number_to_tile_index_lut:
-player_tile_index_table:
         .repeat ::BATTLEFIELD_HEIGHT, i
         .byte (::BATTLEFIELD_WIDTH * i)
         .endrepeat
@@ -518,8 +511,10 @@ damage_flash_lut:
         beq light_palette
         ; fall through to normal pal
 normal_palette:
-        ; If we are in some lingering status, call that status's update function instead
+        ; If we are in some lingering status other than invulnerability, call that status's update function instead
         lda PlayerLingeringStatusType
+        beq draw_palette_normally
+        cmp #PLAYER_STAUTS_INVULNERABLE
         beq draw_palette_normally
         jsr _draw_lingering_effect_palette
         rts
@@ -684,6 +679,25 @@ done_with_fancy_animations:
         inc PlayerJumpHeightPos
 done_with_height:
 
+        ; If we are invulnerable, and this is an odd frame, then
+        ; override the height we just set and move this sprite offscreen instead
+        lda PlayerLingeringStatusType
+        cmp #PLAYER_STAUTS_INVULNERABLE
+        bne not_invulnerable
+        ; visually expire the flicker one beat early, to line up with the mechanical
+        ; effect
+        lda PlayerLingeringStatusDuration
+        cmp #2
+        bcc not_invulnerable
+        ; okay, flicker only on odd frames please
+        lda GameloopCounter
+        and #%00000001
+        beq not_invulnerable
+        ldx PlayerSpriteIndex
+        lda #$F8
+        sta sprite_table + MetaSpriteState::PositionY, x
+not_invulnerable:
+
         ; If we took damage this beat, apply that offset here
         lda PlayerTookDamageThisBeat
         beq done_with_damage_offset
@@ -743,14 +757,10 @@ done_with_lingering_status:
 
         ; Draw weapon effects every frame! Most weapons will spawn sprites only
         ; on their first frame, but some may have additional behavior
-        jsr draw_weapon_effects
+        far_call FAR_draw_weapon_effects
 
         perform_zpcm_inc
         rts
-.endproc
-
-.proc draw_weapon_effects
-        jmp (WeaponDrawFunc)
 .endproc
 
 player_horiz_offset_lut:
@@ -974,6 +984,13 @@ check_wait:
         sta PlayerNextDirection
         sta PlayerIntendsToBomb
         sta PlayerIntendsToCast
+
+        ; DEBUG: I AM INVINCIBLE!
+        lda #PLAYER_STAUTS_INVULNERABLE
+        sta PlayerLingeringStatusType
+        lda #8
+        sta PlayerLingeringStatusDuration
+
         rts
 check_bomb:
         lda #KEY_B
@@ -1150,14 +1167,14 @@ arrived_at_target:
         rts
 .endproc
 
-.proc player_face_right
+.proc FAR_player_face_right
         ldx PlayerSpriteIndex
         lda #(SPRITE_ACTIVE)
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
         rts
 .endproc
 
-.proc player_face_left
+.proc FAR_player_face_left
         ldx PlayerSpriteIndex
         lda #(SPRITE_ACTIVE | SPRITE_HORIZ_FLIP)
         sta sprite_table + MetaSpriteState::BehaviorFlags, x
@@ -1324,7 +1341,7 @@ perform_normal_movement:
 
 ; TODO: Attempt an attack. If we hit something, most weapon types will skip movement
 swing_weapon:
-        jsr player_swing_weapon
+        far_call FAR_player_swing_weapon
 
         ; If the player's movement is still allowed, then attempt a move
         lda PlayerMovementBlocked
@@ -1465,12 +1482,12 @@ perform_bomb_throw:
 check_bomb_east:
         cmp #PLAYER_DIRECTION_EAST
         bne check_bomb_west
-        jsr player_face_right
+        near_call FAR_player_face_right
         jmp check_bomb_in_hand
 check_bomb_west:
         cmp #PLAYER_DIRECTION_WEST
         bne no_bomb_facing_change
-        jsr player_face_left
+        near_call FAR_player_face_left
 no_bomb_facing_change:
         jmp check_bomb_in_hand
 
@@ -2197,7 +2214,7 @@ HealingAmount := R0
 .proc cleanup_dialog_state
 PlayerSquare := R2
         ldx PlayerRow
-        lda player_tile_index_table, x ; Row * Width
+        lda row_number_to_tile_index_lut, x ; Row * Width
         clc
         adc PlayerCol                  ; ... + Col
         sta PlayerSquare
@@ -2312,7 +2329,7 @@ resolve_enemy_collision:
         lda PlayerPassiveDialogSquare
         beq done_fixing_dialogue_square
         ldx TargetRow
-        lda player_tile_index_table, x ; Row * Width
+        lda row_number_to_tile_index_lut, x ; Row * Width
         clc
         adc TargetCol                  ; ... + Col
         sta PlayerPassiveDialogSquare
@@ -2342,7 +2359,7 @@ check_east:
         cmp #PLAYER_DIRECTION_EAST
         bne check_south
         inc TargetCol
-        jsr player_face_right
+        near_call FAR_player_face_right
         jmp done_choosing_target
 check_south:
         cmp #PLAYER_DIRECTION_SOUTH
@@ -2353,253 +2370,11 @@ check_west:
         cmp #PLAYER_DIRECTION_WEST
         bne done_choosing_target
         dec TargetCol        
-        jsr player_face_left
+        near_call FAR_player_face_left
 done_choosing_target:
         ; That's it; leave it in Target Col/Row for now, as we need to let
         ; collision have a go at it, and collision needs old/new coords
 
-        rts
-.endproc
-
-.proc load_weapon_ptr
-ItemPtr := R0
-        access_data_bank #<.bank(item_table)
-        lda current_save + SaveFile::PlayerEquipmentWeapon
-        asl
-        tay
-        lda item_table+0, y
-        sta ItemPtr+0
-        lda item_table+1, y
-        sta ItemPtr+1
-        ldy #ItemDef::WeaponShape
-        lda (ItemPtr), y
-        asl
-        tay
-        lda weapon_class_table+0, y
-        sta PlayerWeaponPtr+0
-        lda weapon_class_table+1, y
-        sta PlayerWeaponPtr+1
-        restore_previous_bank
-        rts
-.endproc
-
-.proc player_swing_weapon
-; R0 and R1 are reserved for the enemy behaviors to use
-; Current target square to consider for attacking
-PlayerSquare := R2
-AttackSquare := R3
-WeaponSquaresIndex := R4
-WeaponSquaresPtr := R5 ; R6
-AttackLanded := R7
-WeaponProperties := R8
-TilesRemaining := R9
-; We don't use these, but we should know not to clobber them
-EffectiveAttackSquare := R10
-TargetRow := R14
-TargetCol := R15
-        perform_zpcm_inc
-
-        jsr load_weapon_ptr ; clobbers R0,R1,y
-
-        perform_zpcm_inc
-
-        lda #0
-        sta EnemyDiedThisFrame
-
-        lda #0
-        sta PlayerCombo
-
-        ldx PlayerRow
-        lda player_tile_index_table, x ; Row * Width
-        clc
-        adc PlayerCol                  ; ... + Col
-        sta PlayerSquare
-
-        ; depending on the player's directional input, we'll need to load one of
-        ; the four directional pointers, so do that:
-
-        lda PlayerNextDirection
-        ora PlayerHeldDirection
-check_north:
-        cmp #PLAYER_DIRECTION_NORTH
-        bne check_east
-        ldy #WeaponClass::NorthSquaresPtr
-        jmp done_choosing_direction
-check_east:
-        cmp #PLAYER_DIRECTION_EAST
-        bne check_south
-        jsr player_face_right
-        ldy #WeaponClass::EastSquaresPtr
-        jmp done_choosing_direction
-check_south:
-        cmp #PLAYER_DIRECTION_SOUTH
-        bne check_west
-        ldy #WeaponClass::SouthSquaresPtr
-        jmp done_choosing_direction
-check_west:
-        cmp #PLAYER_DIRECTION_WEST
-        bne done_choosing_direction ; should never be taken
-        jsr player_face_left
-        ldy #WeaponClass::WestSquaresPtr
-
-done_choosing_direction:
-        perform_zpcm_inc
-        lda (PlayerWeaponPtr), y
-        sta WeaponSquaresPtr
-        iny
-        lda (PlayerWeaponPtr), y
-        sta WeaponSquaresPtr+1
-        ; skip ahead 4 words, minus 1 for the iny we already did, to nab
-        ; the corresponding animation init routine for this direction
-        .repeat 7 
-        iny       
-        .endrepeat
-        ; preload the weapon init animation (which we may cancel later)
-        lda (PlayerWeaponPtr), y
-        sta WeaponDrawFunc+0
-        iny
-        lda (PlayerWeaponPtr), y
-        sta WeaponDrawFunc+1
-        
-        ; Now we iterate through each of these squares, roll an attack against the square
-        lda #0
-        sta AttackLanded
-        sta WeaponSquaresIndex
-        sta WeaponSingleTargetIndex
-
-        ldy #WeaponClass::NumSquares
-        lda (PlayerWeaponPtr), y
-        sta TilesRemaining
-loop:
-        perform_zpcm_inc
-        ; Reset to the player's position
-        lda PlayerSquare
-        sta AttackSquare
-        ; For safety, track the raw row/col as well
-        lda PlayerRow
-        sta SafetyRow
-        lda PlayerCol
-        sta SafetyCol
-
-        ; Add the relative offset from the considered square
-        ldy WeaponSquaresIndex
-        lda (WeaponSquaresPtr), y ; X offset
-        clc
-        adc AttackSquare
-        sta AttackSquare
-        
-        ; Also add it to our tracked SafetyCol
-        lda PlayerCol
-        clc
-        adc (WeaponSquaresPtr), y ; X offset
-        sta SafetyCol
-
-        iny
-        ; For the SafetyRow, we can do simple arithmetic here
-        lda (WeaponSquaresPtr), y ; Y offset
-        clc
-        adc SafetyRow
-        sta SafetyRow
-        
-        lda (WeaponSquaresPtr), y ; Y offset
-        bmi negative_y
-positive_y:
-        tax        
-        lda player_tile_index_table, x
-        clc
-        adc AttackSquare
-        sta AttackSquare
-        jmp converge
-negative_y:
-        eor #$FF
-        tax
-        inx
-        sec
-        lda AttackSquare
-        sbc player_tile_index_table, x
-        sta AttackSquare
-converge:
-        iny
-        perform_zpcm_inc
-
-        lda (WeaponSquaresPtr), y ; Behavioral Flags for this tile
-        sta WeaponProperties      ; Stash these here so the enemies can see them (if applicable)
-        iny
-        sty WeaponSquaresIndex
-
-        ; Safety Dance: do NOT attack tiles that are out of bounds
-        lda SafetyCol
-        bmi skip_out_of_bounds
-        cmp #BATTLEFIELD_WIDTH
-        bcs skip_out_of_bounds
-        lda SafetyRow
-        bmi skip_out_of_bounds
-        cmp #BATTLEFIELD_HEIGHT
-        bcs skip_out_of_bounds
-
-        perform_zpcm_inc
-        far_call FAR_attack_enemy_tile
-skip_out_of_bounds:
-        perform_zpcm_inc
-
-check_player_movement:
-        ; If this weapon square could cancel movement
-        lda #WEAPON_CANCEL_MOVEMENT
-        and WeaponProperties
-        beq check_early_exit
-        ; ... and an attack actually landed
-        lda AttackLanded
-        beq check_early_exit
-        ; ... then block player movement
-        lda #1
-        sta PlayerMovementBlocked
-check_early_exit:
-        ; If this weapon square is single target...
-        lda #WEAPON_SINGLE_TARGET
-        and WeaponProperties
-        beq no_early_exit
-        ; ... and the attack actually landed
-        lda AttackLanded
-        beq no_early_exit
-        ; Then we are done with the swing, and should clean up
-        jmp done_with_swing
-no_early_exit:
-        ; Otherwise, iterate to the next weapon square and continue
-        inc WeaponSingleTargetIndex
-        dec TilesRemaining
-        jne loop
-
-done_with_swing:
-        perform_zpcm_inc
-        ; if an attack landed at all ...
-        lda AttackLanded
-        beq attack_missed
-
-        ; process burn damage, if required
-        jsr process_burn_damage
-        
-        ; ... play a weapon slash effect
-        lda EnemyDiedThisFrame
-        bne skip_weapon_sfx
-        queue_sfx_noise sfx_weapon_slash
-skip_weapon_sfx:
-        ; ... and set our sprite state to attacking
-        ; TODO: if we have multiple or weapon-specific attack animations, here is where to apply them
-        ldx PlayerSpriteIndex
-        set_player_sprite_x SPRITE_PLAYER_01_PLAYER_ATTACK
-        lda #$FF
-        sta PlayerAnimationTable
-
-done:
-        ; If there is any cleanup to do, do that here. Otherwise we're finished I think?
-        perform_zpcm_inc
-        rts
-
-attack_missed:
-        ; Clear out our animation routine which we preloaded earlier, we want to
-        ; draw nothing instead
-        st16 WeaponDrawFunc, weapon_update_none
-        perform_zpcm_inc
         rts
 .endproc
 
@@ -2650,7 +2425,7 @@ TargetRow := R14
 TargetCol := R15
         perform_zpcm_inc
         ldx TargetRow
-        lda player_tile_index_table, x ; Row * Width
+        lda row_number_to_tile_index_lut, x ; Row * Width
         clc
         adc TargetCol                  ; ... + Col
         sta TargetSquare
@@ -2666,6 +2441,12 @@ IncomingDamage := R0
 HealingAmount := R0
 
 DamageReduction := R0
+
+        ; If the player is invulnerable, ignore all of the below and do absolutely nothing.
+        lda PlayerLingeringStatusType
+        cmp #PLAYER_STAUTS_INVULNERABLE
+        jeq handle_being_invulnerable
+
         ; Handle absorbtion, immunity, weakness and resistance in that order
         lda PlayerIncomingDmgElement ; bit mask for this element (possibly 0, for non-elemental)
         bit PlayerAbsorbtions
@@ -2769,9 +2550,19 @@ handle_immunity:
         ; TODO: play a little "tink" SFX here?
         ; For now, do nothing!
         rts
+handle_being_invulnerable:
+        ; TODO: play a "whiff" sound? unclear!
+        rts
 .endproc
 
 .proc FAR_apply_hazard_to_player
+        ; If the player is invulnerable, ignore all of the below and do absolutely nothing.
+        lda PlayerLingeringStatusType
+        cmp #PLAYER_STAUTS_INVULNERABLE
+        bne player_not_invulnerable
+        rts
+player_not_invulnerable:
+
         ; Get complicated based on the hazard type
         lda PlayerIncomingStatusType
         cmp #PLAYER_STATUS_POISONED
@@ -3353,23 +3144,5 @@ processing_required:
         near_call FAR_receive_damage
 
 skip_poison_tick:
-        rts
-.endproc
-
-.proc process_burn_damage
-IncomingDamage := R0
-        lda PlayerLingeringStatusType
-        cmp #PLAYER_STATUS_BURNED
-        beq processing_required
-        rts
-processing_required:
-
-        ; TODO: if we're really going to do burn resistance, factor that in here.
-        ; For now, burn damage deals a consistent 2 HP. Burns **can** kill the player.
-        lda #2
-        sta IncomingDamage
-        near_call FAR_receive_damage
-
-no_attack_this_turn:
         rts
 .endproc

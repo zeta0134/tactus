@@ -10,6 +10,8 @@
 .global FAR_finalize_player_pos_after_slide
 .global FAR_apply_player_palette
 .global FAR_monster_spellcasting_dispatch
+.global FAR_player_face_left
+.global FAR_player_face_right
 
 .global row_number_to_tile_index_lut
 
@@ -26,6 +28,11 @@
 
 .global PlayerCurrentX
 .global PlayerCurrentY
+
+.global PlayerJumpHeightPos
+.global PlayerAnimationTable
+.global PlayerMovementBlocked
+.global PlayerTorchlightRadius
 
 .global PlayerWarpEjectCol
 .global PlayerWarpEjectRow
@@ -110,12 +117,13 @@ PLAYER_STATE_SHOCKED = 4
 ; While frozen, our combo/chain is not reset!
 PLAYER_STATE_FROZEN = 5
 
-PLAYER_STATUS_NORMAL      = 0
-PLAYER_STATUS_POISONED    = 1
-PLAYER_STATUS_FROZEN      = 2
-PLAYER_STATUS_SHOCKED     = 3
-PLAYER_STATUS_BURNED      = 4
-PLAYER_STAUTS_JUST_HEALED = 5
+PLAYER_STATUS_NORMAL       = 0
+PLAYER_STATUS_POISONED     = 1
+PLAYER_STATUS_FROZEN       = 2
+PLAYER_STATUS_SHOCKED      = 3
+PLAYER_STATUS_BURNED       = 4
+PLAYER_STAUTS_JUST_HEALED  = 5
+PLAYER_STAUTS_INVULNERABLE = 6
 
 MAX_WARP_STABILITY = 30
 BEATS_BETWEEN_NATURAL_STABILITY_DECAY = 4
