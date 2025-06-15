@@ -110,11 +110,14 @@ defensive_shield_description:  localized_item_description defensive_shield_name_
 aloha_tshirt_description:      localized_item_description aloha_tshirt_name_localized,      aloha_tshirt_description_localized
 
 ; Accessories
-chain_link_description:        localized_item_description chain_link_name_localized,        chain_link_description_localized
-obsidian_ring_description:     localized_item_description obsidian_ring_name_localized,     obsidian_ring_description_localized
-ruby_necklace_description:     localized_item_description ruby_necklace_name_localized,     ruby_necklace_description_localized
-topaz_earrings_description:    localized_item_description topaz_earrings_name_localized,    topaz_earrings_description_localized
-sapphire_bracelet_description: localized_item_description sapphire_bracelet_name_localized, sapphire_bracelet_description_localized
+chain_link_description:               localized_item_description chain_link_name_localized,        chain_link_description_localized
+obsidian_ring_description:            localized_item_description obsidian_ring_name_localized,     obsidian_ring_description_localized
+ruby_necklace_description:            localized_item_description ruby_necklace_name_localized,     ruby_necklace_description_localized
+topaz_earrings_description:           localized_item_description topaz_earrings_name_localized,    topaz_earrings_description_localized
+sapphire_bracelet_description:        localized_item_description sapphire_bracelet_name_localized, sapphire_bracelet_description_localized
+amulet_of_yendor_description:         localized_item_description amulet_of_yendor_name_localized,  amulet_of_yendor_description_localized
+lucky_penny_description:              localized_item_description lucky_penny_name_localized,       lucky_penny_description_localized
+cheap_plastic_imitation_of_the_amulet_of_yendor_description:  localized_item_description cheap_plastic_imitation_of_the_amulet_of_yendor_name_localized,  cheap_plastic_imitation_of_the_amulet_of_yendor_description_localized
 
 ; Bombs
 bombs_description:             localized_item_description bombs_name_localized,             bombs_description_localized
@@ -179,6 +182,8 @@ item_table:
         .word topaz_earrings
         .word sapphire_bracelet
         .word ninja_footwraps
+        .word amulet_of_yendor
+        .word lucky_penny
 
         ; safety
         .repeat 128
@@ -1080,6 +1085,65 @@ ninja_footwraps:
         .addr do_nothing                          ; ApplyPassivesFunc
         .addr ninja_footwraps_description         ; DescriptionStringPtr
         .byte <.bank(ninja_footwraps_description) ; DescriptionStringBank
+
+; Ditto for both of these, which are checked for in the "player death" routine.
+amulet_of_yendor:
+        .byte SLOT_ACCESSORY                       ; SlotId
+        .word SPRITE_ITEMS_06_AMULET_OF_YENDOR     ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                    ; WorldSpriteAttr
+        .byte EQUIPMENT_AMULET_OF_YENDOR           ; HudBgTile
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS)    ; HudBgAttr
+        .byte 0                                    ; HudSpriteTile
+        .byte 0                                    ; HudSpriteAttr
+        .word 500                                  ; ShopCost
+        .byte WEAPON_DAGGER                        ; WeaponShape (unused)
+        .addr no_effect                            ; DamageFunc
+        .addr no_effect                            ; TorchlightFunc
+        .addr do_nothing                           ; UseFunc
+        .addr no_effect                            ; DmgReductionFunc
+        .addr do_nothing                           ; ApplyPassivesFunc
+        .addr amulet_of_yendor_description         ; DescriptionStringPtr
+        .byte <.bank(amulet_of_yendor_description) ; DescriptionStringBank
+
+; Ditto for both of these, which are checked for in the "player death" routine.
+lucky_penny:
+        .byte SLOT_ACCESSORY                       ; SlotId
+        .word SPRITE_ITEMS_06_LUCKY_PENNY          ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                    ; WorldSpriteAttr
+        .byte EQUIPMENT_LUCKY_PENNY                ; HudBgTile
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS)    ; HudBgAttr
+        .byte 0                                    ; HudSpriteTile
+        .byte 0                                    ; HudSpriteAttr
+        .word 2000                                 ; ShopCost
+        .byte WEAPON_DAGGER                        ; WeaponShape (unused)
+        .addr no_effect                            ; DamageFunc
+        .addr no_effect                            ; TorchlightFunc
+        .addr do_nothing                           ; UseFunc
+        .addr no_effect                            ; DmgReductionFunc
+        .addr do_nothing                           ; ApplyPassivesFunc
+        .addr lucky_penny_description              ; DescriptionStringPtr
+        .byte <.bank(lucky_penny_description)      ; DescriptionStringBank
+
+; This item only exists for tombstone purposes, so that we can "identify" the amulet upon
+; a failed activation. It never appears in game and has no effect. The player can only have
+; this in their inventory upon DEFEAT.
+cheap_plastic_imitation_of_the_amulet_of_yendor:
+        .byte SLOT_ACCESSORY                       ; SlotId
+        .word SPRITE_ITEMS_06_AMULET_OF_YENDOR     ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                    ; WorldSpriteAttr
+        .byte EQUIPMENT_AMULET_OF_YENDOR           ; HudBgTile
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS)    ; HudBgAttr
+        .byte 0                                    ; HudSpriteTile
+        .byte 0                                    ; HudSpriteAttr
+        .word 0                                    ; ShopCost
+        .byte WEAPON_DAGGER                        ; WeaponShape (unused)
+        .addr no_effect                            ; DamageFunc
+        .addr no_effect                            ; TorchlightFunc
+        .addr do_nothing                           ; UseFunc
+        .addr no_effect                            ; DmgReductionFunc
+        .addr do_nothing                           ; ApplyPassivesFunc
+        .addr cheap_plastic_imitation_of_the_amulet_of_yendor_description              ; DescriptionStringPtr
+        .byte <.bank(cheap_plastic_imitation_of_the_amulet_of_yendor_description)      ; DescriptionStringBank
 
         .segment "CODE_ITEMS"
 

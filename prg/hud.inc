@@ -40,6 +40,8 @@ chr_tile_offset EQUIPMENT_OBSIDIAN_RING,        2, 6
 chr_tile_offset EQUIPMENT_RUBY_NECKLACE,        4, 6
 chr_tile_offset EQUIPMENT_TOPAZ_EARRINGS,       6, 6
 chr_tile_offset EQUIPMENT_SAPPHIRE_BRACELET,    8, 6
+chr_tile_offset EQUIPMENT_LUCKY_PENNY,         10, 6
+chr_tile_offset EQUIPMENT_AMULET_OF_YENDOR,    12, 6
 
 chr_tile_offset EQUIPMENT_GO_GO_BOOTS,     0, 8
 chr_tile_offset EQUIPMENT_NINJA_FOOTWRAPS, 2, 8

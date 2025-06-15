@@ -390,7 +390,7 @@ HeartCount := R2
         sta current_save + SaveFile::PlayerEquipmentArmor
         lda #ITEM_NINJA_FOOTWRAPS
         sta current_save + SaveFile::PlayerEquipmentBoots
-        lda #ITEM_SAPPHIRE_BRACELET
+        lda #ITEM_AMULET_OF_YENDOR
         sta current_save + SaveFile::PlayerEquipmentAccessory
         lda #ITEM_BOMB_STANDARD
         sta current_save + SaveFile::PlayerEquipmentBombs
@@ -2816,6 +2816,7 @@ converge:
 .endproc
 
 .proc detect_critical_existence_failure
+HealingAmount := R0
         ; If we are currently in a warp zone and our stability has reached 0,
         ; eject the player!
         lda PlayerRoomIndex
@@ -2828,14 +2829,14 @@ converge:
 
 perform_health_check:
         jsr FIXED_is_player_considered_dead
-        beq existence_proven
+        jeq existence_proven
 
         ; If we are currently in a warp zone, proceed to EJECT out of the warp zone, followed
         ; by a full heal. Oops! It could be worse though.
         lda PlayerRoomIndex
         lda room_properties, x
         and #ROOM_PROPERTIES_WARP
-        bne eject_player_from_warp_zone
+        jne eject_player_from_warp_zone
         ; Otherwise, proceed to actually die
 
         ; If we wanted to pause to avoid our fate, **TOO BAD.**
@@ -2844,10 +2845,45 @@ perform_health_check:
         lda #0
         sta PlayerIntendsToPause
 
-        ; TODO: items that activate on death (amulet!?)
+        ; If we are carrying the lucky penny, consume it and revive.
+        lda current_save + SaveFile::PlayerEquipmentAccessory
+        cmp #ITEM_LUCKY_PENNY
+        bne no_lucky_penny
+        lda #ITEM_NONE
+        sta current_save + SaveFile::PlayerEquipmentAccessory
+        jmp award_extra_life
+no_lucky_penny:
+
+        ; Similarly, if we are currently carrying the amulet of yendor, and
+        ; it is real, consume it and revive.
+        lda current_save + SaveFile::PlayerEquipmentAccessory
+        cmp #ITEM_AMULET_OF_YENDOR
+        bne no_amulet
+        ; Perform the realness check, using the **run seed**. To not overcomplicate
+        ; this, just add all four bytes of that seed together, and use one of the
+        ; final bits as the realness check
+        clc
+        lda #0
+        adc current_save + SaveFile::RunSeed + 0
+        adc current_save + SaveFile::RunSeed + 1
+        adc current_save + SaveFile::RunSeed + 2
+        adc current_save + SaveFile::RunSeed + 3
+        and #%00000100 ; pick a bit at random. sure, this one. why not!
+        beq amulet_failed
+amulet_succeeded:
+        lda #ITEM_NONE
+        sta current_save + SaveFile::PlayerEquipmentAccessory
+        jmp award_extra_life
+amulet_failed:
+        ; replace the item in our hotbar with the known fake, for tombstone
+        ; readout purposes, as we are about to game over
+        lda #ITEM_CHEAP_PLASTIC_IMITATION_OF_THE_AMULET_OF_YENDOR
+        sta current_save + SaveFile::PlayerEquipmentAccessory
+no_amulet:
+
         ; TODO: setup for a proper "dying" beat (greyscale background, player
         ; frozen in dmg state, etc)
-        ; POSTPONED: fix hearts first :)
+        ; POSTPONED: fix hearts first (later: ??? what did I mean by this?)
 
         ; Whelp; that's the end of the line
         ; TODO: I dunno, screen shake? palette greyscale? SFX? Juice this up.
@@ -2883,6 +2919,28 @@ eject_player_from_warp_zone:
         lda #ROOM_TRANSITION_WARP_EJECT
         sta RoomTransitionType
         st16 GameMode, room_transition
+        rts
+
+award_extra_life:
+        ; basically just like the life spell, plus quite a long period of invulnerability to give the player
+        ; an extended chance to get out of danger
+        jsr brighten_room
+        lda #PLAYER_STAUTS_INVULNERABLE
+        sta PlayerLingeringStatusType
+        lda #9
+        sta PlayerLingeringStatusDuration
+
+        ; Heal ALL the health
+        lda #128
+        sta HealingAmount
+        near_call FAR_receive_healing
+
+        ; Max ALL the temporary hearts
+        far_call FAR_give_temporary_heart
+
+        ; TODO: any other fun effects, like maybe temporary shield / invuln, etc
+        queue_sfx_pulse1 sfx_heart_container
+        queue_sfx_pulse2 sfx_heart_container
         rts
 .endproc
 

@@ -318,12 +318,12 @@ combo_offset_lut:
 ; heavily weighted towards L1 weapons, but occasionally has some L2 and other interesting stuff
 common_treasure_table:
     ; Sometimes we need the shop to carry three specific items. Here's how to do that:
-    .byte 3
-    .byte ITEM_SPELL_LIFE
-    .byte ITEM_GO_GO_BOOTS
-    .byte ITEM_NINJA_FOOTWRAPS
+    ;.byte 3
+    ;.byte ITEM_SPELL_LIFE
+    ;.byte ITEM_LUCKY_PENNY
+    ;.byte ITEM_AMULET_OF_YENDOR
 
-    .byte 38
+    .byte 39
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L1
     .byte ITEM_BROADSWORD_L1
@@ -344,7 +344,7 @@ common_treasure_table:
     .byte ITEM_UPGRADE_AIR
     .byte ITEM_UPGRADE_FIRE
     .byte ITEM_GO_GO_BOOTS
-    .byte ITEM_GO_GO_BOOTS
+    .byte ITEM_NINJA_FOOTWRAPS
     .byte ITEM_TEMPORARY_HEART
     .byte ITEM_TEMPORARY_HEART
     .byte ITEM_HEART_ARMOR
@@ -362,10 +362,11 @@ common_treasure_table:
     .byte ITEM_RUBY_NECKLACE
     .byte ITEM_TOPAZ_EARRINGS
     .byte ITEM_SAPPHIRE_BRACELET
+    .byte ITEM_AMULET_OF_YENDOR
 
 ; heavily weighted towards upgrade crystals, contains lots of other powerful items
 rare_treasure_table:
-    .byte 35
+    .byte 36
     .byte ITEM_UPGRADE_EARTH
     .byte ITEM_UPGRADE_ICE
     .byte ITEM_UPGRADE_AIR
@@ -401,6 +402,7 @@ rare_treasure_table:
     .byte ITEM_SPELL_EARTH
     .byte ITEM_SPELL_BOMB
     .byte ITEM_SPELL_LIFE
+    .byte ITEM_LUCKY_PENNY
 
 
 consumable_treasure_table:
