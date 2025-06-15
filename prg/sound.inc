@@ -81,6 +81,8 @@
 .global sfx_puzzle_success_pulse
 .global sfx_puzzle_success_tri
 
+.global sfx_stealthy_pulse
+
 .global CandidateSfxPtr
 .global CandidateSfxPriority
 

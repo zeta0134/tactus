@@ -103,6 +103,7 @@ heart_armor_description:       localized_item_description heart_armor_name_local
 
 ; Footwear
 go_go_boots_description:       localized_item_description go_go_boots_name_localized,       go_go_boots_description_localized
+ninja_footwraps_description:   localized_item_description ninja_footwraps_name_localized,   ninja_footwraps_description_localized
 
 ; Armor
 defensive_shield_description:  localized_item_description defensive_shield_name_localized,  defensive_shield_description_localized
@@ -177,6 +178,7 @@ item_table:
         .word ruby_necklace
         .word topaz_earrings
         .word sapphire_bracelet
+        .word ninja_footwraps
 
         ; safety
         .repeat 128
@@ -1058,6 +1060,26 @@ sapphire_bracelet:
         .addr award_ice_resistance_and_protection        ; ApplyPassivesFunc
         .addr sapphire_bracelet_description              ; DescriptionStringPtr
         .byte <.bank(sapphire_bracelet_description)      ; DescriptionStringBank
+
+; Note: as an item with a custom effect, these are just special-case checked
+; in the player damage code. The HUD icon also has bonus logic that is not represented here.
+ninja_footwraps:
+        .byte SLOT_BOOTS                          ; SlotId
+        .word SPRITE_ITEMS_06_NINJA_FOOTWRAPS     ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                   ; WorldSpriteAttr
+        .byte EQUIPMENT_NINJA_FOOTWRAPS           ; HudBgTile
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS)   ; HudBgAttr
+        .byte 0                                   ; HudSpriteTile
+        .byte 0                                   ; HudSpriteAttr
+        .word 200                                 ; ShopCost
+        .byte WEAPON_DAGGER                       ; WeaponShape (unused)
+        .addr no_effect                           ; DamageFunc
+        .addr no_effect                           ; TorchlightFunc
+        .addr do_nothing                          ; UseFunc
+        .addr no_effect                           ; DmgReductionFunc
+        .addr do_nothing                          ; ApplyPassivesFunc
+        .addr ninja_footwraps_description         ; DescriptionStringPtr
+        .byte <.bank(ninja_footwraps_description) ; DescriptionStringBank
 
         .segment "CODE_ITEMS"
 

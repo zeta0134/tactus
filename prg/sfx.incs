@@ -1024,3 +1024,17 @@ sfx_puzzle_success_tri:
         tri_init  PITCH_G5,       4
         tri_halt                  0
 
+sfx_stealthy_pulse:
+        ; Length in rows
+        .byte 10
+        ;                     pitch,  duty, volume,                            sweep, length
+        pulse_init_sweep   PITCH_G2,    $2,     $F,         (S_PERIOD_0 | S_SHIFT_4),      1
+        pulse_init_sweep   PITCH_C3,    $2,     $F, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      1
+        pulse_init_sweep   PITCH_A2,    $2,     $E,         (S_PERIOD_0 | S_SHIFT_4),      1
+        pulse_init_sweep   PITCH_D3,    $2,     $E, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      1
+        pulse_init_sweep   PITCH_B2,    $2,     $D,         (S_PERIOD_0 | S_SHIFT_4),      1
+        pulse_init_sweep   PITCH_E3,    $2,     $C, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      1
+        pulse_init_sweep  PITCH_CS3,    $2,     $B,         (S_PERIOD_0 | S_SHIFT_4),      1
+        pulse_init_sweep  PITCH_FS3,    $2,     $A, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      1
+        pulse_init_sweep  PITCH_DS3,    $2,     $9,         (S_PERIOD_0 | S_SHIFT_4),      1
+        pulse_init_sweep  PITCH_GS3,    $2,     $8, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      1

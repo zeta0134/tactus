@@ -93,6 +93,8 @@
 .global PlayerIncomingStatusDuration
 .global PlayerIncomingStatusType
 
+.global PlayerNinjaFootwrapsCooldown
+
 MAX_HEARTS = 5
 MAX_GOLD = 9999
 

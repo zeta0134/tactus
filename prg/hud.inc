@@ -41,10 +41,12 @@ chr_tile_offset EQUIPMENT_RUBY_NECKLACE,        4, 6
 chr_tile_offset EQUIPMENT_TOPAZ_EARRINGS,       6, 6
 chr_tile_offset EQUIPMENT_SAPPHIRE_BRACELET,    8, 6
 
-chr_tile_offset EQUIPMENT_GO_GO_BOOTS, 0, 8
-chr_tile_offset EQUIPMENT_BOOTS_2, 2, 8
-chr_tile_offset EQUIPMENT_BOOTS_3, 4, 8
-chr_tile_offset EQUIPMENT_BOOTS_4, 6, 8
+chr_tile_offset EQUIPMENT_GO_GO_BOOTS,     0, 8
+chr_tile_offset EQUIPMENT_NINJA_FOOTWRAPS, 2, 8
+chr_tile_offset EQUIPMENT_BOOTS_3,         4, 8
+chr_tile_offset EQUIPMENT_BOOTS_4,         6, 8
+
+chr_tile_offset EQUIPMENT_NINJA_FOOTWRAPS_RECHARGE_BASE,  0, 10
 
 chr_tile_offset EQUIPMENT_SPELL_FIRE,         0, 12
 chr_tile_offset EQUIPMENT_SPELL_AIR,          2, 12

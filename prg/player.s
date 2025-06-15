@@ -143,7 +143,8 @@ PlayerIncomingDmgElement: .res 1
 PlayerIncomingStatusDuration: .res 1
 PlayerIncomingStatusType: .res 1
 
-
+; miscellaneous bonus state for items
+PlayerNinjaFootwrapsCooldown: .res 1
 
 .segment "PRGFIXED_E000"
 
@@ -359,6 +360,9 @@ HeartCount := R2
         lda #0
         sta MusicalWarpStabilityCooldown
 
+        lda #0
+        sta PlayerNinjaFootwrapsCooldown
+
         rts
 
 sprite_failed:
@@ -384,7 +388,7 @@ HeartCount := R2
         sta current_save + SaveFile::PlayerEquipmentTorch
         lda #ITEM_NONE
         sta current_save + SaveFile::PlayerEquipmentArmor
-        lda #ITEM_NONE
+        lda #ITEM_NINJA_FOOTWRAPS
         sta current_save + SaveFile::PlayerEquipmentBoots
         lda #ITEM_SAPPHIRE_BRACELET
         sta current_save + SaveFile::PlayerEquipmentAccessory
@@ -2453,6 +2457,28 @@ DamageReduction := R0
         jne handle_absorbtion
         bit PlayerImmunities
         jne handle_immunity
+
+        ; Special item: if the player currently has the ninja footwraps equipped AND it is charged, then
+        ; proc the item and treat this like immunity.
+        lda current_save + SaveFile::PlayerEquipmentBoots
+        cmp #ITEM_NINJA_FOOTWRAPS
+        bne not_wearing_charged_footwraps
+        lda PlayerNinjaFootwrapsCooldown
+        bne not_wearing_charged_footwraps
+        ; proc the footwraps! we just "dodged" this hit
+        lda #NINJA_FOOTWRAPS_RECHARGE_COUNT
+        sta PlayerNinjaFootwrapsCooldown
+        queue_sfx_pulse1 sfx_stealthy_pulse
+        ; set the player to invulerable for a couple of beats, so the effect is visible
+        lda #PLAYER_STAUTS_INVULNERABLE
+        sta PlayerLingeringStatusType
+        lda #2
+        sta PlayerLingeringStatusDuration
+        ; and that's all. kthx, bye!
+        rts
+not_wearing_charged_footwraps:
+
+        lda PlayerIncomingDmgElement
         bit PlayerWeaknesses
         beq not_weak_to_this_type
         ; Weakness DOUBLES incoming damage
