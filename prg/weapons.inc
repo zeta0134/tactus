@@ -1,10 +1,23 @@
 .struct WeaponClass
         TileIndex .byte
         NumSquares .byte
+        NumChargeSquares .byte
         NorthSquaresPtr .word
         EastSquaresPtr .word
         SouthSquaresPtr .word
         WestSquaresPtr .word
+        NorthAnimationPtr .word
+        EastAnimationPtr .word
+        SouthAnimationPtr .word
+        WestAnimationPtr .word
+        ChargeNorthSquaresPtr .word
+        ChargeEastSquaresPtr .word
+        ChargeSouthSquaresPtr .word
+        ChargeWestSquaresPtr .word
+        ChargeNorthAnimationPtr .word
+        ChargeEastAnimationPtr .word
+        ChargeSouthAnimationPtr .word
+        ChargeWestAnimationPtr .word
 .endstruct
 
 .struct AttackSquare

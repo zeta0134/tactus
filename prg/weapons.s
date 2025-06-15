@@ -166,6 +166,8 @@ TargetCol := R15
         ; depending on the player's directional input, we'll need to load one of
         ; the four directional pointers, so do that:
 
+        ; TODO: if this is a charge attack load that up instead! (the logic is otherwise shared)
+
         lda PlayerNextDirection
         ora PlayerHeldDirection
 check_north:
@@ -455,11 +457,15 @@ sprite_failed:
 ; patterns only consider a single square.)
 
 dagger:
-        ;       Tile, Length
-        .byte   $00, $01
+        ;       Tile, Length, Charge Length
+        .byte   $00, $01, $01
         ; behavior tables
         .word dagger_north, dagger_east, dagger_south, dagger_west
         ; animation routines
+        .word dagger_init_north, dagger_init_east, dagger_init_south, dagger_init_west
+        ; daggers **cannot charge**, so in theory these definitions will never be used.
+        ; if they are used due to some sort of glitch, populate them with non-crashy data.
+        .word dagger_north, dagger_east, dagger_south, dagger_west
         .word dagger_init_north, dagger_init_east, dagger_init_south, dagger_init_west
 
 dagger_north:
@@ -540,13 +546,26 @@ dagger_west_anim:
 ; [ ][*][ ][ ][ ][ ]
 ; [ ][ ][ ][ ][ ][ ]
 
+; When charged up, Broadswords strike all 8 tiles around the player, in
+; a big fancy circle. Extremely classic and straightforward, this move is
+; present in all sorts of action games.
+; [ ][ ][ ][ ][ ][ ]
+; [*][*][*][ ][ ][ ]
+; [*][P][*][ ][ ][ ]
+; [*][*][*][ ][ ][ ]
+; [ ][ ][ ][ ][ ][ ]
+
 broadsword:
-        ;       Tile, Length
-        .byte   $00, $03
+        ;       Tile, Length, Charge Length
+        .byte   $00, $03, $08
         ; behavior tables
         .word broadsword_north, broadsword_east, broadsword_south, broadsword_west
         ; animation routines
         .word broadsword_init_north, broadsword_init_east, broadsword_init_south, broadsword_init_west
+        ; charge behavior tables
+        .word broadsword_charge, broadsword_charge, broadsword_charge, broadsword_charge
+        ; charge animation routines
+        .word broadsword_charge_init, broadsword_charge_init, broadsword_charge_init, broadsword_charge_init
 
 broadsword_north:
         ;         X,  Y, Behavior
@@ -571,6 +590,19 @@ broadsword_west:
         .lobytes -1,  1, (WEAPON_CANCEL_MOVEMENT)
         .lobytes -1,  0, (WEAPON_CANCEL_MOVEMENT)
         .lobytes -1, -1, (WEAPON_CANCEL_MOVEMENT)
+
+; in terms of behavior, broadsword "charge" mechanics are identical in all four directions. We strike
+; all 8 tiles around the player
+broadsword_charge:
+        ;         X,  Y, Behavior
+        .lobytes -1, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes  0, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes  1, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes -1,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes  1,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes -1,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes  0,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes  1,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
 
 broadsword_north_clockwise_anim:
         .byte 3  ; length
@@ -599,6 +631,20 @@ broadsword_west_clockwise_anim:
         .lobytes -16, -16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_3, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
         .lobytes -16,   0, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_2, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
         .lobytes -16,  16, SPRITE_WEAPON_BROADSWORD_BROADSWORD_EAST_1, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
+
+; As this is non-directional, we'll just use the same variant for all directions to save space.
+; (also this is placeholder)
+broadsword_charge_anim:
+        .byte 8  ; length
+                 ; X,   Y,                        TileId, Sprite Behavior
+        .lobytes -16, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
 
 ; Broadswords have no special behavior; each directional strike sets up a common anim table
 .proc broadsword_init_north
@@ -629,6 +675,15 @@ broadsword_west_clockwise_anim:
         jmp weapon_init_common
 .endproc
 
+; Since the broadsword charge animation is symmetric, all four directions share the same
+; setup code and animation table
+.proc broadsword_charge_init
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, broadsword_charge_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
 ; Longswords are like daggers that hit an extra square in front of the player
 ; [ ][ ][ ][ ][ ][ ]
 ; [ ][ ][ ][ ][ ][ ]
@@ -638,7 +693,12 @@ broadsword_west_clockwise_anim:
 
 longsword:
         ;       Tile, Length
-        .byte   $00, $02
+        .byte   $00, $02, $02
+        ; behavior tables
+        .word longsword_north, longsword_east, longsword_south, longsword_west
+        ; animation routines
+        .word longsword_init_north, longsword_init_east, longsword_init_south, longsword_init_west
+        ; TODO: Charge Patterns!
         ; behavior tables
         .word longsword_north, longsword_east, longsword_south, longsword_west
         ; animation routines
@@ -730,8 +790,13 @@ longsword_west_anim:
 ; to use a shield or something?
 
 spear:
-        ;       Tile, Length
-        .byte   $00, $02
+        ;       Tile, Length, Charge Length
+        .byte   $00, $02, $02
+        ; behavior tables
+        .word spear_north, spear_east, spear_south, spear_west
+        ; animation routines
+        .word spear_init_north, spear_init_east, spear_init_south, spear_init_west
+        ; TODO: Charge Patterns!
         ; behavior tables
         .word spear_north, spear_east, spear_south, spear_west
         ; animation routines
@@ -871,8 +936,13 @@ near:
 ; range combat with a flail especially risky.
 
 flail:
-        ;       Tile, Length
-        .byte   $00, $05
+        ;       Tile, Length, Charge Length
+        .byte   $00, $05, $05
+        ; behavior tables
+        .word flail_north, flail_east, flail_south, flail_west
+        ; animation routines
+        .word flail_init_north, flail_init_east, flail_init_south, flail_init_west
+        ; TODO: Charge Patterns!
         ; behavior tables
         .word flail_north, flail_east, flail_south, flail_west
         ; animation routines
