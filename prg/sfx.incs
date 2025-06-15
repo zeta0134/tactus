@@ -1038,3 +1038,14 @@ sfx_stealthy_pulse:
         pulse_init_sweep  PITCH_FS3,    $2,     $A, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      1
         pulse_init_sweep  PITCH_DS3,    $2,     $9,         (S_PERIOD_0 | S_SHIFT_4),      1
         pulse_init_sweep  PITCH_GS3,    $2,     $8, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      1
+
+sfx_item_recharge_tri:
+        ; Length in rows
+        .byte 6
+        ;             pitch, length
+        tri_init  PITCH_C4,       0
+        tri_init  PITCH_C5,       0
+        tri_init  PITCH_E4,       0
+        tri_init  PITCH_E5,       0
+        tri_init  PITCH_GS4,      0
+        tri_init  PITCH_GS5,      0

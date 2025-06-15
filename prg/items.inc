@@ -50,4 +50,5 @@ SLOT_CONSUMABLE = 7
 .global FAR_roll_gameplay_loot
 
 .global FAR_give_temporary_heart
+.global FAR_proc_items_on_enemy_slain
 

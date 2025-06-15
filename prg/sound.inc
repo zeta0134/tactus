@@ -83,6 +83,8 @@
 
 .global sfx_stealthy_pulse
 
+.global sfx_item_recharge_tri
+
 .global CandidateSfxPtr
 .global CandidateSfxPriority
 

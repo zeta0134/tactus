@@ -2235,3 +2235,22 @@ max_not_exceeded:
         restore_previous_bank
         rts
 .endproc
+
+; some items proc specifically when enemies are defeated. These are so few that we just
+; special case the whole lot of them right here.
+.proc FAR_proc_items_on_enemy_slain
+        lda current_save + SaveFile::PlayerEquipmentBoots
+        cmp #ITEM_NINJA_FOOTWRAPS
+        bne no_ninja_footwraps
+        ; if the ninja footwraps are currently on cooldown...
+        lda PlayerNinjaFootwrapsCooldown
+        beq no_ninja_footwraps
+        ; ... then decrease that cooldown by 1 charge
+        dec PlayerNinjaFootwrapsCooldown
+        ; if the charge is now 0, signal this to the player with a SFX
+        bne no_ninja_footwraps
+        queue_sfx_triangle sfx_item_recharge_tri
+        ; that's it, the HUD will automatically update itself.
+no_ninja_footwraps:
+        rts
+.endproc

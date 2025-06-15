@@ -664,6 +664,7 @@ zone_select_converge:
         lda #0
         sta HeldInputCooldown
         sta PlayerHeldDirection
+        sta PlayerNinjaFootwrapsCooldown
 
         ; We're deleting all existing items, so clear out some backup state we keep
         ; for weapon upgrades. (New weapons should, currently, have no upgrades)
