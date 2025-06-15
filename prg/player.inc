@@ -94,6 +94,7 @@
 .global PlayerIncomingStatusType
 
 .global PlayerNinjaFootwrapsCooldown
+.global PlayerTorchlightBonus
 
 MAX_HEARTS = 5
 MAX_GOLD = 9999

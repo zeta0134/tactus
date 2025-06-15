@@ -87,8 +87,10 @@ flail_lv2_description:         localized_l2_weapon_description flail_name_locali
 flail_lv3_description:         localized_l3_weapon_description flail_name_localized,       flail_description_localized
 
 ; Light Sources
-basic_torch_description:       localized_item_description basic_torch_name_localized, basic_torch_description_localized
-large_torch_description:       localized_item_description large_torch_name_localized, large_torch_description_localized
+basic_torch_description:       localized_item_description basic_torch_name_localized,      basic_torch_description_localized
+large_torch_description:       localized_item_description large_torch_name_localized,      large_torch_description_localized
+infernal_lantern_description:  localized_item_description infernal_lantern_name_localized, infernal_lantern_description_localized
+charge_a_bulb_description:     localized_item_description charge_a_bulb_name_localized,    charge_a_bulb_description_localized
 
 ; Consumables
 compass_description:           localized_item_description compass_name_localized,           compass_description_localized
@@ -184,6 +186,9 @@ item_table:
         .word ninja_footwraps
         .word amulet_of_yendor
         .word lucky_penny
+        .word cheap_plastic_imitation_of_the_amulet_of_yendor
+        .word infernal_lantern
+        .word charge_a_bulb
 
         ; safety
         .repeat 128
@@ -1145,6 +1150,42 @@ cheap_plastic_imitation_of_the_amulet_of_yendor:
         .addr cheap_plastic_imitation_of_the_amulet_of_yendor_description              ; DescriptionStringPtr
         .byte <.bank(cheap_plastic_imitation_of_the_amulet_of_yendor_description)      ; DescriptionStringBank
 
+infernal_lantern:
+        .byte SLOT_TORCH                           ; SlotId
+        .word SPRITE_ITEMS_06_INFERNAL_LANTERN     ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                    ; WorldSpriteAttr
+        .byte EQUIPMENT_INFERNAL_LANTERN           ; HudBgTile
+        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)       ; HudBgAttr
+        .byte 0                                    ; HudSpriteTile
+        .byte 0                                    ; HudSpriteAttr
+        .word 250                                  ; ShopCost
+        .byte WEAPON_DAGGER                        ; WeaponShape (unused)
+        .addr dmg_plus_1_to_ice                    ; DamageFunc
+        .addr bonus_torchlight_from_charge         ; TorchlightFunc
+        .addr do_nothing                           ; UseFunc
+        .addr no_effect                            ; DmgReductionFunc
+        .addr do_nothing                           ; ApplyPassivesFunc
+        .addr infernal_lantern_description         ; DescriptionStringPtr
+        .byte <.bank(infernal_lantern_description) ; DescriptionStringBank
+
+charge_a_bulb:
+        .byte SLOT_TORCH                           ; SlotId
+        .word SPRITE_ITEMS_06_CHARGE_A_BULB        ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                    ; WorldSpriteAttr
+        .byte EQUIPMENT_CHARGE_A_BULB              ; HudBgTile
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS)    ; HudBgAttr
+        .byte 0                                    ; HudSpriteTile
+        .byte 0                                    ; HudSpriteAttr
+        .word 250                                  ; ShopCost
+        .byte WEAPON_DAGGER                        ; WeaponShape (unused)
+        .addr dmg_plus_1_to_earth                  ; DamageFunc
+        .addr bonus_torchlight_from_charge         ; TorchlightFunc
+        .addr do_nothing                           ; UseFunc
+        .addr no_effect                            ; DmgReductionFunc
+        .addr do_nothing                           ; ApplyPassivesFunc
+        .addr charge_a_bulb_description            ; DescriptionStringPtr
+        .byte <.bank(charge_a_bulb_description)    ; DescriptionStringBank
+
         .segment "CODE_ITEMS"
 
 ; Flat value functions. If these seem remarkably inefficient, that's because they are
@@ -1251,6 +1292,38 @@ yes_bonus:
         rts
 no_bonus:
         lda #0
+        rts
+.endproc
+
+.proc dmg_plus_1_to_earth
+; don't clobber
+;DmgTotal := R0
+
+; available because we are in the middle of a weapon strike when this
+; routine is called
+EffectiveAttackSquare := R10
+
+        ldx EffectiveAttackSquare
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_EARTH
+        bne no_bonus
+yes_bonus:
+        lda #1
+        rts
+no_bonus:
+        lda #0
+        rts
+.endproc
+
+.proc bonus_torchlight_from_charge
+        lda #8 ; minimum is always a "basic torch"
+        clc
+        adc PlayerTorchlightBonus
+        cmp #TORCHLIGHT_MAX_CHARGE_BRIGHTNESS
+        bcc not_too_bright
+        lda #TORCHLIGHT_MAX_CHARGE_BRIGHTNESS
+not_too_bright:
         rts
 .endproc
 
@@ -2303,6 +2376,8 @@ max_not_exceeded:
 ; some items proc specifically when enemies are defeated. These are so few that we just
 ; special case the whole lot of them right here.
 .proc FAR_proc_items_on_enemy_slain
+EffectiveAttackSquare := R10
+
         lda current_save + SaveFile::PlayerEquipmentBoots
         cmp #ITEM_NINJA_FOOTWRAPS
         bne no_ninja_footwraps
@@ -2316,5 +2391,94 @@ max_not_exceeded:
         queue_sfx_triangle sfx_item_recharge_tri
         ; that's it, the HUD will automatically update itself.
 no_ninja_footwraps:
+
+        lda current_save + SaveFile::PlayerEquipmentTorch
+        cmp #ITEM_INFERNAL_LANTERN
+        bne no_infernal_lantern
+        ; first off, did we slay a matching foe? if not, we don't care
+        ; about any of the other complicated checks
+        ldx EffectiveAttackSquare
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_FIRE
+        bne no_infernal_lantern
+        ; if we happen to be in a warp zone, then increase warp stability
+        ldx PlayerRoomIndex
+        lda room_properties, x
+        and #ROOM_PROPERTIES_WARP
+        beq not_a_warp_room_infernal
+        increase_warp_stability
+        jmp no_infernal_lantern ; and done
+not_a_warp_room_infernal:
+        ; only try to increase torchlight charge if we are actually in a
+        ; dark room. otherwise leave it alone!
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_DARK
+        beq no_infernal_lantern
+        ; range check
+        lda PlayerTorchlightBonus
+        cmp #TORCHLIGHT_MAX_CHARGE_BRIGHTNESS
+        bcs no_infernal_lantern
+        inc PlayerTorchlightBonus
+        ; and done.
+no_infernal_lantern:
+
+        lda current_save + SaveFile::PlayerEquipmentTorch
+        cmp #ITEM_CHARGE_A_BULB
+        bne no_charge_a_bulb
+        ; first off, did we slay a matching foe? if not, we don't care
+        ; about any of the other complicated checks
+        ldx EffectiveAttackSquare
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_AIR
+        bne no_charge_a_bulb
+        ; if we happen to be in a warp zone, then increase warp stability
+        ldx PlayerRoomIndex
+        lda room_properties, x
+        and #ROOM_PROPERTIES_WARP
+        beq not_a_warp_room_charge_a_bulb
+        increase_warp_stability
+        jmp no_charge_a_bulb ; and done
+not_a_warp_room_charge_a_bulb:
+        ; only try to increase torchlight charge if we are actually in a
+        ; dark room. otherwise leave it alone!
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_DARK
+        beq no_charge_a_bulb
+        ; range check
+        lda PlayerTorchlightBonus
+        cmp #TORCHLIGHT_MAX_CHARGE_BRIGHTNESS
+        bcs no_charge_a_bulb
+        inc PlayerTorchlightBonus
+        ; and done.
+no_charge_a_bulb:
+
+        rts
+.endproc
+
+; Called each time we enter a new room. Any items that need to reset state
+; between room boundaries should do that here.
+.proc FAR_init_room_item_state
+        ; For torchlight bonus, is this a dark room?
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_DARK
+        beq room_is_lit
+room_is_dark:
+        ; for dark rooms, decrement the torchlight brightness by 1
+        lda PlayerTorchlightBonus
+        beq done_with_torchlight_bonus
+        dec PlayerTorchlightBonus
+        jmp done_with_torchlight_bonus
+room_is_lit:
+        ; The light! It burns! Clear out and reset the torchlight bonus.
+        lda #0
+        sta PlayerTorchlightBonus
+        jmp done_with_torchlight_bonus
+done_with_torchlight_bonus:
+
         rts
 .endproc

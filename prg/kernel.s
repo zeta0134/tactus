@@ -665,6 +665,7 @@ zone_select_converge:
         sta HeldInputCooldown
         sta PlayerHeldDirection
         sta PlayerNinjaFootwrapsCooldown
+        sta PlayerTorchlightBonus
 
         ; We're deleting all existing items, so clear out some backup state we keep
         ; for weapon upgrades. (New weapons should, currently, have no upgrades)
@@ -723,6 +724,7 @@ zone_select_converge:
         ; Load the current room (which is now pregenerated)
         far_call FAR_load_current_room
         far_call FAR_init_room_coordination_state
+        far_call FAR_init_room_item_state
 
         ; If the music for this room has changed, get that queued up
         ; TODO: should we try to detect a track change and fade out early?
@@ -863,6 +865,7 @@ not_too_high:
         ; Load the current room (which is now pregenerated)
         far_call FAR_load_current_room
         far_call FAR_init_room_coordination_state
+        far_call FAR_init_room_item_state
 
         ; Set this room's color emphasis
         jsr set_color_emphasis_for_room

@@ -318,10 +318,10 @@ combo_offset_lut:
 ; heavily weighted towards L1 weapons, but occasionally has some L2 and other interesting stuff
 common_treasure_table:
     ; Sometimes we need the shop to carry three specific items. Here's how to do that:
-    ;.byte 3
-    ;.byte ITEM_SPELL_LIFE
-    ;.byte ITEM_LUCKY_PENNY
-    ;.byte ITEM_AMULET_OF_YENDOR
+    .byte 3
+    .byte ITEM_SPELL_LIFE
+    .byte ITEM_INFERNAL_LANTERN
+    .byte ITEM_CHARGE_A_BULB
 
     .byte 39
     .byte ITEM_BROADSWORD_L1

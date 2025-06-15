@@ -146,6 +146,11 @@ PlayerIncomingStatusType: .res 1
 ; miscellaneous bonus state for items
 PlayerNinjaFootwrapsCooldown: .res 1
 
+; some light providing items grant a persistent torchlight bonus. the details
+; vary, but this byte is how they track that bonus. we reset this to 0 between
+; floors as a courtesy. it is not persisted in the save file.
+PlayerTorchlightBonus: .res 1
+
 .segment "PRGFIXED_E000"
 
 ; For rapidly computing the tile row

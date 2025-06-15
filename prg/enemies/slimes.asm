@@ -377,6 +377,10 @@ EffectiveAttackSquare := R10
         lda #1
         sta AttackLanded
 
+        ; proc any items that depend on the enemy we are about to slay
+        ; (do this BEFORE we replace ourselves with a floor tile)
+        far_call FAR_proc_items_on_enemy_slain
+
         ; slimes all have 1 HP, so there is no health bar. Just delete
         ; the slime by replacing it
         ldx EffectiveAttackSquare
@@ -412,7 +416,6 @@ EffectiveAttackSquare := R10
 
         lda #1
         sta EnemyDiedThisFrame
-        far_call FAR_proc_items_on_enemy_slain
 
         ; because we updated ourselves this frame, but we are no longer, decrement ourselves again
         dec enemies_active

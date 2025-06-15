@@ -793,6 +793,10 @@ done_decrementing_reel_counts:
 
         ; TODO: see if we can tail-call into the common shared routine here?
 
+        ; proc any items that depend on the enemy we are about to slay
+        ; (do this BEFORE we replace ourselves with a floor tile)
+        far_call FAR_proc_items_on_enemy_slain
+
         ldx EffectiveAttackSquare
         stx DiscoTile
         lda tile_index_to_row_lut, x
@@ -824,7 +828,6 @@ done_decrementing_reel_counts:
 
         lda #1
         sta EnemyDiedThisFrame
-        far_call FAR_proc_items_on_enemy_slain
 
         ; because we updated ourselves this frame, but we are no longer, decrement ourselves again
         dec enemies_active

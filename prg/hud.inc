@@ -19,10 +19,11 @@ ident = ((tile_y * 16) + tile_x)
 
 chr_tile_offset BLANK_TILE, 0, 0
 
-chr_tile_offset EQUIPMENT_NONE,    0, 0
-chr_tile_offset EQUIPMENT_BASIC_TORCH, 2, 0
-chr_tile_offset EQUIPMENT_LARGE_TORCH, 4, 0
-chr_tile_offset EQUIPMENT_TORCH_3, 6, 0
+chr_tile_offset EQUIPMENT_NONE,             0, 0
+chr_tile_offset EQUIPMENT_BASIC_TORCH,      2, 0
+chr_tile_offset EQUIPMENT_LARGE_TORCH,      4, 0
+chr_tile_offset EQUIPMENT_INFERNAL_LANTERN, 6, 0
+chr_tile_offset EQUIPMENT_CHARGE_A_BULB   , 8, 0
 
 chr_tile_offset EQUIPMENT_WEAPON_DAGGER,     0, 2
 chr_tile_offset EQUIPMENT_WEAPON_BROADSWORD, 2, 2
