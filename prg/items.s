@@ -32,6 +32,8 @@
 ; dance around scratch byte allocation
 ItemPtr: .res 2
 ItemFuncPtr: .res 2
+ItemScratch0: .res 1
+ItemScratch1: .res 1
 
         .segment "RAM"
 
@@ -571,7 +573,7 @@ small_fries:
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
         .addr always_valid                    ; IsValidLootFunc
-        .addr always_helpful                  ; IsConsideredHelpfulFunc
+        .addr helpful_if_health_is_not_full   ; IsConsideredHelpfulFunc
         .addr small_fries_description         ; DescriptionStringPtr
         .byte <.bank(small_fries_description) ; DescriptionStringBank
 
@@ -591,7 +593,7 @@ medium_fries:
         .addr no_effect                        ; DmgReductionFunc
         .addr do_nothing                       ; ApplyPassivesFunc
         .addr always_valid                     ; IsValidLootFunc
-        .addr always_helpful                   ; IsConsideredHelpfulFunc
+        .addr helpful_if_health_is_not_full    ; IsConsideredHelpfulFunc
         .addr medium_fries_description         ; DescriptionStringPtr
         .byte <.bank(medium_fries_description) ; DescriptionStringBank
 
@@ -611,7 +613,7 @@ large_fries:
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
         .addr always_valid                    ; IsValidLootFunc
-        .addr always_helpful                  ; IsConsideredHelpfulFunc
+        .addr helpful_if_health_is_not_full   ; IsConsideredHelpfulFunc
         .addr large_fries_description         ; DescriptionStringPtr
         .byte <.bank(large_fries_description) ; DescriptionStringBank
 
@@ -1312,6 +1314,29 @@ charge_a_bulb:
         rts
 .endproc
 
+; Weapon upgrades start to become available after the player is holding anything other
+; than the starting dagger, as they are otherwise unable to slot in. If the player doesn't
+; have any upgrades yet, then we further restrict the total loot quantity (of any upgrades)
+; to just one, so they can't double-dip and spike in power. The second upgrade becomes
+; available starting in Zone 1-4 for now, and we'll bump this to much later in the retail
+; build for game balance reasons.
+.proc weapon_upgrade_considered_valid
+        ; Easy check: if the player is currently holding the starting dagger, then no
+        ; upgrades for you. :P
+        lda current_save + SaveFile::PlayerEquipmentWeapon
+        cmp #ITEM_DAGGER_L1
+        beq spawn_is_invalid
+
+        ; TODO: all those other checks. In particular, I haven't decided how the
+        ; "current zone" check is going to work.
+        lda #0
+        rts
+
+spawn_is_invalid:
+        lda #$FF
+        rts
+.endproc
+
 ; Similarly, use these functions for the "helpful items" subsystem. Standard chests use
 ; these primarily. These should inspect game state and make a balance-related decision as
 ; to whether the player "needs" this particular item at the moment. Helpful chests will
@@ -1323,6 +1348,17 @@ charge_a_bulb:
 .endproc
 
 .proc never_helpful
+        lda #$FF
+        rts
+.endproc
+
+.proc helpful_if_health_is_not_full
+        far_call FAR_missing_health
+        beq not_helpful
+helpful:
+        lda #0
+        rts
+not_helpful:
         lda #$FF
         rts
 .endproc
@@ -1553,16 +1589,8 @@ done_with_this_room:
 ; Healing amount in A
 .proc _heal_player_common
 HealingAmount := R0
-        pha ; preserve the desired healing amount
-        ; sanity check: does the player have any health to heal?
-        far_call FAR_missing_health
-        bne proceed_to_heal
-        pla ; restore (and throw it away)
-        ; this food item would do nothing! cancel the pickup/purchase
-        lda #$FF ; return failure
-        rts
-proceed_to_heal:
-        pla ; restore
+        ; Note: sanity check removed, healing is always allowed.
+        ; Buyer beware in shops, etc.
         sta HealingAmount
         far_call FAR_receive_healing
 
@@ -2619,5 +2647,57 @@ room_is_lit:
         jmp done_with_torchlight_bonus
 done_with_torchlight_bonus:
 
+        rts
+.endproc
+
+.proc FAR_item_is_considered_valid_loot
+ItemId := R2
+        perform_zpcm_inc
+        access_data_bank #<.bank(item_table)
+
+        lda ItemId
+        asl
+        tax
+        lda item_table+0, x
+        sta ItemPtr+0
+        lda item_table+1, x
+        sta ItemPtr+1
+        ldy #ItemDef::IsValidLootFunc
+        lda (ItemPtr), y
+        sta ItemFuncPtr+0
+        iny
+        lda (ItemPtr), y
+        sta ItemFuncPtr+1
+        jsr __item_logic_trampoline
+        sta ItemScratch0        
+
+        restore_previous_bank
+        lda ItemScratch0
+        rts
+.endproc
+
+.proc FAR_item_is_considered_helpful_loot
+ItemId       := R18
+        perform_zpcm_inc
+        access_data_bank #<.bank(item_table)
+
+        lda ItemId
+        asl
+        tax
+        lda item_table+0, x
+        sta ItemPtr+0
+        lda item_table+1, x
+        sta ItemPtr+1
+        ldy #ItemDef::IsConsideredHelpfulFunc
+        lda (ItemPtr), y
+        sta ItemFuncPtr+0
+        iny
+        lda (ItemPtr), y
+        sta ItemFuncPtr+1
+        jsr __item_logic_trampoline
+        sta ItemScratch0        
+
+        restore_previous_bank
+        lda ItemScratch0
         rts
 .endproc

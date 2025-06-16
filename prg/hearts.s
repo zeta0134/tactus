@@ -9,6 +9,11 @@
 
 already_damaged: .res 1
 
+; Functions that need scratch can use this area, as zp is very full
+; (we have GOT to rework weapon zeropage scratch, good lord)
+HealableMax: .res 1
+HealableCurrent: .res 1
+
         .segment "PRGFIXED_E000"
 
 .proc FIXED_is_player_considered_dead
@@ -489,8 +494,6 @@ handle_overflow:
 ; spawn. How much HP *could* the player gain, if we healed them right now?
 ; That value is returned in A
 .proc FAR_missing_health
-HealableMax := R0
-HealableCurrent := R1
         ldx #0
         stx HealableMax
         stx HealableCurrent

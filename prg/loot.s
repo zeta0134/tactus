@@ -543,6 +543,8 @@ done:
 .endproc
 
 ; place the loot table of your choice in R0, result in R2
+; TODO: detect excessive rerolls and draw from a "known acceptable"
+; set, which is allowed to contain duplicates, as a fallback.
 .proc FAR_roll_shop_loot
 LootTablePtr := R0
 TableLength := R2
@@ -570,6 +572,9 @@ item_index_in_range:
     ; sanity checks here
     jsr check_for_duplicate_shop_roll
     bne roll_acceptable_item_loop
+    far_call FAR_item_is_considered_valid_loot
+    cmp #0
+    bne roll_acceptable_item_loop
     ; we'll keep this item then; add it to the set that we've rolled so far
     jsr add_to_shop_rolls
     ; and... done?
@@ -581,6 +586,10 @@ item_index_in_range:
 
 ; same deal but it uses the gameplay LFSR, for when we need to
 ; spawn treasure on the fly
+; TODO: detect excessive rerolls and draw from a "known acceptable"
+; set, which is allowed to contain duplicates, as a fallback.
+; for gameplay loot this can be just treasure items, which we always
+; consider helpful anyway.
 .proc FAR_roll_gameplay_loot
 LootTablePtr := R16
 ItemId       := R18
@@ -603,10 +612,12 @@ item_index_in_range:
     iny ; move past length byte
     lda (LootTablePtr), y
     sta ItemId
-    ; for gameplay treasures, we don't perform sanity checks or bother
-    ; with duplicates. you get what you get. (depending on mechanics, a player
-    ; might spawn a lot of these, and we don't ever want to run out of unique items
-    ; to roll and lock up)
+    ; gameplay treasures (these come out of "standard chests") run the helpful
+    ; loot sanity check, and will continue to roll until they land on a helpful
+    ; item.
+    far_call FAR_item_is_considered_helpful_loot
+    cmp #0
+    bne roll_acceptable_item_loop
 
     restore_previous_bank
     rts

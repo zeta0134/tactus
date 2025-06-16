@@ -54,3 +54,5 @@ SLOT_CONSUMABLE = 7
 .global FAR_give_temporary_heart
 .global FAR_proc_items_on_enemy_slain
 .global FAR_init_room_item_state
+.global FAR_item_is_considered_valid_loot
+.global FAR_item_is_considered_helpful_loot
