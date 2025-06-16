@@ -13,6 +13,8 @@
     UseFunc .addr
     DmgReductionFunc .addr
     ApplyPassivesFunc .addr
+    IsValidLootFunc .addr
+    IsConsideredHelpfulFunc .addr
     DescriptionStringPtr .addr
     DescriptionStringBank .byte
 .endstruct

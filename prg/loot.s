@@ -318,10 +318,10 @@ combo_offset_lut:
 ; heavily weighted towards L1 weapons, but occasionally has some L2 and other interesting stuff
 common_treasure_table:
     ; Sometimes we need the shop to carry three specific items. Here's how to do that:
-    .byte 3
-    .byte ITEM_SPELL_LIFE
-    .byte ITEM_INFERNAL_LANTERN
-    .byte ITEM_CHARGE_A_BULB
+    ;.byte 3
+    ;.byte ITEM_SPELL_LIFE
+    ;.byte ITEM_INFERNAL_LANTERN
+    ;.byte ITEM_CHARGE_A_BULB
 
     .byte 39
     .byte ITEM_BROADSWORD_L1
@@ -345,8 +345,8 @@ common_treasure_table:
     .byte ITEM_UPGRADE_FIRE
     .byte ITEM_GO_GO_BOOTS
     .byte ITEM_NINJA_FOOTWRAPS
-    .byte ITEM_TEMPORARY_HEART
-    .byte ITEM_TEMPORARY_HEART
+    .byte ITEM_INFERNAL_LANTERN
+    .byte ITEM_CHARGE_A_BULB
     .byte ITEM_HEART_ARMOR
     .byte ITEM_HEART_ARMOR
     .byte ITEM_CHAIN_LINK
@@ -384,10 +384,10 @@ rare_treasure_table:
     .byte ITEM_UPGRADE_AIR
     .byte ITEM_UPGRADE_FIRE
     .byte ITEM_LARGE_TORCH
+    .byte ITEM_INFERNAL_LANTERN
     .byte ITEM_LARGE_TORCH
-    .byte ITEM_LARGE_TORCH
-    .byte ITEM_GO_GO_BOOTS
-    .byte ITEM_GO_GO_BOOTS
+    .byte ITEM_CHARGE_A_BULB
+    .byte ITEM_NINJA_FOOTWRAPS
     .byte ITEM_HEART_CONTAINER
     .byte ITEM_HEART_CONTAINER
     .byte ITEM_HEART_CONTAINER
@@ -407,7 +407,7 @@ rare_treasure_table:
 
 consumable_treasure_table:
     ; FOOOOOOOOOOD! (Also should have bombs, heart containers, etc)
-    .byte 14
+    .byte 12
     .byte ITEM_SMALL_FRIES
     .byte ITEM_SMALL_FRIES
     .byte ITEM_SMALL_FRIES
@@ -416,15 +416,13 @@ consumable_treasure_table:
     .byte ITEM_MEDIUM_FRIES
     .byte ITEM_MEDIUM_FRIES
     .byte ITEM_LARGE_FRIES
-    .byte ITEM_TEMPORARY_HEART
-    .byte ITEM_TEMPORARY_HEART
     .byte ITEM_HEART_ARMOR
     .byte ITEM_HEART_ARMOR
     .byte ITEM_BOMB_STANDARD_X3
     .byte ITEM_BOMB_STANDARD_X3
 
 common_chest_treasure_table:
-    .byte 31
+    .byte 28
     .byte ITEM_BOMB_STANDARD_X1
     .byte ITEM_BOMB_STANDARD_X1
     .byte ITEM_BOMB_STANDARD_X1
@@ -437,9 +435,6 @@ common_chest_treasure_table:
     .byte ITEM_HEART_ARMOR
     .byte ITEM_HEART_ARMOR
     .byte ITEM_HEART_ARMOR
-    .byte ITEM_TEMPORARY_HEART
-    .byte ITEM_TEMPORARY_HEART
-    .byte ITEM_TEMPORARY_HEART
     .byte ITEM_BOMB_STANDARD_X1
     .byte ITEM_BOMB_STANDARD_X3
     .byte ITEM_BOMB_STANDARD_X3

@@ -210,6 +210,8 @@ no_item:
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr never_valid                     ; IsValidLootFunc
+        .addr never_helpful                   ; IsConsideredHelpfulFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
 
@@ -228,6 +230,8 @@ dagger_lvl_1:
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr dagger_lv1_description          ; DescriptionStringPtr
         .byte <.bank(dagger_lv1_description)  ; DescriptionStringBank
 
@@ -246,6 +250,8 @@ broadsword_lvl_1:
         .addr do_nothing                         ; UseFunc
         .addr no_effect                          ; DmgReductionFunc
         .addr do_nothing                         ; ApplyPassivesFunc
+        .addr always_valid                       ; IsValidLootFunc
+        .addr always_helpful                     ; IsConsideredHelpfulFunc
         .addr broadsword_lv1_description         ; DescriptionStringPtr
         .byte <.bank(broadsword_lv1_description) ; DescriptionStringBank
 
@@ -264,6 +270,8 @@ broadsword_lvl_2:
         .addr do_nothing                         ; UseFunc
         .addr no_effect                          ; DmgReductionFunc
         .addr do_nothing                         ; ApplyPassivesFunc
+        .addr always_valid                       ; IsValidLootFunc
+        .addr always_helpful                     ; IsConsideredHelpfulFunc
         .addr broadsword_lv2_description         ; DescriptionStringPtr
         .byte <.bank(broadsword_lv2_description) ; DescriptionStringBank
 
@@ -282,6 +290,8 @@ broadsword_lvl_3:
         .addr do_nothing                         ; UseFunc
         .addr no_effect                          ; DmgReductionFunc
         .addr do_nothing                         ; ApplyPassivesFunc
+        .addr always_valid                       ; IsValidLootFunc
+        .addr always_helpful                     ; IsConsideredHelpfulFunc
         .addr broadsword_lv3_description         ; DescriptionStringPtr
         .byte <.bank(broadsword_lv3_description) ; DescriptionStringBank
 
@@ -300,6 +310,8 @@ longsword_lvl_1:
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr longsword_lv1_description         ; DescriptionStringPtr
         .byte <.bank(longsword_lv1_description) ; DescriptionStringBank
 
@@ -318,6 +330,8 @@ longsword_lvl_2:
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr longsword_lv2_description         ; DescriptionStringPtr
         .byte <.bank(longsword_lv2_description) ; DescriptionStringBank
 
@@ -336,6 +350,8 @@ longsword_lvl_3:
         .addr do_nothing                         ; UseFunc
         .addr no_effect                          ; DmgReductionFunc
         .addr do_nothing                         ; ApplyPassivesFunc
+        .addr always_valid                       ; IsValidLootFunc
+        .addr always_helpful                     ; IsConsideredHelpfulFunc
         .addr longsword_lv3_description          ; DescriptionStringPtr
         .byte <.bank(longsword_lv3_description)  ; DescriptionStringBank
 
@@ -354,6 +370,8 @@ spear_lvl_1:
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr spear_lv1_description             ; DescriptionStringPtr
         .byte <.bank(spear_lv1_description)     ; DescriptionStringBank
 
@@ -372,6 +390,8 @@ spear_lvl_2:
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr spear_lv2_description           ; DescriptionStringPtr
         .byte <.bank(spear_lv2_description)   ; DescriptionStringBank
 
@@ -390,6 +410,8 @@ spear_lvl_3:
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr spear_lv3_description             ; DescriptionStringPtr
         .byte <.bank(spear_lv3_description)     ; DescriptionStringBank
 
@@ -408,6 +430,8 @@ flail_lvl_1:
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr flail_lv1_description             ; DescriptionStringPtr
         .byte <.bank(flail_lv1_description)     ; DescriptionStringBank
 
@@ -426,6 +450,8 @@ flail_lvl_2:
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr flail_lv2_description           ; DescriptionStringPtr
         .byte <.bank(flail_lv2_description)   ; DescriptionStringBank
 
@@ -444,6 +470,8 @@ flail_lvl_3:
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr flail_lv3_description             ; DescriptionStringPtr
         .byte <.bank(flail_lv3_description)     ; DescriptionStringBank
 
@@ -462,6 +490,8 @@ basic_torch:
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr basic_torch_description           ; DescriptionStringPtr
         .byte <.bank(basic_torch_description)   ; DescriptionStringBank
 
@@ -480,6 +510,8 @@ large_torch:
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr large_torch_description           ; DescriptionStringPtr
         .byte <.bank(large_torch_description)   ; DescriptionStringBank
 
@@ -498,6 +530,8 @@ compass:
         .addr identify_special_rooms          ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr compass_description             ; DescriptionStringPtr
         .byte <.bank(compass_description)     ; DescriptionStringBank
 
@@ -516,6 +550,8 @@ map:
         .addr map_all_rooms                   ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr map_description                 ; DescriptionStringPtr
         .byte <.bank(map_description)         ; DescriptionStringBank
 
@@ -534,6 +570,8 @@ small_fries:
         .addr heal_4_hp                       ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr small_fries_description         ; DescriptionStringPtr
         .byte <.bank(small_fries_description) ; DescriptionStringBank
 
@@ -552,6 +590,8 @@ medium_fries:
         .addr heal_8_hp                        ; UseFunc
         .addr no_effect                        ; DmgReductionFunc
         .addr do_nothing                       ; ApplyPassivesFunc
+        .addr always_valid                     ; IsValidLootFunc
+        .addr always_helpful                   ; IsConsideredHelpfulFunc
         .addr medium_fries_description         ; DescriptionStringPtr
         .byte <.bank(medium_fries_description) ; DescriptionStringBank
 
@@ -570,6 +610,8 @@ large_fries:
         .addr heal_all_hp                     ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr large_fries_description         ; DescriptionStringPtr
         .byte <.bank(large_fries_description) ; DescriptionStringBank
 
@@ -590,6 +632,8 @@ go_go_boots:
         .addr do_nothing                      ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr go_go_boots_description         ; DescriptionStringPtr
         .byte <.bank(go_go_boots_description) ; DescriptionStringBank
 
@@ -608,6 +652,8 @@ gold_sack:
         .addr give_100_gold                   ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr gold_sack_description           ; DescriptionStringPtr
         .byte <.bank(gold_sack_description)   ; DescriptionStringBank
 
@@ -626,6 +672,8 @@ heart_container:
         .addr give_heart_container                ; UseFunc
         .addr no_effect                           ; DmgReductionFunc
         .addr do_nothing                          ; ApplyPassivesFunc
+        .addr always_valid                        ; IsValidLootFunc
+        .addr always_helpful                      ; IsConsideredHelpfulFunc
         .addr heart_container_description         ; DescriptionStringPtr
         .byte <.bank(heart_container_description) ; DescriptionStringBank
 
@@ -644,6 +692,8 @@ temporary_heart:
         .addr FAR_give_temporary_heart            ; UseFunc
         .addr no_effect                           ; DmgReductionFunc
         .addr do_nothing                          ; ApplyPassivesFunc
+        .addr always_valid                        ; IsValidLootFunc
+        .addr always_helpful                      ; IsConsideredHelpfulFunc
         .addr temporary_heart_description         ; DescriptionStringPtr
         .byte <.bank(temporary_heart_description) ; DescriptionStringBank
 
@@ -662,6 +712,8 @@ heart_armor:
         .addr give_heart_armor                ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr heart_armor_description         ; DescriptionStringPtr
         .byte <.bank(heart_armor_description) ; DescriptionStringBank
 
@@ -685,6 +737,8 @@ defensive_shield:
         .addr do_nothing                           ; UseFunc
         .addr flat_1                               ; DmgReductionFunc
         .addr do_nothing                           ; ApplyPassivesFunc
+        .addr always_valid                         ; IsValidLootFunc
+        .addr always_helpful                       ; IsConsideredHelpfulFunc
         .addr defensive_shield_description         ; DescriptionStringPtr
         .byte <.bank(defensive_shield_description) ; DescriptionStringBank
 
@@ -705,6 +759,8 @@ chain_link:
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr chain_link_description            ; DescriptionStringPtr
         .byte <.bank(chain_link_description)    ; DescriptionStringBank
 
@@ -723,6 +779,8 @@ aloha_tshirt_1:
         .addr do_nothing                        ; UseFunc
         .addr flat_1                            ; DmgReductionFunc
         .addr award_air_resistance              ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr aloha_tshirt_description          ; DescriptionStringPtr
         .byte <.bank(aloha_tshirt_description)  ; DescriptionStringBank
 
@@ -741,6 +799,8 @@ aloha_tshirt_2:
         .addr do_nothing                          ; UseFunc
         .addr flat_1                              ; DmgReductionFunc
         .addr award_fire_resistance               ; ApplyPassivesFunc
+        .addr always_valid                        ; IsValidLootFunc
+        .addr always_helpful                      ; IsConsideredHelpfulFunc
         .addr aloha_tshirt_description            ; DescriptionStringPtr
         .byte <.bank(aloha_tshirt_description)    ; DescriptionStringBank
 
@@ -759,6 +819,8 @@ aloha_tshirt_3:
         .addr do_nothing                         ; UseFunc
         .addr flat_1                             ; DmgReductionFunc
         .addr award_earth_resistance             ; ApplyPassivesFunc
+        .addr always_valid                       ; IsValidLootFunc
+        .addr always_helpful                     ; IsConsideredHelpfulFunc
         .addr aloha_tshirt_description           ; DescriptionStringPtr
         .byte <.bank(aloha_tshirt_description)   ; DescriptionStringBank
 
@@ -777,6 +839,8 @@ bomb_standard:
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr bombs_description                 ; DescriptionStringPtr
         .byte <.bank(bombs_description)         ; DescriptionStringBank
 
@@ -795,6 +859,8 @@ bomb_standard_one_pack:
         .addr award_1_standard_bomb             ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr bombs_description                 ; DescriptionStringPtr
         .byte <.bank(bombs_description)         ; DescriptionStringBank
 
@@ -813,6 +879,8 @@ bomb_standard_three_pack:
         .addr award_3_standard_bombs            ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr bombs_description                 ; DescriptionStringPtr
         .byte <.bank(bombs_description)         ; DescriptionStringBank
 
@@ -834,6 +902,8 @@ spell_fire:
         .addr no_effect                         ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr spell_fire_description            ; DescriptionStringPtr
         .byte <.bank(spell_fire_description)    ; DescriptionStringBank
 
@@ -852,6 +922,8 @@ spell_air:
         .addr no_effect                         ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr spell_air_description             ; DescriptionStringPtr
         .byte <.bank(spell_air_description)     ; DescriptionStringBank
 
@@ -870,6 +942,8 @@ spell_ice:
         .addr no_effect                         ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr spell_ice_description             ; DescriptionStringPtr
         .byte <.bank(spell_ice_description)     ; DescriptionStringBank
 
@@ -888,6 +962,8 @@ spell_earth:
         .addr no_effect                         ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr spell_earth_description           ; DescriptionStringPtr
         .byte <.bank(spell_earth_description)   ; DescriptionStringBank
 
@@ -906,6 +982,8 @@ spell_bomb_fiesta:
         .addr no_effect                             ; UseFunc
         .addr no_effect                             ; DmgReductionFunc
         .addr do_nothing                            ; ApplyPassivesFunc
+        .addr always_valid                          ; IsValidLootFunc
+        .addr always_helpful                        ; IsConsideredHelpfulFunc
         .addr spell_bomb_fiesta_description         ; DescriptionStringPtr
         .byte <.bank(spell_bomb_fiesta_description) ; DescriptionStringBank
 
@@ -924,6 +1002,8 @@ spell_healing:
         .addr no_effect                         ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr spell_life_description            ; DescriptionStringPtr
         .byte <.bank(spell_life_description)    ; DescriptionStringBank
 
@@ -942,6 +1022,8 @@ upgrade_crystal_earth:
         .addr give_upgrade_earth              ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
 
@@ -960,6 +1042,8 @@ upgrade_crystal_ice:
         .addr give_upgrade_ice                ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
 
@@ -978,6 +1062,8 @@ upgrade_crystal_air:
         .addr give_upgrade_air                ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
 
@@ -996,6 +1082,8 @@ upgrade_crystal_fire:
         .addr give_upgrade_fire               ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
+        .addr always_valid                    ; IsValidLootFunc
+        .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
 
@@ -1014,6 +1102,8 @@ obsidian_ring:
         .addr no_effect                                  ; UseFunc
         .addr no_effect                                  ; DmgReductionFunc
         .addr award_earth_resistance_and_protection      ; ApplyPassivesFunc
+        .addr always_valid                               ; IsValidLootFunc
+        .addr always_helpful                             ; IsConsideredHelpfulFunc
         .addr obsidian_ring_description                  ; DescriptionStringPtr
         .byte <.bank(obsidian_ring_description)          ; DescriptionStringBank
 
@@ -1032,6 +1122,8 @@ ruby_necklace:
         .addr no_effect                                  ; UseFunc
         .addr no_effect                                  ; DmgReductionFunc
         .addr award_fire_resistance_and_protection       ; ApplyPassivesFunc
+        .addr always_valid                               ; IsValidLootFunc
+        .addr always_helpful                             ; IsConsideredHelpfulFunc
         .addr ruby_necklace_description                  ; DescriptionStringPtr
         .byte <.bank(ruby_necklace_description)          ; DescriptionStringBank
 
@@ -1050,6 +1142,8 @@ topaz_earrings:
         .addr no_effect                                  ; UseFunc
         .addr no_effect                                  ; DmgReductionFunc
         .addr award_air_resistance_and_protection        ; ApplyPassivesFunc
+        .addr always_valid                               ; IsValidLootFunc
+        .addr always_helpful                             ; IsConsideredHelpfulFunc
         .addr topaz_earrings_description                 ; DescriptionStringPtr
         .byte <.bank(topaz_earrings_description)         ; DescriptionStringBank
 
@@ -1068,6 +1162,8 @@ sapphire_bracelet:
         .addr no_effect                                  ; UseFunc
         .addr no_effect                                  ; DmgReductionFunc
         .addr award_ice_resistance_and_protection        ; ApplyPassivesFunc
+        .addr always_valid                               ; IsValidLootFunc
+        .addr always_helpful                             ; IsConsideredHelpfulFunc
         .addr sapphire_bracelet_description              ; DescriptionStringPtr
         .byte <.bank(sapphire_bracelet_description)      ; DescriptionStringBank
 
@@ -1088,6 +1184,8 @@ ninja_footwraps:
         .addr do_nothing                          ; UseFunc
         .addr no_effect                           ; DmgReductionFunc
         .addr do_nothing                          ; ApplyPassivesFunc
+        .addr always_valid                        ; IsValidLootFunc
+        .addr always_helpful                      ; IsConsideredHelpfulFunc
         .addr ninja_footwraps_description         ; DescriptionStringPtr
         .byte <.bank(ninja_footwraps_description) ; DescriptionStringBank
 
@@ -1107,6 +1205,8 @@ amulet_of_yendor:
         .addr do_nothing                           ; UseFunc
         .addr no_effect                            ; DmgReductionFunc
         .addr do_nothing                           ; ApplyPassivesFunc
+        .addr always_valid                         ; IsValidLootFunc
+        .addr always_helpful                       ; IsConsideredHelpfulFunc
         .addr amulet_of_yendor_description         ; DescriptionStringPtr
         .byte <.bank(amulet_of_yendor_description) ; DescriptionStringBank
 
@@ -1126,6 +1226,8 @@ lucky_penny:
         .addr do_nothing                           ; UseFunc
         .addr no_effect                            ; DmgReductionFunc
         .addr do_nothing                           ; ApplyPassivesFunc
+        .addr always_valid                         ; IsValidLootFunc
+        .addr always_helpful                       ; IsConsideredHelpfulFunc
         .addr lucky_penny_description              ; DescriptionStringPtr
         .byte <.bank(lucky_penny_description)      ; DescriptionStringBank
 
@@ -1147,6 +1249,8 @@ cheap_plastic_imitation_of_the_amulet_of_yendor:
         .addr do_nothing                           ; UseFunc
         .addr no_effect                            ; DmgReductionFunc
         .addr do_nothing                           ; ApplyPassivesFunc
+        .addr never_valid                          ; IsValidLootFunc
+        .addr never_helpful                        ; IsConsideredHelpfulFunc
         .addr cheap_plastic_imitation_of_the_amulet_of_yendor_description              ; DescriptionStringPtr
         .byte <.bank(cheap_plastic_imitation_of_the_amulet_of_yendor_description)      ; DescriptionStringBank
 
@@ -1165,6 +1269,8 @@ infernal_lantern:
         .addr do_nothing                           ; UseFunc
         .addr no_effect                            ; DmgReductionFunc
         .addr do_nothing                           ; ApplyPassivesFunc
+        .addr always_valid                         ; IsValidLootFunc
+        .addr always_helpful                       ; IsConsideredHelpfulFunc
         .addr infernal_lantern_description         ; DescriptionStringPtr
         .byte <.bank(infernal_lantern_description) ; DescriptionStringBank
 
@@ -1183,10 +1289,43 @@ charge_a_bulb:
         .addr do_nothing                           ; UseFunc
         .addr no_effect                            ; DmgReductionFunc
         .addr do_nothing                           ; ApplyPassivesFunc
+        .addr always_valid                         ; IsValidLootFunc
+        .addr always_helpful                       ; IsConsideredHelpfulFunc
         .addr charge_a_bulb_description            ; DescriptionStringPtr
         .byte <.bank(charge_a_bulb_description)    ; DescriptionStringBank
 
         .segment "CODE_ITEMS"
+
+; Functions to teach the shop/loot rolling systems special properties of certain items.
+; First off, valid/invalid, for whether an item may spawn at all. Note that we always
+; refuse to spawn: duplicates AND items the player has equipped into an inventory slot,
+; so we don't need to redundantly check for those here. #0 indicates success, anything else
+; indicates failure.
+
+.proc always_valid
+        lda #0
+        rts
+.endproc
+
+.proc never_valid
+        lda #$FF
+        rts
+.endproc
+
+; Similarly, use these functions for the "helpful items" subsystem. Standard chests use
+; these primarily. These should inspect game state and make a balance-related decision as
+; to whether the player "needs" this particular item at the moment. Helpful chests will
+; reroll several times trying to generate some item that passes these checks.
+
+.proc always_helpful
+        lda #0
+        rts
+.endproc
+
+.proc never_helpful
+        lda #$FF
+        rts
+.endproc
 
 ; Flat value functions. If these seem remarkably inefficient, that's because they are
 
