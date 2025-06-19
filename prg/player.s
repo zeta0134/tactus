@@ -1390,6 +1390,7 @@ done_with_initial_pose:
         set_player_sprite_x SPRITE_PLAYER_03_PLAYER_CHARGING
         lda #PLAYER_STATE_CHARGING
         sta PlayerState
+        queue_sfx_pulse1 sfx_weapon_charging_pulse
         jmp resolve_enemy_collision
 
 perform_normal_movement:
@@ -2091,12 +2092,6 @@ TargetCol := R15
         lda #0
         sta PlayerAttackLandedLastBeat
 
-        ; Switch to our charge attack sprite!
-        ldx PlayerSpriteIndex
-        set_player_sprite_x SPRITE_PLAYER_03_PLAYER_CHARGE_ATTACK
-        lda #$FF
-        sta PlayerAnimationTable
-
         lda #0
         sta PlayerTookDamageThisBeat
         sta PlayerDamageAnimCounter
@@ -2112,6 +2107,12 @@ TargetCol := R15
         lda #1
         sta PlayerIsCharged
         far_call FAR_player_swing_weapon
+
+        ; Switch to our charge attack sprite!
+        ldx PlayerSpriteIndex
+        set_player_sprite_x SPRITE_PLAYER_03_PLAYER_CHARGE_ATTACK
+        lda #$FF
+        sta PlayerAnimationTable
 
         ; A charge attack does NOT count as having connected, regardless of what the weapon subsystem thinks.
         ; Otherwise we could just chain these indefinitely; that's no good!

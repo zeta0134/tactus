@@ -1049,3 +1049,12 @@ sfx_item_recharge_tri:
         tri_init  PITCH_E5,       0
         tri_init  PITCH_GS4,      0
         tri_init  PITCH_GS5,      0
+
+sfx_weapon_charging_pulse:
+        ; Length in rows
+        .byte 4
+        ;                     pitch,  duty, volume,                            sweep, length
+        pulse_init_sweep   PITCH_E3,    $0,     $C, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      5
+        pulse_init_sweep  PITCH_GS3,    $0,     $F, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      5
+        pulse_init_sweep   PITCH_C4,    $0,     $B, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      5
+        pulse_init_sweep   PITCH_E4,    $0,     $8, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      5

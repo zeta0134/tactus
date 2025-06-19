@@ -85,6 +85,8 @@
 
 .global sfx_item_recharge_tri
 
+.global sfx_weapon_charging_pulse
+
 .global CandidateSfxPtr
 .global CandidateSfxPriority
 
