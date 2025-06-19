@@ -766,17 +766,15 @@ indirect_attack_behaviors_high:
         .endrepeat
 
 .proc FAR_attack_enemy_tile
-; R0 - R2 are reserved for the enemy behaviors to use
+; R0 - R2 are free for called enemy behaviors to use
+; R4 - R9 are free for called enemy behaviors to use
+; R11 - R13 are free for called enemy behaviors to use
 
 ; Current target square to consider for attacking, provided by caller
 AttackSquare := R3
 ; For indirect attacks, the "effective" attack square goes here.
 ; Enemies which move almost always use this.
 EffectiveAttackSquare := R10 
-
-; TODO: see if we can relocate these, it's REALLY inconvenient
-TilesRemaining := R9
-; R11 - R13 are free for called routines to use
 
 ; The player's target location. Generally enemies shouldn't touch this
 ; on weapon strike, but they *could*, and this is how. Don't clobber these.

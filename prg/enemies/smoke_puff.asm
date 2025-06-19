@@ -21,8 +21,6 @@ CurrentTile := R15
 .proc ENEMY_ATTACK_direct_attack_puff
 ; Current target square to consider for attacking
 AttackSquare := R3
-
-TilesRemaining := R9
 ; Indirect target square, so the tile we attack knows its own location
 EffectiveAttackSquare := R10 
 
