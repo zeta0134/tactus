@@ -781,39 +781,39 @@ longsword_charge:
 
 longsword_charge_north:
         ;         X,  Y, Behavior
-        .lobytes -1, -2, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  0, -2, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  1, -2, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes -1, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  0, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  1, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes -1, -2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1, -2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1, -1, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_charge_east:
         ;         X,  Y, Behavior
-        .lobytes  2, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  2,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  2,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  1, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  1,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  1,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes  2, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  2,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  2,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  1, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_charge_south:
         ;         X,  Y, Behavior
-        .lobytes  1,  2, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  0,  2, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes -1,  2, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  1,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  0,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes -1,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes  1,  2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  1, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_charge_west:
         ;         X,  Y, Behavior
-        .lobytes -2,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes -2,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes -2, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes -1,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes -1,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes -1, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes -2,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -2,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -2, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1, -1, (WEAPON_CANCEL_MOVEMENT)
 
 longsword_charge_anim_north:
         .byte 6  ; length

@@ -418,7 +418,7 @@ HeartCount := R2
         lda #ITEM_SPELL_AIR
         sta current_save + SaveFile::PlayerEquipmentSpell
 
-        lda #ITEM_UPGRADE_EARTH
+        lda #ITEM_UPGRADE_ICE
         sta current_save + SaveFile::PlayerWeaponUpgradeSlot1
         lda #ITEM_NONE
         sta current_save + SaveFile::PlayerWeaponUpgradeSlot2
@@ -547,6 +547,12 @@ draw_palette_normally:
         ; If we are in rhythm assist mode, then do the flash thing
         lda current_save + SaveFile::OptionRhythmFlashPlayer
         bne apply_rhythm_assist
+        ; If we are charging up our lasers, do that thing instead
+        ; (note that regular rhythm assist has higher priority, on purpose)
+        lda PlayerState
+        cmp #PLAYER_STATE_CHARGING
+        beq apply_charge_glow
+        ; Otherwise be boring!
         lda player_palettes_phones+PLAYER_PALETTE_NORMAL
         sta PlayfieldObjPal0+0
         lda player_palettes_pajamas+PLAYER_PALETTE_NORMAL
@@ -570,12 +576,22 @@ light_palette:
         lda player_palettes_pigment+PLAYER_PALETTE_DAMAGE_LIGHT
         sta PlayfieldObjPal0+2
         rts
+apply_charge_glow:
+        ; Charging up our weapon reuses the rhythm assist colors but in the reverse direction
+        ; and based on the gameplay timing. (rhythm assist mode never gets here)
+        ldx TrackedMusicPos
+        lda #7
+        sec
+        sbc tracked_row_buffer, x
+        tax
+        jmp rhythm_assist_converge
 apply_rhythm_assist:
         ; rhythm assist always uses the current tracked beat's animation frame, out of the
         ; 8 possible rows
         ldx TrackedMusicPos
         lda tracked_row_buffer, x
         tax
+rhythm_assist_converge:
         lda player_palettes_phones+PLAYER_PALETTE_RHYTHM_ASSIST, x
         sta PlayfieldObjPal0+0
         lda player_palettes_pajamas+PLAYER_PALETTE_RHYTHM_ASSIST, x
