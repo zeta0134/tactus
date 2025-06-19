@@ -134,15 +134,18 @@ ItemPtr := R0
 .proc FAR_player_swing_weapon
 ; R0 and R1 are reserved for the enemy behaviors to use
 ; Current target square to consider for attacking
-PlayerSquare := R2
 AttackSquare := R3
 WeaponSquaresIndex := R4
 WeaponSquaresPtr := R5 ; R6
 AttackLanded := R7
 WeaponProperties := R8
 TilesRemaining := R9
-; We don't use these, but we should know not to clobber them
+
+; Most on-hit routines primarily consume this variable and little else
 EffectiveAttackSquare := R10
+; We don't use these, but we should know not to clobber them. The
+; outer player routine is tracking the player's new destination. Called
+; weapon-handling routines MAY change these, but usually do not.
 TargetRow := R14
 TargetCol := R15
         perform_zpcm_inc

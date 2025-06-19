@@ -61,6 +61,8 @@ PlayerSpriteIndex: .res 1
 PlayerRow: .res 1
 PlayerCol: .res 1
 
+PlayerSquare: .res 1
+
 PlayerWarpEjectCol: .res 1
 PlayerWarpEjectRow: .res 1
 
@@ -1296,8 +1298,6 @@ player_direction_button_lut:
 .proc player_state_normal
 TorchlightTotal := R0
 
-PlayerSquare := R2
-
 TargetRow := R14
 TargetCol := R15
         jsr player_global_reset
@@ -1463,8 +1463,6 @@ done_with_held_inputs:
 .proc player_state_bomb
 TorchlightTotal := R0
 
-PlayerSquare := R2
-
 TargetRow := R14
 TargetCol := R15
         jsr process_lingering_effect_expiry
@@ -1607,8 +1605,6 @@ done_with_held_inputs:
 .proc player_state_shocked
 TorchlightTotal := R0
 
-PlayerSquare := R2
-
 TargetRow := R14
 TargetCol := R15
         lda #0
@@ -1723,8 +1719,6 @@ done_with_held_inputs:
 ; the counter. This will need juice so the player has appropriate feedback, etc.
 .proc player_state_frozen
 TorchlightTotal := R0
-
-PlayerSquare := R2
 
 TargetRow := R14
 TargetCol := R15
@@ -1876,8 +1870,6 @@ spell_casting_dispatch_lut:
 .proc player_state_casting
 SpellCastPtr := R0
 TorchlightTotal := R0
-
-PlayerSquare := R2
 
 TargetRow := R14
 TargetCol := R15
@@ -2221,7 +2213,6 @@ HealingAmount := R0
 .endproc
 
 .proc cleanup_dialog_state
-PlayerSquare := R2
         ldx PlayerRow
         lda row_number_to_tile_index_lut, x ; Row * Width
         clc
@@ -2252,7 +2243,6 @@ done_with_passive_dialog:
 .endproc
 
 .proc handle_go_go_boots_movement
-PlayerSquare := R2
 TargetRow := R14
 TargetCol := R15
         ; ITEM: if the player has the gogo boots equipped, 

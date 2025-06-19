@@ -21,7 +21,6 @@ CurrentTile := R15
 .proc ENEMY_ATTACK_direct_attack_puff
 ; R0 and R1 are reserved for the enemy behaviors to use
 ; Current target square to consider for attacking
-PlayerSquare := R2
 AttackSquare := R3
 WeaponSquaresIndex := R4
 WeaponSquaresPtr := R5 ; R6

@@ -17,6 +17,9 @@
 
 .global PlayerRow
 .global PlayerCol
+
+.global PlayerSquare
+
 .global PlayerMaxHealth
 .global PlayerHealth
 .global PlayerRoomIndex
