@@ -148,6 +148,11 @@ PlayerIncomingStatusType: .res 1
 ; miscellaneous bonus state for items
 PlayerNinjaFootwrapsCooldown: .res 1
 
+; I guess this could technically be a charge counter? But I don't think I want
+; multi-stage charging for any weapon, I'd rather it just come out automatically
+; on the following beat.
+PlayerIsCharged: .res 1
+
 ; some light providing items grant a persistent torchlight bonus. the details
 ; vary, but this byte is how they track that bonus. we reset this to 0 between
 ; floors as a courtesy. it is not persisted in the save file.
@@ -369,6 +374,10 @@ HeartCount := R2
 
         lda #0
         sta PlayerNinjaFootwrapsCooldown
+
+        ; DEBUG
+        lda #0
+        sta PlayerIsCharged
 
         rts
 

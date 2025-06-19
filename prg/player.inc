@@ -99,6 +99,8 @@
 .global PlayerNinjaFootwrapsCooldown
 .global PlayerTorchlightBonus
 
+.global PlayerIsCharged
+
 MAX_HEARTS = 5
 MAX_GOLD = 9999
 
