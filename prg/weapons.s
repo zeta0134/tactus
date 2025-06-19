@@ -47,7 +47,7 @@ weapon_class_table:
         .word dagger, dagger ; Daggers don't have charge attacks :(
         .word broadsword, broadsword_charge
         .word longsword, longsword_charge
-        .word spear, spear ; TODO: charge attacks!
+        .word spear, spear_charge
         .word flail, flail ; TODO: charge attacks!
 
 .proc load_weapon_ptr
@@ -772,6 +772,35 @@ longsword_charge:
         ; animation routines
         .word longsword_charge_init_north, longsword_charge_init_east, longsword_charge_init_south, longsword_charge_init_west
 
+; Longswords have no special behavior; each directional strike sets up a common anim table
+.proc longsword_init_north
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_1
+        st16 WeaponAnimPtr, longsword_north_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
+.proc longsword_init_east
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_1
+        st16 WeaponAnimPtr, longsword_east_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
+.proc longsword_init_south
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_1
+        st16 WeaponAnimPtr, longsword_south_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
+.proc longsword_init_west
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_1
+        st16 WeaponAnimPtr, longsword_west_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
 ; Charged Longswords hit a 2x3 area in front of the player:
 ; [ ][ ][ ][ ][ ][ ]
 ; [ ][*][*][ ][ ][ ]
@@ -854,35 +883,6 @@ longsword_charge_anim_west:
         .lobytes -16,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
         .lobytes -16,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
         .lobytes -16, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW) 
-
-; Longswords have no special behavior; each directional strike sets up a common anim table
-.proc longsword_init_north
-        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_1
-        st16 WeaponAnimPtr, longsword_north_anim
-        st16 WeaponDrawFunc, weapon_update_none
-        jmp weapon_init_common
-.endproc
-
-.proc longsword_init_east
-        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_1
-        st16 WeaponAnimPtr, longsword_east_anim
-        st16 WeaponDrawFunc, weapon_update_none
-        jmp weapon_init_common
-.endproc
-
-.proc longsword_init_south
-        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_1
-        st16 WeaponAnimPtr, longsword_south_anim
-        st16 WeaponDrawFunc, weapon_update_none
-        jmp weapon_init_common
-.endproc
-
-.proc longsword_init_west
-        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_1
-        st16 WeaponAnimPtr, longsword_west_anim
-        st16 WeaponDrawFunc, weapon_update_none
-        jmp weapon_init_common
-.endproc
 
 .proc longsword_charge_init_north
         set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
@@ -1048,6 +1048,101 @@ near:
         st16 WeaponAnimPtr, spear_west_near_anim
         jmp weapon_init_common
 .endproc
+
+; Charged Spears hit a 3x1 area in front of the player, and they smack it hard
+; [ ][ ][ ][ ][ ][ ]
+; [ ][ ][ ][ ][ ][ ]
+; [P][*][*][*][ ][ ]
+; [ ][ ][ ][ ][ ][ ]
+; [ ][ ][ ][ ][ ][ ]
+
+spear_charge:
+        .byte $03 ; Length
+        ; behavior tables
+        .word spear_charge_north, spear_charge_east, spear_charge_south, spear_charge_west
+        ; animation routines
+        .word spear_charge_init_north, spear_charge_init_east, spear_charge_init_south, spear_charge_init_west
+
+spear_charge_north:
+        ;         X,  Y, Behavior
+        .lobytes  0, -3, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes  0, -2, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes  0, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+
+spear_charge_east:
+        ;         X,  Y, Behavior
+        .lobytes  3,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes  2,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes  1,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+
+spear_charge_south:
+        ;         X,  Y, Behavior
+        .lobytes  0,  3, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes  0,  2, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes  0,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+
+spear_charge_west:
+        ;         X,  Y, Behavior
+        .lobytes -3,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes -2,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes -1,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+
+spear_charge_anim_north:
+        .byte 3  ; length
+                 ; X,   Y,                        TileId, Sprite Behavior
+        .lobytes   0, -48, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0, -32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+
+spear_charge_anim_east:
+        .byte 3  ; length
+                 ; X,   Y,                        TileId, Sprite Behavior
+        .lobytes  48,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  32,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW) 
+
+spear_charge_anim_south:
+        .byte 3  ; length
+                 ; X,   Y,                        TileId, Sprite Behavior
+        .lobytes   0,  48, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0,  32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+
+spear_charge_anim_west:
+        .byte 3  ; length
+                 ; X,   Y,                        TileId, Sprite Behavior
+        .lobytes -48,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -32,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW) 
+
+.proc spear_charge_init_north
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, spear_charge_anim_north
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
+.proc spear_charge_init_east
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, spear_charge_anim_east
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
+.proc spear_charge_init_south
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, spear_charge_anim_south
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
+.proc spear_charge_init_west
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, spear_charge_anim_west
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
 
 ; Flails have the widest attack pattern, hit a single enemy, and mostly
 ; do not block movement for the player:
