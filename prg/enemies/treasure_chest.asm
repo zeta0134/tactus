@@ -11,11 +11,10 @@ WeaponClassTemp := R1
 TargetIndex := R0
 TileId := R1
 AttackSquare := R3
-AttackLanded := R7
 WeaponPtr := R11 
         ; Register the attack as a hit
         lda #1
-        sta AttackLanded
+        sta WeaponAttackLanded
 
         ; if this is a boss room, we need to always spawn the key!
         ldx PlayerRoomIndex

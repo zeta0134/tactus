@@ -43,11 +43,10 @@ TileId := R1
 
 OriginalAttackSquare := R3
 
-AttackLanded := R7
 EffectiveAttackSquare := R10 
         ; Register the attack as a hit
         lda #1
-        sta AttackLanded
+        sta WeaponAttackLanded
 
         ; proc any items that depend on the enemy we are about to slay
         ; (do this BEFORE we replace ourselves with a floor tile)

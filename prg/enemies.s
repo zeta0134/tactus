@@ -775,7 +775,6 @@ AttackSquare := R3
 EffectiveAttackSquare := R10 
 
 ; TODO: see if we can relocate these, it's REALLY inconvenient
-AttackLanded := R7
 WeaponProperties := R8
 TilesRemaining := R9
 ; R11 - R13 are free for called routines to use

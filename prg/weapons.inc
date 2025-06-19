@@ -53,3 +53,5 @@ WEAPON_FLAIL = 4
 .global FAR_draw_weapon_effects
 
 .global FAR_calculate_weapon_damage
+
+.global WeaponAttackLanded

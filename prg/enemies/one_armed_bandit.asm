@@ -637,11 +637,10 @@ TileId := R1
 
 OriginalAttackSquare := R3
 
-AttackLanded := R7
 EffectiveAttackSquare := R10 
         ; Register the attack as a hit
         lda #1
-        sta AttackLanded
+        sta WeaponAttackLanded
 
         ; If we are terminal, do nothing else!
         ldx EffectiveAttackSquare

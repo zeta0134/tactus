@@ -6,14 +6,13 @@
 TargetIndex := R0
 TileId := R1
 AttackSquare := R3
-AttackLanded := R7
         lda PlayerKeys
         beq no_key
         
         ; Register the attack as a hit
         ; (don't otherwise interfere with combat if the player doesn't have the key)
         lda #1
-        sta AttackLanded
+        sta WeaponAttackLanded
 
         ; Replace the exit block with the stairs down
         ldx AttackSquare

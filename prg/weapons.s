@@ -36,6 +36,8 @@ SafetyCol: .res 1
 SafetyRow: .res 1
 WeaponSquaresIndex: .res 1
 
+WeaponAttackLanded: .res 1
+
 .segment "CODE_PLAYER_1"
 
 .proc FAR_draw_weapon_effects
@@ -137,7 +139,6 @@ ItemPtr := R0
 ; R0 and R1 are reserved for the enemy behaviors to use
 ; Current target square to consider for attacking
 AttackSquare := R3
-AttackLanded := R7
 WeaponProperties := R8
 TilesRemaining := R9
 
@@ -216,7 +217,7 @@ done_choosing_direction:
         
         ; Now we iterate through each of these squares, roll an attack against the square
         lda #0
-        sta AttackLanded
+        sta WeaponAttackLanded
         sta WeaponSquaresIndex
         sta WeaponSingleTargetIndex
 
@@ -301,7 +302,7 @@ check_player_movement:
         and WeaponProperties
         beq check_early_exit
         ; ... and an attack actually landed
-        lda AttackLanded
+        lda WeaponAttackLanded
         beq check_early_exit
         ; ... then block player movement
         lda #1
@@ -312,7 +313,7 @@ check_early_exit:
         and WeaponProperties
         beq no_early_exit
         ; ... and the attack actually landed
-        lda AttackLanded
+        lda WeaponAttackLanded
         beq no_early_exit
         ; Then we are done with the swing, and should clean up
         jmp done_with_swing
@@ -325,7 +326,7 @@ no_early_exit:
 done_with_swing:
         perform_zpcm_inc
         ; if an attack landed at all ...
-        lda AttackLanded
+        lda WeaponAttackLanded
         beq attack_missed
 
         ; process burn damage, if required
