@@ -775,8 +775,6 @@ AttackSquare := R3
 EffectiveAttackSquare := R10 
 
 ; TODO: see if we can relocate these, it's REALLY inconvenient
-WeaponSquaresIndex := R4
-WeaponSquaresPtr := R5 ; R6
 AttackLanded := R7
 WeaponProperties := R8
 TilesRemaining := R9

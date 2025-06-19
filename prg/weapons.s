@@ -23,6 +23,7 @@
 .zeropage
 
 PlayerWeaponPtr: .res 2
+WeaponSquaresPtr: .res 2
 
 .segment "RAM"
 
@@ -33,6 +34,7 @@ weapon_metasprite_ids: .res 8
 EnemyDiedThisFrame: .res 1
 SafetyCol: .res 1
 SafetyRow: .res 1
+WeaponSquaresIndex: .res 1
 
 .segment "CODE_PLAYER_1"
 
@@ -135,8 +137,6 @@ ItemPtr := R0
 ; R0 and R1 are reserved for the enemy behaviors to use
 ; Current target square to consider for attacking
 AttackSquare := R3
-WeaponSquaresIndex := R4
-WeaponSquaresPtr := R5 ; R6
 AttackLanded := R7
 WeaponProperties := R8
 TilesRemaining := R9
