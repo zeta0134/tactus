@@ -1767,6 +1767,10 @@ process_next_beat_now:
         cmp LastBeat
         beq continue_waiting
         ; The time for the next beat has come.
+        ; Special case: If the player is currently charging, process right away
+        lda PlayerState
+        cmp #PLAYER_STATE_CHARGING
+        beq process_next_beat_now
         ; If the player's input HAS arrived:
         lda PlayerNextDirection
         ora PlayerHeldDirection
