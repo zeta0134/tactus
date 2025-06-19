@@ -186,6 +186,15 @@ TargetCol := R15
 
         lda PlayerNextDirection
         ora PlayerHeldDirection
+        bne direction_in_range
+        ; If we get here, the player released the button and we're probably in a
+        ; charge state. Use the last successful attack direction as a fallback.
+        lda PlayerPreviousSuccessfulAttackDirection
+        bne direction_in_range
+        ; If we get HERE, ... first of all, how? This is weird enough that we should
+        ; crash on purpose, but... default to a north swing, just to be in range.
+        lda #PLAYER_DIRECTION_NORTH
+direction_in_range:
 check_north:
         cmp #PLAYER_DIRECTION_NORTH
         bne check_east
@@ -337,9 +346,17 @@ no_early_exit:
 
 done_with_swing:
         perform_zpcm_inc
+
+        ; charge attacks always "land", because it looks and feels very wrong otherwise.
+        ; even if they whiff, we still need to see the swing. this also means a whiffed
+        ; charge attack still burns the player :D
+        lda PlayerIsCharged
+        bne attack_did_not_miss
+
         ; if an attack landed at all ...
         lda WeaponAttackLanded
         beq attack_missed
+attack_did_not_miss:
 
         ; process burn damage, if required
         jsr process_burn_damage
@@ -794,9 +811,9 @@ longsword_charge_west:
         .lobytes -2,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
         .lobytes -2,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
         .lobytes -2, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  1,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  1,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
-        .lobytes  1, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes -1,  1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes -1,  0, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
+        .lobytes -1, -1, (WEAPON_CANCEL_MOVEMENT | WEAPON_STRONG_HIT)
 
 longsword_charge_anim_north:
         .byte 6  ; length

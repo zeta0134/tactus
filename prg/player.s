@@ -94,6 +94,7 @@ PlayerChainGrace: .res 1
 PlayerNavState: .res 1
 
 PlayerPreviousSuccessfulDirection: .res 1
+PlayerPreviousSuccessfulAttackDirection: .res 1
 
 PlayerIntendsToPause: .res 1
 PlayerIsPaused: .res 1
@@ -148,6 +149,10 @@ PlayerIncomingStatusType: .res 1
 ; miscellaneous bonus state for items
 PlayerNinjaFootwrapsCooldown: .res 1
 
+; A 1-beat buffer indicating whether the previous beat had a successful attack.
+; This is used, with several other conditions, to indicate whether the player's
+; held direction should kick off a charge attack
+PlayerAttackLandedLastBeat: .res 1
 ; I guess this could technically be a charge counter? But I don't think I want
 ; multi-stage charging for any weapon, I'd rather it just come out automatically
 ; on the following beat.
@@ -375,9 +380,9 @@ HeartCount := R2
         lda #0
         sta PlayerNinjaFootwrapsCooldown
 
-        ; DEBUG
         lda #0
         sta PlayerIsCharged
+        sta PlayerAttackLandedLastBeat
 
         rts
 
@@ -398,7 +403,7 @@ HeartCount := R2
         ; not really sure how weapon obelisks are going to work.
 .if ::DEBUG_GOD_MODE
         ; The player should start with whatever Zeta likes        
-        lda #ITEM_DAGGER_L1
+        lda #ITEM_LONGSWORD_L1
         sta current_save + SaveFile::PlayerEquipmentWeapon
         lda #ITEM_NONE
         sta current_save + SaveFile::PlayerEquipmentTorch
@@ -413,7 +418,7 @@ HeartCount := R2
         lda #ITEM_SPELL_AIR
         sta current_save + SaveFile::PlayerEquipmentSpell
 
-        lda #ITEM_NONE
+        lda #ITEM_UPGRADE_EARTH
         sta current_save + SaveFile::PlayerWeaponUpgradeSlot1
         lda #ITEM_NONE
         sta current_save + SaveFile::PlayerWeaponUpgradeSlot2
@@ -1208,6 +1213,7 @@ player_state_lut:
         .word player_state_dead
         .word player_state_shocked
         .word player_state_frozen
+        .word player_state_charging
 
 ; Called once at the beginning of every beat
 .proc FAR_update_player
@@ -1236,6 +1242,9 @@ PlayerStatePtr := R0
         sta PlayerTappedIce
         ; If no damage direction is set, default to a kinda random-circle-y lookin' thing.
         sta PlayerIncomingDamageDirection
+        ; Always default to our regular attacks. Charge attacks will flip this flag right
+        ; before processing.
+        sta PlayerIsCharged
 
         ; Every beat we'll by default be in our generic palette. We need to recover from whatever
         ; the previous beat's effect was doing, so flag that here.
@@ -1313,6 +1322,11 @@ TargetCol := R15
         jsr process_lingering_effect_expiry
         jsr process_poison_tick
 
+        lda WeaponAttackLanded
+        sta PlayerAttackLandedLastBeat
+        lda #0
+        sta WeaponAttackLanded
+
         ; First up, default the player's animation cel to either standing or, if it's been a really long
         ; time since we got a player input AND the room is clear, the idle pose for flavor
         ldx PlayerRoomIndex
@@ -1352,14 +1366,49 @@ done_with_initial_pose:
         lda #0
         sta PlayerIdleBeats
 
+        ; If we satisfy the conditions to initiate a charge attack, do that here
+        ; First off, do we have a charge weapon equipped?
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot1
+        cmp #ITEM_NONE
+        beq perform_normal_movement
+        ; Did we strike a foe on our previous beat?
+        lda PlayerAttackLandedLastBeat
+        beq perform_normal_movement
+        ; And are we still holding that direction?
+        lda PlayerHeldDirection
+        jeq perform_normal_movement
+        lda PlayerPreviousSuccessfulAttackDirection
+        cmp PlayerHeldDirection
+        bne perform_normal_movement
+
+        ; CHARGE! Switch to the charge state, then process collision normally
+        ; (because we still need to get *hit* in this state)
+        ; Note that if we actually take a stun/freeze, we'll get kicked out of the
+        ; charge, throwing off our groove. Should we enter the charging state,
+        ; the only way to interrupt THAT is to die.
+        ldx PlayerSpriteIndex
+        set_player_sprite_x SPRITE_PLAYER_03_PLAYER_CHARGING
+        lda #PLAYER_STATE_CHARGING
+        sta PlayerState
+        jmp resolve_enemy_collision
+
 perform_normal_movement:
 
         lda #0
         sta PlayerMovementBlocked
 
-; TODO: Attempt an attack. If we hit something, most weapon types will skip movement
+        ; Attempt an attack! If we hit something, most weapon types will skip movement
 swing_weapon:
+        lda #0
+        sta PlayerPreviousSuccessfulAttackDirection
         far_call FAR_player_swing_weapon
+        ; If the attack connects, remember the direction we were facing
+        lda WeaponAttackLanded
+        beq done_remembering_sucessful_attack
+        lda PlayerNextDirection
+        ora PlayerHeldDirection
+        sta PlayerPreviousSuccessfulAttackDirection
+done_remembering_sucessful_attack:
 
         ; If the player's movement is still allowed, then attempt a move
         lda PlayerMovementBlocked
@@ -1371,7 +1420,12 @@ move_player:
 resolve_enemy_collision:
         near_call FAR_player_resolve_collision
 
+        ; don't perform go go boots movement if we are currently charging
+        lda PlayerState
+        cmp #PLAYER_STATE_CHARGING
+        beq skip_go_go_processing
         jsr handle_go_go_boots_movement
+skip_go_go_processing:
 
         ; If the player's position changed, have the jumping pose kick in
         ; (this overrides attacking, which feels like it should be appropriate?)
@@ -1475,6 +1529,9 @@ TorchlightTotal := R0
 TargetRow := R14
 TargetCol := R15
         jsr process_lingering_effect_expiry
+
+        lda #0
+        sta PlayerAttackLandedLastBeat
 
         lda #0
         sta PlayerTookDamageThisBeat
@@ -1620,6 +1677,9 @@ TargetCol := R15
         sta PlayerLingeringStatusFrame
         jsr process_lingering_effect_expiry
 
+        lda #0
+        sta PlayerAttackLandedLastBeat
+
         ; If the effect has expired, go ahead and revert us back to normal state
         lda PlayerLingeringStatusType
         bne stun_not_expired
@@ -1734,6 +1794,9 @@ TargetCol := R15
         lda #0
         sta PlayerTappedIce
         sta PlayerLingeringStatusFrame
+
+        lda #0
+        sta PlayerAttackLandedLastBeat
 
         ; If the player intends to move, then process the effect expiry as usual
         lda PlayerNextDirection
@@ -1885,6 +1948,9 @@ TargetCol := R15
         jsr process_lingering_effect_expiry
 
         lda #0
+        sta PlayerAttackLandedLastBeat
+
+        lda #0
         sta PlayerTookDamageThisBeat
         sta PlayerDamageAnimCounter
         ; If no damage direction is set, default to a kinda random-circle-y lookin' thing.
@@ -2007,6 +2073,117 @@ no_defeat_sfx:
         sta current_save + SaveFile::PlayerEquipmentSpell
 .endif
 
+        rts
+.endproc
+
+; A state in which we are charging up our weapon's special power! We don't support
+; variable-length charging, so the player's action will automatically resolve into
+; the actual charge attack on this beat.
+.proc player_state_charging
+TorchlightTotal := R0
+
+TargetRow := R14
+TargetCol := R15
+        jsr player_global_reset
+        jsr process_lingering_effect_expiry
+        jsr process_poison_tick
+
+        lda #0
+        sta PlayerAttackLandedLastBeat
+
+        ; Switch to our charge attack sprite!
+        ldx PlayerSpriteIndex
+        set_player_sprite_x SPRITE_PLAYER_03_PLAYER_CHARGE_ATTACK
+        lda #$FF
+        sta PlayerAnimationTable
+
+        lda #0
+        sta PlayerTookDamageThisBeat
+        sta PlayerDamageAnimCounter
+        ; If no damage direction is set, default to a kinda random-circle-y lookin' thing.
+        sta PlayerIncomingDamageDirection
+
+        ; Every beat we'll by default be in our generic palette. We need to recover from whatever
+        ; the previous beat's effect was doing, so flag that here.
+        lda #1
+        sta StagingObjPaletteDirty
+
+        ; Swing a charged-up attack!
+        lda #1
+        sta PlayerIsCharged
+        far_call FAR_player_swing_weapon
+
+        ; A charge attack does NOT count as having connected, regardless of what the weapon subsystem thinks.
+        ; Otherwise we could just chain these indefinitely; that's no good!
+        lda #0
+        sta WeaponAttackLanded
+
+        ; Our state should revert to normal by default, though it may change in response to taking
+        ; damage down below.
+        lda #PLAYER_STATE_NORMAL
+        sta PlayerState
+        lda #0
+        sta PlayerBeatsInThisState
+
+        ; Now resolve movement as usual, just like any other state. The player does not attempt
+        ; a move on the beat when their charge attack comes out.
+resolve_enemy_collision:
+        lda PlayerRow
+        sta TargetRow
+        lda PlayerCol
+        sta TargetCol
+        near_call FAR_player_resolve_collision
+
+        ; Update the player's combo counter
+        jsr update_chain_and_combo
+
+        ; Now we may finalize the player's position and draw
+        lda TargetRow
+        sta PlayerRow
+        lda TargetCol
+        sta PlayerCol
+
+        near_call FAR_set_player_target_coordinates
+
+        ; If the player is still holding this directional input, carry it over
+        ; to the next beat as a held input
+        ; (note: do this part unconditionally, as some mechanics rely on held inputs.
+        ; the optional ones will be checked at each site)
+        ldx PlayerNextDirection
+        lda player_direction_button_lut, x
+        and ButtonsThisFrame
+        beq done_with_held_inputs
+        lda PlayerNextDirection
+        sta PlayerHeldDirection
+done_with_held_inputs:
+        ; Clear player intent for the next beat
+        lda #0
+        sta PlayerNextDirection
+
+        jsr apply_player_torchlight
+
+        ; Detect exits and, if necessary, transition to the next room
+        jsr detect_exit
+
+        ; Detect being dead and, if necessary, transition to the end screen
+        jsr detect_critical_existence_failure
+
+        ; (Notably: do not detect pausing or spellcasting. Executing a charge attack overrides both!)
+
+        lda #0
+        sta PlayerIntendsToBomb
+        sta PlayerIntendsToCast
+        sta PlayerIntendsToWait
+        sta PlayerIntendsToPause
+
+        perform_zpcm_inc
+
+        ; If necessary, cleanup dialog states through movement
+        jsr cleanup_dialog_state
+
+        ; Finally, our position is finalized, so compute the lookup table ptr for distance
+        ; (this massively improves enemy AI during pathfinding)
+        near_call FAR_compute_player_distance_lut_ptr
         rts
 .endproc
 

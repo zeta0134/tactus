@@ -100,6 +100,8 @@
 .global PlayerTorchlightBonus
 
 .global PlayerIsCharged
+.global PlayerPreviousSuccessfulDirection
+.global PlayerPreviousSuccessfulAttackDirection
 
 MAX_HEARTS = 5
 MAX_GOLD = 9999
@@ -124,6 +126,12 @@ PLAYER_STATE_SHOCKED = 4
 ; on the ice and try to break it. One tap decrements the freeze timer.
 ; While frozen, our combo/chain is not reset!
 PLAYER_STATE_FROZEN = 5
+; We are charging up a weapon! (how exciting!) We can't move, and will
+; automatically resolve this attack on the following beat. We CAN still
+; get HIT.
+; (Note: no charge attack state, we just go back to normal. or die, or 
+; take a hazard to the face and get effectively interrupted, etc)
+PLAYER_STATE_CHARGING = 6
 
 PLAYER_STATUS_NORMAL       = 0
 PLAYER_STATUS_POISONED     = 1
