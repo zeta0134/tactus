@@ -22,7 +22,6 @@ CurrentTile := R15
 ; Current target square to consider for attacking
 AttackSquare := R3
 
-WeaponProperties := R8
 TilesRemaining := R9
 ; Indirect target square, so the tile we attack knows its own location
 EffectiveAttackSquare := R10 

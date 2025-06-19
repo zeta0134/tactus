@@ -2141,13 +2141,11 @@ DmgTotal := R0
 
 ; Returns weapon dmg amount in A, based on the currently loaded item.
 ; This is called by enemy attack processing code, and expects:
-; - WeaponProperties in R8
 ; - EffectiveAttackSquare in R10
 ; Clobbers: TODO, probably at least X,Y
 .proc FAR_weapon_dmg
 TempIndex := R0
 DmgTotal := R0
-WeaponProperties := R8
 EffectiveAttackSquare := R10
         perform_zpcm_inc
         access_data_bank #<.bank(item_table)

@@ -55,3 +55,4 @@ WEAPON_FLAIL = 4
 .global FAR_calculate_weapon_damage
 
 .global WeaponAttackLanded
+.global WeaponProperties

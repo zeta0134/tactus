@@ -36,6 +36,8 @@ SafetyCol: .res 1
 SafetyRow: .res 1
 WeaponSquaresIndex: .res 1
 
+; Outside code depends on these
+WeaponProperties: .res 1
 WeaponAttackLanded: .res 1
 
 .segment "CODE_PLAYER_1"
@@ -139,7 +141,6 @@ ItemPtr := R0
 ; R0 and R1 are reserved for the enemy behaviors to use
 ; Current target square to consider for attacking
 AttackSquare := R3
-WeaponProperties := R8
 TilesRemaining := R9
 
 ; Most on-hit routines primarily consume this variable and little else
