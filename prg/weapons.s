@@ -48,7 +48,7 @@ weapon_class_table:
         .word broadsword, broadsword_charge
         .word longsword, longsword_charge
         .word spear, spear_charge
-        .word flail, flail ; TODO: charge attacks!
+        .word flail, flail_charge
 
 .proc load_weapon_ptr
 ItemPtr := R0
@@ -765,13 +765,6 @@ longsword_west_anim:
         .lobytes -32,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_1, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
         .lobytes -16,   0, SPRITE_WEAPON_LONGSWORD_LONGSWORD_EAST_2, (SPRITE_PAL_YELLOW | SPRITE_VERT_FLIP | SPRITE_HORIZ_FLIP)
 
-longsword_charge:
-        .byte $06 ; Length
-        ; behavior tables
-        .word longsword_charge_north, longsword_charge_east, longsword_charge_south, longsword_charge_west
-        ; animation routines
-        .word longsword_charge_init_north, longsword_charge_init_east, longsword_charge_init_south, longsword_charge_init_west
-
 ; Longswords have no special behavior; each directional strike sets up a common anim table
 .proc longsword_init_north
         set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_LONGSWORD_LONGSWORD_NORTH_1
@@ -807,6 +800,13 @@ longsword_charge:
 ; [P][*][*][ ][ ][ ]
 ; [ ][*][*][ ][ ][ ]
 ; [ ][ ][ ][ ][ ][ ]
+
+longsword_charge:
+        .byte $06 ; Length
+        ; behavior tables
+        .word longsword_charge_north, longsword_charge_east, longsword_charge_south, longsword_charge_west
+        ; animation routines
+        .word longsword_charge_init_north, longsword_charge_init_east, longsword_charge_init_south, longsword_charge_init_west
 
 longsword_charge_north:
         ;         X,  Y, Behavior
@@ -1436,6 +1436,124 @@ SpriteBank := R0
         sta WeaponAnimPtr+1
         lda west_anim_lut+2, x
         sta SPRITE_BANK_WEAPON
+        jmp weapon_init_common
+.endproc
+
+; Charged Flails hit two separate 3x1 areas to the sides of the player:
+; [*][*][*][ ][ ][ ]
+; [ ][ ][ ][ ][ ][ ]
+; [ ][P][ ][ ][ ][ ]
+; [ ][ ][ ][ ][ ][ ]
+; [*][*][*][ ][ ][ ]
+
+flail_charge:
+        .byte $06 ; Length
+        ; behavior tables
+        .word flail_charge_north, flail_charge_east, flail_charge_south, flail_charge_west
+        ; animation routines
+        .word flail_charge_init_north, flail_charge_init_east, flail_charge_init_south, flail_charge_init_west
+
+flail_charge_north:
+        ;         X,  Y, Behavior
+        .lobytes -2,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -2,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -2, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  2, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  2,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  2,  1, (WEAPON_CANCEL_MOVEMENT)
+
+flail_charge_east:
+        ;         X,  Y, Behavior
+        .lobytes -1, -2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1, -2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  2, (WEAPON_CANCEL_MOVEMENT)
+
+flail_charge_south:
+        ;         X,  Y, Behavior
+        .lobytes  2, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  2,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  2,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -2,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -2,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -2, -1, (WEAPON_CANCEL_MOVEMENT)
+
+flail_charge_west:
+        ;         X,  Y, Behavior
+        .lobytes  1,  2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1, -2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -2, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1, -2, (WEAPON_CANCEL_MOVEMENT)
+
+flail_charge_anim_north:
+        .byte 6  ; length
+                 ; X,   Y,                        TileId, Sprite Behavior
+        .lobytes -32,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -32,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -32, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  32, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  32,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  32,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+
+flail_charge_anim_east:
+        .byte 6  ; length
+                 ; X,   Y,                        TileId, Sprite Behavior
+        .lobytes -16, -32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0, -32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16, -32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16,  32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0,  32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16,  32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW) 
+
+flail_charge_anim_south:
+        .byte 6  ; length
+                 ; X,   Y,                        TileId, Sprite Behavior
+        .lobytes  32, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  32,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  32,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -32,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -32,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -32, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW) 
+
+flail_charge_anim_west:
+        .byte 6  ; length
+                 ; X,   Y,                        TileId, Sprite Behavior
+        .lobytes  16,  32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0,  32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16,  32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16, -32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0, -32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16, -32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW) 
+
+.proc flail_charge_init_north
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, flail_charge_anim_north
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
+.proc flail_charge_init_east
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, flail_charge_anim_east
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
+.proc flail_charge_init_south
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, flail_charge_anim_south
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
+.proc flail_charge_init_west
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, flail_charge_anim_west
+        st16 WeaponDrawFunc, weapon_update_none
         jmp weapon_init_common
 .endproc
 

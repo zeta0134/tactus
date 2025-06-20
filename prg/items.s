@@ -140,17 +140,17 @@ item_table:
         .word no_item
         .word dagger_lvl_1
         .word broadsword_lvl_1
-        .word broadsword_lvl_2
-        .word broadsword_lvl_3
+        .word no_item
+        .word no_item
         .word longsword_lvl_1
-        .word longsword_lvl_2
-        .word longsword_lvl_3
+        .word no_item
+        .word no_item
         .word spear_lvl_1
-        .word spear_lvl_2
-        .word spear_lvl_3
+        .word no_item
+        .word no_item
         .word flail_lvl_1
-        .word flail_lvl_2
-        .word flail_lvl_3
+        .word no_item
+        .word no_item
         .word basic_torch
         .word large_torch
         .word compass
@@ -257,46 +257,6 @@ broadsword_lvl_1:
         .addr broadsword_lv1_description         ; DescriptionStringPtr
         .byte <.bank(broadsword_lv1_description) ; DescriptionStringBank
 
-broadsword_lvl_2:
-        .byte SLOT_WEAPON                        ; SlotId
-        .word SPRITE_ITEMS_01_BROADSWORD         ; WorldSpriteTile
-        .byte SPRITE_PAL_RED                     ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_BROADSWORD        ; HudBgTile
-        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)     ; HudBgAttr
-        .byte 0                                  ; HudSpriteTile
-        .byte 0                                  ; HudSpriteAttr
-        .word 250                                ; ShopCost
-        .byte WEAPON_BROADSWORD                  ; WeaponShape
-        .addr flat_2                             ; DamageFunc
-        .addr no_effect                          ; TorchlightFunc
-        .addr do_nothing                         ; UseFunc
-        .addr no_effect                          ; DmgReductionFunc
-        .addr do_nothing                         ; ApplyPassivesFunc
-        .addr always_valid                       ; IsValidLootFunc
-        .addr always_helpful                     ; IsConsideredHelpfulFunc
-        .addr broadsword_lv2_description         ; DescriptionStringPtr
-        .byte <.bank(broadsword_lv2_description) ; DescriptionStringBank
-
-broadsword_lvl_3:
-        .byte SLOT_WEAPON                        ; SlotId
-        .word SPRITE_ITEMS_01_BROADSWORD         ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE                  ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_BROADSWORD        ; HudBgTile
-        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS)  ; HudBgAttr
-        .byte 0                                  ; HudSpriteTile
-        .byte 0                                  ; HudSpriteAttr
-        .word 1000                               ; ShopCost
-        .byte WEAPON_BROADSWORD                  ; WeaponShape
-        .addr flat_3                             ; DamageFunc
-        .addr no_effect                          ; TorchlightFunc
-        .addr do_nothing                         ; UseFunc
-        .addr no_effect                          ; DmgReductionFunc
-        .addr do_nothing                         ; ApplyPassivesFunc
-        .addr always_valid                       ; IsValidLootFunc
-        .addr always_helpful                     ; IsConsideredHelpfulFunc
-        .addr broadsword_lv3_description         ; DescriptionStringPtr
-        .byte <.bank(broadsword_lv3_description) ; DescriptionStringBank
-
 longsword_lvl_1:
         .byte SLOT_WEAPON                       ; SlotId
         .word SPRITE_ITEMS_03_LONGSWORD         ; WorldSpriteTile
@@ -316,46 +276,6 @@ longsword_lvl_1:
         .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr longsword_lv1_description         ; DescriptionStringPtr
         .byte <.bank(longsword_lv1_description) ; DescriptionStringBank
-
-longsword_lvl_2:
-        .byte SLOT_WEAPON                       ; SlotId
-        .word SPRITE_ITEMS_03_LONGSWORD         ; WorldSpriteTile
-        .byte SPRITE_PAL_RED                    ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_LONGSWORD        ; HudBgTile
-        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)    ; HudBgAttr
-        .byte 0                                 ; HudSpriteTile
-        .byte 0                                 ; HudSpriteAttr
-        .word 250                               ; ShopCost
-        .byte WEAPON_LONGSWORD                  ; WeaponShape
-        .addr flat_2                            ; DamageFunc
-        .addr no_effect                         ; TorchlightFunc
-        .addr do_nothing                        ; UseFunc
-        .addr no_effect                         ; DmgReductionFunc
-        .addr do_nothing                        ; ApplyPassivesFunc
-        .addr always_valid                      ; IsValidLootFunc
-        .addr always_helpful                    ; IsConsideredHelpfulFunc
-        .addr longsword_lv2_description         ; DescriptionStringPtr
-        .byte <.bank(longsword_lv2_description) ; DescriptionStringBank
-
-longsword_lvl_3:
-        .byte SLOT_WEAPON                        ; SlotId
-        .word SPRITE_ITEMS_03_LONGSWORD          ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE                  ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_LONGSWORD         ; HudBgTile
-        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS)  ; HudBgAttr
-        .byte 0                                  ; HudSpriteTile
-        .byte 0                                  ; HudSpriteAttr
-        .word 1000                               ; ShopCost
-        .byte WEAPON_LONGSWORD                   ; WeaponShape
-        .addr flat_3                             ; DamageFunc
-        .addr no_effect                          ; TorchlightFunc
-        .addr do_nothing                         ; UseFunc
-        .addr no_effect                          ; DmgReductionFunc
-        .addr do_nothing                         ; ApplyPassivesFunc
-        .addr always_valid                       ; IsValidLootFunc
-        .addr always_helpful                     ; IsConsideredHelpfulFunc
-        .addr longsword_lv3_description          ; DescriptionStringPtr
-        .byte <.bank(longsword_lv3_description)  ; DescriptionStringBank
 
 spear_lvl_1:
         .byte SLOT_WEAPON                       ; SlotId
@@ -377,46 +297,6 @@ spear_lvl_1:
         .addr spear_lv1_description             ; DescriptionStringPtr
         .byte <.bank(spear_lv1_description)     ; DescriptionStringBank
 
-spear_lvl_2:
-        .byte SLOT_WEAPON                     ; SlotId
-        .word SPRITE_ITEMS_03_SPEAR           ; WorldSpriteTile
-        .byte SPRITE_PAL_RED                  ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_SPEAR          ; HudBgTile
-        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)  ; HudBgAttr
-        .byte 0                               ; HudSpriteTile
-        .byte 0                               ; HudSpriteAttr
-        .word 200                             ; ShopCost
-        .byte WEAPON_SPEAR                    ; WeaponShape
-        .addr flat_2                          ; DamageFunc
-        .addr no_effect                       ; TorchlightFunc
-        .addr do_nothing                      ; UseFunc
-        .addr no_effect                       ; DmgReductionFunc
-        .addr do_nothing                      ; ApplyPassivesFunc
-        .addr always_valid                    ; IsValidLootFunc
-        .addr always_helpful                  ; IsConsideredHelpfulFunc
-        .addr spear_lv2_description           ; DescriptionStringPtr
-        .byte <.bank(spear_lv2_description)   ; DescriptionStringBank
-
-spear_lvl_3:
-        .byte SLOT_WEAPON                       ; SlotId
-        .word SPRITE_ITEMS_03_SPEAR             ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_SPEAR            ; HudBgTile
-        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
-        .byte 0                                 ; HudSpriteTile
-        .byte 0                                 ; HudSpriteAttr
-        .word 750                               ; ShopCost
-        .byte WEAPON_SPEAR                      ; WeaponShape
-        .addr flat_3                            ; DamageFunc
-        .addr no_effect                         ; TorchlightFunc
-        .addr do_nothing                        ; UseFunc
-        .addr no_effect                         ; DmgReductionFunc
-        .addr do_nothing                        ; ApplyPassivesFunc
-        .addr always_valid                    ; IsValidLootFunc
-        .addr always_helpful                  ; IsConsideredHelpfulFunc
-        .addr spear_lv3_description             ; DescriptionStringPtr
-        .byte <.bank(spear_lv3_description)     ; DescriptionStringBank
-
 flail_lvl_1:
         .byte SLOT_WEAPON                       ; SlotId
         .word SPRITE_ITEMS_02_FLAIL             ; WorldSpriteTile
@@ -436,46 +316,6 @@ flail_lvl_1:
         .addr always_helpful                    ; IsConsideredHelpfulFunc
         .addr flail_lv1_description             ; DescriptionStringPtr
         .byte <.bank(flail_lv1_description)     ; DescriptionStringBank
-
-flail_lvl_2:
-        .byte SLOT_WEAPON                     ; SlotId
-        .word SPRITE_ITEMS_02_FLAIL           ; WorldSpriteTile
-        .byte SPRITE_PAL_RED                  ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_FLAIL          ; HudBgTile
-        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)  ; HudBgAttr
-        .byte 0                               ; HudSpriteTile
-        .byte 0                               ; HudSpriteAttr
-        .word 350                             ; ShopCost
-        .byte WEAPON_FLAIL                    ; WeaponShape
-        .addr flat_2                          ; DamageFunc
-        .addr no_effect                       ; TorchlightFunc
-        .addr do_nothing                      ; UseFunc
-        .addr no_effect                       ; DmgReductionFunc
-        .addr do_nothing                      ; ApplyPassivesFunc
-        .addr always_valid                    ; IsValidLootFunc
-        .addr always_helpful                  ; IsConsideredHelpfulFunc
-        .addr flail_lv2_description           ; DescriptionStringPtr
-        .byte <.bank(flail_lv2_description)   ; DescriptionStringBank
-
-flail_lvl_3:
-        .byte SLOT_WEAPON                       ; SlotId
-        .word SPRITE_ITEMS_02_FLAIL             ; WorldSpriteTile
-        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
-        .byte EQUIPMENT_WEAPON_FLAIL            ; HudBgTile
-        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
-        .byte 0                                 ; HudSpriteTile
-        .byte 0                                 ; HudSpriteAttr
-        .word 1250                              ; ShopCost
-        .byte WEAPON_FLAIL                      ; WeaponShape
-        .addr flat_3                            ; DamageFunc
-        .addr no_effect                         ; TorchlightFunc
-        .addr do_nothing                        ; UseFunc
-        .addr no_effect                         ; DmgReductionFunc
-        .addr do_nothing                        ; ApplyPassivesFunc
-        .addr always_valid                    ; IsValidLootFunc
-        .addr always_helpful                  ; IsConsideredHelpfulFunc
-        .addr flail_lv3_description             ; DescriptionStringPtr
-        .byte <.bank(flail_lv3_description)     ; DescriptionStringBank
 
 basic_torch:
         .byte SLOT_TORCH                        ; SlotId
