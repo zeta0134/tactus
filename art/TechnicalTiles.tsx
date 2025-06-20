@@ -80,27 +80,27 @@
  </tile>
  <tile id="32" type="item">
   <properties>
-   <property name="behavior" value="ITEM_DAGGER_L1"/>
+   <property name="behavior" value="ITEM_DAGGER"/>
   </properties>
  </tile>
  <tile id="33" type="item">
   <properties>
-   <property name="behavior" value="ITEM_BROADSWORD_L1"/>
+   <property name="behavior" value="ITEM_BROADSWORD"/>
   </properties>
  </tile>
  <tile id="34" type="item">
   <properties>
-   <property name="behavior" value="ITEM_LONGSWORD_L1"/>
+   <property name="behavior" value="ITEM_LONGSWORD"/>
   </properties>
  </tile>
  <tile id="35" type="item">
   <properties>
-   <property name="behavior" value="ITEM_SPEAR_L1"/>
+   <property name="behavior" value="ITEM_SPEAR"/>
   </properties>
  </tile>
  <tile id="36" type="item">
   <properties>
-   <property name="behavior" value="ITEM_FLAIL_L1"/>
+   <property name="behavior" value="ITEM_FLAIL"/>
   </properties>
  </tile>
  <tile id="37" type="item">

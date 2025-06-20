@@ -72,17 +72,17 @@ TOTAL_HEART_SLOTS := 6
 ; ITEMS
 
 ITEM_NONE              =  0
-ITEM_DAGGER_L1         =  1
-ITEM_BROADSWORD_L1     =  2
-;ITEM_BROADSWORD_L2     =  3
+ITEM_DAGGER            =  1
+ITEM_BROADSWORD        =  2
+ITEM_COMBAT_ANCHOR     =  3
 ;ITEM_BROADSWORD_L3     =  4
-ITEM_LONGSWORD_L1      =  5
+ITEM_LONGSWORD         =  5
 ;ITEM_LONGSWORD_L2      =  6
 ;ITEM_LONGSWORD_L3      =  7
-ITEM_SPEAR_L1          =  8
+ITEM_SPEAR             =  8
 ;ITEM_SPEAR_L2          =  9
 ;ITEM_SPEAR_L3          = 10
-ITEM_FLAIL_L1          = 11
+ITEM_FLAIL             = 11
 ;ITEM_FLAIL_L2          = 12
 ;ITEM_FLAIL_L3          = 13
 ITEM_BASIC_TORCH       = 14

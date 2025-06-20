@@ -49,6 +49,7 @@ weapon_class_table:
         .word longsword, longsword_charge
         .word spear, spear_charge
         .word flail, flail_charge
+        .word anchor, anchor_charge
 
 .proc load_weapon_ptr
 ItemPtr := R0
@@ -1553,6 +1554,239 @@ flail_charge_anim_west:
 .proc flail_charge_init_west
         set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
         st16 WeaponAnimPtr, flail_charge_anim_west
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
+; Combat Anchors have the unique distinction of being dragged *behind* the player as
+; they move. They work sortof like a cross between a flail and a broadsword, but because
+; they attack against the direction of movement, they are quite awkward to use. This is
+; offset by their charge attack being *quite* powerful.
+; 
+; Notably, the basic attack does not hit the square in front of the player. At all! It is
+; intentionally quite easy to bonk foward, making the anchor somewhat of a high skill
+; weapon with intentionally awkward mechanics. Also, skilled players can jump over enemies
+; with clever timing.
+; 
+; [ ][ ][ ][ ][ ][ ]
+; [*][*][ ][ ][ ][ ]
+; [*][P][ ][ ][ ][ ]
+; [*][*][ ][ ][ ][ ]
+; [ ][ ][ ][ ][ ][ ]
+
+anchor:
+        .byte $05 ; Length
+        ; behavior tables
+        .word anchor_north, anchor_east, anchor_south, anchor_west
+        ; animation routines
+        .word anchor_init_north, anchor_init_east, anchor_init_south, anchor_init_west
+
+anchor_north:
+        ;         X,  Y, Behavior
+        .lobytes -1,  1, (WEAPON_NO_BEHAVIOR)
+        .lobytes  0,  1, (WEAPON_NO_BEHAVIOR)
+        .lobytes  1,  1, (WEAPON_NO_BEHAVIOR)
+        .lobytes -1,  0, (WEAPON_NO_BEHAVIOR)
+        .lobytes  1,  0, (WEAPON_NO_BEHAVIOR)
+
+anchor_east:
+        ;         X,  Y, Behavior
+        .lobytes -1, -1, (WEAPON_NO_BEHAVIOR)
+        .lobytes -1,  0, (WEAPON_NO_BEHAVIOR)
+        .lobytes -1,  1, (WEAPON_NO_BEHAVIOR)
+        .lobytes  0, -1, (WEAPON_NO_BEHAVIOR)
+        .lobytes  0,  1, (WEAPON_NO_BEHAVIOR)
+
+anchor_south:
+        ;         X,  Y, Behavior
+        .lobytes  1, -1, (WEAPON_NO_BEHAVIOR)
+        .lobytes  0, -1, (WEAPON_NO_BEHAVIOR)
+        .lobytes -1, -1, (WEAPON_NO_BEHAVIOR)
+        .lobytes  1,  0, (WEAPON_NO_BEHAVIOR)
+        .lobytes -1,  0, (WEAPON_NO_BEHAVIOR)
+
+anchor_west:
+        ;         X,  Y, TileId, Behavior
+        .lobytes  1,  1, (WEAPON_NO_BEHAVIOR)
+        .lobytes  1,  0, (WEAPON_NO_BEHAVIOR)
+        .lobytes  1, -1, (WEAPON_NO_BEHAVIOR)
+        .lobytes  0,  1, (WEAPON_NO_BEHAVIOR)        
+        .lobytes  0, -1, (WEAPON_NO_BEHAVIOR)
+
+anchor_north_anim:
+        .byte 3  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes  16,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+
+anchor_east_anim:
+        .byte 3  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes -16,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+
+anchor_south_anim:
+        .byte 3  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes -16, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+
+anchor_west_anim:
+        .byte 3  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes  16, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+
+.proc anchor_init_north
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, anchor_north_anim
+        st16 WeaponDrawFunc, weapon_update_track_player
+        jmp weapon_init_common
+.endproc
+
+.proc anchor_init_east
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, anchor_east_anim
+        st16 WeaponDrawFunc, weapon_update_track_player
+        jmp weapon_init_common
+.endproc
+
+.proc anchor_init_south
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, anchor_south_anim
+        st16 WeaponDrawFunc, weapon_update_track_player
+        jmp weapon_init_common
+.endproc
+
+.proc anchor_init_west
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, anchor_west_anim
+        st16 WeaponDrawFunc, weapon_update_track_player
+        jmp weapon_init_common
+.endproc
+
+; When charged, combat anchors are slammed down in front of the player, hitting a rather
+; large 6-square area. The 3 squares that visibly align with the "tips" of the anchor are
+; stronger hits, dealing much more damage, assuming the player can predict the board state
+; and nail the right enemy with their somewhat awkward placement.
+
+; [ ][ ][ ][ ][ ][ ]
+; [ ][*][*][ ][ ][ ]
+; [ ][P][*][*][ ][ ]
+; [ ][*][*][ ][ ][ ]
+; [ ][ ][ ][ ][ ][ ]
+
+anchor_charge:
+        .byte $06 ; Length
+        ; behavior tables
+        .word anchor_charge_north, anchor_charge_east, anchor_charge_south, anchor_charge_west
+        ; animation routines
+        .word anchor_charge_init_north, anchor_charge_init_east, anchor_charge_init_south, anchor_charge_init_west
+
+anchor_charge_north:
+        ;         X,  Y, Behavior
+        .lobytes -1,  0, (WEAPON_STRONG_HIT | WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -2, (WEAPON_STRONG_HIT | WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  0, (WEAPON_STRONG_HIT | WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1, -1, (WEAPON_CANCEL_MOVEMENT)
+
+anchor_charge_east:
+        ;         X,  Y, Behavior
+        .lobytes  0, -1, (WEAPON_STRONG_HIT | WEAPON_CANCEL_MOVEMENT)
+        .lobytes  2,  0, (WEAPON_STRONG_HIT | WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  1, (WEAPON_STRONG_HIT | WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1, -1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  1, (WEAPON_CANCEL_MOVEMENT)
+
+anchor_charge_south:
+        ;         X,  Y, Behavior
+        .lobytes  1,  0, (WEAPON_STRONG_HIT | WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  2, (WEAPON_STRONG_HIT | WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  0, (WEAPON_STRONG_HIT | WEAPON_CANCEL_MOVEMENT)
+        .lobytes  1,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  1, (WEAPON_CANCEL_MOVEMENT)
+
+anchor_charge_west:
+        ;         X,  Y, TileId, Behavior
+        .lobytes  0,  1, (WEAPON_STRONG_HIT | WEAPON_CANCEL_MOVEMENT)
+        .lobytes -2,  0, (WEAPON_STRONG_HIT | WEAPON_CANCEL_MOVEMENT)
+        .lobytes  0, -1, (WEAPON_STRONG_HIT | WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  1, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1,  0, (WEAPON_CANCEL_MOVEMENT)
+        .lobytes -1, -1, (WEAPON_CANCEL_MOVEMENT)
+
+anchor_charge_north_anim:
+        .byte 6  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes -16,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0, -32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+
+anchor_charge_east_anim:
+        .byte 6  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes   0, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  32,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+
+anchor_charge_south_anim:
+        .byte 6  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes  16,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0,  32, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes  16,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+
+anchor_charge_west_anim:
+        .byte 6  ; length
+                 ; X,   Y,                         TileId, Sprite Behavior
+        .lobytes   0,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -32,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes   0, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16,  16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16,   0, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+        .lobytes -16, -16, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER, (SPRITE_PAL_YELLOW)
+
+.proc anchor_charge_init_north
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, anchor_charge_north_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
+.proc anchor_charge_init_east
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, anchor_charge_east_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
+.proc anchor_charge_init_south
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, anchor_charge_south_anim
+        st16 WeaponDrawFunc, weapon_update_none
+        jmp weapon_init_common
+.endproc
+
+.proc anchor_charge_init_west
+        set_sprite_bank SPRITE_BANK_WEAPON, SPRITE_WEAPON_SPELLCASTING_PLACEHOLDER
+        st16 WeaponAnimPtr, anchor_charge_west_anim
         st16 WeaponDrawFunc, weapon_update_none
         jmp weapon_init_common
 .endproc

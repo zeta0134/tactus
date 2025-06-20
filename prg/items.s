@@ -74,19 +74,12 @@ item_bank_refs: .res 4
 no_item_description:        localized_item_description no_item_name_localized, no_item_description_localized
 
 ; Weapons
-dagger_lv1_description:        localized_item_description      dagger_name_localized,      dagger_description_localized
-broadsword_lv1_description:    localized_item_description      broadsword_name_localized,  broadsword_description_localized
-broadsword_lv2_description:    localized_l2_weapon_description broadsword_name_localized,  broadsword_description_localized
-broadsword_lv3_description:    localized_l3_weapon_description broadsword_name_localized,  broadsword_description_localized
-longsword_lv1_description:     localized_item_description      longsword_name_localized,   longsword_description_localized
-longsword_lv2_description:     localized_l2_weapon_description longsword_name_localized,   longsword_description_localized
-longsword_lv3_description:     localized_l3_weapon_description longsword_name_localized,   longsword_description_localized
-spear_lv1_description:         localized_item_description      spear_name_localized,       spear_description_localized
-spear_lv2_description:         localized_l2_weapon_description spear_name_localized,       spear_description_localized
-spear_lv3_description:         localized_l3_weapon_description spear_name_localized,       spear_description_localized
-flail_lv1_description:         localized_item_description      flail_name_localized,       flail_description_localized
-flail_lv2_description:         localized_l2_weapon_description flail_name_localized,       flail_description_localized
-flail_lv3_description:         localized_l3_weapon_description flail_name_localized,       flail_description_localized
+dagger_description:        localized_item_description      dagger_name_localized,        dagger_description_localized
+broadsword_description:    localized_item_description      broadsword_name_localized,    broadsword_description_localized
+longsword_description:     localized_item_description      longsword_name_localized,     longsword_description_localized
+spear_description:         localized_item_description      spear_name_localized,         spear_description_localized
+flail_description:         localized_item_description      flail_name_localized,         flail_description_localized
+combat_anchor_description: localized_item_description      combat_anchor_name_localized, combat_anchor_description_localized
 
 ; Light Sources
 basic_torch_description:       localized_item_description basic_torch_name_localized,      basic_torch_description_localized
@@ -138,17 +131,17 @@ spell_life_description:        localized_item_description spell_life_name_locali
 
 item_table:
         .word no_item
-        .word dagger_lvl_1
-        .word broadsword_lvl_1
+        .word dagger
+        .word broadsword
+        .word combat_anchor
+        .word no_item
+        .word longsword
         .word no_item
         .word no_item
-        .word longsword_lvl_1
+        .word spear
         .word no_item
         .word no_item
-        .word spear_lvl_1
-        .word no_item
-        .word no_item
-        .word flail_lvl_1
+        .word flail
         .word no_item
         .word no_item
         .word basic_torch
@@ -217,7 +210,7 @@ no_item:
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
 
-dagger_lvl_1:
+dagger:
         .byte SLOT_WEAPON                     ; SlotId
         .word SPRITE_ITEMS_01_DAGGER          ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW               ; WorldSpriteAttr
@@ -234,10 +227,10 @@ dagger_lvl_1:
         .addr do_nothing                      ; ApplyPassivesFunc
         .addr always_valid                    ; IsValidLootFunc
         .addr always_helpful                  ; IsConsideredHelpfulFunc
-        .addr dagger_lv1_description          ; DescriptionStringPtr
-        .byte <.bank(dagger_lv1_description)  ; DescriptionStringBank
+        .addr dagger_description          ; DescriptionStringPtr
+        .byte <.bank(dagger_description)  ; DescriptionStringBank
 
-broadsword_lvl_1:
+broadsword:
         .byte SLOT_WEAPON                        ; SlotId
         .word SPRITE_ITEMS_01_BROADSWORD         ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                  ; WorldSpriteAttr
@@ -254,10 +247,30 @@ broadsword_lvl_1:
         .addr do_nothing                         ; ApplyPassivesFunc
         .addr always_valid                       ; IsValidLootFunc
         .addr always_helpful                     ; IsConsideredHelpfulFunc
-        .addr broadsword_lv1_description         ; DescriptionStringPtr
-        .byte <.bank(broadsword_lv1_description) ; DescriptionStringBank
+        .addr broadsword_description         ; DescriptionStringPtr
+        .byte <.bank(broadsword_description) ; DescriptionStringBank
 
-longsword_lvl_1:
+combat_anchor:
+        .byte SLOT_WEAPON                        ; SlotId
+        .word SPRITE_ITEMS_04_INVALID_ITEM       ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                  ; WorldSpriteAttr
+        .byte EQUIPMENT_NONE                     ; HudBgTile
+        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)     ; HudBgAttr
+        .byte 0                                  ; HudSpriteTile
+        .byte 0                                  ; HudSpriteAttr
+        .word 75                                 ; ShopCost
+        .byte WEAPON_ANCHOR                      ; WeaponShape
+        .addr flat_1                             ; DamageFunc
+        .addr no_effect                          ; TorchlightFunc
+        .addr do_nothing                         ; UseFunc
+        .addr no_effect                          ; DmgReductionFunc
+        .addr do_nothing                         ; ApplyPassivesFunc
+        .addr always_valid                       ; IsValidLootFunc
+        .addr always_helpful                     ; IsConsideredHelpfulFunc
+        .addr combat_anchor_description         ; DescriptionStringPtr
+        .byte <.bank(combat_anchor_description) ; DescriptionStringBank
+
+longsword:
         .byte SLOT_WEAPON                       ; SlotId
         .word SPRITE_ITEMS_03_LONGSWORD         ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
@@ -274,10 +287,10 @@ longsword_lvl_1:
         .addr do_nothing                        ; ApplyPassivesFunc
         .addr always_valid                      ; IsValidLootFunc
         .addr always_helpful                    ; IsConsideredHelpfulFunc
-        .addr longsword_lv1_description         ; DescriptionStringPtr
-        .byte <.bank(longsword_lv1_description) ; DescriptionStringBank
+        .addr longsword_description         ; DescriptionStringPtr
+        .byte <.bank(longsword_description) ; DescriptionStringBank
 
-spear_lvl_1:
+spear:
         .byte SLOT_WEAPON                       ; SlotId
         .word SPRITE_ITEMS_03_SPEAR             ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
@@ -294,10 +307,10 @@ spear_lvl_1:
         .addr do_nothing                        ; ApplyPassivesFunc
         .addr always_valid                      ; IsValidLootFunc
         .addr always_helpful                    ; IsConsideredHelpfulFunc
-        .addr spear_lv1_description             ; DescriptionStringPtr
-        .byte <.bank(spear_lv1_description)     ; DescriptionStringBank
+        .addr spear_description             ; DescriptionStringPtr
+        .byte <.bank(spear_description)     ; DescriptionStringBank
 
-flail_lvl_1:
+flail:
         .byte SLOT_WEAPON                       ; SlotId
         .word SPRITE_ITEMS_02_FLAIL             ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                 ; WorldSpriteAttr
@@ -314,8 +327,8 @@ flail_lvl_1:
         .addr do_nothing                        ; ApplyPassivesFunc
         .addr always_valid                      ; IsValidLootFunc
         .addr always_helpful                    ; IsConsideredHelpfulFunc
-        .addr flail_lv1_description             ; DescriptionStringPtr
-        .byte <.bank(flail_lv1_description)     ; DescriptionStringBank
+        .addr flail_description             ; DescriptionStringPtr
+        .byte <.bank(flail_description)     ; DescriptionStringBank
 
 basic_torch:
         .byte SLOT_TORCH                        ; SlotId
@@ -1164,7 +1177,7 @@ charge_a_bulb:
         ; Easy check: if the player is currently holding the starting dagger, then no
         ; upgrades for you. :P
         lda current_save + SaveFile::PlayerEquipmentWeapon
-        cmp #ITEM_DAGGER_L1
+        cmp #ITEM_DAGGER
         beq spawn_is_invalid
 
         ; TODO: all those other checks. In particular, I haven't decided how the
@@ -1593,7 +1606,7 @@ upgrade_to_temporary_armored:
 .proc _give_upgrade_common
         ; The starting dagger does not support upgrades!
         lda current_save + SaveFile::PlayerEquipmentWeapon
-        cmp #ITEM_DAGGER_L1
+        cmp #ITEM_DAGGER
         beq failure
         ; Otherwise, whichever slot is free, put it there
         lda current_save + SaveFile::PlayerWeaponUpgradeSlot1

@@ -1338,7 +1338,7 @@ DrawAttr := R7
         beq draw_fire_icon
 handle_empty_slot:
         lda current_save + SaveFile::PlayerEquipmentWeapon
-        cmp #ITEM_DAGGER_L1
+        cmp #ITEM_DAGGER
         beq draw_blank_tile
 draw_empty_slot:
         lda #UPGRADE_SLOT

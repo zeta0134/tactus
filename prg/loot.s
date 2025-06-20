@@ -324,18 +324,18 @@ common_treasure_table:
     ;.byte ITEM_CHARGE_A_BULB
 
     .byte 39
-    .byte ITEM_BROADSWORD_L1
-    .byte ITEM_BROADSWORD_L1
-    .byte ITEM_BROADSWORD_L1
-    .byte ITEM_LONGSWORD_L1
-    .byte ITEM_LONGSWORD_L1
-    .byte ITEM_LONGSWORD_L1
-    .byte ITEM_SPEAR_L1
-    .byte ITEM_SPEAR_L1
-    .byte ITEM_SPEAR_L1
-    .byte ITEM_FLAIL_L1
-    .byte ITEM_FLAIL_L1
-    .byte ITEM_FLAIL_L1
+    .byte ITEM_BROADSWORD
+    .byte ITEM_BROADSWORD
+    .byte ITEM_BROADSWORD
+    .byte ITEM_LONGSWORD
+    .byte ITEM_LONGSWORD
+    .byte ITEM_LONGSWORD
+    .byte ITEM_SPEAR
+    .byte ITEM_SPEAR
+    .byte ITEM_SPEAR
+    .byte ITEM_FLAIL
+    .byte ITEM_FLAIL
+    .byte ITEM_FLAIL
     .byte ITEM_BASIC_TORCH
     .byte ITEM_BASIC_TORCH
     .byte ITEM_BASIC_TORCH

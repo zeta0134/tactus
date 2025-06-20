@@ -219,6 +219,9 @@ def gather_translated_strings(languages):
         items["charge_a_bulb"] = {
             "name":        _("charge_a_bulb_name"),
             "description": _("charge_a_bulb_description")}
+        items["combat_anchor"] = {
+            "name":        _("combat_anchor_name"),
+            "description": _("combat_anchor_description")}
 
         # massage the translated strings into a data structure keyed on the individual message,
         # as this is our output unit for the game. (We're looping over entire languages at once,
