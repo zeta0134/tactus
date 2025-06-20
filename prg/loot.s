@@ -11,6 +11,7 @@
     .include "player.inc"
     .include "prng.inc"
     .include "rainbow.inc"
+    .include "saves.inc"
     .include "text_util.inc"
     .include "word_util.inc"
     .include "zeropage.inc"
@@ -315,6 +316,16 @@ combo_offset_lut:
 ;                    TREASURE TABLES
 ; ========================================================
 
+; Exactly what it says on the tin. Typically used in the very early game
+; to force weapon spawns, so players can reliably get a build going
+weapons_only_treasure_table:
+    .byte 5
+    .byte ITEM_BROADSWORD
+    .byte ITEM_LONGSWORD
+    .byte ITEM_SPEAR
+    .byte ITEM_FLAIL
+    .byte ITEM_COMBAT_ANCHOR
+
 ; heavily weighted towards L1 weapons, but occasionally has some L2 and other interesting stuff
 common_treasure_table:
     ; Sometimes we need the shop to carry three specific items. Here's how to do that:
@@ -425,28 +436,37 @@ consumable_treasure_table:
     .byte ITEM_BOMB_STANDARD_X3
 
 common_chest_treasure_table:
-    .byte 34
-    .byte ITEM_BOMB_STANDARD_X1
-    .byte ITEM_BOMB_STANDARD_X1
-    .byte ITEM_BOMB_STANDARD_X1
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_SMALL_FRIES
-    .byte ITEM_MEDIUM_FRIES
-    .byte ITEM_MEDIUM_FRIES
-    .byte ITEM_MEDIUM_FRIES
-    .byte ITEM_HEART_ARMOR
-    .byte ITEM_HEART_ARMOR
-    .byte ITEM_HEART_ARMOR
-    .byte ITEM_BOMB_STANDARD_X1
+    .byte 43
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_BASIC_TORCH
+    .byte ITEM_BASIC_TORCH
     .byte ITEM_BOMB_STANDARD_X3
     .byte ITEM_BOMB_STANDARD_X3
+    .byte ITEM_BOMB_STANDARD_X3
+    .byte ITEM_BOMB_STANDARD_X3
+    .byte ITEM_BOMB_STANDARD_X3
+    .byte ITEM_BOMB_STANDARD_X3
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_MEDIUM_FRIES
+    .byte ITEM_MEDIUM_FRIES
+    .byte ITEM_MEDIUM_FRIES
+    .byte ITEM_HEART_ARMOR
+    .byte ITEM_HEART_ARMOR
+    .byte ITEM_HEART_ARMOR
     .byte ITEM_GOLD_SACK
     .byte ITEM_GOLD_SACK
     .byte ITEM_GOLD_SACK
@@ -581,6 +601,8 @@ item_index_in_range:
     ; sanity checks here
     jsr check_for_duplicate_shop_roll
     bne roll_acceptable_item_loop
+    jsr check_for_duplicate_player_equipment
+    bne roll_acceptable_item_loop
     far_call FAR_item_is_considered_valid_loot
     cmp #0
     bne roll_acceptable_item_loop
@@ -649,6 +671,30 @@ accept:
     lda #0
     rts
 reject:
+    lda #$FF
+    rts
+.endproc
+
+; intentionally ignores the bomb and spell slot, as duplicates there are
+; generally acceptable. also intentionally ignores special mechanics and rules,
+; which should be covered by the item's "is valid" logic instead
+.proc check_for_duplicate_player_equipment
+ItemId := R2
+    lda ItemId
+    cmp current_save + SaveFile::PlayerEquipmentWeapon
+    beq is_dupliate
+    cmp current_save + SaveFile::PlayerEquipmentTorch
+    beq is_dupliate
+    cmp current_save + SaveFile::PlayerEquipmentArmor
+    beq is_dupliate
+    cmp current_save + SaveFile::PlayerEquipmentBoots
+    beq is_dupliate
+    cmp current_save + SaveFile::PlayerEquipmentAccessory
+    beq is_dupliate
+is_unique:
+    lda #0
+    rts
+is_dupliate:
     lda #$FF
     rts
 .endproc

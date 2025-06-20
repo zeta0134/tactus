@@ -109,10 +109,10 @@ zone_grasslands_floor_1:
         .byte 0                     ; Added Tempo
         .word zone_grasslands_banner_1_1 ; HudBanner
         .addr hud_grasslands_pal
-        .addr common_treasure_table     ; ShopLootPtr0
-        .addr common_treasure_table     ; ShopLootPtr1
-        .addr common_treasure_table     ; ShopLootPtr2
-        .addr consumable_treasure_table ; ShopLootPtr3
+        .addr weapons_only_treasure_table ; ShopLootPtr0
+        .addr common_treasure_table       ; ShopLootPtr1
+        .addr common_treasure_table       ; ShopLootPtr2
+        .addr consumable_treasure_table   ; ShopLootPtr3
         .addr test_structure_set_big    ;InteriorStructureLargeSet
         .byte 1                         ;InteriorStructureLargeMaxMax
         .addr test_structure_set_small  ;InteriorStructureSmallSet
@@ -150,10 +150,10 @@ zone_grasslands_floor_2:
         .byte 5   ; Added Tempo
         .word zone_grasslands_banner_1_2 ; HudBanner
         .addr hud_grasslands_pal
-        .addr rare_treasure_table       ; ShopLootPtr0
-        .addr rare_treasure_table       ; ShopLootPtr1
-        .addr common_treasure_table     ; ShopLootPtr2
-        .addr consumable_treasure_table ; ShopLootPtr3
+        .addr rare_treasure_table         ; ShopLootPtr0
+        .addr weapons_only_treasure_table ; ShopLootPtr1
+        .addr common_treasure_table       ; ShopLootPtr2
+        .addr consumable_treasure_table   ; ShopLootPtr3
         .addr test_structure_set_big   ;InteriorStructureLargeSet
         .byte 1                        ;InteriorStructureLargeMaxMax
         .addr test_structure_set_small ;InteriorStructureSmallSet

@@ -345,8 +345,8 @@ basic_torch:
         .addr do_nothing                        ; UseFunc
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
-        .addr always_valid                      ; IsValidLootFunc
-        .addr always_helpful                    ; IsConsideredHelpfulFunc
+        .addr valid_if_torchless                ; IsValidLootFunc
+        .addr helpful_if_torchless_in_the_dark  ; IsConsideredHelpfulFunc
         .addr basic_torch_description           ; DescriptionStringPtr
         .byte <.bank(basic_torch_description)   ; DescriptionStringBank
 
@@ -366,7 +366,7 @@ large_torch:
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
         .addr always_valid                      ; IsValidLootFunc
-        .addr always_helpful                    ; IsConsideredHelpfulFunc
+        .addr helpful_if_torchless_in_the_dark  ; IsConsideredHelpfulFunc
         .addr large_torch_description           ; DescriptionStringPtr
         .byte <.bank(large_torch_description)   ; DescriptionStringBank
 
@@ -568,7 +568,7 @@ heart_armor:
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
         .addr always_valid                    ; IsValidLootFunc
-        .addr always_helpful                  ; IsConsideredHelpfulFunc
+        .addr helpful_if_unarmored_heart      ; IsConsideredHelpfulFunc
         .addr heart_armor_description         ; DescriptionStringPtr
         .byte <.bank(heart_armor_description) ; DescriptionStringBank
 
@@ -695,7 +695,7 @@ bomb_standard:
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
         .addr always_valid                      ; IsValidLootFunc
-        .addr always_helpful                    ; IsConsideredHelpfulFunc
+        .addr helpful_if_low_on_bombs           ; IsConsideredHelpfulFunc
         .addr bombs_description                 ; DescriptionStringPtr
         .byte <.bank(bombs_description)         ; DescriptionStringBank
 
@@ -715,7 +715,7 @@ bomb_standard_one_pack:
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
         .addr always_valid                      ; IsValidLootFunc
-        .addr always_helpful                    ; IsConsideredHelpfulFunc
+        .addr helpful_if_low_on_bombs           ; IsConsideredHelpfulFunc
         .addr bombs_description                 ; DescriptionStringPtr
         .byte <.bank(bombs_description)         ; DescriptionStringBank
 
@@ -735,7 +735,7 @@ bomb_standard_three_pack:
         .addr no_effect                         ; DmgReductionFunc
         .addr do_nothing                        ; ApplyPassivesFunc
         .addr always_valid                      ; IsValidLootFunc
-        .addr always_helpful                    ; IsConsideredHelpfulFunc
+        .addr helpful_if_low_on_bombs           ; IsConsideredHelpfulFunc
         .addr bombs_description                 ; DescriptionStringPtr
         .byte <.bank(bombs_description)         ; DescriptionStringBank
 
@@ -1125,7 +1125,7 @@ infernal_lantern:
         .addr no_effect                            ; DmgReductionFunc
         .addr do_nothing                           ; ApplyPassivesFunc
         .addr always_valid                         ; IsValidLootFunc
-        .addr always_helpful                       ; IsConsideredHelpfulFunc
+        .addr helpful_if_torchless_in_the_dark     ; IsConsideredHelpfulFunc
         .addr infernal_lantern_description         ; DescriptionStringPtr
         .byte <.bank(infernal_lantern_description) ; DescriptionStringBank
 
@@ -1145,7 +1145,7 @@ charge_a_bulb:
         .addr no_effect                            ; DmgReductionFunc
         .addr do_nothing                           ; ApplyPassivesFunc
         .addr always_valid                         ; IsValidLootFunc
-        .addr always_helpful                       ; IsConsideredHelpfulFunc
+        .addr helpful_if_torchless_in_the_dark     ; IsConsideredHelpfulFunc
         .addr charge_a_bulb_description            ; DescriptionStringPtr
         .byte <.bank(charge_a_bulb_description)    ; DescriptionStringBank
 
@@ -1213,6 +1213,82 @@ helpful:
         rts
 not_helpful:
         lda #$FF
+        rts
+.endproc
+
+.proc valid_if_torchless
+        lda current_save + SaveFile::PlayerEquipmentTorch
+        cmp #ITEM_NONE
+        bne not_valid
+valid:
+        lda #0
+        rts
+not_valid:
+        lda #$FF
+        rts
+.endproc
+
+.proc helpful_if_torchless_in_the_dark
+        ldx PlayerRoomIndex
+        lda room_properties, x
+        and #ROOM_PROPERTIES_DARK
+        beq not_helpful
+        lda current_save + SaveFile::PlayerEquipmentTorch
+        cmp #ITEM_NONE
+        bne not_helpful
+helpful:
+        lda #0
+        rts
+not_helpful:
+        lda #$FF
+        rts
+.endproc
+
+.proc helpful_if_low_on_bombs
+        lda current_save + SaveFile::PlayerEquipmentBombs
+        cmp #ITEM_NONE
+        beq bomb_base_item_valid
+        cmp #ITEM_BOMB_STANDARD
+        beq bomb_base_item_valid
+        jmp not_helpful
+bomb_base_item_valid:
+        lda current_save + SaveFile::PlayerBombCount
+        cmp #10
+        bcs not_helpful
+helpful:
+        lda #0
+        rts
+not_helpful:
+        lda #$FF
+        rts
+.endproc
+
+; For heart armor only, pretty much. Stop spawning heart armor from regular
+; chests if the player can't actually put it on in their current state.
+.proc helpful_if_unarmored_heart
+        ; Starting from the left, look for the first
+        ; normal/temporary heart that is unarmored AND
+        ; which has more than 0 HP
+        ldx #0
+find_heart_loop:
+        lda current_save + SaveFile::HeartSlotHp, x
+        beq is_empty
+        lda current_save + SaveFile::HeartSlotType, x
+        cmp #HEART_TYPE_REGULAR
+        beq is_helpful
+        cmp #HEART_TYPE_TEMPORARY
+        beq is_helpful
+is_empty:
+        ; Otherwise keep checking
+        inx
+        cpx #TOTAL_HEART_SLOTS
+        bne find_heart_loop
+not_helpful:
+        ; Oh no! Whelp; cancel the thing then.
+        lda #$FF ; return failure
+        rts
+is_helpful:
+        lda #0
         rts
 .endproc
 
@@ -1544,14 +1620,18 @@ okay_to_heal:
 
 .proc give_heart_armor
         ; Starting from the left, look for the first
-        ; normal/temporary heart that is unarmored
+        ; normal/temporary heart that is unarmored AND
+        ; which has more than 0 HP
         ldx #0
 find_heart_loop:
+        lda current_save + SaveFile::HeartSlotHp, x
+        beq is_empty
         lda current_save + SaveFile::HeartSlotType, x
         cmp #HEART_TYPE_REGULAR
         beq upgrade_to_armored
         cmp #HEART_TYPE_TEMPORARY
         beq upgrade_to_temporary_armored
+is_empty:
         ; Otherwise keep checking
         inx
         cpx #TOTAL_HEART_SLOTS
