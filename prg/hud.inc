@@ -30,6 +30,7 @@ chr_tile_offset EQUIPMENT_WEAPON_BROADSWORD, 2, 2
 chr_tile_offset EQUIPMENT_WEAPON_LONGSWORD,  4, 2
 chr_tile_offset EQUIPMENT_WEAPON_SPEAR,      6, 2
 chr_tile_offset EQUIPMENT_WEAPON_FLAIL,      8, 2
+chr_tile_offset EQUIPMENT_COMBAT_ANCHOR,    10, 2
 
 chr_tile_offset EQUIPMENT_ARMOR_SHIELD,        0, 4
 chr_tile_offset EQUIPMENT_ARMOR_TSHIRT_TEXT,   2, 4

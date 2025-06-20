@@ -323,7 +323,7 @@ common_treasure_table:
     ;.byte ITEM_INFERNAL_LANTERN
     ;.byte ITEM_CHARGE_A_BULB
 
-    .byte 39
+    .byte 42
     .byte ITEM_BROADSWORD
     .byte ITEM_BROADSWORD
     .byte ITEM_BROADSWORD
@@ -336,6 +336,9 @@ common_treasure_table:
     .byte ITEM_FLAIL
     .byte ITEM_FLAIL
     .byte ITEM_FLAIL
+    .byte ITEM_COMBAT_ANCHOR
+    .byte ITEM_COMBAT_ANCHOR
+    .byte ITEM_COMBAT_ANCHOR
     .byte ITEM_BASIC_TORCH
     .byte ITEM_BASIC_TORCH
     .byte ITEM_BASIC_TORCH
@@ -422,10 +425,16 @@ consumable_treasure_table:
     .byte ITEM_BOMB_STANDARD_X3
 
 common_chest_treasure_table:
-    .byte 28
+    .byte 34
     .byte ITEM_BOMB_STANDARD_X1
     .byte ITEM_BOMB_STANDARD_X1
     .byte ITEM_BOMB_STANDARD_X1
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
+    .byte ITEM_SMALL_FRIES
     .byte ITEM_SMALL_FRIES
     .byte ITEM_SMALL_FRIES
     .byte ITEM_SMALL_FRIES

@@ -118,6 +118,31 @@
    <property name="behavior" value="ITEM_LARGE_TORCH"/>
   </properties>
  </tile>
+ <tile id="40" type="item">
+  <properties>
+   <property name="behavior" value="ITEM_COMBAT_ANCHOR"/>
+  </properties>
+ </tile>
+ <tile id="41" type="item">
+  <properties>
+   <property name="behavior" value="ITEM_UPGRADE_ICE"/>
+  </properties>
+ </tile>
+ <tile id="42" type="item">
+  <properties>
+   <property name="behavior" value="ITEM_UPGRADE_EARTH"/>
+  </properties>
+ </tile>
+ <tile id="43" type="item">
+  <properties>
+   <property name="behavior" value="ITEM_UPGRADE_AIR"/>
+  </properties>
+ </tile>
+ <tile id="44" type="item">
+  <properties>
+   <property name="behavior" value="ITEM_UPGRADE_FIRE"/>
+  </properties>
+ </tile>
  <tile id="48" type="item">
   <properties>
    <property name="behavior" value="ITEM_SPELL_FIRE"/>

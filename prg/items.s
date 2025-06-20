@@ -227,8 +227,8 @@ dagger:
         .addr do_nothing                      ; ApplyPassivesFunc
         .addr always_valid                    ; IsValidLootFunc
         .addr always_helpful                  ; IsConsideredHelpfulFunc
-        .addr dagger_description          ; DescriptionStringPtr
-        .byte <.bank(dagger_description)  ; DescriptionStringBank
+        .addr dagger_description              ; DescriptionStringPtr
+        .byte <.bank(dagger_description)      ; DescriptionStringBank
 
 broadsword:
         .byte SLOT_WEAPON                        ; SlotId
@@ -247,15 +247,15 @@ broadsword:
         .addr do_nothing                         ; ApplyPassivesFunc
         .addr always_valid                       ; IsValidLootFunc
         .addr always_helpful                     ; IsConsideredHelpfulFunc
-        .addr broadsword_description         ; DescriptionStringPtr
-        .byte <.bank(broadsword_description) ; DescriptionStringBank
+        .addr broadsword_description             ; DescriptionStringPtr
+        .byte <.bank(broadsword_description)     ; DescriptionStringBank
 
 combat_anchor:
         .byte SLOT_WEAPON                        ; SlotId
-        .word SPRITE_ITEMS_04_INVALID_ITEM       ; WorldSpriteTile
+        .word SPRITE_ITEMS_06_COMBAT_ANCHOR      ; WorldSpriteTile
         .byte SPRITE_PAL_YELLOW                  ; WorldSpriteAttr
-        .byte EQUIPMENT_NONE                     ; HudBgTile
-        .byte (HUD_RED_PAL | CHR_BANK_ITEMS)     ; HudBgAttr
+        .byte EQUIPMENT_COMBAT_ANCHOR            ; HudBgTile
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS)  ; HudBgAttr
         .byte 0                                  ; HudSpriteTile
         .byte 0                                  ; HudSpriteAttr
         .word 75                                 ; ShopCost
@@ -267,8 +267,8 @@ combat_anchor:
         .addr do_nothing                         ; ApplyPassivesFunc
         .addr always_valid                       ; IsValidLootFunc
         .addr always_helpful                     ; IsConsideredHelpfulFunc
-        .addr combat_anchor_description         ; DescriptionStringPtr
-        .byte <.bank(combat_anchor_description) ; DescriptionStringBank
+        .addr combat_anchor_description          ; DescriptionStringPtr
+        .byte <.bank(combat_anchor_description)  ; DescriptionStringBank
 
 longsword:
         .byte SLOT_WEAPON                       ; SlotId
@@ -287,8 +287,8 @@ longsword:
         .addr do_nothing                        ; ApplyPassivesFunc
         .addr always_valid                      ; IsValidLootFunc
         .addr always_helpful                    ; IsConsideredHelpfulFunc
-        .addr longsword_description         ; DescriptionStringPtr
-        .byte <.bank(longsword_description) ; DescriptionStringBank
+        .addr longsword_description             ; DescriptionStringPtr
+        .byte <.bank(longsword_description)     ; DescriptionStringBank
 
 spear:
         .byte SLOT_WEAPON                       ; SlotId
@@ -307,8 +307,8 @@ spear:
         .addr do_nothing                        ; ApplyPassivesFunc
         .addr always_valid                      ; IsValidLootFunc
         .addr always_helpful                    ; IsConsideredHelpfulFunc
-        .addr spear_description             ; DescriptionStringPtr
-        .byte <.bank(spear_description)     ; DescriptionStringBank
+        .addr spear_description                 ; DescriptionStringPtr
+        .byte <.bank(spear_description)         ; DescriptionStringBank
 
 flail:
         .byte SLOT_WEAPON                       ; SlotId
@@ -327,8 +327,8 @@ flail:
         .addr do_nothing                        ; ApplyPassivesFunc
         .addr always_valid                      ; IsValidLootFunc
         .addr always_helpful                    ; IsConsideredHelpfulFunc
-        .addr flail_description             ; DescriptionStringPtr
-        .byte <.bank(flail_description)     ; DescriptionStringBank
+        .addr flail_description                 ; DescriptionStringPtr
+        .byte <.bank(flail_description)         ; DescriptionStringBank
 
 basic_torch:
         .byte SLOT_TORCH                        ; SlotId
@@ -877,7 +877,7 @@ upgrade_crystal_earth:
         .addr give_upgrade_earth              ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
-        .addr always_valid                    ; IsValidLootFunc
+        .addr weapon_upgrade_considered_valid ; IsValidLootFunc
         .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
@@ -897,7 +897,7 @@ upgrade_crystal_ice:
         .addr give_upgrade_ice                ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
-        .addr always_valid                    ; IsValidLootFunc
+        .addr weapon_upgrade_considered_valid ; IsValidLootFunc
         .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
@@ -917,7 +917,7 @@ upgrade_crystal_air:
         .addr give_upgrade_air                ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
-        .addr always_valid                    ; IsValidLootFunc
+        .addr weapon_upgrade_considered_valid ; IsValidLootFunc
         .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
@@ -937,7 +937,7 @@ upgrade_crystal_fire:
         .addr give_upgrade_fire               ; UseFunc
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
-        .addr always_valid                    ; IsValidLootFunc
+        .addr weapon_upgrade_considered_valid ; IsValidLootFunc
         .addr always_helpful                  ; IsConsideredHelpfulFunc
         .addr no_item_description             ; DescriptionStringPtr
         .byte <.bank(no_item_description)     ; DescriptionStringBank
