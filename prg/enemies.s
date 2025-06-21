@@ -218,12 +218,14 @@ tile_index_to_col_lut:
 .include "enemies/birb.asm"
 .include "enemies/cardinal_chaser.asm"
 .include "enemies/challenge_spikes.asm"
+.include "enemies/chests.asm"
 .include "enemies/cultist.asm"
 .include "enemies/diagonal_chaser.asm"
 .include "enemies/disco_tile.asm"
 .include "enemies/exit_block.asm"
 .include "enemies/hazard_tile.asm"
 .include "enemies/item_shadow.asm"
+.include "enemies/mimic.asm"
 .include "enemies/mole.asm"
 .include "enemies/mushroom.asm"
 .include "enemies/one_armed_bandit.asm"
@@ -614,6 +616,48 @@ tile_collide TILE_ONE_BEAT_BURN, ENEMY_COLLIDE_activate_hazard_burn
 tile_suspend TILE_ONE_BEAT_BURN, ENEMY_UTIL_draw_cleared_disco_tile
 tile_explode TILE_ONE_BEAT_BURN, FIXED_no_behavior, FIXED_no_behavior
 tile_spell   TILE_ONE_BEAT_BURN, FIXED_no_behavior
+
+tile_update  TILE_HELPFUL_CHEST, ENEMY_UPDATE_helpful_chest
+tile_attack  TILE_HELPFUL_CHEST, ENEMY_ATTACK_open_helpful_chest, FIXED_no_behavior
+tile_collide TILE_HELPFUL_CHEST, ENEMY_COLLIDE_open_helpful_chest
+tile_suspend TILE_HELPFUL_CHEST, ENEMY_UTIL_suspend_helpful_chest
+tile_explode TILE_HELPFUL_CHEST, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_HELPFUL_CHEST, FIXED_no_behavior
+
+tile_update  TILE_LARGE_CHEST, FIXED_no_behavior
+tile_attack  TILE_LARGE_CHEST, ENEMY_ATTACK_open_large_chest, FIXED_no_behavior
+tile_collide TILE_LARGE_CHEST, ENEMY_COLLIDE_open_large_chest
+tile_suspend TILE_LARGE_CHEST, ENEMY_UTIL_suspend_large_chest
+tile_explode TILE_LARGE_CHEST, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_LARGE_CHEST, FIXED_no_behavior
+
+tile_update  TILE_CHALLENGE_CHEST, ENEMY_UPDATE_challenge_chest
+tile_attack  TILE_CHALLENGE_CHEST, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_CHALLENGE_CHEST, ENEMY_COLLIDE_solid_tile_forbids_movement
+tile_suspend TILE_CHALLENGE_CHEST, ENEMY_UTIL_suspend_challenge_chest
+tile_explode TILE_CHALLENGE_CHEST, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_CHALLENGE_CHEST, FIXED_no_behavior
+
+tile_update  TILE_TIMED_CHEST, ENEMY_UPDATE_timed_chest
+tile_attack  TILE_TIMED_CHEST, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_TIMED_CHEST, ENEMY_COLLIDE_solid_tile_forbids_movement
+tile_suspend TILE_TIMED_CHEST, ENEMY_UTIL_suspend_timed_chest
+tile_explode TILE_TIMED_CHEST, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_TIMED_CHEST, FIXED_no_behavior
+
+tile_update  TILE_MIMIC, ENEMY_UPDATE_mimic
+tile_attack  TILE_MIMIC, ENEMY_ATTACK_direct_attack_mimic, ENEMY_ATTACK_indirect_attack_mimic
+tile_collide TILE_MIMIC, ENEMY_COLLIDE_basic_enemy_attacks_player
+tile_suspend TILE_MIMIC, ENEMY_UTIL_suspend_mimic
+tile_explode TILE_MIMIC, ENEMY_BOMB_SPELL_mimic_direct_explode, ENEMY_BOMB_SPELL_mimic_indirect_explode
+tile_spell   TILE_MIMIC, ENEMY_BOMB_SPELL_mimic_spell_dispatch
+
+tile_update  TILE_HIDDEN_CHEST, ENEMY_UPDATE_hidden_chest
+tile_attack  TILE_HIDDEN_CHEST, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_HIDDEN_CHEST, ENEMY_COLLIDE_solid_tile_forbids_movement
+tile_suspend TILE_HIDDEN_CHEST, FIXED_no_behavior
+tile_explode TILE_HIDDEN_CHEST, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_HIDDEN_CHEST, FIXED_no_behavior
 
 .segment "PRGRAM"
 

@@ -22,7 +22,7 @@ TILE_DISCO_FLOOR       = 17
 TILE_SEMISAFE_FLOOR    = 18
 TILE_WALL              = 19
 TILE_ITEM_SHADOW       = 20
-TILE_TREASURE_CHEST    = 21
+TILE_TREASURE_CHEST    = 21 ; old, going away, etc
 TILE_BIG_KEY           = 22
 TILE_EXIT_BLOCK        = 23
 TILE_EXIT_STAIRS       = 24
@@ -44,6 +44,12 @@ TILE_ONE_BEAT_POISON   = 39 ; | all of these revert to a plain
 TILE_ONE_BEAT_FREEZE   = 40 ; | disco tile on the following beat. good for
 TILE_ONE_BEAT_SHOCK    = 41 ; | enemy abilities, spells, etc
 TILE_ONE_BEAT_BURN     = 42 ; /
+TILE_HELPFUL_CHEST     = 43 ; rerolls common loot dynamically to aid the player
+TILE_LARGE_CHEST       = 44 ; fixed contents, unlocked, generated with the world
+TILE_CHALLENGE_CHEST   = 45 ; fixed contents, locked until the room is cleared
+TILE_TIMED_CHEST       = 46 ; fixed contents, locked, vanishes if room not cleared in time
+TILE_MIMIC             = 47 ; a perfectly ordinary chest. nothing suspicious about it
+TILE_HIDDEN_CHEST      = 48 ; acts like a wall, spawns the corresponding chest when room is cleared
 
 ; Actually in the fixed page
 .global draw_active_tile
