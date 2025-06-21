@@ -624,7 +624,7 @@ tile_suspend TILE_HELPFUL_CHEST, ENEMY_UTIL_suspend_helpful_chest
 tile_explode TILE_HELPFUL_CHEST, FIXED_no_behavior, FIXED_no_behavior
 tile_spell   TILE_HELPFUL_CHEST, FIXED_no_behavior
 
-tile_update  TILE_LARGE_CHEST, FIXED_no_behavior
+tile_update  TILE_LARGE_CHEST, ENEMY_UPDATE_large_chest
 tile_attack  TILE_LARGE_CHEST, ENEMY_ATTACK_open_large_chest, FIXED_no_behavior
 tile_collide TILE_LARGE_CHEST, ENEMY_COLLIDE_open_large_chest
 tile_suspend TILE_LARGE_CHEST, ENEMY_UTIL_suspend_large_chest
@@ -658,6 +658,20 @@ tile_collide TILE_HIDDEN_CHEST, ENEMY_COLLIDE_solid_tile_forbids_movement
 tile_suspend TILE_HIDDEN_CHEST, FIXED_no_behavior
 tile_explode TILE_HIDDEN_CHEST, FIXED_no_behavior, FIXED_no_behavior
 tile_spell   TILE_HIDDEN_CHEST, FIXED_no_behavior
+
+tile_update  TILE_HIDDEN_RARE_CHEST, ENEMY_UPDATE_hidden_rare_chest
+tile_attack  TILE_HIDDEN_RARE_CHEST, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_HIDDEN_RARE_CHEST, ENEMY_COLLIDE_solid_tile_forbids_movement
+tile_suspend TILE_HIDDEN_RARE_CHEST, FIXED_no_behavior
+tile_explode TILE_HIDDEN_RARE_CHEST, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_HIDDEN_RARE_CHEST, FIXED_no_behavior
+
+tile_update  TILE_HIDDEN_LEGENDARY_CHEST, ENEMY_UPDATE_hidden_legendary_chest
+tile_attack  TILE_HIDDEN_LEGENDARY_CHEST, FIXED_no_behavior, FIXED_no_behavior
+tile_collide TILE_HIDDEN_LEGENDARY_CHEST, ENEMY_COLLIDE_solid_tile_forbids_movement
+tile_suspend TILE_HIDDEN_LEGENDARY_CHEST, FIXED_no_behavior
+tile_explode TILE_HIDDEN_LEGENDARY_CHEST, FIXED_no_behavior, FIXED_no_behavior
+tile_spell   TILE_HIDDEN_LEGENDARY_CHEST, FIXED_no_behavior
 
 .segment "PRGRAM"
 

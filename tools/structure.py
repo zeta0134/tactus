@@ -260,6 +260,8 @@ def behavior_flag_bytes(tiles):
         raw_bytes.append(f"TILE_FLAG_DETAIL")
     elif tile.type == "exit":
         raw_bytes.append(f"TILE_FLAG_EXIT")
+    elif tile.type == "chest":
+        raw_bytes.append(f"TILE_FLAG_CHEST")
     else:
         raw_bytes.append("$00")
   return raw_bytes

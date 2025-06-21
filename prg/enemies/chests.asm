@@ -23,7 +23,22 @@
         rts
 .endproc
 
+; For level generation reasons, the hidden chests are split out into separate tile IDs.
+; This is because the attribute, which would normally indicate rarity, is being used as
+; part of whatever wall tile they end up embedded within. "Blue zones tend to have better
+; loot" would be an interesting spice, but... no, we want actual control thanks XD
+
 .proc ENEMY_UPDATE_hidden_chest
+        ; TODO
+        rts
+.endproc
+
+.proc ENEMY_UPDATE_hidden_rare_chest
+        ; TODO
+        rts
+.endproc
+
+.proc ENEMY_UPDATE_hidden_legendary_chest
         ; TODO
         rts
 .endproc
