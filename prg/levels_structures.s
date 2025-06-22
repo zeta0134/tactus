@@ -43,6 +43,10 @@
         .include "../build/structures/BlockingWarpStructure.incs"
         .include "../build/structures/FairyRingWarp.incs"
 
+        .include "../build/structures/StandardChest.incs"
+        .include "../build/structures/RareChest.incs"
+        .include "../build/structures/LegendaryChest.incs"
+
 .macro structure_entry structure_label
         .addr structure_label
         .byte <.bank(structure_label), >.bank(structure_label)
@@ -109,6 +113,17 @@ blocking_warp_structure_set:
         .endrepeat
         structure_entry structure_BlockingWarpStructure ; but we'll settle for this if we have to
 
+standard_chest_structure_set:
+        .byte $1 ; RNG Mask
+        structure_entry structure_StandardChest
+
+rare_chest_structure_set:
+        .byte $1 ; RNG Mask
+        structure_entry structure_RareChest
+
+legendary_chest_structure_set:
+        .byte $1 ; RNG Mask
+        structure_entry structure_LegendaryChest
 
         ; should match procgen.s! we rely on several of its functions, and the far call overhead
         ; would be rather significant
@@ -519,7 +534,7 @@ skip_structure_spawning:
 
 roll_interior_sets:
         perform_zpcm_inc
-        access_data_bank #<.bank(all_zones_data_page)
+        access_data_bank PlayerZoneBank
         ldy #ZoneDefinition::InteriorStructureLargeMaxMax
         lda (PlayerZonePtr), y
         beq done_with_interior_large_structures ; please don't divide by zero
@@ -570,7 +585,7 @@ skip_interior_warp_structures:
         rts
 
 roll_exterior_sets:
-        access_data_bank #<.bank(all_zones_data_page)
+        access_data_bank PlayerZoneBank
         ldy #ZoneDefinition::ExteriorStructureLargeMaxMax
         lda (PlayerZonePtr), y
         beq done_with_exterior_large_structures ; please don't divide by zero

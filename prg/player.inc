@@ -48,7 +48,9 @@
 .global PlayerNavState
 
 .globalzp PlayerZonePtr
+.global PlayerZoneBank
 .global DestinationZonePtr
+.global DestinationZoneBank
 
 .global PlayerIntendsToWait
 .global PlayerIntendsToBomb

@@ -127,6 +127,23 @@ zone_grasslands_floor_1:
         .word zone_sequence_str_1_1       ; SequenceStr
         rng_index_for_zone 1, 1           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
+        .word standard_chest_structure_set   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 8                              ; StandardChestMin
+        .byte 16                             ; StandardChestMax
+        .word rare_chest_structure_set       ; RareChestInteriorStructures
+        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 2                              ; RareChestMax
+        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 1                              ; LegendaryChestMax
+        .byte 1                              ; ZoneIndex
+        .byte 1                              ; FloorIndex
 
 
 zone_grasslands_floor_2:
@@ -168,6 +185,23 @@ zone_grasslands_floor_2:
         .word zone_sequence_str_1_2       ; SequenceStr
         rng_index_for_zone 1, 2           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
+        .word standard_chest_structure_set   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 8                              ; StandardChestMin
+        .byte 16                             ; StandardChestMax
+        .word rare_chest_structure_set       ; RareChestInteriorStructures
+        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 2                              ; RareChestMax
+        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 1                              ; LegendaryChestMax
+        .byte 1                              ; ZoneIndex
+        .byte 2                              ; FloorIndex
 
 zone_grasslands_floor_3:
         .addr spawn_pool_grasslands_cave     ; Interior Spawn Pool
@@ -208,6 +242,23 @@ zone_grasslands_floor_3:
         .word zone_sequence_str_1_3       ; SequenceStr
         rng_index_for_zone 1, 3           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
+        .word standard_chest_structure_set   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 8                              ; StandardChestMin
+        .byte 16                             ; StandardChestMax
+        .word rare_chest_structure_set       ; RareChestInteriorStructures
+        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 2                              ; RareChestMax
+        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 1                              ; LegendaryChestMax
+        .byte 1                              ; ZoneIndex
+        .byte 3                              ; FloorIndex
 
 zone_grasslands_floor_4:
         .addr spawn_pool_grasslands_cave     ; Interior Spawn Pool
@@ -248,6 +299,23 @@ zone_grasslands_floor_4:
         .word zone_sequence_str_1_4       ; SequenceStr
         rng_index_for_zone 1, 4           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
+        .word standard_chest_structure_set   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 8                              ; StandardChestMin
+        .byte 16                             ; StandardChestMax
+        .word rare_chest_structure_set       ; RareChestInteriorStructures
+        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 2                              ; RareChestMax
+        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 1                              ; LegendaryChestMax
+        .byte 1                              ; ZoneIndex
+        .byte 4                              ; FloorIndex
 
 zone_grasslands_floor_boss:
         .addr spawn_pool_generic   ; Interior Spawn Pool
@@ -288,44 +356,61 @@ zone_grasslands_floor_boss:
         .word zone_sequence_str_1_B       ; SequenceStr
         rng_index_for_zone 1, 5           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
+        .word empty_structure_set            ; StandardChestInteriorStructures
+        .word empty_structure_set            ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 0                              ; StandardChestMin
+        .byte 0                              ; StandardChestMax
+        .word empty_structure_set            ; RareChestInteriorStructures
+        .word empty_structure_set            ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 0                              ; RareChestMax
+        .word empty_structure_set            ; LegendaryChestInteriorStructures
+        .word empty_structure_set            ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 0                              ; LegendaryChestMax
+        .byte 1                              ; ZoneIndex
+        .byte 5                              ; FloorIndex
 
 zone_grasslands_floor_1_exits:
         .byte 5 ; length
-        .addr zone_grasslands_floor_2
-        .addr zone_2a_floor_1 ; warp destinations
-        .addr zone_2b_floor_1
-        .addr zone_2c_floor_1
-        .addr zone_2w_floor_1
+        banked_addr zone_grasslands_floor_2
+        banked_addr zone_2a_floor_1 ; warp destinations
+        banked_addr zone_2b_floor_1
+        banked_addr zone_2c_floor_1
+        banked_addr zone_2w_floor_1
 
 zone_grasslands_floor_2_exits:
         .byte 5 ; length
-        .addr zone_grasslands_floor_3
-        .addr zone_2a_floor_1 ; warp destinations
-        .addr zone_2b_floor_1
-        .addr zone_2c_floor_1
-        .addr zone_2w_floor_1
+        banked_addr zone_grasslands_floor_3
+        banked_addr zone_2a_floor_1 ; warp destinations
+        banked_addr zone_2b_floor_1
+        banked_addr zone_2c_floor_1
+        banked_addr zone_2w_floor_1
 
 zone_grasslands_floor_3_exits:
         .byte 5 ; length
-        .addr zone_grasslands_floor_4
-        .addr zone_2a_floor_1 ; warp destinations
-        .addr zone_2b_floor_1
-        .addr zone_2c_floor_1
-        .addr zone_2w_floor_1
+        banked_addr zone_grasslands_floor_4
+        banked_addr zone_2a_floor_1 ; warp destinations
+        banked_addr zone_2b_floor_1
+        banked_addr zone_2c_floor_1
+        banked_addr zone_2w_floor_1
 
 zone_grasslands_floor_4_exits:
         .byte 5 ; length
-        .addr zone_grasslands_floor_boss
-        .addr zone_2a_floor_1 ; warp destinations
-        .addr zone_2b_floor_1
-        .addr zone_2c_floor_1
-        .addr zone_2w_floor_1
+        banked_addr zone_grasslands_floor_boss
+        banked_addr zone_2a_floor_1 ; warp destinations
+        banked_addr zone_2b_floor_1
+        banked_addr zone_2c_floor_1
+        banked_addr zone_2w_floor_1
 
 zone_grasslands_floor_boss_exits:
         .byte 3 ; length
-        .addr zone_2a_floor_1
-        .addr zone_2b_floor_1
-        .addr zone_2c_floor_1
+        banked_addr zone_2a_floor_1
+        banked_addr zone_2b_floor_1
+        banked_addr zone_2c_floor_1
 
 zone_grasslands_floor_1_mazes:
         .byte 10 ; length        

@@ -435,7 +435,8 @@ consumable_treasure_table:
     .byte ITEM_BOMB_STANDARD_X3
     .byte ITEM_BOMB_STANDARD_X3
 
-common_chest_treasure_table:
+common_chest_treasure_table: ; TODO: remove this label
+standard_chest_treasure_table:
     .byte 43
     .byte ITEM_BASIC_TORCH
     .byte ITEM_BASIC_TORCH
@@ -481,6 +482,20 @@ common_chest_treasure_table:
     .byte ITEM_SPELL_BOMB
     .byte ITEM_SPELL_LIFE
     
+rare_chest_treasure_table:
+    ; So very placeholder
+    .byte 16
+    .repeat 16
+    .byte ITEM_UPGRADE_FIRE
+    .endrepeat
+    
+legendary_chest_treasure_table:
+    ; So very placeholder
+    .byte 16
+    .repeat 16
+    .byte ITEM_UPGRADE_EARTH
+    .endrepeat
+
 MAX_CHAIN = 8
 MAX_COMBO = 4 ; actually 5, but we need to decrement
 

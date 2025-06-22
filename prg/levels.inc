@@ -181,7 +181,32 @@
         NameStr .word        ; "Grasslands"
         SequenceStr .word    ; "1-1"
         RngIndex .byte       ; so zones use different-ish seeds
-        OnLoadBehavior .byte ; some zones need special setup logic, mostly the HUB        
+        OnLoadBehavior .byte ; some zones need special setup logic, mostly the HUB
+
+        ; Parameters for chest spawning: which structure sets to use, which loot tables to pull from,
+        ; and how many of each chest type to attempt to spawn, as a range. Note that there is no sanity
+        ; check on the total number of chests, this just determines the relative quality between those
+        ; chests that do get placed.
+        StandardChestInteriorStructures .word
+        StandardChestExteriorStructures .word
+        StandardChestLootTable .word
+        StandardChestMin .byte
+        StandardChestMax .byte
+
+        RareChestInteriorStructures .word
+        RareChestExteriorStructures .word
+        RareChestLootTable .word
+        RareChestMin .byte
+        RareChestMax .byte
+
+        LegendaryChestInteriorStructures .word
+        LegendaryChestExteriorStructures .word
+        LegendaryChestLootTable .word
+        LegendaryChestMin .byte
+        LegendaryChestMax .byte
+
+        ZoneIndex .byte  ; Zone 1, Zone 2, etc. Mind warps.
+        FloorIndex .byte ; Floors range from 1 - 5, with 5 == boss. Not all zones have all floors. 0 is invalid.
 .endstruct
 
 ZONE_ONLOAD_NONE = 0
@@ -372,6 +397,10 @@ OVERLAY_OPEN_NW = 4
 .global grassy_warp_structure_set
 .global cave_warp_structure_set
 .global blocking_warp_structure_set
+
+.global standard_chest_structure_set
+.global rare_chest_structure_set
+.global legendary_chest_structure_set
 
 ROOM_BASE_LOGIC_NONE     = 0
 ROOM_BASE_LOGIC_STANDARD = 1

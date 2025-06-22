@@ -33,7 +33,7 @@ zone_5w_floor_1:
         .byte 0                  ; WarpSpawnPoolMin
         .byte 32                 ; WarpSpawnPoolMax
         .byte 8                  ; WarpPopulationLimit
-        .addr zone_blocking_mazes ; Maze Pool
+        .addr zone_5w_blocking_mazes ; Maze Pool
         .addr zone_5w_floor_1_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
         .byte 0   ; Added Tempo
@@ -57,10 +57,27 @@ zone_5w_floor_1:
         .word zone_sequence_str_5_1       ; SequenceStr
         rng_index_for_zone 5, 1           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
+        .word standard_chest_structure_set   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 8                              ; StandardChestMin
+        .byte 16                             ; StandardChestMax
+        .word rare_chest_structure_set       ; RareChestInteriorStructures
+        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 2                              ; RareChestMax
+        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 1                              ; LegendaryChestMax
+        .byte 5                              ; ZoneIndex
+        .byte 1                              ; FloorIndex
 
 zone_5w_floor_1_exits:
         .byte 1 ; length
-        .addr zone_5w_floor_boss
+        banked_addr zone_5w_floor_boss
 
 zone_5w_banner_boss:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -117,12 +134,36 @@ zone_5w_floor_boss:
         .word zone_sequence_str_5_F       ; SequenceStr
         rng_index_for_zone 5, 2           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
+        .word empty_structure_set            ; StandardChestInteriorStructures
+        .word empty_structure_set            ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 0                              ; StandardChestMin
+        .byte 0                              ; StandardChestMax
+        .word empty_structure_set            ; RareChestInteriorStructures
+        .word empty_structure_set            ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 0                              ; RareChestMax
+        .word empty_structure_set            ; LegendaryChestInteriorStructures
+        .word empty_structure_set            ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 0                              ; LegendaryChestMax
+        .byte 5                              ; ZoneIndex
+        .byte 2                              ; FloorIndex
+
+zone_5w_blocking_mazes:
+        .byte 4 ; length        
+        banked_addr floor_blocking_01
+        banked_addr floor_blocking_02
+        banked_addr floor_blocking_03
+        banked_addr floor_blocking_04
 
 ; Unclear yet if these will be used. We may not ever spawn stairs, rather we'll
 ; probably trigger the game cleared / victory kernel state on success.
 zone_5w_floor_boss_exits:
         .byte 1 ; length
-        .addr zone_hub_world
+        banked_addr zone_hub_world
 
 zone_5w_floor_boss_mazes:
         .byte 1 ; Length

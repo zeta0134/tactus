@@ -27,10 +27,14 @@
 .global test_specific_item_table
 
 .global common_treasure_table
-.global common_chest_treasure_table
+.global common_chest_treasure_table ; TODO: remove
 .global rare_treasure_table
 .global consumable_treasure_table
 .global weapons_only_treasure_table
+
+.global standard_chest_treasure_table
+.global rare_chest_treasure_table
+.global legendary_chest_treasure_table
 
 .macro set_loot_table loot_table
     st16 LootTable, loot_table

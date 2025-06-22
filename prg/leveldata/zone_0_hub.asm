@@ -64,119 +64,136 @@ zone_hub_world:
         .word zone_hub_sequence_str       ; SequenceStr
         rng_index_for_zone 1, 1           ; RngIndex
         .byte ZONE_ONLOAD_HUB             ; OnLoadBehavior
+        .word empty_structure_set            ; StandardChestInteriorStructures
+        .word empty_structure_set            ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 0                              ; StandardChestMin
+        .byte 0                              ; StandardChestMax
+        .word empty_structure_set            ; RareChestInteriorStructures
+        .word empty_structure_set            ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 0                              ; RareChestMax
+        .word empty_structure_set            ; LegendaryChestInteriorStructures
+        .word empty_structure_set            ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 0                              ; LegendaryChestMax
+        .byte 0                              ; ZoneIndex
+        .byte 0                              ; FloorIndex
 
 ; TODO: for the real hub there is very little point in going
 ; to any floor other than 1, but as we only have the one zone,
 ; we'll use that as a standin for the actual behavior later.
 zone_hub_exits:
         .byte 79
-        .addr zone_grasslands_floor_1 ; for now, use this to "start a normal run" ish
+        banked_addr zone_grasslands_floor_1 ; for now, use this to "start a normal run" ish
         ; Debug Zone Exits follow
 
         ; Debug 1:
         ; Zone 1
-        .addr zone_grasslands_floor_1
-        .addr zone_grasslands_floor_2
-        .addr zone_grasslands_floor_3
-        .addr zone_grasslands_floor_4
-        .addr zone_grasslands_floor_boss
+        banked_addr zone_grasslands_floor_1
+        banked_addr zone_grasslands_floor_2
+        banked_addr zone_grasslands_floor_3
+        banked_addr zone_grasslands_floor_4
+        banked_addr zone_grasslands_floor_boss
 
         ; Debug 2:
         ; Zone 2A
-        .addr zone_2a_floor_1
-        .addr zone_2a_floor_2
-        .addr zone_2a_floor_3
-        .addr zone_2a_floor_4
-        .addr zone_2a_floor_boss
+        banked_addr zone_2a_floor_1
+        banked_addr zone_2a_floor_2
+        banked_addr zone_2a_floor_3
+        banked_addr zone_2a_floor_4
+        banked_addr zone_2a_floor_boss
         ; Zone 2B
-        .addr zone_2b_floor_1
-        .addr zone_2b_floor_2
-        .addr zone_2b_floor_3
-        .addr zone_2b_floor_4
-        .addr zone_2b_floor_boss
+        banked_addr zone_2b_floor_1
+        banked_addr zone_2b_floor_2
+        banked_addr zone_2b_floor_3
+        banked_addr zone_2b_floor_4
+        banked_addr zone_2b_floor_boss
         ; Zone 2C:
-        .addr zone_2c_floor_1
-        .addr zone_2c_floor_2
-        .addr zone_2c_floor_3
-        .addr zone_2c_floor_4
-        .addr zone_2c_floor_boss
+        banked_addr zone_2c_floor_1
+        banked_addr zone_2c_floor_2
+        banked_addr zone_2c_floor_3
+        banked_addr zone_2c_floor_4
+        banked_addr zone_2c_floor_boss
         ; Zone 2W:
-        .addr zone_2w_floor_1
-        .addr zone_2w_floor_2
-        .addr zone_2w_floor_3
-        .addr zone_2w_floor_4
-        .addr zone_2w_floor_boss
+        banked_addr zone_2w_floor_1
+        banked_addr zone_2w_floor_2
+        banked_addr zone_2w_floor_3
+        banked_addr zone_2w_floor_4
+        banked_addr zone_2w_floor_boss
 
         ; Debug 3:
         ; Zone 3A
-        .addr zone_3a_floor_1
-        .addr zone_3a_floor_2
-        .addr zone_3a_floor_3
-        .addr zone_3a_floor_4
-        .addr zone_3a_floor_boss
+        banked_addr zone_3a_floor_1
+        banked_addr zone_3a_floor_2
+        banked_addr zone_3a_floor_3
+        banked_addr zone_3a_floor_4
+        banked_addr zone_3a_floor_boss
         ; Zone 3B
-        .addr zone_3b_floor_1
-        .addr zone_3b_floor_2
-        .addr zone_3b_floor_3
-        .addr zone_3b_floor_4
-        .addr zone_3b_floor_boss
+        banked_addr zone_3b_floor_1
+        banked_addr zone_3b_floor_2
+        banked_addr zone_3b_floor_3
+        banked_addr zone_3b_floor_4
+        banked_addr zone_3b_floor_boss
         ; Zone 3C:
-        .addr zone_3c_floor_1
-        .addr zone_3c_floor_2
-        .addr zone_3c_floor_3
-        .addr zone_3c_floor_4
-        .addr zone_3c_floor_boss
+        banked_addr zone_3c_floor_1
+        banked_addr zone_3c_floor_2
+        banked_addr zone_3c_floor_3
+        banked_addr zone_3c_floor_4
+        banked_addr zone_3c_floor_boss
         ; Zone 3W:
-        .addr zone_3w_floor_1
-        .addr zone_3w_floor_2
-        .addr zone_3w_floor_3
-        .addr zone_3w_floor_4
-        .addr zone_3w_floor_boss
+        banked_addr zone_3w_floor_1
+        banked_addr zone_3w_floor_2
+        banked_addr zone_3w_floor_3
+        banked_addr zone_3w_floor_4
+        banked_addr zone_3w_floor_boss
 
         ; Debug 4:
         ; Zone 4A
-        .addr zone_4a_floor_1
-        .addr zone_4a_floor_2
-        .addr zone_4a_floor_3
-        .addr zone_4a_floor_4
-        .addr zone_4a_floor_boss
+        banked_addr zone_4a_floor_1
+        banked_addr zone_4a_floor_2
+        banked_addr zone_4a_floor_3
+        banked_addr zone_4a_floor_4
+        banked_addr zone_4a_floor_boss
         ; Zone 4B
-        .addr zone_4b_floor_1
-        .addr zone_4b_floor_2
-        .addr zone_4b_floor_3
-        .addr zone_4b_floor_4
-        .addr zone_4b_floor_boss
+        banked_addr zone_4b_floor_1
+        banked_addr zone_4b_floor_2
+        banked_addr zone_4b_floor_3
+        banked_addr zone_4b_floor_4
+        banked_addr zone_4b_floor_boss
         ; Zone 4C:
-        .addr zone_4c_floor_1
-        .addr zone_4c_floor_2
-        .addr zone_4c_floor_3
-        .addr zone_4c_floor_4
-        .addr zone_4c_floor_boss
+        banked_addr zone_4c_floor_1
+        banked_addr zone_4c_floor_2
+        banked_addr zone_4c_floor_3
+        banked_addr zone_4c_floor_4
+        banked_addr zone_4c_floor_boss
         ; Zone 4W:
-        .addr zone_4w_floor_1
-        .addr zone_4w_floor_2
-        .addr zone_4w_floor_3
-        .addr zone_4w_floor_4
-        .addr zone_4w_floor_boss
+        banked_addr zone_4w_floor_1
+        banked_addr zone_4w_floor_2
+        banked_addr zone_4w_floor_3
+        banked_addr zone_4w_floor_4
+        banked_addr zone_4w_floor_boss
 
         ; Debug 5:
         ; Zone 5S (normal run final challenge / boss)
-        .addr zone_5s_floor_1          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_5s_floor_boss          ; unimplemented! :(
+        banked_addr zone_5s_floor_1          ; unimplemented! :(
+        banked_addr zone_hub_world          ; unimplemented! :(
+        banked_addr zone_hub_world          ; unimplemented! :(
+        banked_addr zone_hub_world          ; unimplemented! :(
+        banked_addr zone_5s_floor_boss          ; unimplemented! :(
         ; Zone 5W (warp exclusive final challenge / boss)
-        .addr zone_5w_floor_1          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_hub_world          ; unimplemented! :(
-        .addr zone_5w_floor_boss          ; unimplemented! :(
+        banked_addr zone_5w_floor_1          ; unimplemented! :(
+        banked_addr zone_hub_world          ; unimplemented! :(
+        banked_addr zone_hub_world          ; unimplemented! :(
+        banked_addr zone_hub_world          ; unimplemented! :(
+        banked_addr zone_5w_floor_boss          ; unimplemented! :(
 
         ; Debug Miscellaneous
-        .addr zone_grasslands_floor_2_but_fast
-        .addr zone_hub_world ; reserved for future use
-        .addr zone_hub_world ; reserved for future use
+        banked_addr zone_grasslands_floor_2_but_fast
+        banked_addr zone_hub_world ; reserved for future use
+        banked_addr zone_hub_world ; reserved for future use
 
 zone_hub_world_mazes:
         .byte 1

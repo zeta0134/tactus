@@ -641,6 +641,8 @@ normal_load:
 zone_select_converge:
         far_call FAR_set_zone_ptr_from_id
         mov16 DestinationZonePtr, PlayerZonePtr
+        lda PlayerZoneBank
+        sta DestinationZoneBank
 
         ; no matter how we load, we need to initialize the player's weapon dmg table
         far_call FAR_calculate_weapon_damage
@@ -1169,6 +1171,8 @@ continue_waiting:
         ; The exit condition that sent us here will have set a destination,
         ; so load that in
         mov16 PlayerZonePtr, DestinationZonePtr
+        lda DestinationZoneBank
+        sta PlayerZoneBank
 
         ; reset the player's position to the center of the room
         lda #6

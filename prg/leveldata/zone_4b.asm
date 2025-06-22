@@ -33,7 +33,7 @@ zone_4b_floor_1:
         .byte 0                  ; WarpSpawnPoolMin
         .byte 32                 ; WarpSpawnPoolMax
         .byte 8                  ; WarpPopulationLimit
-        .addr zone_blocking_mazes ; Maze Pool
+        .addr zone_4b_blocking_mazes ; Maze Pool
         .addr zone_4b_floor_1_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
         .byte 0   ; Added Tempo
@@ -57,12 +57,29 @@ zone_4b_floor_1:
         .word zone_sequence_str_4_1       ; SequenceStr
         rng_index_for_zone 4, 1           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
+        .word standard_chest_structure_set   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 8                              ; StandardChestMin
+        .byte 16                             ; StandardChestMax
+        .word rare_chest_structure_set       ; RareChestInteriorStructures
+        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 2                              ; RareChestMax
+        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 1                              ; LegendaryChestMax
+        .byte 4                              ; ZoneIndex
+        .byte 1                              ; FloorIndex
 
 zone_4b_floor_1_exits:
         .byte 3 ; length
-        .addr zone_4b_floor_2
-        .addr zone_5s_floor_1 ; warp destinations
-        .addr zone_5w_floor_1
+        banked_addr zone_4b_floor_2
+        banked_addr zone_5s_floor_1 ; warp destinations
+        banked_addr zone_5w_floor_1
 
 zone_4b_banner_2:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -95,7 +112,7 @@ zone_4b_floor_2:
         .byte 0                  ; WarpSpawnPoolMin
         .byte 64                 ; WarpSpawnPoolMax
         .byte 10                 ; WarpPopulationLimit
-        .addr zone_blocking_with_warps_mazes ; Maze Pool
+        .addr zone_4b_blocking_with_warps_mazes ; Maze Pool
         .addr zone_4b_floor_2_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
         .byte 5   ; Added Tempo
@@ -119,12 +136,29 @@ zone_4b_floor_2:
         .word zone_sequence_str_4_2       ; SequenceStr
         rng_index_for_zone 4, 2           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
+        .word standard_chest_structure_set   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 8                              ; StandardChestMin
+        .byte 16                             ; StandardChestMax
+        .word rare_chest_structure_set       ; RareChestInteriorStructures
+        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 2                              ; RareChestMax
+        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 1                              ; LegendaryChestMax
+        .byte 4                              ; ZoneIndex
+        .byte 2                              ; FloorIndex
 
 zone_4b_floor_2_exits:
         .byte 3 ; length
-        .addr zone_4b_floor_3
-        .addr zone_5s_floor_1 ; warp destinations
-        .addr zone_5w_floor_1
+        banked_addr zone_4b_floor_3
+        banked_addr zone_5s_floor_1 ; warp destinations
+        banked_addr zone_5w_floor_1
 
 zone_4b_banner_3:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -157,7 +191,7 @@ zone_4b_floor_3:
         .byte 16                 ; WarpSpawnPoolMin
         .byte 96                 ; WarpSpawnPoolMax
         .byte 12                 ; WarpPopulationLimit
-        .addr zone_blocking_with_warps_mazes ; Maze Pool
+        .addr zone_4b_blocking_with_warps_mazes ; Maze Pool
         .addr zone_4b_floor_3_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
         .byte 10   ; Added Tempo
@@ -181,12 +215,29 @@ zone_4b_floor_3:
         .word zone_sequence_str_4_3       ; SequenceStr
         rng_index_for_zone 4, 3           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
+        .word standard_chest_structure_set   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 8                              ; StandardChestMin
+        .byte 16                             ; StandardChestMax
+        .word rare_chest_structure_set       ; RareChestInteriorStructures
+        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 2                              ; RareChestMax
+        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 1                              ; LegendaryChestMax
+        .byte 4                              ; ZoneIndex
+        .byte 3                              ; FloorIndex
 
 zone_4b_floor_3_exits:
         .byte 3 ; length
-        .addr zone_4b_floor_4
-        .addr zone_5s_floor_1 ; warp destinations
-        .addr zone_5w_floor_1
+        banked_addr zone_4b_floor_4
+        banked_addr zone_5s_floor_1 ; warp destinations
+        banked_addr zone_5w_floor_1
 
 zone_4b_banner_4:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -219,7 +270,7 @@ zone_4b_floor_4:
         .byte 48                 ; WarpSpawnPoolMin
         .byte 128                ; WarpSpawnPoolMax
         .byte 16                 ; WarpPopulationLimit
-        .addr zone_blocking_with_warps_mazes ; Maze Pool
+        .addr zone_4b_blocking_with_warps_mazes ; Maze Pool
         .addr zone_4b_floor_4_exits ; Exit List
         .byte TRACK_SHOWER_GROOVE   ; Music Track
         .byte 15   ; Added Tempo
@@ -243,14 +294,31 @@ zone_4b_floor_4:
         .word zone_sequence_str_4_4       ; SequenceStr
         rng_index_for_zone 4, 4           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
+        .word standard_chest_structure_set   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 8                              ; StandardChestMin
+        .byte 16                             ; StandardChestMax
+        .word rare_chest_structure_set       ; RareChestInteriorStructures
+        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 2                              ; RareChestMax
+        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 1                              ; LegendaryChestMax
+        .byte 4                              ; ZoneIndex
+        .byte 4                              ; FloorIndex
 
 ; DEBUG: for now, just go back to the hub world
 ; (later we'll want a boss chamber, and a branching path)
 zone_4b_floor_4_exits:
         .byte 3 ; length
-        .addr zone_4b_floor_boss
-        .addr zone_5s_floor_1 ; warp destinations
-        .addr zone_5w_floor_1
+        banked_addr zone_4b_floor_boss
+        banked_addr zone_5s_floor_1 ; warp destinations
+        banked_addr zone_5w_floor_1
 
 zone_4b_banner_boss:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -307,10 +375,41 @@ zone_4b_floor_boss:
         .word zone_sequence_str_4_B       ; SequenceStr
         rng_index_for_zone 4, 5           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
+        .word empty_structure_set            ; StandardChestInteriorStructures
+        .word empty_structure_set            ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 0                              ; StandardChestMin
+        .byte 0                              ; StandardChestMax
+        .word empty_structure_set            ; RareChestInteriorStructures
+        .word empty_structure_set            ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 0                              ; RareChestMax
+        .word empty_structure_set            ; LegendaryChestInteriorStructures
+        .word empty_structure_set            ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 0                              ; LegendaryChestMax
+        .byte 4                              ; ZoneIndex
+        .byte 5                              ; FloorIndex
+
+zone_4b_blocking_mazes:
+        .byte 4 ; length        
+        banked_addr floor_blocking_01
+        banked_addr floor_blocking_02
+        banked_addr floor_blocking_03
+        banked_addr floor_blocking_04
+
+zone_4b_blocking_with_warps_mazes:
+        .byte 4 ; length        
+        banked_addr floor_blocking_01_warp
+        banked_addr floor_blocking_02_warp
+        banked_addr floor_blocking_03_warp
+        banked_addr floor_blocking_04_warp
 
 zone_4b_floor_boss_exits:
         .byte 1 ; length
-        .addr zone_5s_floor_1
+        banked_addr zone_5s_floor_1
 
 zone_4b_floor_boss_mazes:
         .byte 1 ; Length

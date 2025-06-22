@@ -36,14 +36,12 @@
 
 .zeropage
 
-FxTileId: .res 1
-SfxTileId: .res 1
-
 PlayerZonePtr: .res 2
-
 WeaponAnimPtr: .res 2
 
 .segment "RAM"
+
+PlayerZoneBank: .res 1
 
 SpellDefeatsEnemy: .res 1
 DeferLootProcessing: .res 1
@@ -51,6 +49,7 @@ DeferLootProcessing: .res 1
 WeaponDrawFunc: .res 2
 
 DestinationZonePtr: .res 2
+DestinationZoneBank: .res 1
 
 PlayerState: .res 1
 PlayerBeatsInThisState: .res 1

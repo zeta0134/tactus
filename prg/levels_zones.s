@@ -94,7 +94,7 @@
         .include "../build/floors/blocking_03_warp.incs"
         .include "../build/floors/blocking_04_warp.incs"
 
-        .segment "LEVEL_DATA_ZONE_DEFS"
+        .segment "LEVEL_DATA_ZONE_DEFS_0"
 
 zone_sequence_str_1_1: .asciiz "1-1"
 zone_sequence_str_1_2: .asciiz "1-2"
@@ -155,9 +155,6 @@ hud_hub_pal:
         .byte (HUD_TEXT_PAL | CHR_BANK_ZONES)
 .endmacro
 
-; for bank switching
-all_zones_data_page:
-
 ;  ########  ##        #######   ######  ##    ## #### ##    ##  ######   
 ;  ##     ## ##       ##     ## ##    ## ##   ##   ##  ###   ## ##    ##  
 ;  ##     ## ##       ##     ## ##       ##  ##    ##  ####  ## ##        
@@ -166,19 +163,7 @@ all_zones_data_page:
 ;  ##     ## ##       ##     ## ##    ## ##   ##   ##  ##   ### ##    ##  
 ;  ########  ########  #######   ######  ##    ## #### ##    ##  ######   
 
-zone_blocking_mazes:
-        .byte 4 ; length        
-        banked_addr floor_blocking_01
-        banked_addr floor_blocking_02
-        banked_addr floor_blocking_03
-        banked_addr floor_blocking_04
-
-zone_blocking_with_warps_mazes:
-        .byte 4 ; length        
-        banked_addr floor_blocking_01_warp
-        banked_addr floor_blocking_02_warp
-        banked_addr floor_blocking_03_warp
-        banked_addr floor_blocking_04_warp
+        .segment "LEVEL_DATA_ZONE_DEFS_0"
 
         .include "leveldata/zone_0_hub.asm"
 
@@ -188,6 +173,8 @@ zone_blocking_with_warps_mazes:
         .include "leveldata/zone_2b.asm"
         .include "leveldata/zone_2c.asm"
         .include "leveldata/zone_2w.asm"
+
+        .segment "LEVEL_DATA_ZONE_DEFS_1"
 
         .include "leveldata/zone_3a.asm"
         .include "leveldata/zone_3b.asm"
@@ -250,86 +237,103 @@ zone_grasslands_floor_2_but_fast:
         .word zone_sequence_str_debug     ; SequenceStr
         rng_index_for_zone 1, 1           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
+        .word standard_chest_structure_set   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_treasure_table  ; StandardChestLootTable
+        .byte 8                              ; StandardChestMin
+        .byte 16                             ; StandardChestMax
+        .word rare_chest_structure_set       ; RareChestInteriorStructures
+        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_treasure_table      ; RareChestLootTable
+        .byte 0                              ; RareChestMin
+        .byte 2                              ; RareChestMax
+        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_treasure_table ; LegendaryChestLootTable
+        .byte 0                              ; LegendaryChestMin
+        .byte 1                              ; LegendaryChestMax
+        .byte 1                              ; ZoneIndex
+        .byte 1                              ; FloorIndex
 
 ; After debugging one zone, return to the hub world
 ; (note: later to the debug world?)
 zone_debug_exits:
         .byte 1 ; length
-        .addr zone_hub_world
+        banked_addr zone_hub_world
 
         .segment "CODE_4"
 
 zone_ptr_by_id_lut:
-        .word zone_hub_world
-        .word zone_grasslands_floor_1
-        .word zone_grasslands_floor_2
-        .word zone_grasslands_floor_3
-        .word zone_grasslands_floor_4
-        .word zone_grasslands_floor_boss
-        .word zone_2a_floor_1
-        .word zone_2a_floor_2
-        .word zone_2a_floor_3
-        .word zone_2a_floor_4
-        .word zone_2a_floor_boss
-        .word zone_2b_floor_1
-        .word zone_2b_floor_2
-        .word zone_2b_floor_3
-        .word zone_2b_floor_4
-        .word zone_2b_floor_boss
-        .word zone_2c_floor_1
-        .word zone_2c_floor_2
-        .word zone_2c_floor_3
-        .word zone_2c_floor_4
-        .word zone_2c_floor_boss
-        .word zone_2w_floor_1
-        .word zone_2w_floor_2
-        .word zone_2w_floor_3
-        .word zone_2w_floor_4
-        .word zone_2w_floor_boss
-        .word zone_3a_floor_1
-        .word zone_3a_floor_2
-        .word zone_3a_floor_3
-        .word zone_3a_floor_4
-        .word zone_3a_floor_boss
-        .word zone_3b_floor_1
-        .word zone_3b_floor_2
-        .word zone_3b_floor_3
-        .word zone_3b_floor_4
-        .word zone_3b_floor_boss
-        .word zone_3c_floor_1
-        .word zone_3c_floor_2
-        .word zone_3c_floor_3
-        .word zone_3c_floor_4
-        .word zone_3c_floor_boss
-        .word zone_3w_floor_1
-        .word zone_3w_floor_2
-        .word zone_3w_floor_3
-        .word zone_3w_floor_4
-        .word zone_3w_floor_boss
-        .word zone_4a_floor_1
-        .word zone_4a_floor_2
-        .word zone_4a_floor_3
-        .word zone_4a_floor_4
-        .word zone_4a_floor_boss
-        .word zone_4b_floor_1
-        .word zone_4b_floor_2
-        .word zone_4b_floor_3
-        .word zone_4b_floor_4
-        .word zone_4b_floor_boss
-        .word zone_4c_floor_1
-        .word zone_4c_floor_2
-        .word zone_4c_floor_3
-        .word zone_4c_floor_4
-        .word zone_4c_floor_boss
-        .word zone_4w_floor_1
-        .word zone_4w_floor_2
-        .word zone_4w_floor_3
-        .word zone_4w_floor_4
-        .word zone_4w_floor_boss
-        .word zone_5s_floor_1
-        .word zone_5s_floor_boss
-        .word zone_5w_floor_1
-        .word zone_5w_floor_boss
+        banked_addr zone_hub_world
+        banked_addr zone_grasslands_floor_1
+        banked_addr zone_grasslands_floor_2
+        banked_addr zone_grasslands_floor_3
+        banked_addr zone_grasslands_floor_4
+        banked_addr zone_grasslands_floor_boss
+        banked_addr zone_2a_floor_1
+        banked_addr zone_2a_floor_2
+        banked_addr zone_2a_floor_3
+        banked_addr zone_2a_floor_4
+        banked_addr zone_2a_floor_boss
+        banked_addr zone_2b_floor_1
+        banked_addr zone_2b_floor_2
+        banked_addr zone_2b_floor_3
+        banked_addr zone_2b_floor_4
+        banked_addr zone_2b_floor_boss
+        banked_addr zone_2c_floor_1
+        banked_addr zone_2c_floor_2
+        banked_addr zone_2c_floor_3
+        banked_addr zone_2c_floor_4
+        banked_addr zone_2c_floor_boss
+        banked_addr zone_2w_floor_1
+        banked_addr zone_2w_floor_2
+        banked_addr zone_2w_floor_3
+        banked_addr zone_2w_floor_4
+        banked_addr zone_2w_floor_boss
+        banked_addr zone_3a_floor_1
+        banked_addr zone_3a_floor_2
+        banked_addr zone_3a_floor_3
+        banked_addr zone_3a_floor_4
+        banked_addr zone_3a_floor_boss
+        banked_addr zone_3b_floor_1
+        banked_addr zone_3b_floor_2
+        banked_addr zone_3b_floor_3
+        banked_addr zone_3b_floor_4
+        banked_addr zone_3b_floor_boss
+        banked_addr zone_3c_floor_1
+        banked_addr zone_3c_floor_2
+        banked_addr zone_3c_floor_3
+        banked_addr zone_3c_floor_4
+        banked_addr zone_3c_floor_boss
+        banked_addr zone_3w_floor_1
+        banked_addr zone_3w_floor_2
+        banked_addr zone_3w_floor_3
+        banked_addr zone_3w_floor_4
+        banked_addr zone_3w_floor_boss
+        banked_addr zone_4a_floor_1
+        banked_addr zone_4a_floor_2
+        banked_addr zone_4a_floor_3
+        banked_addr zone_4a_floor_4
+        banked_addr zone_4a_floor_boss
+        banked_addr zone_4b_floor_1
+        banked_addr zone_4b_floor_2
+        banked_addr zone_4b_floor_3
+        banked_addr zone_4b_floor_4
+        banked_addr zone_4b_floor_boss
+        banked_addr zone_4c_floor_1
+        banked_addr zone_4c_floor_2
+        banked_addr zone_4c_floor_3
+        banked_addr zone_4c_floor_4
+        banked_addr zone_4c_floor_boss
+        banked_addr zone_4w_floor_1
+        banked_addr zone_4w_floor_2
+        banked_addr zone_4w_floor_3
+        banked_addr zone_4w_floor_4
+        banked_addr zone_4w_floor_boss
+        banked_addr zone_5s_floor_1
+        banked_addr zone_5s_floor_boss
+        banked_addr zone_5w_floor_1
+        banked_addr zone_5w_floor_boss
 
 ; Target ID in A please. Clobbers X, Y
 .proc FAR_set_zone_ptr_from_id
@@ -341,11 +345,14 @@ zone_id_in_range:
         sta current_save + SaveFile::PlayerZoneId
 
         asl
+        asl
         tax
         lda zone_ptr_by_id_lut+0, x
         sta PlayerZonePtr+0
         lda zone_ptr_by_id_lut+1, x
         sta PlayerZonePtr+1
+        lda zone_ptr_by_id_lut+2, x
+        sta PlayerZoneBank
 
         rts
 .endproc
@@ -355,26 +362,37 @@ zone_id_in_range:
 ; through a run. (Yes this is stupid, it was all pointer-based originally
 ; and I don't feel like editing 70+ zones **AGAIN.** Deal.)
 .proc FAR_get_zone_id_from_zone_ptr
-        ldx #0        
+ZoneTablePtr := R0
+CurrentIndex := R2
+        st16 ZoneTablePtr, zone_ptr_by_id_lut
+
+        lda #0
+        sta CurrentIndex
 loop:
-        lda zone_ptr_by_id_lut+0, x
+        ldy #0
+        lda (ZoneTablePtr), y
         cmp PlayerZonePtr+0
         bne not_this_one
-        lda zone_ptr_by_id_lut+1, x
+        ldy #1
+        lda (ZoneTablePtr), y
         cmp PlayerZonePtr+1
+        bne not_this_one
+        ldy #2
+        lda (ZoneTablePtr), y
+        cmp PlayerZoneBank
         beq found
 not_this_one:
-        inx
-        inx
-        cpx #(ZONE_TOTAL_COUNT * 2)
+        add16b ZoneTablePtr, #4
+        inc CurrentIndex
+        lda CurrentIndex
+        cmp #ZONE_TOTAL_COUNT
         bne loop
 not_found:
         ; uhh?
         lda #ZONE_HUB_WORLD
         rts
 found:
-        txa
-        lsr
+        lda CurrentIndex
         rts
 .endproc
 
@@ -382,7 +400,7 @@ found:
 FloorListPtr := R0
 FloorListLength := R2
         perform_zpcm_inc
-        access_data_bank #<.bank(all_zones_data_page)
+        access_data_bank PlayerZoneBank
 
         ldy #ZoneDefinition::FloorList
         lda (PlayerZonePtr), y
@@ -422,7 +440,7 @@ FloorListLength := R2
 .endproc
 
 .proc FAR_setup_interior_spawn_pool_for_current_zone
-        access_data_bank #<.bank(all_zones_data_page)
+        access_data_bank PlayerZoneBank
 
         ldy #ZoneDefinition::InteriorSpawnPool
         lda (PlayerZonePtr), y
@@ -447,7 +465,7 @@ FloorListLength := R2
 .endproc
 
 .proc FAR_setup_exterior_spawn_pool_for_current_zone
-        access_data_bank #<.bank(all_zones_data_page)
+        access_data_bank PlayerZoneBank
 
         ldy #ZoneDefinition::ExteriorSpawnPool
         lda (PlayerZonePtr), y
@@ -472,7 +490,7 @@ FloorListLength := R2
 .endproc
 
 .proc FAR_setup_warp_spawn_pool_for_current_zone
-        access_data_bank #<.bank(all_zones_data_page)
+        access_data_bank PlayerZoneBank
 
         ldy #ZoneDefinition::WarpSpawnPool
         lda (PlayerZonePtr), y
@@ -497,7 +515,7 @@ FloorListLength := R2
 .endproc
 
 .proc FAR_setup_general_spawn_set_for_current_zone
-        access_data_bank #<.bank(all_zones_data_page)
+        access_data_bank PlayerZoneBank
 
         ldy #ZoneDefinition::GeneralChallengeSpawnSet
         lda (PlayerZonePtr), y
@@ -512,7 +530,7 @@ FloorListLength := R2
 .endproc
 
 .proc FAR_setup_warp_spawn_set_for_current_zone
-        access_data_bank #<.bank(all_zones_data_page)
+        access_data_bank PlayerZoneBank
 
         ldy #ZoneDefinition::WarpChallengeSpawnSet
         lda (PlayerZonePtr), y
@@ -529,7 +547,7 @@ FloorListLength := R2
 .proc FAR_setup_shop_loot_ptrs_for_current_zone
 LootTablePtr := R0
 LootTableIndex := R2
-        access_data_bank #<.bank(all_zones_data_page)
+        access_data_bank PlayerZoneBank
 
         lda LootTableIndex
         and #%00000011
@@ -556,7 +574,7 @@ SpritePosY := R5
 BannerDefPtr := R6
 SpritePtr := R8
         perform_zpcm_inc
-        access_data_bank #<.bank(all_zones_data_page)
+        access_data_bank PlayerZoneBank
 
         ldy #ZoneDefinition::HudBannerDef
         lda (PlayerZonePtr), y
@@ -815,7 +833,7 @@ PaletteTableBank := R6
         ; If this is a problem we'll just have to catch it in test. We CAN switch
         ; these to a table eventually, I just don't feel like today and I also am
         ; not that worried about readability for these.
-        access_data_bank #<.bank(all_zones_data_page)
+        access_data_bank PlayerZoneBank
 
         ldy #ZoneDefinition::HudPal
         lda (PlayerZonePtr), y
@@ -858,7 +876,7 @@ play_warp_chamber_music:
         rts
 
 not_a_warp_chamber:
-        access_data_bank #<.bank(all_zones_data_page)
+        access_data_bank PlayerZoneBank
 
         ; the track number comes from the zone, of course
         ldy #ZoneDefinition::MusicTrack
@@ -893,7 +911,7 @@ done_picking_variant:
 .proc FAR_load_exit_pointer_from_current_zone
 ExitIndex := R0
 ExitListPtr := R2
-        access_data_bank #<.bank(all_zones_data_page)
+        access_data_bank PlayerZoneBank
 
         ldy #ZoneDefinition::ExitList
         lda (PlayerZonePtr), y
@@ -908,8 +926,16 @@ ExitListPtr := R2
         bcc exit_in_bounds
         lda #0
 exit_in_bounds:
-        ; address the exit in words
+        ; address the exit in word pairs
         asl
+        asl
+        ; if that final ASL carried, fix it
+        ; (deals with exit lists longer than 64, which is only really relevant
+        ; for the debug hub, but we need that for testing. does not correctly deal
+        ; with exit lists longer than 128, which we DON'T need, so it's fine.
+        bcc no_carry
+        inc ExitListPtr+1
+no_carry:
         ; skip past the length byte
         tay
         iny
@@ -919,6 +945,9 @@ exit_in_bounds:
         iny
         lda (ExitListPtr), y
         sta DestinationZonePtr+1
+        iny
+        lda (ExitListPtr), y
+        sta DestinationZoneBank
 
         restore_previous_bank
         perform_zpcm_inc
