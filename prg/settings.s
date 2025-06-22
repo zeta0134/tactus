@@ -35,7 +35,7 @@ palette_preset_lut_phones:  .byte  0, 14, 24,  5, 18, 17
 palette_preset_lut_pajamas: .byte  0, 31, 50, 28, 32, 26
 palette_preset_lut_pigment: .byte  0, 45, 32, 18, 43, 44
 
-    .segment "CODE_2"
+    .segment "CODE_C"
 
 player_colors_lut:
     .byte $00, $11, $12, $13, $14, $15, $16, $17, $18, $19, $1A, $1B, $1C ;  (-)  (0)

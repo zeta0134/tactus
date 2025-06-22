@@ -388,6 +388,7 @@ OVERLAY_OPEN_SE = 2
 OVERLAY_OPEN_SW = 3
 OVERLAY_OPEN_NW = 4
 
+.global FAR_initialize_structure_counts_for_floor
 .global FAR_spawn_structures_from_zonedef
 
 .global test_structure_set_small

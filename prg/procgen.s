@@ -1602,6 +1602,11 @@ done_with_player:
 
 .proc FAR_generate_rooms_for_floor
 RoomIndexToPreserve := R0
+
+        perform_zpcm_inc
+        near_call FAR_initialize_structure_counts_for_floor
+        perform_zpcm_inc
+
         lda #0
         sta RoomIndexToGenerate
 loop:

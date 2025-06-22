@@ -16,6 +16,12 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
+        .segment "RAM"
+
+StandardChestsRemaining: .res 1
+RareChestsRemaining: .res 1
+LegendaryChestsRemaining: .res 1
+
         .segment "LEVEL_DATA_STRUCTURES_0"
 
         .include "../build/structures/GrassMonomino.incs"
@@ -506,6 +512,74 @@ no_match:
         rts
 .endproc
 
+.proc FAR_initialize_structure_counts_for_floor
+RngResult := R0
+RngRange := R1
+
+        perform_zpcm_inc
+        access_data_bank PlayerZoneBank
+
+        ; Figure out our chest total counts for this floor, according to the
+        ; settings from the zone definition
+
+        ; Standard Chests
+        ldy #ZoneDefinition::StandardChestMax
+        lda (PlayerZonePtr), y
+        ldy #ZoneDefinition::StandardChestMin
+        sec
+        sbc (PlayerZonePtr), y
+        sta RngRange
+        beq fixed_standard_chest_size
+variable_standard_chest_size:
+        in_range_smol next_room_rand, RngRange
+fixed_standard_chest_size:
+        ldy #ZoneDefinition::StandardChestMin
+        clc
+        adc (PlayerZonePtr), y
+        sta StandardChestsRemaining
+
+        perform_zpcm_inc
+
+        ; Rare Chests
+        ldy #ZoneDefinition::RareChestMax
+        lda (PlayerZonePtr), y
+        ldy #ZoneDefinition::RareChestMin
+        sec
+        sbc (PlayerZonePtr), y
+        sta RngRange
+        beq fixed_rare_chest_size
+variable_rare_chest_size:
+        in_range_smol next_room_rand, RngRange
+fixed_rare_chest_size:
+        ldy #ZoneDefinition::RareChestMin
+        clc
+        adc (PlayerZonePtr), y
+        sta RareChestsRemaining
+
+        perform_zpcm_inc
+
+        ; Legendary Chests
+        ldy #ZoneDefinition::LegendaryChestMax
+        lda (PlayerZonePtr), y
+        ldy #ZoneDefinition::LegendaryChestMin
+        sec
+        sbc (PlayerZonePtr), y
+        sta RngRange
+        beq fixed_legendary_chest_size
+variable_legendary_chest_size:
+        in_range_smol next_room_rand, RngRange
+fixed_legendary_chest_size:
+        ldy #ZoneDefinition::LegendaryChestMin
+        clc
+        adc (PlayerZonePtr), y
+        sta LegendaryChestsRemaining
+
+        perform_zpcm_inc
+
+        restore_previous_bank
+        rts
+.endproc
+
 .proc FAR_spawn_structures_from_zonedef
 ; RoomPtr := R0 - from call site
 StructureList := R2
@@ -632,6 +706,9 @@ done_with_exterior_small_structures:
         sta StructureList+1
         jsr force_single_structure_from_list
 skip_exterior_warp_structures:
+
+        
+
         restore_previous_bank
         rts
 .endproc
