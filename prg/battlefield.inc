@@ -13,6 +13,7 @@
 .global tile_attributes
 .global tile_detail
 .global tile_metasprite
+.global tile_transient_data
 
 .global active_battlefield, displayed_battlefield, queued_bytes_counter
 

@@ -49,8 +49,12 @@
         .segment "ENEMY_ATTACK"
 
 .proc ENEMY_ATTACK_open_helpful_chest
+MetaSpriteIndex := R0
+WeaponClassTemp := R1
+TargetIndex := R0
+TileId := R1
 AttackSquare := R3
-EffectiveAttackSquare := R10 
+WeaponPtr := R11
         ; TODO: open the chest and spawn its contents
         rts
 .endproc

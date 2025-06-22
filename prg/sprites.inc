@@ -12,6 +12,7 @@ ONE_SPRITE = 4
         TileIndex .byte
         LifetimeBeats .byte
         SpecialBehavior .byte
+        RightTileIndex .byte
 .endstruct
 
 ; These come first so we can use the behavior
@@ -27,7 +28,9 @@ SPRITE_ONE_BEAT    = %00000100
 ; Special behavior flags, for special behaviors
 SPRITE_FLOAT         = %10000000
 SPRITE_BIPHASIC      = %01000000 ; two tile variants selected by musical beat
-SPRITE_PALETTE_CYCLE = %00100000 ; flip between palettes 1, 2, 3 on every other musical beat
+SPRITE_FLICKER       = %00100000 ; on, off, every hardware frame. great for pseudo-transparency on the cheap
+SPRITE_CUSTOM_HALF   = %00010000 ; right tile index is provided explicitly, mostly used for numeric displays
+
 
 .global sprite_table
 

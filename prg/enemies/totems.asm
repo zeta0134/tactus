@@ -130,7 +130,7 @@ sprite_succeeded:
         set_static_07_sprite_x SPRITE_STATIC_07_DISKETTE
         ; Save sprites have a front/back facing thing going on, so get that set
         lda sprite_table + MetaSpriteState::SpecialBehavior, x
-        ora #(SPRITE_BIPHASIC | SPRITE_PALETTE_CYCLE)
+        ora #SPRITE_BIPHASIC
         sta sprite_table + MetaSpriteState::SpecialBehavior, x
         ; For now, just use the blue palette (later we'll cycle this)
         lda #(SPRITE_ACTIVE | SPRITE_PAL_YELLOW)

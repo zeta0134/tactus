@@ -190,6 +190,21 @@ draw:
 
         perform_zpcm_inc
 
+        ; If this sprite should flicker, achieve that by moving its Y position offscreen
+        ; every other beat
+        lda sprite_table + MetaSpriteState::SpecialBehavior, x
+        and #SPRITE_FLICKER
+        beq no_flicker
+        ; use the X position as a baseline
+        txa
+        eor GameloopCounter
+        and #1
+        beq no_flicker
+        ; to flicker, set the Y position to $F8 unconditionally
+        lda #$F8
+        jmp write_sprite_y
+no_flicker:
+
         ; Y position might be modified if we are in RISE mode
         lda sprite_table + MetaSpriteState::BehaviorFlags, x
         and #SPRITE_RISE
@@ -260,10 +275,14 @@ write_sprite_y:
 
         perform_zpcm_inc
 
-        ; special case: sprite tile may be indexed strangely for biphasic mode
+        ; special case: sprite tile may be indexed strangely for biphasic mode...
         lda sprite_table + MetaSpriteState::SpecialBehavior, x
         and #SPRITE_BIPHASIC
-        beq normal_sprite_tile
+        bne biphasic_sprite_tile
+        lda sprite_table + MetaSpriteState::SpecialBehavior, x
+        and #SPRITE_CUSTOM_HALF
+        bne custom_half_sprite_tile
+        jmp normal_sprite_tile
 
 biphasic_sprite_tile:
         ; For biphasic sprites, ignore horizontal flipping, but instead pay attention
@@ -290,6 +309,16 @@ second_biphasic_sprite:
         sta (current_sprite_ptr), y
         clc
         adc #2
+        ldy #(SelfModifiedSprite::TileId + .sizeof(SelfModifiedSprite))
+        sta (current_sprite_ptr), y
+        perform_zpcm_inc
+        jmp attribute_byte
+
+custom_half_sprite_tile:
+        lda sprite_table + MetaSpriteState::TileIndex, x
+        ldy #SelfModifiedSprite::TileId
+        sta (current_sprite_ptr), y
+        lda sprite_table + MetaSpriteState::RightTileIndex, x
         ldy #(SelfModifiedSprite::TileId + .sizeof(SelfModifiedSprite))
         sta (current_sprite_ptr), y
         perform_zpcm_inc

@@ -25,6 +25,11 @@ tile_detail: .res ::BATTLEFIELD_SIZE
 ; metasprites are despawned. be sure to suspend properly!
 tile_metasprite: .res ::BATTLEFIELD_SIZE
 
+; and for those tiles that need just a bit of extra state.
+; this is NOT persisted, or even initialized, 
+; so only use it for temporary things.
+tile_transient_data: .res ::BATTLEFIELD_SIZE
+
 active_battlefield: .res 1
 displayed_battlefield: .res 1
 
