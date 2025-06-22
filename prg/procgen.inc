@@ -77,6 +77,7 @@ ROOM_PROPERTIES_DARK               = %01000000
 ROOM_PROPERTIES_WARP               = %00001000 ; this room is part of the warp zone (don't put the player here)
 ROOM_PROPERTIES_EXIT_CHAMBER       = %00000100 ; this chamber contains an exit (currently only used for warps)
 ROOM_PROPERTIES_FORBID_WARP_PORTAL = %00000010 ; this chamber cannot house the warp portal (no valid structure spot, OOB, etc)
+ROOM_PROPERTIES_FORBID_CHESTS      = %00000001 ; this chamber cannot have chests (OOB, inappropriate features, etc)
 ROOM_CATEGORY_EXTERIOR             = %00000000
 ROOM_CATEGORY_INTERIOR             = %00010000
 ROOM_CATEGORY_CHALLENGE            = %00100000

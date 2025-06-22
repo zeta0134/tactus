@@ -580,6 +580,127 @@ fixed_legendary_chest_size:
         rts
 .endproc
 
+; Try to spawn one chest structure in this room, based on the current
+; chests remaining and the room category. Note that this expects the
+; PlayerZoneBank to already be loaded!
+.proc _spawn_chest_structures
+StructureList := R2
+MaxStructures := R4
+FailedSpawnAttempts := R17
+        lda #1
+        sta MaxStructures
+
+        lda LegendaryChestsRemaining
+        beq not_legendary
+        ldx RoomIndexToGenerate
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_INTERIOR
+        beq roll_legendary_interior
+roll_legendary_exterior:
+        ldy #ZoneDefinition::LegendaryChestExteriorStructures
+        lda (PlayerZonePtr), y
+        sta StructureList+0
+        iny
+        lda (PlayerZonePtr), y
+        sta StructureList+1
+        jsr roll_structures_from_list
+        lda FailedSpawnAttempts
+        cmp #MAX_STRUCTURE_SPAWN_FAILURES
+        bne legendary_success
+        rts
+roll_legendary_interior:
+        ldy #ZoneDefinition::LegendaryChestInteriorStructures
+        lda (PlayerZonePtr), y
+        sta StructureList+0
+        iny
+        lda (PlayerZonePtr), y
+        sta StructureList+1
+        jsr roll_structures_from_list
+        lda FailedSpawnAttempts
+        cmp #MAX_STRUCTURE_SPAWN_FAILURES
+        bne legendary_success
+        rts
+legendary_success:
+        dec LegendaryChestsRemaining
+        rts
+not_legendary:
+
+        lda RareChestsRemaining
+        beq not_rare
+        ldx RoomIndexToGenerate
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_INTERIOR
+        beq roll_rare_interior
+roll_rare_exterior:
+        ldy #ZoneDefinition::RareChestExteriorStructures
+        lda (PlayerZonePtr), y
+        sta StructureList+0
+        iny
+        lda (PlayerZonePtr), y
+        sta StructureList+1
+        jsr roll_structures_from_list
+        lda FailedSpawnAttempts
+        cmp #MAX_STRUCTURE_SPAWN_FAILURES
+        bne rare_success
+        rts
+roll_rare_interior:
+        ldy #ZoneDefinition::RareChestInteriorStructures
+        lda (PlayerZonePtr), y
+        sta StructureList+0
+        iny
+        lda (PlayerZonePtr), y
+        sta StructureList+1
+        jsr roll_structures_from_list
+        lda FailedSpawnAttempts
+        cmp #MAX_STRUCTURE_SPAWN_FAILURES
+        bne rare_success
+        rts
+rare_success:
+        dec RareChestsRemaining
+        rts
+not_rare:
+
+        lda StandardChestsRemaining
+        beq not_standard
+        ldx RoomIndexToGenerate
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_INTERIOR
+        beq roll_standard_interior
+roll_standard_exterior:
+        ldy #ZoneDefinition::StandardChestExteriorStructures
+        lda (PlayerZonePtr), y
+        sta StructureList+0
+        iny
+        lda (PlayerZonePtr), y
+        sta StructureList+1
+        jsr roll_structures_from_list
+        lda FailedSpawnAttempts
+        cmp #MAX_STRUCTURE_SPAWN_FAILURES
+        bne standard_success
+        rts
+roll_standard_interior:
+        ldy #ZoneDefinition::StandardChestInteriorStructures
+        lda (PlayerZonePtr), y
+        sta StructureList+0
+        iny
+        lda (PlayerZonePtr), y
+        sta StructureList+1
+        jsr roll_structures_from_list
+        lda FailedSpawnAttempts
+        cmp #MAX_STRUCTURE_SPAWN_FAILURES
+        bne standard_success
+        rts
+standard_success:
+        dec StandardChestsRemaining
+        rts
+not_standard:
+        ; If we get here, there are no more chests to spawn at all. Bail! We're done!
+        rts
+.endproc
+
 .proc FAR_spawn_structures_from_zonedef
 ; RoomPtr := R0 - from call site
 StructureList := R2
@@ -706,8 +827,23 @@ done_with_exterior_small_structures:
         sta StructureList+1
         jsr force_single_structure_from_list
 skip_exterior_warp_structures:
-
         
+        ; Should this particular room have chests? Exclude them based on a few factors
+        ldx RoomIndexToGenerate
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        ; No chests in shops
+        cmp #ROOM_CATEGORY_SHOP
+        beq skip_chest_spawning
+        ; No chests in challenge rooms
+        cmp #ROOM_CATEGORY_CHALLENGE
+        beq skip_chest_spawning
+        ; No chests in any room that otherwise expressly forbids them
+        lda room_properties, x
+        and #ROOM_PROPERTIES_FORBID_CHESTS
+        bne skip_chest_spawning
+        jsr _spawn_chest_structures
+skip_chest_spawning:
 
         restore_previous_bank
         rts
