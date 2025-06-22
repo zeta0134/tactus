@@ -457,13 +457,6 @@ tile_suspend TILE_ITEM_SHADOW, ENEMY_UTIL_suspend_item_shadow
 tile_explode TILE_ITEM_SHADOW, FIXED_no_behavior, FIXED_no_behavior
 tile_spell   TILE_ITEM_SHADOW, FIXED_no_behavior
 
-tile_update  TILE_TREASURE_CHEST, FIXED_no_behavior
-tile_attack  TILE_TREASURE_CHEST, ENEMY_ATTACK_attack_treasure_chest, FIXED_no_behavior
-tile_collide TILE_TREASURE_CHEST, ENEMY_COLLIDE_solid_tile_forbids_movement
-tile_suspend TILE_TREASURE_CHEST, FIXED_no_behavior
-tile_explode TILE_TREASURE_CHEST, FIXED_no_behavior, FIXED_no_behavior
-tile_spell   TILE_TREASURE_CHEST, FIXED_no_behavior
-
 tile_update  TILE_BIG_KEY, FIXED_no_behavior
 tile_attack  TILE_BIG_KEY, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_BIG_KEY, ENEMY_COLLIDE_collect_key

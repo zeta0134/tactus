@@ -52,6 +52,24 @@ LegendaryChestsRemaining: .res 1
         .include "../build/structures/StandardChest.incs"
         .include "../build/structures/RareChest.incs"
         .include "../build/structures/LegendaryChest.incs"
+        .include "../build/structures/RareChallengeChest.incs"
+        .include "../build/structures/LegendaryChallengeChest.incs"
+        .include "../build/structures/RareTimedChest.incs"
+        .include "../build/structures/LegendaryTimedChest.incs"
+        .include "../build/structures/StandardMimic.incs"
+        .include "../build/structures/RareMimic.incs"
+        .include "../build/structures/LegendaryMimic.incs"
+        .include "../build/structures/StandardHiddenChest.incs"
+        .include "../build/structures/RareHiddenChest.incs"
+        .include "../build/structures/LegendaryHiddenChest.incs"
+        .include "../build/structures/StandardChestLight.incs"
+        .include "../build/structures/RareChestLight.incs"
+        .include "../build/structures/LegendaryChestLight.incs"
+        .include "../build/structures/RareChallengeChestLight.incs"
+        .include "../build/structures/LegendaryChallengeChestLight.incs"
+        .include "../build/structures/RareTimedChestLight.incs"
+        .include "../build/structures/LegendaryTimedChestLight.incs"
+
 
 .macro structure_entry structure_label
         .addr structure_label
@@ -119,16 +137,66 @@ blocking_warp_structure_set:
         .endrepeat
         structure_entry structure_BlockingWarpStructure ; but we'll settle for this if we have to
 
-standard_chest_structure_set:
-        .byte $1 ; RNG Mask
-        structure_entry structure_StandardChest
+standard_chest_structure_set_exterior:
+        .byte $3 ; RNG Mask
+        structure_entry structure_StandardHiddenChest
+        structure_entry structure_StandardChestLight
+        structure_entry structure_StandardChestLight
+        structure_entry structure_StandardChestLight
 
-rare_chest_structure_set:
-        .byte $1 ; RNG Mask
+standard_chest_structure_set_interior:
+        .byte $7 ; RNG Mask
+        structure_entry structure_StandardHiddenChest
+        structure_entry structure_StandardMimic
+        structure_entry structure_StandardChestLight
+        structure_entry structure_StandardChestLight
+        structure_entry structure_StandardChestLight
+        structure_entry structure_StandardChestLight
+        structure_entry structure_StandardChestLight
+        structure_entry structure_StandardChestLight
+
+rare_chest_structure_set_exterior:
+        .byte $7 ; RNG Mask
+        structure_entry structure_RareHiddenChest
+        structure_entry structure_RareChallengeChestLight
+        structure_entry structure_RareChallengeChestLight
+        structure_entry structure_RareChallengeChestLight
+        structure_entry structure_RareChallengeChestLight
+        structure_entry structure_RareTimedChestLight
+        structure_entry structure_RareChestLight
+        structure_entry structure_RareChestLight
+
+rare_chest_structure_set_interior:
+        .byte $7 ; RNG Mask
+        structure_entry structure_RareHiddenChest
+        structure_entry structure_RareChallengeChest
+        structure_entry structure_RareChallengeChest
+        structure_entry structure_RareChallengeChest
+        structure_entry structure_RareChallengeChest
+        structure_entry structure_RareTimedChest
+        structure_entry structure_RareMimic
         structure_entry structure_RareChest
 
-legendary_chest_structure_set:
-        .byte $1 ; RNG Mask
+legendary_chest_structure_set_exterior:
+        .byte $7 ; RNG Mask
+        structure_entry structure_LegendaryHiddenChest
+        structure_entry structure_LegendaryChallengeChestLight
+        structure_entry structure_LegendaryChallengeChestLight
+        structure_entry structure_LegendaryChallengeChestLight
+        structure_entry structure_LegendaryChallengeChestLight
+        structure_entry structure_LegendaryTimedChestLight
+        structure_entry structure_LegendaryChestLight
+        structure_entry structure_LegendaryChestLight
+
+legendary_chest_structure_set_interior:
+        .byte $7 ; RNG Mask
+        structure_entry structure_LegendaryHiddenChest
+        structure_entry structure_LegendaryChallengeChest
+        structure_entry structure_LegendaryChallengeChest
+        structure_entry structure_LegendaryChallengeChest
+        structure_entry structure_LegendaryChallengeChest
+        structure_entry structure_LegendaryTimedChest
+        structure_entry structure_LegendaryMimic
         structure_entry structure_LegendaryChest
 
         ; should match procgen.s! we rely on several of its functions, and the far call overhead

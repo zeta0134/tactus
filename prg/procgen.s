@@ -1928,7 +1928,7 @@ done_with_torchlight:
 ; expanding this when bosses need update functions.
 room_state_dispatch_lut:
         .word no_room_logic
-        .word room_clear_and_chest_spawn
+        .word room_clear_and_key_spawn
 
 spell_state_dispatch_lut:
         .word spells_do_nothing
@@ -2020,7 +2020,7 @@ DispatchPtr := R0
         rts
 .endproc
 
-.proc room_clear_and_chest_spawn
+.proc room_clear_and_key_spawn
 EntityId := R1
 EntityPattern := R2
 EntityAttribute := R3
@@ -2028,7 +2028,7 @@ EntityAttribute := R3
         ; haven't had a real processing round yet, and we are operating on incomplete
         ; information (possibly stale from the previous room)
         lda first_beat_after_load
-        bne room_state_init
+        jne room_state_init
 
         lda current_clear_status
         sta previous_clear_status
@@ -2056,6 +2056,11 @@ room_not_clear:
         sta chest_spawn_cooldown
 done_with_clear_checks:
 
+        ; For challenge rooms, we still need to manually spawn the big key
+        lda room_properties, x
+        and #ROOM_CATEGORY_MASK
+        cmp #ROOM_CATEGORY_CHALLENGE
+        bne done_with_chest_spawns
         ; If the room is clear, and we haven't spawned the chest yet,
         ; then do so
         ldx PlayerRoomIndex
@@ -2069,17 +2074,16 @@ done_with_clear_checks:
         cmp #2
         bcc done_with_chest_spawns
 perform_chest_spawning:
-        ; TODO: instead of rolling a random chest here, we should check for the
-        ; hidden chest (if present) as part of the map data, and spawn in that
-        ; specific chest. (this whole mechanic doesn't exist yet)
+        ; For now, we're just going to spawn the big key directly, rather than spawning
+        ; an actual chest. Later the big key may complicate itself much more than this.
         perform_zpcm_inc
 
         ; spawn in a chest
-        lda #TILE_TREASURE_CHEST
+        lda #TILE_BIG_KEY
         sta EntityId
-        lda #<BG_TILE_TREASURE_CHEST
+        lda #<BG_TILE_BIG_KEY
         sta EntityPattern
-        lda #(>BG_TILE_TREASURE_CHEST | PAL_AIR)
+        lda #(>BG_TILE_BIG_KEY | PAL_ICE)
         sta EntityAttribute
         jsr spawn_entity
 

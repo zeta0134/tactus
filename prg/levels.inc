@@ -399,9 +399,12 @@ OVERLAY_OPEN_NW = 4
 .global cave_warp_structure_set
 .global blocking_warp_structure_set
 
-.global standard_chest_structure_set
-.global rare_chest_structure_set
-.global legendary_chest_structure_set
+.global standard_chest_structure_set_exterior
+.global standard_chest_structure_set_interior
+.global rare_chest_structure_set_exterior
+.global rare_chest_structure_set_interior
+.global legendary_chest_structure_set_exterior
+.global legendary_chest_structure_set_interior
 
 ROOM_BASE_LOGIC_NONE     = 0
 ROOM_BASE_LOGIC_STANDARD = 1

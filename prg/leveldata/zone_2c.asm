@@ -57,18 +57,18 @@ zone_2c_floor_1:
         .word zone_sequence_str_2_1       ; SequenceStr
         rng_index_for_zone 2, 1           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
-        .word standard_chest_structure_set   ; StandardChestInteriorStructures
-        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set_exterior   ; StandardChestExteriorStructures
         .word standard_chest_treasure_table  ; StandardChestLootTable
         .byte 8                              ; StandardChestMin
         .byte 16                             ; StandardChestMax
-        .word rare_chest_structure_set       ; RareChestInteriorStructures
-        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_structure_set_interior       ; RareChestInteriorStructures
+        .word rare_chest_structure_set_exterior       ; RareChestExteriorStructures
         .word rare_chest_treasure_table      ; RareChestLootTable
         .byte 0                              ; RareChestMin
         .byte 2                              ; RareChestMax
-        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
-        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_structure_set_interior  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set_exterior  ; LegendaryChestExteriorStructures
         .word legendary_chest_treasure_table ; LegendaryChestLootTable
         .byte 0                              ; LegendaryChestMin
         .byte 1                              ; LegendaryChestMax
@@ -138,18 +138,18 @@ zone_2c_floor_2:
         .word zone_sequence_str_2_2       ; SequenceStr
         rng_index_for_zone 2, 2           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
-        .word standard_chest_structure_set   ; StandardChestInteriorStructures
-        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set_exterior   ; StandardChestExteriorStructures
         .word standard_chest_treasure_table  ; StandardChestLootTable
         .byte 8                              ; StandardChestMin
         .byte 16                             ; StandardChestMax
-        .word rare_chest_structure_set       ; RareChestInteriorStructures
-        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_structure_set_interior       ; RareChestInteriorStructures
+        .word rare_chest_structure_set_exterior       ; RareChestExteriorStructures
         .word rare_chest_treasure_table      ; RareChestLootTable
         .byte 0                              ; RareChestMin
         .byte 2                              ; RareChestMax
-        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
-        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_structure_set_interior  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set_exterior  ; LegendaryChestExteriorStructures
         .word legendary_chest_treasure_table ; LegendaryChestLootTable
         .byte 0                              ; LegendaryChestMin
         .byte 1                              ; LegendaryChestMax
@@ -219,18 +219,18 @@ zone_2c_floor_3:
         .word zone_sequence_str_2_3       ; SequenceStr
         rng_index_for_zone 2, 3           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
-        .word standard_chest_structure_set   ; StandardChestInteriorStructures
-        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set_exterior   ; StandardChestExteriorStructures
         .word standard_chest_treasure_table  ; StandardChestLootTable
         .byte 8                              ; StandardChestMin
         .byte 16                             ; StandardChestMax
-        .word rare_chest_structure_set       ; RareChestInteriorStructures
-        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_structure_set_interior       ; RareChestInteriorStructures
+        .word rare_chest_structure_set_exterior       ; RareChestExteriorStructures
         .word rare_chest_treasure_table      ; RareChestLootTable
         .byte 0                              ; RareChestMin
         .byte 2                              ; RareChestMax
-        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
-        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_structure_set_interior  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set_exterior  ; LegendaryChestExteriorStructures
         .word legendary_chest_treasure_table ; LegendaryChestLootTable
         .byte 0                              ; LegendaryChestMin
         .byte 1                              ; LegendaryChestMax
@@ -300,18 +300,18 @@ zone_2c_floor_4:
         .word zone_sequence_str_2_4       ; SequenceStr
         rng_index_for_zone 2, 4           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
-        .word standard_chest_structure_set   ; StandardChestInteriorStructures
-        .word standard_chest_structure_set   ; StandardChestExteriorStructures
+        .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
+        .word standard_chest_structure_set_exterior   ; StandardChestExteriorStructures
         .word standard_chest_treasure_table  ; StandardChestLootTable
         .byte 8                              ; StandardChestMin
         .byte 16                             ; StandardChestMax
-        .word rare_chest_structure_set       ; RareChestInteriorStructures
-        .word rare_chest_structure_set       ; RareChestExteriorStructures
+        .word rare_chest_structure_set_interior       ; RareChestInteriorStructures
+        .word rare_chest_structure_set_exterior       ; RareChestExteriorStructures
         .word rare_chest_treasure_table      ; RareChestLootTable
         .byte 0                              ; RareChestMin
         .byte 2                              ; RareChestMax
-        .word legendary_chest_structure_set  ; LegendaryChestInteriorStructures
-        .word legendary_chest_structure_set  ; LegendaryChestExteriorStructures
+        .word legendary_chest_structure_set_interior  ; LegendaryChestInteriorStructures
+        .word legendary_chest_structure_set_exterior  ; LegendaryChestExteriorStructures
         .word legendary_chest_treasure_table ; LegendaryChestLootTable
         .byte 0                              ; LegendaryChestMin
         .byte 1                              ; LegendaryChestMax

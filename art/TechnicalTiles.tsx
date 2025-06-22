@@ -226,6 +226,14 @@
   <properties>
    <property name="behavior" value="TILE_HIDDEN_CHEST"/>
    <property name="palette_index" type="int" value="2"/>
+   <property name="tile_id" value="BG_TILE_MIMIC_IDLE"/>
+  </properties>
+ </tile>
+ <tile id="69" type="chest">
+  <properties>
+   <property name="behavior" value="TILE_HELPFUL_CHEST"/>
+   <property name="palette_index" type="int" value="2"/>
+   <property name="tile_id" value="BG_TILE_SMALL_CHEST_LIGHT"/>
   </properties>
  </tile>
  <tile id="80" type="chest">
@@ -260,6 +268,28 @@
   <properties>
    <property name="behavior" value="TILE_HIDDEN_RARE_CHEST"/>
    <property name="palette_index" type="int" value="3"/>
+   <property name="tile_id" value="BG_TILE_MIMIC_IDLE"/>
+  </properties>
+ </tile>
+ <tile id="85" type="chest">
+  <properties>
+   <property name="behavior" value="TILE_LARGE_CHEST"/>
+   <property name="palette_index" type="int" value="3"/>
+   <property name="tile_id" value="BG_TILE_LARGE_CHEST_LIGHT"/>
+  </properties>
+ </tile>
+ <tile id="86" type="chest">
+  <properties>
+   <property name="behavior" value="TILE_CHALLENGE_CHEST"/>
+   <property name="palette_index" type="int" value="3"/>
+   <property name="tile_id" value="BG_TILE_CHALLENGE_CHEST_LIGHT"/>
+  </properties>
+ </tile>
+ <tile id="87" type="chest">
+  <properties>
+   <property name="behavior" value="TILE_TIMED_CHEST"/>
+   <property name="palette_index" type="int" value="3"/>
+   <property name="tile_id" value="BG_TILE_TIMED_CHEST_LIGHT"/>
   </properties>
  </tile>
  <tile id="96" type="chest">
@@ -294,6 +324,28 @@
   <properties>
    <property name="behavior" value="TILE_HIDDEN_LEGENDARY_CHEST"/>
    <property name="palette_index" type="int" value="1"/>
+   <property name="tile_id" value="BG_TILE_MIMIC_IDLE"/>
+  </properties>
+ </tile>
+ <tile id="101" type="chest">
+  <properties>
+   <property name="behavior" value="TILE_LARGE_CHEST"/>
+   <property name="palette_index" type="int" value="1"/>
+   <property name="tile_id" value="BG_TILE_LARGE_CHEST_LIGHT"/>
+  </properties>
+ </tile>
+ <tile id="102" type="chest">
+  <properties>
+   <property name="behavior" value="TILE_CHALLENGE_CHEST"/>
+   <property name="palette_index" type="int" value="1"/>
+   <property name="tile_id" value="BG_TILE_CHALLENGE_CHEST_LIGHT"/>
+  </properties>
+ </tile>
+ <tile id="103" type="chest">
+  <properties>
+   <property name="behavior" value="TILE_TIMED_CHEST"/>
+   <property name="palette_index" type="int" value="1"/>
+   <property name="tile_id" value="BG_TILE_TIMED_CHEST_LIGHT"/>
   </properties>
  </tile>
 </tileset>
