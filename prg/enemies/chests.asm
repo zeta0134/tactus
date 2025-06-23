@@ -3,8 +3,34 @@
 ; ============================================================================================================================
         .segment "ENEMY_UPDATE1"
 
+HELPFUL_CHEST_STATE_INIT = 0
+HELPFUL_CHEST_STATE_UPDATE = 1
+
+.proc _reroll_helpful_chest_item
+CurrentTile := R15
+LootTablePtr := R16
+ItemId := R18
+        perform_zpcm_inc
+spawn_item:
+        access_data_bank PlayerZoneBank
+        ldy #ZoneDefinition::StandardChestLootTable
+        lda (PlayerZonePtr), y
+        sta LootTablePtr+0
+        iny
+        lda (PlayerZonePtr), y
+        sta LootTablePtr+1
+        restore_previous_bank
+        far_call FAR_roll_gameplay_loot
+        ldx CurrentTile
+        lda ItemId
+        sta tile_data, x
+        perform_zpcm_inc
+        rts
+.endproc
+
 .proc ENEMY_UPDATE_helpful_chest
-        ; TODO
+        jsr _reroll_helpful_chest_item
+        ; TODO: preview that item if the player has the appropriate accessory
         rts
 .endproc
 
@@ -55,7 +81,21 @@ TargetIndex := R0
 TileId := R1
 AttackSquare := R3
 WeaponPtr := R11
-        ; TODO: open the chest and spawn its contents
+        ; Register the attack as a hit
+        lda #1
+        sta WeaponAttackLanded
+        
+        ; TODO: if we have any sprites spawned, clean them up!
+
+        ; Mostly easy: replace the chest with an item shadow
+        ldx AttackSquare
+        stx TargetIndex        
+        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_EARTH
+
+        lda #0
+        sta tile_flags, x
+        jsr draw_active_tile
+
         rts
 .endproc
 
