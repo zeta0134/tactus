@@ -74,7 +74,7 @@ spawn_item:
 ; ============================================================================================================================
         .segment "ENEMY_ATTACK"
 
-.proc ENEMY_ATTACK_open_helpful_chest
+.proc ENEMY_ATTACK_open_unlocked_chest
 MetaSpriteIndex := R0
 WeaponClassTemp := R1
 TargetIndex := R0
@@ -99,13 +99,6 @@ WeaponPtr := R11
         rts
 .endproc
 
-.proc ENEMY_ATTACK_open_large_chest
-AttackSquare := R3
-EffectiveAttackSquare := R10 
-        ; TODO: open the chest and spawn its contents
-        rts
-.endproc
-
 ; ============================================================================================================================
 ; ===                                      Enemy Attacks Player Behaviors                                                  ===
 ; ============================================================================================================================
@@ -113,22 +106,32 @@ EffectiveAttackSquare := R10
 
         .segment "ENEMY_COLLIDE"
 
-.proc ENEMY_COLLIDE_open_helpful_chest
+.proc ENEMY_COLLIDE_open_unlocked_chest
+TargetIndex := R0
+TargetSquare := R13
+        ; We behave like a wall on this beat, so we still want to push the player
+        ; back if we can.
+        ; But we also go ahead and open, which permits movement that is not an attack
+        ; to still open the chest. This mostly helps to resolve situations with weapons that
+        ; don't "attack" the square in the direction the player is moving.
+
+        ; TODO: if we have any sprites spawned, clean them up!
+
+        ; Mostly easy: replace the chest with an item shadow
+        ldx TargetSquare
+        stx TargetIndex        
+        draw_at_x_withpal TILE_ITEM_SHADOW, BG_TILE_WEAPON_SHADOW, PAL_EARTH
+
+        lda #0
+        sta tile_flags, x
+        jsr draw_active_tile
+
+        ; Play the "weapon slash" sfx, just like if an attack had occurred, which functions as our
+        ; "open chest" SFX in any other context. 
+        queue_sfx_noise sfx_weapon_slash
+
         near_call ENEMY_COLLIDE_solid_tile_forbids_movement
 
-        ; TODO: if the player bumps us somehow, treat it like an attack
-        ; and open the chest. This mostly works around an awkward Combat
-        ; Anchor interaction, since it doesn't attack the forward tile.
-        rts
-.endproc
-
-
-.proc ENEMY_COLLIDE_open_large_chest
-        near_call ENEMY_COLLIDE_solid_tile_forbids_movement
-
-        ; TODO: if the player bumps us somehow, treat it like an attack
-        ; and open the chest. This mostly works around an awkward Combat
-        ; Anchor interaction, since it doesn't attack the forward tile.
         rts
 .endproc
 

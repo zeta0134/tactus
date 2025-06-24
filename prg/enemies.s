@@ -611,15 +611,15 @@ tile_explode TILE_ONE_BEAT_BURN, FIXED_no_behavior, FIXED_no_behavior
 tile_spell   TILE_ONE_BEAT_BURN, FIXED_no_behavior
 
 tile_update  TILE_HELPFUL_CHEST, ENEMY_UPDATE_helpful_chest
-tile_attack  TILE_HELPFUL_CHEST, ENEMY_ATTACK_open_helpful_chest, FIXED_no_behavior
-tile_collide TILE_HELPFUL_CHEST, ENEMY_COLLIDE_open_helpful_chest
+tile_attack  TILE_HELPFUL_CHEST, ENEMY_ATTACK_open_unlocked_chest, FIXED_no_behavior
+tile_collide TILE_HELPFUL_CHEST, ENEMY_COLLIDE_open_unlocked_chest
 tile_suspend TILE_HELPFUL_CHEST, ENEMY_UTIL_suspend_helpful_chest
 tile_explode TILE_HELPFUL_CHEST, FIXED_no_behavior, FIXED_no_behavior
 tile_spell   TILE_HELPFUL_CHEST, FIXED_no_behavior
 
 tile_update  TILE_LARGE_CHEST, ENEMY_UPDATE_large_chest
-tile_attack  TILE_LARGE_CHEST, ENEMY_ATTACK_open_large_chest, FIXED_no_behavior
-tile_collide TILE_LARGE_CHEST, ENEMY_COLLIDE_open_large_chest
+tile_attack  TILE_LARGE_CHEST, ENEMY_ATTACK_open_unlocked_chest, FIXED_no_behavior
+tile_collide TILE_LARGE_CHEST, ENEMY_COLLIDE_open_unlocked_chest
 tile_suspend TILE_LARGE_CHEST, ENEMY_UTIL_suspend_large_chest
 tile_explode TILE_LARGE_CHEST, FIXED_no_behavior, FIXED_no_behavior
 tile_spell   TILE_LARGE_CHEST, FIXED_no_behavior
