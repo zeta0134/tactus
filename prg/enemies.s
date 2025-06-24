@@ -233,7 +233,6 @@ tile_index_to_col_lut:
 .include "enemies/sign.asm"
 .include "enemies/slimes.asm"
 .include "enemies/smoke_puff.asm"
-.include "enemies/treasure_chest.asm"
 .include "enemies/totems.asm"
 .include "enemies/warp_portal.asm"
 

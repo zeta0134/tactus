@@ -299,6 +299,7 @@ ZONE_TOTAL_COUNT = 70
 .global FAR_setup_interior_spawn_pool_for_current_zone
 .global FAR_setup_warp_spawn_pool_for_current_zone
 .global FAR_setup_shop_loot_ptrs_for_current_zone
+.global FAR_setup_chest_loot_ptrs_for_current_zone
 .global FAR_draw_banner_for_current_zone
 .global FAR_load_hud_palette_bg
 .global FAR_load_hud_palette_for_current_zone

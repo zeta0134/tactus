@@ -13,6 +13,7 @@
         .include "hud.inc"
         .include "kernel.inc"
         .include "localized_text.inc"
+        .include "loot.inc"
         .include "prng.inc"
         .include "procgen.inc"
         .include "player.inc"
@@ -2582,11 +2583,10 @@ done_with_torchlight_bonus:
 .endproc
 
 .proc FAR_item_is_considered_valid_loot
-ItemId := R2
         perform_zpcm_inc
         access_data_bank #<.bank(item_table)
 
-        lda ItemId
+        lda ResultItemId
         asl
         tax
         lda item_table+0, x

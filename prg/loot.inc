@@ -15,7 +15,8 @@
 .global rare_11_875
 .global loot_25_000
 
-.globalzp LootTable
+.globalzp LootTable, ItemLootTable, ItemFallbackLootTable
+.global ResultItemId
 .global LootPosition
 .global FAR_roll_loot      ; general case: use the player's chain+combo to pick an entry in the loot table
 .global FAR_roll_base_loot ; force a specific drop (always the first entry in the provided loot table)
@@ -31,10 +32,16 @@
 .global rare_treasure_table
 .global consumable_treasure_table
 .global weapons_only_treasure_table
+.global fallback_rare_chest_table
+.global fallback_legendary_chest_table
 
 .global standard_chest_treasure_table
 .global rare_chest_treasure_table
 .global legendary_chest_treasure_table
+
+.global fallback_standard_chest_table
+.global fallback_rare_chest_table
+.global fallback_legendary_chest_table
 
 .macro set_loot_table loot_table
     st16 LootTable, loot_table

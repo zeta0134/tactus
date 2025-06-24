@@ -8,21 +8,20 @@ HELPFUL_CHEST_STATE_UPDATE = 1
 
 .proc _reroll_helpful_chest_item
 CurrentTile := R15
-LootTablePtr := R16
-ItemId := R18
         perform_zpcm_inc
 spawn_item:
         access_data_bank PlayerZoneBank
         ldy #ZoneDefinition::StandardChestLootTable
         lda (PlayerZonePtr), y
-        sta LootTablePtr+0
+        sta ItemLootTable+0
         iny
         lda (PlayerZonePtr), y
-        sta LootTablePtr+1
+        sta ItemLootTable+1
+        st16 ItemFallbackLootTable, fallback_standard_chest_table
         restore_previous_bank
         far_call FAR_roll_gameplay_loot
         ldx CurrentTile
-        lda ItemId
+        lda ResultItemId
         sta tile_data, x
         perform_zpcm_inc
         rts
@@ -131,6 +130,52 @@ TargetSquare := R13
         queue_sfx_noise sfx_weapon_slash
 
         near_call ENEMY_COLLIDE_solid_tile_forbids_movement
+
+        rts
+.endproc
+
+; TODO: rework this into an item? (what color will it be?)
+; Alternate: rework it *properly* into an entity that follows the player
+; (and can be stolen!)
+.proc ENEMY_COLLIDE_collect_key
+TargetIndex := R0
+TileId := R1
+TargetSquare := R13
+        lda #1 ; there is only one key per dungeon floor
+        sta PlayerKeys
+
+        queue_sfx_pulse1 sfx_key_pulse1
+        queue_sfx_pulse2 sfx_key_pulse2
+
+        ; Now, draw a basic floor tile here, which will be underneath the player
+        ldx TargetSquare
+        stx TargetIndex
+        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_FLOOR, PAL_EARTH
+
+        lda #0
+        sta tile_data, x
+        sta tile_flags, x
+
+        jsr draw_active_tile
+
+        ; This is the big key! Now that we have it, reveal the location of the exit
+        ; stairs (this stops the player from needing to do a brute-force search)
+        ldx #0
+find_exit_loop:
+        perform_zpcm_inc
+        lda room_flags, x
+        and #ROOM_FLAG_EXIT_STAIRS
+        beq next_room
+        lda room_minimap_state, x
+        ora #ROOM_MINIMAP_FLAG_IDENTIFIED
+        sta room_minimap_state, x
+next_room:
+        inx
+        cpx #::FLOOR_SIZE
+        bne find_exit_loop
+
+        lda #1
+        sta HudMapDirty
 
         rts
 .endproc

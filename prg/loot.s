@@ -22,19 +22,25 @@
 LootTable: .res 2
 DropTablePtr: .res 2
 CoinTablePtr: .res 2
+ItemLootTable: .res 2
+ItemFallbackLootTable: .res 2
 
     .segment "RAM"
 
 LootPosition: .res 1
 
 ShopRollsCount: .res 1
-shop_rolls_tracker: .res 16
+shop_rolls_tracker: .res 32
 
 price_buffer_low: .res 8
 price_buffer_high: .res 8
 price_buffer_pos: .res 8
 price_buffer_attr: .res 8 ; sets the CHR bank and the color
 PriceBufferPos: .res 1
+
+ScratchTableLength: .res 1
+ResultItemId: .res 1
+MaxItemRollAttempts: .res 1
 
     .segment "CODE_3"
 
@@ -484,17 +490,45 @@ standard_chest_treasure_table:
     
 rare_chest_treasure_table:
     ; So very placeholder
-    .byte 16
-    .repeat 16
+    .byte 10
+    .byte ITEM_SPELL_FIRE
+    .byte ITEM_SPELL_AIR
+    .byte ITEM_SPELL_ICE
+    .byte ITEM_SPELL_EARTH
+    .byte ITEM_SPELL_BOMB
+    .byte ITEM_SPELL_LIFE
+    .byte ITEM_UPGRADE_EARTH
+    .byte ITEM_UPGRADE_ICE
+    .byte ITEM_UPGRADE_AIR
     .byte ITEM_UPGRADE_FIRE
-    .endrepeat
     
 legendary_chest_treasure_table:
     ; So very placeholder
     .byte 16
-    .repeat 16
-    .byte ITEM_UPGRADE_EARTH
+    .byte ITEM_SHIELD
+    .byte ITEM_INFERNAL_LANTERN
+    .byte ITEM_LARGE_TORCH
+    .byte ITEM_CHARGE_A_BULB
+    .byte ITEM_GO_GO_BOOTS
+    .byte ITEM_LUCKY_PENNY
+
+; TODO: swap these for higher value treasure items or otherwise
+; safe consumables. All must be okay to duplicate multiple times
+; on the same map! The whole point of this table is to act as an escape
+; valve when the chest/shop loot systems can't find a non-duplicate.
+fallback_standard_chest_table:
+fallback_rare_chest_table:
+fallback_legendary_chest_table:
+    .byte 16
+    .repeat 10
+    .byte ITEM_GOLD_SACK
     .endrepeat
+    .byte ITEM_SPELL_FIRE
+    .byte ITEM_SPELL_AIR
+    .byte ITEM_SPELL_ICE
+    .byte ITEM_SPELL_EARTH
+    .byte ITEM_SPELL_BOMB
+    .byte ITEM_SPELL_LIFE
 
 MAX_CHAIN = 8
 MAX_COMBO = 4 ; actually 5, but we need to decrement
@@ -587,32 +621,24 @@ done:
 .endproc
 
 ; place the loot table of your choice in R0, result in R2
-; TODO: detect excessive rerolls and draw from a "known acceptable"
-; set, which is allowed to contain duplicates, as a fallback.
 .proc FAR_roll_shop_loot
-LootTablePtr := R0
-TableLength := R2
-ItemId := R2
     access_data_bank #<.bank(item_table)
+
+    lda #32
+    sta MaxItemRollAttempts
 
 roll_acceptable_item_loop:
     perform_zpcm_inc
+    dec MaxItemRollAttempts
+    beq roll_fallback_item
     ldy #0
-    lda (LootTablePtr), y
-    sta TableLength
-    jsr next_room_rand
-fix_index_loop:
-    perform_zpcm_inc
-    cmp TableLength
-    bcc item_index_in_range
-    sec
-    sbc TableLength
-    jmp fix_index_loop
-item_index_in_range:
+    lda (ItemLootTable), y
+    sta ScratchTableLength
+    in_range next_room_rand, ScratchTableLength
     tay
     iny ; move past length byte
-    lda (LootTablePtr), y
-    sta ItemId
+    lda (ItemLootTable), y
+    sta ResultItemId
     ; sanity checks here
     jsr check_for_duplicate_shop_roll
     bne roll_acceptable_item_loop
@@ -628,36 +654,45 @@ item_index_in_range:
     restore_previous_bank
     perform_zpcm_inc
     rts
+
+roll_fallback_item:
+    perform_zpcm_inc
+    ; nope, this is taking too long. roll the first item we see from the fallback
+    ; table and keep it unconditionally
+    ldy #0
+    lda (ItemLootTable), y
+    sta ScratchTableLength
+    in_range next_room_rand, ScratchTableLength
+    tay
+    iny ; move past length byte
+    lda (ItemFallbackLootTable), y
+    sta ResultItemId
+
+    restore_previous_bank
+    perform_zpcm_inc
+    rts
 .endproc
 
 ; same deal but it uses the gameplay LFSR, for when we need to
 ; spawn treasure on the fly
-; TODO: detect excessive rerolls and draw from a "known acceptable"
-; set, which is allowed to contain duplicates, as a fallback.
-; for gameplay loot this can be just treasure items, which we always
-; consider helpful anyway.
 .proc FAR_roll_gameplay_loot
-LootTablePtr := R16
-ItemId       := R18
-TableLength  := R19
     access_data_bank #<.bank(item_table)
 
+    lda #4
+    sta MaxItemRollAttempts
+
 roll_acceptable_item_loop:
+    perform_zpcm_inc
+    dec MaxItemRollAttempts
+    beq roll_fallback_item
     ldy #0
-    lda (LootTablePtr), y
-    sta TableLength
-    jsr next_gameplay_rand
-fix_index_loop:
-    cmp TableLength
-    bcc item_index_in_range
-    sec
-    sbc TableLength
-    jmp fix_index_loop
-item_index_in_range:
+    lda (ItemLootTable), y
+    sta ScratchTableLength
+    in_range_from_table_y ScratchTableLength
     tay
     iny ; move past length byte
-    lda (LootTablePtr), y
-    sta ItemId
+    lda (ItemLootTable), y
+    sta ResultItemId
     ; gameplay treasures (these come out of "standard chests") run the helpful
     ; loot sanity check, and will continue to roll until they land on a helpful
     ; item.
@@ -667,18 +702,33 @@ item_index_in_range:
 
     restore_previous_bank
     rts
+
+roll_fallback_item:
+    perform_zpcm_inc
+    ; nope, this is taking too long. roll the first item we see from the fallback
+    ; table and keep it unconditionally
+    ldy #0
+    lda (ItemFallbackLootTable), y
+    sta ScratchTableLength
+    in_range_from_table_y ScratchTableLength
+    tay
+    iny ; move past length byte
+    lda (ItemFallbackLootTable), y
+    sta ResultItemId
+
+    restore_previous_bank
+    perform_zpcm_inc
+    rts
 .endproc
 
 ; returns 0 on success, nonzero on failure
 .proc check_for_duplicate_shop_roll
-LootTablePtr := R0
-ItemId := R2
     ldx #0
 loop:
     cpx ShopRollsCount
     beq accept ; if we reach the end of the list (which may be empty) we're done!
     lda shop_rolls_tracker, x
-    cmp ItemId ; only reject on exact ItemId match
+    cmp ResultItemId ; only reject on exact ItemId match
     beq reject
     inx
     jmp loop
@@ -694,8 +744,7 @@ reject:
 ; generally acceptable. also intentionally ignores special mechanics and rules,
 ; which should be covered by the item's "is valid" logic instead
 .proc check_for_duplicate_player_equipment
-ItemId := R2
-    lda ItemId
+    lda ResultItemId
     cmp current_save + SaveFile::PlayerEquipmentWeapon
     beq is_dupliate
     cmp current_save + SaveFile::PlayerEquipmentTorch
@@ -715,9 +764,8 @@ is_dupliate:
 .endproc
 
 .proc add_to_shop_rolls
-ItemId := R2
     ldx ShopRollsCount
-    lda ItemId
+    lda ResultItemId
     sta shop_rolls_tracker, x
     inc ShopRollsCount
     rts

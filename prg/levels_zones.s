@@ -549,7 +549,6 @@ FloorListLength := R2
 .endproc
 
 .proc FAR_setup_shop_loot_ptrs_for_current_zone
-LootTablePtr := R0
 LootTableIndex := R2
         access_data_bank PlayerZoneBank
 
@@ -560,11 +559,59 @@ LootTableIndex := R2
         adc #ZoneDefinition::ShopLootPtr0
         tay
         lda (PlayerZonePtr), y
-        sta LootTablePtr+0
+        sta ItemLootTable+0
         iny
         lda (PlayerZonePtr), y
-        sta LootTablePtr+1
+        sta ItemLootTable+1
 
+        restore_previous_bank
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc FAR_setup_chest_loot_ptrs_for_current_zone
+CurrentTileId := R10
+        access_data_bank PlayerZoneBank
+
+        ; Use the palette data for the current tile to determine the chest
+        ; quality. (Default to standard if we somehow have earth)
+        ldx CurrentTileId
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_ICE
+        beq use_legendary
+        cmp #PAL_FIRE
+        beq use_rare
+use_standard:
+        ldy #ZoneDefinition::StandardChestLootTable
+        lda (PlayerZonePtr), y
+        sta ItemLootTable+0
+        iny
+        lda (PlayerZonePtr), y
+        sta ItemLootTable+1
+        ; This isn't actually used, as standard chests are allowed to have
+        ; duplicates, but set it anyway just to be safe.
+        st16 ItemFallbackLootTable, fallback_standard_chest_table
+        jmp done
+use_rare:
+        ldy #ZoneDefinition::RareChestLootTable
+        lda (PlayerZonePtr), y
+        sta ItemLootTable+0
+        iny
+        lda (PlayerZonePtr), y
+        sta ItemLootTable+1
+        st16 ItemFallbackLootTable, fallback_rare_chest_table
+        jmp done
+use_legendary:
+        ldy #ZoneDefinition::LegendaryChestLootTable
+        lda (PlayerZonePtr), y
+        sta ItemLootTable+0
+        iny
+        lda (PlayerZonePtr), y
+        sta ItemLootTable+1
+        st16 ItemFallbackLootTable, fallback_legendary_chest_table
+        ; fall through to done
+done:
         restore_previous_bank
         perform_zpcm_inc
         rts

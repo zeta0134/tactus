@@ -1777,9 +1777,7 @@ not_spawn_chamber:
 .endproc
 
 .proc roll_shop_loot
-LootTablePtr := R0
 LootTableIndex := R2
-ItemId := R2
 ; R3 is clobbered by the loot rolling function
 CurrentTile := R4
 NextLootIndex := R5
@@ -1807,6 +1805,11 @@ loop:
         lda NextLootIndex
         sta LootTableIndex
         far_call FAR_setup_shop_loot_ptrs_for_current_zone
+        ; If for whatever reason we exhaust unique shop items, we can always
+        ; safely draw from the consumable table. Draws from this table ARE allowed
+        ; to be duplicates, so seeing a duplicate is a reasonably good signal that this has occurred
+        ; while debugging.
+        st16 ItemFallbackLootTable, consumable_treasure_table
 
         inc NextLootIndex
         lda NextLootIndex
@@ -1823,10 +1826,10 @@ shop_override:
         lda #::DEBUG_SHOP_ITEM
         jmp done_with_shop_override
 no_shop_override:
-        lda ItemId
+        lda ResultItemId
 done_with_shop_override:
 .else
-        lda ItemId
+        lda ResultItemId
 .endif
 
         sta tile_data, x

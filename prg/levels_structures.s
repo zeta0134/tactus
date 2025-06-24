@@ -7,7 +7,9 @@
         .include "battlefield.inc"
         .include "enemies.inc"
         .include "far_call.inc"
+        .include "items.inc"
         .include "levels.inc"
+        .include "loot.inc"
         .include "player.inc"
         .include "procgen.inc"
         .include "prng.inc"
@@ -21,6 +23,8 @@
 StandardChestsRemaining: .res 1
 RareChestsRemaining: .res 1
 LegendaryChestsRemaining: .res 1
+
+DetailPreserve: .res 1
 
         .segment "LEVEL_DATA_STRUCTURES_0"
 
@@ -253,6 +257,11 @@ loop:
         lda tile_attributes, x
         sta AttrTemp
 
+        ; Preserve the original detail, some tiles need to not clobber it
+        ; (but we don't know if this is one of those yet)
+        lda tile_detail, x
+        sta DetailPreserve
+
         lda (OverlayPtr), y
         sta tile_patterns, x
         sta tile_detail, x
@@ -305,6 +314,38 @@ no_exit_flag:
         beq no_sign_flag
         near_call FAR_process_sign_data
 no_sign_flag:
+        ldy #0
+        lda (OverlayPtr), y
+        and #TILE_FLAG_CHEST
+        beq no_chest_flag
+        ; Chests shouldn't have clobbered detail, fix that
+        ldx CurrentTileId
+        lda DetailPreserve
+        sta tile_detail, x
+        ; All chest types need to roll their loot here, so handle that
+        far_call FAR_setup_chest_loot_ptrs_for_current_zone
+        ; Standard chests roll for gameplay loot here, everything else rolls
+        ; for shop loot. (shop loot tries harder to avoid duplicates; gameplay
+        ; rerolls actively anyway and uses a much faster RNG function.
+        ldx CurrentTileId
+        lda tile_attributes, x
+        and #PAL_MASK
+        cmp #PAL_AIR
+        beq roll_standard_chest_loot
+roll_fancy_chest_loot:
+        far_call FAR_roll_shop_loot
+        ldx CurrentTileId
+        lda ResultItemId
+        sta tile_data, x
+        jmp no_chest_flag
+roll_standard_chest_loot:
+        far_call FAR_roll_gameplay_loot
+        ldx CurrentTileId
+        lda ResultItemId
+        sta tile_data, x
+        jmp no_chest_flag
+
+no_chest_flag:
         inc16 OverlayPtr
         jmp loop
 done:

@@ -219,7 +219,7 @@
   <properties>
    <property name="behavior" value="TILE_MIMIC"/>
    <property name="palette_index" type="int" value="2"/>
-   <property name="tile_id" value="BG_TILE_LARGE_CHEST"/>
+   <property name="tile_id" value="BG_TILE_MIMIC_FIDGET"/>
   </properties>
  </tile>
  <tile id="68" type="chest">
@@ -261,7 +261,7 @@
   <properties>
    <property name="behavior" value="TILE_MIMIC"/>
    <property name="palette_index" type="int" value="3"/>
-   <property name="tile_id" value="BG_TILE_LARGE_CHEST"/>
+   <property name="tile_id" value="BG_TILE_MIMIC_FIDGET"/>
   </properties>
  </tile>
  <tile id="84" type="chest">
@@ -317,7 +317,7 @@
   <properties>
    <property name="behavior" value="TILE_MIMIC"/>
    <property name="palette_index" type="int" value="1"/>
-   <property name="tile_id" value="BG_TILE_LARGE_CHEST"/>
+   <property name="tile_id" value="BG_TILE_MIMIC_FIDGET"/>
   </properties>
  </tile>
  <tile id="100" type="chest">
