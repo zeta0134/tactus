@@ -2608,11 +2608,10 @@ done_with_torchlight_bonus:
 .endproc
 
 .proc FAR_item_is_considered_helpful_loot
-ItemId       := R18
         perform_zpcm_inc
         access_data_bank #<.bank(item_table)
 
-        lda ItemId
+        lda ResultItemId
         asl
         tax
         lda item_table+0, x
