@@ -191,7 +191,7 @@ zone_hub_exits:
         banked_addr zone_5w_floor_boss          ; unimplemented! :(
 
         ; Debug Miscellaneous
-        banked_addr zone_grasslands_floor_2_but_fast
+        banked_addr zone_debug_1
         banked_addr zone_hub_world ; reserved for future use
         banked_addr zone_hub_world ; reserved for future use
 

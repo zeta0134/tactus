@@ -35,8 +35,8 @@ sign_snowy_shop_happy_holidays:
         .byte D_ATTR, COLOR_MM_RED
         .byte "HAPPY HOLIDAYS", D_NEWLINE
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "  From all of us at", D_NEWLINE
-        .byte "    Boxgirl Studios!", D_WAIT, D_CLOSE
+        .byte "  Slime Mold Juice", D_NEWLINE
+        .byte "    Makes a Perfect Gift!", D_WAIT, D_CLOSE
 
 sign_snowy_shop_ho_ho_ho:
         ;     0123456789012345678901234567 ; 28-char width
@@ -239,16 +239,23 @@ sign_debug_zone_5w:
         .byte D_ATTR, COLOR_MM_WHITE
         .byte "F1  F2  F3  F4         Boss", D_WAIT, D_CLOSE
 
+; SIGN_DEBUG_ZONE_MISC_1 = $12
+
 sign_debug_misc_1:
         ;     0123456789012345678901234567 ; 28-char width
         .byte D_PAL, DIALOG_PAL_YELLOW
         localized_embed hello_world
         .byte D_WAIT, D_CLOSE
 
+; SIGN_DEBUG_ZONE_MISC_2 = $13
+
 sign_debug_misc_2:
         ;     0123456789012345678901234567 ; 28-char width
         .byte D_ATTR, COLOR_MM_WHITE
-        .byte "Reserved for future use.", D_WAIT, D_CLOSE
+        .byte "Zone 1-2 with custom chest", D_NEWLINE
+        .byte "generation, for testing.", D_WAIT, D_CLOSE
+
+; SIGN_DEBUG_ZONE_MISC_3 = $14
 
 sign_debug_misc_3:
         ;     0123456789012345678901234567 ; 28-char width

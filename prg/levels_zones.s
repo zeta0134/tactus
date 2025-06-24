@@ -198,9 +198,13 @@ hud_hub_pal:
 ; ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░░▒▓█▓▒░ 
 ; ░▒▓███████▓▒░░▒▓████████▓▒░▒▓███████▓▒░ ░▒▓██████▓▒░ ░▒▓██████▓▒░  
 
-zone_grasslands_floor_2_but_fast:
-        .addr spawn_pool_generic   ; Interior Spawn Pool
-        .addr spawn_pool_generic   ; Exterior Spawn Pool
+; ZETA DUMB NOTE: make sure this matches whatever assets we want the
+; debug floor to draw from. Obviously we can't mix and match these XD
+.segment "LEVEL_DATA_ZONE_DEFS_0"
+
+zone_debug_1:
+        .addr spawn_pool_grasslands_cave     ; Interior Spawn Pool
+        .addr spawn_pool_grasslands_outdoors ; Exterior Spawn Pool
         .addr spawn_pool_generic   ; Warp Spawn Pool
         .addr spawnset_a53_z1_f2 ; General Challenge Set
         .addr spawnset_a53_z1_f2 ; Warp Challenge Set
@@ -214,46 +218,46 @@ zone_grasslands_floor_2_but_fast:
         .byte 64                 ; WarpSpawnPoolMax
         .byte 10                 ; WarpPopulationLimit
         .addr zone_grasslands_floor_234_mazes ; Maze Pool
-        .addr zone_debug_exits   ; Exit List
-        .byte TRACK_SHOWER_GROOVE   ; Music Track
-        .byte 80   ; Added Tempo
-        .word zone_grasslands_banner_1_1 ; HudBanner
+        .addr zone_debug_exits ; Exit List
+        .byte TRACK_BOUNCY          ; Music Track
+        .byte 5   ; Added Tempo
+        .word zone_grasslands_banner_1_2 ; HudBanner
         .addr hud_grasslands_pal
         .addr rare_treasure_table         ; ShopLootPtr0
-        .addr rare_treasure_table         ; ShopLootPtr1
+        .addr weapons_only_treasure_table ; ShopLootPtr1
         .addr common_treasure_table       ; ShopLootPtr2
         .addr consumable_treasure_table   ; ShopLootPtr3
-        .addr test_structure_set_big      ; InteriorStructureLargeSet
-        .byte 1                           ; InteriorStructureLargeMaxMax
-        .addr test_structure_set_small    ; InteriorStructureSmallSet
-        .byte 1                           ; InteriorStructureSmallMaxMax
-        .addr test_structure_set_big      ; ExteriorStructureLargeSet
-        .byte 1                           ; ExteriorStructureLargeMaxMax
-        .addr test_structure_set_small    ; ExteriorStructureSmallSet
-        .byte 3                           ; ExteriorStructureSmallMaxMax
-        .addr blocking_warp_structure_set ; InteriorStructureWarpSet (unused)
-        .addr blocking_warp_structure_set ; ExteriorStructureWarpSet
-        .word zone_name_str_debug         ; NameStr
-        .word zone_sequence_str_debug     ; SequenceStr
-        rng_index_for_zone 1, 1           ; RngIndex
+        .addr test_structure_set_big   ;InteriorStructureLargeSet
+        .byte 1                        ;InteriorStructureLargeMaxMax
+        .addr test_structure_set_small ;InteriorStructureSmallSet
+        .byte 1                        ;InteriorStructureSmallMaxMax
+        .addr test_structure_set_big   ;ExteriorStructureLargeSet
+        .byte 1                        ;ExteriorStructureLargeMaxMax
+        .addr test_structure_set_small ;ExteriorStructureSmallSet
+        .byte 3                        ;ExteriorStructureSmallMaxMax
+        .addr cave_warp_structure_set   ;InteriorStructureWarpSet
+        .addr grassy_warp_structure_set ;ExteriorStructureWarpSet
+        .word zone_1_name_str             ; NameStr
+        .word zone_sequence_str_1_2       ; SequenceStr
+        rng_index_for_zone 1, 2           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
         .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
         .word standard_chest_structure_set_exterior   ; StandardChestExteriorStructures
         .word standard_chest_treasure_table  ; StandardChestLootTable
-        .byte 8                              ; StandardChestMin
-        .byte 16                             ; StandardChestMax
+        .byte 0                              ; StandardChestMin
+        .byte 0                              ; StandardChestMax
         .word rare_chest_structure_set_interior       ; RareChestInteriorStructures
         .word rare_chest_structure_set_exterior       ; RareChestExteriorStructures
         .word rare_chest_treasure_table      ; RareChestLootTable
-        .byte 0                              ; RareChestMin
-        .byte 2                              ; RareChestMax
+        .byte 24                              ; RareChestMin
+        .byte 24                             ; RareChestMax
         .word legendary_chest_structure_set_interior  ; LegendaryChestInteriorStructures
         .word legendary_chest_structure_set_exterior  ; LegendaryChestExteriorStructures
         .word legendary_chest_treasure_table ; LegendaryChestLootTable
         .byte 0                              ; LegendaryChestMin
-        .byte 1                              ; LegendaryChestMax
+        .byte 0                              ; LegendaryChestMax
         .byte 1                              ; ZoneIndex
-        .byte 1                              ; FloorIndex
+        .byte 2                              ; FloorIndex
 
 ; After debugging one zone, return to the hub world
 ; (note: later to the debug world?)
