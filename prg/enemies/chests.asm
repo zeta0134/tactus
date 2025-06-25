@@ -73,6 +73,83 @@ sprite_succeeded:
         rts
 .endproc
 
+; Like the above, but we need to spawn both sprites at once
+.proc _spawn_fancy_chest_metasprites_if_needed
+MetaSpriteIndex := R0 ; also return value, sanity check this!
+
+ItemIndex := R1
+BankOffset := R4
+
+CurrentTile := R15
+        ; If metasprites are already spawned, bail!
+        ldx CurrentTile
+        lda tile_flags, x
+        and #CHEST_FLAGS_SPRITE_SPAWNED
+        beq proceed_to_spawn
+        rts
+proceed_to_spawn:
+
+        far_call FAR_find_unused_sprite
+        lda MetaSpriteIndex
+        cmp #$FF
+        bne fancy_sprite_succeeded
+        rts
+
+fancy_sprite_succeeded:
+        ; Save this sprite's index and mark it as active, but don't do anything else yet
+        ldx CurrentTile
+        lda MetaSpriteIndex
+        sta tile_transient_data, x
+        ldy MetaSpriteIndex
+        lda #SPRITE_ACTIVE
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
+        ; Okay now try to spawn the preview sprite
+        far_call FAR_find_unused_sprite
+        lda MetaSpriteIndex
+        cmp #$FF
+        bne preview_sprite_succeeded
+preview_sprite_failed:
+        ; darn. whelp; undo the first allocation and bail safely
+        ldx CurrentTile
+        lda tile_transient_data, x
+        tay
+        lda #0
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
+        rts
+preview_sprite_succeeded:
+        ; Store that off also, and now we're golden
+        ldx CurrentTile
+        lda MetaSpriteIndex
+        sta tile_metasprite, x
+        ; Just for consistency, mark the new sprite as active
+        ldy MetaSpriteIndex
+        lda #SPRITE_ACTIVE
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
+
+        ; Note that we successfully spawned both sprites
+        lda tile_flags, x
+        ora #CHEST_FLAGS_SPRITE_SPAWNED
+        sta tile_flags, x
+
+        ; Item preview sprites are floaty and transparent
+        ldx MetaSpriteIndex
+        lda #(SPRITE_FLICKER)
+        sta sprite_table + MetaSpriteState::SpecialBehavior, x
+
+        ; Preemptively allocate an item bank for the preview sprite, just for state reasons
+        ldx CurrentTile
+        lda tile_data, x
+        sta ItemIndex
+        far_call FAR_allocate_item_bank
+
+        ; Everything else diverges based on chest type, so do that elsewhere
+
+        ; All set. Note that if we don't set attributes at the call site, this sprite
+        ; will be inactive and will despawn. Don't do that?
+        lda MetaSpriteIndex
+        rts
+.endproc
+
 .proc _free_preview_allocation
 ItemIndex := R1
 TargetSquare := R13
@@ -142,6 +219,63 @@ proceed_to_draw_preview:
         rts
 .endproc
 
+.proc _update_challenge_skull
+MetaSpriteIndex := R0
+CurrentTile := R15
+        ; If metasprites are NOT spawned, bail!
+        ldx CurrentTile
+        lda tile_flags, x
+        and #CHEST_FLAGS_SPRITE_SPAWNED
+        bne proceed_to_draw
+        rts
+proceed_to_draw:
+
+        lda tile_transient_data, x
+        sta MetaSpriteIndex
+
+        ; It's at our X position, of course
+        ldx MetaSpriteIndex
+        ldy CurrentTile
+        lda tile_index_to_col_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_X
+        sta sprite_table + MetaSpriteState::PositionX, x
+
+        ; It's a little bit farther down though, for chest art alignment
+        ldx MetaSpriteIndex
+        ldy CurrentTile
+        lda tile_index_to_row_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_Y
+        clc
+        adc #5
+        sta sprite_table + MetaSpriteState::PositionY, x
+
+        ; The chest sprite always has fixed graphics, and no special behavior, but WHICH skull we use
+        ; depends on our own lightness
+        ldy CurrentTile
+        lda tile_patterns, y
+        cmp #<BG_TILE_CHALLENGE_CHEST_LIGHT
+        bne use_dark_skull
+use_light_skull:
+        set_static_04_sprite_x SPRITE_STATIC_04_CHEST_SKULL_LIGHT
+        jmp done_setting_tile
+use_dark_skull:
+        set_static_04_sprite_x SPRITE_STATIC_04_CHEST_SKULL
+done_setting_tile:
+        
+        ; Finally, the skull is always yellow, regardless of what color the chest is
+        lda #(SPRITE_ACTIVE | SPRITE_PAL_1)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        rts
+.endproc
+
 .proc ENEMY_UPDATE_helpful_chest
         jsr _spawn_standard_chest_metasprites_if_needed
         jsr _free_preview_allocation
@@ -158,10 +292,67 @@ proceed_to_draw_preview:
 .endproc
 
 .proc ENEMY_UPDATE_challenge_chest
-        ; TODO: challenge chest behaviors! challenge chest sprites!
-        jsr _spawn_standard_chest_metasprites_if_needed
+TargetIndex := R0
+MetaSpriteIndex := R0
+ScratchByte := R1
+CurrentTile := R15
+        ; Always do basic sprite maintenance
+        jsr _spawn_fancy_chest_metasprites_if_needed
         jsr _free_preview_allocation
         jsr _update_preview_item
+        jsr _update_challenge_skull
+
+        ; Now process the challenge chest's basic effects. Firstly, if the room
+        ; is NOT clear, reset our cooldown
+        lda current_clear_status
+        beq not_cleared
+room_is_clear:
+        ; Now increment our cooldown unconditionally
+        ldx CurrentTile
+        lda tile_flags, x
+        and #CHEST_FLAGS_TIME_ELAPSED
+        clc
+        adc #1
+        sta ScratchByte
+        lda tile_flags, x
+        and #($FF - CHEST_FLAGS_TIME_ELAPSED)
+        ora ScratchByte
+        sta tile_flags, x
+        ; If our new cooldown is >= 2 beats... 
+        lda ScratchByte
+        cmp #2
+        bcs cooldown_satisfied
+        ; ... it's not, so we're done.
+        rts
+cooldown_satisfied:
+        ; ... then deallocate only our fancy sprite, and revert to a regular large chest.
+        lda tile_transient_data, x
+        tay
+        lda #0
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
+
+        ; The chest type we revert to is again based on what we are currently, so it matches the brightness
+        ; we spawned with
+        lda tile_patterns, x
+        cmp #<BG_TILE_CHALLENGE_CHEST_LIGHT
+        bne use_dark_tile
+use_light_tile:
+        draw_at_x_keeppal TILE_LARGE_CHEST, BG_TILE_LARGE_CHEST_LIGHT
+        jmp done_setting_tile
+use_dark_tile:
+        draw_at_x_keeppal TILE_LARGE_CHEST, BG_TILE_LARGE_CHEST
+done_setting_tile:
+
+        ; ... and mostly for syncing with the sprite vanishing, draw ourselves right now.
+        stx TargetIndex
+        jsr draw_active_tile
+        rts
+
+not_cleared:
+        ldx CurrentTile
+        lda tile_flags, x
+        and #($FF - CHEST_FLAGS_TIME_ELAPSED)
+        sta tile_flags, x
         rts
 .endproc
 
