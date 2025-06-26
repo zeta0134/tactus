@@ -276,6 +276,112 @@ done_setting_tile:
         rts
 .endproc
 
+chest_tens_digit_lut:
+        .byte <SPRITE_STATIC_03_TIMER_0 + SPRITE_OFFSET_STATIC_03 + 0
+        .byte <SPRITE_STATIC_03_TIMER_1 + SPRITE_OFFSET_STATIC_03 + 0
+        .byte <SPRITE_STATIC_03_TIMER_2 + SPRITE_OFFSET_STATIC_03 + 0
+        .byte <SPRITE_STATIC_03_TIMER_3 + SPRITE_OFFSET_STATIC_03 + 0
+        .byte <SPRITE_STATIC_03_TIMER_4 + SPRITE_OFFSET_STATIC_03 + 0
+        .byte <SPRITE_STATIC_03_TIMER_5 + SPRITE_OFFSET_STATIC_03 + 0
+        .byte <SPRITE_STATIC_03_TIMER_6 + SPRITE_OFFSET_STATIC_03 + 0
+        .byte <SPRITE_STATIC_03_TIMER_7 + SPRITE_OFFSET_STATIC_03 + 0
+        .byte <SPRITE_STATIC_04_TIMER_8 + SPRITE_OFFSET_STATIC_04 + 0
+        .byte <SPRITE_STATIC_04_TIMER_9 + SPRITE_OFFSET_STATIC_04 + 0
+chest_ones_digit_lut:
+        .byte <SPRITE_STATIC_03_TIMER_0 + SPRITE_OFFSET_STATIC_03 + 2
+        .byte <SPRITE_STATIC_03_TIMER_1 + SPRITE_OFFSET_STATIC_03 + 2
+        .byte <SPRITE_STATIC_03_TIMER_2 + SPRITE_OFFSET_STATIC_03 + 2
+        .byte <SPRITE_STATIC_03_TIMER_3 + SPRITE_OFFSET_STATIC_03 + 2
+        .byte <SPRITE_STATIC_03_TIMER_4 + SPRITE_OFFSET_STATIC_03 + 2
+        .byte <SPRITE_STATIC_03_TIMER_5 + SPRITE_OFFSET_STATIC_03 + 2
+        .byte <SPRITE_STATIC_03_TIMER_6 + SPRITE_OFFSET_STATIC_03 + 2
+        .byte <SPRITE_STATIC_03_TIMER_7 + SPRITE_OFFSET_STATIC_03 + 2
+        .byte <SPRITE_STATIC_04_TIMER_8 + SPRITE_OFFSET_STATIC_04 + 2
+        .byte <SPRITE_STATIC_04_TIMER_9 + SPRITE_OFFSET_STATIC_04 + 2
+
+.proc _update_timer_digits
+MetaSpriteIndex := R0
+EffectiveTimer := R1
+EffectiveTens := R2
+EffectiveOnes := R3
+CurrentTile := R15
+        ; If metasprites are NOT spawned, bail!
+        ldx CurrentTile
+        lda tile_flags, x
+        and #CHEST_FLAGS_SPRITE_SPAWNED
+        bne proceed_to_draw
+        rts
+proceed_to_draw:
+
+        lda tile_transient_data, x
+        sta MetaSpriteIndex
+
+        ; It's at our X position, of course
+        ldx MetaSpriteIndex
+        ldy CurrentTile
+        lda tile_index_to_col_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_X
+        sta sprite_table + MetaSpriteState::PositionX, x
+
+        ; It's a little bit farther down though, for chest art alignment
+        ldx MetaSpriteIndex
+        ldy CurrentTile
+        lda tile_index_to_row_lut, y
+        .repeat 4
+        asl
+        .endrepeat
+        clc
+        adc #BATTLEFIELD_OFFSET_Y
+        clc
+        adc #5
+        sta sprite_table + MetaSpriteState::PositionY, x
+
+        ; The timing digits are yellow, and require special behavior so that each "half" can use
+        ; a different tile ID. TODO: change the palette to pink/red if the timer value is low?
+        lda #(SPRITE_ACTIVE | SPRITE_PAL_1)
+        sta sprite_table + MetaSpriteState::BehaviorFlags, x
+        lda #SPRITE_CUSTOM_HALF
+        sta sprite_table + MetaSpriteState::SpecialBehavior, x
+
+        ; Our chest timer counts UP, so first work out the effective timer
+        ldy CurrentTile
+        lda tile_flags, y
+        and #CHEST_FLAGS_TIME_ELAPSED
+        sta EffectiveTimer
+        lda #60 ; TODO: move this to a balance constant. Also consider making it tweakable somehow?
+        sec
+        sbc EffectiveTimer
+        sta EffectiveTimer
+        ; Now we need to do a simple base 10 conversion, here as a dumb naive loop
+        lda #0
+        sta EffectiveTens
+        lda EffectiveTimer
+base_10_loop:
+        cmp #10
+        bcc done_with_tens
+        inc EffectiveTens
+        sec
+        sbc #10
+        jmp base_10_loop
+done_with_tens:
+        sta EffectiveOnes
+
+        ; Now we can draw those two tiles
+        ldy EffectiveTens
+        lda chest_tens_digit_lut, y
+        sta sprite_table + MetaSpriteState::TileIndex, x
+        ldy EffectiveOnes
+        lda chest_ones_digit_lut, y
+        sta sprite_table + MetaSpriteState::RightTileIndex, x
+        ; And that's it for display!
+        
+        rts
+.endproc
+
 .proc ENEMY_UPDATE_helpful_chest
         jsr _spawn_standard_chest_metasprites_if_needed
         jsr _free_preview_allocation
@@ -357,10 +463,77 @@ not_cleared:
 .endproc
 
 .proc ENEMY_UPDATE_timed_chest
+TargetIndex := R0
+MetaSpriteIndex := R0
+ScratchByte := R1
+CurrentTile := R15
         ; TODO: timed chest behaviors! timed chest sprites!
-        jsr _spawn_standard_chest_metasprites_if_needed
+        jsr _spawn_fancy_chest_metasprites_if_needed
         jsr _free_preview_allocation
         jsr _update_preview_item
+        jsr _update_timer_digits
+
+        ; Now process the timer chest's basic effects. Firstly, if the room
+        ; is NOT clear, increment our timer
+        lda current_clear_status
+        beq not_cleared
+room_is_clear:
+        ; We don't have any extra state to store a cooldown on the clear mode, so
+        ; just revert to a large chest right away. We can continue to use our
+        ; base underlying graphic here, it'll look better than a shape change
+
+        ; first, deallocate only our fancy sprite
+        ldx CurrentTile
+        lda tile_transient_data, x
+        tay
+        lda #0
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
+        ; And now revert our behavior to a standard chest. Very simple.
+        lda #TILE_LARGE_CHEST
+        sta battlefield, x
+        ; Et voila!
+        ; TODO: any "you did the thing" juice (particles, palette cycles, SFX, etc)
+        rts
+
+not_cleared:
+        ; Firstly, increment our timer unconditionally (note that this is AFTER displaying
+        ; the OLD timer value)
+        ldx CurrentTile
+        lda tile_flags, x
+        and #CHEST_FLAGS_TIME_ELAPSED
+        clc
+        adc #1
+        sta ScratchByte
+        lda tile_flags, x
+        and #($FF - CHEST_FLAGS_TIME_ELAPSED)
+        ora ScratchByte
+        sta tile_flags, x
+        ; If our new cooldown is >= 60 beats... 
+        lda ScratchByte
+        cmp #62 ; TODO: test and tweak so we display 00 reliably
+        bcs timer_expired
+        ; ... it's not, so we're done.
+        rts
+timer_expired:
+        ; the challenge is failed! despawn both of our sprites:
+        lda tile_metasprite, x
+        tay
+        lda #0
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
+        lda tile_transient_data, x
+        tay
+        lda #0
+        sta sprite_table + MetaSpriteState::BehaviorFlags, y
+        ; And revert to an exploding bomb tile (right now)
+        draw_at_x_withpal TILE_DISCO_FLOOR, BG_TILE_EXPLOSION, PAL_AIR
+        stx TargetIndex
+        jsr draw_active_tile
+        ; then draw a disco tile, which will be displayed on the next beat
+        ldx CurrentTile
+        stx DiscoTile
+        lda tile_index_to_row_lut, x
+        sta DiscoRow
+        far_call ENEMY_UPDATE_draw_disco_tile_here
         rts
 .endproc
 
