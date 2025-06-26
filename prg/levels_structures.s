@@ -885,8 +885,7 @@ done_with_interior_small_structures:
         sta StructureList+1
         jsr force_single_structure_from_list
 skip_interior_warp_structures:
-        restore_previous_bank
-        rts
+        jmp check_chest_spawning
 
 roll_exterior_sets:
         access_data_bank PlayerZoneBank
@@ -936,17 +935,8 @@ done_with_exterior_small_structures:
         sta StructureList+1
         jsr force_single_structure_from_list
 skip_exterior_warp_structures:
-        
-        ; Should this particular room have chests? Exclude them based on a few factors
-        ldx RoomIndexToGenerate
-        lda room_properties, x
-        and #ROOM_CATEGORY_MASK
-        ; No chests in shops
-        cmp #ROOM_CATEGORY_SHOP
-        beq skip_chest_spawning
-        ; No chests in challenge rooms
-        cmp #ROOM_CATEGORY_CHALLENGE
-        beq skip_chest_spawning
+        ; fall through to check_chest_spawning
+check_chest_spawning:
         ; No chests in any room that otherwise expressly forbids them
         lda room_properties, x
         and #ROOM_PROPERTIES_FORBID_CHESTS
