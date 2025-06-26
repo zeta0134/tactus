@@ -36,7 +36,7 @@ ItemFuncPtr: .res 2
 ItemScratch0: .res 1
 ItemScratch1: .res 1
 
-        .segment "RAM"
+        .segment "PRGRAM"
 
 item_bank_ids: .res 4
 item_bank_refs: .res 4

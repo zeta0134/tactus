@@ -18,7 +18,7 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
-        .segment "RAM"
+        .segment "PRGRAM"
 
 StandardChestsRemaining: .res 1
 RareChestsRemaining: .res 1

@@ -5,7 +5,7 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
-        .segment "RAM"
+        .segment "PRGRAM"
 
 already_damaged: .res 1
 

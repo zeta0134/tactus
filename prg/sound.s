@@ -20,7 +20,7 @@
         .import sfx_data_ntsc
         .import sfx_data_pal
 
-        .segment "RAM"
+        .segment "PRGRAM"
 Pulse1RowCounter: .res 1
 Pulse2RowCounter: .res 1
 TriangleRowCounter: .res 1

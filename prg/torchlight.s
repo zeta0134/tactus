@@ -12,7 +12,7 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
-        .segment "RAM"
+        .segment "PRGRAM"
 
 current_lighting_counter: .res 1
 current_lighting_row: .res 1

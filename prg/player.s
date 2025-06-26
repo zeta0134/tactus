@@ -39,7 +39,7 @@
 PlayerZonePtr: .res 2
 WeaponAnimPtr: .res 2
 
-.segment "RAM"
+.segment "PRGRAM"
 
 PlayerZoneBank: .res 1
 

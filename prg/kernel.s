@@ -57,7 +57,7 @@ ScreenShakeDecayCounter: .res 1
 ScreenShakeX: .res 1
 ScreenShakeY: .res 1
 
-.segment "RAM"
+.segment "PRGRAM"
 CurrentBeatCounter: .res 1
 LastBeat: .res 1
 AccumulatedGameBeats: .res 2

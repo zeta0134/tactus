@@ -17,7 +17,7 @@
 staging_palette: .res 32
 
 
-        .segment "RAM"
+        .segment "PRGRAM"
 PaletteStateFunc: .res 2
 
 ; For setting a base palette when the original is in hw format. We need to

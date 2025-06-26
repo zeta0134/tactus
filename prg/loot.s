@@ -25,7 +25,7 @@ CoinTablePtr: .res 2
 ItemLootTable: .res 2
 ItemFallbackLootTable: .res 2
 
-    .segment "RAM"
+    .segment "PRGRAM"
 
 LootPosition: .res 1
 

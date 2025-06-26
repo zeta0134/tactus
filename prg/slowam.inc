@@ -32,4 +32,4 @@
 .global sprite_ptr_lut_low, sprite_ptr_lut_high
 
 ; where the routine should go
-SPRITE_TRANSFER_BASE = $6000
+SPRITE_TRANSFER_BASE = $0200

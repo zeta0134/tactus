@@ -25,7 +25,7 @@
 PlayerWeaponPtr: .res 2
 WeaponSquaresPtr: .res 2
 
-.segment "RAM"
+.segment "PRGRAM"
 
 ; oh, this is probably overkill. it's fine.
 weapon_metasprite_ids: .res 8

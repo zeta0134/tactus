@@ -27,7 +27,7 @@ ConditionalPtr: .res 2
 SpawnPoolPtr: .res 2
 SpawnSetPtr: .res 2
 
-    .segment "RAM"
+    .segment "PRGRAM"
 ; populated when an entity is spawned, call sites can
 ; read this to perform further processing as required
 SpawnedEntityIndex: .res 1

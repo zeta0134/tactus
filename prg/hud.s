@@ -31,7 +31,7 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
-.segment "RAM"
+.segment "PRGRAM"
 HudState: .res 2
 
 HeartDisplayTarget: .res 6

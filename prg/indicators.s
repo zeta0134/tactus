@@ -13,7 +13,7 @@
     .include "zeropage.inc"
     .include "zpcm.inc"
 
-    .segment "RAM"
+    .segment "PRGRAM"
 
 LastDisplayedComboBeat: .res 1
 LastDisplayedChain: .res 1

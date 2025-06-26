@@ -7,7 +7,7 @@ __BHOP_CONFIG = 1
 .define BHOP_INIT_SEGMENT "CODE_SOUND"
 .define BHOP_PLAYER_SEGMENT "CODE_BHOP"
 .define BHOP_PLAYER_2_SEGMENT "CODE_SOUND"
-.define BHOP_RAM_SEGMENT "RAM"
+.define BHOP_RAM_SEGMENT "PRGRAM"
 .define BHOP_ZP_SEGMENT "ZEROPAGE"
 
 ; Note: bhop currently requires just 6 bytes of zeropage. ALL of these bytes

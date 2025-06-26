@@ -17,7 +17,7 @@ room_seed: .res 4
 ; expensive routines. Mostly used for pathfinding to keep costs down.
 prng_table: .res 256
 
-	.segment "RAM"
+	.segment "PRGRAM"
 prng_generation_index: .res 1
 prng_entity_start_index: .res 1
 

@@ -41,7 +41,7 @@ DamageSpriteCoordX: .res 2
 DamageSpriteCoordY: .res 2
 HealthDroughtCounter: .res 1
 
-.segment "RAM"
+.segment "PRGRAM"
 
 DiscoTile:
 SmokePuffTile: .res 1

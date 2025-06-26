@@ -15,7 +15,7 @@
 
     .zeropage
 
-    .segment "RAM"
+    .segment "PRGRAM"
 current_save: .res .sizeof(SaveFile)
 current_save_slot: .res 1
 

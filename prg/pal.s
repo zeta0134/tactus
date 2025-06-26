@@ -2,7 +2,7 @@
 ; https://forums.nesdev.org/viewtopic.php?p=140778#p140778
     .include "pal.inc"
 
-    .segment "RAM"
+    .segment "PRGRAM"
 system_type: .res 1
 ppu_type: .res 1
 

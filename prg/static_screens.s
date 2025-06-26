@@ -23,7 +23,7 @@
         .include "zeropage.inc"
         .include "zpcm.inc"
 
-.segment "RAM"
+.segment "PRGRAM"
 
 TitleCursorIndex: .res 1
 
