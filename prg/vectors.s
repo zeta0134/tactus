@@ -98,9 +98,9 @@ loop:
 
         ; Slow OAM, which will take nearly all of the budget
         perform_zpcm_inc
-        lda #$00
-        sta $2003
-        jsr SPRITE_TRANSFER_BASE
+        ;lda #$00
+        ;sta $2003
+        ;jsr SPRITE_TRANSFER_BASE
         ;jmp all_frames (currently not needed)
 lag_frame:
         ; If necessary: actions to be performed only on lag frames        
