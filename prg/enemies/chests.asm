@@ -553,7 +553,11 @@ not_already_alerted:
         ; We should only alert if the player is actually carrying the item. This way,
         ; if they happen to obtain the item while in a room with a hidden secret, it
         ; will ding right away.
-        ; TODO: item check! for now, always alert!
+        
+        lda current_save + SaveFile::PlayerEquipmentAccessory
+        cmp #ITEM_DINGBAT
+        beq perform_alert
+        rts
 
 perform_alert:
         ; Proceed to actually alert
