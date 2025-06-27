@@ -125,6 +125,9 @@ CurrentTile := R15
         lda #TILE_HIDDEN_WARP_FLOOR
         sta battlefield, x
 
+        ; Proc the dingbat, if we haven't already. We are properly hidden, yes!
+        far_call ENEMY_UPDATE_proc_dingbat
+
         rts
 .endproc
 

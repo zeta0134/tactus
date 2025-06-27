@@ -485,7 +485,7 @@ tile_explode TILE_SIGN, FIXED_no_behavior, FIXED_no_behavior
 tile_spell   TILE_SIGN, FIXED_no_behavior
 
 ; TODO: real behaviors. These should convert to warp portals when hit by a bomb!
-tile_update  TILE_CRACKED_WARP_WALL, FIXED_no_behavior
+tile_update  TILE_CRACKED_WARP_WALL, ENEMY_UPDATE_proc_dingbat
 tile_attack  TILE_CRACKED_WARP_WALL, FIXED_no_behavior, FIXED_no_behavior
 tile_collide TILE_CRACKED_WARP_WALL, ENEMY_COLLIDE_solid_tile_forbids_movement
 tile_suspend TILE_CRACKED_WARP_WALL, FIXED_no_behavior

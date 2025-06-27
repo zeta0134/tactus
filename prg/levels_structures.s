@@ -161,19 +161,14 @@ standard_chest_structure_set_interior:
 
 rare_chest_structure_set_exterior:
         .byte $7 ; RNG Mask
-
-        .repeat 8
         structure_entry structure_RareHiddenChest
-        .endrepeat
-
-        ;structure_entry structure_RareHiddenChest
-        ;structure_entry structure_RareChallengeChestLight
-        ;structure_entry structure_RareChallengeChestLight
-        ;structure_entry structure_RareChallengeChestLight
-        ;structure_entry structure_RareChallengeChestLight
-        ;structure_entry structure_RareTimedChestLight
-        ;structure_entry structure_RareChestLight
-        ;structure_entry structure_RareChestLight
+        structure_entry structure_RareChallengeChestLight
+        structure_entry structure_RareChallengeChestLight
+        structure_entry structure_RareChallengeChestLight
+        structure_entry structure_RareChallengeChestLight
+        structure_entry structure_RareTimedChestLight
+        structure_entry structure_RareChestLight
+        structure_entry structure_RareChestLight
 
 rare_chest_structure_set_interior:
         .byte $7 ; RNG Mask
