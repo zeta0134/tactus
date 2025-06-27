@@ -108,14 +108,17 @@ defensive_shield_description:  localized_item_description defensive_shield_name_
 aloha_tshirt_description:      localized_item_description aloha_tshirt_name_localized,      aloha_tshirt_description_localized
 
 ; Accessories
-chain_link_description:               localized_item_description chain_link_name_localized,        chain_link_description_localized
-obsidian_ring_description:            localized_item_description obsidian_ring_name_localized,     obsidian_ring_description_localized
-ruby_necklace_description:            localized_item_description ruby_necklace_name_localized,     ruby_necklace_description_localized
-topaz_earrings_description:           localized_item_description topaz_earrings_name_localized,    topaz_earrings_description_localized
-sapphire_bracelet_description:        localized_item_description sapphire_bracelet_name_localized, sapphire_bracelet_description_localized
-amulet_of_yendor_description:         localized_item_description amulet_of_yendor_name_localized,  amulet_of_yendor_description_localized
-lucky_penny_description:              localized_item_description lucky_penny_name_localized,       lucky_penny_description_localized
+chain_link_description:               localized_item_description chain_link_name_localized,         chain_link_description_localized
+obsidian_ring_description:            localized_item_description obsidian_ring_name_localized,      obsidian_ring_description_localized
+ruby_necklace_description:            localized_item_description ruby_necklace_name_localized,      ruby_necklace_description_localized
+topaz_earrings_description:           localized_item_description topaz_earrings_name_localized,     topaz_earrings_description_localized
+sapphire_bracelet_description:        localized_item_description sapphire_bracelet_name_localized,  sapphire_bracelet_description_localized
+amulet_of_yendor_description:         localized_item_description amulet_of_yendor_name_localized,   amulet_of_yendor_description_localized
+lucky_penny_description:              localized_item_description lucky_penny_name_localized,        lucky_penny_description_localized
 cheap_plastic_imitation_of_the_amulet_of_yendor_description:  localized_item_description cheap_plastic_imitation_of_the_amulet_of_yendor_name_localized,  cheap_plastic_imitation_of_the_amulet_of_yendor_description_localized
+gps_description:                      localized_item_description gps_name_localized,                gps_description_localized
+dingbat_description:                  localized_item_description dingbat_name_localized,            dingbat_description_localized
+interrogation_beam_description:       localized_item_description interrogation_beam_name_localized, interrogation_beam_description_localized
 
 ; Bombs
 bombs_description:             localized_item_description bombs_name_localized,             bombs_description_localized
@@ -135,10 +138,10 @@ item_table:
         .word dagger
         .word broadsword
         .word combat_anchor
-        .word no_item
+        .word item_gps
         .word longsword
-        .word no_item
-        .word no_item
+        .word item_dingbat
+        .word item_interrogation_beam
         .word spear
         .word no_item
         .word no_item
@@ -1149,6 +1152,72 @@ charge_a_bulb:
         .addr helpful_if_torchless_in_the_dark     ; IsConsideredHelpfulFunc
         .addr charge_a_bulb_description            ; DescriptionStringPtr
         .byte <.bank(charge_a_bulb_description)    ; DescriptionStringBank
+
+; This item's effect is triggered manually, so it has stock basic behaviors. Currently
+; it provides no stats.
+item_gps:
+        .byte SLOT_ACCESSORY                    ; SlotId
+        .word SPRITE_ITEMS_07_GPS               ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
+        .byte EQUIPMENT_GPS                     ; HudBgTile
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+        .byte 0                                 ; HudSpriteTile
+        .byte 0                                 ; HudSpriteAttr
+        .word 100                               ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr no_effect                         ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
+        .addr gps_description                   ; DescriptionStringPtr
+        .byte <.bank(gps_description)           ; DescriptionStringBank
+
+; This item's effect is triggered manually, so it has stock basic behaviors. Currently
+; it provides no stats.
+item_dingbat:
+        .byte SLOT_ACCESSORY                    ; SlotId
+        .word SPRITE_ITEMS_06_DINGBAT           ; WorldSpriteTile
+        .byte SPRITE_PAL_PURPLE                 ; WorldSpriteAttr
+        .byte EQUIPMENT_DINGBAT                 ; HudBgTile
+        .byte (HUD_PURPLE_PAL | CHR_BANK_ITEMS) ; HudBgAttr
+        .byte 0                                 ; HudSpriteTile
+        .byte 0                                 ; HudSpriteAttr
+        .word 100                               ; ShopCost
+        .byte WEAPON_DAGGER                     ; WeaponShape (unused)
+        .addr no_effect                         ; DamageFunc
+        .addr no_effect                         ; TorchlightFunc
+        .addr do_nothing                        ; UseFunc
+        .addr no_effect                         ; DmgReductionFunc
+        .addr do_nothing                        ; ApplyPassivesFunc
+        .addr always_valid                      ; IsValidLootFunc
+        .addr always_helpful                    ; IsConsideredHelpfulFunc
+        .addr dingbat_description               ; DescriptionStringPtr
+        .byte <.bank(dingbat_description)       ; DescriptionStringBank
+
+; This item's effect is triggered manually, so it has stock basic behaviors. Currently
+; it provides no stats.
+item_interrogation_beam:
+        .byte SLOT_TORCH                             ; SlotId
+        .word SPRITE_ITEMS_06_INTERROGATION_BEAM     ; WorldSpriteTile
+        .byte SPRITE_PAL_YELLOW                      ; WorldSpriteAttr
+        .byte EQUIPMENT_INTERROGATION_BEAM           ; HudBgTile
+        .byte (HUD_YELLOW_PAL | CHR_BANK_ITEMS)      ; HudBgAttr
+        .byte 0                                      ; HudSpriteTile
+        .byte 0                                      ; HudSpriteAttr
+        .word 200                                    ; ShopCost
+        .byte WEAPON_DAGGER                          ; WeaponShape (unused)
+        .addr no_effect                              ; DamageFunc
+        .addr flat_11                                ; TorchlightFunc
+        .addr do_nothing                             ; UseFunc
+        .addr no_effect                              ; DmgReductionFunc
+        .addr do_nothing                             ; ApplyPassivesFunc
+        .addr always_valid                           ; IsValidLootFunc
+        .addr helpful_if_torchless_in_the_dark       ; IsConsideredHelpfulFunc
+        .addr interrogation_beam_description         ; DescriptionStringPtr
+        .byte <.bank(interrogation_beam_description) ; DescriptionStringBank
 
         .segment "CODE_ITEMS"
 

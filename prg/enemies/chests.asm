@@ -171,10 +171,6 @@ CurrentTile := R15
         bne proceed_to_draw_preview
         rts
 proceed_to_draw_preview:
-        
-        ; TODO: guard this on the new interrogation lamp item. if that isn't equipped, move
-        ; the preview sprite offscreen
-
         ; The preview item and attribute are drawn based on our current item ID, so get set up
         ; to read those back out
         lda tile_metasprite, x
@@ -193,6 +189,16 @@ proceed_to_draw_preview:
         adc #BATTLEFIELD_OFFSET_X
         sta sprite_table + MetaSpriteState::PositionX, x
 
+        ; If the player isn't carrying the interrogation beam, hide this sprite offscreen
+        lda current_save + SaveFile::PlayerEquipmentTorch
+        cmp #ITEM_INTERROGATION_BEAM
+        beq has_interrogation_beam
+does_not_have_interrogation_beam:
+        ldx MetaSpriteIndex
+        lda #$F8
+        sta sprite_table + MetaSpriteState::PositionY, x
+        jmp done_setting_y_position
+has_interrogation_beam:
         ; But they're way up high, to float "above" the chest
         ldx MetaSpriteIndex
         ldy CurrentTile
@@ -205,6 +211,7 @@ proceed_to_draw_preview:
         sec
         sbc #14 ; a liiiitle bit of overlap should look good?
         sta sprite_table + MetaSpriteState::PositionY, x
+done_setting_y_position:
 
         ; Preemptively allocate an item bank for this sprite, just for state reasons
         ldx CurrentTile

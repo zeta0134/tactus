@@ -404,7 +404,7 @@ HeartCount := R2
         ; The player should start with whatever Zeta likes        
         lda #ITEM_COMBAT_ANCHOR
         sta current_save + SaveFile::PlayerEquipmentWeapon
-        lda #ITEM_LARGE_TORCH
+        lda #ITEM_INTERROGATION_BEAM
         sta current_save + SaveFile::PlayerEquipmentTorch
         lda #ITEM_NONE
         sta current_save + SaveFile::PlayerEquipmentArmor

@@ -19,11 +19,12 @@ ident = ((tile_y * 16) + tile_x)
 
 chr_tile_offset BLANK_TILE, 0, 0
 
-chr_tile_offset EQUIPMENT_NONE,             0, 0
-chr_tile_offset EQUIPMENT_BASIC_TORCH,      2, 0
-chr_tile_offset EQUIPMENT_LARGE_TORCH,      4, 0
-chr_tile_offset EQUIPMENT_INFERNAL_LANTERN, 6, 0
-chr_tile_offset EQUIPMENT_CHARGE_A_BULB   , 8, 0
+chr_tile_offset EQUIPMENT_NONE,                0, 0
+chr_tile_offset EQUIPMENT_BASIC_TORCH,         2, 0
+chr_tile_offset EQUIPMENT_LARGE_TORCH,         4, 0
+chr_tile_offset EQUIPMENT_INFERNAL_LANTERN,    6, 0
+chr_tile_offset EQUIPMENT_CHARGE_A_BULB,       8, 0
+chr_tile_offset EQUIPMENT_INTERROGATION_BEAM, 10, 0
 
 chr_tile_offset EQUIPMENT_WEAPON_DAGGER,     0, 2
 chr_tile_offset EQUIPMENT_WEAPON_BROADSWORD, 2, 2
@@ -36,6 +37,7 @@ chr_tile_offset EQUIPMENT_ARMOR_SHIELD,        0, 4
 chr_tile_offset EQUIPMENT_ARMOR_TSHIRT_TEXT,   2, 4
 chr_tile_offset EQUIPMENT_ARMOR_TSHIRT_FLORAL, 4, 4
 chr_tile_offset EQUIPMENT_ARMOR_TSHIRT_SKULL,  6, 4
+chr_tile_offset EQUIPMENT_GPS,                14, 4
 
 chr_tile_offset EQUIPMENT_ACCESSORY_CHAIN_LINK, 0, 6
 chr_tile_offset EQUIPMENT_OBSIDIAN_RING,        2, 6
@@ -44,6 +46,7 @@ chr_tile_offset EQUIPMENT_TOPAZ_EARRINGS,       6, 6
 chr_tile_offset EQUIPMENT_SAPPHIRE_BRACELET,    8, 6
 chr_tile_offset EQUIPMENT_LUCKY_PENNY,         10, 6
 chr_tile_offset EQUIPMENT_AMULET_OF_YENDOR,    12, 6
+chr_tile_offset EQUIPMENT_DINGBAT,             14, 6
 
 chr_tile_offset EQUIPMENT_GO_GO_BOOTS,     0, 8
 chr_tile_offset EQUIPMENT_NINJA_FOOTWRAPS, 2, 8
