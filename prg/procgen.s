@@ -2088,7 +2088,7 @@ perform_chest_spawning:
         sta EntityPattern
         lda #(>BG_TILE_BIG_KEY | PAL_ICE)
         sta EntityAttribute
-        jsr spawn_entity
+        near_call FAR_spawn_entity
 
         ; Flag this chest as spawned, so we don't try to spawn it again later
         ldx PlayerRoomIndex
@@ -2583,7 +2583,7 @@ random_col_table:
 ; WARNING: If there are no safe floor tiles at all on this map, the function WILL lock up indefinitely.
 ; Try not to let this happen.
 ; Note: calls 
-.proc spawn_entity
+.proc FAR_spawn_entity
 TempIndex := R0
 EntityId := R1
 EntityPattern := R2
@@ -2679,7 +2679,7 @@ list_loop:
         iny
         sty ListIndex
 entity_loop:
-        jsr spawn_entity
+        near_call FAR_spawn_entity
         dec EntityCount
         bne entity_loop
         dec ListLength
@@ -2698,7 +2698,7 @@ EntityAttribute := R3
         sta EntityPattern
         lda #(>BG_TILE_EXIT_BLOCK | PAL_ICE)
         sta EntityAttribute
-        jsr spawn_entity
+        near_call FAR_spawn_entity
         rts
 .endproc
 

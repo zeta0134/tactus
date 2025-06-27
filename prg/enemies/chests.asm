@@ -537,25 +537,278 @@ timer_expired:
         rts
 .endproc
 
+.proc ENEMY_UPDATE_proc_dingbat
+        ; Only proc if we are the first call on this beat, so we don't spam the SFX
+        lda RoomStateHasHiddenFeatures
+        beq not_already_alerted
+        rts
+not_already_alerted:
+        ; We should only alert if the player is actually carrying the item. This way,
+        ; if they happen to obtain the item while in a room with a hidden secret, it
+        ; will ding right away.
+        ; TODO: item check! for now, always alert!
+
+perform_alert:
+        ; Proceed to actually alert
+        queue_sfx_pulse1 sfx_dingbat
+        inc RoomStateHasHiddenFeatures
+        rts
+.endproc
+
 ; For level generation reasons, the hidden chests are split out into separate tile IDs.
 ; This is because the attribute, which would normally indicate rarity, is being used as
 ; part of whatever wall tile they end up embedded within. "Blue zones tend to have better
 ; loot" would be an interesting spice, but... no, we want actual control thanks XD
 
 .proc ENEMY_UPDATE_hidden_chest
-        ; TODO
+; Return from FAR_spawn_entity
+SpawnedEntityIndex := R0
+; arguments to FAR_spawn_entity
+EntityId := R1
+EntityPattern := R2
+EntityAttribute := R3
+
+ScratchByte := R1
+CurrentTile := R15
+        near_call ENEMY_UPDATE_proc_dingbat
+
+        ; Now process the hidden chest's effects. Firstly, if the room
+        ; is NOT clear, reset our cooldown
+        lda current_clear_status
+        beq not_cleared
+room_is_clear:
+        ; Now increment our cooldown unconditionally
+        ldx CurrentTile
+        lda tile_flags, x
+        and #CHEST_FLAGS_TIME_ELAPSED
+        clc
+        adc #1
+        sta ScratchByte
+        lda tile_flags, x
+        and #($FF - CHEST_FLAGS_TIME_ELAPSED)
+        ora ScratchByte
+        sta tile_flags, x
+        ; If our new cooldown is >= 2 beats... 
+        lda ScratchByte
+        cmp #2
+        bcs cooldown_satisfied
+        ; ... it's not, so we're done.
+        rts
+cooldown_satisfied:
+        
+        ; Okay now things get fun: we need to try to spawn the chest somewhere inside the room, but
+        ; only on otherwise valid tiles. This is just like the old room clear logic.
+        
+        ; First, spawn in the entity. 
+        lda #TILE_HELPFUL_CHEST
+        sta EntityId
+        ; We need to pick the tile to spawn based on whether our current
+        ; room is dark. (hopefully we don't need special cases here >_<)
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_DARK
+        beq no_darkness
+darkness:
+        lda #<BG_TILE_SMALL_CHEST
+        sta EntityPattern
+        lda #(>BG_TILE_SMALL_CHEST | PAL_AIR)
+        sta EntityAttribute
+        jmp perform_spawn
+no_darkness:
+        lda #<BG_TILE_SMALL_CHEST_LIGHT
+        sta EntityPattern
+        lda #(>BG_TILE_SMALL_CHEST_LIGHT | PAL_AIR)
+        sta EntityAttribute
+        ; fall through to perform_spawn
+perform_spawn:
+        far_call FAR_spawn_entity
+        ; With the entity index we just spawned, copy in our own tile data, so it has the proper
+        ; item sprite
+        ldx CurrentTile
+        ldy SpawnedEntityIndex
+        lda tile_data, x
+        sta tile_data, y
+
+        ; With that, we're done with this logic. We don't need any personal graphical updates, we simply
+        ; revert back to a wall tile. All set.
+        lda #TILE_WALL
+        sta battlefield, x
+        rts
+
+not_cleared:
+        ldx CurrentTile
+        lda tile_flags, x
+        and #($FF - CHEST_FLAGS_TIME_ELAPSED)
+        sta tile_flags, x
         rts
 .endproc
 
 .proc ENEMY_UPDATE_hidden_rare_chest
-        ; TODO
+; Return from FAR_spawn_entity
+SpawnedEntityIndex := R0
+; arguments to FAR_spawn_entity
+EntityId := R1
+EntityPattern := R2
+EntityAttribute := R3
+
+ScratchByte := R1
+CurrentTile := R15
+        near_call ENEMY_UPDATE_proc_dingbat
+
+        ; Now process the hidden chest's effects. Firstly, if the room
+        ; is NOT clear, reset our cooldown
+        lda current_clear_status
+        beq not_cleared
+room_is_clear:
+        ; Now increment our cooldown unconditionally
+        ldx CurrentTile
+        lda tile_flags, x
+        and #CHEST_FLAGS_TIME_ELAPSED
+        clc
+        adc #1
+        sta ScratchByte
+        lda tile_flags, x
+        and #($FF - CHEST_FLAGS_TIME_ELAPSED)
+        ora ScratchByte
+        sta tile_flags, x
+        ; If our new cooldown is >= 2 beats... 
+        lda ScratchByte
+        cmp #2
+        bcs cooldown_satisfied
+        ; ... it's not, so we're done.
+        rts
+cooldown_satisfied:
+        
+        ; Okay now things get fun: we need to try to spawn the chest somewhere inside the room, but
+        ; only on otherwise valid tiles. This is just like the old room clear logic.
+        
+        ; First, spawn in the entity. 
+        lda #TILE_LARGE_CHEST
+        sta EntityId
+        ; We need to pick the tile to spawn based on whether our current
+        ; room is dark. (hopefully we don't need special cases here >_<)
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_DARK
+        beq no_darkness
+darkness:
+        lda #<BG_TILE_LARGE_CHEST
+        sta EntityPattern
+        lda #(>BG_TILE_LARGE_CHEST | PAL_FIRE)
+        sta EntityAttribute
+        jmp perform_spawn
+no_darkness:
+        lda #<BG_TILE_LARGE_CHEST_LIGHT
+        sta EntityPattern
+        lda #(>BG_TILE_LARGE_CHEST_LIGHT | PAL_FIRE)
+        sta EntityAttribute
+        ; fall through to perform_spawn
+perform_spawn:
+        far_call FAR_spawn_entity
+        ; With the entity index we just spawned, copy in our own tile data, so it has the proper
+        ; item sprite
+        ldx CurrentTile
+        ldy SpawnedEntityIndex
+        lda tile_data, x
+        sta tile_data, y
+
+        ; With that, we're done with this logic. We don't need any personal graphical updates, we simply
+        ; revert back to a wall tile. All set.
+        lda #TILE_WALL
+        sta battlefield, x
+        rts
+
+not_cleared:
+        ldx CurrentTile
+        lda tile_flags, x
+        and #($FF - CHEST_FLAGS_TIME_ELAPSED)
+        sta tile_flags, x
         rts
 .endproc
 
 .proc ENEMY_UPDATE_hidden_legendary_chest
-        ; TODO
+; Return from FAR_spawn_entity
+SpawnedEntityIndex := R0
+; arguments to FAR_spawn_entity
+EntityId := R1
+EntityPattern := R2
+EntityAttribute := R3
+
+ScratchByte := R1
+CurrentTile := R15
+        near_call ENEMY_UPDATE_proc_dingbat
+
+        ; Now process the hidden chest's effects. Firstly, if the room
+        ; is NOT clear, reset our cooldown
+        lda current_clear_status
+        beq not_cleared
+room_is_clear:
+        ; Now increment our cooldown unconditionally
+        ldx CurrentTile
+        lda tile_flags, x
+        and #CHEST_FLAGS_TIME_ELAPSED
+        clc
+        adc #1
+        sta ScratchByte
+        lda tile_flags, x
+        and #($FF - CHEST_FLAGS_TIME_ELAPSED)
+        ora ScratchByte
+        sta tile_flags, x
+        ; If our new cooldown is >= 2 beats... 
+        lda ScratchByte
+        cmp #2
+        bcs cooldown_satisfied
+        ; ... it's not, so we're done.
+        rts
+cooldown_satisfied:
+        
+        ; Okay now things get fun: we need to try to spawn the chest somewhere inside the room, but
+        ; only on otherwise valid tiles. This is just like the old room clear logic.
+        
+        ; First, spawn in the entity. 
+        lda #TILE_LARGE_CHEST
+        sta EntityId
+        ; We need to pick the tile to spawn based on whether our current
+        ; room is dark. (hopefully we don't need special cases here >_<)
+        ldx PlayerRoomIndex
+        lda room_flags, x
+        and #ROOM_FLAG_DARK
+        beq no_darkness
+darkness:
+        lda #<BG_TILE_LARGE_CHEST
+        sta EntityPattern
+        lda #(>BG_TILE_LARGE_CHEST | PAL_ICE)
+        sta EntityAttribute
+        jmp perform_spawn
+no_darkness:
+        lda #<BG_TILE_LARGE_CHEST_LIGHT
+        sta EntityPattern
+        lda #(>BG_TILE_LARGE_CHEST_LIGHT | PAL_ICE)
+        sta EntityAttribute
+        ; fall through to perform_spawn
+perform_spawn:
+        far_call FAR_spawn_entity
+        ; With the entity index we just spawned, copy in our own tile data, so it has the proper
+        ; item sprite
+        ldx CurrentTile
+        ldy SpawnedEntityIndex
+        lda tile_data, x
+        sta tile_data, y
+
+        ; With that, we're done with this logic. We don't need any personal graphical updates, we simply
+        ; revert back to a wall tile. All set.
+        lda #TILE_WALL
+        sta battlefield, x
+        rts
+
+not_cleared:
+        ldx CurrentTile
+        lda tile_flags, x
+        and #($FF - CHEST_FLAGS_TIME_ELAPSED)
+        sta tile_flags, x
         rts
 .endproc
+
 
 ; ============================================================================================================================
 ; ===                                      Player Attacks Enemy Behaviors                                                  ===

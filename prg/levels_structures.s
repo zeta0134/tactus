@@ -161,14 +161,19 @@ standard_chest_structure_set_interior:
 
 rare_chest_structure_set_exterior:
         .byte $7 ; RNG Mask
+
+        .repeat 8
         structure_entry structure_RareHiddenChest
-        structure_entry structure_RareChallengeChestLight
-        structure_entry structure_RareChallengeChestLight
-        structure_entry structure_RareChallengeChestLight
-        structure_entry structure_RareChallengeChestLight
-        structure_entry structure_RareTimedChestLight
-        structure_entry structure_RareChestLight
-        structure_entry structure_RareChestLight
+        .endrepeat
+
+        ;structure_entry structure_RareHiddenChest
+        ;structure_entry structure_RareChallengeChestLight
+        ;structure_entry structure_RareChallengeChestLight
+        ;structure_entry structure_RareChallengeChestLight
+        ;structure_entry structure_RareChallengeChestLight
+        ;structure_entry structure_RareTimedChestLight
+        ;structure_entry structure_RareChestLight
+        ;structure_entry structure_RareChestLight
 
 rare_chest_structure_set_interior:
         .byte $7 ; RNG Mask
@@ -288,6 +293,23 @@ preserve_warp:
         sta WarpOverlayAttr
         jsr _choose_warp_wall_tile
 do_not_preserve_warp:
+
+        ; If this is a hidden chest tile, just put the original tile back. We don't
+        ; need to be excessively fancy about this.
+        lda battlefield, x
+        cmp #TILE_HIDDEN_CHEST
+        beq restore_chest_art
+        cmp #TILE_HIDDEN_RARE_CHEST
+        beq restore_chest_art
+        cmp #TILE_HIDDEN_LEGENDARY_CHEST
+        beq restore_chest_art
+        jmp do_not_restore_chest_art
+restore_chest_art:
+        lda PatternTemp
+        sta tile_patterns, x
+        lda AttrTemp
+        sta tile_attributes, x
+do_not_restore_chest_art:
 
         ; structures can have detail too, so we need to roll for that here
         ; as we draw the things. (generally, maps, structures, and overlays

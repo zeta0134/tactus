@@ -5,9 +5,6 @@
 ; - e    - most recent movement was east
 ; - ss   - current state
 
-; TODO: this file has a lot of tedious copy/paste, and ROM space is kindof
-; at a premium for enemy logic. Consider subroutines!
-
 ONE_ARMED_BANDIT_FLAGS_STATE     = %00001110
 ONE_ARMED_BANDIT_DATA_MOVED_EAST = %10000000
 ONE_ARMED_BANDIT_DATA_REEL_POS   = %00110000

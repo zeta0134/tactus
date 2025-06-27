@@ -1058,3 +1058,33 @@ sfx_weapon_charging_pulse:
         pulse_init_sweep  PITCH_GS3,    $0,     $F, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      5
         pulse_init_sweep   PITCH_C4,    $0,     $B, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      5
         pulse_init_sweep   PITCH_E4,    $0,     $8, (S_NEG | S_PERIOD_0 | S_SHIFT_4),      5
+
+sfx_dingbat:
+        .byte 26
+        pulse_init        PITCH_D6,   $2,     $8,         0
+        pulse_cont_duty               $2,     $6,         0
+        pulse_cont_duty               $2,     $4,         0
+        pulse_cont_duty               $2,     $2,         0
+        pulse_init        PITCH_D6,   $2,     $A,         0
+        pulse_cont_duty               $2,     $8,         0
+        pulse_cont_duty               $2,     $6,         0
+        pulse_cont_duty               $2,     $4,         0
+        pulse_init        PITCH_D6,   $2,     $C,         0
+        pulse_cont_duty               $2,     $A,         0
+        pulse_cont_duty               $2,     $8,         0
+        pulse_cont_duty               $2,     $6,         0
+        pulse_init        PITCH_D6,   $2,     $F,         0
+        pulse_cont_duty               $2,     $D,         0
+        pulse_cont_duty               $2,     $C,         0
+        pulse_cont_duty               $2,     $B,         0
+        pulse_cont_duty               $2,     $A,         0
+        pulse_cont_duty               $2,     $9,         1
+        pulse_cont_duty               $2,     $8,         1
+        pulse_cont_duty               $2,     $7,         1
+        pulse_cont_duty               $2,     $6,         1
+        pulse_cont_duty               $2,     $5,         1
+        pulse_cont_duty               $2,     $4,         1
+        pulse_cont_duty               $2,     $3,         1
+        pulse_cont_duty               $2,     $2,         1
+        pulse_cont_duty               $2,     $1,         1
+

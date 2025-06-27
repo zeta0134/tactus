@@ -676,12 +676,20 @@ RoomStateBanditReelCountCherry: .res 4
 RoomStateBanditReelCountGem:    .res 4
 RoomStateBanditReelCountMagic:  .res 4
 
+RoomStateHasHiddenFeatures: .res 1
+
 .segment "ENEMY_UPDATE0"
 
 ; A few enemies need to coordinate their behavior as a group. This is the reset
 ; function for their memory. Anything those enemies want to persist needs to be
 ; handled during suspension. (Try to avoid this if we can, it gets very messy.)
 .proc FAR_init_room_coordination_state
+        ; When we enter a room, clear our knowledge of hidden features. Tiles which
+        ; contain hidden features will use this flag to know whether the dingbat
+        ; item should proc.
+        lda #0
+        sta RoomStateHasHiddenFeatures
+
         ; Bandits have one set of state variables per color group,
         ; allowing up to 4 groups (one of each element) to cooperate
         ; within the same chamber. Not sure how practical this is really,

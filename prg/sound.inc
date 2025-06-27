@@ -87,6 +87,8 @@
 
 .global sfx_weapon_charging_pulse
 
+.global sfx_dingbat
+
 .global CandidateSfxPtr
 .global CandidateSfxPriority
 
