@@ -185,6 +185,7 @@ CULTIST_SHARED_LOOT            = advanced_loot_table
 
 MIMIC_SHARED_HP                = 4
 MIMIC_LOOT_TABLE               = advanced_loot_table
+MIMIC_INTERROGATION_BEAM_ACTIVATION_RADIUS = 53 ; about 4 tiles
 
 ; ░▒▓█▓▒░▒▓████████▓▒░▒▓████████▓▒░▒▓██████████████▓▒░ ░▒▓███████▓▒░ 
 ; ░▒▓█▓▒░  ░▒▓█▓▒░   ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        

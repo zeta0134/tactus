@@ -71,9 +71,35 @@ CurrentTile := R15
 .endproc
 
 .proc ENEMY_UPDATE_mimic_disguised
+; for draw_active_tile
+TargetIndex := R0
 CurrentTile := R15
-        ; TODO: if the player is carrying the interrogation lamp and they are within range,
-        ; automatically enter the enraged state
+        ; If the player has the interrogation beam...
+        lda current_save + SaveFile::PlayerEquipmentTorch
+        cmp #ITEM_INTERROGATION_BEAM
+        bne do_not_proc_interrogation_beam
+        ; ... AND the player is standing close enough to the mimic
+        ldy CurrentTile
+        lda (PlayerDistanceLut), y
+        cmp #MIMIC_INTERROGATION_BEAM_ACTIVATION_RADIUS
+        bcs do_not_proc_interrogation_beam
+        ; ... then switch to our enraged state and charge at the player,
+        ; just like we normally do when taking a hit
+        ldx CurrentTile
+        draw_at_x_keeppal TILE_MIMIC, BG_TILE_MIMIC_ANTICIPATE
+        mimic_set_state #MIMIC_STATE_ENRAGED_0
+        ; right now!
+        stx TargetIndex
+        jsr draw_active_tile
+        ; roar, but delayed
+        queue_sfx_pulse1 sfx_roar_pulse1
+        queue_sfx_pulse2 sfx_roar_pulse2
+        ; and do a delayed palette cycle (we're a bit past the start of the current beat)
+        lda CurrentTile
+        far_call FAR_queue_late_cycle_phase
+        ; now actually process the enraged behavior right away, for timing reasons
+        jmp ENEMY_UPDATE_mimic_enraged_0
+do_not_proc_interrogation_beam:
 
         ; While disguised, a mimic has a small (1/16) chance to fidget, which acts as a visual tell
         ; to very observant players.
@@ -319,6 +345,9 @@ mimic_moved:
         lda tile_index_to_row_lut, x
         sta DiscoRow
         far_call ENEMY_UPDATE_draw_disco_tile_here
+        lda EffectiveAttackSquare
+        sta TargetIndex
+        jsr draw_active_tile
 mimic_was_stationary:
 
         ; Juice: spawn a floaty, flashy death skull above our tile
@@ -428,9 +457,13 @@ EffectiveAttackSquare := R10
         .segment "ENEMY_UTIL"
 
 .proc ENEMY_UTIL_suspend_mimic
-        ; TODO: if we spawned a metasprite, clear that out so we know to
-        ; re-generate it later.
-        ; Mimic Behavior: If we are active, pick a new location and hide again.
+CurrentSquare := R15
+        ; Mimic Behavior: If we are active, disguise ourselves and, if necessary, relocate away
+        ; from the map edge.
+        ldx CurrentSquare
+        mimic_set_state #MIMIC_STATE_DISGUISED
+        draw_at_x_keeppal TILE_MIMIC, BG_TILE_LARGE_CHEST
+        near_call ENEMY_UTIL_move_away_from_map_edge
         rts
 .endproc
 
