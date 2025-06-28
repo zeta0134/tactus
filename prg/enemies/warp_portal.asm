@@ -13,13 +13,16 @@ AttackSquare := R3
         ; TODO: immediately start to palette cycle! (That's not built out yet)
         ldx AttackSquare
 
-        ; First, preserve our old tile type. We'll use this when cleaning up the
-        ; entrance, as we need to know if we should replace it with a wall or a
-        ; disco floor among other stuff
+        ; First, preserve our old tile type. We'll use this when cleaning up the entrance.
         lda battlefield, x
-        ; TODO: don't replace the portal with the hidden portal logic! We need to
-        ; become a REGULAR wall/floor instead. Check for that and fix it here!
-        ; (distracted by other bugs)
+        cmp #TILE_HIDDEN_WARP_FLOOR
+        beq preserve_disco_floor
+preserve_regular_wall:
+        lda #TILE_WALL
+        jmp done_choosing_what_to_preserver
+preserve_disco_floor:
+        lda #TILE_DISCO_FLOOR
+done_choosing_what_to_preserver:
         sta tile_data, x
 
         ; Set ourselves to a warp portal!
