@@ -25,6 +25,7 @@ RareChestsRemaining: .res 1
 LegendaryChestsRemaining: .res 1
 
 DetailPreserve: .res 1
+BattlefieldPreserve: .res 1
 
         .segment "LEVEL_DATA_STRUCTURES_0"
 
@@ -251,12 +252,13 @@ loop:
         sta CurrentTileId
         inc16 OverlayPtr
 
-        ; for warp tile reasons, preserve pattern/att for a sec
+        ; for warp tile reasons, preserve pattern/att/batt for a sec
         lda tile_patterns, x
         sta PatternTemp
         lda tile_attributes, x
         sta AttrTemp
-
+        lda battlefield, x
+        sta BattlefieldPreserve
         ; Preserve the original detail, some tiles need to not clobber it
         ; (but we don't know if this is one of those yet)
         lda tile_detail, x
@@ -286,6 +288,13 @@ preserve_warp:
         sta WarpOverlayPattern
         lda AttrTemp
         sta WarpOverlayAttr
+        lda BattlefieldPreserve
+        sta WarpOverlayBattlefield
+        ; Warps always zero out the detail, we don't need it for walls and it looks goofy for
+        ; floor -> disco if we don't. (The hidden warp is always blank detail, regardless of
+        ; what it replaced, so preserve that visual continuity.)
+        lda #0
+        sta tile_detail, x
         jsr _choose_warp_wall_tile
 do_not_preserve_warp:
 
@@ -597,23 +606,74 @@ warp_equivalence_tile_lut:
         .word BG_TILE_MAP_TILES_0248, BG_TILE_MAP_TILES_0255
         .word BG_TILE_MAP_TILES_0249, BG_TILE_MAP_TILES_0255
         ; For now, everything else uses basic bricks. Deal with it.
+
+; Used for spawned structures, to determine what tile they should
+; revert to, since we shouldn't use the floor underneath
+non_warp_tile_equivalence_lut:
+        .word BG_TILE_MAP_TILES_0239, BG_TILE_MAP_TILES_0177
+        .word BG_TILE_MAP_TILES_0255, BG_TILE_MAP_TILES_0247
+
 MAX_EQUIVALENCE_TILE = 8
+MAX_NONWARP_EQUIVALENCE_TILE = 2
 DEFAULT_WARP_TILE = BG_TILE_MAP_TILES_0223
+DEFAULT_NON_WARP_TILE = BG_TILE_MAP_TILES_0004
 
 ; Because we can't choose which wall tile we displace, we also can't
 ; predict what the replacement graphic needs to be. Here we fix it, yes!
 ; Clobbers Y, expects X to be the target tile, etc
-.proc _choose_warp_wall_tile        
+.proc _choose_warp_wall_tile
+        ; If we replaced a floor tile, just use the supplied graphics instead of replacing them.
+        ; This is common with structures that spawn in the middle of a room, rather than structures
+        ; that replace a poriton of an existing wall.
+        lda WarpOverlayBattlefield
+        cmp #TILE_DISCO_FLOOR
+        bne perform_smart_replacement
+
+perform_reverse_replacement:
         ldy #0
-loop:
+reverse_loop:
+        lda tile_patterns, x
+        cmp non_warp_tile_equivalence_lut + 0, y
+        bne reverse_nope
+        lda tile_attributes, x
+        and #($FF - PAL_MASK)
+        cmp non_warp_tile_equivalence_lut + 1, y
+        bne reverse_nope
+reverse_yup:
+        lda non_warp_tile_equivalence_lut + 2, y
+        sta WarpOverlayPattern
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora non_warp_tile_equivalence_lut + 3, y
+        sta WarpOverlayAttr
+        rts
+reverse_nope:
+        iny
+        iny
+        iny
+        iny
+        cpy #(MAX_NONWARP_EQUIVALENCE_TILE * 4)
+        bcc reverse_loop
+reverse_no_match:
+        lda #<DEFAULT_NON_WARP_TILE
+        sta WarpOverlayPattern
+        lda tile_attributes, x
+        and #PAL_MASK
+        ora #>DEFAULT_NON_WARP_TILE
+        sta WarpOverlayAttr
+        rts
+
+perform_smart_replacement:
+        ldy #0
+smart_loop:
         lda WarpOverlayPattern
         cmp warp_equivalence_tile_lut + 0, y
-        bne nope
+        bne smart_nope
         lda WarpOverlayAttr
         and #($FF - PAL_MASK)
         cmp warp_equivalence_tile_lut + 1, y
-        bne nope
-yup:
+        bne smart_nope
+smart_yup:
         lda warp_equivalence_tile_lut + 2, y
         sta tile_patterns, x
         lda WarpOverlayAttr
@@ -621,14 +681,14 @@ yup:
         ora warp_equivalence_tile_lut + 3, y
         sta tile_attributes, x
         rts
-nope:
+smart_nope:
         iny
         iny
         iny
         iny
         cpy #(MAX_EQUIVALENCE_TILE * 4)
-        bcc loop
-no_match:
+        bcc smart_loop
+smart_no_match:
         lda #<DEFAULT_WARP_TILE
         sta tile_patterns, x
         lda WarpOverlayAttr

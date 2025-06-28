@@ -6,8 +6,8 @@ DEBUG_GOD_MODE = 1
 DEBUG_SPAWN_OVERRIDE = 0
 DEBUG_SINGLE_ENEMY = 0
 
-DEBUG_FORCE_SEED = 0
-DEBUG_SEED = $E5000899
+DEBUG_FORCE_SEED = 1
+DEBUG_SEED = $5AC326ED
 
 ; Force a single specific item to always spawn in shops, for testing
 DEBUG_SHOP_OVERRIDE = 0

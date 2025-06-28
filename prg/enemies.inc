@@ -60,6 +60,7 @@ TILE_HIDDEN_LEGENDARY_CHEST = 49 ; same deal but it's legendary
 
 .global WarpOverlayPattern
 .global WarpOverlayAttr
+.global WarpOverlayBattlefield
 
 ; NOT in the fixed page
 .global FIXED_update_static_enemy_row

@@ -17,6 +17,9 @@ AttackSquare := R3
         ; entrance, as we need to know if we should replace it with a wall or a
         ; disco floor among other stuff
         lda battlefield, x
+        ; TODO: don't replace the portal with the hidden portal logic! We need to
+        ; become a REGULAR wall/floor instead. Check for that and fix it here!
+        ; (distracted by other bugs)
         sta tile_data, x
 
         ; Set ourselves to a warp portal!

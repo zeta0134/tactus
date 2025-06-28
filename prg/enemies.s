@@ -52,6 +52,7 @@ SmokePuffDirection: .res 1
 
 WarpOverlayPattern: .res 1
 WarpOverlayAttr: .res 1
+WarpOverlayBattlefield: .res 1
 
 .segment "PRGFIXED_E000"
 
