@@ -183,6 +183,9 @@ ONE_ARMED_BANDIT_TARGET_RADIUS = $c6 ; about 16 squares
 CULTIST_SHARED_HP              = ADVANCED_HP
 CULTIST_SHARED_LOOT            = advanced_loot_table
 
+MIMIC_SHARED_HP                = 4
+MIMIC_LOOT_TABLE               = advanced_loot_table
+
 ; ░▒▓█▓▒░▒▓████████▓▒░▒▓████████▓▒░▒▓██████████████▓▒░ ░▒▓███████▓▒░ 
 ; ░▒▓█▓▒░  ░▒▓█▓▒░   ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        
 ; ░▒▓█▓▒░  ░▒▓█▓▒░   ░▒▓█▓▒░      ░▒▓█▓▒░░▒▓█▓▒░░▒▓█▓▒░▒▓█▓▒░        

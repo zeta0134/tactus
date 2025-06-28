@@ -89,6 +89,9 @@
 
 .global sfx_dingbat
 
+.global sfx_roar_pulse1
+.global sfx_roar_pulse2
+
 .global CandidateSfxPtr
 .global CandidateSfxPriority
 
