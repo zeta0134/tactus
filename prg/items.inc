@@ -56,3 +56,4 @@ SLOT_CONSUMABLE = 7
 .global FAR_init_room_item_state
 .global FAR_item_is_considered_valid_loot
 .global FAR_item_is_considered_helpful_loot
+.global FAR_init_zone_item_state

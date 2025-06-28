@@ -41,6 +41,9 @@ ItemScratch1: .res 1
 item_bank_ids: .res 4
 item_bank_refs: .res 4
 
+MapEffectActivated: .res 1
+CompassEffectActivated: .res 1
+
         .segment "TEXT_STRINGS"
 
 .macro localized_item_description name_str, description_str
@@ -390,7 +393,7 @@ compass:
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
         .addr always_valid                    ; IsValidLootFunc
-        .addr always_helpful                  ; IsConsideredHelpfulFunc
+        .addr helpful_if_not_yet_revealed     ; IsConsideredHelpfulFunc
         .addr compass_description             ; DescriptionStringPtr
         .byte <.bank(compass_description)     ; DescriptionStringBank
 
@@ -410,7 +413,7 @@ map:
         .addr no_effect                       ; DmgReductionFunc
         .addr do_nothing                      ; ApplyPassivesFunc
         .addr always_valid                    ; IsValidLootFunc
-        .addr always_helpful                  ; IsConsideredHelpfulFunc
+        .addr helpful_if_unmapped             ; IsConsideredHelpfulFunc
         .addr map_description                 ; DescriptionStringPtr
         .byte <.bank(map_description)         ; DescriptionStringBank
 
@@ -1354,7 +1357,28 @@ is_empty:
         cpx #TOTAL_HEART_SLOTS
         bne find_heart_loop
 not_helpful:
-        ; Oh no! Whelp; cancel the thing then.
+        lda #$FF ; return failure
+        rts
+is_helpful:
+        lda #0
+        rts
+.endproc
+
+.proc helpful_if_unmapped
+        lda MapEffectActivated
+        beq is_helpful
+not_helpful:
+        lda #$FF ; return failure
+        rts
+is_helpful:
+        lda #0
+        rts
+.endproc
+
+.proc helpful_if_not_yet_revealed
+        lda CompassEffectActivated
+        beq is_helpful
+not_helpful:
         lda #$FF ; return failure
         rts
 is_helpful:
@@ -1533,9 +1557,16 @@ done_with_this_room:
         lda #1
         sta HudMapDirty
 
+        ; If we aren't currently revealed, play the revealing SFX
+        lda CompassEffectActivated
+        bne already_revealed
         ; Play a SFX! Maybe a custom one later, but we'll use the same one for health
         ; containers just to have something
         queue_sfx_pulse1 sfx_heart_container
+already_revealed:
+
+        lda #1
+        sta CompassEffectActivated
 
         lda #0 ; return success
         rts
@@ -1557,9 +1588,16 @@ done_with_this_room:
         lda #1
         sta HudMapDirty
 
+        ; If we aren't currently mapped, play the mapping SFX
+        lda MapEffectActivated
+        bne already_mapped
         ; Play a SFX! Maybe a custom one later, but we'll use the same one for health
         ; containers just to have something
         queue_sfx_pulse1 sfx_heart_container
+already_mapped:
+
+        lda #1
+        sta MapEffectActivated
 
         lda #0 ; return success
         rts
@@ -2086,6 +2124,7 @@ done_with_crystal_management:
         far_call FAR_calculate_weapon_damage
 not_a_weapon:
         near_call FAR_compute_player_passives
+        near_call FAR_proc_gps
         restore_previous_bank
         perform_zpcm_inc
         rts
@@ -2627,6 +2666,27 @@ no_charge_a_bulb:
         rts
 .endproc
 
+.proc FAR_proc_gps
+        ; If the player has the GPS, proc its effects.
+        lda current_save + SaveFile::PlayerEquipmentAccessory
+        cmp #ITEM_GPS
+        bne no_gps
+        jsr map_all_rooms
+        jsr identify_special_rooms
+no_gps:
+        rts
+.endproc
+
+; Called each time we initialize a new floor, just before that floor is
+; generated. Clears out any item specific state, which might impact some
+; spawning attempts, especially things like the GPS
+.proc FAR_init_zone_item_state
+        lda #0
+        sta MapEffectActivated
+        sta CompassEffectActivated
+        rts
+.endproc
+
 ; Called each time we enter a new room. Any items that need to reset state
 ; between room boundaries should do that here.
 .proc FAR_init_room_item_state
@@ -2647,6 +2707,9 @@ room_is_lit:
         sta PlayerTorchlightBonus
         jmp done_with_torchlight_bonus
 done_with_torchlight_bonus:
+
+        ; Just in case we missed this somehow, fix it between rooms
+        near_call FAR_proc_gps
 
         rts
 .endproc

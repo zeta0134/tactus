@@ -679,6 +679,11 @@ zone_select_converge:
         sta BackupWeaponUpgradeRow
         sta BackupWeaponUpgradeCol
 
+        ; Some items need their state reset between floors. Do this BEFORE generation,
+        ; as item state can affect which items are considered valid/helpful while
+        ; generating the zone's chest and shop loot
+        far_call FAR_init_zone_item_state
+
         ; Generate proper mazes and randomize player, exit, and boss
         ; This **will** lag badly, so switch our beat tracker to update during NMI
         ; while we're busy with level gen. If we don't do this we get a strangely wrong

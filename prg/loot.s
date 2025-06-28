@@ -441,9 +441,12 @@ consumable_treasure_table:
     .byte ITEM_BOMB_STANDARD_X3
     .byte ITEM_BOMB_STANDARD_X3
 
-common_chest_treasure_table: ; TODO: remove this label
 standard_chest_treasure_table:
-    .byte 43
+    .byte 63
+    .repeat 10
+    .byte ITEM_COMPASS
+    .byte ITEM_MAP
+    .endrepeat
     .byte ITEM_BASIC_TORCH
     .byte ITEM_BASIC_TORCH
     .byte ITEM_BASIC_TORCH

@@ -164,9 +164,9 @@ rare_chest_structure_set_exterior:
         .byte $7 ; RNG Mask
 
         ; debug a single chest type
-        .repeat 8
-        structure_entry structure_RareMimic
-        .endrepeat
+        ;.repeat 8
+        ;structure_entry structure_RareMimic
+        ;.endrepeat
 
         structure_entry structure_RareHiddenChest
         structure_entry structure_RareChallengeChestLight
