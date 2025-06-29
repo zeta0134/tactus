@@ -70,8 +70,7 @@ done:
     sta current_save + SaveFile::RunTimeSeconds
     sta current_save + SaveFile::RunTimeMinutes
     sta current_save + SaveFile::RunTimeHours
-    ; For great debugging!
-    lda #1
+    lda #0
     sta RtaTimerEnabled
     sta PedometerEnabled
 

@@ -81,6 +81,8 @@ WarpTransitionTimer: .res 1
 CurrentlyActiveSpell: .res 1
 MonsterRequestsSpellCast: .res 1
 
+FirstBeatOfZone: .res 1
+
 .segment "CODE_KERNEL"
 
 ; === Utility Functions ===
@@ -586,6 +588,7 @@ LayoutPtr := R0
 .proc game_init
         lda #0
         sta LastBeat
+        sta FirstBeatOfZone
         sta CurrentBeatCounter
         sta AccumulatedGameBeats
         sta AccumulatedGameBeats+1
@@ -685,6 +688,11 @@ zone_select_converge:
         ; generating the zone's chest and shop loot
         far_call FAR_init_zone_item_state
 
+        ; The currently loaded zone may need to run some custom initialization logic
+        ; of its own just before we run generation, so do that here. Mostly this handles
+        ; logic that starts a new phase of a run, or a new run entirely.
+        far_call FAR_zone_trigger_onload_pregen
+
         ; Generate proper mazes and randomize player, exit, and boss
         ; This **will** lag badly, so switch our beat tracker to update during NMI
         ; while we're busy with level gen. If we don't do this we get a strangely wrong
@@ -718,6 +726,9 @@ zone_select_converge:
         sta TargetBrightness
         lda #FADE_SPEED_GAMEPLAY
         sta GlobalFadeSpeed
+
+        lda #1
+        sta FirstBeatOfZone
 
         st16 GameMode, room_init
         rts
@@ -770,6 +781,13 @@ zone_select_converge:
         jsr set_color_emphasis_for_room
 
         far_call FAR_reset_palette_warp_tile
+
+        lda FirstBeatOfZone
+        beq skip_first_beat_logic
+        far_call FAR_zone_trigger_onload_first_beat
+        lda #0
+        sta FirstBeatOfZone
+skip_first_beat_logic:
 
         st16 GameMode, beat_frame_1
         rts

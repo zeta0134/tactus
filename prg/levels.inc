@@ -209,6 +209,9 @@
         FloorIndex .byte ; Floors range from 1 - 5, with 5 == boss. Not all zones have all floors. 0 is invalid.
 .endstruct
 
+; These index into several call sites at various stages of the "load and setup a zone" logic,
+; and are useful for things like "set up a run" and "start the timers." These could also be
+; used to initializes bosses, cutscenes, and other unusual starting conditions for a given floor.
 ZONE_ONLOAD_NONE = 0
 ZONE_ONLOAD_HUB  = 1
 
@@ -308,6 +311,8 @@ ZONE_TOTAL_COUNT = 70
 .global FAR_setup_prng_seeds_from_current_save_and_current_zone
 .global FAR_set_zone_ptr_from_id
 .global FAR_get_zone_id_from_zone_ptr
+.global FAR_zone_trigger_onload_pregen
+.global FAR_zone_trigger_onload_first_beat
 
 ROOM_POOL_OUT_OF_BOUNDS          =  0
 ROOM_POOL_GRASSY_EXTERIOR        =  1

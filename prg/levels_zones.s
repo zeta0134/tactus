@@ -20,6 +20,7 @@
         .include "prng.inc"
         .include "procgen.inc"
         .include "rainbow.inc"
+        .include "rta_timer.inc"
         .include "saves.inc"
         .include "slowam.inc"
         .include "sound.inc"
@@ -1029,5 +1030,81 @@ rng_setup_loop:
         ; et voila: a floor seed for *this* floor, based on the
         ; run seed, which will be consistent every time regargless
         ; of what other floors the player visits.
+        rts
+.endproc
+
+zone_onload_pregen_lut:
+        .addr standard_floor_init  ; ZONE_ONLOAD_NONE (default behavior)
+        .addr hub_world_floor_init ; ZONE_ONLOAD_HUB
+
+; Called just before *generating* a given zone. Useful for first-game setup
+; and other conditions that may affect spawning.
+.proc FAR_zone_trigger_onload_pregen
+DestPtr := R0
+        access_data_bank PlayerZoneBank
+
+        ldy #ZoneDefinition::OnLoadBehavior
+        lda (PlayerZonePtr), y
+        asl
+        tax
+        lda zone_onload_pregen_lut+0, x
+        sta DestPtr+0
+        lda zone_onload_pregen_lut+1, x
+        sta DestPtr+1
+
+        restore_previous_bank
+
+        jmp (DestPtr)
+.endproc
+
+.proc standard_floor_init
+        ; TODO: anything we need to reset between gameplay floors could go here,
+        ; though note that this will also be called after a suspended load
+        rts
+.endproc
+
+.proc hub_world_floor_init
+        ; TODO: move hub world logic in here, like resetting the player's
+        ; inventory, etc
+
+        ; Reset and disable both timer sources
+        far_call FAR_initialize_rta_timers
+
+        rts
+.endproc
+
+zone_onload_first_beat_lut:
+        .addr standard_floor_first_beat  ; ZONE_ONLOAD_NONE (default behavior)
+        .addr hub_world_floor_first_beat ; ZONE_ONLOAD_HUB
+
+; Called when the player gains control for the first time
+.proc FAR_zone_trigger_onload_first_beat
+DestPtr := R0
+        access_data_bank PlayerZoneBank
+
+        ldy #ZoneDefinition::OnLoadBehavior
+        lda (PlayerZonePtr), y
+        asl
+        tax
+        lda zone_onload_first_beat_lut+0, x
+        sta DestPtr+0
+        lda zone_onload_first_beat_lut+1, x
+        sta DestPtr+1
+
+        restore_previous_bank
+
+        jmp (DestPtr)
+.endproc
+
+.proc standard_floor_first_beat
+        ; Start up both run tracking timers, if they weren't already enabled!
+        lda #1
+        sta RtaTimerEnabled
+        sta PedometerEnabled
+        rts
+.endproc
+
+.proc hub_world_floor_first_beat
+        ; Intentionally do not start the timers! Leave them paused.
         rts
 .endproc
