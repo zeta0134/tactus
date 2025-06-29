@@ -1253,8 +1253,21 @@ item_interrogation_beam:
         cmp #ITEM_DAGGER
         beq spawn_is_invalid
 
-        ; TODO: all those other checks. In particular, I haven't decided how the
-        ; "current zone" check is going to work.
+        ; If the player lacks any upgrade, then we are valid by default.
+        ; We'll control the zone availability and deduplication nonsense
+        ; with the loot tables.
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot1
+        cmp #ITEM_NONE
+        beq spawn_is_valid
+
+        ; If the player has a fully upgraded weapon, then we are never valid
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot2
+        cmp #ITEM_NONE
+        bne spawn_is_invalid
+
+        ; Otherwise fall through I guess; we might do more checks later
+
+spawn_is_valid:
         lda #0
         rts
 

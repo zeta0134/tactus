@@ -489,32 +489,35 @@ standard_chest_treasure_table:
     .byte ITEM_GOLD_SACK
     
 rare_chest_treasure_table:
-    ; So very placeholder
-    .byte 10
+    .byte 14
     .byte ITEM_SPELL_FIRE
     .byte ITEM_SPELL_AIR
     .byte ITEM_SPELL_ICE
     .byte ITEM_SPELL_EARTH
     .byte ITEM_SPELL_BOMB
     .byte ITEM_SPELL_LIFE
-    .byte ITEM_UPGRADE_EARTH
-    .byte ITEM_UPGRADE_ICE
-    .byte ITEM_UPGRADE_AIR
-    .byte ITEM_UPGRADE_FIRE
+    .byte ITEM_OBSIDIAN_RING
+    .byte ITEM_RUBY_NECKLACE
+    .byte ITEM_TOPAZ_EARRINGS
+    .byte ITEM_SAPPHIRE_BRACELET
+    .byte ITEM_AMULET_OF_YENDOR
+    .byte ITEM_GPS
+    .byte ITEM_DINGBAT
+    .byte ITEM_BASIC_TORCH
     
 legendary_chest_treasure_table:
     ; So very placeholder
     .byte 10
-    .byte ITEM_SHIELD
-    .byte ITEM_INFERNAL_LANTERN
     .byte ITEM_LARGE_TORCH
+    .byte ITEM_INFERNAL_LANTERN
     .byte ITEM_CHARGE_A_BULB
-    .byte ITEM_GO_GO_BOOTS
-    .byte ITEM_LUCKY_PENNY
-    .byte ITEM_GPS
-    .byte ITEM_DINGBAT
     .byte ITEM_INTERROGATION_BEAM
+    .byte ITEM_SHIELD
+    .byte ITEM_GO_GO_BOOTS
     .byte ITEM_NINJA_FOOTWRAPS
+    .byte ITEM_CHAIN_LINK
+    .byte ITEM_LUCKY_PENNY
+    .byte ITEM_HEART_CONTAINER
 
 ; TODO: swap these for higher value treasure items or otherwise
 ; safe consumables. All must be okay to duplicate multiple times

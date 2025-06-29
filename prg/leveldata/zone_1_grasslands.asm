@@ -188,12 +188,12 @@ zone_grasslands_floor_2:
         .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
         .word standard_chest_structure_set_exterior   ; StandardChestExteriorStructures
         .word standard_chest_treasure_table  ; StandardChestLootTable
-        .byte 8                              ; StandardChestMin
-        .byte 16                             ; StandardChestMax
+        .byte 16                             ; StandardChestMin
+        .byte 24                             ; StandardChestMax
         .word rare_chest_structure_set_interior       ; RareChestInteriorStructures
         .word rare_chest_structure_set_exterior       ; RareChestExteriorStructures
         .word rare_chest_treasure_table      ; RareChestLootTable
-        .byte 1                              ; RareChestMin
+        .byte 2                              ; RareChestMin
         .byte 4                              ; RareChestMax
         .word legendary_chest_structure_set_interior  ; LegendaryChestInteriorStructures
         .word legendary_chest_structure_set_exterior  ; LegendaryChestExteriorStructures
@@ -245,12 +245,12 @@ zone_grasslands_floor_3:
         .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
         .word standard_chest_structure_set_exterior   ; StandardChestExteriorStructures
         .word standard_chest_treasure_table  ; StandardChestLootTable
-        .byte 8                              ; StandardChestMin
-        .byte 16                             ; StandardChestMax
+        .byte 16                             ; StandardChestMin
+        .byte 25                             ; StandardChestMax
         .word rare_chest_structure_set_interior       ; RareChestInteriorStructures
         .word rare_chest_structure_set_exterior       ; RareChestExteriorStructures
         .word rare_chest_treasure_table      ; RareChestLootTable
-        .byte 1                              ; RareChestMin
+        .byte 2                              ; RareChestMin
         .byte 4                              ; RareChestMax
         .word legendary_chest_structure_set_interior  ; LegendaryChestInteriorStructures
         .word legendary_chest_structure_set_exterior  ; LegendaryChestExteriorStructures
@@ -302,13 +302,13 @@ zone_grasslands_floor_4:
         .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
         .word standard_chest_structure_set_exterior   ; StandardChestExteriorStructures
         .word standard_chest_treasure_table  ; StandardChestLootTable
-        .byte 8                              ; StandardChestMin
-        .byte 16                             ; StandardChestMax
+        .byte 16                             ; StandardChestMin
+        .byte 24                             ; StandardChestMax
         .word rare_chest_structure_set_interior       ; RareChestInteriorStructures
         .word rare_chest_structure_set_exterior       ; RareChestExteriorStructures
         .word rare_chest_treasure_table      ; RareChestLootTable
-        .byte 1                              ; RareChestMin
-        .byte 4                              ; RareChestMax
+        .byte 3                              ; RareChestMin
+        .byte 6                              ; RareChestMax
         .word legendary_chest_structure_set_interior  ; LegendaryChestInteriorStructures
         .word legendary_chest_structure_set_exterior  ; LegendaryChestExteriorStructures
         .word legendary_chest_treasure_table ; LegendaryChestLootTable

@@ -145,7 +145,7 @@ blocking_warp_structure_set:
 standard_chest_structure_set_exterior:
         .byte $3 ; RNG Mask
         structure_entry structure_StandardHiddenChest
-        structure_entry structure_StandardChestLight
+        structure_entry structure_StandardHiddenChest
         structure_entry structure_StandardChestLight
         structure_entry structure_StandardChestLight
 
@@ -153,7 +153,7 @@ standard_chest_structure_set_interior:
         .byte $7 ; RNG Mask
         structure_entry structure_StandardHiddenChest
         structure_entry structure_StandardMimic
-        structure_entry structure_StandardChestLight
+        structure_entry structure_StandardHiddenChest
         structure_entry structure_StandardChestLight
         structure_entry structure_StandardChestLight
         structure_entry structure_StandardChestLight
@@ -173,7 +173,7 @@ rare_chest_structure_set_exterior:
         structure_entry structure_RareChallengeChestLight
         structure_entry structure_RareChallengeChestLight
         structure_entry structure_RareChallengeChestLight
-        structure_entry structure_RareTimedChestLight
+        structure_entry structure_RareChallengeChestLight
         structure_entry structure_RareChestLight
         structure_entry structure_RareChestLight
 
@@ -181,16 +181,16 @@ rare_chest_structure_set_interior:
         .byte $7 ; RNG Mask
 
         ; debug a single chest type
-        .repeat 8
-        structure_entry structure_RareMimic
-        .endrepeat
+        ;.repeat 8
+        ;structure_entry structure_RareMimic
+        ;.endrepeat
 
         structure_entry structure_RareHiddenChest
         structure_entry structure_RareChallengeChest
         structure_entry structure_RareChallengeChest
         structure_entry structure_RareChallengeChest
         structure_entry structure_RareChallengeChest
-        structure_entry structure_RareTimedChest
+        structure_entry structure_RareChallengeChest
         structure_entry structure_RareMimic
         structure_entry structure_RareChest
 
@@ -200,7 +200,7 @@ legendary_chest_structure_set_exterior:
         structure_entry structure_LegendaryChallengeChestLight
         structure_entry structure_LegendaryChallengeChestLight
         structure_entry structure_LegendaryChallengeChestLight
-        structure_entry structure_LegendaryChallengeChestLight
+        structure_entry structure_LegendaryTimedChestLight
         structure_entry structure_LegendaryTimedChestLight
         structure_entry structure_LegendaryChestLight
         structure_entry structure_LegendaryChestLight
@@ -211,7 +211,7 @@ legendary_chest_structure_set_interior:
         structure_entry structure_LegendaryChallengeChest
         structure_entry structure_LegendaryChallengeChest
         structure_entry structure_LegendaryChallengeChest
-        structure_entry structure_LegendaryChallengeChest
+        structure_entry structure_LegendaryTimedChest
         structure_entry structure_LegendaryTimedChest
         structure_entry structure_LegendaryMimic
         structure_entry structure_LegendaryChest

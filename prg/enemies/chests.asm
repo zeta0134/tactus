@@ -359,7 +359,7 @@ proceed_to_draw:
         lda tile_flags, y
         and #CHEST_FLAGS_TIME_ELAPSED
         sta EffectiveTimer
-        lda #60 ; TODO: move this to a balance constant. Also consider making it tweakable somehow?
+        lda #TIMED_CHEST_DURATION ; TODO: move this to a balance constant. Also consider making it tweakable somehow?
         sec
         sbc EffectiveTimer
         sta EffectiveTimer
@@ -515,9 +515,9 @@ not_cleared:
         and #($FF - CHEST_FLAGS_TIME_ELAPSED)
         ora ScratchByte
         sta tile_flags, x
-        ; If our new cooldown is >= 60 beats... 
+        ; If our new cooldown is >= the maximum duration beats... 
         lda ScratchByte
-        cmp #62 ; TODO: test and tweak so we display 00 reliably
+        cmp #(TIMED_CHEST_DURATION + 2)
         bcs timer_expired
         ; ... it's not, so we're done.
         rts
