@@ -114,6 +114,12 @@ TILE_ROW_OFFSET = 16
 BOMB_COUNTER_POS_X = 115
 BOMB_COUNTER_POS_Y = 194
 
+.macro draw_tile_in_a_at_x row, attr
+        sta HUD_TILE_BASE + row, x
+        lda attr
+        sta HUD_TILE_BASE + HUD_ATTR_OFFSET + row, x
+.endmacro
+
 .macro draw_tile_at_x row, tile_id, attr
         lda tile_id
         sta HUD_TILE_BASE + row, x
@@ -1549,11 +1555,13 @@ hour_second_lut:
         .byte (i .MOD 10) + LIGHT_TRACKER_NUMBERS_BASE ; ones
         .endrepeat
 
+; TODO: the draw_tile_at_x routine requires a tedious shuffling into and out of Numeral,
+; which seems kinda slow. Can we speed that up with a different macro?
 .proc draw_run_timer
-Numeral := R0
 FractionalPtr := R1 ; and R2
         ; The run timer updates every frame, so it is always "dirty." Don't bother to check,
         ; just draw it as fast as we possibly can within reason.
+        perform_zpcm_inc
 
         ldx #1
         draw_tile_at_x ROW_0, #CLOCK_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
@@ -1561,38 +1569,35 @@ FractionalPtr := R1 ; and R2
         lda current_save + SaveFile::RunTimeHours
         and #$0F
         ora #LIGHT_TRACKER_NUMBERS_BASE
-        sta Numeral
-        ldx #2
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
-        ldx #3
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
         draw_tile_at_x ROW_0, #COLON_MID_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         lda current_save + SaveFile::RunTimeMinutes
         asl
         tay
-        lda hour_second_lut+0, y
-        sta Numeral
-        ldx #4
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        lda hour_second_lut+0, y        
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda hour_second_lut+1, y
-        sta Numeral
-        ldx #5
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
-        ldx #6
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
         draw_tile_at_x ROW_0, #COLON_MID_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+
+        perform_zpcm_inc
 
         lda current_save + SaveFile::RunTimeSeconds
         asl
         tay
         lda hour_second_lut+0, y
-        sta Numeral
-        ldx #7
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda hour_second_lut+1, y
-        sta Numeral
-        ldx #8
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
-        ldx #9
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
         draw_tile_at_x ROW_0, #COLON_MID_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         lda current_save + SaveFile::RunTimeFrames+0
@@ -1604,20 +1609,24 @@ FractionalPtr := R1 ; and R2
         add16w FractionalPtr, #fractional_rta_lut
         ldy #0
         lda (FractionalPtr), y
-        sta Numeral
-        ldx #10
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         iny
         lda (FractionalPtr), y
-        sta Numeral
-        ldx #11
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         perform_zpcm_inc
         rts
 .endproc
 
 .proc draw_run_pedometer
+NumberWord := T0
+OnesDigit := T2
+TensDigit := T3
+HundredsDigit := T4
+ThousandsDigit := T5
+TenThousandsDigit := T6
         lda HudPedometerDirty
         bne perform_draw
         rts
@@ -1625,16 +1634,43 @@ perform_draw:
         lda #0
         sta HudPedometerDirty
 
-        ldx #2
-        draw_tile_at_x ROW_0, #SHOE_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        lda current_save + SaveFile::RunBeatsElapsed+0
+        sta NumberWord+0
+        lda current_save + SaveFile::RunBeatsElapsed+1
+        sta NumberWord+1
+        far_call FAR_base_10
 
         perform_zpcm_inc
 
+        ldx #6
+        draw_tile_at_x ROW_0, #SHOE_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        lda TenThousandsDigit
+        ora #LIGHT_TRACKER_NUMBERS_BASE
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        lda ThousandsDigit
+        ora #LIGHT_TRACKER_NUMBERS_BASE
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        lda HundredsDigit
+        ora #LIGHT_TRACKER_NUMBERS_BASE
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        lda TensDigit
+        ora #LIGHT_TRACKER_NUMBERS_BASE
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        lda OnesDigit
+        ora #LIGHT_TRACKER_NUMBERS_BASE
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+
+
+        perform_zpcm_inc
         rts
 .endproc
 
 .proc draw_run_seed
-Numeral := R0
         lda HudSeedDirty
         bne perform_draw
         rts
@@ -1643,6 +1679,11 @@ perform_draw:
         sta HudSeedDirty
 
         ldx #1
+        draw_tile_at_x ROW_0, #BLANK_TILE, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        ldx #2
+        draw_tile_at_x ROW_0, #BLANK_TILE, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+
+        ldx #3
         draw_tile_at_x ROW_0, #SEED_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         perform_zpcm_inc
@@ -1654,15 +1695,13 @@ perform_draw:
         lsr
         and #$0F
         ora #MID_TRACKER_NUMBERS_BASE
-        sta Numeral
-        ldx #2
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda current_save + SaveFile::RunSeed + 0
         and #$0F
         ora #MID_TRACKER_NUMBERS_BASE
-        sta Numeral
-        ldx #3
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         lda current_save + SaveFile::RunSeed + 1
         lsr
@@ -1671,15 +1710,15 @@ perform_draw:
         lsr
         and #$0F
         ora #MID_TRACKER_NUMBERS_BASE
-        sta Numeral
-        ldx #4
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda current_save + SaveFile::RunSeed + 1
         and #$0F
         ora #MID_TRACKER_NUMBERS_BASE
-        sta Numeral
-        ldx #5
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+
+        perform_zpcm_inc
 
         lda current_save + SaveFile::RunSeed + 2
         lsr
@@ -1688,15 +1727,13 @@ perform_draw:
         lsr
         and #$0F
         ora #MID_TRACKER_NUMBERS_BASE
-        sta Numeral
-        ldx #6
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda current_save + SaveFile::RunSeed + 2
         and #$0F
         ora #MID_TRACKER_NUMBERS_BASE
-        sta Numeral
-        ldx #7
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         lda current_save + SaveFile::RunSeed + 3
         lsr
@@ -1705,15 +1742,13 @@ perform_draw:
         lsr
         and #$0F
         ora #MID_TRACKER_NUMBERS_BASE
-        sta Numeral
-        ldx #8
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda current_save + SaveFile::RunSeed + 3
         and #$0F
         ora #MID_TRACKER_NUMBERS_BASE
-        sta Numeral
-        ldx #9
-        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
         perform_zpcm_inc
         rts
