@@ -35,6 +35,7 @@
         .include "ppu.inc"
         .include "rainbow.inc"
         .include "raster_table.inc"
+        .include "rta_timer.inc"
         .include "saves.inc"
         .include "settings.inc"
         .include "sound.inc"
@@ -185,7 +186,7 @@ continue_waiting:
         far_call FAR_disable_all_oam_entries_hud
 
         far_call FAR_init_save_subsystem
-        far_call FAR_compute_player_colors
+        far_call FAR_compute_player_colors        
 
         ; NORMAL: start on the title screen
         ; TODO: add the studio logo, and any other "first run" screens here

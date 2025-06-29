@@ -15,6 +15,7 @@
         .include "ppu.inc"
         .include "prng.inc"
         .include "raster_table.inc"
+        .include "rta_timer.inc"
         .include "slowam.inc"
         .include "sound.inc"
         .include "word_util.inc"
@@ -67,7 +68,6 @@ start:
         far_call FAR_init_dynamic_palettes
         far_call FAR_initialize_palettes
         far_call FAR_initialize_ppu
-        ;jsr init_irq_subsystem
 
         far_call FAR_init_audio
         far_call FAR_init_slowam
@@ -80,9 +80,8 @@ start:
 
         jsr initialize_prng
 
-        ; far_call FAR_init_nametables
-        ; far_call FAR_init_palettes
         far_call FAR_initialize_irq_table
+        far_call FAR_initialize_rta_timers
         ; now it should be safe to enable interrupts, in theory
         cli
 

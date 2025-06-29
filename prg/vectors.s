@@ -20,6 +20,7 @@
 .include "prng.inc"
 .include "rainbow.inc"
 .include "raster_table.inc"
+.include "rta_timer.inc"
 .include "slowam.inc"
 .include "sound.inc"
 .include "zeropage.inc"
@@ -179,6 +180,11 @@ nmi_soft_disable:
         ; ... this is LOAD BEARING? Zeta why!?
         jsr update_beat_tracker
         perform_zpcm_inc
+
+        ; Always advance the RTA timer every frame
+        ; This protects it from timing inconsistencies caused by lag, which is
+        ; itself wildly inconsistent due to music alignment and beat judgement
+        jsr FIXED_advance_rta_timer
 
         pla
         sta data_bank_high_shadow

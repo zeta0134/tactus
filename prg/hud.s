@@ -21,7 +21,9 @@
         .include "prng.inc"
         .include "procgen.inc"
         .include "rainbow.inc"
+        .include "rta_timer.inc"
         .include "saves.inc"
+        .include "settings.inc"
         .include "slowam.inc"
         .include "sound.inc"
         .include "sprites.inc"
@@ -39,6 +41,8 @@ HeartDisplayCurrent: .res 6
 
 HudBorderDirty: .res 1
 HudMapDirty: .res 1
+HudPedometerDirty: .res 1
+HudSeedDirty: .res 1
 CurrentMapIndex: .res 1
 ZonePtrCurrent: .res 2
 
@@ -56,7 +60,7 @@ ItemCountCurrent: .res 1
 
 NinjaFootwrapsChargeCurrent: .res 1
 
-.segment "CODE_0"
+.segment "CODE_C"
 
 HUD_TILE_BASE        = $52C0
 HUD_ATTR_OFFSET      = $0800
@@ -148,6 +152,8 @@ weapon_palette_table:
 .proc hud_state_init
         lda #1
         sta HudMapDirty
+        sta HudPedometerDirty
+        sta HudSeedDirty
         lda #0
         sta CurrentMapIndex
         .repeat 6, i
@@ -190,9 +196,7 @@ weapon_palette_table:
         perform_zpcm_inc
         jsr update_coin_counter
         perform_zpcm_inc
-        .if ::DEBUG_MODE
-        jsr draw_run_seed
-        .endif
+        jsr draw_run_tracker
         perform_zpcm_inc
         jsr update_dialog
         jsr update_rhythm_assist
@@ -631,7 +635,7 @@ loop:
 
         ; coin counter, static tiles
         ldx #14
-        draw_tile_at_x ROW_4, #COIN_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        draw_tile_at_x ROW_4, #COIN_ICON, #(HUD_YELLOW_PAL | CHR_BANK_HUD)
         ldx #15
         draw_tile_at_x ROW_4, #COIN_X, #(HUD_TEXT_PAL | CHR_BANK_HUD)
 
@@ -1030,7 +1034,7 @@ ThousandsDigit := T5
 TenThousandsDigit := T6
         perform_zpcm_inc
         mov16 NumberWord, DisplayedGold
-        near_call FAR_base_10
+        far_call FAR_base_10
 
         lda ThousandsDigit
         beq draw_little_x
@@ -1494,10 +1498,154 @@ done:
         rts
 .endproc
 
-.if ::DEBUG_MODE
+
+COLON_LIGHT_ICON = $01
+SEED_ICON        = $02
+CLOCK_ICON       = $03
+SHOE_ICON        = $04
+COLON_MID_ICON   = $05
+COLON_DARK_ICON  = $06
+
+LIGHT_TRACKER_NUMBERS_BASE = $20
+MID_TRACKER_NUMBERS_BASE   = $30
+DARK_TRACKER_NUMBERS_BASE  = $40
+
+.proc draw_run_tracker
+        lda current_save + SaveFile::OptionRunTrackerType
+        cmp #RUN_TRACKER_TYPE_SEED
+        bne not_run_seed
+        jmp draw_run_seed
+        ; tail call
+not_run_seed:
+
+        cmp #RUN_TRACKER_TYPE_RTA_TIMER
+        bne not_rta_timer
+        jmp draw_run_timer
+        ; tail call
+
+not_rta_timer:
+
+        cmp #RUN_TRACKER_TYPE_TURN_COUNTER
+        bne not_turn_counter
+        jmp draw_run_pedometer
+        ; tail call
+not_turn_counter:
+
+        ; Must be nothing! We're done here.
+        rts
+.endproc
+
+; We have to update the RTA every (non-lag) frame, so we want to spend bytes to make
+; that as efficient as we can possibly stand
+fractional_rta_lut:
+        .repeat 300, i
+        .byte ((i * 100 / 300)    / 10) + LIGHT_TRACKER_NUMBERS_BASE ; tens
+        .byte ((i * 100 / 300) .MOD 10) + LIGHT_TRACKER_NUMBERS_BASE ; ones
+        .endrepeat
+
+hour_second_lut:
+        .repeat 60, i
+        .byte (i    / 10) + LIGHT_TRACKER_NUMBERS_BASE ; tens
+        .byte (i .MOD 10) + LIGHT_TRACKER_NUMBERS_BASE ; ones
+        .endrepeat
+
+.proc draw_run_timer
+Numeral := R0
+FractionalPtr := R1 ; and R2
+        ; The run timer updates every frame, so it is always "dirty." Don't bother to check,
+        ; just draw it as fast as we possibly can within reason.
+
+        ldx #1
+        draw_tile_at_x ROW_0, #CLOCK_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+
+        lda current_save + SaveFile::RunTimeHours
+        and #$0F
+        ora #LIGHT_TRACKER_NUMBERS_BASE
+        sta Numeral
+        ldx #2
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        ldx #3
+        draw_tile_at_x ROW_0, #COLON_MID_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+
+        lda current_save + SaveFile::RunTimeMinutes
+        asl
+        tay
+        lda hour_second_lut+0, y
+        sta Numeral
+        ldx #4
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        lda hour_second_lut+1, y
+        sta Numeral
+        ldx #5
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        ldx #6
+        draw_tile_at_x ROW_0, #COLON_MID_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+
+        lda current_save + SaveFile::RunTimeSeconds
+        asl
+        tay
+        lda hour_second_lut+0, y
+        sta Numeral
+        ldx #7
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        lda hour_second_lut+1, y
+        sta Numeral
+        ldx #8
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        ldx #9
+        draw_tile_at_x ROW_0, #COLON_MID_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+
+        lda current_save + SaveFile::RunTimeFrames+0
+        asl
+        sta FractionalPtr+0
+        lda current_save + SaveFile::RunTimeFrames+1
+        rol
+        sta FractionalPtr+1
+        add16w FractionalPtr, #fractional_rta_lut
+        ldy #0
+        lda (FractionalPtr), y
+        sta Numeral
+        ldx #10
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        iny
+        lda (FractionalPtr), y
+        sta Numeral
+        ldx #11
+        draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+
+        perform_zpcm_inc
+        rts
+.endproc
+
+.proc draw_run_pedometer
+        lda HudPedometerDirty
+        bne perform_draw
+        rts
+perform_draw:
+        lda #0
+        sta HudPedometerDirty
+
+        ldx #2
+        draw_tile_at_x ROW_0, #SHOE_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+
+        perform_zpcm_inc
+
+        rts
+.endproc
+
 .proc draw_run_seed
-Numeral := R0     
-        perform_zpcm_inc   
+Numeral := R0
+        lda HudSeedDirty
+        bne perform_draw
+        rts
+perform_draw:
+        lda #0
+        sta HudSeedDirty
+
+        ldx #1
+        draw_tile_at_x ROW_0, #SEED_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+
+        perform_zpcm_inc
 
         lda current_save + SaveFile::RunSeed + 0
         lsr
@@ -1505,13 +1653,13 @@ Numeral := R0
         lsr
         lsr
         and #$0F
-        ora #$40
+        ora #MID_TRACKER_NUMBERS_BASE
         sta Numeral
         ldx #2
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda current_save + SaveFile::RunSeed + 0
         and #$0F
-        ora #$40
+        ora #MID_TRACKER_NUMBERS_BASE
         sta Numeral
         ldx #3
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
@@ -1522,13 +1670,13 @@ Numeral := R0
         lsr
         lsr
         and #$0F
-        ora #$40
+        ora #MID_TRACKER_NUMBERS_BASE
         sta Numeral
         ldx #4
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda current_save + SaveFile::RunSeed + 1
         and #$0F
-        ora #$40
+        ora #MID_TRACKER_NUMBERS_BASE
         sta Numeral
         ldx #5
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
@@ -1539,13 +1687,13 @@ Numeral := R0
         lsr
         lsr
         and #$0F
-        ora #$40
+        ora #MID_TRACKER_NUMBERS_BASE
         sta Numeral
         ldx #6
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda current_save + SaveFile::RunSeed + 2
         and #$0F
-        ora #$40
+        ora #MID_TRACKER_NUMBERS_BASE
         sta Numeral
         ldx #7
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
@@ -1556,13 +1704,13 @@ Numeral := R0
         lsr
         lsr
         and #$0F
-        ora #$40
+        ora #MID_TRACKER_NUMBERS_BASE
         sta Numeral
         ldx #8
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         lda current_save + SaveFile::RunSeed + 3
         and #$0F
-        ora #$40
+        ora #MID_TRACKER_NUMBERS_BASE
         sta Numeral
         ldx #9
         draw_tile_at_x ROW_0, Numeral, #(HUD_TEXT_PAL | CHR_BANK_HUD)
@@ -1570,7 +1718,6 @@ Numeral := R0
         perform_zpcm_inc
         rts
 .endproc
-.endif
 
 bomb_counter_tens_lut:
         .byte <SPRITE_HUD_STATIC_00_COUNTER_10S_01 + 0 + SPRITE_OFFSET_HUD_STATIC_00
@@ -1633,7 +1780,7 @@ draw_counter:
         sta NumberWord+0
         lda #0
         sta NumberWord+1
-        near_call FAR_base_10
+        far_call FAR_base_10
 
         ; Tens Digit
         perform_zpcm_inc

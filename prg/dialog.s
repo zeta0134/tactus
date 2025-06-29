@@ -69,7 +69,7 @@ hello_dialog:
         .byte "This dialog box has", D_NEWLINE
         .byte "multiple pages of text.", D_WAIT, D_CLOSE
 
-        .segment "CODE_0"
+        .segment "CODE_C"
 
 DIALOG_EASING_LENGTH = 12
 dialog_easing_lut:

@@ -70,9 +70,10 @@ options_sublayout_compatibility_tweaks_page_1:
 options_sublayout_debug_page_1:
         widget_controller FAR_options_page_clear_controller_init
         widget_text_label placeholder_debug_str, 2, 13
-        widget_text_options debug_language_str, debug_language_options, {current_block + SaveBlock::GlobalOptionLanguage },      3, 15
+        widget_text_options debug_language_str,    debug_language_options,    {current_block + SaveBlock::GlobalOptionLanguage },      3, 15
+        widget_text_options debug_run_tracker_str, debug_run_tracker_options, {current_save  + SaveFile::OptionRunTrackerType  },      3, 16
 
-        widget_text_label debug_localized_label, 3, 17
+        widget_text_label debug_localized_label, 3, 18
         widget_text_label debug_silly_str, 2, 24
         widget_controller FAR_apply_language_selection_controller_init
         .addr $0000 ; end of list
@@ -233,10 +234,26 @@ debug_language_options:
         .addr debug_language_toki_pona_sitelen_lasina_str
         .addr debug_language_toki_pona_sitelen_pona_str
 ; TODO: localize the language string into the target language
-; (waiting on UI string drawing to become command aware)
 debug_language_english_str:                  .byte "English", D_CLOSE
 debug_language_toki_pona_sitelen_lasina_str: .byte "Toki Pona (lasina)", D_CLOSE
 debug_language_toki_pona_sitelen_pona_str:   .byte "Toki Pona (pona)", D_CLOSE
+
+; Why debug? Because this should eventually become an in-game totem set, in the
+; oracle's chambers. That's not build out yet, and is waiting on a few mechanics
+; to come together. High on the priority list though.
+debug_run_tracker_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Tracker ", D_CLOSE
+debug_run_tracker_options:
+        .byte 4
+        .addr debug_run_tracker_none_str
+        .addr debug_run_tracker_seed_str
+        .addr debug_run_tracker_timer_str
+        .addr debug_run_tracker_turns_str
+; TODO: localize the language string into the target language
+; (waiting on UI string drawing to become command aware)
+debug_run_tracker_none_str:  .byte "Off", D_CLOSE
+debug_run_tracker_seed_str:  .byte "Seed", D_CLOSE
+debug_run_tracker_timer_str: .byte "RTA Timer", D_CLOSE
+debug_run_tracker_turns_str: .byte "Turn Count", D_CLOSE
 
 options_pal_default_base:    .incbin "../art/palettes/options/base.pal"
 options_pal_protan_base:     .incbin "../art/palettes/options/protan.pal"

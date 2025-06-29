@@ -41,7 +41,8 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     OptionColorEmphasis .byte
     OptionSfxMode .byte
     OptionMusicMode .byte
-    OptionsReserved .byte 6 ; pad out to 16 bytes total
+    OptionRunTrackerType .byte
+    OptionsReserved .byte 5 ; pad out to 16 bytes total
     ; FUTURE
     GeneralReserved .byte 24
     ; CURRENT RUN STATE (that which persists, anyway) (current: 32 bytes)
@@ -65,7 +66,7 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     PlayerWeaponUpgradeSlot2 .byte
     RunStateReserved         .byte 16 ; bring total up to 48 bytes
     ; STUFF WE TRACK DURING A RUN, FOR THE END SCREEN MOSTLY (current: 33 bytes)
-    RunTimeFrames            .byte
+    RunTimeFrames            .byte 2
     RunTimeSeconds           .byte
     RunTimeMinutes           .byte
     RunTimeHours             .byte
@@ -85,7 +86,7 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     SpellsCast               .byte
     StepsTaken               .byte 2
     LastDamageDealtWith      .byte ; item / weapon used to deliver the final blow, basically
-    RunTrackerReserved       .byte 31 ; bring the total up to 80 bytes
+    RunTrackerReserved       .byte 30 ; bring the total up to 80 bytes
 .endstruct ; total size should be 256 bytes
 
 ; When set: do not roll a new run seed upon entering the big door
