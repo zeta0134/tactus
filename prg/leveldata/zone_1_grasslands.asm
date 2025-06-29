@@ -135,7 +135,7 @@ zone_grasslands_floor_1:
         .word rare_chest_structure_set_interior       ; RareChestInteriorStructures
         .word rare_chest_structure_set_exterior       ; RareChestExteriorStructures
         .word rare_chest_treasure_table      ; RareChestLootTable
-        .byte 0                              ; RareChestMin
+        .byte 1                              ; RareChestMin
         .byte 2                              ; RareChestMax
         .word legendary_chest_structure_set_interior  ; LegendaryChestInteriorStructures
         .word legendary_chest_structure_set_exterior  ; LegendaryChestExteriorStructures
@@ -193,13 +193,13 @@ zone_grasslands_floor_2:
         .word rare_chest_structure_set_interior       ; RareChestInteriorStructures
         .word rare_chest_structure_set_exterior       ; RareChestExteriorStructures
         .word rare_chest_treasure_table      ; RareChestLootTable
-        .byte 0                              ; RareChestMin
-        .byte 2                              ; RareChestMax
+        .byte 1                              ; RareChestMin
+        .byte 4                              ; RareChestMax
         .word legendary_chest_structure_set_interior  ; LegendaryChestInteriorStructures
         .word legendary_chest_structure_set_exterior  ; LegendaryChestExteriorStructures
         .word legendary_chest_treasure_table ; LegendaryChestLootTable
-        .byte 0                              ; LegendaryChestMin
-        .byte 1                              ; LegendaryChestMax
+        .byte 1                              ; LegendaryChestMin
+        .byte 2                              ; LegendaryChestMax
         .byte 1                              ; ZoneIndex
         .byte 2                              ; FloorIndex
 
@@ -250,13 +250,13 @@ zone_grasslands_floor_3:
         .word rare_chest_structure_set_interior       ; RareChestInteriorStructures
         .word rare_chest_structure_set_exterior       ; RareChestExteriorStructures
         .word rare_chest_treasure_table      ; RareChestLootTable
-        .byte 0                              ; RareChestMin
-        .byte 2                              ; RareChestMax
+        .byte 1                              ; RareChestMin
+        .byte 4                              ; RareChestMax
         .word legendary_chest_structure_set_interior  ; LegendaryChestInteriorStructures
         .word legendary_chest_structure_set_exterior  ; LegendaryChestExteriorStructures
         .word legendary_chest_treasure_table ; LegendaryChestLootTable
-        .byte 0                              ; LegendaryChestMin
-        .byte 1                              ; LegendaryChestMax
+        .byte 1                              ; LegendaryChestMin
+        .byte 2                              ; LegendaryChestMax
         .byte 1                              ; ZoneIndex
         .byte 3                              ; FloorIndex
 
@@ -307,13 +307,13 @@ zone_grasslands_floor_4:
         .word rare_chest_structure_set_interior       ; RareChestInteriorStructures
         .word rare_chest_structure_set_exterior       ; RareChestExteriorStructures
         .word rare_chest_treasure_table      ; RareChestLootTable
-        .byte 0                              ; RareChestMin
-        .byte 2                              ; RareChestMax
+        .byte 1                              ; RareChestMin
+        .byte 4                              ; RareChestMax
         .word legendary_chest_structure_set_interior  ; LegendaryChestInteriorStructures
         .word legendary_chest_structure_set_exterior  ; LegendaryChestExteriorStructures
         .word legendary_chest_treasure_table ; LegendaryChestLootTable
-        .byte 0                              ; LegendaryChestMin
-        .byte 1                              ; LegendaryChestMax
+        .byte 1                              ; LegendaryChestMin
+        .byte 2                              ; LegendaryChestMax
         .byte 1                              ; ZoneIndex
         .byte 4                              ; FloorIndex
 

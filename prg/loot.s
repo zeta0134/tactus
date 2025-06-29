@@ -336,9 +336,9 @@ weapons_only_treasure_table:
 common_treasure_table:
     ; Sometimes we need the shop to carry three specific items. Here's how to do that:
     .byte 3
-    .byte ITEM_GPS
-    .byte ITEM_DINGBAT
-    .byte ITEM_INTERROGATION_BEAM
+    ;.byte ITEM_GPS
+    ;.byte ITEM_DINGBAT
+    ;.byte ITEM_INTERROGATION_BEAM
 
     .byte 42
     .byte ITEM_BROADSWORD
@@ -386,7 +386,7 @@ common_treasure_table:
 
 ; heavily weighted towards upgrade crystals, contains lots of other powerful items
 rare_treasure_table:
-    .byte 36
+    .byte 39
     .byte ITEM_UPGRADE_EARTH
     .byte ITEM_UPGRADE_ICE
     .byte ITEM_UPGRADE_AIR
@@ -423,6 +423,9 @@ rare_treasure_table:
     .byte ITEM_SPELL_BOMB
     .byte ITEM_SPELL_LIFE
     .byte ITEM_LUCKY_PENNY
+    .byte ITEM_GPS
+    .byte ITEM_DINGBAT
+    .byte ITEM_INTERROGATION_BEAM
 
 
 consumable_treasure_table:
@@ -442,7 +445,7 @@ consumable_treasure_table:
     .byte ITEM_BOMB_STANDARD_X3
 
 standard_chest_treasure_table:
-    .byte 63
+    .byte 57
     .repeat 10
     .byte ITEM_COMPASS
     .byte ITEM_MAP
@@ -484,12 +487,6 @@ standard_chest_treasure_table:
     .byte ITEM_GOLD_SACK
     .byte ITEM_GOLD_SACK
     .byte ITEM_GOLD_SACK
-    .byte ITEM_SPELL_FIRE
-    .byte ITEM_SPELL_AIR
-    .byte ITEM_SPELL_ICE
-    .byte ITEM_SPELL_EARTH
-    .byte ITEM_SPELL_BOMB
-    .byte ITEM_SPELL_LIFE
     
 rare_chest_treasure_table:
     ; So very placeholder
@@ -507,13 +504,17 @@ rare_chest_treasure_table:
     
 legendary_chest_treasure_table:
     ; So very placeholder
-    .byte 16
+    .byte 10
     .byte ITEM_SHIELD
     .byte ITEM_INFERNAL_LANTERN
     .byte ITEM_LARGE_TORCH
     .byte ITEM_CHARGE_A_BULB
     .byte ITEM_GO_GO_BOOTS
     .byte ITEM_LUCKY_PENNY
+    .byte ITEM_GPS
+    .byte ITEM_DINGBAT
+    .byte ITEM_INTERROGATION_BEAM
+    .byte ITEM_NINJA_FOOTWRAPS
 
 ; TODO: swap these for higher value treasure items or otherwise
 ; safe consumables. All must be okay to duplicate multiple times

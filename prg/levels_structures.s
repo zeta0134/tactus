@@ -1027,6 +1027,7 @@ skip_exterior_warp_structures:
         ; fall through to check_chest_spawning
 check_chest_spawning:
         ; No chests in any room that otherwise expressly forbids them
+        ldx RoomIndexToGenerate
         lda room_properties, x
         and #ROOM_PROPERTIES_FORBID_CHESTS
         bne skip_chest_spawning
