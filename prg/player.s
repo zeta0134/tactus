@@ -24,6 +24,7 @@
         .include "procgen.inc"
         .include "rainbow.inc"
         .include "raster_table.inc"
+        .include "rta_timer.inc"
         .include "saves.inc"
         .include "settings.inc"
         .include "sound.inc"
@@ -3081,6 +3082,11 @@ no_amulet:
         ; TODO: setup for a proper "dying" beat (greyscale background, player
         ; frozen in dmg state, etc)
         ; POSTPONED: fix hearts first (later: ??? what did I mean by this?)
+
+        ; Disable both gameplay time timers, as the game is ending
+        lda #0
+        sta RtaTimerEnabled
+        sta PedometerEnabled
 
         ; Whelp; that's the end of the line
         ; TODO: I dunno, screen shake? palette greyscale? SFX? Juice this up.

@@ -1,7 +1,9 @@
     .include "rta_timer.inc"    
 
     .include "far_call.inc"
+    .include "hud.inc"
     .include "pal.inc"
+    .include "player.inc"
     .include "saves.inc"
     .include "word_util.inc"
 
@@ -19,6 +21,8 @@ PedometerEnabled: .res 1
 .proc FIXED_advance_rta_timer
     lda RtaTimerEnabled
     beq done
+    lda PlayerIsPaused
+    bne done
     
     ; Advance subframes
     add16b current_save + SaveFile::RunTimeFrames, RtaTimeBase
@@ -49,6 +53,10 @@ done:
 .proc FIXED_advance_pedometer
     lda PedometerEnabled
     beq done
+    lda PlayerIsPaused
+    bne done
+    lda #1
+    sta HudPedometerDirty
     inc current_save + SaveFile::RunBeatsElapsed+0
     bne done
     inc current_save + SaveFile::RunBeatsElapsed+1
@@ -73,6 +81,8 @@ done:
     lda #0
     sta RtaTimerEnabled
     sta PedometerEnabled
+    lda #1
+    sta HudPedometerDirty
 
     ; NTSC and PAL have different fractions of a frame here,
     ; so handle that gracefully

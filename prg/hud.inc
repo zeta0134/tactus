@@ -3,6 +3,8 @@
 .global FAR_refresh_hud
 
 .global HudMapDirty
+.global HudPedometerDirty
+.global HudSeedDirty
 
 .global WeaponDisplayCurrent
 .global TorchDisplayCurrent

@@ -1773,6 +1773,7 @@ cooldown_is_fine:
 player_input_forces_a_beat:
         lda #0
         sta ClearedRoomCooldown
+        jsr FIXED_advance_pedometer
 process_next_beat_now:
         st16 GameMode, beat_frame_1
         rts ; right now!
@@ -1820,6 +1821,7 @@ no_input_received:
         ; Otherwise let the whole engine lag while the player makes up their damned mind :)
         jmp continue_waiting
 process_next_beat_now:
+        jsr FIXED_advance_pedometer
         st16 GameMode, beat_frame_1
         rts ; do that now
 continue_waiting:
@@ -1871,6 +1873,7 @@ SyntheticHeldIntent := R2
         beq continue_waiting
 input_received:
         ; Then immediatly process this beat
+        jsr FIXED_advance_pedometer
         st16 GameMode, beat_frame_1
         rts ; do that now
 continue_waiting:
