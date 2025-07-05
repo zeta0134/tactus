@@ -93,6 +93,8 @@ empty_string: .asciiz ""
         .include "ui/widgets/text_label.incs"
         .include "ui/widgets/text_options.incs"
         .include "ui/widgets/text_button.incs"
+        .include "ui/widgets/run_time_viewer.incs"
+        .include "ui/widgets/step_count_viewer.incs"
 
         .include "ui/title_screen.incs"
         .include "ui/options_screen.incs"

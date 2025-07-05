@@ -1642,25 +1642,53 @@ perform_draw:
 
         perform_zpcm_inc
 
+
         ldx #6
         draw_tile_at_x ROW_0, #SHOE_ICON, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         inx
         lda TenThousandsDigit
+        bne normal_rendering_ten_thousands
+        lda #BLANK_TILE
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        lda ThousandsDigit
+        bne normal_rendering_thousands
+        lda #BLANK_TILE
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        lda HundredsDigit
+        bne normal_rendering_hundreds_thousands
+        lda #BLANK_TILE
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        lda TensDigit
+        bne normal_rendering_tens
+        lda #BLANK_TILE
+        draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        inx
+        jmp normal_rendering_ones
+
+
+normal_rendering_ten_thousands:
         ora #LIGHT_TRACKER_NUMBERS_BASE
         draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         inx
         lda ThousandsDigit
+normal_rendering_thousands:
         ora #LIGHT_TRACKER_NUMBERS_BASE
         draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         inx
         lda HundredsDigit
+normal_rendering_hundreds_thousands:
         ora #LIGHT_TRACKER_NUMBERS_BASE
         draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         inx
         lda TensDigit
+normal_rendering_tens:
         ora #LIGHT_TRACKER_NUMBERS_BASE
         draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         inx
+normal_rendering_ones:
         lda OnesDigit
         ora #LIGHT_TRACKER_NUMBERS_BASE
         draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)

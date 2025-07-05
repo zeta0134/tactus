@@ -4,14 +4,94 @@
 
 .segment "DATA_UI_LAYOUTS"
 
-game_over_screen_ui_layout:
+; TODO: localize ALL of these
+game_over_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Game Over (WIP)", D_CLOSE
+floor_reached_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Floor Reached", D_CLOSE
+run_time_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Run Time", D_CLOSE
+steps_taken_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Steps Taken", D_CLOSE
+gold_earned_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Gold Earned", D_CLOSE
+carrying_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Carrying", D_CLOSE
+
+
+game_over_ui_layout:
         widget_controller FAR_game_over_controller_init
+        widget_text_label game_over_str,      7,  3
+        
+        widget_text_label floor_reached_str,  4,  8
+
+        widget_text_label run_time_str,       4, 10
+        widget_run_time_viewer               18, 10
+
+        widget_text_label steps_taken_str,    4, 12
+        widget_step_count_viewer             23, 12
+
+        widget_text_label gold_earned_str,    4, 14
+
+        widget_text_label carrying_str,       4, 16
+
+        .addr $0000 ; end of list
+
+victory_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Victory (WIP)", D_CLOSE
+
+victory_ui_layout:
+        widget_controller FAR_victory_controller_init
+        widget_text_label victory_str, 10, 3
         .addr $0000 ; end of list
 
 .segment "CODE_UI_LAYOUTS"
 
 .proc FAR_game_over_controller_init
+Top := R0
+Left := R1
+Width := R2
+Height := R3
+
 CurrentWidgetIndex := R20
+
+        ; For being dead, the gameover theme is essential
+        lda #TRACK_GAMEOVER
+        ldy #TRACK_VARIANT_NORMAL
+        far_call FAR_play_track
+
+        ; this screen DOES use extended attributes, so set that up
+        lda #0
+        sta LeftNametableBank
+        sta RightNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta LeftNametableAttr
+        sta RightNametableAttr
+
+        ; draw an initial checkerboard background (no nametable for now)
+        near_call FAR_draw_checkerboard_base
+
+        ; Draw a small box up top for the title
+        lda #3
+        sta Left
+        lda #2
+        sta Top
+        lda #25
+        sta Width
+        lda #3
+        sta Height
+        far_call widget_file_select_box::FAR_draw_box_outline_light
+        far_call widget_file_select_box::FAR_draw_box_fill
+        far_call widget_file_select_box::FAR_draw_box_shadow
+
+        ; And a bigger box to house the stats. Again, working first, polish later.
+        lda #3
+        sta Left
+        lda #6
+        sta Top
+        lda #25
+        sta Width
+        lda #20
+        sta Height
+        far_call widget_file_select_box::FAR_draw_box_outline_light
+        far_call widget_file_select_box::FAR_draw_box_fill
+        far_call widget_file_select_box::FAR_draw_box_shadow
+
+        ; Get the palettes loaded in
+        near_call FAR_apply_standard_ui_palette
 
         lda #BRIGHTNESS_FULLY_DARK
         jsr set_brightness
@@ -21,18 +101,62 @@ CurrentWidgetIndex := R20
         sta GlobalFadeSpeed
 
         ldy CurrentWidgetIndex
-        set_widget_state_y FAR_game_over_controller_update
+        set_widget_state_y FAR_end_screen_controller_update
         rts
 .endproc
 
-.proc FAR_game_over_controller_update
+; TODO: make this differ meaningfully from gameover; right now it's
+; a copy-paste. It should have victory music, load a different nametable
+; and palettes, etc etc.
+.proc FAR_victory_controller_init
+CurrentWidgetIndex := R20
+
+        ; For being dead, the gameover theme is essential
+        lda #TRACK_GAMEOVER
+        ldy #TRACK_VARIANT_NORMAL
+        far_call FAR_play_track
+
+        ; this screen DOES use extended attributes, so set that up
+        lda #0
+        sta LeftNametableBank
+        sta RightNametableBank
+        lda #(NT_FPGA_RAM | NT_EXT_BANK_2 | NT_EXT_BG_AT)
+        sta LeftNametableAttr
+        sta RightNametableAttr
+
+        ; draw an initial checkerboard background (no nametable for now)
+        near_call FAR_draw_checkerboard_base
+
+        ; Get the palettes loaded in
+        near_call FAR_apply_standard_ui_palette
+
+        lda #BRIGHTNESS_FULLY_DARK
+        jsr set_brightness
+        lda #BRIGHTNESS_NORMAL
+        sta TargetBrightness
+        lda #FADE_SPEED_UI
+        sta GlobalFadeSpeed
+
+        set_widget_state_y FAR_end_screen_controller_update
+        rts
+.endproc
+
+.proc FAR_end_screen_controller_update
         perform_zpcm_inc
         far_call FAR_draw_sprites
 
         lda #(KEY_A | KEY_B | KEY_START)
         and ButtonsDown
         beq stay_here
-        far_call FAR_return_to_title
+
+        ; Make sure we're not flagged as suspended, this'll force the HUB to load.
+        ; When we load into the HUB, its init logic resets the player state to new-game
+        ; stats, based on their current challenge mode.
+        lda current_save + SaveFile::RunFlags
+        and #($FF - RUN_FLAGS_SUSPENDED)
+        sta current_save + SaveFile::RunFlags
+
+        far_call FAR_go_to_gameplay
         rts
 stay_here:
         rts

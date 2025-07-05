@@ -37,6 +37,8 @@
 .global game_end_screen_prep
 .global name_entry_prep
 .global file_details_prep
+.global game_over_prep
+.global victory_prep
 .global draw_battlefield_A
 .global draw_battlefield_B
 .global draw_battlefield_C

@@ -1,0 +1,142 @@
+; Given a position, displays the final RTA time for the current
+; run. Really only meant for the gameover / victory screen, though
+; we may later repurpose it to point at historical data.
+.macro widget_run_time_viewer tile_x, tile_y
+    .addr widget_run_time_viewer::FAR_widget_run_time_viewer_init
+    .byte <.bank(widget_run_time_viewer::FAR_widget_run_time_viewer_init)
+    .byte tile_x, tile_y
+    .byte 0, 0, 0, 0, 0, 0
+.endmacro
+
+.scope widget_run_time_viewer
+
+.segment "CODE_UI_WIDGETS_1"
+
+; We need to display this just like the in-game timer, but we need to use a different
+; font base for all the entries
+fractional_rta_lut:
+        .repeat 300, i
+        .byte ((i * 100 / 300)    / 10) + '0' ; tens
+        .byte ((i * 100 / 300) .MOD 10) + '0' ; ones
+        .endrepeat
+
+hour_second_lut:
+        .repeat 60, i
+        .byte (i    / 10) + '0' ; tens
+        .byte (i .MOD 10) + '0' ; ones
+        .endrepeat
+
+.proc FAR_widget_run_time_viewer_init
+FractionalPtr := R0
+DestYPreserve := R2
+CurrentWidgetIndex := R20
+
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+
+; arguments to string drawing functions
+NametableAddr := T0
+AttributeAddr := T2
+TileX := T4
+TileY := T5
+
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        sta TileX
+        lda widget_tile_y, y
+        sta TileY
+        st16 NametableAddr, $5000
+        st16 AttributeAddr, $5800
+        far_call FAR_nametable_from_coordinates
+
+        ldy #0
+        lda current_save + SaveFile::RunTimeHours
+        and #$0F
+        clc
+        adc #'0'
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+
+        lda #':'
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+
+        lda current_save + SaveFile::RunTimeMinutes
+        asl
+        tax
+        lda hour_second_lut+0, x
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+        lda hour_second_lut+1, x
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+
+        lda #':'
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+
+        lda current_save + SaveFile::RunTimeSeconds
+        asl
+        tax
+        lda hour_second_lut+0, x
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+        lda hour_second_lut+1, x
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+
+        lda #':'
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+
+        sty DestYPreserve
+
+        lda current_save + SaveFile::RunTimeFrames+0
+        asl
+        sta FractionalPtr+0
+        lda current_save + SaveFile::RunTimeFrames+1
+        rol
+        sta FractionalPtr+1
+        add16w FractionalPtr, #fractional_rta_lut
+        ldy #0
+        lda (FractionalPtr), y
+        ldy DestYPreserve
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+        sty DestYPreserve
+        ldy #1
+        lda (FractionalPtr), y
+        ldy DestYPreserve
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y FAR_widget_run_time_viewer_update
+        rts
+.endproc
+
+.proc FAR_widget_run_time_viewer_update
+        ; Zzzz....
+        rts
+.endproc
+
+.endscope ; widget_numeric_viewer

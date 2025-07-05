@@ -3090,7 +3090,7 @@ no_amulet:
 
         ; Whelp; that's the end of the line
         ; TODO: I dunno, screen shake? palette greyscale? SFX? Juice this up.
-        st16 FadeToGameMode, game_end_screen_prep
+        st16 FadeToGameMode, game_over_prep
         st16 GameMode, fade_to_game_mode_from_gameplay
 
         ; STOP the music

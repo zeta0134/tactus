@@ -10,6 +10,7 @@
 .global title_ui_layout
 .global file_select_ui_layout
 .global game_over_ui_layout
+.global victory_ui_layout
 .global name_entry_ui_layout
 .global file_details_ui_layout
 
