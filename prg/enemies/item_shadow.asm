@@ -295,6 +295,16 @@ item_is_for_sale:
         sbc ItemCost+1
         sta current_save + SaveFile::PlayerGold+1
 
+        ; Track the purchase for run prestige purposes
+        ; (we later use this to compute "gold earned")
+        clc
+        lda current_save + SaveFile::GoldSpent+0
+        adc ItemCost+0
+        sta current_save + SaveFile::GoldSpent+0
+        lda current_save + SaveFile::GoldSpent+1
+        adc ItemCost+1
+        sta current_save + SaveFile::GoldSpent+1
+
         ; It turns out that the detail is clobbered during level gen, since this square was not
         ; originally a disco tile. Zero it out here so that the newly drawn disco tile doesn't
         ; end up with some random pattern

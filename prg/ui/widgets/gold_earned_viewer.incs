@@ -1,0 +1,141 @@
+; Given a position, displays the final step counter for the current
+; run. Really only meant for the gameover / victory screen, though
+; we may later repurpose it to point at historical data.
+.macro widget_gold_earned_viewer tile_x, tile_y
+    .addr widget_gold_earned_viewer::FAR_widget_gold_earned_viewer_init
+    .byte <.bank(widget_gold_earned_viewer::FAR_widget_gold_earned_viewer_init)
+    .byte tile_x, tile_y
+    .byte 0, 0, 0, 0, 0, 0
+.endmacro
+
+.scope widget_gold_earned_viewer
+
+.segment "CODE_UI_WIDGETS_1"
+
+.proc FAR_widget_gold_earned_viewer_init
+NametableAddr := R0
+AttributeAddr := R2
+
+CurrentWidgetIndex := R20
+
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+
+; arguments to string drawing functions
+ComputedNametableAddr := T0
+ComputedAttributeAddr := T2
+TileX := T4
+TileY := T5
+
+NumberWord := T0
+OnesDigit := T2
+TensDigit := T3
+HundredsDigit := T4
+ThousandsDigit := T5
+TenThousandsDigit := T6
+
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        sta TileX
+        lda widget_tile_y, y
+        sta TileY
+        st16 ComputedNametableAddr, $5000
+        st16 ComputedAttributeAddr, $5800
+        far_call FAR_nametable_from_coordinates
+        mov16 NametableAddr, ComputedNametableAddr
+        mov16 AttributeAddr, ComputedAttributeAddr
+
+        clc
+        lda current_save + SaveFile::PlayerGold+0
+        adc current_save + SaveFile::GoldSpent+0
+        sta NumberWord+0
+        lda current_save + SaveFile::PlayerGold+1
+        adc current_save + SaveFile::GoldSpent+1
+        sta NumberWord+1
+        far_call FAR_base_10
+
+        ldy #0
+        lda TenThousandsDigit
+        bne normal_rendering_ten_thousands
+        lda #' '
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+        lda ThousandsDigit
+        bne normal_rendering_thousands
+        lda #' '
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+        lda HundredsDigit
+        bne normal_rendering_hundreds
+        lda #' '
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+        lda TensDigit
+        bne normal_rendering_tens
+        lda #' '
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+        jmp normal_rendering_ones
+
+normal_rendering_ten_thousands:
+        clc
+        adc #'0'
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+
+        lda ThousandsDigit
+normal_rendering_thousands:
+        clc
+        adc #'0'
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+
+        lda HundredsDigit
+normal_rendering_hundreds:
+        clc
+        adc #'0'
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+
+        lda TensDigit
+normal_rendering_tens:
+        clc
+        adc #'0'
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+        iny
+
+normal_rendering_ones:
+        lda OnesDigit
+        clc
+        adc #'0'
+        sta (NametableAddr), y
+        lda #(FONT_ASCII | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y FAR_widget_gold_earned_viewer_update
+        rts
+.endproc
+
+.proc FAR_widget_gold_earned_viewer_update
+        ; Zzzz....
+        rts
+.endproc
+
+.endscope ; widget_numeric_viewer

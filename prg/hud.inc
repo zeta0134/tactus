@@ -73,3 +73,6 @@ chr_tile_offset EQUIPMENT_SPELL_LIFE,        10, 12
 chr_tile_offset EQUIPMENT_BOMB_STANDARD, 4, 14
 chr_tile_offset EQUIPMENT_ITEM_2, 6, 14
 chr_tile_offset EQUIPMENT_ITEM_3, 8, 14
+
+chr_tile_offset COIN_ICON, 0, 7
+chr_tile_offset COIN_X,    1, 7

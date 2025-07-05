@@ -5,7 +5,7 @@
 .segment "DATA_UI_LAYOUTS"
 
 ; TODO: localize ALL of these
-game_over_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Game Over (WIP)", D_CLOSE
+game_over_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Game Over", D_CLOSE
 floor_reached_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Floor Reached", D_CLOSE
 run_time_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Run Time", D_CLOSE
 steps_taken_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Steps Taken", D_CLOSE
@@ -15,7 +15,7 @@ carrying_str: .byte D_PAL, UI_STRING_PAL_LIGHT_THEME, "Carrying", D_CLOSE
 
 game_over_ui_layout:
         widget_controller FAR_game_over_controller_init
-        widget_text_label game_over_str,      7,  3
+        widget_text_label game_over_str,     11,  3
         
         widget_text_label floor_reached_str,  4,  8
 
@@ -26,6 +26,7 @@ game_over_ui_layout:
         widget_step_count_viewer             23, 12
 
         widget_text_label gold_earned_str,    4, 14
+        widget_gold_earned_viewer            23, 14
 
         widget_text_label carrying_str,       4, 16
 

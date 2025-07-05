@@ -82,8 +82,6 @@ chr_tile_offset MAP_BORDER_MR, 8, 8
 chr_tile_offset MAP_BORDER_BL, 6, 9
 chr_tile_offset MAP_BORDER_BM, 7, 9
 chr_tile_offset MAP_BORDER_BR, 8, 9
-chr_tile_offset COIN_ICON, 0, 7
-chr_tile_offset COIN_X,    1, 7
 chr_tile_offset FULL_HEART_BASE,          0, 5
 chr_tile_offset FULL_HEART_BEATING,       2, 5
 chr_tile_offset ARMORED_HEART_BASE,       4, 5
@@ -1505,12 +1503,15 @@ done:
 .endproc
 
 
-COLON_LIGHT_ICON = $01
-SEED_ICON        = $02
-CLOCK_ICON       = $03
-SHOE_ICON        = $04
-COLON_MID_ICON   = $05
-COLON_DARK_ICON  = $06
+COLON_LIGHT_ICON    = $02
+SEED_ICON           = $03
+CLOCK_ICON          = $04
+SHOE_ICON           = $05
+COLON_MID_ICON      = $06
+COLON_DARK_ICON     = $07
+SEPARATOR_DARK_ICON = $08
+DICE_ICON           = $09
+LOCK_ICON           = $0A
 
 LIGHT_TRACKER_NUMBERS_BASE = $20
 MID_TRACKER_NUMBERS_BASE   = $30
@@ -1648,22 +1649,22 @@ perform_draw:
         inx
         lda TenThousandsDigit
         bne normal_rendering_ten_thousands
-        lda #BLANK_TILE
+        lda #SEPARATOR_DARK_ICON
         draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         inx
         lda ThousandsDigit
         bne normal_rendering_thousands
-        lda #BLANK_TILE
+        lda #SEPARATOR_DARK_ICON
         draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         inx
         lda HundredsDigit
         bne normal_rendering_hundreds_thousands
-        lda #BLANK_TILE
+        lda #SEPARATOR_DARK_ICON
         draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         inx
         lda TensDigit
         bne normal_rendering_tens
-        lda #BLANK_TILE
+        lda #SEPARATOR_DARK_ICON
         draw_tile_in_a_at_x ROW_0, #(HUD_TEXT_PAL | CHR_BANK_HUD)
         inx
         jmp normal_rendering_ones

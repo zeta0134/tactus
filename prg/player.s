@@ -496,6 +496,13 @@ heart_loop:
         sta current_save + SaveFile::PlayerBombCount
 .endif
 
+        ; While we're here, initialize a bunch of other tracked state for this run, as we are
+        ; starting a brand new one
+        lda #0
+        sta current_save + SaveFile::GoldSpent+0
+        sta current_save + SaveFile::GoldSpent+1
+        
+
         rts
 .endproc
 
