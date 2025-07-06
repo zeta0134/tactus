@@ -1,6 +1,11 @@
 ; Placeholder 4a
 
-zone_4a_name_str: .asciiz "Placeholder 4A"
+zone_4a_name_str: .byte "Placeholder 4A", D_CLOSE
+zone_sequence_str_4a_1: .byte "4-1", D_CLOSE
+zone_sequence_str_4a_2: .byte "4-2", D_CLOSE
+zone_sequence_str_4a_3: .byte "4-3", D_CLOSE
+zone_sequence_str_4a_4: .byte "4-4", D_CLOSE
+zone_sequence_str_4a_B: .byte "4-B", D_CLOSE
 
 zone_4a_banner_1:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -54,7 +59,7 @@ zone_4a_floor_1:
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
         .word zone_4a_name_str            ; NameStr
-        .word zone_sequence_str_4_1       ; SequenceStr
+        .word zone_sequence_str_4a_1       ; SequenceStr
         rng_index_for_zone 4, 1           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
         .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
@@ -133,7 +138,7 @@ zone_4a_floor_2:
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
         .word zone_4a_name_str            ; NameStr
-        .word zone_sequence_str_4_2       ; SequenceStr
+        .word zone_sequence_str_4a_2       ; SequenceStr
         rng_index_for_zone 4, 2           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
         .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
@@ -212,7 +217,7 @@ zone_4a_floor_3:
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
         .word zone_4a_name_str            ; NameStr
-        .word zone_sequence_str_4_3       ; SequenceStr
+        .word zone_sequence_str_4a_3       ; SequenceStr
         rng_index_for_zone 4, 3           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
         .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
@@ -291,7 +296,7 @@ zone_4a_floor_4:
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
         .word zone_4a_name_str            ; NameStr
-        .word zone_sequence_str_4_4       ; SequenceStr
+        .word zone_sequence_str_4a_4       ; SequenceStr
         rng_index_for_zone 4, 4           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
         .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
@@ -372,7 +377,7 @@ zone_4a_floor_boss:
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
         .word zone_4a_name_str            ; NameStr
-        .word zone_sequence_str_4_B       ; SequenceStr
+        .word zone_sequence_str_4a_B       ; SequenceStr
         rng_index_for_zone 4, 5           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
         .word empty_structure_set            ; StandardChestInteriorStructures

@@ -18,6 +18,7 @@ game_over_ui_layout:
         widget_text_label game_over_str,     11,  3
         
         widget_text_label floor_reached_str,  4,  8
+        widget_short_floor_name_viewer       25,  8
 
         widget_text_label run_time_str,       4, 10
         widget_run_time_viewer               18, 10
@@ -29,6 +30,7 @@ game_over_ui_layout:
         widget_gold_earned_viewer            23, 14
 
         widget_text_label carrying_str,       4, 16
+        widget_equipment_inspector           17, 16
 
         .addr $0000 ; end of list
 

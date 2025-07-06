@@ -6,7 +6,12 @@
 ;   ##    ##  ##    ##  ##     ## ##    ## ##    ## ##       ##     ## ##   ### ##     ## ##    ## 
 ;    ######   ##     ## ##     ##  ######   ######  ######## ##     ## ##    ## ########   ######  
 
-zone_1_name_str: .asciiz "Grasslands"
+zone_1_name_str: .byte "Grasslands", D_CLOSE
+zone_sequence_str_1_1: .byte "1-1", D_CLOSE
+zone_sequence_str_1_2: .byte "1-2", D_CLOSE
+zone_sequence_str_1_3: .byte "1-3", D_CLOSE
+zone_sequence_str_1_4: .byte "1-4", D_CLOSE
+zone_sequence_str_1_B: .byte "1-B", D_CLOSE
 
 zone_grasslands_banner_1_1:
         hud_banner_sprite SPRITE_BANNERS_00_GRASSLANDS_1_1, SPRITE_BANNERS_00_GRASSLANDS_LOWER

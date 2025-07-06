@@ -8,6 +8,7 @@
 
         .include "bhop/bhop.inc"
         .include "battlefield.inc"
+        .include "dialog.inc"
         .include "dynamic_palette.inc"
         .include "enemies.inc"
         .include "far_call.inc"
@@ -97,36 +98,6 @@
 
         .segment "LEVEL_DATA_ZONE_DEFS_0"
 
-zone_sequence_str_1_1: .asciiz "1-1"
-zone_sequence_str_1_2: .asciiz "1-2"
-zone_sequence_str_1_3: .asciiz "1-3"
-zone_sequence_str_1_4: .asciiz "1-4"
-zone_sequence_str_1_B: .asciiz "1-B"
-
-zone_sequence_str_2_1: .asciiz "2-1"
-zone_sequence_str_2_2: .asciiz "2-2"
-zone_sequence_str_2_3: .asciiz "2-3"
-zone_sequence_str_2_4: .asciiz "2-4"
-zone_sequence_str_2_B: .asciiz "2-B"
-
-zone_sequence_str_3_1: .asciiz "3-1"
-zone_sequence_str_3_2: .asciiz "3-2"
-zone_sequence_str_3_3: .asciiz "3-3"
-zone_sequence_str_3_4: .asciiz "3-4"
-zone_sequence_str_3_B: .asciiz "3-B"
-
-zone_sequence_str_4_1: .asciiz "4-1"
-zone_sequence_str_4_2: .asciiz "4-2"
-zone_sequence_str_4_3: .asciiz "4-3"
-zone_sequence_str_4_4: .asciiz "4-4"
-zone_sequence_str_4_B: .asciiz "4-B"
-
-zone_sequence_str_5_1: .asciiz "5-1"
-zone_sequence_str_5_F: .asciiz "5-F"
-
-zone_name_str_debug: .asciiz "Debug"
-zone_sequence_str_debug: .asciiz "DBG"
-
 hud_base_pal:       .incbin "../art/palettes/hud/base.pal"
 hud_protan_pal:     .incbin "../art/palettes/hud/protan.pal"
 hud_tritan_pal:     .incbin "../art/palettes/hud/tritan.pal"
@@ -202,6 +173,9 @@ hud_hub_pal:
 ; ZETA DUMB NOTE: make sure this matches whatever assets we want the
 ; debug floor to draw from. Obviously we can't mix and match these XD
 .segment "LEVEL_DATA_ZONE_DEFS_0"
+
+zone_name_str_debug: .byte "Debug", D_CLOSE
+zone_sequence_str_debug: .byte "DBG", D_CLOSE
 
 zone_debug_1:
         .addr spawn_pool_grasslands_cave     ; Interior Spawn Pool

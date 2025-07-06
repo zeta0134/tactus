@@ -1,0 +1,63 @@
+; Given a position, displays the name of the last floor visited in the current run.
+; run. Really only meant for the gameover / victory screen, though
+; we may later repurpose it to point at historical data.
+.macro widget_short_floor_name_viewer tile_x, tile_y
+    .addr widget_short_floor_name_viewer::FAR_widget_short_floor_name_viewer_init
+    .byte <.bank(widget_short_floor_name_viewer::FAR_widget_short_floor_name_viewer_init)
+    .byte tile_x, tile_y
+    .byte 0, 0, 0, 0, 0, 0
+.endmacro
+
+.scope widget_short_floor_name_viewer
+
+.segment "CODE_UI_WIDGETS_1"
+
+.proc FAR_widget_short_floor_name_viewer_init
+NametableAddr := R0
+AttributeAddr := R2
+
+CurrentWidgetIndex := R20
+
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+
+; arguments to string drawing functions
+ComputedNametableAddr := T0
+ComputedAttributeAddr := T2
+TileX := T4
+TileY := T5
+StringPtr := T4
+
+
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        sta TileX
+        lda widget_tile_y, y
+        sta TileY
+        st16 ComputedNametableAddr, $5000
+        st16 ComputedAttributeAddr, $5800
+        far_call FAR_nametable_from_coordinates
+
+        access_data_bank PlayerZoneBank
+
+        ldy #ZoneDefinition::SequenceStr
+        lda (PlayerZonePtr), y
+        sta StringPtr+0
+        iny
+        lda (PlayerZonePtr), y
+        sta StringPtr+1
+        far_call FAR_draw_ui_string
+
+        restore_previous_bank
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y FAR_widget_short_floor_name_viewer_update
+        rts
+.endproc
+
+.proc FAR_widget_short_floor_name_viewer_update
+        ; Zzzz....
+        rts
+.endproc
+
+.endscope ; widget_numeric_viewer

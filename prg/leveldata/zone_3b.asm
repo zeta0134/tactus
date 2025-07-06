@@ -1,6 +1,11 @@
 ; Placeholder 3b
 
-zone_3b_name_str: .asciiz "Placeholder 3B"
+zone_3b_name_str: .byte "Placeholder 3B", D_CLOSE
+zone_sequence_str_3b_1: .byte "3-1", D_CLOSE
+zone_sequence_str_3b_2: .byte "3-2", D_CLOSE
+zone_sequence_str_3b_3: .byte "3-3", D_CLOSE
+zone_sequence_str_3b_4: .byte "3-4", D_CLOSE
+zone_sequence_str_3b_B: .byte "3-B", D_CLOSE
 
 zone_3b_banner_1:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -54,7 +59,7 @@ zone_3b_floor_1:
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
         .word zone_3b_name_str            ; NameStr
-        .word zone_sequence_str_3_1       ; SequenceStr
+        .word zone_sequence_str_3b_1       ; SequenceStr
         rng_index_for_zone 3, 1           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
         .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
@@ -135,7 +140,7 @@ zone_3b_floor_2:
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
         .word zone_3b_name_str            ; NameStr
-        .word zone_sequence_str_3_2       ; SequenceStr
+        .word zone_sequence_str_3b_2       ; SequenceStr
         rng_index_for_zone 3, 2           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
         .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
@@ -216,7 +221,7 @@ zone_3b_floor_3:
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
         .word zone_3b_name_str            ; NameStr
-        .word zone_sequence_str_3_3       ; SequenceStr
+        .word zone_sequence_str_3b_3       ; SequenceStr
         rng_index_for_zone 3, 3           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
         .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
@@ -297,7 +302,7 @@ zone_3b_floor_4:
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
         .word zone_3b_name_str            ; NameStr
-        .word zone_sequence_str_3_4       ; SequenceStr
+        .word zone_sequence_str_3b_4       ; SequenceStr
         rng_index_for_zone 3, 4           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
         .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
@@ -380,7 +385,7 @@ zone_3b_floor_boss:
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
         .word zone_3b_name_str            ; NameStr
-        .word zone_sequence_str_3_B       ; SequenceStr
+        .word zone_sequence_str_3b_B       ; SequenceStr
         rng_index_for_zone 3, 5           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
         .word empty_structure_set            ; StandardChestInteriorStructures

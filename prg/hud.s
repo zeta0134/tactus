@@ -98,12 +98,6 @@ chr_tile_offset SPELL_A_ENABLED,    2, 14
 chr_tile_offset SPELL_B_ENABLED,    2, 15
 chr_tile_offset SPELL_DISABLED_BL_CORNER, 1, 14
 
-chr_tile_offset UPGRADE_ICE,   0, 8
-chr_tile_offset UPGRADE_EARTH, 1, 8
-chr_tile_offset UPGRADE_AIR,   2, 8
-chr_tile_offset UPGRADE_FIRE,  3, 8
-chr_tile_offset UPGRADE_SLOT,  0, 9
-
 chr_tile_offset WARP_STATIC, 0, 12
 
 TILE_COL_OFFSET = 1

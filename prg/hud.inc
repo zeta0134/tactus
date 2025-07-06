@@ -76,3 +76,9 @@ chr_tile_offset EQUIPMENT_ITEM_3, 8, 14
 
 chr_tile_offset COIN_ICON, 0, 7
 chr_tile_offset COIN_X,    1, 7
+
+chr_tile_offset UPGRADE_ICE,   0, 8
+chr_tile_offset UPGRADE_EARTH, 1, 8
+chr_tile_offset UPGRADE_AIR,   2, 8
+chr_tile_offset UPGRADE_FIRE,  3, 8
+chr_tile_offset UPGRADE_SLOT,  0, 9

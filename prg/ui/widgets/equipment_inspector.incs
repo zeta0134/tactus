@@ -1,0 +1,228 @@
+; Eventually we want this to be more involved, so the player can move the cursor
+; around and see the in-game description for every item. That's a bit complicated
+; at the moment, so for now it just draws all of the equipment icons. They probably
+; aren't even all the right colors. XD
+.macro widget_equipment_inspector tile_x, tile_y
+    .addr widget_equipment_inspector::FAR_widget_equipment_inspector_init
+    .byte <.bank(widget_equipment_inspector::FAR_widget_equipment_inspector_init)
+    .byte tile_x, tile_y
+    .byte 0, 0, 0, 0, 0, 0
+.endmacro
+
+.scope widget_equipment_inspector
+
+.segment "CODE_UI_WIDGETS_1"
+
+
+.proc _draw_icon
+ItemId := R0
+DrawTile := R6
+DrawAttr := R7
+ItemPtr := R8
+
+NametableAddr := T0
+AttributeAddr := T2
+        
+
+        ; lookup the item ID to obtain its attributes
+        lda ItemId
+        asl
+        tay
+        lda item_table+0, y
+        sta ItemPtr+0
+        lda item_table+1, y
+        sta ItemPtr +1
+        ldy #ItemDef::HudBgTile
+        lda (ItemPtr), y
+        sta DrawTile
+        ldy #ItemDef::HudBgAttr
+        lda (ItemPtr), y
+        sta DrawAttr
+
+        ; Perform the draw
+perform_the_draw:
+        ldy #0
+
+        lda DrawTile
+        sta (NametableAddr), y
+        lda DrawAttr
+        sta (AttributeAddr), y
+        
+        inc DrawTile
+        iny
+
+        lda DrawTile
+        sta (NametableAddr), y
+        lda DrawAttr
+        sta (AttributeAddr), y
+
+        clc
+        lda DrawTile
+        adc #15
+        sta DrawTile
+
+        tya
+        clc
+        adc #31
+        tay
+
+        lda DrawTile
+        sta (NametableAddr), y
+        lda DrawAttr
+        sta (AttributeAddr), y
+
+        inc DrawTile
+        iny
+
+        lda DrawTile
+        sta (NametableAddr), y
+        lda DrawAttr
+        sta (AttributeAddr), y
+        
+        rts
+.endproc
+
+.proc _draw_weapon_upgrade_icon
+ItemId := R0
+DrawTile := R6
+DrawAttr := R7
+
+NametableAddr := T0
+AttributeAddr := T2
+        lda ItemId
+        cmp #ITEM_UPGRADE_EARTH
+        beq draw_earth_icon
+        cmp #ITEM_UPGRADE_ICE
+        beq draw_ice_icon
+        cmp #ITEM_UPGRADE_AIR
+        beq draw_air_icon
+        cmp #ITEM_UPGRADE_FIRE
+        beq draw_fire_icon
+handle_empty_slot:
+        lda current_save + SaveFile::PlayerEquipmentWeapon
+        cmp #ITEM_DAGGER
+        beq draw_blank_tile
+draw_empty_slot:
+        lda #UPGRADE_SLOT
+        sta DrawTile
+        lda #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        sta DrawAttr
+        jmp converge
+draw_blank_tile:
+        lda #BLANK_TILE
+        sta DrawTile
+        lda #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        sta DrawAttr
+        jmp converge
+draw_earth_icon:
+        lda #UPGRADE_EARTH
+        sta DrawTile
+        lda #(HUD_PURPLE_PAL | CHR_BANK_HUD)
+        sta DrawAttr
+        jmp converge
+draw_ice_icon:
+        lda #UPGRADE_ICE
+        sta DrawTile
+        lda #(HUD_TEXT_PAL | CHR_BANK_HUD)
+        sta DrawAttr
+        jmp converge
+draw_air_icon:
+        lda #UPGRADE_AIR
+        sta DrawTile
+        lda #(HUD_YELLOW_PAL | CHR_BANK_HUD)
+        sta DrawAttr
+        jmp converge
+draw_fire_icon:
+        lda #UPGRADE_FIRE
+        sta DrawTile
+        lda #(HUD_RED_PAL | CHR_BANK_HUD)
+        sta DrawAttr
+        jmp converge
+converge:
+        ldy #0
+        lda DrawTile
+        sta (NametableAddr), y
+        lda DrawAttr
+        sta (AttributeAddr), y
+        rts
+.endproc
+
+.proc FAR_widget_equipment_inspector_init
+ItemId := R0
+CurrentWidgetIndex := R20
+
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+
+; arguments to string drawing functions
+NametableAddr := T0
+AttributeAddr := T2
+TileX := T4
+TileY := T5
+
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        sta TileX
+        lda widget_tile_y, y
+        sta TileY
+        st16 NametableAddr, $5000
+        st16 AttributeAddr, $5800
+        far_call FAR_nametable_from_coordinates
+
+        access_data_bank #<.bank(item_table)
+
+        ; Upgrade icons first, to the left of the weapon slots
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot1
+        sta ItemId
+        jsr _draw_weapon_upgrade_icon
+        add16b NametableAddr, #32
+        add16b AttributeAddr, #32
+        lda current_save + SaveFile::PlayerWeaponUpgradeSlot2
+        sta ItemId
+        jsr _draw_weapon_upgrade_icon
+        sub16w NametableAddr, 31
+        sub16w AttributeAddr, 31
+
+        ; Now all 5 basic equipment slots
+        lda current_save + SaveFile::PlayerEquipmentWeapon
+        sta ItemId
+        jsr _draw_icon
+        add16b NametableAddr, #2
+        add16b AttributeAddr, #2
+        lda current_save + SaveFile::PlayerEquipmentTorch
+        sta ItemId
+        jsr _draw_icon
+        add16b NametableAddr, #2
+        add16b AttributeAddr, #2
+        lda current_save + SaveFile::PlayerEquipmentArmor
+        sta ItemId
+        jsr _draw_icon
+        add16b NametableAddr, #2
+        add16b AttributeAddr, #2
+        lda current_save + SaveFile::PlayerEquipmentBoots
+        sta ItemId
+        jsr _draw_icon
+        add16b NametableAddr, #2
+        add16b AttributeAddr, #2
+        lda current_save + SaveFile::PlayerEquipmentAccessory
+        sta ItemId
+        jsr _draw_icon
+        add16b NametableAddr, #2
+        add16b AttributeAddr, #2
+
+        ; TODO: figure out what we're doing about consumables.
+        ; They're mostly unimportant-ish?
+
+        restore_previous_bank
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y FAR_widget_equipment_inspector_update
+        rts
+.endproc
+
+.proc FAR_widget_equipment_inspector_update
+        ; Zzzz....
+        rts
+.endproc
+
+.endscope ; widget_numeric_viewer

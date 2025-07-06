@@ -1,5 +1,5 @@
-; Given a position, displays the final step counter for the current
-; run. Really only meant for the gameover / victory screen, though
+; Given a position, displays the total gold earned over the current run.
+; Really only meant for the gameover / victory screen, though
 ; we may later repurpose it to point at historical data.
 .macro widget_gold_earned_viewer tile_x, tile_y
     .addr widget_gold_earned_viewer::FAR_widget_gold_earned_viewer_init

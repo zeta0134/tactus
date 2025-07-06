@@ -1,6 +1,8 @@
 ; Placeholder 5s
 
-zone_5s_name_str: .asciiz "Placeholder 5S"
+zone_5s_name_str: .byte "Placeholder 5S", D_CLOSE
+zone_sequence_str_5s_1: .byte "5-1", D_CLOSE
+zone_sequence_str_5s_F: .byte "5-B", D_CLOSE
 
 zone_5s_banner_1:
         hud_banner_sprite SPRITE_000_BLANK_NOTHING, SPRITE_000_BLANK_NOTHING
@@ -54,7 +56,7 @@ zone_5s_floor_1:
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
         .word zone_5s_name_str            ; NameStr
-        .word zone_sequence_str_5_1       ; SequenceStr
+        .word zone_sequence_str_5s_1       ; SequenceStr
         rng_index_for_zone 5, 1           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
         .word standard_chest_structure_set_interior   ; StandardChestInteriorStructures
@@ -131,7 +133,7 @@ zone_5s_floor_boss:
         .addr blocking_warp_structure_set ;InteriorStructureWarpSet
         .addr blocking_warp_structure_set ;ExteriorStructureWarpSet
         .word zone_5s_name_str            ; NameStr
-        .word zone_sequence_str_5_F       ; SequenceStr
+        .word zone_sequence_str_5s_F       ; SequenceStr
         rng_index_for_zone 5, 2           ; RngIndex
         .byte ZONE_ONLOAD_NONE            ; OnLoadBehavior
         .word empty_structure_set            ; StandardChestInteriorStructures
