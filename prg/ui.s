@@ -100,6 +100,7 @@ empty_string: .asciiz ""
         .include "ui/widgets/gold_earned_viewer.incs"
         .include "ui/widgets/short_floor_name_viewer.incs"
         .include "ui/widgets/equipment_inspector.incs"
+        .include "ui/widgets/challenge_icons.incs"
 
         .include "ui/title_screen.incs"
         .include "ui/options_screen.incs"

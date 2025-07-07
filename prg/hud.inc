@@ -82,3 +82,13 @@ chr_tile_offset UPGRADE_EARTH, 1, 8
 chr_tile_offset UPGRADE_AIR,   2, 8
 chr_tile_offset UPGRADE_FIRE,  3, 8
 chr_tile_offset UPGRADE_SLOT,  0, 9
+
+chr_tile_offset CHALLENGE_LEFT_BORDER,       0, 10
+chr_tile_offset CHALLENGE_ICON_GLASS_HEART,  1, 10
+chr_tile_offset CHALLENGE_ICON_DAGGER,       3, 10
+chr_tile_offset CHALLENGE_ICON_SMALL_HEART,  5, 10
+chr_tile_offset CHALLENGE_ICON_FAST_FORWARD, 7, 10
+chr_tile_offset CHALLENGE_ICON_MONK_FACE,    9, 10
+chr_tile_offset CHALLENGE_ICON_RESERVED,    11, 10
+chr_tile_offset CHALLENGE_ICON_PAUSE,       13, 10
+chr_tile_offset CHALLENGE_RIGHT_BORDER,     15, 10

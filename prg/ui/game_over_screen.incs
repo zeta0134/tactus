@@ -17,20 +17,23 @@ game_over_ui_layout:
         widget_controller FAR_game_over_controller_init
         widget_text_label game_over_str,     11,  3
         
-        widget_text_label floor_reached_str,  4,  8
-        widget_short_floor_name_viewer       25,  8
+        widget_challenge_icons                    7 ; Y pos only, X is screen center
 
-        widget_text_label run_time_str,       4, 10
-        widget_run_time_viewer               18, 10
+        widget_text_label floor_reached_str,  4, 10
+        widget_short_floor_name_viewer       25, 10
 
-        widget_text_label steps_taken_str,    4, 12
-        widget_step_count_viewer             23, 12
+        widget_text_label run_time_str,       4, 12
+        widget_run_time_viewer               18, 12
 
-        widget_text_label gold_earned_str,    4, 14
-        widget_gold_earned_viewer            23, 14
+        widget_text_label steps_taken_str,    4, 14
+        widget_step_count_viewer             23, 14
 
-        widget_text_label carrying_str,       4, 16
-        widget_equipment_inspector           17, 16
+        widget_text_label gold_earned_str,    4, 16
+        widget_gold_earned_viewer            23, 16
+
+        widget_text_label carrying_str,       4, 18
+        widget_equipment_inspector           17, 18
+
 
         .addr $0000 ; end of list
 

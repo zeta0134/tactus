@@ -1,0 +1,251 @@
+; Eventually we want this to be more involved, so the player can move the cursor
+; around and see the in-game description for every item. That's a bit complicated
+; at the moment, so for now it just draws all of the equipment icons. They probably
+; aren't even all the right colors. XD
+.macro widget_challenge_icons tile_y
+    .addr widget_challenge_icons::FAR_widget_challenge_icons_init
+    .byte <.bank(widget_challenge_icons::FAR_widget_challenge_icons_init)
+    .byte 0, tile_y
+    .byte 0, 0, 0, 0, 0, 0
+.endmacro
+
+.scope widget_challenge_icons
+
+.segment "CODE_UI_WIDGETS_1"
+
+.proc _compute_x_position
+CurrentWidgetIndex := R20
+
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_challenge_icon_count := widgets_data2
+        ldx CurrentWidgetIndex
+
+        ; Based on the number of challenge icons we will draw, center our starting X
+        ; position for drawing automatically
+        lda current_save + SaveFile::OptionRhythmMode
+        cmp #GAME_MODE_STANDARD
+        beq no_rhythm_mode
+        inc widget_challenge_icon_count, x
+no_rhythm_mode:
+
+        lda current_save + SaveFile::RunFlags
+        and #RUN_FLAGS_GLASS_HEARTS
+        beq no_glass_hearts
+        inc widget_challenge_icon_count, x
+no_glass_hearts:
+
+        lda current_save + SaveFile::RunFlags
+        and #RUN_FLAGS_LOW_HEALTH
+        beq no_low_health
+        inc widget_challenge_icon_count, x
+no_low_health:
+
+        lda current_save + SaveFile::RunFlags
+        and #RUN_FLAGS_NO_GOLD
+        beq no_vow_of_poverty
+        inc widget_challenge_icon_count, x
+no_vow_of_poverty:
+
+        lda current_save + SaveFile::RunFlags
+        and #RUN_FLAGS_DAGGER_ONLY
+        beq no_dagger_only
+        inc widget_challenge_icon_count, x
+no_dagger_only:
+
+        lda #15 ; account for the left border, if we end up drawing at all
+        sec
+        sbc widget_challenge_icon_count, x
+        sta widget_tile_x, x
+        rts
+.endproc
+
+.proc _draw_left_border_here
+NametableAddr := T0
+AttributeAddr := T2
+
+        ldy #0
+        lda #CHALLENGE_LEFT_BORDER
+        sta (NametableAddr), y
+        lda #(CHR_BANK_HUD | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+
+        ldy #32
+        lda #(CHALLENGE_LEFT_BORDER+16)
+        sta (NametableAddr), y
+        lda #(CHR_BANK_HUD | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+
+        rts
+.endproc
+
+.proc _draw_right_border_here
+NametableAddr := T0
+AttributeAddr := T2
+
+        ldy #0
+        lda #CHALLENGE_RIGHT_BORDER
+        sta (NametableAddr), y
+        lda #(CHR_BANK_HUD | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+
+        ldy #32
+        lda #(CHALLENGE_RIGHT_BORDER+16)
+        sta (NametableAddr), y
+        lda #(CHR_BANK_HUD | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+
+        rts
+.endproc
+
+.proc _draw_icon_here
+IconTileId := R0
+NametableAddr := T0
+AttributeAddr := T2
+        ldy #0
+        lda IconTileId
+        sta (NametableAddr), y
+        lda #(CHR_BANK_HUD | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+
+        ldy #1
+        lda IconTileId
+        clc
+        adc #1
+        sta (NametableAddr), y
+        lda #(CHR_BANK_HUD | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+
+        ldy #32
+        lda IconTileId
+        clc
+        adc #16
+        sta (NametableAddr), y
+        lda #(CHR_BANK_HUD | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+
+        ldy #33
+        lda IconTileId
+        clc
+        adc #17
+        sta (NametableAddr), y
+        lda #(CHR_BANK_HUD | UI_STRING_PAL_WHITE)
+        sta (AttributeAddr), y
+
+        rts
+.endproc
+
+.proc FAR_widget_challenge_icons_init
+IconTileId := R0
+CurrentWidgetIndex := R20
+
+widget_tile_x := widgets_data0
+widget_tile_y := widgets_data1
+widget_challenge_icon_count := widgets_data2
+
+; arguments to string drawing functions
+NametableAddr := T0
+AttributeAddr := T2
+TileX := T4
+TileY := T5
+
+        jsr _compute_x_position
+        ldx CurrentWidgetIndex
+        lda widget_challenge_icon_count, x
+        bne perform_draw
+nothing_to_do:
+        ldy CurrentWidgetIndex
+        set_widget_state_y FAR_widget_challenge_icons_update
+        rts
+
+perform_draw:
+        ldy CurrentWidgetIndex
+        lda widget_tile_x, y
+        sta TileX
+        lda widget_tile_y, y
+        sta TileY
+        st16 NametableAddr, $5000
+        st16 AttributeAddr, $5800
+        far_call FAR_nametable_from_coordinates
+
+        ; Always draw the left border unconditionally
+        jsr _draw_left_border_here
+        add16b NametableAddr, #1
+        add16b AttributeAddr, #1
+
+        ; Each individual icon is conditional on whether that challenge mode is enabled, so do all
+        ; of those checks
+        lda current_save + SaveFile::OptionRhythmMode
+        cmp #GAME_MODE_DOUBLETIME
+        beq no_doubletime
+        lda #CHALLENGE_ICON_FAST_FORWARD
+        sta IconTileId
+        jsr _draw_icon_here
+        add16b NametableAddr, #2
+        add16b AttributeAddr, #2
+no_doubletime:
+
+        lda current_save + SaveFile::OptionRhythmMode
+        cmp #GAME_MODE_PATIENT
+        beq no_patient
+        lda #CHALLENGE_ICON_PAUSE
+        sta IconTileId
+        jsr _draw_icon_here
+        add16b NametableAddr, #2
+        add16b AttributeAddr, #2
+no_patient:
+
+        lda current_save + SaveFile::RunFlags
+        and #RUN_FLAGS_GLASS_HEARTS
+        beq no_glass_heart
+        lda #CHALLENGE_ICON_GLASS_HEART
+        sta IconTileId
+        jsr _draw_icon_here
+        add16b NametableAddr, #2
+        add16b AttributeAddr, #2
+no_glass_heart:
+
+        lda current_save + SaveFile::RunFlags
+        and #RUN_FLAGS_LOW_HEALTH
+        beq no_low_health
+        lda #CHALLENGE_ICON_SMALL_HEART
+        sta IconTileId
+        jsr _draw_icon_here
+        add16b NametableAddr, #2
+        add16b AttributeAddr, #2
+no_low_health:
+
+        lda current_save + SaveFile::RunFlags
+        and #RUN_FLAGS_NO_GOLD
+        beq no_vow_of_poverty
+        lda #CHALLENGE_ICON_MONK_FACE
+        sta IconTileId
+        jsr _draw_icon_here
+        add16b NametableAddr, #2
+        add16b AttributeAddr, #2
+no_vow_of_poverty:
+
+        lda current_save + SaveFile::RunFlags
+        and #RUN_FLAGS_DAGGER_ONLY
+        beq no_dagger_only
+        lda #CHALLENGE_ICON_DAGGER
+        sta IconTileId
+        jsr _draw_icon_here
+        add16b NametableAddr, #2
+        add16b AttributeAddr, #2
+no_dagger_only:
+
+        ; Finally, unconditionally draw the right border, and we're done
+        jsr _draw_right_border_here
+
+        ldy CurrentWidgetIndex
+        set_widget_state_y FAR_widget_challenge_icons_update
+        rts
+.endproc
+
+.proc FAR_widget_challenge_icons_update
+        ; Zzzz....
+        rts
+.endproc
+
+.endscope ; widget_numeric_viewer

@@ -23,7 +23,7 @@ TACTUS_SAVE_VERSION_NUMBER = 2
     PlayerNameFont  .byte 16 ; bank ID (no palette info) for the font to use for EACH tile.
     ; GAME STATE
     EnemiesEncounteredFlags .byte 32
-    ItemsDiscoveredFlags .byte 32  
+    ItemsDiscoveredFlags .byte 32
     ; PLAYER PERSONALIZATION PREFERENCES
     PlayerPalettePreset .byte
     PlayerPalettePhonesIndex .byte
@@ -93,6 +93,10 @@ TACTUS_SAVE_VERSION_NUMBER = 2
 RUN_FLAGS_FIXED_SEED   = %10000000 ; TODO: make an interface to set the seed
 RUN_FLAGS_GLASS_HEARTS = %01000000 ; TODO: make this selectable
 RUN_FLAGS_SINGLE_ZONE  = %00100000 ; TODO: when set, return to the HUD after bosses
+RUN_FLAGS_LOW_HEALTH   = %00010000 ; TODO: respect this!
+RUN_FLAGS_NO_GOLD      = %00001000 ; TODO: respect this!
+RUN_FLAGS_DAGGER_ONLY  = %00000100 ; TODO: respect this!
+RUN_FLAGS_RESERVED     = %00000010 ; TODO: if we come up with another challenge type, put this here
 RUN_FLAGS_SUSPENDED    = %00000001 ; TODO: when this save file is selected, restore this run (and clear the flag!)
 
 PLAYER_NAME_FIELD_LENGTH = 16
